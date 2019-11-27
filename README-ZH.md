@@ -1,5 +1,9 @@
-DataSphere Studio
+![DSS](images/en_US/readme/DSS.png)
 ====
+
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+[English](README.md) | 中文
 
 ## 引言
 
@@ -19,7 +23,7 @@ DataSphere Studio定位为数据应用开发门户，闭环涵盖数据应用开
 
 DSS主要特点：
 
-- 一站式、全流程的应用开发管理界面
+### 一站式、全流程的应用开发管理界面
 
 &nbsp; &nbsp; &nbsp; &nbsp;DSS集成度极高，目前已集成的系统有：
  
@@ -33,7 +37,7 @@ DSS主要特点：
  
 ![DSS一站式](images/zh_CN/readme/onestop.gif) 
 
-- 基于Linkis计算中间件，打造独有的AppJoint设计理念
+### 基于Linkis计算中间件，打造独有的AppJoint设计理念
 
  &nbsp; &nbsp; &nbsp; &nbsp;AppJoint——应用关节，定义了一套统一的前后台接入规范，可让外部数据应用系统快速简单地接入，成为DSS数据应用开发中的一环。
 
@@ -41,9 +45,11 @@ DSS主要特点：
 
  &nbsp; &nbsp; &nbsp; &nbsp;由于AppJoint对接了Linkis，外部数据应用系统因此具备了资源管控、并发限流、用户资源管理等能力，且允许上下文信息跨系统级共享，彻底告别应用孤岛。
 
-- 以Project为单位，组织和管理各数据应用系统的业务应用，定义了一套跨数据应用系统的项目协同开发通用标准。
+### Project级管理单元
 
-- 已集成的数据应用组件
+ &nbsp; &nbsp; &nbsp; &nbsp;以Project为管理单元，组织和管理各数据应用系统的业务应用，定义了一套跨数据应用系统的项目协同开发通用标准。
+
+### 已集成的数据应用组件
 
  &nbsp; &nbsp; &nbsp; &nbsp;1、DSS的调度能力——Azkaban AppJoint
 
@@ -108,25 +114,25 @@ DSS主要特点：
 
 ## 与类似系统对比
 
-DSS是一个引领数据应用开发管理方向的开源项目，开源社区目前尚没有同类产品。
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS是一个引领数据应用开发管理方向的开源项目，开源社区目前尚没有同类产品。
 
 ## 使用场景
 
-DataSphere Studio适用于以下场景：
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphere Studio适用于以下场景：
 
-1. 正在筹建或初步具备大数据平台能力，但无任何数据应用工具的场景。
+ &nbsp; &nbsp; &nbsp; &nbsp;1. 正在筹建或初步具备大数据平台能力，但无任何数据应用工具的场景。
 
-2. 已具备大数据基础平台能力，且仅有少数数据应用工具的场景。
+ &nbsp; &nbsp; &nbsp; &nbsp;2. 已具备大数据基础平台能力，且仅有少数数据应用工具的场景。
 
-3. 已具备大数据基础平台能力，且拥有全部数据应用工具，但工具间尚未打通，用户使用隔离感强、学习成本高的场景。
+ &nbsp; &nbsp; &nbsp; &nbsp;3. 已具备大数据基础平台能力，且拥有全部数据应用工具，但工具间尚未打通，用户使用隔离感强、学习成本高的场景。
 
-4. 已具备大数据基础平台能力，且拥有全部数据应用工具，部分工具已实现对接，但尚未定义统一规范的场景。
+ &nbsp; &nbsp; &nbsp; &nbsp;4. 已具备大数据基础平台能力，且拥有全部数据应用工具，部分工具已实现对接，但尚未定义统一规范的场景。
 
 ## Demo试用环境
 
-[点我进入](https://sandbox.webank.com/wds/dss/#) Demo试用环境
+ &nbsp; &nbsp; &nbsp; &nbsp;[点我进入](https://sandbox.webank.com/wds/dss/#) Demo试用环境
 
-用户/密码: bdp/Abcd1234
+ &nbsp; &nbsp; &nbsp; &nbsp;用户/密码: bdp/Abcd1234
 
 ## 快速安装使用
 
@@ -143,6 +149,8 @@ DataSphere Studio适用于以下场景：
 [用户手册]()
 
 [外部系统快速接入DSS]()
+
+更多文档，敬请期待！
 
 ## 交流贡献
 

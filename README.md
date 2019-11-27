@@ -1,5 +1,9 @@
-DataSphere Studio
+![DSS](images/en_US/readme/DSS.png)
 ====
+
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+English | [中文](README-ZH.md)
 
 ## Introduction
 
@@ -17,7 +21,7 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
 
 ## Core features
 
-- One-stop, full-process application development management UI
+### One-stop, full-process application development management UI
 
 &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated systems include:
  
@@ -31,7 +35,7 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
  
 ![DSS one-stop video](images/en_US/readme/onestop.gif) 
 
-- AppJoint, based on Linkis，defines a unique design concept
+### AppJoint, based on Linkis，defines a unique design concept
 
  &nbsp; &nbsp; &nbsp; &nbsp;AppJoint——application joint, defining unified front-end and back-end 
                             integration specifications, can quickly and easily integrate with external data application systems, 
@@ -41,11 +45,13 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
 
  &nbsp; &nbsp; &nbsp; &nbsp;Since AppJoint is integrated with Linkis, the external data application system shares the capabilities of resource management, concurrent limiting, and high performance. AppJoint also allows sharable context across system level and completely gets away from application silos.
 
-- With Project as the management unit, DSS organizes and manages the business applications of each data application system, and defines a set of common standards for collaborative development of projects across data application systems.
+### Project, as the management unit
 
-- Integrated data application components
+ &nbsp; &nbsp; &nbsp; &nbsp;With Project as the management unit, DSS organizes and manages the business applications of each data application system, and defines a set of common standards for collaborative development of projects across data application systems.
 
- &nbsp; &nbsp; &nbsp; &nbsp;1. Azkaban AppJoint —— Batch workflow job scheduler
+### Integrated data application components
+
+ &nbsp; &nbsp;&nbsp; &nbsp;1. Azkaban AppJoint —— Batch workflow job scheduler
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;MMany data applications developed by users usually require periodic scheduling capability.
                                                  
@@ -57,7 +63,7 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
                                                  
 ![Azkaban](images/en_US/readme/Azkaban_AppJoint.gif)
 
- &nbsp; &nbsp; &nbsp; &nbsp;2. Scriptis AppJoint —— Data Development IDE Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;2. Scriptis AppJoint —— Data Development IDE Tool
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Scriptis](https://github.com/WeBankFinTech/Scriptis)?
                                                  
@@ -69,7 +75,7 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
                                                 
 ![Scriptis](images/en_US/readme/Scriptis_AppJoint.gif)
 
- &nbsp; &nbsp; &nbsp; &nbsp;3. Visualis AppJoint —— Data Visualization Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;3. Visualis AppJoint —— Data Visualization Tool
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Visualis](https://github.com/WeBankFinTech/Visualis)?
                                                  
@@ -79,19 +85,19 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
                                                 
 ![Visualis](images/en_US/readme/Visualis_AppJoint.gif)
 
- &nbsp; &nbsp; &nbsp; &nbsp;4. Data Sender——Sender AppJoint
+ &nbsp; &nbsp;&nbsp; &nbsp;4. Data Sender——Sender AppJoint
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sender AppJoint provides data delivery capability for DSS. Currently it supports the SendEmail node type, and the result sets of all other nodes can be sent via email.
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;For example, the SendEmail node can directly send the screen shot of a display as an email.
 
- &nbsp; &nbsp; &nbsp; &nbsp;5. Qualitis AppJoint —— Data quality management Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;5. Qualitis AppJoint —— Data quality management Tool
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Qualitis AppJoint integrates data quality verification capabilities for DSS, allows Qualitis as a node in DSS workflow
                                                 
 ![Qualitis](images/en_US/readme/Qualitis_AppJoint.gif)
   
- &nbsp; &nbsp; &nbsp; &nbsp;6. Signal AppJoint —— Signal Nodes
+ &nbsp; &nbsp;&nbsp; &nbsp;6. Signal AppJoint —— Signal Nodes
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signal AppJoint is used to strengthen the correlation between business and process while keeping them decoupled.
                                                 
@@ -101,32 +107,32 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;EventReceiver: Receive nodes for messages across workflows and projects.
    
- &nbsp; &nbsp; &nbsp; &nbsp;7. Function node
+ &nbsp; &nbsp;&nbsp; &nbsp;7. Function node
    
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Empty nodes, sub workflow nodes.
 
 ##  Compared with similar systems
 
-DSS is an open source project leading the direction of data application development and management.
+ &nbsp; &nbsp;&nbsp; &nbsp;DSS is an open source project leading the direction of data application development and management.
  The open source community currently does not have similar products.
 
 ## Usage Scenarios
 
-DataSphere Studio is suitable for the following scenarios:
+ &nbsp; &nbsp;&nbsp; &nbsp;DataSphere Studio is suitable for the following scenarios:
 
-1. Scenarios in which a big data platform capability is being prepared or initialized but no data application tools are available.
+ &nbsp; &nbsp;&nbsp; &nbsp;1. Scenarios in which a big data platform capability is being prepared or initialized but no data application tools are available.
 
-2. Scenarios in which users already have big data foundation platform capabilities but with only a few data application tools.
+ &nbsp; &nbsp;&nbsp; &nbsp;2. Scenarios in which users already have big data foundation platform capabilities but with only a few data application tools.
 
-3. Scenarios in which users has the ability of big data foundation platform and comprehensive data application tools, but suffers strong isolation and and high learning costs because those tools have not been integrated together.
+ &nbsp; &nbsp;&nbsp; &nbsp;3. Scenarios in which users has the ability of big data foundation platform and comprehensive data application tools, but suffers strong isolation and and high learning costs because those tools have not been integrated together.
 
-4. Scenarios in which users has the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
+ &nbsp; &nbsp;&nbsp; &nbsp;4. Scenarios in which users has the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
 
 ## Demo environment
 
-[click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
+ &nbsp; &nbsp;&nbsp; &nbsp;[click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
 
-User/Password: bdp/Abcd1234
+ &nbsp; &nbsp;&nbsp; &nbsp;User/Password: bdp/Abcd1234
 
 ## Quick start
 

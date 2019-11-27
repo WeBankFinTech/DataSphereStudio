@@ -17,25 +17,27 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
 
 ## UI preview
 
-![DSS-V1.0 Video](images/zh_CN/readme/DataSphere%20Studio%20Demo%20v1.1.mp4)
+Please be patient, it will take some time to load gif.
+
+![DSS-V1.0 GIF](images/en_US/readme/DSS_gif.gif)
 
 ## Core features
 
-### One-stop, full-process application development management UI
+### 1. One-stop, full-process application development management UI
 
 &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated systems include:
  
- &nbsp; &nbsp; &nbsp; &nbsp;1. [Scriptis](https://github.com/WeBankFinTech/Scriptis) - Data Development IDE Tool.
+ &nbsp; &nbsp; &nbsp; &nbsp;a. [Scriptis](https://github.com/WeBankFinTech/Scriptis) - Data Development IDE Tool.
  
- &nbsp; &nbsp; &nbsp; &nbsp;2. [Visualis](https://github.com/WeBankFinTech/Visualis) - Data Visualization Tool(Based on the open source project [Davinci](https://github.com/edp963/davinci) contributed by CreditEase)
+ &nbsp; &nbsp; &nbsp; &nbsp;b. [Visualis](https://github.com/WeBankFinTech/Visualis) - Data Visualization Tool(Based on the open source project [Davinci](https://github.com/edp963/davinci) contributed by CreditEase)
  
- &nbsp; &nbsp; &nbsp; &nbsp;3. [Qualitis](https://github.com/WeBankFinTech/Qualitis) - Data Quality Management Tool
+ &nbsp; &nbsp; &nbsp; &nbsp;c. [Qualitis](https://github.com/WeBankFinTech/Qualitis) - Data Quality Management Tool
  
- &nbsp; &nbsp; &nbsp; &nbsp;4. [Azkaban](https://azkaban.github.io/) - Batch workflow job scheduler
+ &nbsp; &nbsp; &nbsp; &nbsp;d. [Azkaban](https://azkaban.github.io/) - Batch workflow job scheduler
  
 ![DSS one-stop video](images/en_US/readme/onestop.gif) 
 
-### AppJoint, based on Linkis，defines a unique design concept
+### 2. AppJoint, based on Linkis，defines a unique design concept
 
  &nbsp; &nbsp; &nbsp; &nbsp;AppJoint——application joint, defining unified front-end and back-end 
                             integration specifications, can quickly and easily integrate with external data application systems, 
@@ -45,71 +47,71 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
 
  &nbsp; &nbsp; &nbsp; &nbsp;Since AppJoint is integrated with Linkis, the external data application system shares the capabilities of resource management, concurrent limiting, and high performance. AppJoint also allows sharable context across system level and completely gets away from application silos.
 
-### Project, as the management unit
+### 3. Project, as the management unit
 
  &nbsp; &nbsp; &nbsp; &nbsp;With Project as the management unit, DSS organizes and manages the business applications of each data application system, and defines a set of common standards for collaborative development of projects across data application systems.
 
-### Integrated data application components
+### 4. Integrated data application components
 
- &nbsp; &nbsp;&nbsp; &nbsp;1. Azkaban AppJoint —— Batch workflow job scheduler
+ &nbsp; &nbsp;&nbsp; &nbsp;a. Azkaban AppJoint —— Batch workflow job scheduler
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;MMany data applications developed by users usually require periodic scheduling capability.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Many data applications developed by users usually require periodic scheduling capability.
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;At present, the open source scheduling system in the community is pretty unfriendly to integrate with other data application systems.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;At present, the open source scheduling system in the community is pretty unfriendly to integrate with other data application systems.
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS implements Azkaban AppJoint, which allows users to publish DSS workflows to Azkaban for regular scheduling.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS implements Azkaban AppJoint, which allows users to publish DSS workflows to Azkaban for regular scheduling.
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS also defines standard and generic workflow parsing and publishing specifications for scheduling systems, allowing other scheduling systems to easily achieve low-cost integration with DSS.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS also defines standard and generic workflow parsing and publishing specifications for scheduling systems, allowing other scheduling systems to easily achieve low-cost integration with DSS.
                                                  
 ![Azkaban](images/en_US/readme/Azkaban_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;2. Scriptis AppJoint —— Data Development IDE Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;b. Scriptis AppJoint —— Data Development IDE Tool
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Scriptis](https://github.com/WeBankFinTech/Scriptis)?
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Scriptis](https://github.com/WeBankFinTech/Scriptis)?
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis is for interactive data analysis with script development(SQL, Pyspark, HiveQL), task submission(Spark, Hive), UDF, function, resource management and intelligent diagnosis.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis is for interactive data analysis with script development(SQL, Pyspark, HiveQL), task submission(Spark, Hive), UDF, function, resource management and intelligent diagnosis.
                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis AppJoint integrates the data development capabilities of Scriptis to DSS, and allows various script types of Scriptis to serve as nodes in the DSS workflow to participate in the application development process.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis AppJoint integrates the data development capabilities of Scriptis to DSS, and allows various script types of Scriptis to serve as nodes in the DSS workflow to participate in the application development process.
                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Currently supports HiveSQL, SparkSQL, Pyspark, Scala and other script node types.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Currently supports HiveSQL, SparkSQL, Pyspark, Scala and other script node types.
                                                 
 ![Scriptis](images/en_US/readme/Scriptis_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;3. Visualis AppJoint —— Data Visualization Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;c. Visualis AppJoint —— Data Visualization Tool
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Visualis](https://github.com/WeBankFinTech/Visualis)?
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Visualis](https://github.com/WeBankFinTech/Visualis)?
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis is a BI tool for data visualization. It provides financial-grade data visualization capabilities on the basis of data security and permissions, based on the open source project Davinci contributed by CreditEase.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis is a BI tool for data visualization. It provides financial-grade data visualization capabilities on the basis of data security and permissions, based on the open source project Davinci contributed by CreditEase.
                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis AppJoint integrates data visualization capabilities to DSS, and allows displays and dashboards, as nodes of DSS workflows, to be associated with upstream data market.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis AppJoint integrates data visualization capabilities to DSS, and allows displays and dashboards, as nodes of DSS workflows, to be associated with upstream data market.
                                                 
 ![Visualis](images/en_US/readme/Visualis_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;4. Data Sender——Sender AppJoint
+ &nbsp; &nbsp;&nbsp; &nbsp;d. Qualitis AppJoint —— Data quality management Tool
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sender AppJoint provides data delivery capability for DSS. Currently it supports the SendEmail node type, and the result sets of all other nodes can be sent via email.
-                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;For example, the SendEmail node can directly send the screen shot of a display as an email.
-
- &nbsp; &nbsp;&nbsp; &nbsp;5. Qualitis AppJoint —— Data quality management Tool
-
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Qualitis AppJoint integrates data quality verification capabilities for DSS, allows Qualitis as a node in DSS workflow
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Qualitis AppJoint integrates data quality verification capabilities for DSS, allows Qualitis as a node in DSS workflow
                                                 
 ![Qualitis](images/en_US/readme/Qualitis_AppJoint.gif)
-  
- &nbsp; &nbsp;&nbsp; &nbsp;6. Signal AppJoint —— Signal Nodes
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signal AppJoint is used to strengthen the correlation between business and process while keeping them decoupled.
-                                                
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DataChecker Node：Checks whether a table or partition exists.
-                                                    
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;EventSender Node: Messaging nodes across workflows and projects.
+ &nbsp; &nbsp;&nbsp; &nbsp;e. Data Sender——Sender AppJoint
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sender AppJoint provides data delivery capability for DSS. Currently it supports the SendEmail node type, and the result sets of all other nodes can be sent via email.
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;EventReceiver: Receive nodes for messages across workflows and projects.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;For example, the SendEmail node can directly send the screen shot of a display as an email.  
+
+ &nbsp; &nbsp;&nbsp; &nbsp;f. Signal AppJoint —— Signal Nodes
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signal AppJoint is used to strengthen the correlation between business and process while keeping them decoupled.
+                                                
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DataChecker Node：Checks whether a table or partition exists.
+                                                    
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;EventSender Node: Messaging nodes across workflows and projects.
+                                                 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;EventReceiver: Receive nodes for messages across workflows and projects.
    
- &nbsp; &nbsp;&nbsp; &nbsp;7. Function node
+ &nbsp; &nbsp;&nbsp; &nbsp;g. Function node
    
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Empty nodes, sub workflow nodes.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Empty nodes, sub workflow nodes.
 
 ##  Compared with similar systems
 
@@ -120,17 +122,17 @@ With the connection, reusability, and simplification capabilities of Linkis, DSS
 
  &nbsp; &nbsp;&nbsp; &nbsp;DataSphere Studio is suitable for the following scenarios:
 
- &nbsp; &nbsp;&nbsp; &nbsp;1. Scenarios in which a big data platform capability is being prepared or initialized but no data application tools are available.
+ &nbsp; &nbsp;&nbsp; &nbsp;1. Scenarios in which big data platform capability is being prepared or initialized but no data application tools are available.
 
  &nbsp; &nbsp;&nbsp; &nbsp;2. Scenarios in which users already have big data foundation platform capabilities but with only a few data application tools.
 
- &nbsp; &nbsp;&nbsp; &nbsp;3. Scenarios in which users has the ability of big data foundation platform and comprehensive data application tools, but suffers strong isolation and and high learning costs because those tools have not been integrated together.
+ &nbsp; &nbsp;&nbsp; &nbsp;3. Scenarios in which users have the ability of big data foundation platform and comprehensive data application tools, but suffers strong isolation and and high learning costs because those tools have not been integrated together.
 
- &nbsp; &nbsp;&nbsp; &nbsp;4. Scenarios in which users has the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
+ &nbsp; &nbsp;&nbsp; &nbsp;4. Scenarios in which users have the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
 
 ## Demo environment
 
- &nbsp; &nbsp;&nbsp; &nbsp;[click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
+ &nbsp; &nbsp;&nbsp; &nbsp;[Click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
 
  &nbsp; &nbsp;&nbsp; &nbsp;User/Password: bdp/Abcd1234
 

@@ -4,10 +4,10 @@
 ![functions](/images/zh_CN/charpter3/manual/functions.png)
 
 - 工作流服务——Workflow: 支持工作流的托拉拽生成，支持实时执行，支持发布到调度服务
-- 数据研发———Scriptis：为DSS集成数据开发能力，支持各类型脚本语言的在线开发,详细介绍请点击[Scriptis使用手册]()
-- 数据可视化——Visualis: 提供可视化能力，允许数据大屏和仪表盘作为DSS应用开发节点，详细介绍请点击[Visualis使用手册]()；
+- 数据研发———Scriptis：为DSS集成数据开发能力，支持各类型脚本语言的在线开发,详细介绍请点击[Scriptis使用手册](https://github.com/WeBankFinTech/Scriptis/blob/master/docs/zh_CN/ch4/Scriptis%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.md)
+- 数据可视化——Visualis: 提供可视化能力，允许数据大屏和仪表盘作为DSS应用开发节点，详细介绍请点击[Visualis使用手册](https://github.com/WeBankFinTech/Visualis)；
 - 数据发送——SendEmail: 为DSS集成数据发送能力，支持table，DashBoard，文本等的发送；
-- 数据质量——Qualitis： 为DSS集成数据校验能力，将数据质量系统集成到DSS工作流开发中，对数据完整性、正确性等进行校验[Qualitis使用手册]()；
+- 数据质量——Qualitis： 为DSS集成数据校验能力，将数据质量系统集成到DSS工作流开发中，对数据完整性、正确性等进行校验[Qualitis使用手册](https://github.com/WeBankFinTech/Qualitis/blob/master/docs/zh_CN/ch1/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md)；
 - 信号节点：事件节点（发送和接收），用于信号的传递，需要配对使用。DataChecker:用于检查Hive中的表是否准备好，如果准备后则开始执行下面的流程；
 - 功能节点：连接节点（空节点），用于做连接用，子工作流，用于工作流嵌套。
 
@@ -165,7 +165,7 @@ msg.body=${msg.mycontent}
 
 7. msg.savekey: 用于保存消息内容key值，单个flow内多个接收job，需指定不同的msg.savekey保存消息内容，默认值为msg.body，后续Job可以使用该key值获取消息内容。
 
-8. msg.rece.today: 如果为true 有且只能接收job启动当天发来的消息
+8. only.receive.today: 如果为true 有且只能接收job启动当天发来的消息
 
 9. **注意：msg.type默认不可变为RECEIVE，msg.receiver、msg.topic、msg.name是必填。**
 ```
@@ -185,7 +185,7 @@ dataCheck支持如下参数：
 ```
 1. source.type: 依赖的数据来源，job表示是由其他job产生
 
-2. data.object: 依赖数据的名称例如：data.object.1=dbname.tablename{partitionlist}
+2. check.object: 依赖数据的名称例如：data.object.1=dbname.tablename{partitionlist}
 
 3. max.check.hours: 描述任务的等待时间，单位是小时
 

@@ -81,11 +81,17 @@ Visualis接入的DSS系统的步骤如下:
 | support_jump  | 是否支持跳转页面  |  1表示支持，0表示不支持 |
 | enable_copy  | 是否支持复制该节点  |  1表示支持，0表示不支持 |
 | jump_url  | 双击工作流节点跳转的url  | 如 http://127.0.0.1:8080  |
+<br>
 表3-2 dss_workflow_node表
+
 ![dss_application表示例](/images/zh_CN/chapter4/dss_application.png)<br>
+
 图3-1 dss_application表示例图
+
 ![dss_application表示例](/images/zh_CN/chapter4/dss_workflow_node.png)<br>
+
 图3-2 dss_workflow_node表示例图
+
 图3-1以及图3-2是visualis中插入dss_application表和dss_workflow_node 两个表中的测试数据。您可以将您系统需要指定的参数插入到对应的表中
 
 **3.6.前端的修改**

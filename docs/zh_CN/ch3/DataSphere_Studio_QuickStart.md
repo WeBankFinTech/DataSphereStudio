@@ -33,4 +33,4 @@ __注意：__ 如果要支持多用户登录，DSS的用户登录依赖Linkis，
 运行：
 ![quick_start06](/images/zh_CN/charpter3/quickstart/quick_start06.png)
 
-详细的使用手册建：[使用手册文档]()
+详细的使用手册建：[使用手册文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)

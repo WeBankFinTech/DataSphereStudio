@@ -1,7 +1,7 @@
 ## 1 功能简介
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS作为一站式数据应用开发门户，定位为闭环涵盖数据应用的全流程，满足从数据ETL、数据研发、可视化展现、数据治理、数据输出到工作流调度的数据应用全生命周期开发场景,现已经开源的组件包括如下图所示：
 
-![functions](/images/zh_CN/charpter3/manual/functions.png)
+![functions](/images/zh_CN/chapter3/manual/functions.png)
 
 - 工作流服务——Workflow: 支持工作流的托拉拽生成，支持实时执行，支持发布到调度服务
 - 数据研发———Scriptis：为DSS集成数据开发能力，支持各类型脚本语言的在线开发,详细介绍请点击[Scriptis使用手册](https://github.com/WeBankFinTech/Scriptis/blob/master/docs/zh_CN/ch4/Scriptis%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.md)
@@ -17,11 +17,11 @@
 ### 2.1 已经集成组件展示：
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首页对DSS集成的组件的全流程进行了展示和示意，其中每个组件的展示都支持直接跳转到对应的服务：
 
-![components](/images/zh_CN/charpter3/manual/components.png)
+![components](/images/zh_CN/chapter3/manual/components.png)
 
 如点击Scriptis图标会跳转到数据开发组件Scriptis的首页：
 
-![components02](/images/zh_CN/charpter3/manual/components02.png)
+![components02](/images/zh_CN/chapter3/manual/components02.png)
 
 
 ### 2.2 DSS 工程：
@@ -31,7 +31,7 @@
 
 1. 现阶段工程支持版本控制，发布等功能，后续会对协同开发进行支持：
 
-![project](/images/zh_CN/charpter3/manual/project.png)
+![project](/images/zh_CN/chapter3/manual/project.png)
 
 2. 工程版本新建（回滚）：可以通过设置当前版本作为源版本复制为最新版本。
 
@@ -41,38 +41,38 @@
 ### 3.1 工作流编排
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当点击一个对应的工程后，既可以进入工程首页，在工程首页可以做工作流的编排。
 1. 首先需要创建工作流
-![workflow01](/images/zh_CN/charpter3/manual/workflow01.png)
+![workflow01](/images/zh_CN/chapter3/manual/workflow01.png)
 2. 建立好工作流好就可以进行组件节点的托拉拽了，支持第一章所提到的组件节点编排：
-![workflow02](/images/zh_CN/charpter3/manual/workflow02.png)
+![workflow02](/images/zh_CN/chapter3/manual/workflow02.png)
 3. 节点支持右键功能包括，删除、依赖选择、复制等基本功能，同时数据开发节点还支持脚本关联
-![workflow03](/images/zh_CN/charpter3/manual/workflow03.png)
+![workflow03](/images/zh_CN/chapter3/manual/workflow03.png)
 
 ### 3.2 工作流节点打开
 节点支持双击打开：
 1. 数据开发节点：点开后即可进入Scriptis进行脚本编辑
-![workflow04](/images/zh_CN/charpter3/manual/workflow04.png)
+![workflow04](/images/zh_CN/chapter3/manual/workflow04.png)
 2. 子工作流节点：双击后跳转到子工作流编辑页面
-![workflow05](/images/zh_CN/charpter3/manual/workflow05.png)
+![workflow05](/images/zh_CN/chapter3/manual/workflow05.png)
 3. 数据质量节点：跳转到数据质量规则配置页面
-![workflow06](/images/zh_CN/charpter3/manual/workflow06.png)
+![workflow06](/images/zh_CN/chapter3/manual/workflow06.png)
 4. 数据可视化节点：跳转到对应的可视化编辑页面
-![workflow07](/images/zh_CN/charpter3/manual/workflow07.png)
+![workflow07](/images/zh_CN/chapter3/manual/workflow07.png)
 
 ### 3.3 层级切换
 1. 支持多层级切换：支持快速工程切换、支持在工作流页面切换工作流、支持在单个工作流中切换节点
-![workflow08](/images/zh_CN/charpter3/manual/workflow08.png)
+![workflow08](/images/zh_CN/chapter3/manual/workflow08.png)
 
 2. 右上脚支持多组件快速切换，在切换后进入的组件的内容都只与该工程相关，让用户更加清晰的去定义工程和业务的内容：
-![functions](/images/zh_CN/charpter3/manual/functions.png)
+![functions](/images/zh_CN/chapter3/manual/functions.png)
 
 ### 3.4 参数和资源设置
 
 1. 工作流上下文信息设置，支持工作流参数、变量、代理用户等
 
-![workflow_09](/images/zh_CN/charpter3/manual/workflow_09.png)
+![workflow_09](/images/zh_CN/chapter3/manual/workflow_09.png)
 
 2. 支持工作流资源文件设置
-![workflow10](/images/zh_CN/charpter3/manual/workflow10.png)
+![workflow10](/images/zh_CN/chapter3/manual/workflow10.png)
 支持工程级别、工作流级别、节点级别资源文件使用，您只需要在脚本中指定对应的级别就好：比如有一个test.txt 在脚本python脚本打开一个文件：
 ```
 open("project://test.txt", encoding="utf-8") #工程级资源文件使用project://开头
@@ -82,35 +82,35 @@ open("node://test.txt", encoding="utf-8") #节点级资源文件使用node://开
 
 ### 3.5 工作流实时执行
 1. 除了功能节点中的subflow会跳过执行，连接节点会作为空节点运行，其他都支持实时执行
-![workflow11](/images/zh_CN/charpter3/manual/workflow11.png)
+![workflow11](/images/zh_CN/chapter3/manual/workflow11.png)
 2. 用户编辑好工作流后点击执行就可以将工作流进行运行，您将看到实时的工作流运行起来可以看到现在运行节点的时间，同时可以右键节点打开节点的管理台去展示该节点的进度，运行结果，运行日志等。支持任务停止等功能
-![workflow12](/images/zh_CN/charpter3/manual/workflow12.png)
+![workflow12](/images/zh_CN/chapter3/manual/workflow12.png)
 
 
 ### 3.6 工作流调度执行
 1. DSS的工程支持发布调度，默认支持发布到Azkaban，同样DSS的调度部分做了深层次的抽象可以做到对其他的调度系统快速支持。发布前会对工作流进行解析，以确保工作流是可以调度运行的：
-![workflow13](/images/zh_CN/charpter3/manual/workflow13.png)
+![workflow13](/images/zh_CN/chapter3/manual/workflow13.png)
 2. 发布后即可到调度系统中进行查看，比如去Azkaban页面上进行查看：
-![workflow14](/images/zh_CN/charpter3/manual/workflow14.png)
+![workflow14](/images/zh_CN/chapter3/manual/workflow14.png)
 3. DSS如何对接调度系统可以参考：[]()
 
 ### 3.7 工作流版本
 1. 工作流创建完成后，具有初始版本，版本号为v000001，直接点击工作流图标时，默认打开工作流的最新版本
 2. 可以查看工作流的版本，方便您进行历史版本查看：
-![workflow15](/images/zh_CN/charpter3/manual/workflow15.png)
+![workflow15](/images/zh_CN/chapter3/manual/workflow15.png)
 
 ### 3.8 工作流布局修改
 1. 工作流格式化：当工作流节点过多，界面太乱时。可以点击节点编辑页的右上方第四个“格式化”按钮。快速美化节点界面：
-![workflow16](/images/zh_CN/charpter3/manual/workflow16.png)
+![workflow16](/images/zh_CN/chapter3/manual/workflow16.png)
 如果格式化后不满意，可再次点击节点编辑页的右上方第五个“恢复”按钮，恢复到之前的状态：
-![workflow17](/images/zh_CN/charpter3/manual/workflow17.png)
+![workflow17](/images/zh_CN/chapter3/manual/workflow17.png)
 
 2. 支持放大、缩小、全屏/取消全屏 按钮可调整界面大小比例
 
 3. 多个节点移动：
  - 第一种方式是按住键盘“shift”+鼠标拖动，完全包括住的节点为选中节点，选中的节点有一圈灰色轮廓色。此时即可进行移动了
  - 第二种方式为按住键盘“ctrl”+鼠标点击选中的节点，选中的节点有一圈灰色轮廓色。此时即可进行移动了
-![workflow18](/images/zh_CN/charpter3/manual/workflow18.png)
+![workflow18](/images/zh_CN/chapter3/manual/workflow18.png)
 
 
 
@@ -131,7 +131,7 @@ open("node://test.txt", encoding="utf-8") #节点级资源文件使用node://开
 
 6. **注意：msg.type默认不可变为SEND，msg.sender、msg.topic、msg.name是必填。**
 ```
-![signal_01](/images/zh_CN/charpter3/manual/signal_01.png)
+![signal_01](/images/zh_CN/chapter3/manual/signal_01.png)
 
 
 示例：
@@ -171,10 +171,10 @@ msg.body=${msg.mycontent}
 ```
 示例使用4.1节的eventSender的信息：
 1. 配置reveive接收对应的topic信息，并通过msg.savekey进行保存
-![signal02](/images/zh_CN/charpter3/manual/signal02.png)
+![signal02](/images/zh_CN/chapter3/manual/signal02.png)
 
 2. 在hql节点中使用receiver的msg.savekey作为自定义变量
-![signal03](/images/zh_CN/charpter3/manual/signal03.png)
+![signal03](/images/zh_CN/chapter3/manual/signal03.png)
 
 3. 通过上图的运行可以知道整个流程下来hql节点读取到了eventsender发送的信息。信号节点支持跨工程和工作流，这里只是示例使用
 
@@ -191,7 +191,7 @@ dataCheck支持如下参数：
 
 4. job.desc: 追加多源信息配置。
 ```
-![signal04](/images/zh_CN/charpter3/manual/signal04.png)
+![signal04](/images/zh_CN/chapter3/manual/signal04.png)
 
 
 ## 5.数据输出节点
@@ -205,16 +205,16 @@ sendEmail支持如下参数：
 关联审批单：该邮件是否走过审批，如果未则不会进行发送
 其他邮件基本属性：收件人、抄送、秘密抄送
 ```
-![sendemail01](/images/zh_CN/charpter3/manual/sendemail01.png)
+![sendemail01](/images/zh_CN/chapter3/manual/sendemail01.png)
 
 ## 6.功能节点
 ### 6.1 连接节点：
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connector节点的作用是为了作为节点与节点的连接，让工作流更加好看：
-![connector](/images/zh_CN/charpter3/manual/connector.png)
+![connector](/images/zh_CN/chapter3/manual/connector.png)
 
 ### 6.2 子工作流：
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subflow节点是您可以在一条工作流中嵌入一条子工作流，子工作流支持发布调度，但是在实时执行时父工作流的subflow节点会跳过执行，需要跳到子工作流编辑页面进行执行：
-![subflow01](/images/zh_CN/charpter3/manual/subflow01.png)
+![subflow01](/images/zh_CN/chapter3/manual/subflow01.png)
 
 
 

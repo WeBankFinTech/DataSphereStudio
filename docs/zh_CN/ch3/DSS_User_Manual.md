@@ -72,7 +72,7 @@
 ![workflow_09](/images/zh_CN/charpter3/manual/workflow_09.png)
 
 2. 支持工作流资源文件设置
-![workflow10](/images/zh_CN/charpter3/manual/workflowpng)
+![workflow10](/images/zh_CN/charpter3/manual/workflow10.png)
 支持工程级别、工作流级别、节点级别资源文件使用，您只需要在脚本中指定对应的级别就好：比如有一个test.txt 在脚本python脚本打开一个文件：
 ```
 open("project://test.txt", encoding="utf-8") #工程级资源文件使用project://开头

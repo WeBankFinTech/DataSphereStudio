@@ -12,7 +12,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最少环境依赖，前后端基础环境部分仅需准备：[Linkis](https://github.com/WeBankFinTech/Linkis)、JAVA、MYSQL、[Nginx](https://www.nginx.com/) ，您即刻能享受到DSS已集成的数据开发Scriptis、工作流实时执行，可视化，邮件发送，DATACHECK和EVENTCHECK服务。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[简单版DSS环境配置准备](http://github.com/pes/dataworkis/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[简单版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
 
 ----
 
@@ -21,7 +21,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS还实现了很多外部系统的集成，如[Qualitis](https://github.com/WeBankFinTech/Qualitis)和[Azkaban](https://github.com/azkaban/azkaban)，如果您想使用这些外部系统，则需要在简单版的基础上，提前安装和启动好Qualitis和Azkaban服务，并确保其能够正常提供服务，并在配置中指定对应服务的IP和端口。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[标准版DSS环境配置准备](http://github.com/pes/dataworkis/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%B8%89%E6%A0%87%E5%87%86%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[标准版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%B8%89%E6%A0%87%E5%87%86%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
 
 ----
 
@@ -47,7 +47,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有[sudo权限](https://www.jianshu.com/p/0922095f69f3)，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
 ```
       vi /etc/sudoers
 
@@ -135,12 +135,12 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-   环境准备完毕，点我进入 [四、安装和使用](http://github.com/pes/dataworkis/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+   环境准备完毕，点我进入 [四、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 ## 三、标准版DSS环境配置准备
 标准版DSS环境准备也分为三部分，前后端基础软件安装、后端环境准备和前端环境准备，详细介绍如下：
 ### 3.1 前后端基础软件安装
-Linkis标准版(0.9.1及以上)，[如何安装Linkis]([https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis))
+Linkis标准版(0.9.1及以上)，[如何安装Linkis]([https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)) 
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -151,7 +151,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 Qualitis [如何安装Qualitis](https://github.com/WeBankFinTech/Qualitis/blob/master/docs/zh_CN/ch1/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%89%8B%E5%86%8C.md)
 
 Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban) 
-##### 注意：支持Azkaban调度需要配套安装linkis-jobtype，请点击[Linkis jobType安装文档](docs/zh_CN/ch2/AzkaBank's_LinkisJobType_Deployment_Manual.md)
+##### 注意：支持Azkaban调度需要配套安装linkis-jobtype，请点击[Linkis jobType安装文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/Azkaban_LinkisJobType_Deployment_Manual.md)
 
 ### 3.2 后端环境配置准备
 
@@ -164,7 +164,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有[sudo权限](https://www.jianshu.com/p/0922095f69f3)，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
 ```
       vi /etc/sudoers
 
@@ -261,7 +261,7 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-   环境准备完毕，点我进入 [四、安装和使用](http://github.com/pes/dataworkis/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+   环境准备完毕，点我进入 [四、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 # 四、安装和使用
 
@@ -392,7 +392,7 @@ server {
 ### 4.谷歌浏览器访问：
 ```http://nginx_ip:nginx_port```
 
-如何详细使用DSS, 点我进入 [DSS详细使用文档](https://github.com/WeBankFinTech/DataSphereStudio/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis#%E4%BA%94%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+如何详细使用DSS, 点我进入 [DSS详细使用文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)
 
 ## 4.3、常见问题
 

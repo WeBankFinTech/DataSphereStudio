@@ -1,7 +1,7 @@
-###第三方系统接入DSS指南
-####1.指南介绍
+### 第三方系统接入DSS指南
+#### 1.指南介绍
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本指南用于介绍第三方系统接入DSS系统的设计方案、具体实现以及举例进行说明。本指南适合于希望将自己的第三方系统接入DSS的用户阅读。
-####2.第三方系统接入DSS的设计方案
+#### 2.第三方系统接入DSS的设计方案
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS(DataSphere Studio)从一开始就被设计成为一个开放的、具有强扩展能力的系统。DSS系统希望第三方系统是能以插拔式的方式接入，为了实现上述的理念，DSS提出了AppJoint(应用关节)的概念。AppJoint从作用上来说是连接两个系统，并为两个系统的协调运行提供服务。
 任务提交到DSS系统，并由DSS系统转发给第三方外部系统进行执行，必须要考虑并实现下面的几点功能。
 - 1).解决双方系统用户的鉴权问题。
@@ -33,7 +33,7 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NodeExecution接口是用来将任务提交到第三方系统进行执行的接口,NodeExecution接口有支持短时间任务的NodeExecution和支持长时间任务的LongTermNodeExecution。一般短时间任务，如邮件发送等，可以直接实现NodeExecution接口，并重写execute方法，DSS系统同步等待任务结束。另外的长时间任务，如数据质量检测等，可以实现LongTermNodeExecution接口，并重写submit方法，返回一个NodeExecutionAction，DSS系统通过这个NodeExecutionAction可以向第三方系统获取任务的日志、状态等。
 
-####3.第三方系统接入DSS的实现(以Visualis为例)
+#### 3.第三方系统接入DSS的实现(以Visualis为例)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis是微众银行WeDataSphere开源的一款商业BI工具，DSS集成Visualis系统之后可以获得数据可视化的能力。Visualis接入DSS系统的代码在DSS项目中已经同步开源，下面将以开源代码为例，对步骤进行罗列分析。
 Visualis接入的DSS系统的步骤如下:

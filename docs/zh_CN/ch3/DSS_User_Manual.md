@@ -1,7 +1,7 @@
 ## 1 功能简介
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS作为一站式数据应用开发门户，定位为闭环涵盖数据应用的全流程，满足从数据ETL、数据研发、可视化展现、数据治理、数据输出到工作流调度的数据应用全生命周期开发场景,现已经开源的组件包括如下图所示：
 
-![functions](../../images/zh_CN/charpter3/manual/functions.png)
+![functions](/images/zh_CN/charpter3/manual/functions.png)
 
 - 工作流服务——Workflow: 支持工作流的托拉拽生成，支持实时执行，支持发布到调度服务
 - 数据研发———Scriptis：为DSS集成数据开发能力，支持各类型脚本语言的在线开发,详细介绍请点击[Scriptis使用手册]()
@@ -17,7 +17,7 @@
 ### 2.1 已经集成组件展示：
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;首页对DSS集成的组件的全流程进行了展示和示意，其中每个组件的展示都支持直接跳转到对应的服务：
 
-![components](../../images/zh_CN/charpter3/manual/components.png)
+![components](../../../images/zh_CN/charpter3/manual/components.png)
 
 如点击Scriptis图标会跳转到数据开发组件Scriptis的首页：
 

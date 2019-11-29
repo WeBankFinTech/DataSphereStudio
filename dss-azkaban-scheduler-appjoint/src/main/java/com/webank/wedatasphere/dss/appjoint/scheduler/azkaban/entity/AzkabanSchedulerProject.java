@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.AbstractSchedulerProject;
 
 /**
- * Created by v_wbbmwan on  2019/9/19
+ * Created by cooperyang on  2019/9/19
  */
 public class AzkabanSchedulerProject extends AbstractSchedulerProject {
 

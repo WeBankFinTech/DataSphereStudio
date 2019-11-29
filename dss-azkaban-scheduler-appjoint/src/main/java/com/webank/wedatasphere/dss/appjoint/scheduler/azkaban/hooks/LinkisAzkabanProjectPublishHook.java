@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by v_wbbmwan on  2019/9/18
+ * Created by cooperyang on  2019/9/18
  */
 @Component
 public class LinkisAzkabanProjectPublishHook extends AbstractProjectPublishHook {

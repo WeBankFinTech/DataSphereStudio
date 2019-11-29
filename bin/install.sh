@@ -369,7 +369,6 @@ installVisualis
 ###update visualis-server linkis.properties
 echo "$SERVERNAME-step4:update linkis.properties"
 SERVER_CONF_PATH=$SERVER_HOME/$SERVERNAME/conf/linkis.properties
-echo $VISUALIS_NGINX_IP
 if [ $VISUALIS_NGINX_IP == "127.0.0.1" ]||[ $VISUALIS_NGINX_IP == "0.0.0.0" ]; then
     VISUALIS_NGINX_IP=$local_host
 fi

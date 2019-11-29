@@ -114,7 +114,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
    ```bash
        unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
    ``` 
-##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dws/visualis文件夹下，以供自动化安装使用
+##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
 ### b、配置修改
 
@@ -239,7 +239,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
    ```bash
        unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
    ```
-##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dws/visualis文件夹下，以供自动化安装使用
+##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
 ### b、配置修改
 
@@ -346,8 +346,12 @@ server {
             server_name  localhost;
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
+            location /dss/visualis {
+            root   /appcom/Install/DSS/FRONT/dss/visualis; # visualis静态文件目录
+            autoindex on;
+            }
             location / {
-            root   /appcom/Install/dss/ROOT; # 前端包解压的目录
+            root   /appcom/Install/DSS/FRONT/dist; # 前端包解压的目录
             index  index.html index.html;
             }
             location /ws {#webSocket配置支持
@@ -384,7 +388,7 @@ server {
 ### 2.将前端包拷贝到对应的目录:
 ```/appcom/Install/DSS/FRONT; # 前端包安装目录 ```
 
-##### 注意: 手动安装DSS前端，则需要到DSS前端安装目录的dws/visualis文件夹下，解压visualis前端安装包。
+##### 注意: 手动安装DSS前端，则需要到DSS前端安装目录的dss/visualis文件夹下，解压visualis前端安装包。
 
 ### 3.启动服务
 ```sudo systemctl restart nginx```

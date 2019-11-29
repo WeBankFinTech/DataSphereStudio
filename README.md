@@ -130,11 +130,6 @@ Please be patient, it will take some time to load gif.
 
  &nbsp; &nbsp;&nbsp; &nbsp;4. Scenarios in which users have the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
 
-## Demo environment
-
- &nbsp; &nbsp;&nbsp; &nbsp;[Click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
-
- &nbsp; &nbsp;&nbsp; &nbsp;User/Password: bdp/Abcd1234
 
 ## Quick start
 

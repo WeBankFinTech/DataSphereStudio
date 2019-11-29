@@ -17,9 +17,7 @@
 
 package com.webank.wedatasphere.dss.server.entity
 
-/**
-  * Created by v_wbjftang on 2019/5/13.
-  */
+
 object CrumbType extends Enumeration{
   type CrumbType = Value
   val Index,All,SortProject,Project,SortFlow,Flow = Value

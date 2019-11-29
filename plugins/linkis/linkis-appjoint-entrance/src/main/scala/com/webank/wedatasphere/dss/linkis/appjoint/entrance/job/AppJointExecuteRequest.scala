@@ -15,10 +15,19 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.linkis.appjoint.entrance.job
 
+import com.webank.wedatasphere.dss.appjoint.execution.core.AppJointNode
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+/**
+  * created by cooperyang on 2019/9/26
+  * Description:
+  */
+trait AppJointExecuteRequest {
+  val node:AppJointNode
+  val runTimeParams:java.util.Map[String, Object]
+
+  override def toString: String = {
+    node.getProjectName + " " + node.getFlowName + " " + node.getName
+  }
 }

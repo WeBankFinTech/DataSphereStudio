@@ -15,10 +15,14 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.linkis.appjoint.entrance.exception
 
+import com.webank.wedatasphere.linkis.common.exception.ErrorException
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
-}
+/**
+  * created by cooperyang on 2019/10/8
+  * Description:
+  */
+case class AppJointEntranceIllegalParamException(errorMsg:String) extends ErrorException(70012, errorMsg)
+
+case class AppJointErrorException(errorMsg:String) extends ErrorException(70058, errorMsg)

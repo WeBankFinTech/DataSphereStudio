@@ -1,0 +1,22 @@
+server:
+  port: 9006
+spring:
+  application:
+    name: appjointEntrance
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:20303/eureka/
+  instance:
+    metadata-map:
+      test: enjoyyin
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,info
+logging:
+  config: classpath:log4j2.xml
+#    register-with-eureka: false
+#    fetch-registry: false

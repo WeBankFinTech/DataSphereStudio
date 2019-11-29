@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.AbstractSchedulerNo
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 /**
- * Created by v_wbbmwan on  2019/9/15
+ * Created by cooperyang on  2019/9/15
  */
 public class AzkabanSchedulerNode extends AbstractSchedulerNode {
 

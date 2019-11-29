@@ -1,4 +1,4 @@
-![DSS](images/en_US/readme/DSS.png)
+![DSS](images/en_US/readme/DSS_logo.png)
 ====
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -130,11 +130,6 @@ Please be patient, it will take some time to load gif.
 
  &nbsp; &nbsp;&nbsp; &nbsp;4. Scenarios in which users have the capabilities of big data foundation platform and comprehensive data application tools. but lacks unified and standardized specifications, while a part of these tools have been integrated.
 
-## Demo environment
-
- &nbsp; &nbsp;&nbsp; &nbsp;[Click me to](https://sandbox.webank.com/wds/dss/#) DSS Demo environment
-
- &nbsp; &nbsp;&nbsp; &nbsp;User/Password: bdp/Abcd1234
 
 ## Quick start
 

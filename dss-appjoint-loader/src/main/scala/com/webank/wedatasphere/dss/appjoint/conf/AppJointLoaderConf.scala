@@ -15,10 +15,14 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.conf
 
+import com.webank.wedatasphere.linkis.common.conf.CommonVars
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+/**
+  * created by cooperyang on 2019/11/9
+  * Description:
+  */
+object AppJointLoaderConf {
+  val CLASS_LOADER_CLASS_NAME = CommonVars("dss.appjoint.loader.classname", "")
 }

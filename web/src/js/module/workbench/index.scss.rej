@@ -1,0 +1,13 @@
+diff a/app/js/module/workbench/index.scss b/app/js/module/workbench/index.scss	(rejected hunks)
+@@ -549 +549 @@ $toolbarWidth: 40px;
+-.ivu-table-body::-webkit-scrollbar {
++.we-result-view .ivu-table-body::-webkit-scrollbar {
+@@ -553 +553 @@ $toolbarWidth: 40px;
+-.ivu-table-body::-webkit-scrollbar-track {
++.we-result-view .ivu-table-body::-webkit-scrollbar-track {
+@@ -562 +562 @@ $toolbarWidth: 40px;
+-.ivu-table-body::-webkit-scrollbar-thumb {
++.we-result-view .ivu-table-body::-webkit-scrollbar-thumb {
+@@ -571 +571 @@ $toolbarWidth: 40px;
+-.ivu-table-body::-webkit-scrollbar-thumb:window-inactive {
++.we-result-view .ivu-table-body::-webkit-scrollbar-thumb:window-inactive {

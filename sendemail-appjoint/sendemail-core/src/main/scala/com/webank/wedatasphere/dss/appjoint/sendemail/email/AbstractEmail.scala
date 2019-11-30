@@ -27,13 +27,13 @@ import scala.collection.mutable.ArrayBuffer
   */
 class AbstractEmail extends Email {
 
-  private var content = _
+  private var content: String = _
   private var attachments = ArrayBuffer[Attachment]()
-  private var subject = _
-  private var from = _
-  private var to = _
-  private var cc = _
-  private var bcc = _
+  private var subject: String = _
+  private var from: String = _
+  private var to: String = _
+  private var cc: String = _
+  private var bcc: String = _
 
   override def getContent: String = content
   override def setContent(content: String): Unit = this.content = content

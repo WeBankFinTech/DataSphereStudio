@@ -15,10 +15,18 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.utils;
 
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+/**
+ * created by cooperyang on 2019/11/10
+ * Description:
+ */
+public class ExceptionHelper {
+    public static void dealErrorException(int errorCode, String errorMsg, Throwable t) throws ErrorException {
+        ErrorException errorException = new ErrorException(errorCode, errorMsg);
+        errorException.initCause(t);
+        throw errorException;
+    }
 }

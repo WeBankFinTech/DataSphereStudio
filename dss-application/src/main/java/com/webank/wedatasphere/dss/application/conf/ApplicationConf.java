@@ -15,10 +15,15 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.application.conf;
 
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+
+/**
+ * Created by chaogefeng on 2019/10/10.
+ */
+public class ApplicationConf {
+
+    public static final CommonVars<String> FAQ = CommonVars.apply("wds.linkis.application.dws.params","");
 }

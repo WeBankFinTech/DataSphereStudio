@@ -15,10 +15,21 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.schedulis.jobtype.utils;
 
+/**
+ * A util helper class full of static methods that are commonly used.
+ */
+public class Utils {
+    /**
+     * Equivalent to Object.equals except that it handles nulls. If a and b are both null, true is
+     * returned.
+     */
+    public static boolean equals(final Object a, final Object b) {
+        if (a == null || b == null) {
+            return a == b;
+        }
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+        return a.equals(b);
+    }
 }

@@ -15,10 +15,22 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.application.dao;
 
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+import com.webank.wedatasphere.dss.application.entity.Application;
+
+import java.util.List;
+
+/**
+ * Created by chaogefeng on 2019/10/10.
+ */
+public interface ApplicationMapper {
+    List<String> listApplicationNames();
+
+    List<Application> listApplications();
+
+    Application getApplication(String appName);
+
+    Application getApplicationbyNodeType(String nodeType);
 }

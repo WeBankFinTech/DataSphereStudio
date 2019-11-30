@@ -143,7 +143,7 @@ Click to [Quick start]()
 
 [Compiled documentation]()
 
-[User manual]()
+[User manual](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)
 
 [Quick integration with DSS for external systems]()
 

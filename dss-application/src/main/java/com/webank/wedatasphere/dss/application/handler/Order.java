@@ -15,10 +15,13 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.application.handler;
 
+/**
+ * Created by chaogefeng on 2019/9/30.
+ */
+public interface Order {
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+    int getOrder();
+
 }

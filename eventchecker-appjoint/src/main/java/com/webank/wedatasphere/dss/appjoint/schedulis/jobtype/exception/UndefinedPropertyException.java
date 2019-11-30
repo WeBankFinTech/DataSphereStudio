@@ -15,10 +15,17 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.schedulis.jobtype.exception;
 
+/**
+ * Indicates that a required property is missing from the Props
+ */
+public class UndefinedPropertyException extends RuntimeException {
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+  private static final long serialVersionUID = 1;
+
+  public UndefinedPropertyException(final String message) {
+    super(message);
+  }
+
 }

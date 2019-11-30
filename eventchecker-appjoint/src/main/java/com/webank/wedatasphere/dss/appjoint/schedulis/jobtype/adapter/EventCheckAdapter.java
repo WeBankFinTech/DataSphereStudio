@@ -15,10 +15,23 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.schedulis.jobtype.adapter;
 
+import org.apache.log4j.Logger;
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+import java.util.Properties;
+
+/**
+ * @author georgeqiao
+ * @Title: EventCheckReceiver
+ * @ProjectName Azkaban-EventChecker
+ * @date 2019/9/1822:10
+ * @Description: TODO
+ */
+public interface EventCheckAdapter {
+
+    boolean sendMsg(int jobId, Properties props, Logger log);
+
+    boolean reciveMsg(int jobId, Properties props, Logger log);
+
 }

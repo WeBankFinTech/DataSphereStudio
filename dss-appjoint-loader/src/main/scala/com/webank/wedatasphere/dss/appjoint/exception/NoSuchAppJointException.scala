@@ -15,10 +15,12 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.appjoint.exception
 
+import com.webank.wedatasphere.linkis.common.exception.ErrorException
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
-}
+/**
+  * created by cooperyang on 2019/11/10
+  * Description:
+  */
+case class NoSuchAppJointException(errDesc:String) extends ErrorException(70059, errDesc)

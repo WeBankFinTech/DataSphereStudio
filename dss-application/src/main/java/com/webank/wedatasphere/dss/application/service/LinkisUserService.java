@@ -14,11 +14,18 @@
  * limitations under the License.
  *
  */
+package com.webank.wedatasphere.dss.application.service;
 
-package com.webank.wedatasphere.dss.server.entity
+import com.webank.wedatasphere.dss.application.entity.LinkisUser;
 
+/**
+ * Created by chaogefeng on 2019/11/29.
+ */
+public interface LinkisUserService {
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+    LinkisUser getUserByName(String username);
+
+    void registerLinkisAndDssUser(LinkisUser userDb);
+
+    void registerDSSUser(LinkisUser userDb);
 }

@@ -15,10 +15,29 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.application.handler;
 
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+import com.webank.wedatasphere.dss.application.entity.DSSUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * Created by chaogefeng on 2019/10/15.
+ */
+@Component
+public class ProjectUserInitHandler implements Handler {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Override
+    public void handle(DSSUser user) {
+        logger.info("ProjectUserInitHandler:");
+    }
+
+    @Override
+    public int getOrder() {
+        return 1;
+    }
 }

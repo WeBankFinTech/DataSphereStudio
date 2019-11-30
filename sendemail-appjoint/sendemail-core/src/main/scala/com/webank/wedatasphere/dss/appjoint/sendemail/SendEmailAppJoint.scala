@@ -28,8 +28,8 @@ import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl
   */
 class SendEmailAppJoint extends AppJointUrlImpl with AppJoint {
 
-  private var params = _
-  private var nodeExecution = _
+  private var params: util.Map[String, AnyRef] = _
+  private var nodeExecution: NodeExecution = _
 
   override def getAppJointName = "SendEmail"
 

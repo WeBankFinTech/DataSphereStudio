@@ -15,10 +15,13 @@
  *
  */
 
-package com.webank.wedatasphere.dss.server.entity
+package com.webank.wedatasphere.dss.application.handler;
 
+import com.webank.wedatasphere.dss.application.entity.DSSUser;
 
-object CrumbType extends Enumeration{
-  type CrumbType = Value
-  val Index,All,SortProject,Project,SortFlow,Flow = Value
+/**
+ * Created by chaogefeng on 2019/10/15.
+ */
+public interface Handler extends Order {
+    void handle(DSSUser user);
 }

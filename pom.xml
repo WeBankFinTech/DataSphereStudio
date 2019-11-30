@@ -40,7 +40,6 @@
         <module>eventchecker-appjoint</module>
         <module>datachecker-appjoint</module>
         <module>sendemail-appjoint/sendemail-core</module>
-        <module>sendemail-appjoint/esb-email-support</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>

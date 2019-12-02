@@ -314,8 +314,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
     
   如下图，如您的Eureka主页出现以下微服务，则表示服务都启动成功，可以正常对外提供服务了：
     
-  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
-
+  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ## 4.2 DataSphereStudio前端安装
 

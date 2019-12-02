@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.application.dao.DSSUserMapper">
+
+    <sql id="dss_user">
+        id,`username`,`name`,`is_first_login`
+    </sql>
+
+    <select id="getUserByName" resultType="com.webank.wedatasphere.dss.application.entity.DSSUser">
+        select * from  dss_user where `username` = #{username}
+    </select>
+
+    <insert id="registerDSSUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.application.entity.DSSUser" >
+        INSERT INTO dss_user(<include refid = "dss_user" />)
+        VALUES (#{id},#{username},#{name},#{isFirstLogin})
+    </insert>
+
+    <update id="updateUserFirstLogin">
+        UPDATE FROM dss_user SET is_first_login = FALSE WHERE id = #{userId}
+    </update>
+
+</mapper>

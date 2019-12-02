@@ -1,0 +1,123 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@import './variables.scss';
+.page-process{
+    height: calc(100% - 36px);
+    width: 100%;
+    background-color: #f7f7f7;
+    .bread-crumb{
+        margin: 5px;
+    }
+}
+
+.process-tabs {
+    position: $relative;
+    height: calc(100%);
+    overflow: hidden;
+    &.no-tab{
+        .process-tab{
+            display: none;
+        }
+        .process-container{
+            height: 100%;
+        }
+    }
+    .process-tab {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+        height: 32px;
+        padding: 0 20px;
+        box-sizing: border-box;
+        border-top: 1px solid #e3e8ee;
+        .process-tab-item {
+            position: $relative;
+            height: 30px;
+            line-height: 30px;
+            padding: 0 20px;
+            border-right: 1px solid #e3e8ee;
+            background: $background-color-base;
+            color: $title-color;
+            cursor: pointer;
+            min-width: 100px;
+            max-width: 200px;
+            overflow: hidden;
+            text-align: center;
+            &:first-child{
+                border-left: 1px solid #e3e8ee;
+            }
+            &.active {
+                margin-top: -1px;
+                &:before{
+                    content: "";
+                    position: absolute;
+                    top: -1px;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: $primary-color;
+                }
+                height: 32px;
+                line-height: 31px;
+                background: $body-background;
+                color: $primary-color;
+            }
+            .process-tab-name{
+                width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding-right: 5px;
+                padding-left: 5px;
+            }
+            .process-tab-unsave-icon, .ivu-icon{
+                position: absolute;
+                right: 10px;
+                top: 10px;
+            }
+            .tab-icon {
+                position: absolute;
+                left: 7px;
+                top: 8px;
+                width: 15px;
+                height: 15px;
+            }
+            .flow {
+                width: 12px;
+                height: 12px;
+            }
+            .hivesql {
+                width: 16px;
+                height: 16px;
+            }
+            .display {
+                width: 13px;
+                height: 13px;
+            }
+            .dashboard {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+    .process-container {
+        height: calc(100% - 32px);
+    }
+}

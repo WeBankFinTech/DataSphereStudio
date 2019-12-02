@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.server.dao.FlowTaxonomyMapper">
+
+    <sql id="flow_taxonomy">
+        id, `name`,`description`,`creator_id`,`create_time`,`update_time`,`project_id`
+    </sql>
+
+    <select id="selectFlowTaxonomyByID" resultType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+        SELECT * FROM `dss_flow_taxonomy` WHERE id = #{id}
+    </select>
+
+    <insert id="insertFlowTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+        INSERT INTO dss_flow_taxonomy (<include refid = "flow_taxonomy" />)
+        VALUES
+        (#{id},#{name},#{description},#{creatorID},#{createTime},#{updateTime},#{projectID})
+    </insert>
+
+    <update id="updateFlowTaxonomy" parameterType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+        UPDATE dss_flow_taxonomy
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">name=#{name},</if>
+            <if test="description != null">description=#{description},</if>
+            <if test="updateTime != null">update_time=#{updateTime},</if>
+        </trim>
+        WHERE id =#{id}
+    </update>
+
+    <select id="hasFlows" resultType="Long">
+        select count(*) from dss_flow_taxonomy_relation ftr
+        WHERE ftr.taxonomy_id = #{flowTaxonomyID}
+    </select>
+
+    <delete id="deleteFlowTaxonomy">
+        DELETE FROM dss_flow_taxonomy WHERE id = #{flowTaxonomyID}
+    </delete>
+
+    <insert id="insertFlowTaxonomyRelation">
+        INSERT INTO dss_flow_taxonomy_relation(taxonomy_id,flow_id) VALUES (#{taxonomyID},#{flowID})
+    </insert>
+
+    <select id="selectTaxonomyIDByFlowID" resultType="Long">
+        SELECT ftr.taxonomy_id FROM dss_flow_taxonomy_relation ftr WHERE ftr.flow_id = #{flowID}
+    </select>
+
+    <update id="updateFlowTaxonomyRelation">
+        UPDATE dss_flow_taxonomy_relation
+        SET taxonomy_id = #{taxonomyID}
+        WHERE <foreach collection="flowIDList" item="element" close=")" separator="," open="flow_id in (">#{element}</foreach>
+    </update>
+
+    <delete id="deleteFlowTaxonomyRelation">
+        DELETE
+        FROM
+            dss_flow_taxonomy_relation
+        WHERE flow_id = #{flowID}
+    </delete>
+
+    <delete id="deleteFlowTaxonomyByProjectID">
+        DELETE
+        FROM
+            `dss_flow_taxonomy`
+        WHERE
+            project_id = #{projectID}
+    </delete>
+
+    <!--加了OR ft.project_id = -1-->
+    <select id="listFlowTaxonomyByProjectID" resultType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+        SELECT
+        *
+        FROM
+        `dss_flow_taxonomy` ft
+        WHERE
+        ft.project_id = #{projectID} OR ft.project_id = -1
+    </select>
+</mapper>

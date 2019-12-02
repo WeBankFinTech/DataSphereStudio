@@ -1,4 +1,4 @@
-![DSS](images/en_US/readme/DSS.png)
+![DSS](images/en_US/readme/DSS_logo.png)
 ====
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -130,15 +130,9 @@ DSS主要特点：
 
  &nbsp; &nbsp; &nbsp; &nbsp;4. 已具备大数据基础平台能力，且拥有全部数据应用工具，部分工具已实现对接，但尚未定义统一规范的场景。
 
-## Demo试用环境
-
- &nbsp; &nbsp; &nbsp; &nbsp;[点我进入](https://sandbox.webank.com/wds/dss/#) Demo试用环境
-
- &nbsp; &nbsp; &nbsp; &nbsp;用户/密码: bdp/Abcd1234
-
 ## 快速安装使用
 
-点我进入[快速安装使用]()
+点我进入[快速安装使用](docs/zh_CN/ch2/DSS快速安装使用文档.md)
 
 ## 架构
 
@@ -146,11 +140,11 @@ DSS主要特点：
 
 ## 文档列表
 
-[DSS编译文档]()
+[DSS编译文档](docs/zh_CN/ch1/DSS编译文档.md)
 
-[用户手册]()
+[用户手册](docs/zh_CN/ch3/DSS_User_Manual.md)
 
-[外部系统快速接入DSS]()
+[外部系统快速接入DSS](docs/zh_CN/ch4/第三方系统接入DSS指南.md)
 
 更多文档，敬请期待！
 

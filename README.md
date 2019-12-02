@@ -133,7 +133,7 @@ Please be patient, it will take some time to load gif.
 
 ## Quick start
 
-Click to [Quick start]()
+Click to [Quick start](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)
 
 ## Architecture
 

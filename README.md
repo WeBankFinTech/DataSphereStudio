@@ -141,7 +141,7 @@ Click to [Quick start](https://github.com/WeBankFinTech/DataSphereStudio/blob/ma
 
 ## Documents
 
-[Compiled documentation]()
+[Compiled documentation](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch1/DataSphereStudio_Compile_Manual.md)
 
 [User manual](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)
 

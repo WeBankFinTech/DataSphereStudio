@@ -346,7 +346,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
             location /dss/visualis {
-            root   /appcom/Install/DSS/FRONT/dss/visualis; # visualis静态文件目录
+            root   /appcom/Install/DSS/FRONT; # visualis静态文件目录
             autoindex on;
             }
             location / {

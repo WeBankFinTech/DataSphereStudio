@@ -303,7 +303,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
 			location /dss/visualis {
-            root   /appcom/Install/DSS/frontEnd/dss/visualis; # visualis Static file directory
+            root   /appcom/Install/DSS/frontEnd; # visualis Static file directory
             autoindex on;
             }
             location / {
@@ -355,7 +355,7 @@ sudo systemctl restart nginx
 http://nginx_ip:nginx_port
 ```
 
-How to use DSS in detail, click me to enter **[DSS detailed usage document.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)**
+How to use DSS in detail, click me to enter **[DSS user manual.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)**
 
 ### 4.3、common problem
 
@@ -377,7 +377,7 @@ xxx=xxx
 Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
 ```
 
-Download the [driver driver](https://phantomjs.org/download.html) and put the phantomjs binary file in the bin directory of visualis-server.
+Download the [driver](https://phantomjs.org/download.html) and put the phantomjs binary file in the bin directory of visualis-server.
 
 
 (3)Upload file size limit

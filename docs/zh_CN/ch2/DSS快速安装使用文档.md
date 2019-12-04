@@ -112,7 +112,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 下载对应安装包，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-0.5.0-dist.zip 
    ``` 
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
@@ -237,7 +237,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 选择安装包下载，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-0.5.0-dist.zip
    ```
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 

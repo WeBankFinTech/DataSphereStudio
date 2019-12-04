@@ -314,8 +314,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
     
   如下图，如您的Eureka主页出现以下微服务，则表示服务都启动成功，可以正常对外提供服务了：
     
-  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
-
+  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ## 4.2 DataSphereStudio前端安装
 
@@ -347,7 +346,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
             location /dss/visualis {
-            root   /appcom/Install/DSS/FRONT/dss/visualis; # visualis静态文件目录
+            root   /appcom/Install/DSS/FRONT; # visualis静态文件目录
             autoindex on;
             }
             location / {
@@ -400,7 +399,29 @@ server {
 
 ## 4.3、常见问题
 
-(1)上传文件大小限制
+(1)用户token为空
+
+```
+sudo vi dss-server/conf/token.properties
+```
+
+添加用户
+
+```
+xxx=xxx
+```
+
+(2)visualis执行报错
+
+```
+Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
+```
+
+下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
+
+
+
+(3)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -412,7 +433,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (2)接口超时
+ (4)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

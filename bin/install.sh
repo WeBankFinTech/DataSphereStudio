@@ -246,7 +246,7 @@ scp   -P $SSH_PORT   ${workDir}/share/$PACKAGE_DIR/$SERVERNAME.zip $SERVER_IP:$S
 isSuccess "copy  ${SERVERNAME}.zip"
 ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;rm -rf $SERVERNAME-bak; mv -f $SERVERNAME $SERVERNAME-bak"
 ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;unzip $SERVERNAME.zip > /dev/null"
-ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;scp -r lib/*  $SERVERNAME/lib"
+ssh  -p $SSH_PORT $SERVER_IP "cd $workDir/;scp -r lib/*  $SERVER_HOME/$SERVERNAME/lib"
 isSuccess "unzip  ${SERVERNAME}.zip"
 
 echo "$SERVERNAME-step3:subsitution conf"
@@ -297,7 +297,7 @@ if ! ssh  -p $SSH_PORT  $SERVER_IP test -e $SERVER_HOME/$APPJOINTPARENT; then
 fi
 
 echo "$APPJOINTNAME-step2:copy install package"
-scp  -P $SSH_PORT  $SERVER_HOME/share/appjoints/$APPJOINTNAME/*.zip  $SERVER_IP:$SERVER_HOME/$APPJOINTPARENT
+scp  -P $SSH_PORT  $workDir/share/appjoints/$APPJOINTNAME/*.zip  $SERVER_IP:$SERVER_HOME/$APPJOINTPARENT
 isSuccess "copy  ${APPJOINTNAME}.zip"
 ssh  -p $SSH_PORT  $SERVER_IP "cd $SERVER_HOME/$APPJOINTPARENT/;unzip -o dss-$APPJOINTNAME-appjoint.zip > /dev/null;rm -rf dss-$APPJOINTNAME-appjoint.zip"
 isSuccess "install  ${APPJOINTNAME}.zip"

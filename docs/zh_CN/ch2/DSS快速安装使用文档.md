@@ -209,10 +209,10 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
     HIVE_META_PASSWORD=xxx
     #2、用于Qualitis
     QUALITIS_ADRESS_IP=127.0.0.1 #QUALITIS服务IP地址
-    QUALITIS_ADRESS_PORT=9991 #QUALITIS服务端口号 
+    QUALITIS_ADRESS_PORT=8090 #QUALITIS服务端口号 
     #3、用于AZKABAN
     AZKABAN_ADRESS_IP=127.0.0.1 #AZKABAN服务IP地址
-    AZKABAN_ADRESS_PORT=9987 #AZKABAN服务端口号
+    AZKABAN_ADRESS_PORT=8091 #AZKABAN服务端口号
     
 ```
 

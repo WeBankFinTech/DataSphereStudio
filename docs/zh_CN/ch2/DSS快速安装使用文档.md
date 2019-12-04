@@ -399,7 +399,29 @@ server {
 
 ## 4.3、常见问题
 
-(1)上传文件大小限制
+(1)用户token为空
+
+```
+sudo vi dss-server/conf/token.properties
+```
+
+添加用户
+
+```
+xxx=xxx
+```
+
+(2)visualis执行报错
+
+```
+Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
+```
+
+下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
+
+
+
+(3)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -411,7 +433,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (2)接口超时
+ (4)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

@@ -37,6 +37,7 @@
         <module>dss-azkaban-scheduler-appjoint</module>
         <module>dss-server</module>
         <module>visualis-appjoint/appjoint</module>
+        <module>qualitis-appjoint/appjoint</module>
         <module>eventchecker-appjoint</module>
         <module>datachecker-appjoint</module>
         <module>sendemail-appjoint/sendemail-core</module>

@@ -122,6 +122,7 @@ Nginx, How to Install [Nginx](https://www.tecmint.com/install-nginx-on-centos-7/
 Qualitis, How to Install [Qualitis](https://github.com/WeBankFinTech/Qualitis/blob/master/docs/zh_CN/ch1/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%89%8B%E5%86%8C.md)
 
 Azkaban, How to Install [Azkaban](https://github.com/azkaban/azkaban)
+
 **Note: To support Azkaban scheduling, linkis-jobtype needs to be installed. Please click the [Linkis jobType installation document](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/Azkaban_LinkisJobType_Deployment_Manual.md).**
 
 ### 3.2 BackEnd environment configuration preparation
@@ -135,7 +136,7 @@ Create a deployment user on the deployment machine and use that user for install
 **Note: It is best for users to have sudo permissions and log in to this machine without password. [How to configure SSH passwordless login](https://www.jianshu.com/p/0922095f69f3)**
 
 ### b. Installation package preparation
-From the DSS released[click here to enter the download page](https://github.com/WeBankFinTech/DataSphereStudio/releases), download the corresponding installation package. First decompress the installation package to the installation directory and modify the configuration of the decompressed file
+From the DSS released [click here to enter the download page](https://github.com/WeBankFinTech/DataSphereStudio/releases), download the corresponding installation package. First decompress the installation package to the installation directory and modify the configuration of the decompressed file
 ```
  tar -xvf  wedatasphere-dss-x.x.x-dist.tar.gz
 ```
@@ -149,7 +150,7 @@ From the DSS released[click here to enter the download page](https://github.com/
 ```
 
 ```properties
-        <!--Note: The following are mandatory configuration items for DSS. Please ensure that external services are available.-->
+    <!--Note: The following are mandatory configuration items for DSS. Please ensure that external services are available.-->
 
     deployUser=hadoop  #Specify the deployment user
 
@@ -260,7 +261,7 @@ You can view the success of the service startup on the Eureka interface, and che
 
 - As shown in the figure below, if the following microservices appear on your Eureka homepage, the services are successfully started and services can be provided normally:
 
- ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
+ ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ### 4.2 DataSphereStudio frontEnd installation
 ### a、Download the installation package
@@ -354,7 +355,7 @@ sudo systemctl restart nginx
 http://nginx_ip:nginx_port
 ```
 
-How to use DSS in detail, click me to enter **[DSS detailed usage document.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)**
+How to use DSS in detail, click me to enter **[DSS detailed usage document.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)**
 
 ### 4.3、common problem
 

@@ -122,16 +122,6 @@
     </includes>
   </fileSet>
 
-  <!--sendemail-appjoint-->
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/sendemail-appjoint/esb-email-support/target/
-    </directory>
-    <outputDirectory>share/appjoints/sendemail</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
 
   <!--visualis-appjoint-->
   <fileSet>
@@ -143,6 +133,17 @@
       <include>*.zip</include>
     </includes>
   </fileSet>
+
+    <!--qualtis-appjoint-->
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/qualitis-appjoint/appjoint/target/
+      </directory>
+      <outputDirectory>share/appjoints/qualitis</outputDirectory>
+      <includes>
+        <include>*.zip</include>
+      </includes>
+    </fileSet>
 
     <!--visualis-server-->
     <fileSet>

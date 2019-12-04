@@ -36,7 +36,6 @@ import org.springframework.context.annotation.Configuration
 class AppJointEntranceSpringConfiguration {
   private val logger = LoggerFactory.getLogger(classOf[AppJointEntranceSpringConfiguration])
   @EntranceExecutorManagerBeanAnnotation
-  @ConditionalOnMissingBean(value = Array(classOf[EntranceExecutorManager]))
   def generateExternalEntranceExecutorManager(@GroupFactoryBeanAnnotation.GroupFactoryAutowiredAnnotation groupFactory: GroupFactory,
                                       @EngineBuilderBeanAnnotation.EngineBuilderAutowiredAnnotation engineBuilder: EngineBuilder,
                                       @EngineRequesterBeanAnnotation.EngineRequesterAutowiredAnnotation engineRequester: EngineRequester,
@@ -47,7 +46,6 @@ class AppJointEntranceSpringConfiguration {
 
 
   @EntranceParserBeanAnnotation
-  @ConditionalOnMissingBean(name = Array(EntranceParserBeanAnnotation.BEAN_NAME))
   def generateEntranceParser():EntranceParser = {
     new AppJointEntranceParser()
   }

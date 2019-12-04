@@ -83,7 +83,7 @@ On the DSS release page [click here to enter the download page](https://github.c
 ### a、Download the installation package
 Click [release](https://github.com/WeBankFinTech/DataSphereStudio/releases) to download the corresponding installation package and extract it to the installation directory:
 ```bash
- unzip wedatasphere-dss-web-0.5.0-dist.zip
+ unzip wedatasphere-dss-web-x.x.x-dist.zip
 ```
 
 **Note: If the DSS frontend installation package was compiled by the user, you need to copy the [visualis frontEnd](https://github.com/WeBankFinTech/Visualis/releases) installation package to the dss/visualis folder in the DSS frontEnd-end installation directory for automated installation.**
@@ -172,10 +172,10 @@ From the DSS released [click here to enter the download page](https://github.com
     HIVE_META_PASSWORD=xxx
     #2、for Qualitis
     QUALITIS_ADRESS_IP=127.0.0.1 #QUALITIS service IP address
-    QUALITIS_ADRESS_PORT=9991 #QUALITIS service port number
+    QUALITIS_ADRESS_PORT=8090 #QUALITIS service port number
     #3、for AZKABAN
     AZKABAN_ADRESS_IP=127.0.0.1 #AZKABAN service IP address
-    AZKABAN_ADRESS_PORT=9987 #AZKABAN service port number
+    AZKABAN_ADRESS_PORT=8091 #AZKABAN service port number
 ```
 
 ### d. Modify database configuration
@@ -268,7 +268,7 @@ You can view the success of the service startup on the Eureka interface, and che
 Click release to select the installation package to download and extract it in the installation directory:
 
 ```bash
-     unzip wedatasphere-dss-web-0.5.0-dist.zip
+     unzip wedatasphere-dss-web-x.x.x-dist.zip
 ```
 ### b、deploy:
 

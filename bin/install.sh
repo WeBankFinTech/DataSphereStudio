@@ -432,3 +432,11 @@ APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoin
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
 isSuccess "subsitution conf of $SERVERNAME"
 echo "<----------------$APPJOINTNAME:end------------------->"
+
+echo ""
+echo "<----------------schedulis  appjoint install start------------------->"
+APPJOINTPARENT=dss-appjoints
+APPJOINTNAME=schedulis
+#schedulis  appjoint install
+installAppjoints
+echo "<----------------$APPJOINTNAME:end------------------->"

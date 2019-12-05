@@ -304,7 +304,8 @@ isSuccess "install  ${APPJOINTNAME}.zip"
 }
 ##function end
 
-##Dss-Server Install
+##
+ver Install
 PACKAGE_DIR=dss/dss-server
 SERVERNAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
@@ -320,7 +321,7 @@ ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.u
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.password.*#wds.linkis.server.mybatis.datasource.password=$MYSQL_PASSWORD#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.azkaban.address.*#wds.dss.appjoint.scheduler.azkaban.address=http://${AZKABAN_ADRESS_IP}:${AZKABAN_ADRESS_PORT}#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.gateway.ip.*#wds.linkis.gateway.ip=$GATEWAY_INSTALL_IP#g\" $SERVER_CONF_PATH"
-ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dataworlcloud.gateway.port.*#wds.dataworlcloud.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
+ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.project.store.dir.*#wds.dss.appjoint.scheduler.project.store.dir=$WDS_SCHEDULER_PATH#g\" $SERVER_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
@@ -430,5 +431,13 @@ APPJOINTNAME=qualitis
 installAppjoints
 APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoint.properties
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
+isSuccess "subsitution conf of $SERVERNAME"
+echo "<----------------$APPJOINTNAME:end------------------->"
+echo ""
+echo "<----------------schedulis  appjoint install start------------------->"
+APPJOINTPARENT=dss-appjoints
+APPJOINTNAME=schedulis
+#schedulis  appjoint install
+installAppjoints
 isSuccess "subsitution conf of qualitis"
 echo "<----------------$APPJOINTNAME:end------------------->"

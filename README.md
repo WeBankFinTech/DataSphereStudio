@@ -133,7 +133,7 @@ Please be patient, it will take some time to load gif.
 
 ## Quick start
 
-Click to [Quick start](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)
+Click to [Quick start](docs/en_US/ch2/DSS%20Quick%20Installation%20Guide.md)
 
 ## Architecture
 
@@ -145,7 +145,7 @@ Click to [Quick start](https://github.com/WeBankFinTech/DataSphereStudio/blob/ma
 
 [User manual](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)
 
-[Quick integration with DSS for external systems]()
+[Quick integration with DSS for external systems](docs/en_US/ch4/The%20Guide%20for%20Third-party%20Systems%20accessing%20DSS.md)
 
 ## Communication
 

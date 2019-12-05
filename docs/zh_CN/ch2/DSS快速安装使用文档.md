@@ -28,7 +28,7 @@
 ## 二、简单版DSS环境配置准备
 DSS环境配置准备分为三部分，前后端基础软件安装、后端环境配置准备和前端环配置境准备，详细介绍如下：
 ### 2.1 前后端基础软件安装
-Linkis标准版(0.9.1及以上)，[如何安装Linkis]([https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)) 
+Linkis标准版(0.9.1及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html) 
 
@@ -112,7 +112,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 下载对应安装包，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-x.x.x-dist.zip 
    ``` 
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
@@ -140,7 +140,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 ## 三、标准版DSS环境配置准备
 标准版DSS环境准备也分为三部分，前后端基础软件安装、后端环境准备和前端环境准备，详细介绍如下：
 ### 3.1 前后端基础软件安装
-Linkis标准版(0.9.1及以上)，[如何安装Linkis]([https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)) 
+Linkis标准版(0.9.1及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -209,10 +209,10 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
     HIVE_META_PASSWORD=xxx
     #2、用于Qualitis
     QUALITIS_ADRESS_IP=127.0.0.1 #QUALITIS服务IP地址
-    QUALITIS_ADRESS_PORT=9991 #QUALITIS服务端口号 
+    QUALITIS_ADRESS_PORT=8090 #QUALITIS服务端口号 
     #3、用于AZKABAN
     AZKABAN_ADRESS_IP=127.0.0.1 #AZKABAN服务IP地址
-    AZKABAN_ADRESS_PORT=9987 #AZKABAN服务端口号
+    AZKABAN_ADRESS_PORT=8091 #AZKABAN服务端口号
     
 ```
 
@@ -237,7 +237,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 选择安装包下载，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-x.x.x-dist.zip
    ```
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
@@ -314,8 +314,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
     
   如下图，如您的Eureka主页出现以下微服务，则表示服务都启动成功，可以正常对外提供服务了：
     
-  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
-
+  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ## 4.2 DataSphereStudio前端安装
 
@@ -347,7 +346,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
             location /dss/visualis {
-            root   /appcom/Install/DSS/FRONT/dss/visualis; # visualis静态文件目录
+            root   /appcom/Install/DSS/FRONT; # visualis静态文件目录
             autoindex on;
             }
             location / {
@@ -400,7 +399,29 @@ server {
 
 ## 4.3、常见问题
 
-(1)上传文件大小限制
+(1)用户token为空
+
+```
+sudo vi dss-server/conf/token.properties
+```
+
+添加用户
+
+```
+xxx=xxx
+```
+
+(2)visualis执行报错
+
+```
+Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
+```
+
+下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
+
+
+
+(3)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -412,7 +433,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (2)接口超时
+ (4)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

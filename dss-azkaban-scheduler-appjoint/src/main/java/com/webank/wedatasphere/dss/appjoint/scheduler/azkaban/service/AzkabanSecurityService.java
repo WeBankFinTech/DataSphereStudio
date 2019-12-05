@@ -98,6 +98,7 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
             httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
             context = HttpClientContext.create();
             response = httpClient.execute(httpPost, context);
+            LOGGER.info("Get azkaban response code is "+ response.getStatusLine().getStatusCode());
         } finally {
             IOUtils.closeQuietly(response);
             IOUtils.closeQuietly(httpClient);

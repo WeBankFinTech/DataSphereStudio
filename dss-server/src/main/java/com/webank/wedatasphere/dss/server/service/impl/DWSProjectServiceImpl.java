@@ -178,7 +178,11 @@ public class DWSProjectServiceImpl implements DWSProjectService {
             project.setUserName(userName);
             project.setDescription(description);
             if(existSchesulis()){
-                functionInvoker.projectServiceFunction(project,ProjectService::updateProject,Arrays.asList(getSchedulerAppJoint()));
+                if(getSchedulerAppJoint() != null) {
+                     functionInvoker.projectServiceFunction(project,ProjectService::updateProject,Arrays.asList(getSchedulerAppJoint()));
+                }else{
+                    logger.error("Update scheduler project failed for scheduler appjoint is null");
+                }
             }
             functionInvoker.projectServiceFunction(project,ProjectService::updateProject,applicationService.listAppjoint());
         }
@@ -193,7 +197,11 @@ public class DWSProjectServiceImpl implements DWSProjectService {
             project.setUserName(userName);
             if(ifDelScheduler){
                 if(existSchesulis()){
-                    functionInvoker.projectServiceFunction(project,ProjectService::deleteProject,Arrays.asList(getSchedulerAppJoint()));
+                    if(getSchedulerAppJoint() != null) {
+                        functionInvoker.projectServiceFunction(project, ProjectService::deleteProject, Arrays.asList(getSchedulerAppJoint()));
+                    }else{
+                        logger.error("Delete scheduler project failed for scheduler appjoint is null");
+                    }
                 }
             }
             functionInvoker.projectServiceFunction(project,ProjectService::deleteProject,applicationService.listAppjoint());

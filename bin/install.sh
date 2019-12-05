@@ -121,8 +121,8 @@ elif [[ '2' = "$idx" ]];then
   checkExternalServer
   #check  qualitis serivice
   SERVER_NAME=Qualitis
-  EXTERNAL_SERVER_IP=$QUALISTIS_ADRESS_IP
-  EXTERNAL_SERVER_PORT=$QUALISTIS_ADRESS_PORT
+  EXTERNAL_SERVER_IP=$QUALITIS_ADRESS_IP
+  EXTERNAL_SERVER_PORT=$QUALITIS_ADRESS_PORT
   checkExternalServer
   #check  azkaban serivice
   SERVER_NAME=AZKABAN
@@ -416,16 +416,19 @@ ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#msg.eventchecker.jdo.option.password.
 isSuccess "subsitution conf of $SERVERNAME"
 echo "<----------------$APPJOINTNAME:end------------------->"
 echo ""
-echo "<----------------sendemail  appjoint install start------------------->"
-APPJOINTPARENT=dss-appjoints
-APPJOINTNAME=sendemail
-#Sendemail  appjoint install
-installAppjoints
-echo "<----------------$APPJOINTNAME:end------------------->"
-echo ""
 echo "<----------------visualis  appjoint install start------------------->"
 APPJOINTPARENT=dss-appjoints
 APPJOINTNAME=visualis
 #visualis  appjoint install
 installAppjoints
+echo "<----------------$APPJOINTNAME:end------------------->"
+echo ""
+echo "<----------------qualitis  appjoint install start------------------->"
+APPJOINTPARENT=dss-appjoints
+APPJOINTNAME=qualitis
+#qualitis  appjoint install
+installAppjoints
+APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoint.properties
+ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
+isSuccess "subsitution conf of $SERVERNAME"
 echo "<----------------$APPJOINTNAME:end------------------->"

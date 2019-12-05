@@ -33,7 +33,7 @@ SSH_PORT=22 ## SSH port
 ##Azkaban executor  dir 
 AZKABAN_EXECUTOR_DIR=/tmp/Install/AzkabanInstall/executor ## The installation directory of the actuator
 
-##Azkaban executor plugin reload url 
+##Azkaban executor plugin reload url (请注意：Azkaban的执行器地址，不是Azkaban的webServer地址)
 AZKABAN_EXECUTOR_URL=http://127.0.0.1:12321/executor?action=reloadJobTypePlugins ##Only need to modify the IP and port here
 ```
 ## 3. Execute the installation script

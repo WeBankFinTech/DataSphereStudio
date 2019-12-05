@@ -7,9 +7,6 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.LinkisAzkab
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.LinkisAzkabanShareNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.constant.SchedulerAppJointConstant;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +15,13 @@ import java.util.Map;
 /**
  * Created by cooperyang on 2019/11/1.
  */
-@Component
+
 public class LinkisJobConverter {
 
-    @Autowired
+    public LinkisJobConverter(){
+        LinkisJobTuning[] linkisJobTunings = {new AzkabanSubFlowJobTuning()};
+        this.linkisJobTunings = linkisJobTunings;
+    }
     private LinkisJobTuning[] linkisJobTunings;
 
     public String conversion(LinkisAzkabanSchedulerNode schedulerNode){

@@ -7,19 +7,25 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerProject;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.AbstractProjectTuning;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.FlowTuning;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by cooperyang on 2019/9/26.
  */
-@Component
+
 public class AzkabanProjectTuning extends AbstractProjectTuning {
+
+    public AzkabanProjectTuning(){
+        ArrayList<FlowTuning> list = new ArrayList<>();
+        list.add(new LinkisAzkabanFlowTuning());
+        list.add(new LinkisShareNodeFlowTuning());
+        FlowTuning[] flowTunings =new FlowTuning[list.size()];
+        setFlowTunings(list.toArray(flowTunings));
+    }
 
     @Override
     public SchedulerProject tuningSchedulerProject(SchedulerProject schedulerProject) {
@@ -39,7 +45,7 @@ public class AzkabanProjectTuning extends AbstractProjectTuning {
         azkabanSchedulerFlow.setStorePath(projectStorePath + File.separator + azkabanSchedulerFlow.getName());
     }
 
-    @Autowired
+
     @Override
     public void setFlowTunings(FlowTuning[] flowTunings) {
         super.setFlowTunings(flowTunings);

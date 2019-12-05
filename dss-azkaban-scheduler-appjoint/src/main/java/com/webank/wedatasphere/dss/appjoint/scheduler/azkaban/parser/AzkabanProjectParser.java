@@ -6,14 +6,16 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.parser.AbstractProjectPars
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.FlowParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * Created by allenlliu on 2019/9/16.
  */
-@Component
+
 public class AzkabanProjectParser extends AbstractProjectParser {
+
+    public AzkabanProjectParser(){
+        FlowParser[] flowParsers = {new AzkabanFlowParser()};
+        setFlowParsers(flowParsers);
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(AzkabanProjectParser.class);
 
@@ -23,7 +25,6 @@ public class AzkabanProjectParser extends AbstractProjectParser {
     }
 
     @Override
-    @Autowired
     public void setFlowParsers(FlowParser[] flowParsers) {
         super.setFlowParsers(flowParsers);
     }

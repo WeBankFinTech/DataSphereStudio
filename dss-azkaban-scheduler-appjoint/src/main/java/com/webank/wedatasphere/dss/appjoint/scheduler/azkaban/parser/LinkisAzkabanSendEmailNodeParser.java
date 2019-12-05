@@ -5,9 +5,9 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.LinkisAzkab
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.ReadNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.SendEmailNodeParser;
-import org.springframework.stereotype.Component;
 
-@Component
+
+
 public class LinkisAzkabanSendEmailNodeParser extends SendEmailNodeParser {
 
     @Override

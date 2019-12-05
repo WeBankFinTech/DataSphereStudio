@@ -1,0 +1,337 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@import 'variables.scss';
+
+@font-face {
+  font-family: 'font-dws-icon';
+  src:  url('../iconfont/font-dws-icon.eot?fkqrnv');
+  src:  url('../iconfont/font-dws-icon.eot?fkqrnv#iefix') format('embedded-opentype'),
+    url('../iconfont/font-dws-icon.ttf?fkqrnv') format('truetype'),
+    url('../iconfont/font-dws-icon.woff?fkqrnv') format('woff'),
+    url('../iconfont/font-dws-icon.svg?fkqrnv#font-dws-icon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="fi-"], [class*=" fi-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'font-dws-icon' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fi-export:before {
+  content: "\e904";
+}
+.fi-download:before {
+  content: "\e905";
+}
+.fi-quit:before {
+  content: "\e906";
+}
+.fi-search:before {
+  content: "\e907";
+}
+.fi-undo:before {
+  content: "\e908";
+}
+.fi-redo:before {
+  content: "\e909";
+}
+.fi-format:before {
+  content: "\e90a";
+}
+.fi-play:before {
+  content: "\e90b";
+}
+.fi-stop:before {
+  content: "\e90c";
+}
+.fi-save:before {
+  content: "\e90d";
+}
+.fi-disconnect:before {
+  content: "\e90e";
+}
+.fi-warn:before {
+  content: "\e90f";
+}
+.fi-expand-right:before {
+  content: "\e910";
+}
+.fi-cross:before {
+  content: "\e911";
+}
+.fi-tick:before {
+  content: "\e912";
+}
+.fi-dir-fold:before {
+  content: "\e913";
+}
+.fi-dir-unfold:before {
+  content: "\e914";
+}
+.fi-more-things:before {
+  content: "\e915";
+}
+.fi-radio-on2:before {
+  content: "\e918";
+}
+.fi-ide:before {
+  content: "\e91d";
+}
+.fi-hivedb.open:before {
+  content: "\e91e";
+}
+.fi-hivedb:before {
+  content: "\e91f";
+}
+.fi-disk-o:before {
+  content: "\e920";
+}
+.fi-disk:before {
+  content: "\e921";
+}
+.fi-project-o:before {
+  content: "\e922";
+}
+.fi-project:before {
+  content: "\e923";
+}
+.fi-caret-down:before {
+  content: "\e924";
+}
+.fi-caret-right:before {
+  content: "\e925";
+}
+.fi-folder:before {
+  content: "\e926";
+  padding: 0 2px;
+  font-size: 14px;
+}
+.fi-folder-o:before {
+  content: "\e927";
+  padding: 0 2px;
+  font-size: 14px;
+}
+.fi-file:before {
+  content: "\e928";
+  font-size: 16px;
+  color: gray;
+}
+.fi-file-o:before {
+  content: "\e929";
+  font-size: 16px;
+  padding: 0 2px;
+}
+.fi-logo:before {
+  content: "\e930"
+}
+.fi-table:before {
+  content: "\e931";
+}
+.fi-table.open:before {
+  content: "\e931";
+  color: gray;
+}
+.fi-field:before {
+  content: "\e932";
+  font-size: 14px;
+  color: gray;
+}
+.fi-field.open:before {
+  content: "\e932";
+  font-size: 14px;
+  color: gray;
+}
+.fi-open-in:before {
+  content: "\e92d"
+}
+.fi-dock-show:before {
+  content: "\e92e"
+}
+.fi-dock-hide:before {
+  content: "\e92f"
+}
+.fi-hive:before {
+  content: "\e93a";
+  color: #f4cf2a;
+  font-size: 16px;
+}
+.fi-spark:before {
+  content: "\e93b";
+  color: $warning-color;
+  font-size: 16px;
+}
+.fi-scala:before {
+  content: "\e93c";
+  color: $error-color;
+  font-size: 16px;
+}
+.fi-jdbc:before {
+  content: "\e93d";
+  font-size: 16px;
+}
+.fi-python:before {
+  content: "\e93e";
+  color: #3573a6;
+  font-size: 16px;
+  font-weight: bold;
+}
+.fi-spark-python:before {
+  color: #3573a6;
+  content: "\e93f";
+  font-size: 18px;
+}
+.fi-storage:before {
+  content: "\e940";
+  color: #4db091;
+  font-size: 12px;
+}
+.fi-sas:before {
+  content: "\e941";
+  color: #58c6a2;
+}
+.fi-r:before {
+  content: "\e942";
+  color: #2d8cf0;
+  font-size: 14px;
+}
+.fi-txt:before {
+  content: "\e943";
+  color: gray;
+  font-size: 16px;
+}
+.fi-log:before {
+  content: "\e944";
+  color: gray;
+  font-size: 16px;
+}
+.fi-xls:before {
+  content: "\e945";
+  color: #36af47;
+  font-size: 16px;
+}
+.fi-xlsx:before {
+  content: "\e946";
+  color: #36af47;
+  font-size: 16px;
+}
+.fi-csv:before {
+  content: "\e947";
+  color: #36af47;
+  font-size: 16px;
+}
+.fi-jar:before {
+  content: "\e948";
+  color: #e45f3d;
+  font-size: 16px;
+}
+.fi-fx-method:before {
+  content: "\e94a";
+}
+.fi-fx-method-o:before {
+  content: "\e94a";
+}
+.fi-fx-udf:before {
+  content: "\e94b";
+}
+.fi-fx-udf-o:before {
+  content: "\e94b"
+}
+.fi-data-develop:before {
+  content: "\e600";
+  color: #4cbf4b;
+}
+.fi-resource:before {
+  content: "\e601";
+  color: #3293e3;
+}
+.fi-data-exchange:before {
+  content: "\e602";
+}
+.fi-algorithms:before {
+  content: "\e603";
+  color: #ff3d3d;
+}
+.fi-workflow:before {
+  content: "\e604"
+}
+.fi-bi:before {
+  content: "\e605";
+  color: #9654f5;
+  font-size: 14px;
+}
+.fi-schedule:before {
+  content: "\e903";
+}
+.fi-workflow1:before {
+  content: "\e901";
+}
+.fi-exchange:before {
+  content: "\e902";
+}
+.fi-application:before {
+  content: "\e916";
+}
+.fi-newproject:before {
+  content: "\e91a";
+}
+.fi-addproject:before {
+  content: "\e919";
+}
+.fi-visualis:before {
+  content: "\e91b";
+}
+.fi-qualitis:before {
+  content: "\e91c";
+}
+.fi-scriptis:before {
+  content: "\e92a";
+}
+.fi-system:before {
+  content: "\e92b";
+}
+
+// refresh icon 单独设置padding
+.ivu-icon-ios-refresh{
+  padding: 4px 3px;
+}
+
+@keyframes we-icon-loading-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+.we-icon-loading {
+    color: #3d3d3d;
+    animation: we-icon-loading-spin 1s linear infinite;
+}

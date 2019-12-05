@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <groupId>com.webank.wedatasphere.dss</groupId>
+    <artifactId>dss</artifactId>
+    <version>0.5.0</version>
+
+    <modules>
+        <module>dss-common</module>
+        <module>dss-appjoint-auth</module>
+        <module>dss-appjoint-core</module>
+        <module>dss-appjoint-loader</module>
+        <module>dss-application</module>
+        <module>dss-scheduler-appjoint-core</module>
+        <module>dss-linkis-node-execution</module>
+        <module>dss-flow-execution-entrance</module>
+        <module>dss-azkaban-scheduler-appjoint</module>
+        <module>dss-server</module>
+        <module>visualis-appjoint/appjoint</module>
+        <module>qualitis-appjoint/appjoint</module>
+        <module>eventchecker-appjoint</module>
+        <module>datachecker-appjoint</module>
+        <module>sendemail-appjoint/sendemail-core</module>
+        <module>plugins/azkaban/linkis-jobtype</module>
+        <module>plugins/linkis/linkis-appjoint-entrance</module>
+        <module>assembly</module>
+    </modules>
+
+    <properties>
+        <dss.version>0.5.0</dss.version>
+        <linkis.version>0.9.1</linkis.version>
+        <scala.version>2.11.8</scala.version>
+        <jdk.compile.version>1.8</jdk.compile.version>
+        <maven.version>3.3.3</maven.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-compiler</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scalap</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>${maven.version}</version>
+                                    </requireMavenVersion>
+                                    <requireJavaVersion>
+                                        <version>${java.version}</version>
+                                    </requireJavaVersion>
+                                    <bannedDependencies>
+                                        <excludes>
+                                            <exclude>org.jboss.netty</exclude>
+                                        </excludes>
+                                        <searchTransitive>true</searchTransitive>
+                                    </bannedDependencies>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                        <source>${jdk.compile.version}</source>
+                        <target>${jdk.compile.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>3.2.2</version>
+                    <executions>
+                        <execution>
+                            <id>eclipse-add-source</id>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-compile-first</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile-first</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>attach-scaladocs</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>doc-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scalaVersion>${scala.version}</scalaVersion>
+                        <recompileMode>incremental</recompileMode>
+                        <useZincServer>true</useZincServer>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

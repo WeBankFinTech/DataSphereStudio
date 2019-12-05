@@ -18,8 +18,11 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler;
 
 import com.webank.wedatasphere.dss.appjoint.AppJoint;
+import com.webank.wedatasphere.dss.appjoint.scheduler.hooks.ProjectPublishHook;
+import com.webank.wedatasphere.dss.appjoint.scheduler.parser.ProjectParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerProjectService;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerSecurityService;
+import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.ProjectTuning;
 
 import java.io.Closeable;
 
@@ -31,5 +34,11 @@ public interface SchedulerAppJoint extends AppJoint, Closeable {
     SchedulerProjectService getProjectService();
 
     SchedulerSecurityService getSecurityService();
+
+    ProjectParser getProjectParser();
+    ProjectTuning getProjectTuning();
+
+    ProjectPublishHook[] getProjectPublishHooks();
+
 
 }

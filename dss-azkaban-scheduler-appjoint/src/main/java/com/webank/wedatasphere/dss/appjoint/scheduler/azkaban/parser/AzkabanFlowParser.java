@@ -5,11 +5,19 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.parser.NodeParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.AzkabanSchedulerFlow;
 import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
 
-@Component
+
 public class AzkabanFlowParser extends AbstractFlowParser {
+
+    public AzkabanFlowParser(){
+        ArrayList<NodeParser> list = new ArrayList<>();
+        list.add(new LinkisAzkabanNodeParser());
+        list.add(new LinkisAzkabanSendEmailNodeParser());
+        NodeParser[] nodeParsers =new NodeParser[list.size()];
+        list.toArray(nodeParsers);
+        setNodeParsers(nodeParsers);
+    }
 
     @Override
     protected SchedulerFlow createSchedulerFlow() {
@@ -17,7 +25,6 @@ public class AzkabanFlowParser extends AbstractFlowParser {
     }
 
     @Override
-    @Autowired
     public void setNodeParsers(NodeParser[] nodeParsers) {
         super.setNodeParsers(nodeParsers);
     }

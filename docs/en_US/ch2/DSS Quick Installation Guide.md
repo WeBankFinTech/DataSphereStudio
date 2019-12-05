@@ -7,17 +7,17 @@
 Due to the richness of its components, DataSphereStudio can be installed as a simple version or a standard version, different with other softwares. The differences are mentioned as below:
 
 1. **Simple Version**
-Minimal environment dependencies and only basic components need to be prepared：[Linkis](https://github.com/WeBankFinTech/Linkis)、JAVA、MYSQL、[Nginx](https://www.nginx.com/). Then you can immediately enjoy the integrated Scriptis(for data development), real-time workflow execution, visualization, email delivery, datacheck and eventcheck services. Click to enter the [simple version DSS environment configuration preparation](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+Minimal environment dependencies and only basic components need to be prepared：[Linkis](https://github.com/WeBankFinTech/Linkis)、JAVA、MYSQL、[Nginx](https://www.nginx.com/). Then you can immediately enjoy the integrated Scriptis(for data development), real-time workflow execution, visualization, email delivery, datacheck and eventcheck services. Click to enter the [simple version DSS environment configuration preparation](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/DSS%20Quick%20Installation%20Guide.md#second-simple-version-dss-environment-configuration)
 
 2. **Standard Version**
-DSS also implements the integration of many external systems, such as [Qualitis](https://github.com/WeBankFinTech/Qualitis) and [Azkaban](https://github.com/azkaban/azkaban). If you want to use these external systems, you need to install and start the Qualities and Azkaban services before installing the simple version, and ensure that they can provide services properly. The IP and port of the corresponding service should be specified in the configuration. Click me to enter the [standard version DSS environment configuration preparation](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%B8%89%E6%A0%87%E5%87%86%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+DSS also implements the integration of many external systems, such as [Qualitis](https://github.com/WeBankFinTech/Qualitis) and [Azkaban](https://github.com/azkaban/azkaban). If you want to use these external systems, you need to install and start the Qualities and Azkaban services before installing the simple version, and ensure that they can provide services properly. The IP and port of the corresponding service should be specified in the configuration. Click me to enter the [standard version DSS environment configuration preparation](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/DSS%20Quick%20Installation%20Guide.md#three-standard-dss-environment-configuration-preparation)
 
 ## Second: Simple version DSS environment configuration
 
 DSS environment configuration can be divided into three steps, including basic software installation, backend environment configuration, and frontend environment configuration. The details are as below:
 
 ### 2.1 Frontend and backend basic software installation
-Linkis standard version (above 0.9.1). How to install [Linkis]([https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis]
+Linkis standard version (above 0.9.1). How to install [Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
 
 JDK (above 1.8.0_141). How to install [JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -83,7 +83,7 @@ On the DSS release page [click here to enter the download page](https://github.c
 ### a、Download the installation package
 Click [release](https://github.com/WeBankFinTech/DataSphereStudio/releases) to download the corresponding installation package and extract it to the installation directory:
 ```bash
- unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip
+ unzip wedatasphere-dss-web-x.x.x-dist.zip
 ```
 
 **Note: If the DSS frontend installation package was compiled by the user, you need to copy the [visualis frontEnd](https://github.com/WeBankFinTech/Visualis/releases) installation package to the dss/visualis folder in the DSS frontEnd-end installation directory for automated installation.**
@@ -106,12 +106,12 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-The environment is ready, click me to enter ****[4. Installation and use](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)**
+The environment is ready, click me to enter ****[4. Installation and use](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/DSS%20Quick%20Installation%20Guide.md#four-installation-and-use)**
 
 ## Three Standard DSS environment configuration preparation
 The standard DSS environment preparation is also divided into three parts, the frontEnd-end and back-end basic software installation, back-end environment preparation, and frontEnd-end environment preparation. The details are as follows:
 ### 3.1 frontEnd and BackEnd basic software installation
-Linkis standard version (above 0.9.1), [How to install Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
+Linkis standard version (above 0.9.1), [How to install Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
 
 JDK (above 1.8.0_141), How to install [JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -122,7 +122,8 @@ Nginx, How to Install [Nginx](https://www.tecmint.com/install-nginx-on-centos-7/
 Qualitis, How to Install [Qualitis](https://github.com/WeBankFinTech/Qualitis/blob/master/docs/zh_CN/ch1/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%89%8B%E5%86%8C.md)
 
 Azkaban, How to Install [Azkaban](https://github.com/azkaban/azkaban)
-**Note: To support Azkaban scheduling, linkis-jobtype needs to be installed. Please click the [Linkis jobType installation document](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/Azkaban_LinkisJobType_Deployment_Manual.md).**
+
+**Note: To support Azkaban scheduling, linkis-jobtype needs to be installed. Please click the [Linkis jobType installation document](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/Azkaban_LinkisJobType_Deployment_Manual.md).**
 
 ### 3.2 BackEnd environment configuration preparation
 ### a. User creation
@@ -135,7 +136,7 @@ Create a deployment user on the deployment machine and use that user for install
 **Note: It is best for users to have sudo permissions and log in to this machine without password. [How to configure SSH passwordless login](https://www.jianshu.com/p/0922095f69f3)**
 
 ### b. Installation package preparation
-From the DSS released[click here to enter the download page](https://github.com/WeBankFinTech/DataSphereStudio/releases), download the corresponding installation package. First decompress the installation package to the installation directory and modify the configuration of the decompressed file
+From the DSS released [click here to enter the download page](https://github.com/WeBankFinTech/DataSphereStudio/releases), download the corresponding installation package. First decompress the installation package to the installation directory and modify the configuration of the decompressed file
 ```
  tar -xvf  wedatasphere-dss-x.x.x-dist.tar.gz
 ```
@@ -149,7 +150,7 @@ From the DSS released[click here to enter the download page](https://github.com/
 ```
 
 ```properties
-        <!--Note: The following are mandatory configuration items for DSS. Please ensure that external services are available.-->
+    <!--Note: The following are mandatory configuration items for DSS. Please ensure that external services are available.-->
 
     deployUser=hadoop  #Specify the deployment user
 
@@ -171,10 +172,10 @@ From the DSS released[click here to enter the download page](https://github.com/
     HIVE_META_PASSWORD=xxx
     #2、for Qualitis
     QUALITIS_ADRESS_IP=127.0.0.1 #QUALITIS service IP address
-    QUALITIS_ADRESS_PORT=9991 #QUALITIS service port number
+    QUALITIS_ADRESS_PORT=8090 #QUALITIS service port number
     #3、for AZKABAN
     AZKABAN_ADRESS_IP=127.0.0.1 #AZKABAN service IP address
-    AZKABAN_ADRESS_PORT=9987 #AZKABAN service port number
+    AZKABAN_ADRESS_PORT=8091 #AZKABAN service port number
 ```
 
 ### d. Modify database configuration
@@ -221,7 +222,7 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-The environment is ready, click me to enter **[Four  Installation and use](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)**
+The environment is ready, click me to enter **[Four  Installation and use](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch2/DSS%20Quick%20Installation%20Guide.md#four-installation-and-use)**
 
 ## Four Installation and use
 ### 4.1. DataSphereStudio BackEnd installation：
@@ -260,14 +261,14 @@ You can view the success of the service startup on the Eureka interface, and che
 
 - As shown in the figure below, if the following microservices appear on your Eureka homepage, the services are successfully started and services can be provided normally:
 
- ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
+ ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ### 4.2 DataSphereStudio frontEnd installation
 ### a、Download the installation package
 Click release to select the installation package to download and extract it in the installation directory:
 
 ```bash
-     unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip
+     unzip wedatasphere-dss-web-x.x.x-dist.zip
 ```
 ### b、deploy:
 
@@ -302,7 +303,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
 			location /dss/visualis {
-            root   /appcom/Install/DSS/frontEnd/dss/visualis; # visualis Static file directory
+            root   /appcom/Install/DSS/frontEnd; # visualis Static file directory
             autoindex on;
             }
             location / {
@@ -354,7 +355,7 @@ sudo systemctl restart nginx
 http://nginx_ip:nginx_port
 ```
 
-How to use DSS in detail, click me to enter **[DSS detailed usage document.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)**
+How to use DSS in detail, click me to enter **[DSS user manual.](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/en_US/ch3/DataSphereStudio_quick_start.md)**
 
 ### 4.3、common problem
 
@@ -376,7 +377,7 @@ xxx=xxx
 Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
 ```
 
-Download the [driver driver](https://phantomjs.org/download.html) and put the phantomjs binary file in the bin directory of visualis-server.
+Download the [driver](https://phantomjs.org/download.html) and put the phantomjs binary file in the bin directory of visualis-server.
 
 
 (3)Upload file size limit

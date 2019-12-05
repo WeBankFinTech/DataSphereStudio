@@ -65,7 +65,12 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public AppJoint getAppjoint(String nodeType) throws AppJointErrorException {
-        Application application = getApplicationbyNodeType(nodeType);
+        Application application;
+        if(nodeType.equals("schedulis")){
+            application = getApplication(nodeType);
+        }else {
+            application = getApplicationbyNodeType(nodeType);
+        }
         AppJoint appJoint = null;
         try {
             appJoint = loadAppjoint(application);

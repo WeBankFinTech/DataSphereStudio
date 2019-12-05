@@ -1,11 +1,11 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.linkisjob;
 
-import org.springframework.stereotype.Component;
+
 
 /**
  * Created by cooperyang on 2019/11/1.
  */
-@Component
+
 public class AzkabanSubFlowJobTuning implements LinkisJobTuning {
 
     @Override

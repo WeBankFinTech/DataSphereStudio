@@ -60,21 +60,21 @@
             <version>${dss.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-azkaban-scheduler-appjoint</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-cloud-starter-openfeign</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-            </exclusions>
-            <version>${dss.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.webank.wedatasphere.dss</groupId>-->
+            <!--<artifactId>dss-azkaban-scheduler-appjoint</artifactId>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>spring-cloud-starter-openfeign</artifactId>-->
+                    <!--<groupId>org.springframework.cloud</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+                    <!--<groupId>org.springframework.cloud</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+            <!--<version>${dss.version}</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -141,6 +141,11 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-scheduler-appjoint-core</artifactId>
+            <version>0.5.0</version>
         </dependency>
     </dependencies>
 

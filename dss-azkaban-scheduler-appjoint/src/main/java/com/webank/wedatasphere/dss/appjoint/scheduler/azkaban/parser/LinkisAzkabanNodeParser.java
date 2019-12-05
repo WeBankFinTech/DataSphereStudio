@@ -5,9 +5,7 @@ import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LinkisAzkabanNodeParser extends AzkabanNodeParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkisAzkabanNodeParser.class);

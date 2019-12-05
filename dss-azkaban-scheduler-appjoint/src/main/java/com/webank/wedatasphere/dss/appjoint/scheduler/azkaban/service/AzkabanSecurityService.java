@@ -1,12 +1,14 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.service;
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
+import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerSecurityService;
 import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.constant.AzkabanConstant;
 import com.webank.wedatasphere.linkis.common.utils.Utils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -18,6 +20,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +43,7 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
     private ConcurrentHashMap<String, Session> sessionCache = new ConcurrentHashMap<>();
     private String securityUrl;
     private static final String USER_NAME_KEY = "username";
-    private static final String USER_TOKEN_KEY = "userpwd";
+    private static final String USER_TOKEN_KEY = AzkabanConf.AZKABAN_LOGIN_PWD.getValue();
     private static final String SESSION_ID_KEY = "azkaban.browser.session.id";
     private static Properties userToken ;
 
@@ -83,7 +86,7 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
         }
     }
 
-    private Session getSession(String user, String token) throws IOException {
+    private Session getSession(String user, String token) throws IOException, AppJointErrorException {
         HttpPost httpPost = new HttpPost(securityUrl);
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(USER_NAME_KEY, user));
@@ -94,18 +97,24 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         HttpClientContext context;
+        String responseContent;
         try {
             httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
             context = HttpClientContext.create();
             response = httpClient.execute(httpPost, context);
-            LOGGER.info("Get azkaban response code is "+ response.getStatusLine().getStatusCode());
+            HttpEntity entity = response.getEntity();
+            responseContent = EntityUtils.toString(entity,"utf-8");
+            LOGGER.info("Get azkaban response code is "+ response.getStatusLine().getStatusCode()+",response: "+responseContent);
+            if(response.getStatusLine().getStatusCode() != 200){
+                throw new AppJointErrorException(90041, responseContent);
+            }
         } finally {
             IOUtils.closeQuietly(response);
             IOUtils.closeQuietly(httpClient);
         }
         List<Cookie> cookies = context.getCookieStore().getCookies();
         Optional<Session> session = cookies.stream().filter(this::findSessionId).map(this::cookieToSession).findFirst();
-        return session.orElseThrow(() -> new IllegalAccessError("azkaban登录失败：无此用户"));
+        return session.orElseThrow(() -> new AppJointErrorException(90041,"Get azkaban session is null : "+ responseContent));
     }
 
     private boolean findSessionId(Cookie cookie) {

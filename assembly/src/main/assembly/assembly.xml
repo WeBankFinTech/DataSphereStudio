@@ -112,6 +112,16 @@
     </includes>
   </fileSet>
 
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/dss-azkaban-scheduler-appjoint/target/
+      </directory>
+      <outputDirectory>share/appjoints/schedulis</outputDirectory>
+      <includes>
+        <include>*.zip</include>
+      </includes>
+    </fileSet>
+
   <fileSet>
     <directory>
       ${project.parent.basedir}/dss-flow-execution-entrance/target/

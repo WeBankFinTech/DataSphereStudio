@@ -79,20 +79,15 @@ public class DWSProjectServiceImpl implements DWSProjectService {
     private DWSFlowService flowService;
     @Autowired
     private ProjectMapper projectMapper;
-    @Autowired
-    private SchedulerAppJoint schedulerAppJoint;
-    @Autowired
-    private ProjectParser projectParser;
-    @Autowired
-    private ProjectTuning projectTuning;
-    @Autowired
-    private ProjectPublishHook[] projectPublishHooks;
+
     @Autowired
     private BMLService bmlService;
     @Autowired
     private ApplicationService applicationService;
     @Autowired
     private FunctionInvoker functionInvoker;
+
+    private SchedulerAppJoint schedulerAppJoint=null;
 
     @Override
     public DWSProject getProjectByID(Long id) {
@@ -162,7 +157,11 @@ public class DWSProjectServiceImpl implements DWSProjectService {
 
     private void createSchedulerProject(DWSProject dwsProject) throws DSSErrorException {
         try {
-            functionInvoker.projectServiceAddFunction(dwsProject,ProjectService::createProject,Arrays.asList(schedulerAppJoint));
+            if(getSchedulerAppJoint() != null) {
+                functionInvoker.projectServiceAddFunction(dwsProject, ProjectService::createProject, Arrays.asList(getSchedulerAppJoint()));
+            }else{
+                logger.error("Add scheduler project failed for scheduler appjoint is null");
+            }
         } catch (Exception e) {
             logger.error("add scheduler project failed,", e);
             throw new DSSErrorException(90002, "add scheduler project failed" + e.getMessage());
@@ -179,7 +178,11 @@ public class DWSProjectServiceImpl implements DWSProjectService {
             project.setUserName(userName);
             project.setDescription(description);
             if(existSchesulis()){
-                functionInvoker.projectServiceFunction(project,ProjectService::updateProject,Arrays.asList(schedulerAppJoint));
+                if(getSchedulerAppJoint() != null) {
+                     functionInvoker.projectServiceFunction(project,ProjectService::updateProject,Arrays.asList(getSchedulerAppJoint()));
+                }else{
+                    logger.error("Update scheduler project failed for scheduler appjoint is null");
+                }
             }
             functionInvoker.projectServiceFunction(project,ProjectService::updateProject,applicationService.listAppjoint());
         }
@@ -194,7 +197,11 @@ public class DWSProjectServiceImpl implements DWSProjectService {
             project.setUserName(userName);
             if(ifDelScheduler){
                 if(existSchesulis()){
-                    functionInvoker.projectServiceFunction(project,ProjectService::deleteProject,Arrays.asList(schedulerAppJoint));
+                    if(getSchedulerAppJoint() != null) {
+                        functionInvoker.projectServiceFunction(project, ProjectService::deleteProject, Arrays.asList(getSchedulerAppJoint()));
+                    }else{
+                        logger.error("Delete scheduler project failed for scheduler appjoint is null");
+                    }
                 }
             }
             functionInvoker.projectServiceFunction(project,ProjectService::deleteProject,applicationService.listAppjoint());
@@ -252,40 +259,50 @@ public class DWSProjectServiceImpl implements DWSProjectService {
     @Transactional(rollbackFor = {DSSErrorException.class, InterruptedException.class,AppJointErrorException.class})
     @Override
     public void publish(Long projectVersionID, String userName, String comment) throws DSSErrorException, InterruptedException, AppJointErrorException {
-        // TODO: 2019/9/24 try catch 下载json要挪到parser去
-        //1.封装dwsProject
-        DWSProject dwsProject = projectMapper.selectProjectByVersionID(projectVersionID);
-        dwsProject.setUserName(dwsUserMapper.getuserName(dwsProject.getUserID()));
-        logger.info(userName + "-开始发布工程：" + dwsProject.getName() + "版本ID为：" + projectVersionID);
-        ArrayList<DWSFlow> dwsFlows = new ArrayList<>();
-        List<DWSFlowVersion> dwsFlowVersionList = flowMapper.listLatestRootFlowVersionByProjectVersionID(projectVersionID);
-        for (DWSFlowVersion dwsFlowVersion : dwsFlowVersionList) {
-            DWSFlow dwsFlow = flowMapper.selectFlowByID(dwsFlowVersion.getFlowID());
-            String json = (String) bmlService.query(userName, dwsFlowVersion.getJsonPath(), dwsFlowVersion.getVersion()).get("string");
-            if (!dwsFlow.getHasSaved()) {
-                logger.info("工作流{}从未保存过，忽略",dwsFlow.getName());
-            } else if(StringUtils.isNotBlank(json)){
-                dwsFlowVersion.setJson(json);
-                dwsFlow.setLatestVersion(dwsFlowVersion);
-                createPublishProject(userName, dwsFlowVersion.getFlowID(), dwsFlow, projectVersionID);
-                dwsFlows.add(dwsFlow);
-            } else {
-                String warnMsg = String.format(DSSServerConstant.PUBLISH_FLOW_REPORT_FORMATE, dwsFlow.getName(), dwsFlowVersion.getVersion());
-                logger.info(warnMsg);
-                throw new DSSErrorException(90013, warnMsg);
+
+        SchedulerAppJoint schedulerAppJoint = getSchedulerAppJoint();
+        if(schedulerAppJoint != null) {
+            ProjectParser projectParser = schedulerAppJoint.getProjectParser();
+            ProjectTuning projectTuning = schedulerAppJoint.getProjectTuning();
+            ProjectPublishHook[] projectPublishHooks = schedulerAppJoint.getProjectPublishHooks();
+            // TODO: 2019/9/24 try catch 下载json要挪到parser去
+            //1.封装dwsProject
+            DWSProject dwsProject = projectMapper.selectProjectByVersionID(projectVersionID);
+            dwsProject.setUserName(dwsUserMapper.getuserName(dwsProject.getUserID()));
+            logger.info(userName + "-开始发布工程：" + dwsProject.getName() + "版本ID为：" + projectVersionID);
+            ArrayList<DWSFlow> dwsFlows = new ArrayList<>();
+            List<DWSFlowVersion> dwsFlowVersionList = flowMapper.listLatestRootFlowVersionByProjectVersionID(projectVersionID);
+            for (DWSFlowVersion dwsFlowVersion : dwsFlowVersionList) {
+                DWSFlow dwsFlow = flowMapper.selectFlowByID(dwsFlowVersion.getFlowID());
+                String json = (String) bmlService.query(userName, dwsFlowVersion.getJsonPath(), dwsFlowVersion.getVersion()).get("string");
+                if (!dwsFlow.getHasSaved()) {
+                    logger.info("工作流{}从未保存过，忽略", dwsFlow.getName());
+                } else if (StringUtils.isNotBlank(json)) {
+                    dwsFlowVersion.setJson(json);
+                    dwsFlow.setLatestVersion(dwsFlowVersion);
+                    createPublishProject(userName, dwsFlowVersion.getFlowID(), dwsFlow, projectVersionID);
+                    dwsFlows.add(dwsFlow);
+                } else {
+                    String warnMsg = String.format(DSSServerConstant.PUBLISH_FLOW_REPORT_FORMATE, dwsFlow.getName(), dwsFlowVersion.getVersion());
+                    logger.info(warnMsg);
+                    throw new DSSErrorException(90013, warnMsg);
+                }
             }
+            if (dwsFlows.isEmpty()) throw new DSSErrorException(90007, "该工程没有可以发布的工作流,请检查工作流是否都为空");
+            dwsProject.setFlows(dwsFlows);
+            //2.封装dwsProject完成，开始发布
+            SchedulerProject schedulerProject = projectParser.parseProject(dwsProject);
+            projectTuning.tuningSchedulerProject(schedulerProject);
+            Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.prePublish(schedulerProject)));
+            (schedulerAppJoint.getProjectService()).publishProject(schedulerProject, schedulerAppJoint.getSecurityService().login(userName));
+            Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.postPublish(schedulerProject)));
+            //3.发布完成后复制工程
+            DWSProjectVersion dwsProjectVersion = projectMapper.selectProjectVersionByID(projectVersionID);
+            copyProjectVersionMax(projectVersionID, dwsProjectVersion, dwsProjectVersion, userName, null);
+        }else {
+            logger.error("SchedulerAppJoint is null");
+            throw new DSSErrorException(90014, "SchedulerAppJoint is null");
         }
-        if (dwsFlows.isEmpty()) throw new DSSErrorException(90007, "该工程没有可以发布的工作流,请检查工作流是否都为空");
-        dwsProject.setFlows(dwsFlows);
-        //2.封装dwsProject完成，开始发布
-        SchedulerProject schedulerProject = projectParser.parseProject(dwsProject);
-        projectTuning.tuningSchedulerProject(schedulerProject);
-        Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.prePublish(schedulerProject)));
-        (schedulerAppJoint.getProjectService()).publishProject(schedulerProject, schedulerAppJoint.getSecurityService().login(userName));
-        Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.postPublish(schedulerProject)));
-        //3.发布完成后复制工程
-        DWSProjectVersion dwsProjectVersion = projectMapper.selectProjectVersionByID(projectVersionID);
-        copyProjectVersionMax(projectVersionID, dwsProjectVersion, dwsProjectVersion, userName, null);
     }
 
     @Override
@@ -574,6 +591,18 @@ public class DWSProjectServiceImpl implements DWSProjectService {
         return longs.stream().sorted((o1, o2) -> {
             return Integer.valueOf(o1.toString()) - Integer.valueOf(o2.toString());
         }).collect(Collectors.toList());
+    }
+
+
+    private SchedulerAppJoint getSchedulerAppJoint(){
+        if(schedulerAppJoint == null){
+            try {
+                schedulerAppJoint = (SchedulerAppJoint)applicationService.getAppjoint("schedulis");
+            } catch (AppJointErrorException e) {
+                logger.error("Schedule system init failed!", e);
+            }
+        }
+        return schedulerAppJoint;
     }
 
 }

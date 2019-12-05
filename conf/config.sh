@@ -53,6 +53,7 @@ SSH_PORT=22
 #for azkaban
 WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
 
+###The IP address and port are written into the database here, so be sure to plan ahead
 ## visualis-server
 VISUALIS_SERVER_INSTALL_IP=127.0.0.1
 VISUALIS_SERVER_PORT=9007
@@ -65,10 +66,10 @@ VISUALIS_NGINX_PORT=9009
 
 #azkaban address for check
 AZKABAN_ADRESS_IP=127.0.0.1
-AZKABAN_ADRESS_PORT=99887
+AZKABAN_ADRESS_PORT=8091
 
 #qualitis.address for check
-QUALISTIS_ADRESS_IP=127.0.0.1
-QUALISTIS_ADRESS_PORT=99867
+QUALITIS_ADRESS_IP=127.0.0.1
+QUALITIS_ADRESS_PORT=8090
 
 DSS_VERSION=0.5.0

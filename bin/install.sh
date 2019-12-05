@@ -299,7 +299,7 @@ fi
 echo "$APPJOINTNAME-step2:copy install package"
 scp  -P $SSH_PORT  $workDir/share/appjoints/$APPJOINTNAME/*.zip  $SERVER_IP:$SERVER_HOME/$APPJOINTPARENT
 isSuccess "copy  ${APPJOINTNAME}.zip"
-ssh  -p $SSH_PORT  $SERVER_IP "cd $SERVER_HOME/$APPJOINTPARENT/;unzip -o dss-$APPJOINTNAME-appjoint.zip > /dev/null;rm -rf dss-$APPJOINTNAME-appjoint.zip"
+ssh  -p $SSH_PORT  $SERVER_IP "cd $SERVER_HOME/$APPJOINTPARENT/;unzip -o dss-*-appjoint.zip > /dev/null;rm -rf dss-*-appjoint.zip"
 isSuccess "install  ${APPJOINTNAME}.zip"
 }
 ##function end

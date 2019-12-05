@@ -7,9 +7,9 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.ShareNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.AbstractShareNodeFlowTuning;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.NodeTuning;
-import org.springframework.stereotype.Component;
 
-@Component
+
+
 public class LinkisShareNodeFlowTuning extends AbstractShareNodeFlowTuning {
 
     @Override

@@ -430,5 +430,5 @@ APPJOINTNAME=qualitis
 installAppjoints
 APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoint.properties
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
-isSuccess "subsitution conf of $SERVERNAME"
+isSuccess "subsitution conf of qualitis"
 echo "<----------------$APPJOINTNAME:end------------------->"

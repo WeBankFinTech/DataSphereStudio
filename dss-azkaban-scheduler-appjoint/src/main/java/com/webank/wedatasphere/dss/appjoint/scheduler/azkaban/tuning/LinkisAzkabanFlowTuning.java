@@ -10,16 +10,12 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.AbstractFlowTuning;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.NodeTuning;
 import com.webank.wedatasphere.dss.common.entity.node.DWSNodeDefault;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 //DefaultFlowTuning修改为AzkabanFlowTuning
-@Component
 public class LinkisAzkabanFlowTuning extends AbstractFlowTuning {
 
 

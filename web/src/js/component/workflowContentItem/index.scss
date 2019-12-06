@@ -1,0 +1,250 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@import '../../../assets/styles/variables.scss';
+.content-item {
+    margin-bottom: 20px;
+    padding: 0 20px;
+    .project-list-ul {
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .project-item {
+        height: 180px;
+        margin: 15px;
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+        background: #fff;
+        .project-main {
+            position: relative;
+            height: 130px;
+            padding: 5px;
+            background: url("../../../assets/images/project_bg.png") center center no-repeat;
+            background-size: cover;
+            cursor: pointer;
+            transition: transform .2s linear,box-shadow .2s linear,background-size .5s linear;
+            color: #fff;
+            .project-main-icon {
+                position: absolute;
+                left: 6px;
+                top: 6px;
+            }
+            .project-main-business {
+                right: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 13px;
+            }
+            .product-app, .applicationArea {
+                display: flex;
+                width: 100%;
+                justify-content: start;
+                align-items: center;
+                .product {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-right: 15px;
+                    .product-bgc {
+                        display: inline-block;
+                        padding-right: 5px;
+                        width: 20px;
+                        height: 20px;
+                        vertical-align: middle;
+                    }
+                }
+                .app {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    .app-bgc {
+                        display: inline-block;
+                        padding-right: 5px;
+                        width: 20px;
+                        height: 20px;
+                        margin-top: -2px;
+                        vertical-align: middle;
+                    }
+                }
+            }
+            .low {
+                position: absolute;
+                bottom: 20px;
+                left: 5px;
+            }
+            .middle {
+                position: absolute;
+                bottom: 43px;
+                left: 5px;
+            }
+            .high {
+                position: absolute;
+                bottom: 65px;
+                left: 5px;
+            }
+            &:hover {
+                transform: translate3d(0,-2px,0);
+            }
+            .versions {
+                position: absolute;
+                top: -1px;
+                left: -1px;
+            }
+            .tool-bar {
+                width: 100%;
+                padding: 5px;
+                text-align: right;
+                .tool-bar-more {
+                    display: inline-block;
+                }
+            }
+            .icon-bar {
+                .icon-marsk {
+                    position: absolute;
+                    left: 10px;
+                    top: 10px;
+                    padding: 1px 5px;
+                    background-color: rgba(0,0,0,0.15);
+                    border-radius: 3px;
+                    align-items: center;
+                    .status-icon {
+                        margin-top: -2px;
+                    }
+                }
+                .icon-bar-menu {
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                    background: #000;
+                }
+            }
+        }
+        .project-item-info {
+            padding: 2px 10px 6px
+        }
+        .project-main-title {
+            font-size: 16px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .project-main-desc {
+            font-size: 12px;
+            color: #999;
+        }
+        .version-bar {
+            display: inline-block;
+            background-color: rgba(82, 173, 251, 1);
+            border-radius: 2px;
+            padding: 1px 3px;
+            color: #fff;
+            line-height: 13px;
+            transform: scale(0.7, 0.9);
+            margin-left: -4px;
+        }
+        .icon-bar-publish {
+            position: absolute;
+            right: 5px;
+            bottom: 5px;
+            color: $primary-color;
+            transform: scale(0.9, 0.9);
+        }
+        .project-name {
+            text-align: center;
+            padding: 6px 0 8px 0;
+            font-size: $font-size-base;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+.item-header {
+    font-size: 14px;
+    margin: 10px 25px;
+    font-weight: bold;
+    padding-left: 5px;
+    border-left: 3px solid $primary-color;
+}
+.page-bar {
+    padding: 0 30px;
+    margin-bottom: 30px;
+}
+.no-data {
+    text-align: center;
+    padding: 20px;
+}
+.queue-manager-status {
+    position: $relative;
+    width: 100%;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    border-radius: 10px;
+    background-image: linear-gradient(60deg, transparent 0rem, transparent 0.8rem, rgb(88, 175, 251) 0.8rem, rgb(88, 175, 251) 1.6rem, transparent 1.6rem, transparent 2.4rem, rgb(88, 175, 251) 2.4rem);
+    background-size: 21px 27px;
+    box-shadow: 1px 1px 5px rgba(88, 175, 251, .6);
+    -webkit-animation: process 800ms infinite linear;
+    animation: process 800ms infinite linear;
+    background-color: $background-color-base;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        border-radius: 10px;
+        background-image: linear-gradient(to bottom,rgba(88, 175, 251, .4), rgba(88, 175, 251, .4) 15%, transparent 60%, rgba(88, 175, 251, .4));
+    }
+    .queue-manager-status-busy {
+        position: $absolute;
+        left: 0;
+        background: $success-color;
+        height: 100%;
+        border-radius: 10px;
+        z-index: 1;
+    }
+    .queue-manager-status-idle {
+        background: $success-color;
+        height: 100%;
+        border-radius: 10px;
+        position: $absolute;
+        z-index: 0;
+    }
+    .queue-manager-status-label {
+        position: $absolute;
+        right: 6px;
+        color: $tooltip-color ;
+    }
+}
+ /* 动画 */
+    @-webkit-keyframes process {
+        0% { background-position: 0 0; }
+        100% { background-position: 20px 0; }
+    }
+    @keyframes process {
+        0% { background-position: 0 0; }
+        100% { background-position: 20px 0; }
+    }
+

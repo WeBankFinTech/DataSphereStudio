@@ -44,10 +44,6 @@ public class QualitisNodeExecution extends LongTermNodeExecution {
 
     private String baseUrl;
 
-    public boolean canExecute(Node node, NodeContext nodeContext) {
-        return true;
-    }
-
     @Override
     public void init(Map<String, Object> map) throws AppJointErrorException {
         appId = (String) map.get("qualitis_appId");
@@ -58,7 +54,7 @@ public class QualitisNodeExecution extends LongTermNodeExecution {
 
     @Override
     public boolean canExecute(AppJointNode appJointNode, NodeContext context, Session session) {
-        return false;
+        return appJointNode.getNodeType().toLowerCase().contains("qualitis");
     }
 
     @Override

@@ -423,6 +423,8 @@ APPJOINTNAME=visualis
 #visualis  appjoint install
 installAppjoints
 echo "<----------------$APPJOINTNAME:end------------------->"
+##sample version does not install qualitis APPJoint and scheduis APPJoint
+if [[ '2' = "$INSTALL_MODE" ]];then
 echo ""
 echo "<----------------qualitis  appjoint install start------------------->"
 APPJOINTPARENT=dss-appjoints
@@ -441,3 +443,4 @@ APPJOINTNAME=schedulis
 installAppjoints
 isSuccess "subsitution conf of qualitis"
 echo "<----------------$APPJOINTNAME:end------------------->"
+fi

@@ -1,4 +1,4 @@
-## 如何接入调度系统Azkaban：
+## 如何接入调度系统Azkaban
  Azkaban目前是作为一个SchedulerAppJoint在DSS-SERVER中使用，通过AzkabanSchedulerAppJoint实现了Azkaban的工程服务和安全认证服务，
  主要提供了工程的创建、更新、发布、删除，以及安全认证服务相关的代理登录，Cookie保存等。
  

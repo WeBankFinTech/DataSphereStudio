@@ -47,7 +47,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -164,7 +164,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -420,8 +420,19 @@ Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis
 下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
 
 
+(3)简单版DSS创建工程失败
 
-(3)上传文件大小限制
+
+删除数据库中表dss_application的schedulis和qualitis记录
+
+
+(4)多次重复安装后报错:TooManyResultsException:Expected on result
+
+
+删除数据库中表dss_application的schedulis和qualitis记录
+
+
+(5)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -433,7 +444,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (4)接口超时
+ (6)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

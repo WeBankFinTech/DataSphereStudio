@@ -429,7 +429,7 @@ Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis
 (4)多次重复安装后报错:TooManyResultsException:Expected on result
 
 
-删除数据库中表dss_application的schedulis和qualitis记录
+删除数据库中表linkis_user和dss_user中的重复记录
 
 
 (5)上传文件大小限制

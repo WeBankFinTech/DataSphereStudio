@@ -146,6 +146,8 @@ DSS主要特点：
 
 [外部系统快速接入DSS](docs/zh_CN/ch4/第三方系统接入DSS指南.md)
 
+[如何接入调度系统Azkaban](docs/zh_CN/ch4/如何接入调度系统Azkaban.md)
+
 更多文档，敬请期待！
 
 ## 交流贡献

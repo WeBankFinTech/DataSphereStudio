@@ -13,9 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
@@ -24,11 +21,15 @@ import java.util.Map;
 /**
  * Created by allenlliu on 2019/9/20.
  */
-@Component
+
 public class LinkisAzkabanFlowPublishHook extends AbstractFlowPublishHook {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkisAzkabanFlowPublishHook.class);
 
+    public LinkisAzkabanFlowPublishHook(){
+        NodePublishHook[] nodePublishHooks = {new LinkisAzkabanNodePublishHook()};
+        setNodeHooks(nodePublishHooks);
+    }
 
     @Override
     public void prePublish(SchedulerFlow flow) throws DSSErrorException {
@@ -102,7 +103,7 @@ public class LinkisAzkabanFlowPublishHook extends AbstractFlowPublishHook {
         super.postPublish(flow);
     }
 
-    @Autowired
+
     @Override
     public void setNodeHooks(NodePublishHook[] nodePublishHooks) {
         super.setNodeHooks(nodePublishHooks);

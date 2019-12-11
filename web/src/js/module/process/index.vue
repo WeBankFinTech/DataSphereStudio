@@ -208,7 +208,7 @@ export default {
           }
         }
       }
-      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SHELL, NODETYPE.SCALA].indexOf(node.type) !== -1) {
+      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SHELL, NODETYPE.SCALA, NODETYPE.PYTHON].indexOf(node.type) !== -1) {
         const len = node.resources ? node.resources.length : 0;
         if (len && node.jobContent && node.jobContent.script) { // 判断是否有保存过脚本
           const resourceId = node.resources[0].resourceId;

@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 
     <modules>
         <module>dss-common</module>
@@ -37,6 +37,7 @@
         <module>dss-azkaban-scheduler-appjoint</module>
         <module>dss-server</module>
         <module>visualis-appjoint/appjoint</module>
+        <module>qualitis-appjoint/appjoint</module>
         <module>eventchecker-appjoint</module>
         <module>datachecker-appjoint</module>
         <module>sendemail-appjoint/sendemail-core</module>
@@ -46,7 +47,7 @@
     </modules>
 
     <properties>
-        <dss.version>0.5.0</dss.version>
+        <dss.version>0.6.0</dss.version>
         <linkis.version>0.9.1</linkis.version>
         <scala.version>2.11.8</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

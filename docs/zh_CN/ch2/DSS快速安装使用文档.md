@@ -47,7 +47,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -112,7 +112,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 下载对应安装包，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-x.x.x-dist.zip 
    ``` 
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
@@ -164,7 +164,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -209,10 +209,10 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
     HIVE_META_PASSWORD=xxx
     #2、用于Qualitis
     QUALITIS_ADRESS_IP=127.0.0.1 #QUALITIS服务IP地址
-    QUALITIS_ADRESS_PORT=9991 #QUALITIS服务端口号 
+    QUALITIS_ADRESS_PORT=8090 #QUALITIS服务端口号 
     #3、用于AZKABAN
     AZKABAN_ADRESS_IP=127.0.0.1 #AZKABAN服务IP地址
-    AZKABAN_ADRESS_PORT=9987 #AZKABAN服务端口号
+    AZKABAN_ADRESS_PORT=8091 #AZKABAN服务端口号
     
 ```
 
@@ -237,7 +237,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
    点击[release](https://github.com/WeBankFinTech/DataSphereStudio/releases) 选择安装包下载，并在安装目录进行解压：
    ```bash
-       unzip wedatasphere-DataSphereStudio-x.x.x-dist.zip 
+       unzip wedatasphere-dss-web-x.x.x-dist.zip
    ```
 ##### 注意:如果DSS前端安装包是用户自行编译的，则需要把[visualis前端安装包](https://github.com/WeBankFinTech/Visualis/releases)复制到DSS前端安装目录的dss/visualis文件夹下，以供自动化安装使用
 
@@ -314,8 +314,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
     
   如下图，如您的Eureka主页出现以下微服务，则表示服务都启动成功，可以正常对外提供服务了：
     
-  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/raw/master/docs/zh_CN/images/ch1/Eureka_homepage.png)
-
+  ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
 ## 4.2 DataSphereStudio前端安装
 
@@ -347,7 +346,7 @@ server {
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
             location /dss/visualis {
-            root   /appcom/Install/DSS/FRONT/dss/visualis; # visualis静态文件目录
+            root   /appcom/Install/DSS/FRONT; # visualis静态文件目录
             autoindex on;
             }
             location / {
@@ -400,7 +399,40 @@ server {
 
 ## 4.3、常见问题
 
-(1)上传文件大小限制
+(1)用户token为空
+
+```
+sudo vi dss-server/conf/token.properties
+```
+
+添加用户
+
+```
+xxx=xxx
+```
+
+(2)visualis执行报错
+
+```
+Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
+```
+
+下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
+
+
+(3)简单版DSS创建工程失败
+
+
+删除数据库中表dss_application的schedulis和qualitis记录
+
+
+(4)多次重复安装后报错:TooManyResultsException:Expected on result
+
+
+删除数据库中表linkis_user和dss_user中的重复记录
+
+
+(5)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -412,7 +444,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (2)接口超时
+ (6)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

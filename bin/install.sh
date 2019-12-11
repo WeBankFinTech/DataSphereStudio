@@ -121,8 +121,8 @@ elif [[ '2' = "$idx" ]];then
   checkExternalServer
   #check  qualitis serivice
   SERVER_NAME=Qualitis
-  EXTERNAL_SERVER_IP=$QUALISTIS_ADRESS_IP
-  EXTERNAL_SERVER_PORT=$QUALISTIS_ADRESS_PORT
+  EXTERNAL_SERVER_IP=$QUALITIS_ADRESS_IP
+  EXTERNAL_SERVER_PORT=$QUALITIS_ADRESS_PORT
   checkExternalServer
   #check  azkaban serivice
   SERVER_NAME=AZKABAN
@@ -246,7 +246,7 @@ scp   -P $SSH_PORT   ${workDir}/share/$PACKAGE_DIR/$SERVERNAME.zip $SERVER_IP:$S
 isSuccess "copy  ${SERVERNAME}.zip"
 ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;rm -rf $SERVERNAME-bak; mv -f $SERVERNAME $SERVERNAME-bak"
 ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;unzip $SERVERNAME.zip > /dev/null"
-ssh  -p $SSH_PORT $SERVER_IP "cd $SERVER_HOME/;scp -r lib/*  $SERVERNAME/lib"
+ssh  -p $SSH_PORT $SERVER_IP "cd $workDir/;scp -r lib/*  $SERVER_HOME/$SERVERNAME/lib"
 isSuccess "unzip  ${SERVERNAME}.zip"
 
 echo "$SERVERNAME-step3:subsitution conf"
@@ -297,14 +297,15 @@ if ! ssh  -p $SSH_PORT  $SERVER_IP test -e $SERVER_HOME/$APPJOINTPARENT; then
 fi
 
 echo "$APPJOINTNAME-step2:copy install package"
-scp  -P $SSH_PORT  $SERVER_HOME/share/appjoints/$APPJOINTNAME/*.zip  $SERVER_IP:$SERVER_HOME/$APPJOINTPARENT
+scp  -P $SSH_PORT  $workDir/share/appjoints/$APPJOINTNAME/*.zip  $SERVER_IP:$SERVER_HOME/$APPJOINTPARENT
 isSuccess "copy  ${APPJOINTNAME}.zip"
-ssh  -p $SSH_PORT  $SERVER_IP "cd $SERVER_HOME/$APPJOINTPARENT/;unzip -o dss-$APPJOINTNAME-appjoint.zip > /dev/null;rm -rf dss-$APPJOINTNAME-appjoint.zip"
+ssh  -p $SSH_PORT  $SERVER_IP "cd $SERVER_HOME/$APPJOINTPARENT/;unzip -o dss-*-appjoint.zip > /dev/null;rm -rf dss-*-appjoint.zip"
 isSuccess "install  ${APPJOINTNAME}.zip"
 }
 ##function end
 
-##Dss-Server Install
+##
+ver Install
 PACKAGE_DIR=dss/dss-server
 SERVERNAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
@@ -320,7 +321,7 @@ ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.u
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.password.*#***REMOVED***$MYSQL_PASSWORD#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.azkaban.address.*#wds.dss.appjoint.scheduler.azkaban.address=http://${AZKABAN_ADRESS_IP}:${AZKABAN_ADRESS_PORT}#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.gateway.ip.*#wds.linkis.gateway.ip=$GATEWAY_INSTALL_IP#g\" $SERVER_CONF_PATH"
-ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dataworlcloud.gateway.port.*#wds.dataworlcloud.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
+ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
 ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.project.store.dir.*#wds.dss.appjoint.scheduler.project.store.dir=$WDS_SCHEDULER_PATH#g\" $SERVER_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
@@ -353,8 +354,8 @@ installPackage
 ###Update appjoint entrance linkis.properties
 echo "$SERVERNAME-step4:update linkis.properties"
 SERVER_CONF_PATH=$SERVER_HOME/$SERVERNAME/conf/linkis.properties
-ssh $SERVER_IP "sed -i  \"s#wds.linkis.entrance.config.logPath.*#wds.linkis.entrance.config.logPath=$WORKSPACE_USER_ROOT_PATH#g\" $SERVER_CONF_PATH"
-ssh $SERVER_IP "sed -i  \"s#wds.linkis.resultSet.store.path.*#wds.linkis.resultSet.store.path=$RESULT_SET_ROOT_PATH#g\" $SERVER_CONF_PATH"
+ssh -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.entrance.config.logPath.*#wds.linkis.entrance.config.logPath=$WORKSPACE_USER_ROOT_PATH#g\" $SERVER_CONF_PATH"
+ssh -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.resultSet.store.path.*#wds.linkis.resultSet.store.path=$RESULT_SET_ROOT_PATH#g\" $SERVER_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
 echo ""
@@ -416,16 +417,30 @@ ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#msg.eventchecker.jdo.option.password.
 isSuccess "subsitution conf of $SERVERNAME"
 echo "<----------------$APPJOINTNAME:end------------------->"
 echo ""
-echo "<----------------sendemail  appjoint install start------------------->"
-APPJOINTPARENT=dss-appjoints
-APPJOINTNAME=sendemail
-#Sendemail  appjoint install
-installAppjoints
-echo "<----------------$APPJOINTNAME:end------------------->"
-echo ""
 echo "<----------------visualis  appjoint install start------------------->"
 APPJOINTPARENT=dss-appjoints
 APPJOINTNAME=visualis
 #visualis  appjoint install
 installAppjoints
 echo "<----------------$APPJOINTNAME:end------------------->"
+##sample version does not install qualitis APPJoint and scheduis APPJoint
+if [[ '2' = "$INSTALL_MODE" ]];then
+echo ""
+echo "<----------------qualitis  appjoint install start------------------->"
+APPJOINTPARENT=dss-appjoints
+APPJOINTNAME=qualitis
+#qualitis  appjoint install
+installAppjoints
+APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoint.properties
+ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
+isSuccess "subsitution conf of $SERVERNAME"
+echo "<----------------$APPJOINTNAME:end------------------->"
+echo ""
+echo "<----------------schedulis  appjoint install start------------------->"
+APPJOINTPARENT=dss-appjoints
+APPJOINTNAME=schedulis
+#schedulis  appjoint install
+installAppjoints
+isSuccess "subsitution conf of schedulis"
+echo "<----------------$APPJOINTNAME:end------------------->"
+fi

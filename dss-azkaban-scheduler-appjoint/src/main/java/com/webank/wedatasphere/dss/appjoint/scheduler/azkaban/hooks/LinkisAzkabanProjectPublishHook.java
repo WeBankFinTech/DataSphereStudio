@@ -14,9 +14,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -25,13 +22,16 @@ import java.util.List;
 /**
  * Created by cooperyang on  2019/9/18
  */
-@Component
+
 public class LinkisAzkabanProjectPublishHook extends AbstractProjectPublishHook {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( LinkisAzkabanProjectPublishHook.class);
+    public LinkisAzkabanProjectPublishHook(){
+        FlowPublishHook[] flowPublishHooks = {new LinkisAzkabanFlowPublishHook()};
+        setFlowPublishHooks(flowPublishHooks);
+    }
 
     @Override
-    @Autowired
     public void setFlowPublishHooks(FlowPublishHook[] flowPublishHooks) {
         super.setFlowPublishHooks(flowPublishHooks);
     }

@@ -60,15 +60,6 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/target</directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <fileMode>0777</fileMode>
-            <outputDirectory>/</outputDirectory>
-            <lineEnding>unix</lineEnding>
-        </fileSet>
-        <fileSet>
             <directory>${basedir}/bin</directory>
             <includes>
                 <include>install.sh</include>

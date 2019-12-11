@@ -10,4 +10,5 @@ public class AzkabanConf {
 
     public static final CommonVars<String> AZKABAN_BASE_URL = CommonVars.apply("wds.dss.appjoint.scheduler.azkaban.address", "");
     public static final CommonVars<String> DEFAULT_STORE_PATH = CommonVars.apply("wds.dss.appjoint.scheduler.project.store.dir", "/appcom/tmp/wds/dss");
+    public static final CommonVars<String> AZKABAN_LOGIN_PWD = CommonVars.apply("wds.dss.appjoint.scheduler.azkaban.login.passwd", "password");
 }

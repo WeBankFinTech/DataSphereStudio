@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractAppJointLinkisJob;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -29,6 +30,9 @@ public class AzkabanAppJointLinkisJob extends AbstractAppJointLinkisJob {
 
     @Override
     public String getSubmitUser() {
+        if (StringUtils.isEmpty(getJobProps().get(LinkisJobTypeConf.FLOW_SUBMIT_USER))){
+            return getJobProps().get(LinkisJobTypeConf.PROXY_USER);
+        }
         return getJobProps().get(LinkisJobTypeConf.FLOW_SUBMIT_USER);
     }
 

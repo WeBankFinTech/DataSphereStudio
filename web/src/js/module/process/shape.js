@@ -66,6 +66,13 @@ export default [
       image: NODEICON[NODETYPE.SCALA].icon,
       editParam: false,
       editBaseInfo: false,
+    },
+    {
+      type: NODETYPE.PYTHON,
+      title: 'python',
+      image: NODEICON[NODETYPE.PYTHON].icon,
+      editParam: false,
+      editBaseInfo: false,
     }],
   },
   {

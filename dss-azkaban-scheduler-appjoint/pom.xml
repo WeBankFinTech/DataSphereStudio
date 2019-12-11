@@ -22,22 +22,24 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>0.5.0</version>
+        <version>0.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-azkaban-scheduler-appjoint</artifactId>
     
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>2.0.3.RELEASE</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-autoconfigure</artifactId>-->
+            <!--<version>2.0.3.RELEASE</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-scheduler-appjoint-core</artifactId>
             <version>${dss.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -48,6 +50,8 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-application</artifactId>
             <version>${dss.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -65,6 +69,35 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/distribution.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skipAssembly>false</skipAssembly>
+                    <finalName>dss-azkaban-appjoint</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <attach>false</attach>
+                    <descriptors>
+                        <descriptor>src/main/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                </configuration>
             </plugin>
         </plugins>
     </build>

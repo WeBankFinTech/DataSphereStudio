@@ -66,9 +66,8 @@ public abstract class AbstractShareNodeFlowTuning extends AbstractFlowTuning imp
         Map<ShareNode, Integer> res = new HashMap<>();
         //遍历readNodes，将NodeIds转为name的集合,过滤掉删除了节点但是还滞留在content里面的id
         Arrays.stream(readNodes).filter(rn ->rn.getShareNodeIds() != null).forEach(rn ->{
-            List<String> names = Arrays.stream(rn.getShareNodeIds()).filter(id->flow.getSchedulerNodes().stream().filter(sn -> id.equals(sn.getId())).findFirst().isPresent()).
-                    map(id -> flow.getSchedulerNodes().stream().filter(sn -> id.equals(sn.getId())).findFirst().get().getName()).collect(Collectors.toList());
-            rn.setShareNodeIds(names.toArray(new String[0]));
+            rn.setShareNodeIds(Arrays.stream(rn.getShareNodeIds()).filter(id -> flow.getSchedulerNodes().stream().anyMatch(sn -> id.equals(sn.getId()))).
+                    map(id -> flow.getSchedulerNodes().stream().filter(sn -> id.equals(sn.getId())).findFirst().get().getName()).toArray(String[]::new));
         });
         Stream.of(readNodes).forEach(x ->
                 {

@@ -85,7 +85,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
 
     #用于DATACHECK校验
-    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
     HIVE_META_USER=xxx
     HIVE_META_PASSWORD=xxx
     
@@ -98,7 +98,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=
@@ -201,7 +201,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
     
-    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #Azkaban工程存储目录
+    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #DSS工程转换成Azkaban工程后zip包的存储路径
 
     #1、用于DATACHECK
     HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
@@ -223,7 +223,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=

@@ -29,14 +29,18 @@ check_cmd() {
 
 need_cmd() {
     if ! check_cmd "$1"; then
-        err "need '$1' (command not found)"
+        err "need '$1' (your linux command not found)"
     fi
 }
-echo "<-----start to check used cmd---->"
+echo "<-----start to check linux cmd:yum java mysql unzip expect telnet sed tar---->"
 need_cmd yum
 need_cmd java
 need_cmd mysql
 need_cmd unzip
 need_cmd expect
 need_cmd telnet
-echo "<-----end to check used cmd------>"
+need_cmd sed
+need_cmd tar
+need_cmd source
+need_cmd hostname
+echo "<-----end to check linux cmd:yum java mysql unzip expect telnet sed tar------>"

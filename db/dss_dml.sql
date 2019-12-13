@@ -1,6 +1,5 @@
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'linkis', null, '0', '1', NULL, '0', '/home', NULL, '0', '/home', NULL);
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'visualis', null, '0', '1', NULL, '0', NULL, NULL, '1', NULL, NULL);
-INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'schedulis', NULL, '0', '1', NULL, '0', NULL, NULL, '1', NULL, NULL);
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'workflow', null, '0', '1', NULL, '0', '/workflow', NULL, '0', '/project', NULL);
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'console', null, '0', '1', NULL, '0', '/console', NULL, '0', '/console', NULL);
 
@@ -30,7 +29,6 @@ INSERT INTO `dss_flow_taxonomy` (`id`, `name`, `description`, `creator_id`, `cre
 UPDATE `dss_application` SET url = 'http://GATEWAY_INSTALL_IP_2:GATEWAY_PORT' WHERE `name` in('linkis','workflow');
 UPDATE `dss_application` SET url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT' WHERE `name` in('visualis');
 UPDATE `dss_application` SET project_url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/project/${projectId}',homepage_url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/projects' WHERE `name` in('visualis');
-UPDATE `dss_application` SET url = 'http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT', project_url = 'http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/manager?project=${projectName}',homepage_url = 'http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/homepage' WHERE `name` in('schedulis');
 UPDATE `dss_workflow_node` SET jump_url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/project/${projectId}/display/${nodeId}' where node_type = 'linkis.appjoint.visualis.display';
 UPDATE `dss_workflow_node` SET jump_url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/project/${projectId}/portal/${nodeId}/portalName/${nodeName}' where node_type = 'linkis.appjoint.visualis.dashboard';
 

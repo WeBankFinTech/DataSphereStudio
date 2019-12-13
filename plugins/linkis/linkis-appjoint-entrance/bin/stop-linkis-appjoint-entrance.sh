@@ -4,7 +4,7 @@ cd `dirname $0`
 cd ..
 HOE=`pwd`
 
-export DWS_ENTRANCE_PID=$HOE/bin/linkis-appjoint-entrance.pid
+export DWS_ENTRANCE_PID=$HOE/bin/linkis.pid
 
 function wait_for_DWS_ENGINE_MANAGER_to_die() {
   local pid

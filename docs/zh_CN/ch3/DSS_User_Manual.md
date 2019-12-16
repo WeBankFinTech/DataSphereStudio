@@ -1,3 +1,9 @@
+## 快速登录
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为了方便用户使用，系统默认通过使用Linkis的部署用户名进行登录，比如是hadoop部署的可以直接通过 用户：hadoop，密码：hadoop(密码就是用户名)来进行登录。 首先输入前端容器地址：192.168.xx.xx:8888 接着输入用户名密码：hadoop/hadoop
+![quick_start00](/images/zh_CN/chapter3/quickstart/quick_start00.png)
+
+__注意：__ 如果要支持多用户登录，DSS的用户登录依赖Linkis，需要在linkis-GateWay的配置里面进行配置，Linkis-GateWay默认支持LDAP。
+
 ## 1 功能简介
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS作为一站式数据应用开发门户，定位为闭环涵盖数据应用的全流程，满足从数据ETL、数据研发、可视化展现、数据治理、数据输出到工作流调度的数据应用全生命周期开发场景,现已经开源的组件包括如下图所示：
 

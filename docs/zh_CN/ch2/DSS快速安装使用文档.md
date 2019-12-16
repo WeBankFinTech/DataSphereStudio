@@ -47,7 +47,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -85,7 +85,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
 
     #用于DATACHECK校验
-    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
     HIVE_META_USER=xxx
     HIVE_META_PASSWORD=xxx
     
@@ -98,7 +98,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=
@@ -164,7 +164,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
      sudo useradd hadoop    
 ```
 
-##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://www.jianshu.com/p/0922095f69f3)
+##### 注意:用户需要有sudo权限，且可免密登陆本机。[如何配置SSH免密登陆](https://linuxconfig.org/passwordless-ssh)
 ```
       vi /etc/sudoers
 
@@ -201,7 +201,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
     
-    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #Azkaban工程存储目录
+    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #DSS工程转换成Azkaban工程后zip包的存储路径
 
     #1、用于DATACHECK
     HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
@@ -223,7 +223,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=
@@ -420,8 +420,19 @@ Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis
 下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
 
 
+(3)简单版DSS创建工程失败
 
-(3)上传文件大小限制
+
+删除数据库中表dss_application的schedulis和qualitis记录
+
+
+(4)多次重复安装后报错:TooManyResultsException:Expected on result
+
+
+删除数据库中表linkis_user和dss_user中的重复记录
+
+
+(5)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -433,7 +444,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
- (4)接口超时
+ (6)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf

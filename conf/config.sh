@@ -15,7 +15,7 @@ WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
 RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 
 ### 1、DataCheck APPJOINT，This service is used to provide DataCheck capability.
-HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
 HIVE_META_USER=xxx
 HIVE_META_PASSWORD=xxx
 
@@ -50,16 +50,16 @@ GATEWAY_PORT=9001
 ### SSH Port
 SSH_PORT=22
 
-#for azkaban
+#Used to store the azkaban project transformed by DSS
 WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
 
 ###The IP address and port are written into the database here, so be sure to plan ahead
 ## visualis-server
 VISUALIS_SERVER_INSTALL_IP=127.0.0.1
 VISUALIS_SERVER_PORT=9007
-### visualis nginx acess ip
+### visualis nginx acess ip,keep consistent with DSS front end
 VISUALIS_NGINX_IP=0.0.0.0
-VISUALIS_NGINX_PORT=9009
+VISUALIS_NGINX_PORT=8088
 
 ### Eventchecker APPJOINT
 ### This service is used to provide Eventchecker capability. it's config in db.sh same as dss-server.
@@ -72,4 +72,4 @@ AZKABAN_ADRESS_PORT=8091
 QUALITIS_ADRESS_IP=127.0.0.1
 QUALITIS_ADRESS_PORT=8090
 
-DSS_VERSION=0.5.0
+DSS_VERSION=0.6.0

@@ -395,7 +395,7 @@ server {
 ### 4.谷歌浏览器访问：
 ```http://nginx_ip:nginx_port```
 
-**试用用户和密码均为hadoop，更多用户配置，详见** [Linkis LDAP](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)
+**试用用户和密码均为部署用户，更多用户配置，详见** [Linkis LDAP](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)
 
 如何详细使用DSS, 点我进入 [DSS快速使用文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)
 

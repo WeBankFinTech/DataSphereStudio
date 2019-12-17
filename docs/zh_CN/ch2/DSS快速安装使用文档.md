@@ -204,7 +204,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
     WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #DSS工程转换成Azkaban工程后zip包的存储路径
 
     #1、用于DATACHECK
-    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
     HIVE_META_USER=xxx
     HIVE_META_PASSWORD=xxx
     #2、用于Qualitis
@@ -341,7 +341,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 添加如下内容：
 ```
 server {
-            listen       8080;# 访问端口
+            listen       8088;# 访问端口
             server_name  localhost;
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;

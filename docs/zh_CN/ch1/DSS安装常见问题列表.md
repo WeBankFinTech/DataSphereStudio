@@ -51,12 +51,41 @@ Cause: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Table 'linkis.
 
 进入mysql，选择linkis的数据库，手动执行linkis安装目录中,db/moudle/linkis-bml.sql文件。
 
-
 #### (7)如何配置ladp登陆
 
 修改linkis-gateway配置目录下的linkis.properties文件，增加LDAP登陆认证。
 
-#### (8)上传文件大小限制
+
+#### (8) visualis可视化服务访问报错
+
+a) 确保visualis-server已经启动。
+
+b)检查visualis-server安装目录下的application.yml配置，确保以下配置准确无误
+
+```
+  url: http://0.0.0.0:0000/dss/visualis  此处url中的IP和端口必须保持与DSS前端Nginx访问的IP地址和端口一致
+  access:
+    address: 0.0.0.0 #frontend address，此处保持与DSS前端Nginx访问IP地址一致
+    port: 0000#frontend port，此处保持与DSS前端Nginx访问端口一致
+```
+
+c) 确保数据库表dss_application中 visualis记录行，访问地址与DSS前端Nginx访问IP地址和端口一致。
+
+d) 访问visualis出现404错误，确保Nginx配置文件中关于visualis的访问路径配置正确。
+
+```
+            location /dss/visualis {
+            root   /data/DSSFront; # 示例visualis前端静态文件目录
+            autoindex on;
+            }
+            location / {
+            root   /data/DSSFront/dist; # 示例DSS前端静态文件目录
+            index  index.html index.html;
+            }            
+```
+
+
+#### (9)上传文件大小限制
 
 ```
 sudo vi /etc/nginx/nginx.conf
@@ -68,7 +97,7 @@ sudo vi /etc/nginx/nginx.conf
 client_max_body_size 200m
 ```
 
-#### (9)接口超时
+#### (10)接口超时
 
 ```
 sudo vi /etc/nginx/conf.d/dss.conf
@@ -82,4 +111,4 @@ proxy_read_timeout 600s
 ```
 
 **如果您在安装和使用DSS过程中遇到Linkis相关问题，请访问**
-[linkis常见问题列表]([https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93))
+[linkis常见问题列表](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)

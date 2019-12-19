@@ -63,7 +63,7 @@ a) 确保visualis-server已经启动。
 b)检查visualis-server安装目录下的application.yml配置，确保以下配置准确无误
 
 ```
-  url: http://0.0.0.0:0000/dws/visualis #frontend index page full path,此处保持与DSS前端Nginx访问IP地址和端口一致
+  url: http://0.0.0.0:0000/dss/visualis  此出url中的IP和端口必须保持与DSS前端Nginx访问的IP地址和端口一致
   access:
     address: 0.0.0.0 #frontend address，此处保持与DSS前端Nginx访问IP地址一致
     port: 0000#frontend port，此处保持与DSS前端Nginx访问端口一致

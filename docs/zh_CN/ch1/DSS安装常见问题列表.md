@@ -111,4 +111,4 @@ proxy_read_timeout 600s
 ```
 
 **如果您在安装和使用DSS过程中遇到Linkis相关问题，请访问**
-[linkis常见问题列表]([https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93])
+[linkis常见问题列表](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)

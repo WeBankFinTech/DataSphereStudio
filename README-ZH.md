@@ -142,9 +142,13 @@ DSS主要特点：
 
 [DSS编译文档](docs/zh_CN/ch1/DSS编译文档.md)
 
+[快速使用文档](docs/zh_CN/ch3/DataSphere_Studio_QuickStart.md)
+
 [用户手册](docs/zh_CN/ch3/DSS_User_Manual.md)
 
 [外部系统快速接入DSS](docs/zh_CN/ch4/第三方系统接入DSS指南.md)
+
+[如何接入调度系统Azkaban](docs/zh_CN/ch4/如何接入调度系统Azkaban.md)
 
 更多文档，敬请期待！
 

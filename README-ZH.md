@@ -7,13 +7,15 @@
 
 ## 引言
 
-DataSphere Studio（简称DSS）是微众银行大数据平台——WeDataSphere，自研的一站式数据应用开发管理门户。
+DataSphere Studio（简称DSS）是微众银行自研的一站式数据应用开发管理门户。
 
-基于 [**Linkis**](https://github.com/WeBankFinTech/Linkis) 计算中间件构建，可轻松整合上层各数据应用系统，让数据应用开发变得简洁又易用。
+基于插拔式的集成框架设计，及计算中间件 [**Linkis**](https://github.com/WeBankFinTech/Linkis) ，可轻松接入上层各种数据应用系统，让数据开发变得简洁又易用。
 
-DataSphere Studio定位为数据应用开发门户，闭环涵盖数据应用开发全流程。在统一的UI下，以工作流式的图形化拖拽开发体验，满足从数据导入、脱敏清洗、分析挖掘、质量检测、可视化展现、定时调度到数据输出应用等，数据应用开发全流程场景需求。
+在统一的UI下，DataSphere Studio以工作流式的图形化拖拽开发体验，将满足从数据交换、脱敏清洗、分析挖掘、质量检测、可视化展现、定时调度到数据输出应用等，数据应用开发全流程场景需求。
 
-借助于Linkis计算中间件的连接、复用与简化能力，DSS天生便具备了金融级高并发、高可用、多租户隔离和资源管控等执行与调度能力。
+**DSS通过插拔式的集成框架设计，让用户可以根据需要，简单快速替换DSS已集成的各种功能组件，或新增功能组件。**
+
+借助于 [**Linkis**](https://github.com/WeBankFinTech/Linkis) 计算中间件的连接、复用与简化能力，DSS天生便具备了金融级高并发、高可用、多租户隔离和资源管控等执行与调度能力。
 
 ## 界面预览
 
@@ -37,9 +39,13 @@ DSS主要特点：
  
  &nbsp; &nbsp; &nbsp; &nbsp;4、工作流调度工具——[Azkaban](https://azkaban.github.io/)
  
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS插拔式的框架设计模式，允许用户快速替换DSS已集成的各个Web系统**。如：将Scriptis替换成Zeppelin，将Azkaban替换成DolphinScheduler。
+ 
 ![DSS一站式](images/zh_CN/readme/onestop.gif) 
 
 ### 二、基于Linkis计算中间件，打造独有的AppJoint设计理念
+
+ &nbsp; &nbsp; &nbsp; &nbsp;AppJoint，是DSS可以简单快速集成各种上层Web系统的核心概念。
 
  &nbsp; &nbsp; &nbsp; &nbsp;AppJoint——应用关节，定义了一套统一的前后台接入规范，可让外部数据应用系统快速简单地接入，成为DSS数据应用开发中的一环。
 
@@ -52,6 +58,10 @@ DSS主要特点：
  &nbsp; &nbsp; &nbsp; &nbsp;以Project为管理单元，组织和管理各数据应用系统的业务应用，定义了一套跨数据应用系统的项目协同开发通用标准。
 
 ### 四、已集成的数据应用组件
+
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS通过实现多个AppJoint，已集成了丰富多样的各种上层数据应用系统，基本可满足用户的数据开发需求。
+
+ &nbsp; &nbsp; &nbsp; &nbsp;**用户如果有需要，也可以轻松集成新的数据应用系统，以替换或丰富DSS的数据应用开发流程。**
 
  &nbsp; &nbsp; &nbsp; &nbsp;1、DSS的调度能力——Azkaban AppJoint
 
@@ -113,6 +123,10 @@ DSS主要特点：
    
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;空节点、子工作流节点。
 
+ &nbsp; &nbsp; &nbsp; &nbsp;8、**节点扩展**
+ 
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;**根据需要，用户可以简单快速替换DSS已集成的各种功能组件，或新增功能组件。**
+
 
 ## 与类似系统对比
 
@@ -140,15 +154,35 @@ DSS主要特点：
 
 ## 文档列表
 
+#### 1. 安装编译文档
+
+[快速安装使用文档](docs/zh_CN/ch2/DSS快速安装使用文档.md)
+
+[**DSS安装常见问题列表**](docs/zh_CN/ch1/DSS安装常见问题列表.md)
+
 [DSS编译文档](docs/zh_CN/ch1/DSS编译文档.md)
+
+#### 2. 使用文档
 
 [快速使用文档](docs/zh_CN/ch3/DataSphere_Studio_QuickStart.md)
 
 [用户手册](docs/zh_CN/ch3/DSS_User_Manual.md)
 
-[外部系统快速接入DSS](docs/zh_CN/ch4/第三方系统接入DSS指南.md)
+#### 3. AppJoint插件安装文档
 
-[如何接入调度系统Azkaban](docs/zh_CN/ch4/如何接入调度系统Azkaban.md)
+**以下为手动安装相关插件的指南，DSS一键安装【标准版】已自动安装了以下插件，可忽略。**
+
+[DSS的Azkaban AppJoint插件安装指南](docs/zh_CN/ch4/如何接入调度系统Azkaban.md)
+
+[DSS的Qualitis AppJoint插件安装指南](https://github.com/WeBankFinTech/Qualitis/blob/master/docs/zh_CN/ch1/%E6%8E%A5%E5%85%A5%E5%B7%A5%E4%BD%9C%E6%B5%81%E6%8C%87%E5%8D%97.md)
+
+#### 4. 第三方系统如何接入文档
+
+[DSS如何快速集成第三方系统](docs/zh_CN/ch4/第三方系统接入DSS指南.md)
+
+#### 5. 架构文档
+
+[DSS工程发布到调度系统的架构设计](docs/zh_CN/ch4/DSS工程发布调度系统架构设计.md)
 
 更多文档，敬请期待！
 

@@ -4,16 +4,19 @@
  
  **前提条件：用户已经安装部署好社区版Azkaban-3.X以上版本。**[如何安装Azkaban](https://github.com/azkaban/azkaban)  
 #### **步骤：**
-1、Azkaban APPJoint安装及配置
+**1、Azkaban APPJoint安装及配置**
+
  进入DSS安装包解压目录，复制share/appjoints/schedulis/dss-azkaban-appjoint.zip到DSS安装目录的dss-appjoints/schedulis文件夹下，解压即可。
 
-2、修改dss-server配置目录中linkis.properties配置，增加如下参数：
+**2、修改dss-server配置目录中linkis.properties配置，增加如下参数：**
+
 ```
 wds.dss.appjoint.scheduler.azkaban.address=http://IP地址:端口   #Azkaban的http地址
 wds.dss.appjoint.scheduler.project.store.dir=file:///appcom/tmp/wds/scheduler  #Azkaban发布包临时存储目录
 ```
 
-3、数据库中dss_application表修改
+**3、数据库中dss_application表修改**
+
  修改DSS数据库dss_application表中schedulis记录行，修改url的连接IP地址和端口，保持与Azkaban Server实际地址一致。
  示例SQL：
 
@@ -24,10 +27,11 @@ UPDATE `dss_application` SET url = 'http://IP地址:端口', project_url = 'http
   ('schedulis');
 ```
 
-4、Azkaban JobType插件安装
+**4、Azkaban JobType插件安装**
+
 您还需为Azkaban安装一个JobType插件： linkis-jobtype，请点击[Linkis jobType安装文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/Azkaban_LinkisJobType_Deployment_Manual.md)
 
-5、用户token配置
+**5、用户token配置**
 
 ##### 请在DSS-SERVER服务conf目录的token.properties文件中，配置用户名和密码信息，关联DSS和Azkaban用户，因为用户通过DSS创建工程后，要发布到azkaban，用户必须保持一致。示例：
  

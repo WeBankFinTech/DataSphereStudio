@@ -1,3 +1,18 @@
+#
+# Copyright 2019 WeBank
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 #!/bin/sh
 #Actively load user env
 source ~/.bash_profile
@@ -37,6 +52,11 @@ else
     echo "Succeed to" + $1
 fi
 }
+
+
+#check env
+sh ${workDir}/bin/checkEnv.sh
+isSuccess "check env"
 
 function checkJava(){
 	java -version
@@ -158,38 +178,55 @@ fi
 ##init db
 if [[ '2' = "$MYSQL_INSTALL_MODE" ]];then
 	mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/dss_ddl.sql"
-	isSuccess "source linkis_ddl.sql"
-	LOCAL_IP="`ifconfig | grep 'inet' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}'`"
+	isSuccess "source dss_ddl.sql"
+	LOCAL_IP="`hostname -i`"
 	if [ $GATEWAY_INSTALL_IP == "127.0.0.1" ];then
         echo "GATEWAY_INSTALL_IP is equals 127.0.0.1 ,we will change it to ip address"
         GATEWAY_INSTALL_IP_2=$LOCAL_IP
     else
         GATEWAY_INSTALL_IP_2=$GATEWAY_INSTALL_IP
     fi
-    echo $GATEWAY_INSTALL_IP_2
+    #echo $GATEWAY_INSTALL_IP_2
     sed -i "s/GATEWAY_INSTALL_IP_2/$GATEWAY_INSTALL_IP_2/g" ${workDir}/db/dss_dml.sql
     sed -i "s/GATEWAY_PORT/$GATEWAY_PORT/g" ${workDir}/db/dss_dml.sql
-    if [ $AZKABAN_ADRESS_IP == "127.0.0.1" ];then
-        echo "AZKABAN_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
-        AZKABAN_ADRESS_IP_2=$LOCAL_IP
-    else
-        AZKABAN_ADRESS_IP_2=$AZKABAN_ADRESS_IP
-    fi
-    echo $AZKABAN_ADRESS_IP_2
-    sed -i "s/AZKABAN_ADRESS_IP_2/$AZKABAN_ADRESS_IP_2/g" ${workDir}/db/dss_dml.sql
-    sed -i "s/AZKABAN_ADRESS_PORT/$AZKABAN_ADRESS_PORT/g" ${workDir}/db/dss_dml.sql
     if [ $VISUALIS_NGINX_IP == "127.0.0.1" ]||[ $VISUALIS_NGINX_IP == "0.0.0.0" ];then
         echo "VISUALIS_NGINX_IP is equals $VISUALIS_NGINX_IP ,we will change it to ip address"
         VISUALIS_NGINX_IP_2=$LOCAL_IP
     else
         VISUALIS_NGINX_IP_2=$VISUALIS_NGINX_IP
     fi
-    echo $VISUALIS_NGINX_IP_2
+    #echo $VISUALIS_NGINX_IP_2
     sed -i "s/VISUALIS_NGINX_IP_2/$VISUALIS_NGINX_IP_2/g" ${workDir}/db/dss_dml.sql
     sed -i "s/VISUALIS_NGINX_PORT/$VISUALIS_NGINX_PORT/g" ${workDir}/db/dss_dml.sql
 	mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/dss_dml.sql"
-	isSuccess "source linkis_dml.sql"
-	echo "Rebuild the table"
+	isSuccess "source dss_dml.sql"
+	if [[ '2' = "$INSTALL_MODE" ]];then
+	   echo "start to update azkaban and qualitis table info "
+       #azkaban
+       if [ $AZKABAN_ADRESS_IP == "127.0.0.1" ];then
+           echo "AZKABAN_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
+           AZKABAN_ADRESS_IP_2=$LOCAL_IP
+       else
+            AZKABAN_ADRESS_IP_2=$AZKABAN_ADRESS_IP
+       fi
+       echo $AZKABAN_ADRESS_IP_2
+       sed -i "s/AZKABAN_ADRESS_IP_2/$AZKABAN_ADRESS_IP_2/g" ${workDir}/db/azkaban.sql
+       sed -i "s/AZKABAN_ADRESS_PORT/$AZKABAN_ADRESS_PORT/g" ${workDir}/db/azkaban.sql
+       mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/azkaban.sql"
+	   isSuccess "source azkaban.sql"
+       #qualitis
+       if [ $QUALITIS_ADRESS_IP == "127.0.0.1" ];then
+           echo "QUALITIS_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
+           QUALITIS_ADRESS_IP_2=$LOCAL_IP
+       else
+            QUALITIS_ADRESS_IP_2=$QUALITIS_ADRESS_IP
+       fi
+       echo $QUALITIS_ADRESS_IP_2
+       sed -i "s/QUALITIS_ADRESS_IP_2/$QUALITIS_ADRESS_IP_2/g" ${workDir}/db/qualitis.sql
+       sed -i "s/QUALITIS_ADRESS_PORT/$QUALITIS_ADRESS_PORT/g" ${workDir}/db/qualitis.sql
+       mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/qualitis.sql"
+	   isSuccess "source qualitis.sql"
+    fi
 fi
 
 ##env check
@@ -304,8 +341,7 @@ isSuccess "install  ${APPJOINTNAME}.zip"
 }
 ##function end
 
-##
-ver Install
+##dss-Server install
 PACKAGE_DIR=dss/dss-server
 SERVERNAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
@@ -354,8 +390,8 @@ installPackage
 ###Update appjoint entrance linkis.properties
 echo "$SERVERNAME-step4:update linkis.properties"
 SERVER_CONF_PATH=$SERVER_HOME/$SERVERNAME/conf/linkis.properties
-ssh $SERVER_IP "sed -i  \"s#wds.linkis.entrance.config.logPath.*#wds.linkis.entrance.config.logPath=$WORKSPACE_USER_ROOT_PATH#g\" $SERVER_CONF_PATH"
-ssh $SERVER_IP "sed -i  \"s#wds.linkis.resultSet.store.path.*#wds.linkis.resultSet.store.path=$RESULT_SET_ROOT_PATH#g\" $SERVER_CONF_PATH"
+ssh -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.entrance.config.logPath.*#wds.linkis.entrance.config.logPath=$WORKSPACE_USER_ROOT_PATH#g\" $SERVER_CONF_PATH"
+ssh -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.linkis.resultSet.store.path.*#wds.linkis.resultSet.store.path=$RESULT_SET_ROOT_PATH#g\" $SERVER_CONF_PATH"
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
 echo ""
@@ -423,6 +459,8 @@ APPJOINTNAME=visualis
 #visualis  appjoint install
 installAppjoints
 echo "<----------------$APPJOINTNAME:end------------------->"
+##sample version does not install qualitis APPJoint and scheduis APPJoint
+if [[ '2' = "$INSTALL_MODE" ]];then
 echo ""
 echo "<----------------qualitis  appjoint install start------------------->"
 APPJOINTPARENT=dss-appjoints
@@ -439,5 +477,6 @@ APPJOINTPARENT=dss-appjoints
 APPJOINTNAME=schedulis
 #schedulis  appjoint install
 installAppjoints
-isSuccess "subsitution conf of qualitis"
+isSuccess "subsitution conf of schedulis"
 echo "<----------------$APPJOINTNAME:end------------------->"
+fi

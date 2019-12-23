@@ -76,6 +76,16 @@ sleep 15 #for Eureka register
 SERVER_NAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
 startApp
+#MICRO_SERVICE_NAME=dss-server
+#MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
+#MICRO_SERVICE_PORT=$DSS_SERVER_PORT
+#sh $workDir/check.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
+#state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
+#if [ $state -eq 0 ]; then
+#   echo ""
+#   echo "ERROR " $MICRO_SERVICE_NAME "is a critical service and must be guaranteed to be started !!!"  
+#   exit 1
+#fi
 
 #dss-flow-execution-entrance
 SERVER_NAME=dss-flow-execution-entrance
@@ -90,4 +100,42 @@ startApp
 SERVER_NAME=visualis-server
 SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
 startApp
+
+
+echo "Start to check all dss microservice"
+
+#check dss-server
+MICRO_SERVICE_NAME=dss-server
+MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
+MICRO_SERVICE_PORT=$DSS_SERVER_PORT
+sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
+state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
+isSuccess "$MICRO_SERVICE_NAME start"
+
+
+#check dss-flow-execution-entrance
+MICRO_SERVICE_NAME=dss-flow-execution-entrance
+MICRO_SERVICE_IP=$FLOW_EXECUTION_INSTALL_IP
+MICRO_SERVICE_PORT=$FLOW_EXECUTION_PORT
+sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
+state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
+isSuccess "$MICRO_SERVICE_NAME start"
+
+#check linkis-appjoint-entrance
+MICRO_SERVICE_NAME=linkis-appjoint-entrance
+MICRO_SERVICE_IP=$APPJOINT_ENTRANCE_INSTALL_IP
+MICRO_SERVICE_PORT=$APPJOINT_ENTRANCE_PORT
+sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
+state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
+isSuccess "$MICRO_SERVICE_NAME start"
+
+
+#check visualis-server
+sleep 10 #for visualis-server 
+MICRO_SERVICE_NAME=visualis-server
+MICRO_SERVICE_IP=$VISUALIS_SERVER_INSTALL_IP
+MICRO_SERVICE_PORT=$VISUALIS_SERVER_PORT
+sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
+state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
+isSuccess "$MICRO_SERVICE_NAME start"
 

@@ -85,7 +85,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
 
     #用于DATACHECK校验
-    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
     HIVE_META_USER=xxx
     HIVE_META_PASSWORD=xxx
     
@@ -98,7 +98,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=
@@ -201,10 +201,10 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
     RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis  # 结果集文件路径，用于存储Job的结果集文件 
     
-    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #Azkaban工程存储目录
+    WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler #DSS工程转换成Azkaban工程后zip包的存储路径
 
     #1、用于DATACHECK
-    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/linkis?characterEncoding=UTF-8
+    HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
     HIVE_META_USER=xxx
     HIVE_META_PASSWORD=xxx
     #2、用于Qualitis
@@ -223,7 +223,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 ```
 
 ```properties
-    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息。
+    # 设置DSS-Server和Eventchecker AppJoint的数据库的连接信息,需要和linkis保持同库
     MYSQL_HOST=
     MYSQL_PORT=
     MYSQL_DB=
@@ -341,7 +341,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 添加如下内容：
 ```
 server {
-            listen       8080;# 访问端口
+            listen       8088;# 访问端口
             server_name  localhost;
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
@@ -395,65 +395,10 @@ server {
 ### 4.谷歌浏览器访问：
 ```http://nginx_ip:nginx_port```
 
-如何详细使用DSS, 点我进入 [DSS详细使用文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)
+**试用用户和密码均为部署用户，更多用户配置，详见** [Linkis LDAP](https://github.com/WeBankFinTech/Linkis/wiki/%E9%83%A8%E7%BD%B2%E5%92%8C%E7%BC%96%E8%AF%91%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93)
+
+如何详细使用DSS, 点我进入 [DSS快速使用文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)
 
 ## 4.3、常见问题
 
-(1)用户token为空
-
-```
-sudo vi dss-server/conf/token.properties
-```
-
-添加用户
-
-```
-xxx=xxx
-```
-
-(2)visualis执行报错
-
-```
-Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis not executable!
-```
-
-下载 [driver驱动](https://phantomjs.org/download.html)，把phantomjs二进制文件放入visualis-server的bin目录下即可。
-
-
-(3)简单版DSS创建工程失败
-
-
-删除数据库中表dss_application的schedulis和qualitis记录
-
-
-(4)多次重复安装后报错:TooManyResultsException:Expected on result
-
-
-删除数据库中表linkis_user和dss_user中的重复记录
-
-
-(5)上传文件大小限制
-
-```
-sudo vi /etc/nginx/nginx.conf
-```
-
-更改上传大小
-
-```
-client_max_body_size 200m
-```
-
- (6)接口超时
-
-```
-sudo vi /etc/nginx/conf.d/dss.conf
-```
-
-
-更改接口超时时间
-
-```
-proxy_read_timeout 600s
-```
-
+[DSS安装常见问题](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch1/DSS%E5%AE%89%E8%A3%85%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%88%97%E8%A1%A8.md)

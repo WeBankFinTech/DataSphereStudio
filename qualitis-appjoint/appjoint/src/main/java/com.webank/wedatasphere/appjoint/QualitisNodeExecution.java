@@ -44,6 +44,10 @@ public class QualitisNodeExecution extends LongTermNodeExecution {
 
     private String baseUrl;
 
+    public boolean canExecute(Node node, NodeContext nodeContext) {
+        return true;
+    }
+
     @Override
     public void init(Map<String, Object> map) throws AppJointErrorException {
         appId = (String) map.get("qualitis_appId");
@@ -64,8 +68,10 @@ public class QualitisNodeExecution extends LongTermNodeExecution {
             String filter = (String) map.get("filter");
             String executionUser = (String) map.get("executeUser");
             String createUser = (String) map.get("user");
-            Long groupId = Long.valueOf((Integer) map.get("ruleGroupId"));
-
+            Map<String, Object> map1 = ((AppJointNode)appJointNode).getJobContent();
+            String id = map1.get("ruleGroupId").toString();
+            float f = Float.valueOf(id);
+            Long groupId = (long)f;
             QualitisSubmitRequest submitRequest = new QualitisSubmitRequest();
             submitRequest.setCreateUser(createUser);
             submitRequest.setExecutionUser(executionUser);

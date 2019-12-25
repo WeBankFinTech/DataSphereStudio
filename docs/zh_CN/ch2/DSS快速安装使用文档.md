@@ -79,10 +79,6 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
     deployUser=hadoop  #指定部署用户
 
     DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
-
-    EUREKA_INSTALL_IP=127.0.0.1 #Linkis的 EUREKA 服务主机IP地址
-    
-    EUREKA_PORT=20303  #Linkis的 EUREKA 服务端口号
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 
@@ -194,10 +190,6 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
     deployUser=hadoop  #指定部署用户
 
     DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
-
-    EUREKA_INSTALL_IP=127.0.0.1 #Linkis的 EUREKA 服务主机IP地址
-    
-    EUREKA_PORT=20303  #Linkis的 EUREKA 服务端口号
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 
@@ -311,10 +303,6 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
     deployUser=hadoop  #指定部署用户
 
     DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
-
-    EUREKA_INSTALL_IP=127.0.0.1 #Linkis的 EUREKA 服务主机IP地址
-    
-    EUREKA_PORT=20303  #Linkis的 EUREKA 服务端口号
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 

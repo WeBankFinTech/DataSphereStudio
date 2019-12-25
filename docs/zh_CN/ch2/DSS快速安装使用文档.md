@@ -11,21 +11,21 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最少环境依赖，前后端基础环境部分仅需准备：[Linkis](https://github.com/WeBankFinTech/Linkis)、JAVA、MYSQL、[Nginx](https://www.nginx.com/) ，您即刻能享受到DSS已集成的数据开发Scriptis服务。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[简单版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[精简版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%B2%BE%E7%AE%80%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
 
 ----
 2. **简单版**：
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;较少环境依赖，前后端基础环境部分仅需准备：[Linkis](https://github.com/WeBankFinTech/Linkis)、JAVA、MYSQL、[Nginx](https://www.nginx.com/) ，您即刻能享受到DSS已集成的数据开发Scriptis、工作流实时执行，可视化，邮件发送，DATACHECK和EVENTCHECK服务。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[简单版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%8C%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[简单版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%B8%89%E7%AE%80%E5%8D%95%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
 
 ----
 3. **标准版**
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DSS还实现了很多外部系统的集成，如[Qualitis](https://github.com/WeBankFinTech/Qualitis)和[Azkaban](https://github.com/azkaban/azkaban)，如果您想使用这些外部系统，则需要在简单版的基础上，提前安装和启动好Qualitis和Azkaban服务，并确保其能够正常提供服务，并在配置中指定对应服务的IP和端口。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[标准版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%B8%89%E6%A0%87%E5%87%86%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点我进入[标准版DSS环境配置准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E6%A0%87%E5%87%86%E7%89%88dss%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E5%87%86%E5%A4%87)
 
 ----
 
@@ -139,7 +139,7 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-   环境准备完毕，点我进入 [五、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+   环境准备完毕，点我进入 [五、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%94%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
    
 
 ----
@@ -254,7 +254,7 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-   环境准备完毕，点我进入 [五、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+   环境准备完毕，点我进入 [五、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%94%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 ## 四、标准版DSS环境配置准备
 标准版DSS环境准备也分为三部分，前后端基础软件安装、后端环境准备和前端环境准备，详细介绍如下：
@@ -380,7 +380,7 @@ linkis_url="http://127.0.0.1:9001"
 dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 ```
 
-   环境准备完毕，点我进入 [四、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
+   环境准备完毕，点我进入 [五、安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md#%E4%BA%94%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 # 五、安装和使用
 

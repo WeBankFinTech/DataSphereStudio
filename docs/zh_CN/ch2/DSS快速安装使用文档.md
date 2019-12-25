@@ -1,4 +1,4 @@
-# # 如何快速安装使用DataSphereStudio
+## 如何快速安装使用DataSphereStudio
 
 ### DataSphereStudio安装分为前端部分和后台部分，安装之前首先需要确定前、后端安装环境。
 
@@ -372,7 +372,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 
 ## 五、安装和使用
 
-## 5.1. DataSphereStudio 后台安装：
+### 5.1. DataSphereStudio 后台安装：
 
 ### a. 执行安装脚本：
 
@@ -421,7 +421,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
     
   ![Eureka](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/images/zh_CN/chapter2/quickInstallUse/quickInstall.png)
 
-## 5.2 DataSphereStudio前端安装
+### 5.2 DataSphereStudio前端安装
 
 ### a、部署
 
@@ -504,6 +504,6 @@ server {
 
 如何详细使用DSS, 点我进入 [DSS快速使用文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md)
 
-## 5.3、常见问题
+### 5.3、常见问题
 
 [DSS安装常见问题](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch1/DSS%E5%AE%89%E8%A3%85%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%88%97%E8%A1%A8.md)

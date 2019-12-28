@@ -39,8 +39,7 @@ need_cmd mysql
 need_cmd unzip
 need_cmd expect
 need_cmd telnet
-need_cmd sed
 need_cmd tar
-need_cmd source
-need_cmd hostname
+need_cmd sed
+need_cmd dos2unix
 echo "<-----end to check linux cmd:yum java mysql unzip expect telnet sed tar------>"

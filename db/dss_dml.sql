@@ -50,9 +50,9 @@ insert into `linkis_config_key_tree` VALUES(NULL,@key_id5,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id6,@tree_id2);
 
 #-----------------------jdbc-------------------
-INSERT INTO `linkis_application` (`id`, `name`, `chinese_name`, `description`) VALUES (NULL, 'nodeexecution', NULL, NULL);
 
 select @application_id:=id from `linkis_application` where `name` = 'nodeexecution';
+INSERT INTO `linkis_application` (`id`, `name`, `chinese_name`, `description`)  SELECT NULL,'nodeexecution',`chinese_name`,`description` FROM  linkis_application  WHERE @application_id IS NULL LIMIT 1 ;
 select @jdbc_id:=id from `linkis_application` where `name` = 'jdbc';
 
 INSERT INTO `linkis_config_key` (`id`, `key`, `description`, `name`, `application_id`, `default_value`, `validate_type`, `validate_range`, `is_hidden`, `is_advanced`, `level`) VALUES (NULL, 'jdbc.url', '格式:', 'jdbc连接地址', @application_id, NULL , 'None', NULL , '0', '0', '1');

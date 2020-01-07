@@ -9,6 +9,7 @@ INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `s
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.spark.sql', @linkis_appid, '1', '1', '0', '1', NULL);
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.spark.scala', @linkis_appid, '1', '1', '0', '1', NULL);
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.hive.hql', @linkis_appid, '1', '1', '0', '1', NULL);
+INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.jdbc', @linkis_appid, '1', '1', '0', '1', NULL);
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.control.empty', @linkis_appid, '1', '1', '0', '0', NULL);
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.appjoint.sendemail', @linkis_appid, '1', '1', '0', '0', NULL);
 INSERT INTO `dss_workflow_node` (`id`, `icon`, `node_type`, `application_id`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `support_jump`, `jump_url`) VALUES (NULL, NULL, 'linkis.appjoint.eventchecker.eventsender', @linkis_appid, '1', '1', '0', '0', NULL);
@@ -47,3 +48,23 @@ insert into `linkis_config_key_tree` VALUES(NULL,@key_id3,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id4,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id5,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id6,@tree_id2);
+
+#-----------------------jdbc-------------------
+
+select @application_id:=id from `linkis_application` where `name` = 'nodeexecution';
+INSERT INTO `linkis_application` (`id`, `name`, `chinese_name`, `description`)  SELECT NULL,'nodeexecution',`chinese_name`,`description` FROM  linkis_application  WHERE @application_id IS NULL LIMIT 1 ;
+select @jdbc_id:=id from `linkis_application` where `name` = 'jdbc';
+
+INSERT INTO `linkis_config_key` (`id`, `key`, `description`, `name`, `application_id`, `default_value`, `validate_type`, `validate_range`, `is_hidden`, `is_advanced`, `level`) VALUES (NULL, 'jdbc.url', '格式:', 'jdbc连接地址', @application_id, NULL , 'None', NULL , '0', '0', '1');
+INSERT INTO `linkis_config_key` (`id`, `key`, `description`, `name`, `application_id`, `default_value`, `validate_type`, `validate_range`, `is_hidden`, `is_advanced`, `level`) VALUES (NULL, 'jdbc.username', NULL , 'jdbc连接用户名', @application_id, NULL, 'None', NULL , '0', '0', '1');
+INSERT INTO `linkis_config_key` (`id`, `key`, `description`, `name`, `application_id`, `default_value`, `validate_type`, `validate_range`, `is_hidden`, `is_advanced`, `level`) VALUES (NULL, 'jdbc.password', NULL , 'jdbc连接密码', @application_id, NULL , 'None', NULL , '0', '0', '1');
+
+select @key_id1:=id from `linkis_config_key` where `application_id` = @application_id and `key` = 'jdbc.url';
+select @key_id2:=id from `linkis_config_key` where `application_id` = @application_id and `key` = 'jdbc.username';
+select @key_id3:=id from `linkis_config_key` where `application_id` = @application_id and `key` = 'jdbc.password';
+
+SELECT @tree_id1:=t.id from linkis_config_tree t LEFT JOIN  linkis_application a on t.application_id = a.id WHERE t.`name` = 'jdbc连接设置' and a.`name` = 'jdbc';
+
+insert into `linkis_config_key_tree` VALUES(NULL,@key_id1,@tree_id1);
+insert into `linkis_config_key_tree` VALUES(NULL,@key_id2,@tree_id1);
+insert into `linkis_config_key_tree` VALUES(NULL,@key_id3,@tree_id1);

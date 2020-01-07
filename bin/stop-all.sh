@@ -60,6 +60,11 @@ echo "<-------------------------------->"
 echo "Begin to stop $SERVER_NAME"
 SERVER_BIN=${DSS_INSTALL_HOME}/${SERVER_NAME}/bin
 SERVER_STOP_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1; sh stop-${SERVER_NAME}.sh"
+if [ ! -d ${DSS_INSTALL_HOME}/${SERVER_NAME} ];then
+  echo "$SERVER_NAME is not installed,the stop steps will be skipped"
+  return
+fi
+
 if [ -n "${SERVER_IP}"  ];then
     ssh -p $SSH_PORT ${SERVER_IP} "${SERVER_STOP_CMD}"
 else

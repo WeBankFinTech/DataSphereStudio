@@ -38,7 +38,8 @@ class AppJointAuthImpl private() extends AppJointAuth with Logging {
 
   private def getBaseUrl(dssUrl: String): String = {
     val uri = new URI(dssUrl)
-    uri.getScheme + "://" + uri.getHost + ":" + uri.getPort
+    val dssPort = if(uri.getPort != -1) uri.getPort else 80
+    uri.getScheme + "://" + uri.getHost + ":" + dssPort
   }
 
   protected def getDWSClient(dssUrl: String): DWSHttpClient = {

@@ -37,7 +37,6 @@ elif [[ "$OSTYPE" == "win32" ]]; then
     echo "dss not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
-
     txt=""
 else
     echo "Operating system unknown, please tell us(submit issue) for better service"
@@ -46,13 +45,12 @@ fi
 
 function isSuccess(){
 if [ $? -ne 0 ]; then
-    echo "Failed to " + $1
+    echo "ERROR to " + $1
     exit 1
 else
-    echo "Succeed to" + $1
+    echo "SUCESS to" + $1
 fi
 }
-
 
 #check env
 sh ${workDir}/bin/checkEnv.sh
@@ -74,45 +72,19 @@ else
 fi
 }
 
-function checkPythonAndJava(){
-	python --version
-	isSuccess "execute python --version"
-	java -version
-	isSuccess "execute java --version"
-}
-
-function checkHadoopAndHive(){
-	hdfs version
-	isSuccess "execute hdfs version"
-	hive --help
-	#isSuccess "execute hive -h"
-}
-
-function checkSpark(){
-	spark-submit --version
-	isSuccess "execute spark-submit --version"
-}
-
-##install env:expect,
-sudo yum install -y expect
-isSuccess "install expect"
-
-##install env:telnet,
-sudo yum install -y telnet
-isSuccess "install telnet"
-
 ##load config
 echo "step1:load config"
 source ${workDir}/conf/config.sh
 source ${workDir}/conf/db.sh
 isSuccess "load config"
 
-local_host="`hostname --fqdn`"
+local_host="`hostname -i`"
 
 ##env check
 echo "Please enter the mode selection such as: 1"
-echo " 1: Simple"
-echo " 2: Standard"
+echo " 1: lite"
+echo " 2: sample"
+echo " 3: Standard"
 echo ""
 
 INSTALL_MODE=1
@@ -120,7 +92,7 @@ INSTALL_MODE=1
 read -p "Please input the choice:"  idx
 if [[ '1' = "$idx" ]];then
   INSTALL_MODE=1
-  echo "You chose Simple installation mode"
+  echo "You chose lite installation mode"
   #check for Java
   checkJava
   #check for mysql
@@ -128,9 +100,18 @@ if [[ '1' = "$idx" ]];then
   EXTERNAL_SERVER_IP=$MYSQL_HOST
   EXTERNAL_SERVER_PORT=$MYSQL_PORT
   checkExternalServer
-
 elif [[ '2' = "$idx" ]];then
   INSTALL_MODE=2
+  echo "You chose sample installation mode"
+  #check for Java
+  checkJava
+  #check for mysql
+  SERVER_NAME=MYSQL
+  EXTERNAL_SERVER_IP=$MYSQL_HOST
+  EXTERNAL_SERVER_PORT=$MYSQL_PORT
+
+elif [[ '3' = "$idx" ]];then
+  INSTALL_MODE=3
   echo "You chose Standard installation mode"
   #check for Java
   checkJava
@@ -155,8 +136,8 @@ else
   exit 1
 fi
 
-##env check
-echo "Do you want to clear Dss table information in the database?"
+##init db
+echo "Do you want to clear DSS table information in the database?"
 echo " 1: Do not execute table-building statements"
 echo " 2: Dangerous! Clear all data and rebuild the tables."
 echo ""
@@ -189,18 +170,25 @@ if [[ '2' = "$MYSQL_INSTALL_MODE" ]];then
     #echo $GATEWAY_INSTALL_IP_2
     sed -i "s/GATEWAY_INSTALL_IP_2/$GATEWAY_INSTALL_IP_2/g" ${workDir}/db/dss_dml.sql
     sed -i "s/GATEWAY_PORT/$GATEWAY_PORT/g" ${workDir}/db/dss_dml.sql
-    if [ $VISUALIS_NGINX_IP == "127.0.0.1" ]||[ $VISUALIS_NGINX_IP == "0.0.0.0" ];then
+    mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/dss_dml.sql"
+	isSuccess "source dss_dml.sql"
+
+    if [ '2' = "$INSTALL_MODE" ]||[ '3' = "$INSTALL_MODE" ];then
+	echo "visualis support "
+	    if [ $VISUALIS_NGINX_IP == "127.0.0.1" ]||[ $VISUALIS_NGINX_IP == "0.0.0.0" ];then
         echo "VISUALIS_NGINX_IP is equals $VISUALIS_NGINX_IP ,we will change it to ip address"
         VISUALIS_NGINX_IP_2=$LOCAL_IP
-    else
+        else
         VISUALIS_NGINX_IP_2=$VISUALIS_NGINX_IP
+        fi
+        #echo $VISUALIS_NGINX_IP_2
+        sed -i "s/VISUALIS_NGINX_IP_2/$VISUALIS_NGINX_IP_2/g" ${workDir}/db/visualis.sql
+        sed -i "s/VISUALIS_NGINX_PORT/$VISUALIS_NGINX_PORT/g" ${workDir}/db/visualis.sql
+	    mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/visualis.sql"
+	    isSuccess "source visualis.sql"
     fi
-    #echo $VISUALIS_NGINX_IP_2
-    sed -i "s/VISUALIS_NGINX_IP_2/$VISUALIS_NGINX_IP_2/g" ${workDir}/db/dss_dml.sql
-    sed -i "s/VISUALIS_NGINX_PORT/$VISUALIS_NGINX_PORT/g" ${workDir}/db/dss_dml.sql
-	mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/dss_dml.sql"
-	isSuccess "source dss_dml.sql"
-	if [[ '2' = "$INSTALL_MODE" ]];then
+
+	if [[ '3' = "$INSTALL_MODE" ]];then
 	   echo "start to update azkaban and qualitis table info "
        #azkaban
        if [ $AZKABAN_ADRESS_IP == "127.0.0.1" ];then
@@ -229,7 +217,7 @@ if [[ '2' = "$MYSQL_INSTALL_MODE" ]];then
     fi
 fi
 
-##env check
+## davinci db init
 echo "Do you want to clear davinci table information in the database ? If you have not installed davinci environment,you must input '2',if you have davinci installed,choice 1."
 echo " 1: Do not execute table-building statements"
 echo "WARN:"
@@ -251,7 +239,6 @@ else
   echo "no choice,exit!"
   exit 1
 fi
-
 
 ###linkis Eurkea info
 SERVER_IP=$EUREKA_INSTALL_IP
@@ -362,6 +349,8 @@ ssh  -p $SSH_PORT $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.project.sto
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
 echo ""
+
+if [ '2' = "$INSTALL_MODE" ]||[ '3' = "$INSTALL_MODE" ];then
 ##Flow execution Install
 PACKAGE_DIR=dss/dss-flow-execution-entrance
 SERVERNAME=dss-flow-execution-entrance
@@ -437,7 +426,7 @@ APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoin
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#job.datachecker.jdo.option.url.*#job.datachecker.jdo.option.url=$HIVE_META_URL#g\" $APPJOINTNAME_CONF_PATH_PATENT"
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#job.datachecker.jdo.option.username.*#job.datachecker.jdo.option.username=$HIVE_META_USER#g\" $APPJOINTNAME_CONF_PATH_PATENT"
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#job.datachecker.jdo.option.password.*#job.datachecker.jdo.option.password=$HIVE_META_PASSWORD#g\" $APPJOINTNAME_CONF_PATH_PATENT"
-isSuccess "subsitution conf of $SERVERNAME"
+isSuccess "subsitution conf of datachecker"
 echo "<----------------datachecker appjoint install end------------------->"
 echo ""
 echo "<----------------eventchecker appjoint install start------------------->"
@@ -450,7 +439,7 @@ APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoin
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#msg.eventchecker.jdo.option.url.*#msg.eventchecker.jdo.option.url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?characterEncoding=UTF-8#g\" $APPJOINTNAME_CONF_PATH_PATENT"
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#msg.eventchecker.jdo.option.username.*#msg.eventchecker.jdo.option.username=$MYSQL_USER#g\" $APPJOINTNAME_CONF_PATH_PATENT"
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#msg.eventchecker.jdo.option.password.*#msg.eventchecker.jdo.option.password=$MYSQL_PASSWORD#g\" $APPJOINTNAME_CONF_PATH_PATENT"
-isSuccess "subsitution conf of $SERVERNAME"
+isSuccess "subsitution conf of eventchecker"
 echo "<----------------$APPJOINTNAME:end------------------->"
 echo ""
 echo "<----------------visualis  appjoint install start------------------->"
@@ -459,8 +448,10 @@ APPJOINTNAME=visualis
 #visualis  appjoint install
 installAppjoints
 echo "<----------------$APPJOINTNAME:end------------------->"
-##sample version does not install qualitis APPJoint and scheduis APPJoint
-if [[ '2' = "$INSTALL_MODE" ]];then
+fi
+
+##lite and sample version does not install qualitis APPJoint and scheduis APPJoint
+if [[ '3' = "$INSTALL_MODE" ]];then
 echo ""
 echo "<----------------qualitis  appjoint install start------------------->"
 APPJOINTPARENT=dss-appjoints
@@ -469,7 +460,7 @@ APPJOINTNAME=qualitis
 installAppjoints
 APPJOINTNAME_CONF_PATH_PATENT=$SERVER_HOME/$APPJOINTPARENT/$APPJOINTNAME/appjoint.properties
 ssh  -p $SSH_PORT  $SERVER_IP "sed -i  \"s#baseUrl=http://127.0.0.1:8090#baseUrl=http://$QUALITIS_ADRESS_IP:$QUALITIS_ADRESS_PORT#g\" $APPJOINTNAME_CONF_PATH_PATENT"
-isSuccess "subsitution conf of $SERVERNAME"
+isSuccess "subsitution conf of qualitis"
 echo "<----------------$APPJOINTNAME:end------------------->"
 echo ""
 echo "<----------------schedulis  appjoint install start------------------->"

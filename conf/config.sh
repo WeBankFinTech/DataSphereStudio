@@ -4,20 +4,11 @@ deployUser=hadoop
 ### The install home path of DSS，Must provided
 DSS_INSTALL_HOME=/appcom/Install/DSS
 
-###  Linkis EUREKA  information.
-EUREKA_INSTALL_IP=127.0.0.1         # Microservices Service Registration Discovery Center
-EUREKA_PORT=20303
-
 ### Specifies the user workspace, which is used to store the user's script files and log files.
 ### Generally local directory
 WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
 ### Path to store job ResultSet：file or hdfs path
 RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
-
-### 1、DataCheck APPJOINT，This service is used to provide DataCheck capability.
-HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
-HIVE_META_USER=xxx
-HIVE_META_PASSWORD=xxx
 
 ################### The install Configuration of all Micro-Services #####################
 #
@@ -43,12 +34,21 @@ APPJOINT_ENTRANCE_PORT=9005
 FLOW_EXECUTION_INSTALL_IP=127.0.0.1
 FLOW_EXECUTION_PORT=9006
 
+###  Linkis EUREKA  information.
+EUREKA_INSTALL_IP=127.0.0.1         # Microservices Service Registration Discovery Center
+EUREKA_PORT=20303
+
 ### Linkis Gateway  information
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
 
 ### SSH Port
 SSH_PORT=22
+
+### 1、DataCheck APPJOINT，This service is used to provide DataCheck capability.
+HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
+HIVE_META_USER=xxx
+HIVE_META_PASSWORD=xxx
 
 #Used to store the azkaban project transformed by DSS
 WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
@@ -58,7 +58,7 @@ WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
 VISUALIS_SERVER_INSTALL_IP=127.0.0.1
 VISUALIS_SERVER_PORT=9007
 ### visualis nginx acess ip,keep consistent with DSS front end
-VISUALIS_NGINX_IP=0.0.0.0
+VISUALIS_NGINX_IP=127.0.0.1
 VISUALIS_NGINX_PORT=8088
 
 ### Eventchecker APPJOINT
@@ -72,4 +72,4 @@ AZKABAN_ADRESS_PORT=8091
 QUALITIS_ADRESS_IP=127.0.0.1
 QUALITIS_ADRESS_PORT=8090
 
-DSS_VERSION=0.6.0
+DSS_VERSION=0.7.0

@@ -31,6 +31,31 @@ workDir=`cd "$workDir"; pwd`
 CONF_DIR="${workDir}"/../conf
 CONF_FILE=${CONF_DIR}/config.sh
 
+function isLocal(){
+    if [ "$1" == "127.0.0.1" ];then
+        return 0
+    elif [ $1 == "localhost" ]; then
+        return 0
+    elif [ $1 == $local_host ]; then
+        return 0
+    elif [ $1 == $ipaddr ]; then
+        return 0
+    fi
+        return 1
+}
+
+function executeCMD(){
+   isLocal $1
+   flag=$?
+   echo "Is local "$flag
+   if [ $flag == "0" ];then
+      eval $2
+   else
+      ssh -p $SSH_PORT $1 $2
+   fi
+
+}
+
 function isSuccess(){
 if [ $? -ne 0 ]; then
     echo "ERROR:  " + $1
@@ -60,7 +85,14 @@ function startApp(){
 echo "<-------------------------------->"
 echo "Begin to start $SERVER_NAME"
 SERVER_BIN=${DSS_INSTALL_HOME}/${SERVER_NAME}/bin
-SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh start-${SERVER_NAME}.sh > /dev/null 2>&1 &"
+SERVER_START_CMD="source /etc/profile;source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh start-${SERVER_NAME}.sh > /dev/null 2>&1 &"
+
+if [ ! -d $SERVER_BIN ];then
+  echo "<-------------------------------->"
+  echo "$SERVER_NAME is not installed,the start steps will be skipped"
+  echo "<-------------------------------->"
+  return
+fi
 
 if [ -n "${SERVER_IP}"  ];then
     ssh ${SERVER_IP} "${SERVER_START_CMD}"
@@ -76,16 +108,6 @@ sleep 15 #for Eureka register
 SERVER_NAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
 startApp
-#MICRO_SERVICE_NAME=dss-server
-#MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
-#MICRO_SERVICE_PORT=$DSS_SERVER_PORT
-#sh $workDir/check.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-#state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-#if [ $state -eq 0 ]; then
-#   echo ""
-#   echo "ERROR " $MICRO_SERVICE_NAME "is a critical service and must be guaranteed to be started !!!"  
-#   exit 1
-#fi
 
 #dss-flow-execution-entrance
 SERVER_NAME=dss-flow-execution-entrance
@@ -101,15 +123,14 @@ SERVER_NAME=visualis-server
 SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
 startApp
 
-
+echo ""
 echo "Start to check all dss microservice"
-
+echo ""
 #check dss-server
 MICRO_SERVICE_NAME=dss-server
 MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
 MICRO_SERVICE_PORT=$DSS_SERVER_PORT
 sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
 isSuccess "$MICRO_SERVICE_NAME start"
 
 
@@ -118,7 +139,6 @@ MICRO_SERVICE_NAME=dss-flow-execution-entrance
 MICRO_SERVICE_IP=$FLOW_EXECUTION_INSTALL_IP
 MICRO_SERVICE_PORT=$FLOW_EXECUTION_PORT
 sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
 isSuccess "$MICRO_SERVICE_NAME start"
 
 #check linkis-appjoint-entrance
@@ -126,7 +146,6 @@ MICRO_SERVICE_NAME=linkis-appjoint-entrance
 MICRO_SERVICE_IP=$APPJOINT_ENTRANCE_INSTALL_IP
 MICRO_SERVICE_PORT=$APPJOINT_ENTRANCE_PORT
 sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
 isSuccess "$MICRO_SERVICE_NAME start"
 
 
@@ -136,6 +155,5 @@ MICRO_SERVICE_NAME=visualis-server
 MICRO_SERVICE_IP=$VISUALIS_SERVER_INSTALL_IP
 MICRO_SERVICE_PORT=$VISUALIS_SERVER_PORT
 sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
 isSuccess "$MICRO_SERVICE_NAME start"
 

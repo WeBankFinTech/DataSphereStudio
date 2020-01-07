@@ -26,6 +26,7 @@ import java.util.Map;
 public class FunctionPool {
 
     public static NodeServiceFunction deleteNode = (NodeService nodeService, Session session, AppJointNode node, Map<String, Object> requestBody)->{
+        node.setJobContent(requestBody);
         nodeService.deleteNode(session,node);
         return null;
     };

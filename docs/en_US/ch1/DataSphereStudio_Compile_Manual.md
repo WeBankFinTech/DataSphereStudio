@@ -6,7 +6,7 @@
    
 ```xml
   <properties>
-          <dss.version>0.6.0</dss.version>
+          <dss.version>0.7.0</dss.version>
           <linkis.version>0.9.1</linkis.version>
           <scala.version>2.11.8</scala.version>
           <jdk.compile.version>1.8</jdk.compile.version>

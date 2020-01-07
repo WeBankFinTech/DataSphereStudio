@@ -1,59 +1,42 @@
-## 如何接入调度系统Azkaban
- Azkaban目前是作为一个SchedulerAppJoint在DSS-SERVER中使用，通过AzkabanSchedulerAppJoint实现了Azkaban的工程服务和安全认证服务，
+## DSS如何手动安装接入调度系统Azkaban
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Azkaban目前是作为一个SchedulerAppJoint在DSS-SERVER中使用，通过AzkabanSchedulerAppJoint实现了Azkaban的工程服务和安全认证服务，
  主要提供了工程的创建、更新、发布、删除，以及安全认证服务相关的代理登录，Cookie保存等。
  
- **前提条件：用户已经安装部署好社区版本的Azkaban-3.69.X环境**
+ **前提条件：用户已经安装部署好社区版Azkaban-3.X以上版本。**[如何安装Azkaban](https://github.com/azkaban/azkaban)  
+#### **步骤：**
+**1、Azkaban APPJoint安装及配置**
+
+ 进入DSS安装包解压目录，复制share/appjoints/schedulis/dss-azkaban-appjoint.zip到DSS安装目录的dss-appjoints/schedulis文件夹下，解压即可。
+
+**2、修改dss-server配置目录中linkis.properties配置，增加如下参数：**
+
+```
+wds.dss.appjoint.scheduler.azkaban.address=http://IP地址:端口   #Azkaban的http地址
+wds.dss.appjoint.scheduler.project.store.dir=file:///appcom/tmp/wds/scheduler  #Azkaban发布包临时存储目录
+```
+
+**3、数据库中dss_application表修改**
+
+ 修改DSS数据库dss_application表中schedulis记录行，修改url的连接IP地址和端口，保持与Azkaban Server实际地址一致。
+ 示例SQL：
+
+```
+INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'schedulis', NULL, '0', '1', NULL, '0', NULL, NULL, '1', NULL, NULL);
+
+UPDATE `dss_application` SET url = 'http://IP地址:端口', project_url = 'http://IP地址:端口/manager?project=${projectName}',homepage_url = 'http://IP地址:端口/homepage' WHERE `name` in
+  ('schedulis');
+```
+
+**4、Azkaban JobType插件安装**
+
+您还需为Azkaban安装一个JobType插件： linkis-jobtype，请点击[Linkis jobType安装文档](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/Azkaban_LinkisJobType_Deployment_Manual.md)
+
+**5、用户token配置**
+
+##### 请在DSS-SERVER服务conf目录的token.properties文件中，配置用户名和密码信息，关联DSS和Azkaban用户，因为用户通过DSS创建工程后，要发布到azkaban，用户必须保持一致。示例：
  
- (1) 安装DSS前配置Azkaban的环境信息 
- 
-   在安装DSS之前，在工程的conf目录下配置Azkaban的IP地址和端口信息:
-    
 ```
-    #azkaban.address
-    AZKABAN_ADRESS_IP=127.0.0.1
-    AZKABAN_ADRESS_PORT=99887
+ 用户名=密码
 ```
  
-   用户使用DSS一键安装,会自动配置以下两个参数内容：
-    
-```
-    wds.dss.appjoint.scheduler.azkaban.address=            //Azkaban 的http地址
-    wds.dss.appjoint.scheduler.project.store.dir=          //Azkaban发布包临时存储目录
-```
- (2) 安装DSS后配置Azkaban用户信息
- 
-     在DSS-SERVER服务的conf目录下放置token.properties属性文件，配置用户名和密码信息，用于登录Azkaban.示例：
-     user01=1234
-     说明：由于每个公司都有各自的登录认证系统，这里只提供简单实现，用户可以实现SchedulerSecurityService定义自己的登录认证方法。
-     关联后DSS和Azkaban的用户必须是同一个。
-     
- (3) 在DSS数据库中配置Azkaban的appjoint信息（一键安装时默认已执行不需要重复执行,单独安装需要）
- 
-```
-    INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`) VALUES (NULL, 'azkaban', NULL, '0', '1', NULL, '0', NULL, NULL);
-```
-    检查dss-appjoints目录下是否已经安装了schedulis的appjoint。
-    
- (4) 在Azkaban上安装Linkis任务执行插件
- 
-   由于现在DSS的任务基本都是提交给Linkis来执行的，所以需要在Azkaban上安装一个插件，用于DSS发布到Azkaban后的调度执行。
-   1、获取插件包
-    
-```
-    /wedatasphere-dss-x.x.x-dist/share/plugins/azkaban/linkis-jobtype/linkis-jobtype-x.x.x-linkis-jobtype.zip
-```
-   2、安装插件
-   
-   把安装包解压到指定的目录下：
-```
-    /AzkabanInstall/wtss-exec/plugins/jobtypes/linkis
-```
-    
-   3、配置插件
-   
-      private.properties（azkaban的jobtype配置）和 plugin.properties(额外的配置)
-      请根据实际环境设置两个配置文件的内容
-      
-   4、刷新生效
-   
-    curl http://IP:PORT/executor?action=reloadJobTypePlugins
+说明：由于每个公司都有各自的登录认证系统，这里只提供简单实现，用户可以实现SchedulerSecurityService定义自己的登录认证方法。azkaban用户管理可参考[Azkaban-3.x 用户管理](https://cloud.tencent.com/developer/article/1492734)及[官网](https://azkaban.readthedocs.io/en/latest/userManager.html)

@@ -21,12 +21,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.ContextInfo;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by peacewong on 2019/9/26.
+ * Created by johnnwang on 2019/9/26.
  */
 public class WorkflowContextImpl implements WorkflowContext {
 
@@ -79,7 +80,7 @@ public class WorkflowContextImpl implements WorkflowContext {
         while (keys.hasNext()) {
             String key = keys.next();
             if (key.startsWith(keyPrefix)) {
-                map.put(key, getValue(key));
+                map.put(StringUtils.substringAfter(key, keyPrefix), getValue(key));
             }
         }
         return map;

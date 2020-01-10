@@ -1,8 +1,13 @@
+#!/bin/sh
+
+shellDir=`dirname $0`
+workDir=`cd ${shellDir}/..;pwd`
+
 ### deploy user
 deployUser=hadoop
 
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/appcom/Install/DSS
+DSS_INSTALL_HOME=$workDir
 
 ### Specifies the user workspace, which is used to store the user's script files and log files.
 ### Generally local directory

@@ -45,6 +45,14 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <artifactId>linkis-httpclient</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
 

@@ -44,9 +44,10 @@ object FlowExecutionEntranceConfiguration {
 
   val NODE_STATUS_POLLER_THREAD_SIZE = CommonVars("wds.dds.flow.node.status.poller.thread.size", 20)
 
-  val NODE_STATUS_POLLER_SCHEDULER_TIME = CommonVars("wds.dds.flow.node.status.poller.scheduler.time", 2)
+  val NODE_STATUS_POLLER_SCHEDULER_TIME = CommonVars("wds.dds.flow.node.status.poller.scheduler.time", 5)
   val FLOW_EXECUTION_SCHEDULER_POOL_SIZE = CommonVars("wds.linkis.flow.execution.pool.size", 30)
 
+  val NODE_STATUS_INTERVAL = CommonVars("wds.dds.flow.node.status.poller.interval.time", 3000)
 
   val COMMAND = "command"
 

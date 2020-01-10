@@ -17,26 +17,9 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-/**
- * Created by enjoyyin on 2019/11/13.
- */
-public interface SignalSharedJob extends SharedJob {
+public interface JobSignalKeyCreator {
 
-    String PREFIX = "signal.";
+    String getSignalKeyByJob(Job job);
 
-    JobSignalKeyCreator getSignalKeyCreator();
-
-    void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator);
-
-    @Override
-    default int getSharedNum() {
-        return  -1;
-    }
-
-    @Override
-    default String getSharedKey() {
-        return PREFIX + getSignalKeyCreator().getSignalKeyBySignalSharedJob(this) + "." + getMsgSaveKey();
-    }
-
-    String getMsgSaveKey();
+    String getSignalKeyBySignalSharedJob(SignalSharedJob job);
 }

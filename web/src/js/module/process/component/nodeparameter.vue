@@ -298,6 +298,18 @@ export default {
         }
       };
       return {
+        'jdbcUrl': [
+          { required: true, message: 'joburl为必填项', trigger: 'blur' },
+          { type: 'string', pattern: /(jdbc)[a-zA-Z0-9_:./]/, message: '必须以jdbc开头，且只支持数字、字母、(_:./)', trigger: 'blur' },
+        ],
+        'jdbcUsername': [
+          { required: true, message: 'username为必填项', trigger: 'blur' },
+          { type: 'string', pattern: /^[^\u4e00-\u9fa5]+$/, message: '此值不支持中文', trigger: 'blur' },
+        ],
+        'jdbcPassword': [
+          { required: true, message: 'password为必填项', trigger: 'blur' },
+          { type: 'string', pattern: /^[^\u4e00-\u9fa5]+$/, message: '此值不支持中文', trigger: 'blur' },
+        ],
         'sourceType': [
           { required: true, message: this.$t('message.process.nodeParameter.XZSJLY'), trigger: 'blur' },
           { type: 'string', pattern: /^[^\u4e00-\u9fa5]+$/, message: this.$t('message.process.nodeParameter.CZBNSRZW'), trigger: 'change' },
@@ -612,7 +624,7 @@ export default {
         if (this.currentNode.jobContent && this.currentNode.jobContent.jobParams) {
           this.currentNode.params.configuration.runtime = JSON.parse(JSON.stringify(this.currentNode.jobContent.jobParams));
         }
-        if ([NODETYPE.EVENTCHECKERF, NODETYPE.EVENTCHECKERW, NODETYPE.DATACHECKER].includes(this.currentNode.type)) {
+        if ([NODETYPE.EVENTCHECKERF, NODETYPE.EVENTCHECKERW, NODETYPE.DATACHECKER, NODETYPE.JDBC].includes(this.currentNode.type)) {
           Object.keys(this.currentNode.params.configuration.runtime).map((key) => {
             this.currentNode.params.configuration.runtime[this.transtionKey(key)] = String(this.currentNode.params.configuration.runtime[key]);
             delete this.currentNode.params.configuration.runtime[key];

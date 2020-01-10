@@ -17,41 +17,23 @@
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
+import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobSignalKeyCreator;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 
-import java.util.Map;
-
-/**
- * Created by johnnwang on 2019/11/14.
- */
-public class AzkabanAppJointSignalSharedJob extends AzkabanAppJointLinkisJob implements SignalSharedJob {
-
-
-    private JobSignalKeyCreator signalKeyCreator;
+public class AzkabanJobSignalKeyCreator implements JobSignalKeyCreator {
 
     @Override
-    public JobSignalKeyCreator getSignalKeyCreator() {
-        return this.signalKeyCreator;
+    public String getSignalKeyByJob(Job job) {
+        String projectId = job.getJobProps().get(LinkisJobTypeConf.PROJECT_ID);
+        String flowId = job.getJobProps().get(LinkisJobTypeConf.FLOW_NAME);
+        String flowExecId = job.getJobProps().get(LinkisJobTypeConf.FLOW_EXEC_ID);
+        return projectId + "." + flowId + "." + flowExecId ;
     }
 
     @Override
-    public void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator) {
-        this.signalKeyCreator = signalKeyCreator;
-    }
-
-    @Override
-    public String getMsgSaveKey() {
-        Map<String, Object> configuration = this.getConfiguration();
-        Object map = configuration.get("runtime");
-        if (map != null && map instanceof Map) {
-            Map<String, Object> runtime = (Map<String, Object>) map;
-            Object msgValue = runtime.get(LinkisJobTypeConf.MSG_SAVE_KEY);
-            if (null != msgValue) {
-                return msgValue.toString();
-            }
-        }
-        return null;
+    public String getSignalKeyBySignalSharedJob(SignalSharedJob job) {
+        return getSignalKeyByJob((Job)job);
     }
 }

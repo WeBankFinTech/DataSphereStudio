@@ -71,7 +71,7 @@ echo $MICRO_SERVICE_IP
 echo $MICRO_SERVICE_PORT
 echo "==========================================================="
 
-if [ $MICRO_SERVICE_NAME == "visualis-server" ]||[ $MICRO_SERVICE_IP == "127.0.0.1" ]; then
+if [ $MICRO_SERVICE_NAME == "visualis-server" ] && [ $MICRO_SERVICE_IP == "127.0.0.1" ]; then
     MICRO_SERVICE_IP="`hostname -i`"
 fi
 

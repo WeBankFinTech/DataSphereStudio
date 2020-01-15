@@ -104,7 +104,7 @@ source ${DISTRIBUTION}
 isSuccess "load config"
 
 local_host="`hostname --fqdn`"
-ipaddr="`hostname -i`"
+ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 
 function isLocal(){
     if [ "$1" == "127.0.0.1" ];then
@@ -277,7 +277,7 @@ fi
 if [[ '2' = "$MYSQL_INSTALL_MODE" ]];then
     mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/dss_ddl.sql"
     isSuccess "source dss_ddl.sql"
-    LOCAL_IP="`hostname -i`"
+    LOCAL_IP=$ipaddr
     if [ $GATEWAY_INSTALL_IP == "127.0.0.1" ];then
       echo "GATEWAY_INSTALL_IP is equals 127.0.0.1 ,we will change it to ip address"
       GATEWAY_INSTALL_IP_2=$LOCAL_IP

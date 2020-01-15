@@ -31,7 +31,7 @@ MICRO_SERVICE_PORT=$3
 
 local_host="`hostname --fqdn`"
 
-ipaddr="`hostname -i`"
+ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 
 function isLocal(){
     if [ "$1" == "127.0.0.1" ];then
@@ -72,7 +72,7 @@ echo $MICRO_SERVICE_PORT
 echo "==========================================================="
 
 if [ $MICRO_SERVICE_NAME == "visualis-server" ] && [ $MICRO_SERVICE_IP == "127.0.0.1" ]; then
-    MICRO_SERVICE_IP="`hostname -i`"
+    MICRO_SERVICE_IP=$ipaddr
 fi
 
 result=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`

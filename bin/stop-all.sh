@@ -34,7 +34,7 @@ export DISTRIBUTION=${DISTRIBUTION:-"${CONF_DIR}/config.sh"}
 source ${DISTRIBUTION}
 
 local_host="`hostname --fqdn`"
-ipaddr="`hostname -i`"
+ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 
 function isSuccess(){
 if [ $? -ne 0 ]; then

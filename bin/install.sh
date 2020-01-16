@@ -452,6 +452,7 @@ executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.azkaban.address.*#
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.gateway.ip.*#wds.linkis.gateway.ip=$GATEWAY_INSTALL_IP#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.project.store.dir.*#wds.dss.appjoint.scheduler.project.store.dir=$WDS_SCHEDULER_PATH#g\" $SERVER_CONF_PATH"
+executeCMD $SERVER_IP "echo "$deployUser=$deployUser" >> $SERVER_HOME/$SERVERNAME/conf/token.properties"
 isSuccess "subsitution linkis.properties of $SERVERNAME"
 echo "<----------------$SERVERNAME:end------------------->"
 echo ""

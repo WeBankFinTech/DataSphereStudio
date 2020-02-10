@@ -80,6 +80,10 @@ export default {
         }, {
           name: 'IDE-pipeline',
           title: 'PipeLine',
+        },
+        {
+          name: 'IDE-jdbc',
+          title: 'Jdbc',
         }],
       }, {
         name: '3',
@@ -88,6 +92,26 @@ export default {
         children: [{
           name: 'visualis-spark',
           title: 'Spark',
+        }],
+      },
+      {
+        name: '4',
+        title: '工作流',
+        icon: 'md-analytics',
+        children: [{
+          name: 'nodeexecution-spark',
+          title: 'Spark',
+        }, {
+          name: 'nodeexecution-hive',
+          title: 'Hive',
+        },
+        {
+          name: 'nodeexecution-python',
+          title: 'Python',
+        },
+        {
+          name: 'nodeexecution-jdbc',
+          title: 'Jdbc',
         }],
       }],
       activeMenu: '',
@@ -110,6 +134,7 @@ export default {
       this.activeMenu = type;
       const IDE = 'IDE';
       const VSBI = 'visualis';
+      const NODEECECUTION = 'nodeexecution';
       let appName = '通用设置';
       let creator = '通用设置';
       if (type.match(IDE)) {
@@ -118,6 +143,9 @@ export default {
       } else if (type.match(VSBI)) {
         creator = VSBI;
         appName = type.slice(VSBI.length + 1, type.length);
+      } else if (type.match(NODEECECUTION)) {
+        creator = NODEECECUTION;
+        appName = type.slice(NODEECECUTION.length + 1, type.length);
       }
       api.fetch('/configuration/getFullTreesByAppName', {
         appName,

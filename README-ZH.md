@@ -127,6 +127,17 @@ DSS主要特点：
  
  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;**根据需要，用户可以简单快速替换DSS已集成的各种功能组件，或新增功能组件。**
 
+## Demo试用环境
+
+&nbsp; &nbsp; &nbsp; &nbsp;由于DataSphereStudio支持执行脚本风险较高，WeDataSphere Demo环境的隔离没有做完，考虑到大家都在咨询Demo环境，决定向社区先定向发放邀请码，接受企业和组织的试用申请。
+
+&nbsp; &nbsp; &nbsp; &nbsp;如果您想试用Demo环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系团队成员获取邀请码。
+
+&nbsp; &nbsp; &nbsp; &nbsp;WeDataSphere Demo环境用户注册页面：https://sandbox.webank.com/wds/dss/#/register
+
+&nbsp; &nbsp; &nbsp; &nbsp;WeDataSphere Demo环境登录页面：https://sandbox.webank.com/wds/dss/
+
+&nbsp; &nbsp; &nbsp; &nbsp;我们会尽快解决环境隔离问题，争取早日向社区完全开放WeDataSphere Demo环境。
 
 ## 与类似系统对比
 

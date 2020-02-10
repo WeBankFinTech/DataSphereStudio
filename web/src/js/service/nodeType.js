@@ -32,12 +32,14 @@ import scala from '../module/process/images/scala.svg';
 import exchange from '../module/process/images/newIcon/exchange.svg';
 import qualitis from '../module/process/images/newIcon/qualitis.svg';
 import python from '../module/process/images/newIcon/python.svg';
+import jdbc from '../module/process/images/newIcon/JDBC2.svg';
 const NODETYPE = {
   SHELL: 'azkaban.shell',
   HQL: 'linkis.hive.hql',
   SPARKSQL: 'linkis.spark.sql',
   SPARKPY: 'linkis.spark.py',
   SCALA: 'linkis.spark.scala',
+  JDBC: 'linkis.jdbc.jdbc',
   PYTHON: 'linkis.python.python',
   CONNECTOR: 'linkis.control.empty',
   DISPLAY: 'linkis.appjoint.visualis.display',
@@ -57,9 +59,14 @@ const ext = {
   [NODETYPE.SPARKSQL]: 'sparksql',
   [NODETYPE.SPARKPY]: 'pyspark',
   [NODETYPE.SCALA]: 'scala',
-  [NODETYPE.PYTHON]: 'python'
+  [NODETYPE.PYTHON]: 'python',
+  [NODETYPE.JDBC]: 'jdbc'
 }
 const NODEICON = {
+  [NODETYPE.JDBC]: {
+    icon: jdbc,
+    class: {'jdbc': true}
+  },
   [NODETYPE.SHELL]: {
     icon: shell,
     class: {'shell': true}

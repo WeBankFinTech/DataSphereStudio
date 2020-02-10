@@ -176,7 +176,9 @@
                 <exclude>org.eclipse.jetty:jetty-continuation:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-http:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-io:jar</exclude>
+<!--
                 <exclude>org.eclipse.jetty:jetty-jndi:jar</exclude>
+-->
                 <exclude>org.eclipse.jetty:jetty-plus:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-security:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-server:jar</exclude>
@@ -225,7 +227,9 @@
                 <exclude>org.json4s:json4s-ast_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-core_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-jackson_2.11:jar</exclude>
+<!--
                 <exclude>org.jsoup:jsoup:jar</exclude>
+-->
                 <exclude>org.jvnet.mimepull:mimepull:jar</exclude>
                 <exclude>org.jvnet:tiger-types:jar</exclude>
                 <exclude>org.latencyutils:LatencyUtils:jar</exclude>

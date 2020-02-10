@@ -20,7 +20,10 @@ package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
+import com.webank.wedatasphere.dss.linkis.node.execution.execution.LinkisNodeExecution;
+import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.*;
+import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.utils.LinkisJobTypeUtils;
@@ -29,17 +32,29 @@ import org.apache.commons.lang.StringUtils;
 import java.util.*;
 
 /**
- * Created by peacewong on 2019/11/3.
+ * Created by johnnwang on 2019/11/3.
  */
 public class AzkanbanBuilder extends Builder{
 
     private Map<String, String> jobProps;
+
+    private JobSignalKeyCreator jobSignalKeyCreator = new AzkabanJobSignalKeyCreator();
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
         this.jobProps = jobProps;
         return this;
     }
 
+    {
+        init();
+    }
+
+    private void init(){
+        JobParamsParser jobParamsParser = new JobParamsParser();
+        jobParamsParser.setSignalKeyCreator(jobSignalKeyCreator);
+        LinkisNodeExecutionImpl linkisNodeExecution = (LinkisNodeExecutionImpl)LinkisNodeExecutionImpl.getLinkisNodeExecution();
+        linkisNodeExecution.registerJobParser(jobParamsParser);
+    }
 
     @Override
     protected String getJobType() {
@@ -99,6 +114,7 @@ public class AzkanbanBuilder extends Builder{
             return null;
         } else {
             AzkabanAppJointSignalSharedJob signalSharedJob = new AzkabanAppJointSignalSharedJob();
+            signalSharedJob.setSignalKeyCreator(jobSignalKeyCreator);
             signalSharedJob.setJobProps(this.jobProps);
             return signalSharedJob;
         }

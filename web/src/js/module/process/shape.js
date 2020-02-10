@@ -73,6 +73,13 @@ export default [
       image: NODEICON[NODETYPE.PYTHON].icon,
       editParam: false,
       editBaseInfo: false,
+    },
+    {
+      type: NODETYPE.JDBC,
+      title: 'jdbc',
+      image: NODEICON[NODETYPE.JDBC].icon,
+      editParam: false,
+      editBaseInfo: false,
     }],
   },
   {

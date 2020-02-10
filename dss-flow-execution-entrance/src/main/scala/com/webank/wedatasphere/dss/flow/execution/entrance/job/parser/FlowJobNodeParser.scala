@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.job.parser
 
 import java.util
 
+import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration._
 import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
@@ -34,8 +35,8 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 /**
-  * Created by peacewong on 2019/11/6.
-  */
+ * Created by johnnwang on 2019/11/6.
+ */
 
 @Order(2)
 @Component
@@ -75,6 +76,8 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
           flowVar.putAll(proper)
         }
       }
+
+      propsMap.put(FlowExecutionEntranceConfiguration.FLOW_EXEC_ID, flowEntranceJob.getId)
 
       params.put(PROPS_MAP, propsMap)
       params.put(FLOW_VAR_MAP, flowVar)

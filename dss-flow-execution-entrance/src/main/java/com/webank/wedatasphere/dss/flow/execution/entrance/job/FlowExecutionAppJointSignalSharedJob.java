@@ -19,15 +19,27 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
 import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.JobSignalKeyCreator;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;
 
 import java.util.Map;
 
 /**
- * Created by peacewong on 2019/11/14.
+ * Created by johnnwang on 2019/11/14.
  */
-public class FlowExecutionAppJointSignalSharedJob extends FlowExecutionAppJointLinkisSharedJob implements SignalSharedJob {
+public class FlowExecutionAppJointSignalSharedJob extends FlowExecutionAppJointLinkisJob implements SignalSharedJob {
 
+    private JobSignalKeyCreator signalKeyCreator;
+
+    @Override
+    public JobSignalKeyCreator getSignalKeyCreator() {
+        return this.signalKeyCreator;
+    }
+
+    @Override
+    public void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator) {
+        this.signalKeyCreator = signalKeyCreator;
+    }
 
     @Override
     public String getMsgSaveKey() {

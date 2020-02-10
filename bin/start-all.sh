@@ -15,22 +15,24 @@
 # limitations under the License.
 #
 
-
-
 # Start all dss applications
 info="We will start all dss applications, it will take some time, please wait"
 echo ${info}
 
 #Actively load user env
+source /etc/profile
 source ~/.bash_profile
 
-workDir=`dirname "${BASH_SOURCE-$0}"`
-workDir=`cd "$workDir"; pwd`
+shellDir=`dirname $0`
 
+workDir=`cd ${shellDir}/..;pwd`
 
-CONF_DIR="${workDir}"/../conf
-CONF_FILE=${CONF_DIR}/config.sh
+CONF_DIR="${workDir}"/conf
 
+export LINKIS_DSS_CONF_FILE=${LINKIS_DSS_CONF_FILE:-"${CONF_DIR}/config.sh"}
+export DISTRIBUTION=${DISTRIBUTION:-"${CONF_DIR}/config.sh"}
+source $LINKIS_DSS_CONF_FILE
+source ${DISTRIBUTION}
 function isSuccess(){
 if [ $? -ne 0 ]; then
     echo "ERROR:  " + $1
@@ -39,20 +41,43 @@ else
     echo "INFO:" + $1
 fi
 }
-
-sudo yum -y install dos2unix
-
-
 local_host="`hostname --fqdn`"
+
+ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+
+function isLocal(){
+    if [ "$1" == "127.0.0.1" ];then
+        return 0
+    elif [ $1 == "localhost" ]; then
+        return 0
+    elif [ $1 == $local_host ]; then
+        return 0
+    elif [ $1 == $ipaddr ]; then
+        return 0
+    fi
+        return 1
+}
+
+function executeCMD(){
+   isLocal $1
+   flag=$?
+   echo "Is local "$flag
+   if [ $flag == "0" ];then
+      eval $2
+   else
+      ssh -p $SSH_PORT $1 $2
+   fi
+
+}
 
 #if there is no LINKIS_INSTALL_HOME，we need to source config again
 if [ -z ${DSS_INSTALL_HOME} ];then
     echo "Warning: DSS_INSTALL_HOME does not exist, we will source config"
-    if [ ! -f "${CONF_FILE}" ];then
+    if [ ! -f "${LINKIS_DSS_CONF_FILE}" ];then
         echo "Error: can not find config file, start applications failed"
         exit 1
     else
-        source ${CONF_FILE}
+        source ${LINKIS_DSS_CONF_FILE}
     fi
 fi
 
@@ -60,12 +85,29 @@ function startApp(){
 echo "<-------------------------------->"
 echo "Begin to start $SERVER_NAME"
 SERVER_BIN=${DSS_INSTALL_HOME}/${SERVER_NAME}/bin
-SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh start-${SERVER_NAME}.sh > /dev/null 2>&1 &"
+#echo $SERVER_BIN
+SERVER_LOCAL_START_CMD="dos2unix ${SERVER_BIN}/* > /dev/null 2>&1; dos2unix ${SERVER_BIN}/../conf/* > /dev/null 2>&1;sh ${SERVER_BIN}/start-${SERVER_NAME}.sh > /dev/null 2>&1 &"
+SERVER_REMOTE_START_CMD="source /etc/profile;source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1; sh start-${SERVER_NAME}.sh > /dev/null 2>&1"
 
-if [ -n "${SERVER_IP}"  ];then
-    ssh ${SERVER_IP} "${SERVER_START_CMD}"
+if test -z "$SERVER_IP"
+then
+  SERVER_IP=$local_host
+fi
+
+if ! executeCMD $SERVER_IP "test -e $SERVER_BIN"; then
+  echo "<-------------------------------->"
+  echo "$SERVER_NAME is not installed,the start steps will be skipped"
+  echo "<-------------------------------->"
+  return
+fi
+
+isLocal $SERVER_IP
+flag=$?
+echo "Is local "$flag
+if [ $flag == "0" ];then
+   eval $SERVER_LOCAL_START_CMD
 else
-    ssh ${local_host} "${SERVER_START_CMD}"
+   ssh -p $SSH_PORT $SERVER_IP $SERVER_REMOTE_START_CMD
 fi
 isSuccess "End to start $SERVER_NAME"
 echo "<-------------------------------->"
@@ -76,16 +118,6 @@ sleep 15 #for Eureka register
 SERVER_NAME=dss-server
 SERVER_IP=$DSS_SERVER_INSTALL_IP
 startApp
-#MICRO_SERVICE_NAME=dss-server
-#MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
-#MICRO_SERVICE_PORT=$DSS_SERVER_PORT
-#sh $workDir/check.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-#state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-#if [ $state -eq 0 ]; then
-#   echo ""
-#   echo "ERROR " $MICRO_SERVICE_NAME "is a critical service and must be guaranteed to be started !!!"  
-#   exit 1
-#fi
 
 #dss-flow-execution-entrance
 SERVER_NAME=dss-flow-execution-entrance
@@ -97,45 +129,61 @@ SERVER_NAME=linkis-appjoint-entrance
 SERVER_IP=$APPJOINT_ENTRANCE_INSTALL_IP
 startApp
 
+#visualis-server
 SERVER_NAME=visualis-server
 SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
 startApp
 
-
+echo ""
 echo "Start to check all dss microservice"
+echo ""
+
+function checkServer(){
+echo "<-------------------------------->"
+echo "Begin to check $SERVER_NAME"
+if test -z "$SERVER_IP"
+then
+  SERVER_IP=$local_host
+fi
+
+SERVER_BIN=${SERVER_HOME}/${SERVER_NAME}/bin
+
+if ! executeCMD $SERVER_IP "test -e ${DSS_INSTALL_HOME}/${SERVER_NAME}"; then
+  echo "$SERVER_NAME is not installed,the checkServer steps will be skipped"
+  return
+fi
+
+sh $workDir/bin/checkServices.sh $SERVER_NAME $SERVER_IP $SERVER_PORT
+isSuccess "start $SERVER_NAME "
+sleep 3
+echo "<-------------------------------->"
+}
 
 #check dss-server
-MICRO_SERVICE_NAME=dss-server
-MICRO_SERVICE_IP=$DSS_SERVER_INSTALL_IP
-MICRO_SERVICE_PORT=$DSS_SERVER_PORT
-sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-isSuccess "$MICRO_SERVICE_NAME start"
+SERVER_NAME=dss-server
+SERVER_IP=$DSS_SERVER_INSTALL_IP
+SERVER_PORT=$DSS_SERVER_PORT
+checkServer
 
 
 #check dss-flow-execution-entrance
-MICRO_SERVICE_NAME=dss-flow-execution-entrance
-MICRO_SERVICE_IP=$FLOW_EXECUTION_INSTALL_IP
-MICRO_SERVICE_PORT=$FLOW_EXECUTION_PORT
-sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-isSuccess "$MICRO_SERVICE_NAME start"
+SERVER_NAME=dss-flow-execution-entrance
+SERVER_IP=$FLOW_EXECUTION_INSTALL_IP
+SERVER_PORT=$FLOW_EXECUTION_PORT
+checkServer
 
 #check linkis-appjoint-entrance
-MICRO_SERVICE_NAME=linkis-appjoint-entrance
-MICRO_SERVICE_IP=$APPJOINT_ENTRANCE_INSTALL_IP
-MICRO_SERVICE_PORT=$APPJOINT_ENTRANCE_PORT
-sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-isSuccess "$MICRO_SERVICE_NAME start"
+SERVER_NAME=linkis-appjoint-entrance
+SERVER_IP=$APPJOINT_ENTRANCE_INSTALL_IP
+SERVER_PORT=$APPJOINT_ENTRANCE_PORT
+checkServer
 
 
 #check visualis-server
-sleep 10 #for visualis-server 
-MICRO_SERVICE_NAME=visualis-server
-MICRO_SERVICE_IP=$VISUALIS_SERVER_INSTALL_IP
-MICRO_SERVICE_PORT=$VISUALIS_SERVER_PORT
-sh $workDir/checkMicro.sh $MICRO_SERVICE_NAME $MICRO_SERVICE_IP $MICRO_SERVICE_PORT
-state=`echo -e "\n" | telnet $MICRO_SERVICE_IP $MICRO_SERVICE_PORT 2>/dev/null | grep Connected | wc -l`
-isSuccess "$MICRO_SERVICE_NAME start"
+sleep 10 #visualis service need more time to register
+SERVER_NAME=visualis-server
+SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
+SERVER_PORT=$VISUALIS_SERVER_PORT
+checkServer
 
+echo "DSS started successfully"

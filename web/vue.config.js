@@ -38,8 +38,8 @@ module.exports = {
         onEnd: {
           copy: [
             { source: 'node_modules/monaco-editor/dev/vs', destination: `./dist/dist/static/vs` },
-            { source: './config.sh', destination: `./dist` },
-            { source: './install.sh', destination: `./dist` }
+            { source: './config.sh', destination: `./dist/conf` },
+            { source: './install.sh', destination: `./dist/bin` }
           ],
           // 先删除根目录下的zip包
           delete: [`./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip`],

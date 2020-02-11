@@ -34,7 +34,7 @@ import qualitis from '../module/process/images/newIcon/qualitis.svg';
 import python from '../module/process/images/newIcon/python.svg';
 import jdbc from '../module/process/images/newIcon/JDBC2.svg';
 const NODETYPE = {
-  SHELL: 'azkaban.shell',
+  SHELL: 'linkis.shell.sh',
   HQL: 'linkis.hive.hql',
   SPARKSQL: 'linkis.spark.sql',
   SPARKPY: 'linkis.spark.py',

@@ -472,9 +472,7 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 
 ### Baidu cloud:
 
-- 百度云链接：
-
-https://pan.baidu.com/s/1hmxuJtyY72D5X_dZoQIE5g 
+- 百度云链接：https://pan.baidu.com/s/1hmxuJtyY72D5X_dZoQIE5g 
 
 - Password: p82h 
 

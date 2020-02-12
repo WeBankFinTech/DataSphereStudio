@@ -5,6 +5,7 @@
 1. DSS & Linkis 一键部署
 
 &nbsp; &nbsp; &nbsp;该模式适合于DSS和Linkis都没有安装的情况。
+
 &nbsp; &nbsp; &nbsp;进入[DSS & Linkis安装环境准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E4%B8%80dss--linkis%E5%AE%89%E8%A3%85%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)
 
 2. DSS 一键部署

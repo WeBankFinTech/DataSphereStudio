@@ -350,6 +350,12 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
     HIVE_CONF_DIR=/appcom/config/hive-config
     ###spark配置文件目录
     SPARK_CONF_DIR=/appcom/config/spark-config
+    ###azkaban服务端IP地址及端口，单机版安装时请勿修改
+    AZKABAN_ADRESS_IP=127.0.0.1
+    AZKABAN_ADRESS_PORT=8081
+    ####Qualitis服务端IP地址及端口，单机版安装时请勿修改
+    QUALITIS_ADRESS_IP=127.0.0.1
+    QUALITIS_ADRESS_PORT=8090
    
 ```
 

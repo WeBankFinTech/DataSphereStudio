@@ -5,7 +5,7 @@
 1. DSS & Linkis 一键部署
 
 &nbsp; &nbsp; &nbsp;该模式适合于DSS和Linkis都没有安装的情况。
-&nbsp; &nbsp; &nbsp;进入[DSS & Linkis安装环境准备]()
+&nbsp; &nbsp; &nbsp;进入[DSS & Linkis安装环境准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E4%B8%80dss--linkis%E5%AE%89%E8%A3%85%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)
 
 2. DSS 一键部署
 
@@ -28,7 +28,7 @@
 - 数据开发IDE - Scriptis，仅支持：执行Python和JDBC脚本
 - Linkis管理台
 
-**进入[DSS & Linkis精简版环境准备]()**
+**进入[DSS & Linkis精简版环境准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E4%BA%8Cdss--linkis%E7%B2%BE%E7%AE%80%E7%89%88%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)**
 
 2. **标准版**：
 
@@ -52,7 +52,7 @@
 
 - Linkis管理台
 
-**进入[DSS & Linkis标准版环境准备]()**
+**进入[DSS & Linkis标准版环境准备](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E4%B8%89dss--linkis%E6%A0%87%E5%87%86%E7%89%88%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)**
 
 ----
 
@@ -124,7 +124,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
 
-先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
+先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
 
 ```text
 ├── dss_linkis # 一键部署主目录
@@ -190,7 +190,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
     mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD
 ```
 
-精简版配置修改完毕，进入[安装和使用]()
+精简版配置修改完毕，进入[安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 ## 三、DSS & Linkis标准版环境准备
 
@@ -298,7 +298,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
 - azkaban-solo-server-x.x.x.tar.gz
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
-先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
+先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
 
 ```text
 ├── dss_linkis # 一键部署主目录
@@ -391,7 +391,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
     mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD
 ```
 
-标准版配置修改完毕，进入[安装和使用]()
+标准版配置修改完毕，进入[安装和使用](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md#%E5%9B%9B%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8)
 
 ----
 
@@ -424,7 +424,7 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果有错误信息，可以查看具体报错原因。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您也可以通过查看我们的[安装常见问题](https://github.com/WeBankFinTech/DataSphereStudio/wiki/FAQ)，获取问题的解答。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您也可以通过查看我们的[安装常见问题](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch1/DSS%E5%AE%89%E8%A3%85%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%88%97%E8%A1%A8.md)，获取问题的解答。
 
 ### 4. 启动服务
 
@@ -438,7 +438,7 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果启动产生了错误信息，可以查看具体报错原因。启动后，各项微服务都会进行**通信检测**，如果有异常则可以帮助用户定位异常日志和原因。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您可以通过查看我们的[启动常见问题](https://github.com/WeBankFinTech/DataSphereStudio/wiki/FAQ)，获取问题的解答。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;您可以通过查看我们的[启动常见问题](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch1/DSS%E5%AE%89%E8%A3%85%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E5%88%97%E8%A1%A8.md)，获取问题的解答。
 
 #### (2) 查看是否启动成功
     

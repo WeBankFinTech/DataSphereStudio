@@ -93,30 +93,11 @@
 ```
 
 ### c. 安装包准备
-DSS_LINKIS一键部署，安装包准备有两种方式:
-1. 下载DataSphereStudio官方预编译且打包在一起的安装包，进行安装.
-2. 用户自行编译或者去各个组件的release页面下载后替换一键部署目录中预编译的安装包。
 
-（1）使用DSS社区预编译好的release安装包
+如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。
 
-请访问[点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90)）进行下载，解压后的安装目录结构如下
-
-```text
-├── dss_linkis # 一键部署主目录
- ├── backup # 用于兼容Linkis老版本的安装启动脚本
- ├── bin # 用于一键安装启动DSS+Linkis
- ├── conf # 一键部署的配置文件
- ├── azkaban-solo-server-x.x.x.tar.gz #azkaban安装包
- ├── linkis-jobtype-x.x.x.zip #linkis jobtype安装包
- ├── wedatasphere-dss-x.x.x-dist.tar.gz # DSS后台安装包
- ├── wedatasphere-dss-web-x.x.x-dist.zip # DSS前端安装包
- ├── wedatasphere-linkis-x.x.x-dist.tar.gz # Linkis安装包
- ├── wedatasphere-qualitis-x.x.x.zip # Qualitis安装包
-```
-
-
-（2）用户自行编译或者去各个组件release页面下载得到的安装包
-
+下列步骤为用户自行编译或者去各个组件release页面下载安装包：
+1. 下载安装包
 - [wedatasphere-linkis-x.x.x-dist.tar.gz](https://github.com/WeBankFinTech/Linkis/releases)
 - [wedatasphere-dss-x.x.x-dist.tar.gz](https://github.com/WeBankFinTech/DataSphereStudio/releases)
 - [wedatasphere-dss-web-x.x.x-dist.zip](https://github.com/WeBankFinTech/DataSphereStudio/releases)
@@ -124,8 +105,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
 - azkaban-solo-server-x.x.x.tar.gz
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
-
-先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
+2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再上述下载的安装包放置于该目录下，目录层级如下：
 
 ```text
 ├── dss_linkis # 一键部署主目录
@@ -272,26 +252,10 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
 
 ### c. 安装包准备
 
-（1）使用DSS社区预编译好的release安装包
+如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。
 
-请访问[点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90)）进行下载，解压后的安装目录结构如下
-
-```text
-├── dss_linkis # 一键部署主目录
- ├── backup # 用于兼容Linkis老版本的安装启动脚本
- ├── bin # 用于一键安装启动DSS+Linkis
- ├── conf # 一键部署的配置文件
- ├── azkaban-solo-server-x.x.x.tar.gz #azkaban安装包
- ├── linkis-jobtype-x.x.x.zip #linkis jobtype安装包
- ├── wedatasphere-dss-x.x.x-dist.tar.gz # DSS后台安装包
- ├── wedatasphere-dss-web-x.x.x-dist.zip # DSS前端安装包
- ├── wedatasphere-linkis-x.x.x-dist.tar.gz # Linkis安装包
- ├── wedatasphere-qualitis-x.x.x.zip # Qualitis安装包
-```
-
-
-（2）用户自行编译或通过各个组件release下载得到的安装包
-
+下列步骤为用户自行编译或者去各个组件release页面下载安装包：
+1. 下载安装包
 - [wedatasphere-linkis-x.x.x-dist.tar.gz](https://github.com/WeBankFinTech/Linkis/releases)
 - [wedatasphere-dss-x.x.x-dist.tar.gz](https://github.com/WeBankFinTech/DataSphereStudio/releases)
 - [wedatasphere-dss-web-x.x.x-dist.zip](https://github.com/WeBankFinTech/DataSphereStudio/releases)
@@ -299,7 +263,7 @@ DSS_LINKIS一键部署，安装包准备有两种方式:
 - azkaban-solo-server-x.x.x.tar.gz
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
-先下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将自行编译或单独下载的安装包放置于该解压目录下，目录层级结构与上述保持一致：
+2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再上述下载的安装包放置于该目录下，目录层级如下：
 
 ```text
 ├── dss_linkis # 一键部署主目录

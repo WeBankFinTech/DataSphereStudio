@@ -105,7 +105,7 @@
 - azkaban-solo-server-x.x.x.tar.gz
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
-2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再上述下载的安装包放置于该目录下，目录层级如下：
+2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将上述所下载的安装包放置于该目录下，目录层级如下：
 
 ```text
 ├── dss_linkis # 一键部署主目录
@@ -263,7 +263,7 @@
 - azkaban-solo-server-x.x.x.tar.gz
 - [wedatasphere-qualitis-x.x.x.zip](https://github.com/WeBankFinTech/Qualitis/releases)
 
-2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再上述下载的安装包放置于该目录下，目录层级如下：
+2. 下载[一键部署脚本](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/dss-linkis-one-click-0.7.0-scripts.zip)，并解压，再将上述所下载的安装包放置于该目录下，目录层级如下：
 
 ```text
 ├── dss_linkis # 一键部署主目录

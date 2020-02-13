@@ -374,6 +374,7 @@
 ```bash
     sh bin/install.sh
 ```
+注意：安装脚本里面有两处是相对路径，请严格按照以上命令执行。
 
 ### 2. 安装步骤
 
@@ -452,6 +453,10 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 - 腾讯云链接：https://share.weiyun.com/5vpLr9t
 
 - Password: upqgib
+
+**DSS&Linkis 一键部署脚本**
+
+- URL：https://share.weiyun.com/5Qvl07X
 
 **以下为Linkis安装包资源：**
 

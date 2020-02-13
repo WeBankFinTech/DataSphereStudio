@@ -94,7 +94,7 @@
 
 ### c. 安装包准备
 
-**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。
+**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。**
 
 下列步骤为用户自行编译或者去各个组件release页面下载安装包：
 1. 下载安装包
@@ -252,7 +252,7 @@
 
 ### c. 安装包准备
 
-**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。
+**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。**
 
 下列步骤为用户自行编译或者去各个组件release页面下载安装包：
 1. 下载安装包

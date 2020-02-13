@@ -442,13 +442,13 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 
 **我们提供了DSS + Linkis + Qualitis + Visualis + Azkaban【全家桶一键部署安装包】，由于安装包过大（1.3GB），Github下载缓慢，请通过以下方式获取**：
 
-### Baidu cloud:
+** Baidu cloud:**
 
 - 百度云链接：https://pan.baidu.com/s/1hmxuJtyY72D5X_dZoQIE5g 
 
 - Password: p82h 
 
-### Tencent Cloud:
+** Tencent Cloud:**
 
 - 腾讯云链接：https://share.weiyun.com/5vpLr9t
 

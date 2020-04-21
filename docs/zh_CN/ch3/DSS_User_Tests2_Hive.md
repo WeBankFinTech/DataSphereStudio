@@ -48,6 +48,20 @@ partitioned by (month string)
 row format delimited fields terminated by '\t';
 ```
 
+**导入数据**
+
+目前需要通过后台手动批量导入数据，可以通过insert方法从页面插入数据
+
+```sql
+load data local inpath 'dept.txt' into table default.dept;
+load data local inpath 'emp.txt' into table default.emp;
+load data local inpath 'emp1.txt' into table default.emp_partition;
+load data local inpath 'emp2.txt' into table default.emp_partition;
+load data local inpath 'emp2.txt' into table default.emp_partition;
+```
+
+其它数据按照上述语句导入，样例数据文件路径在：`examples\ch3`
+
 ## 2.2 基本SQL语法测试
 
 ### 2.2.1 简单查询
@@ -102,9 +116,11 @@ select * from emp_partition where month='202003'
 
 ### 2.3.1 Jar包上传
 
-进入scripts页面后，右键目录路径上传jar包：
+进入Scriptis页面后，右键目录路径上传jar包：
 
-​            ![img](../../../images/zh_CN/chapter3/tests/hive3.png)                      
+​            ![img](../../../images/zh_CN/chapter3/tests/hive3.png)                  
+
+测试样例jar包在`examples\ch3\rename.jar`    
 
 ### 4.3.2 自定义函数
 

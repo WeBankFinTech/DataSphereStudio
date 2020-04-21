@@ -6,7 +6,7 @@ DSS用户测试样例的目的是为平台新用户提供一组测试样例，�
 
 ## 1.1 Spark Core（入口函数sc）
 
-在script中，已经默认为您注册了SparkContext，所以直接使用sc即可：
+在Scriptis中，已经默认为您注册了SparkContext，所以直接使用sc即可：
 
 ### 1.1.1 单Value算子(Map算子为例)
 

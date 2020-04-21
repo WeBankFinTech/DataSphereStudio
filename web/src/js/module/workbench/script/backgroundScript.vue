@@ -377,9 +377,9 @@ export default {
       };
       const variable = _.isEmpty(params.variable) ? {} : trans(params.variable);
       const configuration = {};
-      if (!_.isEmpty(params.variable)) {
+      if (!_.isEmpty(params.configuration)) {
         _.keys(params.configuration).forEach((key) => {
-          configuration[key] = trans(key);
+          configuration[key] = trans(params.configuration[key]);
         });
       }
       return {

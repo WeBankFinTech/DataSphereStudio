@@ -2,8 +2,10 @@
   <div class="preview">
     <span>sqlContext.udf.register[</span>
     <span class="preview-type">{{ typeL }}</span>
-    <span>, </span>
-    <span class="preview-type">{{ typeR }}</span>
+    <template v-if="typeR">
+      <span>, </span>
+      <span class="preview-type">{{ typeR }}</span>
+    </template>
     <span>]("</span>
     <span class="preview-name">{{ name }}</span>
     <span>", </span>

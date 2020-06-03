@@ -23,7 +23,6 @@ import com.webank.wedatasphere.dss.linkis.node.execution.execution.LinkisNodeExe
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SharedJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobRuntimeParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.BuildJobActionImpl;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
@@ -51,7 +50,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
 
     private LinkisNodeExecutionImpl() {
         registerJobParser(new CodeParser());
-        registerJobParser(new JobParamsParser());
+        /*registerJobParser(new JobParamsParser());*/
         registerJobParser(new JobRuntimeParamsParser());
     }
 
@@ -107,7 +106,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
                         job.getLogFromLine(),
                         LinkisJobExecutionConfiguration.LOG_SIZE.getValue());
 
-        job.setLogFromLint(jobLogResult.fromLine());
+        job.setLogFromLine(jobLogResult.fromLine());
 
         ArrayList<String> logArray = jobLogResult.getLog();
 
@@ -191,12 +190,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             if (job instanceof SignalSharedJob){
                 SignalSharedJob signalSharedJob = (SignalSharedJob) job;
                 String result = getResult(job, 0, -1);
-                String msgSaveKey = signalSharedJob.getMsgSaveKey();
-                String key = SignalSharedJob.PREFIX ;
-                if (StringUtils.isNotEmpty(msgSaveKey)){
-                    key = key + msgSaveKey;
-                }
-                WorkflowContext.getAppJointContext().setValue(key, result , -1);
+                WorkflowContext.getAppJointContext().setValue(signalSharedJob.getSharedKey(), result , -1);
             } else if(job instanceof SharedJob){
                 String taskId = job.getJobExecuteResult().getTaskID();
                 job.getLogObj().info("Set shared info:" + taskId);

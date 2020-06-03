@@ -17,7 +17,7 @@
 
 package com.webank.wedatasphere.dss.appjoint.visualis.execution
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, InputStream}
 import java.util
 import java.util.Base64
 
@@ -28,24 +28,33 @@ import com.webank.wedatasphere.dss.appjoint.service.session.Session
 import com.webank.wedatasphere.dss.appjoint.visualis.execution.VisualisNodeExecutionConfiguration._
 import com.webank.wedatasphere.linkis.common.exception.ErrorException
 import com.webank.wedatasphere.linkis.common.log.LogUtils
-import com.webank.wedatasphere.linkis.common.utils.{HttpClient, Logging, Utils}
+import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
 import com.webank.wedatasphere.linkis.storage.{LineMetaData, LineRecord}
 import org.apache.commons.io.IOUtils
 
 import scala.collection.JavaConversions.mapAsScalaMap
-import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext}
+import dispatch._
+import org.json4s.{DefaultFormats, Formats}
 
 /**
   * Created by enjoyyin on 2019/10/12.
   */
-class VisualisNodeExecution extends NodeExecution with HttpClient with Logging {
-
-  override protected implicit val executors: ExecutionContext = Utils.newCachedExecutionContext(VISUALIS_THREAD_MAX.getValue, getName + "-NodeExecution-Thread", true)
+class VisualisNodeExecution extends NodeExecution with Logging {
 
   private val DISPLAY = "display"
   private val DASHBOARD = "dashboard"
 
   var basicUrl:String = _
+
+  protected implicit val executors: ExecutionContext = Utils.newCachedExecutionContext(VISUALIS_THREAD_MAX.getValue, getName + "-NodeExecution-Thread", true)
+  protected implicit val formats: Formats = DefaultFormats
+
+  private implicit def svc(url: String): Req =
+    dispatch.url(url)
+
+
 
   override def getBaseUrl: String = this.basicUrl
 
@@ -93,6 +102,17 @@ class VisualisNodeExecution extends NodeExecution with HttpClient with Logging {
       }(IOUtils.closeQuietly(resultSetWriter))
       appJointResponse.setIsSucceed(true)
       appJointResponse
+  }
+
+  def download(url: String, queryParams: Map[String, String], headerParams: Map[String, String],
+               write: InputStream => Unit,
+               paths: String*): Unit = {
+    var req = url.GET
+    if(headerParams != null && headerParams.nonEmpty) req = req <:< headerParams
+    if(queryParams != null) queryParams.foreach{ case (k, v) => req = req.addQueryParameter(k, v)}
+    if(paths != null) paths.filter(_ != null).foreach(p => req = req / p)
+    val response = Http(req OK as.Response(_.getResponseBodyAsStream)).map(write)
+    Await.result(response,  Duration.Inf)
   }
 
   private def getRealId(displayId:String):Int = {

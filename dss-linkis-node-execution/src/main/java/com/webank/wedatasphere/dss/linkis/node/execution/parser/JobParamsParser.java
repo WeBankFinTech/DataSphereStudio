@@ -19,18 +19,30 @@ package com.webank.wedatasphere.dss.linkis.node.execution.parser;
 
 import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.linkis.node.execution.WorkflowContext;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.JobSignalKeyCreator;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by peacewong on 2019/11/3.
+ * Created by johnnwang on 2019/11/3.
  */
 public class JobParamsParser implements JobParser {
+
+    private JobSignalKeyCreator signalKeyCreator;
+
+    public JobSignalKeyCreator getSignalKeyCreator() {
+        return signalKeyCreator;
+    }
+
+    public void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator) {
+        this.signalKeyCreator = signalKeyCreator;
+    }
 
     @Override
     public void parseJob(Job job) throws Exception {
@@ -44,11 +56,15 @@ public class JobParamsParser implements JobParser {
             Map<String, Object> flowVariables = linkisJob.getVariables();
             putParamsMap(job.getParams(), "variable", flowVariables);
             //put signal info
-            Map<String, Object> sharedValue = WorkflowContext.getAppJointContext().getSubMapByPrefix(SignalSharedJob.PREFIX);
+            Map<String, Object> sharedValue = WorkflowContext.getAppJointContext()
+                    .getSubMapByPrefix(SignalSharedJob.PREFIX + this.getSignalKeyCreator().getSignalKeyByJob(job));
             if (sharedValue != null) {
-                putParamsMap(job.getParams(), "variable", sharedValue);
+                Collection<Object> values = sharedValue.values();
+                for(Object value : values){
+                    Map<String, Object> variableMap = LinkisJobExecutionUtils.gson.fromJson(value.toString(), new TypeToken<Map<String, Object>>() {}.getType());
+                    putParamsMap(job.getParams(), "variable", variableMap);
+                }
             }
-
             // put configuration
             Map<String, Object> configuration = linkisJob.getConfiguration();
             putParamsMap(job.getParams(), "configuration", configuration);

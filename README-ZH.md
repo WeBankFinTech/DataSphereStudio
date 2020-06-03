@@ -157,7 +157,7 @@ DSS主要特点：
 
 ## 快速安装使用
 
-点我进入[快速安装使用](docs/zh_CN/ch2/DSS快速安装使用文档.md)
+点我进入[快速安装使用](docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md)
 
 ## 架构
 
@@ -167,7 +167,7 @@ DSS主要特点：
 
 #### 1. 安装编译文档
 
-[快速安装使用文档](docs/zh_CN/ch2/DSS快速安装使用文档.md)
+[快速安装使用文档](docs/zh_CN/ch2/DSS_LINKIS_Quick_Install.md)
 
 [**DSS安装常见问题列表**](docs/zh_CN/ch1/DSS安装常见问题列表.md)
 

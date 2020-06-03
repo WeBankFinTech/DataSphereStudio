@@ -32,7 +32,7 @@
 ## 二、精简版DSS环境配置准备
 DSS环境配置准备分为三部分，前后端基础软件安装、后端环境配置准备和前端环配置境准备，详细介绍如下：
 ### 2.1 前后端基础软件安装
-Linkis简单版(0.9.1及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
+Linkis精简版(0.9.3及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html) 
 
@@ -78,7 +78,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 
     deployUser=hadoop  #指定部署用户
 
-    DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
+    DSS_INSTALL_HOME=$workDir    #默认为上一级目录 
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 
@@ -143,7 +143,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 ## 三、简单版DSS环境配置准备
 DSS环境配置准备分为三部分，前后端基础软件安装、后端环境配置准备和前端环配置境准备，详细介绍如下：
 ### 3.1 前后端基础软件安装
-Linkis简单版(0.9.1及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
+Linkis简单版(0.9.3及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html) 
 
@@ -189,7 +189,7 @@ Nginx，[如何安装Nginx](https://www.tecmint.com/install-nginx-on-centos-7/)
 
     deployUser=hadoop  #指定部署用户
 
-    DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
+    DSS_INSTALL_HOME=$workDir    #默认为上一级目录 
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 
@@ -251,7 +251,7 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 ## 四、标准版DSS环境配置准备
 标准版DSS环境准备也分为三部分，前后端基础软件安装、后端环境准备和前端环境准备，详细介绍如下：
 ### 4.1 前后端基础软件安装
-Linkis简单版(0.9.1及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
+Linkis标准版(0.9.3及以上)，[如何安装Linkis](https://github.com/WeBankFinTech/Linkis/wiki/%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8Linkis)
 
 JDK (1.8.0_141以上)，[如何安装JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -302,7 +302,7 @@ Azkaban [如何安装Azkaban](https://github.com/azkaban/azkaban)
 
     deployUser=hadoop  #指定部署用户
 
-    DSS_INSTALL_HOME=/appcom/Install/DSS    #指定DSS的安装目录 
+    DSS_INSTALL_HOME=$workDir    #默认为上一级目录  
     
     WORKSPACE_USER_ROOT_PATH=file:///tmp/Linkis   #指定用户根目录，存储用户的脚本文件和日志文件等，是用户的工作空间。
 
@@ -386,12 +386,10 @@ dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;安装模式就是简单模式或标准模式，请根据您准备的环境情况，选择合适的安装模式，精简版、简单模式和标准模式都会检查mysql服务，标准模式还会检测Qualitis服务和Azkaban外部server服务，如果检测失败会直接退出安装。
 
+- 安装过程如果有很多cp 命令提示您是否覆盖安装，说明您的系统配置有别名，输入alias，如果有cp、mv、rm的别名，如果有可以去掉，就不会再有大量提示。
+
 - install.sh脚本会询问您是否需要初始化数据库并导入元数据。
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因为担心用户重复执行install.sh脚本，把数据库中的用户数据清空，所以在install.sh执行时，会询问用户是否需要初始化数据库并导入元数据。
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**第一次安装**必须选是。
-
-- install.sh脚本会询问您是否需要初始化使用[davinci](https://github.com/edp963/davinci)所依赖的库表,如果您没有安装过davinci，则需要进行初始化建表，如果您已经安装了davinci，则无需再次初始化。
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因为担心用户会mysql中已安装好的davinci数据清空，所以在install.sh执行时，会询问用户是否需要初始化。
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**第一次安装**必须选是。
 
 

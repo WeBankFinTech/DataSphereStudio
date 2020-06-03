@@ -44,7 +44,17 @@ __注意：__ 如果要支持多用户登录，DSS的用户登录依赖Linkis，
 3. 工程复制：以工程的最新版本为源工程，复制出新工程，初始版本工作流内容为源工程最新版本的工作流。注意：**工程名是唯一，不可重复**
 
 ## 3工作流——workflow
-### 3.1 工作流编排
+### 3.1 工作流spark节点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spark节点分别支持sql、pyspark、scala三种方式执行spark任务，使用时只需将节点拖拽至工作台后编写代码即可。
+### 3.2 工作流hive节点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hive节点支持sql方式执行hive任务，使用时只需将节点拖拽至工作台后编写hivesql代码即可。
+### 3.3 工作流python节点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python节点支持执行python任务，使用时只需将节点拖拽至工作台后编写python代码即可。
+### 3.4 工作流shell节点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shell节点支持执行shell命令或者脚本运行，使用时只需将节点拖拽至工作台后编写shell命令即可。
+### 3.5 工作流jdbc节点
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jdbc节点支持以jdbc方式运行sql命令，使用时只需将节点拖拽至工作台后编写sql即可，**注意需要提前在linkis console管理台配置jdbc连接信息。**
+### 3.6 工作流编排
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当点击一个对应的工程后，既可以进入工程首页，在工程首页可以做工作流的编排。
 1. 首先需要创建工作流
 ![workflow01](/images/zh_CN/chapter3/manual/workflow01.png)
@@ -53,7 +63,7 @@ __注意：__ 如果要支持多用户登录，DSS的用户登录依赖Linkis，
 3. 节点支持右键功能包括，删除、依赖选择、复制等基本功能，同时数据开发节点还支持脚本关联
 ![workflow03](/images/zh_CN/chapter3/manual/workflow03.png)
 
-### 3.2 工作流节点打开
+### 3.7 工作流节点打开
 节点支持双击打开：
 1. 数据开发节点：点开后即可进入Scriptis进行脚本编辑
 ![workflow04](/images/zh_CN/chapter3/manual/workflow04.png)
@@ -64,14 +74,14 @@ __注意：__ 如果要支持多用户登录，DSS的用户登录依赖Linkis，
 4. 数据可视化节点：跳转到对应的可视化编辑页面
 ![workflow07](/images/zh_CN/chapter3/manual/workflow07.png)
 
-### 3.3 层级切换
+### 3.8 层级切换
 1. 支持多层级切换：支持快速工程切换、支持在工作流页面切换工作流、支持在单个工作流中切换节点
 ![workflow08](/images/zh_CN/chapter3/manual/workflow08.png)
 
 2. 右上脚支持多组件快速切换，在切换后进入的组件的内容都只与该工程相关，让用户更加清晰的去定义工程和业务的内容：
 ![functions](/images/zh_CN/chapter3/manual/functions.png)
 
-### 3.4 参数和资源设置
+### 3.9 参数和资源设置
 
 1. 工作流上下文信息设置，支持工作流参数、变量、代理用户等
 
@@ -86,26 +96,26 @@ open("flow://test.txt", encoding="utf-8")  #工作流级资源文件使用flow:/
 open("node://test.txt", encoding="utf-8") #节点级资源文件使用node://开头
 ```
 
-### 3.5 工作流实时执行
+### 3.10 工作流实时执行
 1. 除了功能节点中的subflow会跳过执行，连接节点会作为空节点运行，其他都支持实时执行
 ![workflow11](/images/zh_CN/chapter3/manual/workflow11.png)
 2. 用户编辑好工作流后点击执行就可以将工作流进行运行，您将看到实时的工作流运行起来可以看到现在运行节点的时间，同时可以右键节点打开节点的管理台去展示该节点的进度，运行结果，运行日志等。支持任务停止等功能
 ![workflow12](/images/zh_CN/chapter3/manual/workflow12.png)
 
 
-### 3.6 工作流调度执行
+### 3.11 工作流调度执行
 1. DSS的工程支持发布调度，默认支持发布到Azkaban，同样DSS的调度部分做了深层次的抽象可以做到对其他的调度系统快速支持。发布前会对工作流进行解析，以确保工作流是可以调度运行的：
 ![workflow13](/images/zh_CN/chapter3/manual/workflow13.png)
 2. 发布后即可到调度系统中进行查看，比如去Azkaban页面上进行查看：
 ![workflow14](/images/zh_CN/chapter3/manual/workflow14.png)
 3. DSS如何对接调度系统可以参考：[]()
 
-### 3.7 工作流版本
+### 3.12 工作流版本
 1. 工作流创建完成后，具有初始版本，版本号为v000001，直接点击工作流图标时，默认打开工作流的最新版本
 2. 可以查看工作流的版本，方便您进行历史版本查看：
 ![workflow15](/images/zh_CN/chapter3/manual/workflow15.png)
 
-### 3.8 工作流布局修改
+### 3.13 工作流布局修改
 1. 工作流格式化：当工作流节点过多，界面太乱时。可以点击节点编辑页的右上方第四个“格式化”按钮。快速美化节点界面：
 ![workflow16](/images/zh_CN/chapter3/manual/workflow16.png)
 如果格式化后不满意，可再次点击节点编辑页的右上方第五个“恢复”按钮，恢复到之前的状态：

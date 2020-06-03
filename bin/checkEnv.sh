@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Copyright 2019 WeBank
 #
@@ -13,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#!/bin/sh
 say() {
     printf 'check command fail \n %s\n' "$1"
 }
@@ -32,7 +32,7 @@ need_cmd() {
         err "need '$1' (your linux command not found)"
     fi
 }
-echo "<-----start to check linux cmd:yum java mysql unzip expect telnet sed tar---->"
+echo "<-----start to check used cmd---->"
 need_cmd yum
 need_cmd java
 need_cmd mysql
@@ -42,4 +42,4 @@ need_cmd telnet
 need_cmd tar
 need_cmd sed
 need_cmd dos2unix
-echo "<-----end to check linux cmd:yum java mysql unzip expect telnet sed tar------>"
+echo "<-----end to check used cmd---->"

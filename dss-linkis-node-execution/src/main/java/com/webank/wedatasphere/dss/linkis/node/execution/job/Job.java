@@ -63,6 +63,6 @@ public interface Job {
 
     int getLogFromLine();
 
-    void  setLogFromLint(int index);
+    void setLogFromLine(int index);
 
 }

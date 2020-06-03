@@ -84,7 +84,6 @@
                 <exclude>com.google.code.gson:gson:jar</exclude>
                 <exclude>com.google.guava:guava:jar</exclude>
                 <exclude>com.google.inject:guice:jar</exclude>
-                <exclude>com.google.protobuf:protobuf-java:jar</exclude>
                 <exclude>com.netflix.archaius:archaius-core:jar</exclude>
                 <exclude>com.netflix.eureka:eureka-client:jar</exclude>
                 <exclude>com.netflix.eureka:eureka-core:jar</exclude>
@@ -100,7 +99,6 @@
                 <exclude>com.netflix.ribbon:ribbon-loadbalancer:jar</exclude>
                 <exclude>com.netflix.ribbon:ribbon-transport:jar</exclude>
                 <exclude>com.netflix.servo:servo-core:jar</exclude>
-                <exclude>com.ning:async-http-client:jar</exclude>
                 <exclude>com.sun.jersey.contribs:jersey-apache-client4:jar</exclude>
                 <exclude>com.sun.jersey:jersey-client:jar</exclude>
                 <exclude>com.sun.jersey:jersey-core:jar</exclude>
@@ -113,15 +111,10 @@
                 <exclude>com.webank.wedatasphere.linkis:linkis-common:jar</exclude>
                 <exclude>com.webank.wedatasphere.linkis:linkis-module:jar</exclude>
                 <exclude>commons-beanutils:commons-beanutils:jar</exclude>
-                <exclude>commons-beanutils:commons-beanutils-core:jar</exclude>
-                <exclude>commons-cli:commons-cli:jar</exclude>
                 <exclude>commons-codec:commons-codec:jar</exclude>
                 <exclude>commons-collections:commons-collections:jar</exclude>
                 <exclude>commons-configuration:commons-configuration:jar</exclude>
-                <exclude>commons-daemon:commons-daemon:jar</exclude>
                 <exclude>commons-dbcp:commons-dbcp:jar</exclude>
-                <exclude>commons-digester:commons-digester:jar</exclude>
-                <exclude>commons-httpclient:commons-httpclient:jar</exclude>
                 <exclude>commons-io:commons-io:jar</exclude>
                 <exclude>commons-jxpath:commons-jxpath:jar</exclude>
                 <exclude>commons-lang:commons-lang:jar</exclude>
@@ -129,7 +122,6 @@
                 <exclude>commons-net:commons-net:jar</exclude>
                 <exclude>commons-pool:commons-pool:jar</exclude>
                 <exclude>io.micrometer:micrometer-core:jar</exclude>
-                <exclude>io.netty:netty:jar</exclude>
                 <exclude>io.netty:netty-all:jar</exclude>
                 <exclude>io.netty:netty-buffer:jar</exclude>
                 <exclude>io.netty:netty-codec:jar</exclude>
@@ -146,41 +138,21 @@
                 <exclude>javax.annotation:javax.annotation-api:jar</exclude>
                 <exclude>javax.inject:javax.inject:jar</exclude>
                 <exclude>javax.servlet:javax.servlet-api:jar</exclude>
-                <exclude>javax.servlet.jsp:jsp-api:jar</exclude>
                 <exclude>javax.validation:validation-api:jar</exclude>
                 <exclude>javax.websocket:javax.websocket-api:jar</exclude>
                 <exclude>javax.ws.rs:javax.ws.rs-api:jar</exclude>
                 <exclude>javax.xml.bind:jaxb-api:jar</exclude>
                 <exclude>javax.xml.stream:stax-api:jar</exclude>
                 <exclude>joda-time:joda-time:jar</exclude>
-                <exclude>log4j:log4j:jar</exclude>
                 <exclude>mysql:mysql-connector-java:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-core_2.11:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-json4s-jackson_2.11:jar</exclude>
                 <exclude>org.antlr:antlr-runtime:jar</exclude>
                 <exclude>org.antlr:stringtemplate:jar</exclude>
-                <exclude>org.apache.commons:commons-compress:jar</exclude>
                 <exclude>org.apache.commons:commons-math:jar</exclude>
-                <exclude>org.apache.commons:commons-math3:jar</exclude>
-                <exclude>org.apache.curator:curator-client:jar</exclude>
-                <exclude>org.apache.curator:curator-framework:jar</exclude>
-                <exclude>org.apache.curator:curator-recipes:jar</exclude>
-                <exclude>org.apache.directory.api:api-asn1-api:jar</exclude>
-                <exclude>org.apache.directory.api:api-util:jar</exclude>
-                <exclude>org.apache.directory.server:apacheds-i18n:jar</exclude>
-                <exclude>org.apache.directory.server:apacheds-kerberos-codec:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-annotations:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-auth:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-common:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-hdfs:jar</exclude>
-                <exclude>org.apache.htrace:htrace-core:jar</exclude>
                 <exclude>org.apache.httpcomponents:httpclient:jar</exclude>
-                <exclude>org.apache.httpcomponents:httpcore:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-api:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-core:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-jul:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-slf4j-impl:jar</exclude>
-                <exclude>org.apache.zookeeper:zookeeper:jar</exclude>
                 <exclude>org.aspectj:aspectjweaver:jar</exclude>
                 <exclude>org.bouncycastle:bcpkix-jdk15on:jar</exclude>
                 <exclude>org.bouncycastle:bcprov-jdk15on:jar</exclude>
@@ -194,7 +166,6 @@
                 <exclude>org.eclipse.jetty:jetty-continuation:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-http:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-io:jar</exclude>
-                <exclude>org.eclipse.jetty:jetty-jndi:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-plus:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-security:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-server:jar</exclude>
@@ -210,7 +181,6 @@
                 <exclude>org.eclipse.jetty.websocket:websocket-common:jar</exclude>
                 <exclude>org.eclipse.jetty.websocket:websocket-server:jar</exclude>
                 <exclude>org.eclipse.jetty.websocket:websocket-servlet:jar</exclude>
-                <exclude>org.fusesource.leveldbjni:leveldbjni-all:jar</exclude>
                 <exclude>org.glassfish.hk2:class-model:jar</exclude>
                 <exclude>org.glassfish.hk2:config-types:jar</exclude>
                 <exclude>org.glassfish.hk2.external:aopalliance-repackaged:jar</exclude>
@@ -243,13 +213,10 @@
                 <exclude>org.json4s:json4s-ast_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-core_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-jackson_2.11:jar</exclude>
-                <exclude>org.jsoup:jsoup:jar</exclude>
                 <exclude>org.jvnet.mimepull:mimepull:jar</exclude>
                 <exclude>org.jvnet:tiger-types:jar</exclude>
                 <exclude>org.latencyutils:LatencyUtils:jar</exclude>
                 <exclude>org.mortbay.jasper:apache-el:jar</exclude>
-                <exclude>org.mortbay.jetty:jetty:jar</exclude>
-                <exclude>org.mortbay.jetty:jetty-util:jar</exclude>
                 <exclude>org.ow2.asm:asm-analysis:jar</exclude>
                 <exclude>org.ow2.asm:asm-commons:jar</exclude>
                 <exclude>org.ow2.asm:asm-tree:jar</exclude>
@@ -296,11 +263,8 @@
                 <exclude>org.springframework:spring-jcl:jar</exclude>
                 <exclude>org.springframework:spring-web:jar</exclude>
                 <exclude>org.springframework:spring-webmvc:jar</exclude>
-                <exclude>org.tukaani:xz:jar</exclude>
                 <exclude>org.yaml:snakeyaml:jar</exclude>
                 <exclude>software.amazon.ion:ion-java:jar</exclude>
-                <exclude>xerces:xercesImpl:jar</exclude>
-                <exclude>xmlenc:xmlenc:jar</exclude>
                 <exclude>xmlpull:xmlpull:jar</exclude>
                 <exclude>xpp3:xpp3_min:jar</exclude>
             </excludes>

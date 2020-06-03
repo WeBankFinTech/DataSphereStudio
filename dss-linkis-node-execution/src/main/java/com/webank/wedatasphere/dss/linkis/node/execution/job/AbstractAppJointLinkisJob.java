@@ -146,7 +146,7 @@ public abstract class AbstractAppJointLinkisJob extends AppJointLinkisJob {
     }
 
     @Override
-    public void setLogFromLint(int index) {
+    public void setLogFromLine(int index) {
         this.logFromLine = index;
     }
 

@@ -91,7 +91,7 @@ export default {
         if (newValue == this.getValue()) {
           return;
         }
-        let readOnly = this.editor.getConfiguration().readOnly;
+        let readOnly = this.editor.getRawOptions().readOnly;
         if (readOnly) {
           // editor.setValue 和 model.setValue 都会丢失撤销栈
           this.editor.setValue(newValue);

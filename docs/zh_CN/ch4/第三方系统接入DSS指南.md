@@ -31,28 +31,142 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NodeService是用来解决用户在DSS提交的任务在第三方系统生成相应的任务的问题。用户如果在DSS系统的工作流中新建了一个工作流节点并进行任务的编辑，第三方系统需要同步感知到
 - 4.getNodeExecution
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NodeExecution接口是用来将任务提交到第三方系统进行执行的接口,NodeExecution接口有支持短时间任务的NodeExecution和支持长时间任务的LongTermNodeExecution。一般短时间任务，如邮件发送等，可以直接实现NodeExecution接口，并重写execute方法，DSS系统同步等待任务结束。另外的长时间任务，如数据质量检测等，可以实现LongTermNodeExecution接口，并重写submit方法，返回一个NodeExecutionAction，DSS系统通过这个NodeExecutionAction可以向第三方系统获取任务的日志、状态等。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NodeExecution接口是用来将任务提交到第三方系统进行执行的接口,NodeExecution
+接口有支持短时间任务的NodeExecution和支持长时间任务的LongTermNodeExecution。一般短时间任务，如邮件发送等，可以直接实现NodeExecution接口，并重写execute方法，DSS系统同步等待任务结束。另外的长时间任务，如数据质量检测等，可以实现LongTermNodeExecution接口，并重写submit方法，返回一个NodeExecutionAction，DSS系统通过这个NodeExecutionAction可以向第三方系统获取任务的日志、状态等。
 
 #### 3.第三方系统接入DSS的实现(以Visualis为例)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis是微众银行WeDataSphere开源的一款商业BI工具，DSS集成Visualis系统之后可以获得数据可视化的能力。Visualis接入DSS系统的代码在DSS项目中已经同步开源，下面将以开源代码为例，对步骤进行罗列分析。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis是微众银行WeDataSphere开源的一款商业BI工具，DSS集成Visualis系统之后可以获得数据可视化的能力。
+Visualis接入DSS系统的代码在DSS项目中已经同步开源，下面将以开源代码为例，对步骤进行罗列分析。
 Visualis接入的DSS系统的步骤如下:
 
 **3.1.Visualis实现AppJoint接口**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的 AppJoint接口的实现类是VisualisAppjoint。查看VisualisAppjoint的代码可知，它在init方法时候，初始化了自己实现的SecurityService、 NodeService以及NodeExecution。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的 AppJoint接口的实现类是VisualisAppjoint。查看VisualisAppjoint的代码可知，它在init方法时候，
+初始化了自己实现的SecurityService、 NodeService以及NodeExecution。
+```java
+ public void init(String baseUrl, Map<String, Object> params) {
+        securityService = new VisualisSecurityService();
+        securityService.setBaseUrl(baseUrl);
+        nodeExecution = new VisualisNodeExecution();
+        nodeExecution.setBaseUrl(baseUrl);
+        nodeService = new VisualisNodeService();
+        nodeService.setBaseUrl(baseUrl);
+    }
+```
 
 **3.2.Visualis实现SecurtyService接口**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的SecurityService接口的类名是VisualisSecurityService，并重写了login方法，为了能够进行授权登陆，Visualis采用了提供token的方式，DSS的网关对该token进行授权，这样就能够做到用户鉴权。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的SecurityService接口的类名是VisualisSecurityService，
+并重写了login方法，为了能够进行授权登陆，Visualis采用了提供token的方式，DSS的网关对该token进行授权，这样就能够做到用户鉴权。
+
+```java
+public class VisualisSecurityService extends AppJointUrlImpl implements SecurityService {
+    @Override
+    public Session login(String user) throws AppJointErrorException {
+        VisualisSession visualisSession = new VisualisSession();
+        visualisSession.setUser(user);
+        visualisSession.getParameters().put("Token-User",user);
+        visualisSession.getParameters().put("Token-Code","***REMOVED***");
+        return visualisSession;
+    }
+
+    @Override
+    public void logout(String user) {
+
+    }
+}
+```
 
 **3.3.Visualis实现的NodeService接口**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的NodeService接口的类是VisualisNodeService，并重写了createNode，deleteNode和updateNode三个方法，这三个方法是进行在第三方系统同步生成任务元数据。例如createNode方法是通过调用visualis的HTTP接口在Visualis系统生成同一工程下面的Visualis任务。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的NodeService接口的类是VisualisNodeService，并重写了createNode，
+deleteNode和updateNode三个方法，这三个方法是进行在第三方系统同步生成任务元数据。例如createNode方法是通过调用visualis的HTTP接口在Visualis系统生成同一工程下面的Visualis任务。
+
+```java
+    @Override
+    public Map<String, Object> createNode(Session session, AppJointNode node,
+                                          Map<String, Object> requestBody) throws AppJointErrorException {
+        if (DisplayNodeService.getNodeType().equals(node.getNodeType())) {
+            return DisplayNodeService.createNode(session, getBaseUrl(), String.valueOf(node.getProjectId()), node.getNodeType(), requestBody);
+        } else if (DashboardNodeService.getNodeType().equals(node.getNodeType())) {
+            return DashboardNodeService.createNode(session, getBaseUrl(), String.valueOf(node.getProjectId()), node.getNodeType(), requestBody);
+        } else {
+            throw new AppJointErrorException(42002, "cannot recognize the nodeType " + node.getNodeType());
+        }
+    }
+
+    @Override
+    public void deleteNode(Session session, AppJointNode node) throws AppJointErrorException {
+        if (DisplayNodeService.getNodeType().equals(node.getNodeType())) {
+            DisplayNodeService.deleteNode(session, getBaseUrl(), String.valueOf(node.getProjectId()), node.getNodeType(), node.getJobContent());
+        } else if (DashboardNodeService.getNodeType().equals(node.getNodeType())) {
+            DashboardNodeService.deleteNode(session, getBaseUrl(), String.valueOf(node.getProjectId()), node.getNodeType(), node.getJobContent());
+        } else {
+            throw new AppJointErrorException(42002, "cannot recognize the nodeType " + node.getNodeType());
+        }
+    }
+
+    @Override
+    public Map<String, Object> updateNode(Session session, AppJointNode node,
+                                          Map<String, Object> requestBody) throws AppJointErrorException {
+        if (DisplayNodeService.getNodeType().equals(node.getNodeType())) {
+            return DisplayNodeService.updateNode(session, getBaseUrl(), node.getProjectId(), node.getNodeType(), requestBody);
+        } else if (DashboardNodeService.getNodeType().equals(node.getNodeType())) {
+            return DashboardNodeService.updateNode(session, getBaseUrl(), node.getProjectId(), node.getNodeType(), requestBody);
+        } else {
+            throw new AppJointErrorException(42002, "cannot recognize the nodeType " + node.getNodeType());
+        }
+    }
+```
 
 **3.4.Visualis实现NodeExecution接口**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的NodeExecution接口的类是VisualisNodeExecution，并重写了execute方法，该方法传入的两个参数为Node和NodeContext，从NodeContext中我们可以拿到用户、DSS的网关地址，还有网关验证的Token。通过这些，我们可以封装成一个HTTP的请求发送到第三方系统Visualis并从Visualis获取响应结果，NodeContext提供写入结果集的方法，如Visualis的结果集一般是以图片的形式展示，在execute方法的最后，Visualis通过nodeContext获取到一个支持图片写入的PictureResultSetWriter方法，并将结果集进行写入。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Visualis实现的NodeExecution接口的类是VisualisNodeExecution，并重写了execute方法，
+该方法传入的两个参数为Node和NodeContext，从NodeContext中我们可以拿到用户、DSS的网关地址，还有网关验证的Token。
+通过这些，我们可以封装成一个HTTP的请求发送到第三方系统Visualis并从Visualis获取响应结果，NodeContext提供写入结果集的方法，
+如Visualis的结果集一般是以图片的形式展示，在execute方法的最后，Visualis通过nodeContext获取到一个支持图片写入的PictureResultSetWriter方法，并将结果集进行写入。
+```scala
+ override def execute(node: AppJointNode, nodeContext: NodeContext, session: Session): NodeExecutionResponse = node match {
+    case commonAppJointNode: CommonAppJointNode =>
+      val appJointResponse = new CompletedNodeExecutionResponse()
+      val idMap = commonAppJointNode.getJobContent
+      val id = idMap.values().iterator().next().toString
+      val url = if(commonAppJointNode.getNodeType.toLowerCase.contains(DISPLAY)) getDisplayPreviewUrl(nodeContext.getGatewayUrl, id)
+      else if(commonAppJointNode.getNodeType.toLowerCase.contains(DASHBOARD)) getDashboardPreviewUrl(nodeContext.getGatewayUrl, id)
+      else {
+        appJointResponse.setIsSucceed(false)
+        appJointResponse.setErrorMsg("不支持的appJoint类型：" + node.getNodeType)
+        return appJointResponse
+      }
+      var response = ""
+      val headers = nodeContext.getTokenHeader(nodeContext.getUser)
+      nodeContext.appendLog(LogUtils.generateInfo(s"Ready to download preview picture from $url."))
+      Utils.tryCatch(download(url, null, headers.toMap,
+        input => Utils.tryFinally{
+          val os = new ByteArrayOutputStream()
+          IOUtils.copy(input, os)
+          response = new String(Base64.getEncoder.encode(os.toByteArray))
+          //response = IOUtils.toString(input, ServerConfiguration.BDP_SERVER_ENCODING.getValue)
+        }(IOUtils.closeQuietly(input)))){ t =>
+        val errException = new ErrorException(70063, "failed to do visualis request")
+        errException.initCause(t)
+        appJointResponse.setException(errException)
+        appJointResponse.setIsSucceed(false)
+        appJointResponse.setErrorMsg(s"用户${nodeContext.getUser}请求Visualis失败！URL为: " + url)
+        return appJointResponse
+      }
+      nodeContext.appendLog(LogUtils.generateInfo("Preview picture downloaded, now ready to write results."))
+      val imagesBytes = response
+      val resultSetWriter = nodeContext.createPictureResultSetWriter()
+      Utils.tryFinally{
+        resultSetWriter.addMetaData(new LineMetaData())
+        resultSetWriter.addRecord(new LineRecord(imagesBytes))
+      }(IOUtils.closeQuietly(resultSetWriter))
+      appJointResponse.setIsSucceed(true)
+      appJointResponse
+  }
+```
 
 **3.5.数据库内容的更新(dss-application模块)**
 
@@ -66,7 +180,7 @@ Visualis接入的DSS系统的步骤如下:
 | url  | 10  |  如 http://127.0.0.1:8080 |
 | is_user_need_init  | 是否需要用户初始化  |  默认否 |
 | user_init_url  | 用户初始化url  |  默认空 |
-| exists_project_service  | 是否存在自己的projectService服务, 存在的话要自己写appjoint实现projectService0  |   |
+| exists_project_service  | 是否存在自己的projectService服务, 存在的话要自己写appjoint实现projectService  |   |
 | enhance_json  | 加强json，在appjoint初始化的时候会作为map进行传入  |   |
 | homepage_url  | 接入的系统主页url  |   |
 | direct_url  | 接入的系统重定向url  |   |
@@ -97,11 +211,11 @@ Visualis接入的DSS系统的步骤如下:
 **3.6.前端的修改**
 
 - 3.6.1 增加节点类型
-修改src/js/service/nodeType.js文件，增加Qualitis节点类型
+修改src/js/service/nodeType.js文件，增加Visualis节点类型
 - 3.6.2 增加节点图标
 将节点图标复制到src/js/module/process/images/路径下，目前只支持SVG格式。
 - 3.6.3 新增节点配置
-修改src/js/module/process/shape.js文件，增加Qualitis的节点配置信息。
+修改src/js/module/process/shape.js文件，增加Visualis的节点配置信息。
 - 3.6.4 修改首页单击节点事件
 修改src/js/module/process/index.vue文件，增加节点单击事件以及单击事件的处理逻辑。
 - 3.6.5 修改工作流节点双击事件
@@ -109,7 +223,13 @@ Visualis接入的DSS系统的步骤如下:
 
 **3.7.编译打包成jar包放置到指定位置**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实现了上述的接口之后，一个AppJoint就已经实现了。打包之后，需要放置到指定的位置。jar包需要放置到dss-server和linkis-appjoint-entrance两个微服务中，以linkis-appjoint-entrance 为例(dss-server与linkis-appjoint-entrance一致)，在linkis-appjont-entrance下面的lib的同级目录有一个appjoints目录，目录下面层次如图3-3所示。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实现了上述的接口之后，一个AppJoint就已经实现了。打包之后，需要放置到指定的位置。
+jar包需要放置到dss-server和linkis-appjoint-entrance两个微服务中，以linkis-appjoint-entrance 为例(dss-server与linkis-appjoint-entrance一致)，
+在linkis-appjont-entrance下面的lib的同级目录有一个appjoints目录，目录下面层次如图3-3所示。
 ![appjoints目录示例](/images/zh_CN/chapter4/appjoints.png)<br>
 图3-3 appjoints目录示例
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在appjoints目录下面新建一个visualis目录。visualis目录下面要求有lib目录，lib目录存放的是visualis在实现VisualisAppJoint的编译的jar包，当然如果有引入dss系统没有带入的jar包，也需要放置到lib目录中，如sendemail Appjoint需要发送邮件功能的依赖包，所以需要将这些依赖包和已经实现的jar包统一放置到lib目录中。另外可以将本AppJoint所需要的一些配置参数放置到appjoints.properties,DSS系统提供的AppJointLoader会将这些配置的参数读取，放置到一个Map中，在AppJoint调用init方法的时候传入。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在appjoints目录下面新建一个visualis目录。
+visualis目录下面要求有lib目录，lib目录存放的是visualis在实现VisualisAppJoint的编译的jar包，
+当然如果有引入dss系统没有带入的jar包，也需要放置到lib目录中，如sendemail Appjoint需要发送邮件功能的依赖包，
+所以需要将这些依赖包和已经实现的jar包统一放置到lib目录中。
+另外可以将本AppJoint所需要的一些配置参数放置到appjoints.properties,DSS系统提供的AppJointLoader会将这些配置的参数读取，放置到一个Map中，在AppJoint调用init方法的时候传入。

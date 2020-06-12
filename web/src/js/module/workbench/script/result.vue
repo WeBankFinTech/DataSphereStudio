@@ -78,7 +78,7 @@
       v-else-if="result.type === '5'"
       :style="{'height': resultHeight}"
       class="html-result-div"
-      v-html="result.bodyRows"/>
+      v-html="result.bodyRows[0][0]"/>
     <span
       v-else
       class="empty-text">{{ $t('message.workBench.body.script.result.emptyText') }}</span>

@@ -307,8 +307,8 @@ export default {
       this.dispatch('Workbench:pasteInEditor', value, this.node);
     },
     queryTable() {
-      const tabName = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
-      const code = `select * from ${tabName} limit 100`;
+      const tabName = `${this.currentAcitved.dbName}_${this.currentAcitved.name}`;
+      const code = `select * from ${this.currentAcitved.dbName}.${this.currentAcitved.name} limit 100`;
       const filename = `${tabName}_select.hql`;
       const md5Path = util.md5(filename);
       this.dispatch('Workbench:add', {

@@ -797,7 +797,7 @@ export default {
               'msgName': '',
               'queryFrequency': 10,
               'maxReceiveHours': 12,
-              'msgSavekey': '',
+              'msgSavekey': 'msg.body',
               'onlyReceiveToday': 'true',
             },
           });

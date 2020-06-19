@@ -158,8 +158,9 @@ public class DataCheckerDao {
 
 	private PreparedStatement getStatement(Connection conn, String dataObject) throws SQLException {
 		String dataScape =  dataObject.contains("{") ? "Partition" : "Table";
-		String dbName = dataObject.split("\\.")[0];
-		String tableName = dataObject.split("\\.")[1];
+		String[] dataObjectArray = dataObject.split("\\.");
+		String dbName = dataObjectArray[0];
+		String tableName = dataObjectArray[1];
 		if(dataScape.equals("Partition")) {
 			Pattern pattern = Pattern.compile("\\{([^\\}]+)\\}");
 			Matcher matcher = pattern.matcher(dataObject);
@@ -174,11 +175,13 @@ public class DataCheckerDao {
 			pstmt.setString(2, tableName);
 			pstmt.setString(3, partitionName);
 			return pstmt;
-		} else {
+		} else if(dataObjectArray.length == 2){
 			PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
 			pstmt.setString(1, dbName);
 			pstmt.setString(2, tableName);
 			return pstmt;
+		}else {
+			throw new SQLException("Incorrect input format for dataObject "+ dataObject);
 		}
 	}
 

@@ -441,13 +441,13 @@ export default {
       api.fetch('/filesystem/openFile', {
         path: option.path,
       }, 'get').then((rst) => {
-        const ismodifyByOldTab = option.code && !rst.fileContent;
+        const ismodifyByOldTab = option.code && !rst.fileContent[0][0];
         const params = ismodifyByOldTab ? option.params : this.convertSettingParams(rst.params);
         this[methodName]({
           id: md5Path,
           filename: option.filename,
           filepath: option.path,
-          code: rst.fileContent || option.code,
+          code: rst.fileContent[0][0] || option.code,
           params,
           type: option.type,
           saveAs: option.saveAs || false,

@@ -70,6 +70,12 @@ public class FlowExecutionRestfulApi {
                 message = Message.ok("Successfully get job execution info");
                 message.setMethod("/api/entrance/" + id + "/execution");
                 message.setStatus(0);
+                long nowTime = System.currentTimeMillis();
+                flowEntranceJob.getFlowContext().getRunningNodes().forEach((k, v) -> {
+                    if (v != null) {
+                        v.setNowTime(nowTime);
+                    }
+                });
                 message.data("runningJobs", FlowContext$.MODULE$.convertView(flowEntranceJob.getFlowContext().getRunningNodes()));
                 List<Map<String, Object>> pendingList = FlowContext$.MODULE$.convertView(flowEntranceJob.getFlowContext().getPendingNodes());
                 pendingList.addAll(FlowContext$.MODULE$.convertView(flowEntranceJob.getFlowContext().getSkippedNodes()));

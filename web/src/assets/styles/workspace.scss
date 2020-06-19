@@ -1,0 +1,207 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+@import './variables.scss';
+
+.entry {
+  font-size: 16px;
+  height: 120px;
+  line-height: 120px;
+  background: #515a6e;
+  margin: 10px 30px 10px 10px;
+  color: #FFF;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    font-weight: 600;
+
+    .icon-blod {
+      font-weight: 600;
+    }
+  }
+}
+
+.no-data-bgc {
+  font-size: 14px;
+  position: absolute;
+  top: 0;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .no-data-img {
+    width: 200px;
+    margin-top: 150px;
+  }
+
+  .bg-text {
+    width: 60%;
+    text-align: left;
+    display: block;
+    line-height: 40px;
+
+    &.weight {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    &.indent {
+      text-indent: 2em;
+    }
+  }
+}
+
+.icon-blod {
+  margin-right: 2px;
+}
+
+.sort-icon {
+  margin-top: 10px;
+  margin-right: 8%;
+  float: right;
+  color: #2d8cf0;
+  cursor: pointer;
+}
+
+.icon {
+  margin-left: 5px;
+  color: #2d8cf0;
+}
+
+.header-search {
+  padding: 0 35px;
+  overflow: hidden;
+
+  .search-input {
+    width: 200px;
+  }
+}
+
+.page-bgc {
+  background-color: #f7f7f7;
+  background: #fff;
+
+  .page-bgc-header {
+    padding: 10px 25px 0;
+  }
+
+  .header-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 5px;
+    border-left: 3px solid $primary-color;
+  }
+
+  .header-info {
+    padding: 10px 0 10px 20px;
+
+    p {
+      line-height: 24px;
+    }
+  }
+
+}
+
+.workspace-main {
+  padding: 10px 25px;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: start;
+  align-items: flex-start;
+
+  .item-header {
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 5px;
+    border-left: 3px solid $primary-color;
+  }
+
+  .left {
+    flex: 1;
+    box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: #eee;
+    padding: 0;
+  }
+
+  .right {
+    margin-left: 25px;
+    width: 500px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: #eee;
+    padding: 0;
+  }
+
+  .app-list {
+    display: flex;
+
+    .app-item-wrap {
+      display: flex;
+      margin: 20px 10px 10px 50px;
+      padding: 10px;
+      cursor: pointer;
+
+      &:hover {
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+        border-radius: 4px;
+      }
+
+      .label {
+        margin-left: 10px;
+        width: 110px;
+        font-weight: 700;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 30px;
+        height: 30px;
+      }
+    }
+  }
+}
+
+.app-list-tabs {
+  flex: 1;
+  // border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  position: relative;
+  -webkit-transition: all .2s ease-in-out;
+  transition: all .2s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 2px 7px rgba(0,0,0,.15);
+    border-color: transparent;
+    position: relative;
+  }
+}
+
+.input-wrap {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 200px;
+}
+
+.radio-box .ivu-radio .ivu-radio-inner {
+  border: 1px solid #2d8cf0;
+}

@@ -32,6 +32,32 @@ const getVersion = () => {
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  devServer: {
+    port: 8091,
+    open: true,
+    disableHostCheck: true,
+    overlay: {
+      warnings: false,
+      errors: true
+    },
+    proxy: {    //代理转发
+      '^/api/rest_j/v1': {
+        target: 'http://192.168.9.180:8089',  //后端服务地址
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/rest_j/v1': '/api/rest_j/v1'
+        }
+      },
+      '^/ws/api': {    //websocket
+        target: 'ws://192.168.9.180:8089',
+        ws: true,
+        secure: false,
+        // logLevel: 'debug',
+      },
+    }
+    // after: require('./mock/mock-server.js')
+  },
   chainWebpack: (config) => {
     if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'sandbox') {
       config.plugin('compress').use(FileManagerPlugin, [{

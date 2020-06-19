@@ -75,6 +75,10 @@ abstract class NodeRunner extends Runnable with Logging{
 
   def setStartTime(startTime: Long): Unit
 
+  def getNowTime():Long
+
+  def setNowTime(nowTime: Long):Unit
+
   protected def transitionState(toState: NodeExecutionState): Unit = Utils.tryAndWarn{
     if (getStatus == toState) return
     info(s"from state $getStatus to $toState")

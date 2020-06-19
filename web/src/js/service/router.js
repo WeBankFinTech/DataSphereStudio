@@ -66,6 +66,15 @@ const router = new VueRouter({
           component: () => import('../view/workflow/index.vue'),
         },
         {
+          path: 'workspace',
+          name: 'workspace',
+          meta: {
+            title: 'Workspace',
+            publicPage: true,
+          },
+          component: () => import('../view/workspace/index.vue'),
+        },
+        {
           path: 'commonIframe',
           name: 'commonIframe',
           meta: {

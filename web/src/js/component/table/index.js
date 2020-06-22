@@ -15,7 +15,7 @@
  *
  */
 
-import WeTable from './table.vue';
+import WeTable from './resultTable/table.vue';
 import historyTable from './historyTable/historyTable.vue';
 
 export default { WeTable,

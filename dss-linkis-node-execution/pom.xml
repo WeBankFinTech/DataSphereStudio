@@ -33,13 +33,13 @@
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-ujes-client</artifactId>
-            <version>0.9.3</version>
+            <version>${linkis.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-workspace-httpclient</artifactId>
-            <version>0.9.3</version>
+            <version>${linkis.version}</version>
         </dependency>
 
 

@@ -16,86 +16,13 @@
  */
 @import './variables.scss';
 
-.entry {
-  font-size: 16px;
-  height: 120px;
-  line-height: 120px;
-  background: #515a6e;
-  margin: 10px 30px 10px 10px;
-  color: #FFF;
-  text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    font-weight: 600;
-
-    .icon-blod {
-      font-weight: 600;
-    }
-  }
-}
-
-.no-data-bgc {
-  font-size: 14px;
-  position: absolute;
-  top: 0;
-  bottom: 40px;
+.page-bgc {
+  background: rgb(245, 245, 245);
+  height: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  .no-data-img {
-    width: 200px;
-    margin-top: 150px;
-  }
-
-  .bg-text {
-    width: 60%;
-    text-align: left;
-    display: block;
-    line-height: 40px;
-
-    &.weight {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    &.indent {
-      text-indent: 2em;
-    }
-  }
-}
-
-.icon-blod {
-  margin-right: 2px;
-}
-
-.sort-icon {
-  margin-top: 10px;
-  margin-right: 8%;
-  float: right;
-  color: #2d8cf0;
-  cursor: pointer;
-}
-
-.icon {
-  margin-left: 5px;
-  color: #2d8cf0;
-}
-
-.header-search {
-  padding: 0 35px;
-  overflow: hidden;
-
-  .search-input {
-    width: 200px;
-  }
-}
-
-.page-bgc {
-  background-color: #f7f7f7;
-  background: #fff;
+  //竖轴方向
 
   .page-bgc-header {
     padding: 10px 25px 0;
@@ -118,6 +45,13 @@
 
 }
 
+.app-icon {
+  font-size: 14px;
+  height: 30px;
+  line-height: 30px;
+  color: #39f;
+}
+
 .workspace-main {
   padding: 10px 25px;
   display: -webkit-box;
@@ -130,33 +64,82 @@
   .item-header {
     font-size: 14px;
     font-weight: bold;
-    padding-left: 5px;
-    border-left: 3px solid $primary-color;
+    padding-left: 23px;
+    border-left: 2px solid $primary-color;
+
   }
 
   .left {
     flex: 1;
-    box-shadow: 0 1px 6px rgba(0,0,0,.2);
-    border-color: #eee;
+    // box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: rgba(0,0,0,0);
     padding: 0;
   }
 
   .right {
+    // flex: 1;
     margin-left: 25px;
     width: 500px;
-    box-shadow: 0 1px 6px rgba(0,0,0,.2);
-    border-color: #eee;
+    // box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: rgba(0,0,0,0);
     padding: 0;
+  }
+
+  .setting-bt-wrap {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
+
+    &.ivu-btn-text {
+      outline: none;
+      border: none;
+      box-shadow: 0 0 0 2px transparent;
+    }
   }
 
   .app-list {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .app-item-add {
+      display: flex;
+      margin: 20px 10px 10px 25px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+
+      &:hover {
+        transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+        color: #39f;
+
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+        border-radius: 4px;
+      }
+    }
+
+    .shadow {
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+      border-radius: 4px;
+    }
 
     .app-item-wrap {
       display: flex;
-      margin: 20px 10px 10px 50px;
-      padding: 10px;
+      position: relative;
+      margin: 20px 10px 10px 25px;
+      padding: 10px 30px;
       cursor: pointer;
+      border: 1px solid rgb(245, 245, 245);
+      border-radius: 3px;
+
+      .close-wrap {
+        position: absolute;
+        right: -5px;
+        top: -5px;
+        color: #39f;
+      }
 
       &:hover {
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
@@ -165,9 +148,9 @@
 
       .label {
         margin-left: 10px;
-        width: 110px;
-        font-weight: 700;
-        font-size: 14px;
+        // width: 110px;
+        // font-weight: 700;
+        font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -178,21 +161,106 @@
   }
 }
 
-.app-list-tabs {
-  flex: 1;
-  // border: 1px solid #eee;
-  padding: 20px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  position: relative;
-  -webkit-transition: all .2s ease-in-out;
-  transition: all .2s ease-in-out;
+.app-list-main {
+  padding: 0 25px 10px;
+  // bottom: 0;
+  flex: auto;
 
-  &:hover {
-    box-shadow: 0 2px 7px rgba(0,0,0,.15);
-    border-color: transparent;
+  .app-list-tabs {
+    padding: 20px 20px 20px 22px;
+
+    border-radius: 6px;
+    height: 100%;
     position: relative;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    background-color: #fff;
+
+    &:hover {
+      box-shadow: 0 2px 7px rgba(0,0,0,.15);
+      border-color: transparent;
+      position: relative;
+    }
+
+    .pane-wrap {
+      display: flex;
+      flex-wrap: wrap;
+
+      .pane-item {
+        float: left;
+        margin: 10px 100px 20px 0;
+        width: 450px;
+      }
+
+      .app-entrance {
+        display: flex;
+
+        .app-title-wrap {
+          flex: 1;
+          font-size: 12px;
+
+          .app-title {
+            display: flex;
+            align-items: center;
+            margin-top: -10px;
+
+            .title-sub {
+              margin-right: 10px;
+            }
+
+            .app-tag {
+              color: #07C1E0;
+              border: 1px solid transparent;
+              background: #07C1E0;
+            }
+
+          }
+
+        }
+
+        .app-status-wrap-active {
+          position: absolute;
+          right: 0;
+          top: 6px;
+          width: 70px;
+          font-size: 12px;
+
+          color: #0c6;
+
+          span {
+            color: #515a6e;
+          }
+        }
+
+        .app-status-wrap-disable {
+
+          position: absolute;
+          right: 0;
+          top: 6px;
+          width: 70px;
+          font-size: 12px;
+          color: #ccc;
+
+          span {
+            color: #515a6e;
+          }
+        }
+
+      }
+
+      .button-wrap {
+        display: flex;
+        margin-top: 20px;
+        // justify-content: center;
+
+        .entrace-btn {
+          margin-right: 10px;
+        }
+      }
+
+    }
   }
+
 }
 
 .input-wrap {

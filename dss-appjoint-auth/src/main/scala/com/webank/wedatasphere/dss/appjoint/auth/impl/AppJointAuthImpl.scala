@@ -24,8 +24,9 @@ import com.webank.wedatasphere.dss.appjoint.auth.{AppJointAuth, RedirectMsg}
 import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
-import javax.servlet.http.{Cookie, HttpServletRequest}
+import javax.servlet.http.HttpServletRequest
 import org.apache.commons.io.IOUtils
+import org.apache.http.impl.cookie.BasicClientCookie
 
 import scala.collection.JavaConversions._
 
@@ -68,7 +69,7 @@ class AppJointAuthImpl private() extends AppJointAuth with Logging {
       val index = cookie.indexOf("=")
       val key = cookie.substring(0, index).trim
       val value = cookie.substring(index + 1).trim
-      userInfoAction.addCookie(new Cookie(key, value))
+      userInfoAction.addCookie(new BasicClientCookie(key, value))
     }
     val redirectMsg = new RedirectMsgImpl
     redirectMsg.setRedirectUrl(request.getParameter(AppJointAuthImpl.REDIRECT_KEY))

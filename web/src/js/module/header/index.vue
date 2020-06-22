@@ -21,6 +21,8 @@
             src="../../../assets/images/dssLogo6.png" :alt="$t('message.newConst.logoName')">
         </div>
       </div>
+      
+      <workspaceMenu v-if="$route.path.indexOf('workspace')!==-1" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
       <span
         v-if="currentProject.id"
         class="proj-select"
@@ -49,6 +51,10 @@
           </div>
         </DropdownMenu>
       </Dropdown>
+      <ul v-if="$route.path.indexOf('workspace')!==-1" class="menu">
+        <li class="menu-item" @click="goSpaceHome">首页</li>
+        <li class="menu-item" @click="goConsole">控制台</li>
+      </ul>
       <div
         v-clickoutside="handleOutsideClick"
         :class="{'selected': isUserMenuShow}"
@@ -99,8 +105,10 @@ import { isEmpty } from 'lodash';
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import userMenu from './userMenu.vue';
+import workspaceMenu from './workspaceMenu';
 import clickoutside from '@js/helper/clickoutside';
 import navMenu from '@/js/component/navMenu/index.vue'
+import weMenu from '@/js/component/menu/index.vue'
 export default {
   directives: {
     clickoutside,
@@ -108,6 +116,7 @@ export default {
   components: {
     userMenu,
     navMenu,
+    workspaceMenu,
   },
   data() {
     return {
@@ -116,6 +125,7 @@ export default {
       isNavMenuShow: false,
       currentProject: {},
       projectList: [],
+      workspaces: [],
       isSandbox: process.env.NODE_ENV === 'sandbox'
     };
   },
@@ -131,7 +141,6 @@ export default {
         '/home': 'Scriptis',
         '/console': 'Console',
         '/kanban': 'Visualis',
-        '/workflow': 'Workflow',
         '/process': 'Workflow'
       }
       let moudleName;
@@ -151,7 +160,7 @@ export default {
   },
   methods: {
     init() {
-      api.fetch('/dss/getBaseInfo', 'get').then((rst) => {
+      api.fetch('/mock/dss/getBaseInfo', 'get').then((rst) => {
         if (!isEmpty(rst)) {
           this.userName = rst.userInfo.basic.username;
           storage.set('baseInfo', rst);
@@ -162,6 +171,12 @@ export default {
           this.$emit('set-init');
         }
       });
+
+      api.fetch(`/mock/dss/workspaces`, 'get').then(rst=>{
+        if (!isEmpty(rst)) {
+          this.workspaces = rst.workspaces;
+        }
+      })
     },
     goto(name) {
       this.$router.push({
@@ -247,6 +262,17 @@ export default {
       setTimeout(() => {
         newTab.location.href = url;
       }, 500);
+    },
+    goSpaceHome(){
+      console.log('workspaceId', this.$route.query.workspaceId)
+      this.$router.push({path: '/home',query: Object.assign({}, this.$route.query)});
+    },
+    goConsole(){
+      console.log('workspaceId', this.$route.query.workspaceId)
+      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+    },
+    changeWorkspace(data){
+      this.$router.push({path: '/workspace',query: Object.assign({}, this.$route.query, {workspaceId: data.id})});
     }
   },
 };

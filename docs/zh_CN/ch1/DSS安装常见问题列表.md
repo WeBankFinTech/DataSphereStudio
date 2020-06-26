@@ -3,17 +3,20 @@
 **本文档汇总DSS安装过程中所有问题列表及解决方式，为社区用户安装DSS提供参考。**
 
 
-#### (1) 创建工程提示用户token为空
+#### (1) 创建工程失败:add scheduler project用户token为空
 
 ```
-sudo vi dss-server/conf/token.properties
-```
-
-添加用户
+{"method":null,"status":1,"message":"error code(错误码): 90002, error message(错误信息): add scheduler project failederrCode: 90019 ,desc: errCode: 90020 ,desc: 用户token为空 ,ip: dss.com ,port: 9004 ,serviceKind: dss-server ,ip: dss.com ,port: 9004 ,serviceKind: dss-server.","data":{"errorMsg":{"serviceKind":"dss-server","level":2,"port":9004,"errCode":90002,"ip":"dss.com","desc":"add scheduler project failederrCode: 90019 ,desc: errCode: 90020 ,desc: 用户token为空 ,ip: dss.com ,port: 9004 ,serviceKind: dss-server ,ip: dss.com ,port: 9004 ,serviceKind: dss-server"}}}
 
 ```
-xxx=xxx
-```
+
+确保dss-server的token.properties中添加了此用户，并保持与 azkaban 的 azkaban-users.xml用户一致
+以hadoop用户为例:
+1、在dss-server的token.properties添加
+hadoop=hadoop
+2、在azkaban azkaban-users.xml 文件 添加
+<user groups="hadoop" password="hadoop" roles="admin" username="hadoop"/
+用户名密码务必保持一致
 
 #### (2) visualis执行报错，找不到driver驱动
 

@@ -190,24 +190,24 @@ export default {
   methods: {
     init(){
     
-      api.fetch(`/mock/dss/workspaces/${this.workspaceId}`, 'get').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}`, 'get').then(data=>{
         this.workspaceData = data;
       })
 
-      api.fetch(`/mock/dss/workspaces/${this.workspaceId}/favorites`, 'get').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, 'get').then(data=>{
         this.favoriteApps = data;
       })
 
-      api.fetch(`/mock/dss/workspaces/${this.workspaceId}/managements`, 'get').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}/managements`, 'get').then(data=>{
         this.adminApps = data.managements ? data.managements[0]: [];
       })
 
-      api.fetch(`/mock/dss/workspaces/${this.workspaceId}/applications`, 'get').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}/applications`, 'get').then(data=>{
         this.applications = data.applications;
       })
     },
     deleteFavoriteApp(favouritesId, index){
-      api.fetch(`/mock/dss/workspaces/${this.workspaceId}/favorites`, 'delete').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, 'delete').then(data=>{
         this.favoriteApps.splice(index, 1);
       })
     },
@@ -217,8 +217,7 @@ export default {
         if (valid) {
           // this.addAppLoading = true;
           this.show = false;
-          api.fetch(`/mock/dss/workspaces/${this.workspaceId}/favorites`, {applicationId: this.formDynamic.selectApp},'post').then(data=>{
-            console.log('添加成功')
+          api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, {applicationId: this.formDynamic.selectApp},'post').then(data=>{
             const app = this.findAppByApplicationId(this.formDynamic.selectApp)
             this.favoriteApps.push({
               ...app,
@@ -254,7 +253,7 @@ export default {
           }
           return false;
         })
-        this.searchResult = [{title: '搜索结果', appInstances: [...this.searchResult]}];
+        this.searchResult = [{title: '', appInstances: [...this.searchResult]}];
         this.search = true;
       }else{
         this.search = false;
@@ -277,7 +276,6 @@ export default {
       return this.applications.map(item=>({title: item.title, id: item.id}))
     },
     apps: function(){
-      console.log('this.formDynamic.selectType', this.formDynamic.selectType);
       if(this.formDynamic.selectType){
         const arr = this.applications.filter(item=>item.id==this.formDynamic.selectType);
         return arr[0].appInstances;
@@ -286,7 +284,6 @@ export default {
     },
     tabsApplication: function(){
       if(this.search){
-        console.log('dsadad', this.searchResult, this.applications)
         return this.searchResult;
       }
       return this.applications;

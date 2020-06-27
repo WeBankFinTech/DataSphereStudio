@@ -71,6 +71,7 @@
 
   .left {
     flex: 1;
+    min-height: 137px;
     // box-shadow: 0 1px 6px rgba(0,0,0,.2);
     border-color: rgba(0,0,0,0);
     padding: 0;
@@ -79,6 +80,7 @@
   .right {
     // flex: 1;
     margin-left: 25px;
+    min-height: 137px;
     width: 500px;
     // box-shadow: 0 1px 6px rgba(0,0,0,.2);
     border-color: rgba(0,0,0,0);
@@ -188,7 +190,7 @@
 
       .pane-item {
         float: left;
-        margin: 10px 100px 20px 0;
+        margin: 10px 100px 0 0;
         width: 450px;
       }
 

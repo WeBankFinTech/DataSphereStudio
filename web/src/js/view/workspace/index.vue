@@ -43,9 +43,9 @@
           <span>{{adminApps.title}}</span>
         </h3>
         <div class="app-list">
-          <div v-for="item in adminApps.appInstances" :key="item.title" class="app-item-wrap"  @click="navTo(item, item.url)">
+          <div v-for="item in adminApps.appInstances" :key="item.title" class="app-item-wrap" @click="navTo(item, item.accessButtonUrl)">
             <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
-            <span class="label">{{item.title}}</span>
+            <span class="label">{{item.accessButton}}</span>
           </div>
         </div>
 
@@ -194,8 +194,6 @@ export default {
       if(icon){
         return icon.split('|')
       }
-      // icon="fi-scriptis|rgb(102, 102, 255)"
-      // return icon.split('|')
       return ['','']
     },
     init(){
@@ -273,10 +271,14 @@ export default {
       this.gotoCommonIframe(item.name, {workspaceId: this.workspaceId})
     },
     navTo(item, path){
-      if(path.startsWith('http')){
-        window.open(path);
+      if(path){
+        if(path.startsWith('http')){
+          window.open(path);
+        }else {
+          this.$router.push({path: path, query: Object.assign({}, this.$route.query)});
+        }
       }else {
-        this.$route.push(path);
+        console.warn('path error', path);
       }
     }
   },  

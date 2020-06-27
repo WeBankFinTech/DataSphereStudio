@@ -142,7 +142,6 @@ export default {
         localStorage.removeItem('appJointProjectId')
         url = info.homepageUrl
       }
-      window.console.log(url, 'url', info)
       // 如果没有提示用户功能暂未开发
       if (Object.keys(info).length === 0) {
         this.$Message.warning(this.$t('message.constants.warning.comingSoon'));

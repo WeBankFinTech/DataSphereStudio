@@ -33,7 +33,7 @@ module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
   devServer: {
-    port: 8091,
+    port: 8080,
     open: true,
     disableHostCheck: true,
     overlay: {
@@ -41,24 +41,8 @@ module.exports = {
       errors: true
     },
     proxy: {    //代理转发
-      
-      '^/api/rest_j/v1/mock': {
-        target: 'http://rap2.taobao.org:38080/app/mock/162239',  //后端服务地址
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api/rest_j/v1/mock': '/api/rest_j/v1'
-        },
-        logLevel: "debug"
-      },
-      // '^/ws/api': {    //websocket
-      //   target: 'ws://192.168.9.180:8089',
-      //   ws: true,
-      //   secure: false,
-      //   // logLevel: 'debug',
-      // },
       '^/api/rest_j/v1': {
-        target: 'http://42.123.106.20:8088',  //后端服务地址
+        target: 'http://host:port',  //后端服务地址
         ws: true,
         changeOrigin: true,
         pathRewrite: {
@@ -66,10 +50,9 @@ module.exports = {
         }
       },
       '^/ws/api': {    //websocket
-        target: 'ws://42.123.106.20:8088',
+        target: 'ws://host:port',
         ws: true,
         secure: false,
-        // logLevel: 'debug',
       },
     }
     // after: require('./mock/mock-server.js')

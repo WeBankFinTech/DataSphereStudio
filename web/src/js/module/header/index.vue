@@ -160,7 +160,7 @@ export default {
   },
   methods: {
     init() {
-      api.fetch('/mock/dss/getBaseInfo', 'get').then((rst) => {
+      api.fetch('/dss/getBaseInfo', 'get').then((rst) => {
         if (!isEmpty(rst)) {
           this.userName = rst.userInfo.basic.username;
           storage.set('baseInfo', rst);
@@ -170,13 +170,14 @@ export default {
 
           this.$emit('set-init');
         }
+        api.fetch(`/dss/workspaces`, 'get').then(rst=>{
+          if (!isEmpty(rst)) {
+            this.workspaces = rst.workspaces;
+          }
+        })
       });
 
-      api.fetch(`/mock/dss/workspaces`, 'get').then(rst=>{
-        if (!isEmpty(rst)) {
-          this.workspaces = rst.workspaces;
-        }
-      })
+      
     },
     goto(name) {
       this.$router.push({

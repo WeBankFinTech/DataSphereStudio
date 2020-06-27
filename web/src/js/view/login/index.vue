@@ -86,7 +86,7 @@ export default {
   },
   methods: {
     getIfLogin() {
-      api.fetch('/mock/dss/getBaseInfo', 'get').then(() => {
+      api.fetch('/dss/getBaseInfo', 'get').then(() => {
         this.$router.push('/');
       }).catch(() => {
         this.clearSession();

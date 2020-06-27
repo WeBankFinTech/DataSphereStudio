@@ -1020,7 +1020,6 @@
                 "fileExists": "该文件已经存在！"
             },
             "home": {
-                "adminArea": "管理员功能",
                 "welcome": "欢迎来到 {text} 的工作空间!",
                 "setting": "设置",
                 "exit": "退出设置",

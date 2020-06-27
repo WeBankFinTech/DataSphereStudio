@@ -18,7 +18,7 @@
         <div class="app-list">
           <div v-for="(item, index) in favoriteApps" :key="item.title" class="app-item-wrap" :class="{shadow:setting}" @click="setting?null:linkTo(item, item.url)">
             <div v-if="setting" class="close-wrap" @click.stop="deleteFavoriteApp(item.favouritesId, index)"><i class="fi-cross1"></i></div>
-            <i class="app-icon" :class="item.icon"></i>
+            <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
             <span class="label">{{$t('message.workSpace.home.enter', {text: item.title})}}</span>
           </div>
 
@@ -43,11 +43,13 @@
           <span>{{adminApps.title}}</span>
         </h3>
         <div class="app-list">
-          <div v-for="item in adminApps.appInstances" :key="item.title" class="app-item-wrap">
-            <i class="app-icon" :class="item.icon" ></i>
+          <div v-for="item in adminApps.appInstances" :key="item.title" class="app-item-wrap"  @click="navTo(item, item.url)">
+            <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
             <span class="label">{{item.title}}</span>
           </div>
         </div>
+
+        <Spin fix v-if="!adminApps.title"></Spin>
       </Card>     
     </div>
 
@@ -61,16 +63,16 @@
                   <div class="app-title-wrap">
 
                     <div class="app-title">
-                      <i class="app-icon title-sub" :class="item.icon"></i>
+                      <i class="app-icon title-sub" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
                       <span class="label title-sub">{{item.title}}</span>
-                      <Tag class="app-tag title-sub" v-for="tag in (item.labels.split(','))" :key="tag">{{tag}}</Tag>
+                      <Tag class="app-tag title-sub" v-for="tag in (item.labels ? item.labels.split(','):[])" :key="tag">{{tag}}</Tag>
                     </div>
                     
 
                     <p>{{item.description}}</p>
                   </div>
 
-                  <div v-if="item.isActive" class="app-status-wrap-active">
+                  <div v-if="item.active" class="app-status-wrap-active">
                     <i class="status-icon fi-radio-on2"></i>
                     <span>{{$t('message.workSpace.home.running')}}</span>
                   </div>
@@ -81,7 +83,7 @@
 
                 </div>
 
-                <div v-if="item.isActive" class="button-wrap">
+                <div v-if="item.active" class="button-wrap">
                   <Button class="entrace-btn" size="small" type="primary" @click="linkTo(item, item.accessButtonUrl)">{{item.accessButton}}</Button>
                   <Button class="entrace-btn" size="small" @click="navTo(item, item.manualButtonUrl)">{{item.manualButton}}</Button>
                 </div>
@@ -163,8 +165,8 @@ export default {
         name: "",
         description: ""
       },
-      favoriteApps: [{icon: 'fi-exchange', url: ""}],
-      adminApps: [],
+      favoriteApps: [],
+      adminApps: {},
       setting: false,
       show: false,
       applications: [],
@@ -188,6 +190,14 @@ export default {
   },
 
   methods: {
+    iconSplit(icon){
+      if(icon){
+        return icon.split('|')
+      }
+      // icon="fi-scriptis|rgb(102, 102, 255)"
+      // return icon.split('|')
+      return ['','']
+    },
     init(){
     
       api.fetch(`/dss/workspaces/${this.workspaceId}`, 'get').then(data=>{

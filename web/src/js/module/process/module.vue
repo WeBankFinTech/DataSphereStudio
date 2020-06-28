@@ -797,7 +797,7 @@ export default {
               'msgName': '',
               'queryFrequency': 10,
               'maxReceiveHours': 12,
-              'msgSavekey': '',
+              'msgSavekey': 'msg.body',
               'onlyReceiveToday': 'true',
             },
           });
@@ -1635,7 +1635,7 @@ export default {
         const fileName = `${time.getTime()}${match.ext}`;
         const params = {
           fileName,
-          scriptContent: rst.fileContent,
+          scriptContent: rst.fileContent[0][0],
           metadata: rst.params,
         };
         api.fetch('/filesystem/saveScriptToBML', params, 'post')

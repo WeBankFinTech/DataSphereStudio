@@ -36,7 +36,7 @@ public class WorkspaceRestfulApi {
     @Path("/workspaces")
     public Response getAllWorkspaces(@Context HttpServletRequest req) {
         // TODO: Order By time
-        List<DWSWorkspace> workspaces = dwsWorkspaceService.getWorkspacesByPageInfo();
+        List<DWSWorkspace> workspaces = dwsWorkspaceService.getWorkspaces();
         return Message.messageToResponse(Message.ok().data("workspaces", workspaces));
     }
 

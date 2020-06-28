@@ -1,4 +1,4 @@
-@import '../../../assets/styles/variables.scss';
+@import '../../../../../assets/styles/variables.scss';
 
 .page-bgc {
   background-color: #f7f7f7;
@@ -48,7 +48,7 @@
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        margin: 10px 0 50px 0;
+        margin: 10px 0 50px;
 
         .workspace-create {
           flex-basis: 200px;
@@ -56,10 +56,12 @@
           justify-content: flex-start;
           align-items: center;
           padding: 15px 10px;
+
           &:hover {
             box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
             border-radius: 4px;
           }
+
           .workspace-create-text {
             margin-left: 10px;
             cursor: pointer;
@@ -73,7 +75,7 @@
 
       .item-header {
         font-size: 14px;
-        margin: 20px 25px 10px 25px;
+        margin: 20px 25px 10px;
         font-weight: bold;
         padding-left: 5px;
         border-left: 3px solid $primary-color;
@@ -89,9 +91,10 @@
             background: #fff;
             padding: 10px;
             position: relative;
-            background: url("../../../assets/images/workspace.png") center center no-repeat;
+            // background: url("../../../../../assets/images/workspace.png") center center no-repeat;
             background-size: cover;
             min-width: 222px;
+
             .name {
               display: block;
               font-size: 16px;
@@ -118,6 +121,7 @@
               justify-content: flex-start;
               align-items: flex-start;
               width: 100%;
+
               .item {
                 display: inline-block;
                 font-size: 10px;

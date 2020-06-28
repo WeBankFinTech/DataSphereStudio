@@ -9,6 +9,7 @@
       ref="resourceSimple"
       @update-job="updateJob">
     </resource-simple>
+    <div v-if="isMouseMove" class="footer-mask"></div>
     <div
       :title="msg"
       class="footer-channel">

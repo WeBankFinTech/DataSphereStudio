@@ -114,16 +114,19 @@
           "department": "Department",
           "selectDepartment": "Please Select Department",
           "label": "Label",
-          "addLabel": "Add label",
+          "addLabel": "Add Label",
           "description": "Description",
           "pleaseInputWorkspaceDesc": "Please Input Workspace Description",
-          "createdSuccess": "Created failed!",
+          "createdSuccess": "Successfully created!",
           "createdFailed": "Created failed!",
-          "display": "Display"
+          "display": "Display",
+          "tableDisplay": "Table",
+          "cardDisplay": "Card",
+          "createTime": "CreateTime"
         },
         "GLY": {
           "ALTY": "Demos",
-          "KSRM": "Quick start",
+          "KSRM": "Quick Start",
           "HYP": "Change"
         },
         "workflow": {

@@ -60,7 +60,7 @@
                     <li v-if="tag && tagIndex <= 2"  class="item" :key="tagIndex">{{tag}}</li>
                   </template>
                 </ul>
-                <Button size="small" class="editor" @click.stop="editor(item)">{{ $t('message.workspace.editWorkspace') }}</Button>
+                <!-- <Button size="small" class="editor" @click.stop="editor(item)">{{ $t('message.workspace.editWorkspace') }}</Button> -->
               </i-col>
             </Row>
             <div v-show="visual === 'table'" class="workspace-table">
@@ -140,8 +140,8 @@ export default {
       videos: [],
       videoCache: [],
       visualCates: [
-        { name: 'table', title: '列表展示' },
-        { name: 'card', title: '图标展示' }
+        { name: 'table', title: this.$t('message.workspace.tableDisplay') },
+        { name: 'card', title: this.$t('message.workspace.cardDisplay') }
       ],
       total: null,
       pageSize: 4,

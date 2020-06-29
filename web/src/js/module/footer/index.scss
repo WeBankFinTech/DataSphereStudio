@@ -50,3 +50,12 @@
         color: $text-color;
     }
 }
+.footer-mask {
+    position: fixed;
+    top: -100vh;
+    left: -100vw;
+    width: 200vw;
+    height: 200vh;
+    background-color: #00000000;
+}
+  

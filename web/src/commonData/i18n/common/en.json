@@ -513,7 +513,7 @@
             "cancel": "Cancel",
             "timeout": "Timeout on publishing project {name}!"
         },
-        "tableDetails" : {
+        "tableDetails": {
             "BZBSX": "Table basic attributes",
             "BZDXX": "Table column information",
             "BTJXX": "Table statistical information",
@@ -1041,6 +1041,20 @@
             },
             "error": {
                 "fileExists": "Duplicated file!"
+            },
+            "home": {
+                "welcome": "Welcome to the {text} workspace!",
+                "setting": "Seting",
+                "exit": "Exit",
+                "enter": "Enter {text}",
+                "dlgTitle": "New Fast entry",
+                "selectType": "Please select category",
+                "selectApp": "Please select Application",
+                "save": "Save",
+                "cancel": "Cancel",
+                "running": "running",
+                "stop": "disable",
+                "searchPlaceholder": "Search application"
             }
         },
         "database": {

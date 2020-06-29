@@ -35,20 +35,20 @@ export default {
       tableData: [],
       columns: [
         {
-          title: '名称',
+          title: this.$t('message.workspace.workName'),
           slot: 'name'
         },
         {
-          title: '创建日期',
+          title: this.$t('message.workspace.createTime'),
           slot: 'createTime',
           sortable: true
         },
         {
-          title: '标签',
+          title: this.$t('message.workspace.label'),
           slot: 'label'
         },
         {
-          title: '描述',
+          title: this.$t('message.workspace.description'),
           slot: 'description',
           ellipsis: true
         }

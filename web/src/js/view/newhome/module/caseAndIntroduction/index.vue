@@ -6,30 +6,29 @@
         <div class="admin-left-content">
           <div class="content-box" v-for="(item, index) in demos" :key="index">
             <div style="width: 30%;margin: auto;">
-              <img style="width: 100%;margin-top:10px" :src="getsrc(item,index)" alt />
+              <img style="width: 100%;margin-top:10px" :src="getsrc(item)" alt />
             </div>
 
             <div style="margin-top: 15px;">
-              <h3 style="font-size: 12px;text-align: center;margin-bottom: 25px;">{{index}}</h3>
-              <div class="demo-item" v-for="(text,index) in item" :key="index">
+              <h3 style="font-size: 12px;text-align: center;margin-bottom: 25px;">{{item.title}}</h3>
+              <div class="demo-item" v-for="(text, index) in item.demoInstances" :key="index">
                 <a class="demo-title" :href="filterValid(text.url)">{{text.title}}</a>
-
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="admin-box-right">
+      <!-- <div class="admin-box-right">
         <p class="title">{{$t('message.GLY.KSRM')}}</p>
         <div class="admin-box-video">
-          <div v-for="(item,index) in data.videos" :key="index" class="video-item" @click="play(item)">
+          <div v-for="(item, index) in videos" :key="index" class="video-item" @click="play(item)">
             <video width="100%" height="100" controls>
               <source :src="item.url" type="video/mp4" />
             </video>
             <h3 class="video-title">{{item.title}}</h3>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <Modal
       v-model="showVideo"
@@ -44,13 +43,20 @@
   </div>
 </template>
 <script>
+import api from '@/js/service/api';
+
 export default {
-  props: {
-    applist: Array,
-    data: Object
-  },
   data() {
+    const src = {
+      workflow: require("../../images/edit1.png"),
+      application: require("../../images/333.png"),
+      visualization: require("../../images/111.png"),
+      工作流: require("../../images/edit1.png"),
+      应用场景: require("../../images/333.png"),
+      可视化: require("../../images/111.png")
+    };
     return {
+      src,
       menuurl: [
         {title: 'Schedulis',url: '/workspaceHome/scheduleCenter',icon: 'fi-schedule'},
         {title: 'Scriptis',url: '/home',icon: 'fi-scriptis'},
@@ -58,27 +64,33 @@ export default {
       ],
       showVideo: false,
       video: {},
-      demos: {
-
-      }
+      demos: [],
+      videos: []
     }
   },
-  watch: {
-    data(val) {
-      let temDemo = {workflow: '',
-        application: '',
-        visualization: '',
-        工作流: '',
-        应用场景: '',
-        可视化: '',}
-      Object.keys(temDemo).map((key) => {
-        if (this.data.demos[key]) {
-          this.demos[key] = this.data.demos[key]
-        }
-      })
-    }
+  created() {
+    // this.getVideos();
+    this.getDemos();
   },
   methods: {
+    getDemos() {
+      this.loading = true;
+      api.fetch('dss/workspaces/demos', {}, 'get').then((res) => {
+        this.demos = res.demos;
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
+    },
+    getVideos() {
+      this.loading = true;
+      api.fetch('dss/workspaces/videos', {}, 'get').then((res) => {
+        this.videos = res.videos;
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
+    },
     // 过滤a标签url，防止XSS
     filterValid(url) {
       const reg = /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
@@ -88,17 +100,8 @@ export default {
         return 'javascript:;';
       }
     },
-    getsrc(v, index) {
-      let src = {
-        workflow: require("../images/edit1.png"),
-        application: require("../images/333.png"),
-        visualization: require("../images/111.png"),
-        工作流: require("../images/edit1.png"),
-        应用场景: require("../images/333.png"),
-        可视化: require("../images/111.png"),
-
-      };
-      return src[index];
+    getsrc(item) {
+      return this.src[item.name];
     },
     play(item) {
       this.showVideo = true;
@@ -123,7 +126,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .admin-box-left {
-      padding: 10px;
+      padding: 0px 10px;
       // width: 70%;
       flex: 1;
       .content-box {

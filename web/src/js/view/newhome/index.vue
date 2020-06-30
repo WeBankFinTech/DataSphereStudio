@@ -1,3 +1,15 @@
 <template>
-  <div>首页</div>
+  <div>
+    <workspace />
+  </div>
 </template>
+
+<script>
+import workspace from './module/workspace';
+
+export default {
+  components: {
+    workspace: workspace.component
+  }
+}
+</script>

@@ -29,13 +29,22 @@ const router = new VueRouter({
     {
       path: '',
       name: 'layout',
-      redirect: '/project',
+      redirect: '/newhome',
       component: Layout,
       meta: {
         title: 'DataSphere Studio',
         publicPage: true, // 权限公开
       },
       children: [
+        {
+          path: 'newhome',
+          name: 'Newhome',
+          meta: {
+            title: 'DataSphere Studio',
+            publicPage: true,
+          },
+          component: () => import('../view/newhome/index.vue'),
+        },
         {
           path: 'home',
           name: 'Home',

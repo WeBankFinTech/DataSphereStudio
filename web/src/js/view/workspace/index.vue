@@ -16,11 +16,13 @@
           <span >{{this.$t('message.console.sideNavList.function.name')}}</span>
         </h3>
         <div class="app-list">
-          <div v-for="(item, index) in favoriteApps" :key="item.title" class="app-item-wrap" :class="{shadow:setting}" @click="setting?null:linkTo(item, item.url)">
-            <div v-if="setting" class="close-wrap" @click.stop="deleteFavoriteApp(item.favouritesId, index)"><i class="fi-cross1"></i></div>
+          <div class="nodata-tips" v-if="favoriteApps.length===0">{{$t('message.workSpace.home.tips')}}</div>
+          <div v-else v-for="(item, index) in favoriteApps" :key="item.title" class="app-item-wrap" :class="{shadow:setting}" @click="setting?null:linkTo(item, item.url)">
+            <div v-if="setting" class="close-wrap" @click.stop="deleteFavoriteApp(item.id, index)"><i class="fi-cross1"></i></div>
             <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
             <span class="label">{{$t('message.workSpace.home.enter', {text: item.title})}}</span>
           </div>
+          
 
           <div v-if="setting" class="app-item-add" @click="show = true">
             <i class="fi-plus add"></i>
@@ -39,23 +41,25 @@
       
 
       <Card class="right">
-        <h3 class="item-header">
+        <div class="nodata-tips" v-if="!adminApps.title">{{$t('message.workSpace.home.tips')}}</div>
+        <h3 v-if="adminApps.title" class="item-header">
           <span>{{adminApps.title}}</span>
         </h3>
-        <div class="app-list">
+        <div v-if="adminApps.title" class="app-list">
           <div v-for="item in adminApps.appInstances" :key="item.title" class="app-item-wrap" @click="navTo(item, item.accessButtonUrl)">
             <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
             <span class="label">{{item.accessButton}}</span>
           </div>
         </div>
 
-        <Spin fix v-if="!adminApps.title"></Spin>
+       
       </Card>     
     </div>
 
     <div class="app-list-main">
       <div class="app-list-tabs" :class="{hideBar: search}">
-        <Tabs>
+        <div class="nodata-tips" v-if="tabsApplication.length===0">{{$t('message.workSpace.home.tips')}}</div>
+        <Tabs v-else>
           <Tab-pane v-for="(type, index) in tabsApplication" :label="type.title" :key="type.title">
             <div class="pane-wrap">
               <Card v-for="item in tabsApplication[index].appInstances" :key="item.name" class="pane-item">
@@ -123,7 +127,7 @@
         <FormItem :label="$t('message.workSpace.home.selectApp')"
           prop="selectApp"> 
           <Select v-model="formDynamic.selectApp">
-            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`">{{ item.title }}</Option>
+            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had">{{ item.title }}</Option>
           </Select>
         </FormItem>
       </Form>
@@ -199,23 +203,23 @@ export default {
     init(){
     
       api.fetch(`/dss/workspaces/${this.workspaceId}`, 'get').then(data=>{
-        this.workspaceData = data;
+        this.workspaceData = data.workspace;
       })
 
       api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, 'get').then(data=>{
-        this.favoriteApps = data;
+        this.favoriteApps = data.favorites;
       })
 
       api.fetch(`/dss/workspaces/${this.workspaceId}/managements`, 'get').then(data=>{
-        this.adminApps = data.managements ? data.managements[0]: [];
+        this.adminApps = data.managements[0] ? data.managements[0]: {};
       })
 
       api.fetch(`/dss/workspaces/${this.workspaceId}/applications`, 'get').then(data=>{
-        this.applications = data.applications;
+        this.applications = data.applications || [];
       })
     },
     deleteFavoriteApp(favouritesId, index){
-      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, 'delete').then(data=>{
+      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites/${favouritesId}`, 'delete').then(data=>{
         this.favoriteApps.splice(index, 1);
       })
     },
@@ -225,12 +229,12 @@ export default {
         if (valid) {
           // this.addAppLoading = true;
           this.show = false;
-          api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, {applicationId: this.formDynamic.selectApp},'post').then(data=>{
+          api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, {menuApplicationId: parseInt(this.formDynamic.selectApp, 10)},'post').then(data=>{
             const app = this.findAppByApplicationId(this.formDynamic.selectApp)
             this.favoriteApps.push({
               ...app,
-              "favouritesId": data.favouritesId,
-              "applicationId": app.id, //application表里的id
+              "id": data.favouritesId,
+              "menuApplicationId": app.id, //application表里的id
             })
           })
         }
@@ -289,8 +293,14 @@ export default {
     },
     apps: function(){
       if(this.formDynamic.selectType){
-        const arr = this.applications.filter(item=>item.id==this.formDynamic.selectType);
-        return arr[0].appInstances;
+        const result = this.applications.find(item=>item.id==this.formDynamic.selectType);
+        result.appInstances.map(item=>{
+          item.had = false;
+          if(this.favoriteApps.find(fItem=>item.id===fItem.menuApplicationId)){
+            item.had = true;
+          }
+        })
+        return result.appInstances;
       }
       return [];
     },

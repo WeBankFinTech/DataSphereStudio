@@ -17,7 +17,8 @@
             "nameLength": "名称长度不能大于",
             "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
             "project": "工程",
-            "feedback": "反馈"
+            "feedback": "反馈",
+            "validNameExist": "名称不能重复"
         },
         "project": {
             "projectName": "工程名",
@@ -102,6 +103,32 @@
             "outputSubTitle": "数据发送",
             "deleteWtss": "是否同时删除scheduler工程?",
             "noData": "暂无数据请添加"
+        },
+        "workspace": {
+          "createWorkspace": "创建工作空间",
+          "searchWorkspace": "搜索工作空间",
+          "workspaceList": "工作空间列表",
+          "editWorkspace": "编辑",
+          "newWorkspace": "新建工作空间",
+          "editor": "编辑工作空间",
+          "workName": "工作空间名",
+          "department": "归属部门",
+          "selectDepartment": "请选择部门",
+          "label": "标签",
+          "addLabel": "添加标签",
+          "description": "描述",
+          "pleaseInputWorkspaceDesc": "请输入工作空间描述",
+          "createdSuccess": "工作空间创建成功！",
+          "createdFailed": "工作空间创建失败！",
+          "display": "展示方式",
+          "tableDisplay": "列表展示",
+          "cardDisplay": "图标展示",
+          "createTime": "创建时间"
+        },
+        "GLY": {
+          "ALTY": "案例体验",
+          "KSRM": "快速入门",
+          "HYP": "换一批"
         },
         "workflow": {
             "workflow": "工作流",

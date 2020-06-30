@@ -1031,7 +1031,8 @@
                 "cancel": "取消",
                 "running": "运行中",
                 "stop": "不可用",
-                "searchPlaceholder": "搜索应用系统"
+                "searchPlaceholder": "搜索应用系统",
+                "tips": "没有数据或者未添加"
             }
         },
         "database": {

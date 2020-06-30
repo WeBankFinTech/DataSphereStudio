@@ -1031,7 +1031,8 @@
                 "cancel": "Cancel",
                 "running": "running",
                 "stop": "disable",
-                "searchPlaceholder": "Search application"
+                "searchPlaceholder": "Search application",
+                "tips": "No data or no addition"
             }
         },
         "database": {

@@ -59,8 +59,8 @@
     <div class="app-list-main">
       <div class="app-list-tabs" :class="{hideBar: search}">
         <div class="nodata-tips" v-if="tabsApplication.length===0">{{$t('message.workSpace.home.tips')}}</div>
-        <Tabs v-else>
-          <Tab-pane v-for="(type, index) in tabsApplication" :label="type.title" :key="type.title">
+        <Tabs v-else active-key=0>
+          <Tab-pane v-for="(type, index) in tabsApplication" :label="type.title" :key="index">
             <div class="pane-wrap">
               <Card v-for="item in tabsApplication[index].appInstances" :key="item.name" class="pane-item">
                 <div class="app-entrance">
@@ -265,7 +265,7 @@ export default {
           }
           return false;
         })
-        this.searchResult = [{title: '', appInstances: [...this.searchResult]}];
+        this.searchResult = [{title: 'result', appInstances: [...this.searchResult]}];
         this.search = true;
       }else{
         this.search = false;

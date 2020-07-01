@@ -218,7 +218,7 @@ export default {
       this.changePage(this.pageNum);
     },
     gotoWorkspace(workspace) {
-      this.$router.push({ path: '/workspace', query: { workspaceId: workspace.id }});
+      this.$router.push({ path: '/workspace', query: { workspaceId: workspace.workspaceId }});
     },
     workspaceShowAction(val) {
       this.workspaceShow = val;

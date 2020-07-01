@@ -22,8 +22,15 @@ public class DWSWorkspaceServiceImpl implements DWSWorkspaceService {
 
     @Override
     public List<DWSWorkspace> getWorkspaces() {
+
         return workspaceMapper.getWorkspaces();
     }
+
+    @Override
+    public DWSWorkspace getWorkspacesById(Long id) {
+        return workspaceMapper.getWorkspaceById(id);
+    }
+
 
     @Override
     public Long addWorkspace(String userName, String name, String department, String label, String description) {
@@ -61,7 +68,7 @@ public class DWSWorkspaceServiceImpl implements DWSWorkspaceService {
 
     @Override
     public List<HomepageDemoMenuVo> getHomepageDemos(boolean isChinese) {
-        List<HomepageDemoMenuVo> demoMenuVos = isChinese ? workspaceMapper.getHomepageDemoMenusCn():workspaceMapper.getHomepageDemoMenusEn();
+        List<HomepageDemoMenuVo> demoMenuVos = isChinese ? workspaceMapper.getHomepageDemoMenusCn() : workspaceMapper.getHomepageDemoMenusEn();
         for (HomepageDemoMenuVo demoMenuVo : demoMenuVos) {
             Long menuId = demoMenuVo.getId();
             List<HomepageDemoInstanceVo> demoInstanceVos = isChinese ? workspaceMapper.getHomepageInstancesByMenuIdCn(menuId) : workspaceMapper.getHomepageInstancesByMenuIdEn(menuId);
@@ -97,6 +104,31 @@ public class DWSWorkspaceServiceImpl implements DWSWorkspaceService {
     public List<OnestopMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese) {
         List<OnestopMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
         return getMenuAppInstances(applicationMenuVos, isChinese);
+    }
+
+    @Override
+    public List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese) {
+        return isChinese ? workspaceMapper.getWorkspaceFavoritesCn(username, workspaceId) : workspaceMapper.getWorkspaceFavoritesEn(username, workspaceId);
+    }
+
+    @Override
+    public Long addFavorite(String username, Long workspaceId, Long menuApplicationId) {
+        DWSFavorite dwsFavorite = new DWSFavorite();
+        dwsFavorite.setUsername(username);
+        dwsFavorite.setWorkspaceId(workspaceId);
+        dwsFavorite.setMenuApplicationId(menuApplicationId);
+        // todo: order will from the front end
+        dwsFavorite.setOrder(1);
+        dwsFavorite.setCreateBy(username);
+        dwsFavorite.setLastUpdateUser(username);
+        workspaceMapper.addFavorite(dwsFavorite);
+        return dwsFavorite.getId();
+    }
+
+    @Override
+    public Long deleteFavorite(String username, Long favouritesId) {
+        workspaceMapper.deleteFavorite(favouritesId);
+        return favouritesId;
     }
 
     private boolean isAdminUser(Long workspaceId, String username) {

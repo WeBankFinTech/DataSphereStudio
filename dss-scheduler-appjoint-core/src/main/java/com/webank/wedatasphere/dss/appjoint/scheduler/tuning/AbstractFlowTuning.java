@@ -75,8 +75,8 @@ public abstract class AbstractFlowTuning implements FlowTuning {
     private List<String> resolveDependencys(SchedulerNode node,List<SchedulerNode> schedulerNodes, List<SchedulerEdge> flowEdges) {
         List<String> dependencys = new ArrayList<>();
         flowEdges.forEach(edge -> {
-            if (edge.getDWSEdge().getTarget().equals(node.getId())) {
-                dependencys.add(schedulerNodes.stream().filter(n ->edge.getDWSEdge().getSource().equals(n.getId())).findFirst().get().getName());
+            if (edge.getDssEdge().getTarget().equals(node.getId())) {
+                dependencys.add(schedulerNodes.stream().filter(n ->edge.getDssEdge().getSource().equals(n.getId())).findFirst().get().getName());
             }
         });
 
@@ -112,7 +112,7 @@ public abstract class AbstractFlowTuning implements FlowTuning {
     private void setProxyUser(SchedulerFlow schedulerFlow) {
         String proxyUser = getProxyUser(schedulerFlow);
         if(StringUtils.isNotBlank(proxyUser)) {
-            schedulerFlow.getSchedulerNodes().forEach(node -> node.getDWSNode().setUserProxy(proxyUser));
+            schedulerFlow.getSchedulerNodes().forEach(node -> node.getDssNode().setUserProxy(proxyUser));
             schedulerFlow.setUserProxy(proxyUser);
         }
     }

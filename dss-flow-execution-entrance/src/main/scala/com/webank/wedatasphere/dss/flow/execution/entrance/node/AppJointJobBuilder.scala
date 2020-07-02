@@ -139,12 +139,12 @@ object AppJointJobBuilder {
     }
 
     override protected def fillLinkisJobInfo(linkisJob: LinkisJob): Unit = {
-      this.node.getDWSNode.getParams.get(FlowExecutionEntranceConfiguration.NODE_CONFIGURATION_KEY) match {
+      this.node.getDssNode.getParams.get(FlowExecutionEntranceConfiguration.NODE_CONFIGURATION_KEY) match {
         case configuration:util.Map[String, AnyRef] =>
           linkisJob.setConfiguration(configuration)
         case _ =>
       }
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP) match {
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP) match {
         case flowVar:util.Map[String, AnyRef] =>
           linkisJob.setVariables(flowVar)
         case _ =>
@@ -153,13 +153,13 @@ object AppJointJobBuilder {
     }
 
     override protected def fillCommonLinkisJobInfo(linkisAppjointJob: CommonLinkisJob): Unit = {
-      linkisAppjointJob.setJobResourceList(FlowExecutionUtils.resourcesAdaptation(this.node.getDWSNode.getResources))
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.PROJECT_RESOURCES) match {
+      linkisAppjointJob.setJobResourceList(FlowExecutionUtils.resourcesAdaptation(this.node.getDssNode.getResources))
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.PROJECT_RESOURCES) match {
         case projectResources:util.List[Resource] =>
           linkisAppjointJob.setProjectResourceList(FlowExecutionUtils.resourcesAdaptation(projectResources))
         case _ =>
       }
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_RESOURCES) match {
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_RESOURCES) match {
         case flowResources:util.HashMap[String, util.List[BMLResource]] =>
           linkisAppjointJob.setFlowNameAndResources(flowResources)
         case _ =>

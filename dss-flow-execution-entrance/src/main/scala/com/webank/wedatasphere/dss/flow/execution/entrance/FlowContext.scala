@@ -53,7 +53,7 @@ object FlowContext {
 
   def changedNodeState(fromMap: util.Map[String, NodeRunner],
                        toMap: util.Map[String, NodeRunner], node: SchedulerNode,info:String): Unit = {
-    val nodeName = node.getDWSNode.getName
+    val nodeName = node.getDssNode.getName
     if (fromMap.containsKey(nodeName)) {
       val runner = fromMap.get(nodeName)
       runner.setNodeExecutedInfo(info)

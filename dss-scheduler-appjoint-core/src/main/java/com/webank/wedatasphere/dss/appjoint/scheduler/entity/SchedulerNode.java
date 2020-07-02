@@ -18,14 +18,14 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.entity;
 
 
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
 
 /**
  * Created by enjoyyin on 2019/9/7.
  */
 public interface SchedulerNode extends Node {
-    DWSNode getDWSNode();
+    DSSNode getDssNode();
 
-    void setDWSNode(DWSNode dwsNode);
+    void setDssNode(DSSNode dssNode);
 }

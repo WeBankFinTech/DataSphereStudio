@@ -23,7 +23,7 @@
           :hide-button-bar="false"
           :hide-publish-andcopy="true"
           :current-data="item"
-          :data-list="item.dwsFlowList"
+          :data-list="item.dssFlowList"
           :readonly="myReadonly"
           tag-prop="uses"
           @goto="gotoWorkflow"
@@ -191,7 +191,7 @@ export default {
       let flowList = this.cacheData.filter((item) => {
         return item.id === projectData.taxonomyID;
       });
-      if (this.checkName(flowList[0].dwsFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
+      if (this.checkName(flowList[0].dssFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addFlow', projectData, 'post').then(() => {
@@ -363,8 +363,8 @@ export default {
         projectVersionID: +this.$route.query.projectVersionID,
       };
       for (let i = 0; i < this.dataList.length; i++) {
-        for (let j = 0; j < this.dataList[i].dwsFlowList.length; j++) {
-          if (this.dataList[i].dwsFlowList[j].id === project.id) {
+        for (let j = 0; j < this.dataList[i].dssFlowList.length; j++) {
+          if (this.dataList[i].dssFlowList[j].id === project.id) {
             this.flowTaxonomyID = this.dataList[i].id;
             break;
           }
@@ -385,7 +385,7 @@ export default {
         let tepArray = storage.get('flowsList');
         this.dataList = tepArray.map((item) => {
           if (id === item.id) {
-            item.dwsFlowList = item.dwsFlowList.filter((subItem) => {
+            item.dssFlowList = item.dssFlowList.filter((subItem) => {
               return subItem.name.indexOf(event.target.value) != -1;
             });
           }
@@ -495,7 +495,7 @@ export default {
         const projectId = this.$route.query.projectID;
         res.data.forEach((Taxonomy) => {
           if (Taxonomy.id === projectTaxonomyID) {
-            Taxonomy.dwsProjectList.forEach((project) => {
+            Taxonomy.dssProjectList.forEach((project) => {
               if (project.id === projectId) {
                 const newProjectVersionId = project.latestVersion.id;
                 this.$router.push({

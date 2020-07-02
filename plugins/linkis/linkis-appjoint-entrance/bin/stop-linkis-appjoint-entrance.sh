@@ -4,9 +4,9 @@ cd `dirname $0`
 cd ..
 HOE=`pwd`
 
-export DWS_ENTRANCE_PID=$HOE/bin/linkis.pid
+export DSS_ENTRANCE_PID=$HOE/bin/linkis.pid
 
-function wait_for_DWS_ENGINE_MANAGER_to_die() {
+function wait_for_DSS_ENGINE_MANAGER_to_die() {
   local pid
   local count
   pid=$1
@@ -33,15 +33,15 @@ function wait_for_DWS_ENGINE_MANAGER_to_die() {
   fi
 }
 
-if [[ ! -f "${DWS_ENTRANCE_PID}" ]]; then
+if [[ ! -f "${DSS_ENTRANCE_PID}" ]]; then
     echo "AppJoint Entrance is not running"
 else
-    pid=$(cat ${DWS_ENTRANCE_PID})
+    pid=$(cat ${DSS_ENTRANCE_PID})
     if [[ -z "${pid}" ]]; then
       echo "AppJoint Entrance is not running"
     else
-      wait_for_DWS_ENGINE_MANAGER_to_die $pid 40
-      $(rm -f ${DWS_ENTRANCE_PID})
+      wait_for_DSS_ENGINE_MANAGER_to_die $pid 40
+      $(rm -f ${DSS_ENTRANCE_PID})
       echo "AppJoint Entrance is stopped."
     fi
 fi

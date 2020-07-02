@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.LinkisAzkabanSchedulerNode;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +12,14 @@ public class LinkisAzkabanNodeParser extends AzkabanNodeParser {
 
 
     @Override
-    public SchedulerNode parseNode(DWSNode dwsNode) {
+    public SchedulerNode parseNode(DSSNode dssNode) {
         LinkisAzkabanSchedulerNode schedulerNode = new LinkisAzkabanSchedulerNode();
-        schedulerNode.setDWSNode(dwsNode);
+        schedulerNode.setDssNode(dssNode);
         return schedulerNode;
     }
 
     @Override
-    public Boolean ifNodeCanParse(DWSNode dwsNode) {
+    public Boolean ifNodeCanParse(DSSNode dssNode) {
         //预留
         return true;
     }

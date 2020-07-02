@@ -20,7 +20,6 @@ package com.webank.wedatasphere.dss.server.restful;
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.execution.core.CommonAppJointNode;
-import com.webank.wedatasphere.dss.appjoint.service.NodeService;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.application.util.ApplicationUtils;
@@ -28,7 +27,7 @@ import com.webank.wedatasphere.dss.server.entity.NodeInfo;
 import com.webank.wedatasphere.dss.server.function.FunctionInvoker;
 import com.webank.wedatasphere.dss.server.function.FunctionPool;
 import com.webank.wedatasphere.dss.server.function.NodeServiceFunction;
-import com.webank.wedatasphere.dss.server.service.DWSNodeInfoService;
+import com.webank.wedatasphere.dss.server.service.DSSNodeInfoService;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class NodeRestfulApi {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private DWSNodeInfoService nodeInfoService;
+    private DSSNodeInfoService nodeInfoService;
 
     @Autowired
     private ApplicationService applicationService;

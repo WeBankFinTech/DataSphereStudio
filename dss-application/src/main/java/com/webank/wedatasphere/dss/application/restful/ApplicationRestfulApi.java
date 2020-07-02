@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.DSSUserVO;
 import com.webank.wedatasphere.dss.application.handler.ApplicationHandlerChain;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
-import com.webank.wedatasphere.dss.application.service.DSSUserService;
+import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
 import com.webank.wedatasphere.dss.application.util.ApplicationUtils;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
@@ -51,7 +51,7 @@ public class ApplicationRestfulApi {
     @Autowired
     private ApplicationService applicationService;
     @Autowired
-    private DSSUserService dataworkisUserService;
+    private DSSApplicationUserService dataworkisUserService;
     @Autowired
     private ApplicationHandlerChain applicationHandlerChain;
 

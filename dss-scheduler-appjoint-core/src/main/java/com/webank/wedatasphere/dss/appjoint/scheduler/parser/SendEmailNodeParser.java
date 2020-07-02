@@ -18,7 +18,7 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.constant.SchedulerAppJointConstant;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 
 import java.util.Map;
 
@@ -28,9 +28,9 @@ import java.util.Map;
 public abstract class SendEmailNodeParser extends AbstractReadNodeParser {
 
     @Override
-    public Boolean ifNodeCanParse(DWSNode dwsNode) {
+    public Boolean ifNodeCanParse(DSSNode dssNode) {
         //判断是sendemail  并且category是node
-        Map<String, Object> params = dwsNode.getParams();
+        Map<String, Object> params = dssNode.getParams();
         if(params != null && !params.isEmpty()){
             Object configuration = params.get(SchedulerAppJointConstant.CONFIGURATION);
             if(configuration instanceof Map){
@@ -38,7 +38,7 @@ public abstract class SendEmailNodeParser extends AbstractReadNodeParser {
                 if(runtime instanceof Map){
                     Object category = ((Map) runtime).get(SchedulerAppJointConstant.CATEGORY);
                     if(category != null && SchedulerAppJointConstant.NODE.equals(category.toString())){
-                        return SchedulerAppJointConstant.SENDEMAIL_NODE_TYPE.equals(dwsNode.getNodeType());
+                        return SchedulerAppJointConstant.SENDEMAIL_NODE_TYPE.equals(dssNode.getNodeType());
                     }
                 }
             }

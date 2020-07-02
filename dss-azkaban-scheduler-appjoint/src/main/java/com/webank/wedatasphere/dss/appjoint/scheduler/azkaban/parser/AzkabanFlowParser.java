@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.parser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.AbstractFlowParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.NodeParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.AzkabanSchedulerFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSJSONFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ public class AzkabanFlowParser extends AbstractFlowParser {
     }
 
     @Override
-    public Boolean ifFlowCanParse(DWSJSONFlow flow) {
+    public Boolean ifFlowCanParse(DSSJSONFlow flow) {
         return true;
     }
 

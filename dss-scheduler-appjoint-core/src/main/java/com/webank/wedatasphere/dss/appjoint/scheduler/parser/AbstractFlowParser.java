@@ -27,12 +27,12 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerEdgeDefaul
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSJSONFlow;
 import com.webank.wedatasphere.dss.common.entity.flow.Flow;
-import com.webank.wedatasphere.dss.common.entity.node.DWSEdge;
-import com.webank.wedatasphere.dss.common.entity.node.DWSEdgeDefault;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNodeDefault;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdgeDefault;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import org.springframework.beans.BeanUtils;
 
 import java.util.*;
@@ -64,39 +64,39 @@ public abstract class AbstractFlowParser implements FlowParser {
     protected void dealFlowProperties(Flow flow){}
 
     @Override
-    public SchedulerFlow parseFlow(DWSJSONFlow flow) {
+    public SchedulerFlow parseFlow(DSSJSONFlow flow) {
         downloadFlowResources();
         dealFlowResources();
         dealFlowProperties(flow);
-        return resolveDWSJSONFlow(flow);
+        return resolveDSSJSONFlow(flow);
     }
 
-    //    解析DWSJSONFlow，生成DWSNode
-    public SchedulerFlow resolveDWSJSONFlow(DWSJSONFlow jsonFlow){
+    //    解析DSSJSONFlow，生成DSSNode
+    public SchedulerFlow resolveDSSJSONFlow(DSSJSONFlow jsonFlow){
         SchedulerFlow schedulerFlow = createSchedulerFlow();
         BeanUtils.copyProperties(jsonFlow,schedulerFlow,"children");
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(jsonFlow.getJson()).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
         Gson gson = new Gson();
-        List<DWSNode> dwsNodes = gson.fromJson(nodeJsonArray, new TypeToken<List<DWSNodeDefault>>() {
+        List<DSSNode> dssNodes = gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
         }.getType());
         List<SchedulerNode> schedulerNodeList = new ArrayList<>();
         List<SchedulerEdge> schedulerEdgeList = new ArrayList<>();
-        for (DWSNode dwsNode : dwsNodes) {
+        for (DSSNode dssNode : dssNodes) {
             Optional<NodeParser> firstNodeParser = Arrays.stream(getNodeParsers())
-                    .filter(p -> p.ifNodeCanParse(dwsNode))
+                    .filter(p -> p.ifNodeCanParse(dssNode))
                     .sorted((p1, p2) -> p2.getOrder() - p1.getOrder())
                     .findFirst();
-            SchedulerNode schedulerNode = firstNodeParser.orElseThrow(()->new IllegalArgumentException("NodeParser个数应该大于0")).parseNode(dwsNode);
+            SchedulerNode schedulerNode = firstNodeParser.orElseThrow(()->new IllegalArgumentException("NodeParser个数应该大于0")).parseNode(dssNode);
             schedulerNodeList.add(schedulerNode);
         }
         JsonArray edgeJsonArray = jsonObject.getAsJsonArray("edges");
-        List<DWSEdge> dwsEdges = gson.fromJson(edgeJsonArray, new TypeToken<List<DWSEdgeDefault>>() {
+        List<DSSEdge> dssEdges = gson.fromJson(edgeJsonArray, new TypeToken<List<DSSEdgeDefault>>() {
         }.getType());
-        for (DWSEdge dwsEdge : dwsEdges) {
+        for (DSSEdge dssEdge : dssEdges) {
             SchedulerEdge schedulerEdge = new SchedulerEdgeDefault();
-            schedulerEdge.setDWSEdge(dwsEdge);
+            schedulerEdge.setDssEdge(dssEdge);
             schedulerEdgeList.add(schedulerEdge);
 
         }

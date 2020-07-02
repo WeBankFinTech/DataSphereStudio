@@ -83,7 +83,7 @@ public abstract class AbstractShareNodeFlowTuning extends AbstractFlowTuning imp
             if(schedulerNode != null) {
                 int shareTimes = (nameAndNumMap.get(key)).intValue();
                 ShareNode shareNode = createShareNode();
-                shareNode.setDWSNode(schedulerNode.getDWSNode());
+                shareNode.setDssNode(schedulerNode.getDssNode());
                 shareNode.setSchedulerNode(schedulerNode);
                 shareNode.setShareTimes(shareTimes);
                 res.put(shareNode, shareTimes);

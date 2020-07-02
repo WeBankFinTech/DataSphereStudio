@@ -103,6 +103,32 @@
             "deleteWtss": "Delete the scheduler project at the same time?",
             "noData": "No data please add"
         },
+        "workspace": {
+          "createWorkspace": "Create Workspace",
+          "searchWorkspace": "Search Workspace",
+          "workspaceList": "Workspace List",
+          "editWorkspace": "Edit",
+          "newWorkspace": "New Workspace",
+          "editor": "Edit Workspace",
+          "workName": "Name",
+          "department": "Department",
+          "selectDepartment": "Please Select Department",
+          "label": "Label",
+          "addLabel": "Add Label",
+          "description": "Description",
+          "pleaseInputWorkspaceDesc": "Please Input Workspace Description",
+          "createdSuccess": "Successfully created!",
+          "createdFailed": "Created failed!",
+          "display": "Display",
+          "tableDisplay": "Table",
+          "cardDisplay": "Card",
+          "createTime": "CreateTime"
+        },
+        "GLY": {
+          "ALTY": "Demos",
+          "KSRM": "Quick Start",
+          "HYP": "Change"
+        },
         "workflow": {
             "workflow": "Workflow",
             "createWorkflow": "Create workflow",
@@ -490,7 +516,7 @@
             "cancel": "Cancel",
             "timeout": "Timeout on publishing project {name}!"
         },
-        "tableDetails" : {
+        "tableDetails": {
             "BZBSX": "Table basic attributes",
             "BZDXX": "Table column information",
             "BTJXX": "Table statistical information",
@@ -1018,6 +1044,20 @@
             },
             "error": {
                 "fileExists": "Duplicated file!"
+            },
+            "home": {
+                "welcome": "Welcome to the {text} workspace!",
+                "setting": "Seting",
+                "exit": "Exit",
+                "enter": "Enter {text}",
+                "dlgTitle": "New Fast entry",
+                "selectType": "Please select category",
+                "selectApp": "Please select Application",
+                "save": "Save",
+                "cancel": "Cancel",
+                "running": "running",
+                "stop": "disable",
+                "searchPlaceholder": "Search application"
             }
         },
         "database": {

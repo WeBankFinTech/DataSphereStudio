@@ -806,6 +806,10 @@
             "clearCacheSuccess": "清除本地数据缓存成功!",
             "comingSoon": "尚未开源，敬请期待！"
         },
+        "header": {
+            "home": "首页",
+            "console": "控制台"
+        },
         "headerNavBar": {
             "Workflow": "工作流开发",
             "Exchangis": "数据交换组件",
@@ -1058,7 +1062,8 @@
                 "cancel": "取消",
                 "running": "运行中",
                 "stop": "不可用",
-                "searchPlaceholder": "搜索应用系统"
+                "searchPlaceholder": "搜索应用系统",
+                "tips": "没有数据或者未添加"
             }
         },
         "database": {

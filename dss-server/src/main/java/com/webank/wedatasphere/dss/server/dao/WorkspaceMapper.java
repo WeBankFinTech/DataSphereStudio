@@ -2,6 +2,11 @@ package com.webank.wedatasphere.dss.server.dao;
 
 import com.webank.wedatasphere.dss.server.dto.response.*;
 import com.webank.wedatasphere.dss.server.entity.*;
+import com.webank.wedatasphere.dss.server.dto.response.HomepageDemoInstanceVo;
+import com.webank.wedatasphere.dss.server.dto.response.HomepageDemoMenuVo;
+import com.webank.wedatasphere.dss.server.dto.response.HomepageVideoVo;
+import com.webank.wedatasphere.dss.server.dto.response.WorkspaceFavoriteVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,11 +15,11 @@ import java.util.List;
  */
 public interface WorkspaceMapper {
 
-    List<DWSWorkspace> getWorkspaces();
+    List<DSSWorkspace> getWorkspaces();
 
-    List<DWSWorkspace> findByWorkspaceName(String name);
+    List<DSSWorkspace> findByWorkspaceName(String name);
 
-    void addWorkSpace(DWSWorkspace dwsWorkspace);
+    void addWorkSpace(DSSWorkspace dssWorkspace);
 
     List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
     List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
@@ -25,7 +30,7 @@ public interface WorkspaceMapper {
     List<HomepageVideoVo> getHomepageVideosEn();
     List<HomepageVideoVo> getHomepageVideosCn();
 
-    DWSWorkspace getWorkspaceById(Long workspaceId);
+    DSSWorkspace getWorkspaceById(Long workspaceId);
 
     List<OnestopMenuVo> getManagementMenuCn();
     List<OnestopMenuVo> getManagementMenuEn();
@@ -36,4 +41,11 @@ public interface WorkspaceMapper {
     List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
     List<OnestopMenuAppInstanceVo> getMenuAppInstanceEn(Long id);
 
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+
+    void addFavorite(DSSFavorite dssFavorite);
+
+    void deleteFavorite(Long favouritesId);
 }

@@ -5,6 +5,8 @@ import com.webank.wedatasphere.dss.server.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.server.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.server.entity.DWSWorkspace;
 import com.webank.wedatasphere.dss.server.dto.response.WorkspaceDepartmentVo;
+import com.webank.wedatasphere.dss.application.service.DSSUserService;
+import com.webank.wedatasphere.dss.server.dto.response.*;
 import com.webank.wedatasphere.dss.server.service.DWSWorkspaceService;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
@@ -31,6 +33,8 @@ public class WorkspaceRestfulApi {
     @Autowired
     private DWSWorkspaceService dwsWorkspaceService;
 
+    @Autowired
+    private DSSUserService dssUserService;
 
     @GET
     @Path("/workspaces")
@@ -38,6 +42,13 @@ public class WorkspaceRestfulApi {
         // TODO: Order By time
         List<DWSWorkspace> workspaces = dwsWorkspaceService.getWorkspaces();
         return Message.messageToResponse(Message.ok().data("workspaces", workspaces));
+    }
+
+    @GET
+    @Path("/workspaces/{id}")
+    public Response getWorkspacesById(@Context HttpServletRequest req, @PathParam("id") Long id) {
+        DWSWorkspace workspace = dwsWorkspaceService.getWorkspacesById(id);
+        return Message.messageToResponse(Message.ok().data("workspace", workspace));
     }
 
     @GET
@@ -89,7 +100,7 @@ public class WorkspaceRestfulApi {
 
     @GET
     @Path("workspaces/{workspaceId}/managements")
-    public Response getWorkspaceManagements(@Context HttpServletRequest req, @PathParam("workspaceId")Long workspaceId) {
+    public Response getWorkspaceManagements(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
@@ -100,11 +111,45 @@ public class WorkspaceRestfulApi {
 
     @GET
     @Path("workspaces/{workspaceId}/applications")
-    public Response getWorkspaceApplications(@Context HttpServletRequest req, @PathParam("workspaceId")Long workspaceId) {
+    public Response getWorkspaceApplications(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
         List<OnestopMenuVo> applications = dwsWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
         return Message.messageToResponse(Message.ok().data("applications", applications));
+    }
+
+    @GET
+    @Path("/workspaces/{workspaceId}/favorites")
+    public Response getWorkspaceFavorites(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId) {
+        String header = req.getHeader("Content-language").trim();
+        boolean isChinese = "zh-CN".equals(header);
+        String username = SecurityFilter.getLoginUsername(req);
+        List<WorkspaceFavoriteVo> favorites = dwsWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese);
+        return Message.messageToResponse(Message.ok().data("favorites", favorites));
+    }
+
+    /**
+     * 应用加入收藏，返回收藏后id
+     *
+     * @param req
+     * @param json
+     * @return
+     */
+    @POST
+    @Path("/workspaces/{workspaceId}/favorites")
+    public Response addFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, JsonNode json) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
+        Long favoriteId = dwsWorkspaceService.addFavorite(username, workspaceId, menuApplicationId);
+        return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
+    }
+
+    @DELETE
+    @Path("/workspaces/{workspaceId}/favorites/{favouritesId}")
+    public Response deleteFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, @PathParam("favouritesId") Long favouritesId) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Long favoriteId = dwsWorkspaceService.deleteFavorite(username, favouritesId);
+        return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
     }
 }

@@ -311,11 +311,12 @@ export default {
         projectTaxonomyID: item.id,
         projectID: subItem.id,
         projectVersionID: subItem.latestVersion.id,
-        projectName: subItem.name
+        projectName: subItem.name,
+        workspaceId: this.$route.query.workspaceId
       }
       this.$router.push({
         name: 'Workflow',
-        query,
+        query
       });
       this.dispatch('IndexedDB:clearProjectCache');
       this.dispatch('IndexedDB:addProjectCache', {

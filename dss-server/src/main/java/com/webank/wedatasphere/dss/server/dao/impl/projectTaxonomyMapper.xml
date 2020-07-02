@@ -23,16 +23,16 @@
     <sql id="project_taxonomy">
         id, `name`,`description`,`creator_id`,`create_time`,`update_time`
     </sql>
-    <select id="selectProjectTaxonomyByID" resultType="com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy">
+    <select id="selectProjectTaxonomyByID" resultType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy">
         SELECT * FROM `dss_project_taxonomy` WHERE id = #{id}
     </select>
 
-    <select id="selectProjectTaxonomyRelationByTaxonomyIdOrProjectId" resultType="com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomyRelation">
+    <select id="selectProjectTaxonomyRelationByTaxonomyIdOrProjectId" resultType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomyRelation">
         SELECT taxonomy_id as taxonomyId , project_id as projectId ,  creator_id as creatorId
         FROM `dss_project_taxonomy_relation` WHERE  project_id = #{taxonomyIdOrProjectId}
     </select>
 
-    <select id="listProjectTaxonomyByUser" resultType="com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy">
+    <select id="listProjectTaxonomyByUser" resultType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy">
         SELECT
             pt.*
         FROM
@@ -54,13 +54,13 @@
         AND bdu.`name` = #{userName}
     </select>
 
-    <insert id="insertProjectTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy">
+    <insert id="insertProjectTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy">
         INSERT INTO dss_project_taxonomy (<include refid = "project_taxonomy" />)
         VALUES
         (#{id},#{name},#{description},#{creatorID},#{createTime},#{updateTime})
     </insert>
 
-    <update id="updateProjectTaxonomy" parameterType="com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy">
+    <update id="updateProjectTaxonomy" parameterType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy">
         UPDATE dss_project_taxonomy
         <trim prefix="set" suffixOverrides=",">
             <if test="name != null">name=#{name},</if>

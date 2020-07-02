@@ -18,7 +18,7 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.job
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.{SchedulerFlow, SchedulerNode}
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject
 import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
 import com.webank.wedatasphere.dss.flow.execution.entrance.{FlowContext, FlowContextImpl}
 import com.webank.wedatasphere.dss.flow.execution.entrance.listener.NodeRunnerListener
@@ -44,7 +44,7 @@ class FlowEntranceJob extends EntranceExecutionJob with NodeRunnerListener {
   private val flowContext: FlowContext = new FlowContextImpl
 
 
-   @BeanProperty   var dwsProject: DWSProject = _
+   @BeanProperty   var dwsProject: DSSProject = _
 
   def setFlow(flow: SchedulerFlow): Unit = this.flow = flow
 
@@ -80,7 +80,7 @@ class FlowEntranceJob extends EntranceExecutionJob with NodeRunnerListener {
 
   override def onStatusChanged(fromState: NodeExecutionState, toState: NodeExecutionState, node: SchedulerNode): Unit = {
 
-    val nodeName = node.getDWSNode.getName
+    val nodeName = node.getDssNode.getName
     toState match {
       case NodeExecutionState.Failed =>
         printLog(s"Failed to execute node($nodeName),prepare to kill flow job", "ERROR")

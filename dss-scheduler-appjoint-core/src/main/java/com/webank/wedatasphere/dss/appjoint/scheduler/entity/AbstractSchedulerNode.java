@@ -17,7 +17,7 @@
 
 package com.webank.wedatasphere.dss.appjoint.scheduler.entity;
 
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 
 import java.util.List;
 
@@ -26,65 +26,65 @@ import java.util.List;
  */
 public abstract class AbstractSchedulerNode implements SchedulerNode {
 
-    private DWSNode dwsNode;
+    private DSSNode dssNode;
 
     @Override
-    public DWSNode getDWSNode() {
-        return this.dwsNode;
+    public DSSNode getDssNode() {
+        return this.dssNode;
     }
 
     @Override
-    public void setDWSNode(DWSNode dwsNode) {
-        this.dwsNode = dwsNode;
+    public void setDssNode(DSSNode dssNode) {
+        this.dssNode = dssNode;
     }
 
     @Override
     public String getId() {
-        return dwsNode.getId();
+        return dssNode.getId();
     }
 
     @Override
     public void setId(String id) {
-        dwsNode.setId(id);
+        dssNode.setId(id);
     }
 
     @Override
     public String getNodeType() {
-        return dwsNode.getNodeType();
+        return dssNode.getNodeType();
     }
 
     @Override
     public void setNodeType(String nodeType) {
-        dwsNode.setNodeType(nodeType);
+        dssNode.setNodeType(nodeType);
     }
 
     @Override
     public String getName() {
-        return dwsNode.getName();
+        return dssNode.getName();
     }
 
     @Override
     public void setName(String name) {
-        dwsNode.setName(name);
+        dssNode.setName(name);
     }
 
     @Override
     public void addDependency(String nodeName) {
-        dwsNode.addDependency(nodeName);
+        dssNode.addDependency(nodeName);
     }
 
     @Override
     public void setDependency(List<String> dependency) {
-        dwsNode.setDependency(dependency);
+        dssNode.setDependency(dependency);
     }
 
     @Override
     public void removeDependency(String nodeName) {
-        dwsNode.removeDependency(nodeName);
+        dssNode.removeDependency(nodeName);
     }
 
     @Override
     public List<String> getDependencys() {
-        return dwsNode.getDependencys();
+        return dssNode.getDependencys();
     }
 }

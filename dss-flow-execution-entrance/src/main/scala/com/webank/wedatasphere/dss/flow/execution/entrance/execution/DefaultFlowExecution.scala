@@ -61,7 +61,7 @@ class DefaultFlowExecution extends FlowExecution with Logging {
             // submit node runner
             runningNodes.add(runner)
           } else {
-            info(s"This node ${runner.getNode.getDWSNode.getName} Skipped in execution")
+            info(s"This node ${runner.getNode.getDssNode.getName} Skipped in execution")
             runner.fromScheduledTunToState(NodeExecutionState.Skipped)
           }
         }

@@ -33,7 +33,7 @@
         id,`project_version_id`,`create_time`,`creator_id`,`update_time`,`comment`,`state`,`version_path`,`expire_time`
     </sql>
 
-    <select id="selectProjectByID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProject">
+    <select id="selectProjectByID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProject">
         SELECT
             p.*, MIN(ISNULL(pph.id)) AS 'is_not_publish'
         FROM
@@ -44,11 +44,11 @@
             p.id = #{id}
     </select>
 
-    <select id="selectLatestVersionByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion">
+    <select id="selectLatestVersionByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion">
         SELECT * FROM dss_project_version WHERE project_id = #{projectID} ORDER BY id DESC LIMIT 1
     </select>
     
-    <select id="selectProjectByVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProject">
+    <select id="selectProjectByVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProject">
         SELECT
             wp.*
         FROM
@@ -58,13 +58,13 @@
             wpv.id = #{projrctVersionID}
     </select>
 
-    <insert id="addProject" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.common.entity.project.DWSProject">
+    <insert id="addProject" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.common.entity.project.DSSProject">
         INSERT INTO dss_project (<include refid = "project_main" />)
         VALUES
         (#{id},#{name},#{source},#{description},#{orgID},#{visibility},#{isTransfer},#{initialOrgID},#{userID},#{createTime},#{createBy},#{product},#{applicationArea},#{business})
     </insert>
 
-    <insert id="addProjectVersion" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion" >
+    <insert id="addProjectVersion" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion" >
         INSERT INTO dss_project_version (<include refid = "project_version" />)
         VALUES
         (#{id},#{projectID},#{version},#{comment},#{updateTime},#{updatorID},#{lock})
@@ -76,11 +76,11 @@
         WHERE id = #{projectID}
     </update>
 
-<!--    <select id="listProjectVersionsByProjectID" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DWSProjectVersion">
+<!--    <select id="listProjectVersionsByProjectID" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DSSProjectVersion">
         SELECT * from dss_project_version WHERE project_id = #{projectID} ORDER BY version DESC
     </select>-->
 
-    <select id="listProjectVersionsByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion">
+    <select id="listProjectVersionsByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion">
         SELECT
             pv.*, u.`name` AS 'updator',
             (
@@ -126,11 +126,11 @@
         id = #{projectID}
     </delete>
 
-    <select id="selectProjectVersionByID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion">
+    <select id="selectProjectVersionByID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion">
         SELECT * from dss_project_version WHERE id = #{id}
     </select>
 
-    <select id="selectProjectVersionByProjectIDAndVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion">
+    <select id="selectProjectVersionByProjectIDAndVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion">
         SELECT *  from dss_project_version WHERE project_id = #{projectID} and version = #{version}
     </select>
 
@@ -138,7 +138,7 @@
       UPDATE `dss_project_version` set `lock` = `lock` +1  WHERE id= #{projectVersionID} AND `lock` = #{lock}
     </update>
 
-    <select id="selectProjectPublishHistoryByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectPublishHistory">
+    <select id="selectProjectPublishHistoryByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectPublishHistory">
         SELECT
             pph.*, u.`name` as 'creator'
         FROM
@@ -148,7 +148,7 @@
             pph.project_version_id = #{projectVersionID}
     </select>
 
-    <insert id="insertPublishHistory" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.project.DWSProjectPublishHistory">
+    <insert id="insertPublishHistory" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectPublishHistory">
         INSERT INTO dss_project_publish_history (<include refid = "project_publish" />)
         VALUES
         (#{id},#{projectVersionID},#{createTime},#{createID},#{updateTime},#{comment},#{state},#{versionPath},#{expireTime})

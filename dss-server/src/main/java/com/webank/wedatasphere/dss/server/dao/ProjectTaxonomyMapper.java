@@ -17,8 +17,8 @@
 
 package com.webank.wedatasphere.dss.server.dao;
 
-import com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy;
-import com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomyRelation;
+import com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy;
+import com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomyRelation;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -26,16 +26,16 @@ import java.util.List;
 
 
 public interface ProjectTaxonomyMapper {
-    DWSProjectTaxonomy selectProjectTaxonomyByID(Long id);
-    DWSProjectTaxonomyRelation selectProjectTaxonomyRelationByTaxonomyIdOrProjectId(Long taxonomyIdOrProjectId);
-    List<DWSProjectTaxonomy> listProjectTaxonomyByUser(String userName);
+    DSSProjectTaxonomy selectProjectTaxonomyByID(Long id);
+    DSSProjectTaxonomyRelation selectProjectTaxonomyRelationByTaxonomyIdOrProjectId(Long taxonomyIdOrProjectId);
+    List<DSSProjectTaxonomy> listProjectTaxonomyByUser(String userName);
 
     //--------------------
     List<Long> listProjectIDByTaxonomyID(@Param("taxonomyID") Long taxonomyID, @Param("userName") String userName);
 
-    void insertProjectTaxonomy(DWSProjectTaxonomy dwsProjectTaxonomy) throws DuplicateKeyException;
+    void insertProjectTaxonomy(DSSProjectTaxonomy dssProjectTaxonomy) throws DuplicateKeyException;
 
-    void updateProjectTaxonomy(DWSProjectTaxonomy dwsProjectTaxonomy) throws DuplicateKeyException;
+    void updateProjectTaxonomy(DSSProjectTaxonomy dssProjectTaxonomy) throws DuplicateKeyException;
 
     Long hasProjects(Long projectTaxonomyID);
 

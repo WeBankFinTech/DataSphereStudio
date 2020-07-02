@@ -3,10 +3,8 @@
     <div class="page-bgc-header">
       <div class="header-info">
         <h1>{{$t('message.project.infoHeader')}}</h1>
-        <p>{{$t('message.project.infoBodyFirstRow')}}</p>
-        <p>{{$t('message.project.infoBodySecondRow')}}</p>
       </div>
-      <feature @add-project="addProject"></feature>
+      <feature />
     </div>
     <template v-if="dataList.length > 0">
       <project-content-item
@@ -14,11 +12,13 @@
         :key="item.id"
         :hide-button-bar="false"
         :hide-publish-andcopy="false"
-        :data-list="item.dssProjectList"
+        :data-list="item.dwsProjectList"
         :current-data="item"
         :precent-list="precentList"
+        source="project"
         tag-prop="business"
         @goto="gotoWorkflow"
+        @add="addProject"
         @modify="projectModify"
         @delete="deleteProject"
         @copy="copyProject"
@@ -186,7 +186,7 @@ export default {
       return api.fetch(`/dss/tree`, {}, 'get').then((res) => {
         this.cacheData = res.data;
         this.dataList = this.cacheData;
-        this.activeItem = this.dataList[0];
+        // this.activeItem = this.dataList[0];
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t('message.project.updteTime');
         })
@@ -207,14 +207,14 @@ export default {
       let projectList = this.cacheData.filter((item) => {
         return item.id === projectData.taxonomyID;
       });
-      if (this.checkName(projectList[0].dssProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+      if (this.checkName(projectList[0].dwsProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addProject', projectData, 'post').then(() => {
           this.$Message.success(`${this.$t('message.project.createProject')}${this.$t('message.newConst.success')}`);
           this.getclassListData().then((data) => {
             // 新建完工程进到工作流页
-            const currentProject = data[0].dssProjectList.filter((project) => project.name === projectData.name)[0];
+            const currentProject = data[0].dwsProjectList.filter((project) => project.name === projectData.name)[0];
             this.$router.push({
               name: 'Workflow',
               query: {
@@ -331,7 +331,7 @@ export default {
         let tepArray = storage.get('projectList', 'local');
         this.dataList = tepArray.map((item) => {
           if (id === item.id) {
-            item.dssProjectList = item.dssProjectList.filter((subItem) => {
+            item.dwsProjectList = item.dwsProjectList.filter((subItem) => {
               return subItem.name.indexOf(event.target.value) != -1;
             });
           }
@@ -400,7 +400,7 @@ export default {
           let projectList = this.cacheData.filter((item) => {
             return item.id === this.currentProjectData.taxonomyID;
           });
-          if (this.checkName(projectList[0].dssProjectList, name, this.currentProjectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+          if (this.checkName(projectList[0].dwsProjectList, name, this.currentProjectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
         };
         this.dispatch('Project:copy', copyCheckName);
       } else if (this.currentForm === 'publishForm') {
@@ -492,7 +492,7 @@ export default {
       this.sortType[id] = name === 'updateTime' ? this.$t('message.project.updteTime') : this.$t('message.project.name')
       this.dataList = this.dataList.map((item) => {
         if (!id || id === item.id) {
-          item.dssProjectList = item.dssProjectList.sort((a, b) => {
+          item.dwsProjectList = item.dwsProjectList.sort((a, b) => {
             if (name === 'updateTime') {
               return b.latestVersion[name] - a.latestVersion[name];
             } else {

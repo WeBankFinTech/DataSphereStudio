@@ -8,6 +8,18 @@
       v-if="dataList.length > 0"
       class="content-item">
       <i-col
+        :xs="12" :sm="8" :md="6" :lg="4"
+        class="project-item ">
+        <div class="project-add" @click="add">
+          <Icon
+            type="ios-add"
+            class="icon-blod"
+            size="60"
+          ></Icon>
+          <span>{{$t(`message.${source}.create${source}`)}}</span>
+        </div>
+      </i-col>
+      <i-col
         class="project-item"
         :xs="12" :sm="8" :md="6" :lg="4"
         @click.native="goto(currentData, subitem)"
@@ -200,6 +212,10 @@ export default {
     tagProp: {
       type: String,
       default: 'business',
+    },
+    source: {
+      type: String,
+      default: 'Project'
     }
   },
   data() {
@@ -221,12 +237,12 @@ export default {
         return (this.pagination.current - 1) * this.pagination.size <= index && index < this.pagination.current * this.pagination.size;
       });
     },
-    pageNumer() {
+    pageNumber() {
       return Math.ceil(this.dataList.length / this.pagination.size);
     },
   },
   watch: {
-    pageNumer(val) {
+    pageNumber(val) {
       if (val < this.pagination.current && val !== 0) {
         this.pagination.current = val;
       }
@@ -256,6 +272,9 @@ export default {
     },
     publish(classifyId, project) {
       this.$emit('publish', classifyId, project);
+    },
+    add() {
+      this.$emit('add');
     },
     isPercent(id) {
       let flag = false;

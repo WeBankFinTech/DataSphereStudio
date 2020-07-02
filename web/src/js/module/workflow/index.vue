@@ -1,20 +1,11 @@
 <template>
   <div class="page-bgc">
-    <Row style="padding:20px 25px 10px">
-      <i-col
-        v-if="!myReadonly"
-        :xs="6" :sm="5" :md="4" :lg="4"
-        class="entry">
-        <div  @click="addProject">
-          <Icon
-            type="ios-add"
-            class="icon-blod"
-            size="25"
-          ></Icon>
-          <span>{{$t('message.workflow.createWorkflow')}}</span>
-        </div>
-      </i-col>
-    </Row>
+    <div class="page-bgc-header">
+      <div class="header-info">
+        <h1>{{$t('message.workflow.infoHeader')}}</h1>
+      </div>
+      <!-- <feature @add-project="addProject"></feature> -->
+    </div>
     <div>
       <template v-if="dataList.length > 0">
         <project-content-item
@@ -23,9 +14,11 @@
           :hide-button-bar="false"
           :hide-publish-andcopy="true"
           :current-data="item"
-          :data-list="item.dssFlowList"
+          :data-list="item.dwsFlowList"
           :readonly="myReadonly"
+          source="workflow"
           tag-prop="uses"
+          @add="addProject"
           @goto="gotoWorkflow"
           @detail="versionDetail"
           @modify="projectModify"
@@ -191,7 +184,7 @@ export default {
       let flowList = this.cacheData.filter((item) => {
         return item.id === projectData.taxonomyID;
       });
-      if (this.checkName(flowList[0].dssFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
+      if (this.checkName(flowList[0].dwsFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addFlow', projectData, 'post').then(() => {
@@ -363,8 +356,8 @@ export default {
         projectVersionID: +this.$route.query.projectVersionID,
       };
       for (let i = 0; i < this.dataList.length; i++) {
-        for (let j = 0; j < this.dataList[i].dssFlowList.length; j++) {
-          if (this.dataList[i].dssFlowList[j].id === project.id) {
+        for (let j = 0; j < this.dataList[i].dwsFlowList.length; j++) {
+          if (this.dataList[i].dwsFlowList[j].id === project.id) {
             this.flowTaxonomyID = this.dataList[i].id;
             break;
           }
@@ -385,7 +378,7 @@ export default {
         let tepArray = storage.get('flowsList');
         this.dataList = tepArray.map((item) => {
           if (id === item.id) {
-            item.dssFlowList = item.dssFlowList.filter((subItem) => {
+            item.dwsFlowList = item.dwsFlowList.filter((subItem) => {
               return subItem.name.indexOf(event.target.value) != -1;
             });
           }

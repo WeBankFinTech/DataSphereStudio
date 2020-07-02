@@ -22,7 +22,6 @@
             src="../../../assets/images/dssLogo6.png" :alt="$t('message.newConst.logoName')">
         </div>
       </div>
-      
       <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
       <span
         v-if="currentProject.id"
@@ -42,7 +41,7 @@
         <DropdownMenu slot="list" class="proj-list">
           <div v-for="proj in projectList" :key="proj.id">
             <div class="proj-name">{{ proj.name }}</div>
-            <div v-for="p in proj.dwsProjectList"
+            <div v-for="p in proj.dssProjectList"
               @click="changeProj(proj,p)"
               :key="proj.id+p.id"
               :class="{'active':p.id == currentProject.id}"
@@ -222,8 +221,8 @@ export default {
       let proj = {};
       if (projId) {
         this.projectList.forEach(item => {
-          if (item.dwsProjectList) {
-            item.dwsProjectList.forEach(p => {
+          if (item.dssProjectList) {
+            item.dssProjectList.forEach(p => {
               if(p.id == projId) {
                 proj = { ...p }
               }

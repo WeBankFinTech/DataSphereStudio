@@ -59,7 +59,7 @@ public class LinkisAzkabanNodePublishHook extends AbstractNodePublishHook {
     }
 
     private void writeNodeResourcesToLocal(SchedulerNode schedulerNode) throws DSSErrorException {
-        List<Resource> nodeResources = schedulerNode.getDWSNode().getResources();
+        List<Resource> nodeResources = schedulerNode.getDssNode().getResources();
         if(nodeResources == null || nodeResources.isEmpty()) {return;}
         FileOutputStream os = null;
         try {

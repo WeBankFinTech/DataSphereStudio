@@ -18,16 +18,16 @@
 package com.webank.wedatasphere.dss.server.publish;
 
 
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
 
 
 public class PublishSubmitJob extends PublishJob {
 
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
 
     private String comment;
 
-    public PublishSubmitJob(DWSProjectService projectService, String user, String comment, Long projectVersionID) {
+    public PublishSubmitJob(DSSProjectService projectService, String user, String comment, Long projectVersionID) {
         this.projectService = projectService;
         this.user = user;
         this.comment = comment;

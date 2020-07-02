@@ -19,18 +19,18 @@ package com.webank.wedatasphere.dss.appjoint.scheduler.parser;
 
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSJSONFlow;
 
 /**
  * Created by enjoyyin on 2019/9/7.
  */
 public interface FlowParser {
 
-    SchedulerFlow parseFlow(DWSJSONFlow flow);
+    SchedulerFlow parseFlow(DSSJSONFlow flow);
 
     void setNodeParsers(NodeParser[] nodeParsers);
 
     NodeParser[] getNodeParsers();
 
-    Boolean ifFlowCanParse(DWSJSONFlow flow);
+    Boolean ifFlowCanParse(DSSJSONFlow flow);
 }

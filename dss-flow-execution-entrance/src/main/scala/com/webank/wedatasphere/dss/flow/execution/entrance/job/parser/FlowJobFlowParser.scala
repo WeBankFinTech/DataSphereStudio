@@ -18,8 +18,8 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.job.parser
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.{AbstractSchedulerProject, SchedulerFlow}
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject
-import com.webank.wedatasphere.dss.common.protocol.RequestDWSProject
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject
+import com.webank.wedatasphere.dss.common.protocol.RequestDSSProject
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.FlowExecutionCode
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
@@ -52,8 +52,8 @@ class FlowJobFlowParser extends FlowEntranceJobParser with Logging {
     val code = flowEntranceJob.jobToExecuteRequest().code
     val flowExecutionCode = LinkisJobExecutionUtils.gson.fromJson(code, classOf[FlowExecutionCode])
 
-    getDWSProjectByCode(flowExecutionCode) match {
-      case dwsProject: DWSProject =>
+    getDSSProjectByCode(flowExecutionCode) match {
+      case dwsProject: DSSProject =>
 
         val project = this.flowExecutionProjectParser.parseProject(dwsProject)
 
@@ -76,8 +76,8 @@ class FlowJobFlowParser extends FlowEntranceJobParser with Logging {
     info(s"${flowEntranceJob.getId} finished to parse flow")
   }
 
-  private def getDWSProjectByCode(flowExecutionCode: FlowExecutionCode) = {
-    val req = new RequestDWSProject(flowExecutionCode.getFlowId, flowExecutionCode.getVersion, flowExecutionCode.getProjectVersionId)
+  private def getDSSProjectByCode(flowExecutionCode: FlowExecutionCode) = {
+    val req = new RequestDSSProject(flowExecutionCode.getFlowId, flowExecutionCode.getVersion, flowExecutionCode.getProjectVersionId)
     Sender.getSender(FlowExecutionEntranceConfiguration.SCHEDULER_APPLICATION.getValue).ask(req)
   }
 

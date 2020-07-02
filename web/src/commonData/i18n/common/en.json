@@ -808,6 +808,10 @@
             "clearCacheSuccess": "Successfully cleared local cache!",
             "comingSoon": "Not yet open source, please stay tuned!"
         },
+        "header": {
+            "home": "Home",
+            "console": "Console"
+        },
         "headerNavBar": {
             "Workflow": "Workflow Development",
             "Exchangis": "Data Exchange Component",
@@ -1060,7 +1064,8 @@
                 "cancel": "Cancel",
                 "running": "running",
                 "stop": "disable",
-                "searchPlaceholder": "Search application"
+                "searchPlaceholder": "Search application",
+                "tips": "No data or no addition"
             }
         },
         "database": {

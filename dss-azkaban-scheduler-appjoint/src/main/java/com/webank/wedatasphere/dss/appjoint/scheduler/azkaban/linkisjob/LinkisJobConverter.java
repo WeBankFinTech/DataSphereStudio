@@ -79,7 +79,7 @@ public class LinkisJobConverter {
     }
 
     private void convertDependencies(LinkisAzkabanSchedulerNode schedulerNode,LinkisJob job){
-        List<String> dependencys = schedulerNode.getDWSNode().getDependencys();
+        List<String> dependencys = schedulerNode.getDssNode().getDependencys();
         if(dependencys != null && !dependencys.isEmpty()) {
             StringBuilder dependencies = new StringBuilder();
             dependencys.forEach(d ->dependencies.append(d + ","));
@@ -88,12 +88,12 @@ public class LinkisJobConverter {
     }
 
     private void convertProxyUser(LinkisAzkabanSchedulerNode schedulerNode,LinkisJob job){
-        String userProxy = schedulerNode.getDWSNode().getUserProxy();
+        String userProxy = schedulerNode.getDssNode().getUserProxy();
         if(!StringUtils.isEmpty(userProxy)) job.setProxyUser(userProxy);
     }
 
     private void convertConfiguration(LinkisAzkabanSchedulerNode schedulerNode,LinkisJob job){
-        Map<String, Object> params = schedulerNode.getDWSNode().getParams();
+        Map<String, Object> params = schedulerNode.getDssNode().getParams();
         if (params != null && !params.isEmpty()) {
             Object configuration = params.get("configuration");
             String confprefix = "node.conf.";
@@ -103,7 +103,7 @@ public class LinkisJobConverter {
     }
 
     private void convertJobCommand(LinkisAzkabanSchedulerNode schedulerNode,LinkisJob job){
-        Map<String, Object> jobContent = schedulerNode.getDWSNode().getJobContent();
+        Map<String, Object> jobContent = schedulerNode.getDssNode().getJobContent();
         if(jobContent != null) {
             jobContent.remove("jobParams");
             job.setCommand(new Gson().toJson(jobContent));

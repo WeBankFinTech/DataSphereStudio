@@ -72,6 +72,7 @@ export default {
   },
   methods: {
     goto(type) {
+      console.log('--->', type)
       this.gotoCommonIframe(type);
     },
     createProject() {

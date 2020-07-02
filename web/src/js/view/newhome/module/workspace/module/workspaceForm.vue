@@ -1,7 +1,7 @@
 <template>
   <Modal
     v-model="ProjectShow"
-    :title="actionType === 'add' ? $t('message.workspace.NEWWORKSPACE') : $t('message.workspace.EIDITOR')"
+    :title="actionType === 'add' ? $t('message.workspace.newWorkspace') : $t('message.workspace.editor')"
     :closable="false">
     <Form
       :label-width="100"
@@ -11,49 +11,42 @@
       :rules="formValid"
       v-if="ProjectShow">
       <FormItem
-        :label="$t('message.workspace.WORKNAME')"
-        prop="workspaceName">
+        :label="$t('message.workspace.workName')"
+        prop="name">
         <Input
-          v-model="projectDataCurrent.workspaceName"
+          v-model="projectDataCurrent.name"
           :placeholder="$t('message.newConst.enterName')"
-          :disabled="actionType === 'modify'"></Input>
+          :disabled="actionType === 'modify'" />
       </FormItem>
       <FormItem
-        :label="$t('message.workspace.DEPARTMNET')"
+        :label="$t('message.workspace.department')"
         prop="department">
         <Select
           v-model="projectDataCurrent.department"
-          :placeholder="$t('message.workspace.SELECTDEPARTMNET')">
+          :placeholder="$t('message.workspace.selectDepartment')">
           <Option
             v-for="(item, index) in departments"
-            :label="item.frontName"
-            :value="item.frontName"
+            :label="item.name"
+            :value="String(item.id)"
             :key="index"/>
         </Select>
       </FormItem>
       <FormItem
-        :label="$t('message.workspace.PRODUCT')"
-        prop="productName">
-        <Input
-          v-model="projectDataCurrent.productName"
-          :placeholder="$t('message.workspace.ENTERPRODUCTNAME')"></Input>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workspace.LABEL')"
-        prop="business">
+        :label="$t('message.workspace.label')"
+        prop="label">
         <we-tag
-          :new-label="$t('message.project.addBusiness')"
-          :tag-list="projectDataCurrent.tags"
+          :new-label="$t('message.workspace.addLabel')"
+          :tag-list="projectDataCurrent.label"
           @add-tag="addTag"
           @delete-tag="deleteTag"></we-tag>
       </FormItem>
       <FormItem
-        :label="$t('message.workspace.DESCRIPTION')"
+        :label="$t('message.workspace.description')"
         prop="description">
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
-          :placeholder="$t('message.project.pleaseInputProjectDesc')"></Input>
+          :placeholder="$t('message.workspace.pleaseInputWorkspaceDesc')" />
       </FormItem>
     </Form>
     <div slot="footer">
@@ -93,7 +86,6 @@ export default {
     return {
       ProjectShow: false,
       departments: [],
-      originBusiness: '',
     };
   },
   computed: {
@@ -102,40 +94,44 @@ export default {
     },
     formValid() {
       return {
-        workspaceName: [
+        name: [
           { required: true, message: this.$t('message.newConst.enterName'), trigger: 'blur' },
           { message: `${this.$t('message.newConst.nameLength')}128`, max: 128 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.newConst.validNameDesc'), trigger: 'blur' },
+          { validator: this.checkNameExist, message: this.$t('message.newConst.validNameExist'), trigger: 'blur' },
         ],
         description: [
-          { required: true, message: this.$t('message.project.pleaseInputProjectDesc'), trigger: 'blur' },
-        ],
-        productName: [
-          { required: true, message: this.$t('message.project.selectProduct'), trigger: 'change' },
+          { required: true, message: this.$t('message.workspace.pleaseInputWorkspaceDesc'), trigger: 'blur' },
         ],
         department: [
-          { required: true, message: this.$t('message.project.selectAppArea'), trigger: 'change', type: 'string' },
+          { required: true, message: this.$t('message.workspace.selectDepartment'), trigger: 'change' },
         ],
       }
     }
   },
   mounted() {
-    api.fetch('/dss/listDepartments', 'get').then((res) => {
-      this.departments = res.departments
-    })
+    api.fetch('dss/workspaces/departments', 'get').then((res) => {
+      this.departments = res.departments;
+    });
   },
   watch: {
     addProjectShow(val) {
       this.ProjectShow = val;
     },
     ProjectShow(val) {
-      if (val) {
-        this.originBusiness = this.projectDataCurrent.tags;
-      }
       this.$emit('show', val);
     },
   },
   methods: {
+    checkNameExist(rule, value, callback) {
+      api.fetch('dss/workspaces/exists', { name: value }, 'get').then((res) => {
+        if (res.workspaceNameExists) {
+          callback(new Error('不可重复'));
+        } else {
+          callback();
+        }
+      });
+    },
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
@@ -148,20 +144,19 @@ export default {
     },
     Cancel() {
       this.ProjectShow = false;
-      this.projectData.tags = this.originBusiness;
     },
     addTag(label) {
-      if (this.projectDataCurrent.tags) {
-        this.projectDataCurrent.tags += `,${label}`;
+      if (this.projectDataCurrent.label) {
+        this.projectDataCurrent.label += `,${label}`;
       } else {
-        this.projectDataCurrent.tags = label;
+        this.projectDataCurrent.label = label;
       }
     },
     deleteTag(label) {
-      const tmpArr = this.projectDataCurrent.tags.split(',');
+      const tmpArr = this.projectDataCurrent.label.split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.projectData.tags = tmpArr.toString();
+      this.projectData.label = tmpArr.toString();
     }
   },
 };

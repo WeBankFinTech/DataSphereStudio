@@ -365,7 +365,7 @@ export default {
       });
     },
     getExecuteData(option, id) {
-      this.script.executionCode = isString(option) ? option : this.script.data;
+      this.script.executionCode = isString(option.code) ? option.code : this.script.data;
       let initData = {
         method: '/api/rest_j/v1/entrance/execute',
         websocketTag: this.work.id,

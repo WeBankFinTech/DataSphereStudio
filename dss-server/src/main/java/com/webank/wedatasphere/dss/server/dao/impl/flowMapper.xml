@@ -29,11 +29,11 @@
         id,`flow_id`,`source`,`version`,`json_path`,`comment`,`update_time`,`updator_id`,`project_version_id`
     </sql>
 
-    <select id="selectFlowByID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlow">
+    <select id="selectFlowByID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlow">
         SELECT * FROM `dss_flow` WHERE id = #{id}
     </select>
 
-    <select id="listFlowByTaxonomyID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlow">
+    <select id="listFlowByTaxonomyID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlow">
         SELECT
         f.*
         FROM
@@ -44,7 +44,7 @@
         AND f.project_id=#{projectID}
     </select>
 
-<!--    <select id="listFlowByTaxonomyID" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DWSFlow">
+<!--    <select id="listFlowByTaxonomyID" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DSSFlow">
         SELECT
             f.*
         FROM
@@ -53,7 +53,7 @@
         WHERE
             ftr.taxonomy_id = #{taxonomyID} AND f.is_root_flow = #{isRootFlow}
     </select>-->
-    <!--<resultMap id="flowWithVersionsMap" type="com.webank.bdp.dataworkcloud.wtss.entity.DWSFlow">
+    <!--<resultMap id="flowWithVersionsMap" type="com.webank.bdp.dataworkcloud.wtss.entity.DSSFlow">
         <id column="id" property="id"/>
         <collection property="versions" column="id" select="test"/>
     </resultMap>
@@ -67,11 +67,11 @@
         ftr.taxonomy_id = #{taxonomyID} AND f.is_root_flow = #{isRootFlow}
     </select>
 
-    <select id="test" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DWSFlowVersion">
+    <select id="test" resultType="com.webank.bdp.dataworkcloud.wtss.entity.DSSFlowVersion">
         SELECT * FROM  dss_flow_version fv WHERE fv.flow_id = #{id}
     </select>-->
 
-    <select id="listFlowVersionsByFlowID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <select id="listFlowVersionsByFlowID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         SELECT
             fv.*, bdu.`name` AS 'updator',
             ISNULL(fph.id) AS 'is_not_published'
@@ -86,19 +86,19 @@
 
 
 
-    <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlow">
+    <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlow">
         INSERT INTO dss_flow (<include refid = "flow_main" />)
         VALUES
         (#{id},#{name},#{state},#{source},#{description},#{createTime},#{creatorID},#{isRootFlow},#{rank},#{projectID},#{hasSaved},#{uses})
     </insert>
 
-    <insert id="insertFlowVersion" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <insert id="insertFlowVersion" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         INSERT INTO dss_flow_version (<include refid = "flow_version" />)
         VALUES
         (#{id},#{flowID},#{source},#{version},#{jsonPath},#{comment},#{updateTime},#{updatorID},#{projectVersionID})
     </insert>
 
-    <insert id="batchInsertFlowVersion" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <insert id="batchInsertFlowVersion" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         INSERT INTO dss_flow_version
         ( `flow_id`,`source`,`version`,`json_path`,`comment`,`update_time`,`updator_id`,`project_version_id`)
         VALUES
@@ -107,7 +107,7 @@
         </foreach>
     </insert>
 
-    <update id="batchUpdateFlowVersion" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <update id="batchUpdateFlowVersion" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
           <foreach collection="flowVersions" item="fv" index="index" open="" close="" separator=";">
             UPDATE dss_flow_version
               <set> source= #{fv.source} </set>
@@ -127,7 +127,7 @@
         (#{flowID},#{parentFlowID})
     </insert>
 
-    <select id="selectVersionByFlowID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <select id="selectVersionByFlowID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         SELECT
             fv.*, bdu.`name` AS 'updator',
             ISNULL(fph.id) AS 'is_not_published'
@@ -141,7 +141,7 @@
         AND fv.project_version_id = #{projectVersionID}
     </select>
 
-    <update id="updateFlowBaseInfo" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlow">
+    <update id="updateFlowBaseInfo" parameterType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlow">
         UPDATE dss_flow
         <trim prefix="set" suffixOverrides=",">
             <if test="name != null">name=#{name},</if>
@@ -186,7 +186,7 @@
             flow_id = #{flowID}
     </select>
 
-    <select id="listFlowByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlow">
+    <select id="listFlowByProjectID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlow">
         SELECT
         *
         FROM
@@ -195,7 +195,7 @@
         project_id = #{projectID}
     </select>
 
-    <select id="listVersionByFlowIDAndProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <select id="listVersionByFlowIDAndProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         SELECT
             fv.*, bdu.`name` AS 'updator',
             ISNULL(fph.id) AS 'is_not_published'
@@ -218,7 +218,7 @@
         LIMIT 1
     </select>
 
-    <select id="listLastFlowVersionsByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion" >
+    <select id="listLastFlowVersionsByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion" >
         select <include refid = "flow_version" />
         from dss_flow_version as fv
         where  version =
@@ -228,7 +228,7 @@
         and fv.flow_id=flow_id    ) ;
     </select>
 
-    <select id="listLatestRootFlowVersionByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion">
+    <select id="listLatestRootFlowVersionByProjectVersionID" resultType="com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion">
         SELECT
             fv.*
         FROM

@@ -19,16 +19,16 @@ package com.webank.wedatasphere.dss.server.restful;
 
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.server.dao.DWSUserMapper;
+import com.webank.wedatasphere.dss.server.dao.DSSUserMapper;
 import com.webank.wedatasphere.dss.server.dao.ProjectMapper;
 import com.webank.wedatasphere.dss.server.entity.ApplicationArea;
 import com.webank.wedatasphere.dss.server.publish.*;
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
-import com.webank.wedatasphere.dss.server.service.DWSProjectTaxonomyService;
-import com.webank.wedatasphere.dss.server.service.DWSUserService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectTaxonomyService;
+import com.webank.wedatasphere.dss.server.service.DSSUserService;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.codehaus.jackson.JsonNode;
@@ -53,11 +53,11 @@ import java.util.concurrent.Future;
 public class ProjectRestfulApi {
 
     @Autowired
-    private DWSProjectTaxonomyService projectTaxonomyService;
+    private DSSProjectTaxonomyService projectTaxonomyService;
     @Autowired
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
     @Autowired
-    private DWSUserService dwsUserService;
+    private DSSUserService dssUserService;
     @Autowired
     private ProjectMapper projectMapper;
     @Autowired
@@ -66,12 +66,12 @@ public class ProjectRestfulApi {
     private PublishManager publishManager;
 
     @Autowired
-    private DWSUserMapper dwsUserMapper;
+    private DSSUserMapper dssUserMapper;
 
     @GET
     @Path("/listAllProjectVersions")
     public Response listAllVersions(@Context HttpServletRequest req, @QueryParam("id") Long projectID) {
-        List<DWSProjectVersion> versions = projectService.listAllProjectVersions(projectID);
+        List<DSSProjectVersion> versions = projectService.listAllProjectVersions(projectID);
         return Message.messageToResponse(Message.ok().data("versions", versions));
     }
 
@@ -144,7 +144,7 @@ public class ProjectRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         Long projectID = json.get("projectID").getLongValue();
         String projectName = json.get("projectName") == null ? null : json.get("projectName").getTextValue();
-        DWSProjectVersion maxVersion = projectMapper.selectLatestVersionByProjectID(projectID);
+        DSSProjectVersion maxVersion = projectMapper.selectLatestVersionByProjectID(projectID);
         projectService.copyProject( maxVersion.getId(),projectID, projectName, userName);
         return Message.messageToResponse(Message.ok());
     }
@@ -154,8 +154,8 @@ public class ProjectRestfulApi {
     public Response copyProjectVersion(@Context HttpServletRequest req, JsonNode json) throws InterruptedException, DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         Long copyprojectVersionID = json.get("projectVersionID").getLongValue();
-        DWSProjectVersion currentVersion = projectMapper.selectProjectVersionByID(copyprojectVersionID);
-        DWSProjectVersion maxVersion = projectMapper.selectLatestVersionByProjectID(currentVersion.getProjectID());
+        DSSProjectVersion currentVersion = projectMapper.selectProjectVersionByID(copyprojectVersionID);
+        DSSProjectVersion maxVersion = projectMapper.selectLatestVersionByProjectID(currentVersion.getProjectID());
 
         projectService.copyProjectVersionMax( maxVersion.getId(), maxVersion,currentVersion,userName,null);
         return Message.messageToResponse(Message.ok());
@@ -167,8 +167,8 @@ public class ProjectRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         Long projectID = json.get("id").getLongValue();
         String comment = json.get("comment").getTextValue();
-        DWSProject latestVersionProject = projectService.getLatestVersionProject(projectID);
-        publishManager.addPublishCache(latestVersionProject.getLatestVersion().getId(),dwsUserService.getUserID(userName),comment);
+        DSSProject latestVersionProject = projectService.getLatestVersionProject(projectID);
+        publishManager.addPublishCache(latestVersionProject.getLatestVersion().getId(), dssUserService.getUserID(userName),comment);
         PublishSubmitJob job = publishJobFactory.createSubmitPublishJob(latestVersionProject.getLatestVersion().getId(), userName, comment);
         Future<?> submit = PublishThreadPool.get().submit(job);
         PublishSubmitJobDeamon deamon = publishJobFactory.createSubmitPublishJobDeamon(submit, job);

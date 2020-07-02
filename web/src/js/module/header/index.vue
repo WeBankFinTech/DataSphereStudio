@@ -23,7 +23,7 @@
         </div>
       </div>
       
-      <workspaceMenu v-if="isShowWorkspaceMenu" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
+      <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
       <span
         v-if="currentProject.id"
         class="proj-select"
@@ -52,9 +52,9 @@
           </div>
         </DropdownMenu>
       </Dropdown>
-      <ul v-if="$route.query&&$route.query.workspaceId" class="menu">
-        <li class="menu-item" @click="goSpaceHome">首页</li>
-        <li class="menu-item" @click="goConsole">控制台</li>
+      <ul class="menu">
+        <li v-if="this.$route.query && this.$route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.header.home")}}</li>
+        <li class="menu-item" @click="goConsole">{{$t("message.header.console")}}</li>
       </ul>
       <div
         v-clickoutside="handleOutsideClick"
@@ -162,10 +162,7 @@ export default {
   },
   methods: {
     isShowWorkspaceMenu(){
-      return (!this.currentProject.id && this.isShowHomeNav());
-    },
-    isShowHomeNav(){
-      return (this.$route.query && this.$route.query.workspaceId|| this.$route.path.indexOf('workspace')!==-1);
+      return (!this.currentProject.id && (this.$route.query && this.$route.query.workspaceId) && this.$route.path.indexOf('workflow')===-1 );
     },
     init() {
       api.fetch('/dss/getBaseInfo', 'get').then((rst) => {

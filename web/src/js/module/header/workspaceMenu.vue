@@ -1,5 +1,5 @@
 <template>
-  <span v-if="currentProject.id">    
+  <span>    
     <span
       class="proj-select"
     >

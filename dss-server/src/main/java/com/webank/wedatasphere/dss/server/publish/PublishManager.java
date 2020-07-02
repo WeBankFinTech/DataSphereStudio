@@ -18,8 +18,8 @@
 package com.webank.wedatasphere.dss.server.publish;
 
 
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProjectPublishHistory;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProjectPublishHistory;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.linkis.common.utils.Utils;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class PublishManager implements PublishListner {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
 
     private Map<Long, PublishProjectCache> cacheMap = new ConcurrentHashMap<>();
 
@@ -105,7 +105,7 @@ public class PublishManager implements PublishListner {
         if (cacheMap.get(projectVersionID) == null) {
             synchronized (cacheMap) {
                 if (cacheMap.get(projectVersionID) == null) {
-                    DWSProjectPublishHistory history = projectService.getPublishHistoryByID(projectVersionID);
+                    DSSProjectPublishHistory history = projectService.getPublishHistoryByID(projectVersionID);
                     if (history == null) {
                         logger.info("创建一个发布job" + projectVersionID);
                         projectService.createPublishHistory(comment, creatorID, projectVersionID);

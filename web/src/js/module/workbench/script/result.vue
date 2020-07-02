@@ -17,9 +17,12 @@
       :style="{'height': resultHeight}"
       class="text-result-div">
       <div v-if="result.bodyRows">
-        <div
-          v-for="(row, index) in result.bodyRows.split('\n')"
-          :key="index">{{ row }}</div>
+        <!-- 数据格式不统一，先循环外部数据，再循环内部 -->
+        <div v-for="(item,index) in result.bodyRows" :key="index">
+          <div
+            v-for="(row, subindex) in item[0].split('\n')"
+            :key="subindex">{{ row }}</div>
+        </div>
       </div>
       <span
         v-else

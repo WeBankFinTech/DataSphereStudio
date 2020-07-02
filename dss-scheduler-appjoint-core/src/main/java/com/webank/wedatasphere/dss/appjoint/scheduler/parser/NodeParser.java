@@ -18,14 +18,14 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.order.Order;
 
 /**
  * Created by enjoyyin on 2019/9/7.
  */
 public interface NodeParser extends Order {
-    SchedulerNode parseNode(DWSNode dwsNode);
+    SchedulerNode parseNode(DSSNode dssNode);
 
-    Boolean ifNodeCanParse(DWSNode dwsNode);
+    Boolean ifNodeCanParse(DSSNode dssNode);
 }

@@ -9,7 +9,7 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.AbstractFlowTuning;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.NodeTuning;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNodeDefault;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class LinkisAzkabanFlowTuning extends AbstractFlowTuning {
     }
 
     private SchedulerFlow addEndNodeForFlowName(SchedulerFlow flow) {
-        DWSNodeDefault endNode = new DWSNodeDefault();
+        DSSNodeDefault endNode = new DSSNodeDefault();
         List<SchedulerNode> endNodeList = getFlowEndJobList(flow);
         endNode.setId(flow.getName() + "_");
         endNode.setName(flow.getName() + "_");
@@ -70,7 +70,7 @@ public class LinkisAzkabanFlowTuning extends AbstractFlowTuning {
             endNodeList.forEach(tmpNode -> endNode.addDependency(tmpNode.getName()));
         }
         LinkisAzkabanSchedulerNode azkabanSchedulerNode = new LinkisAzkabanSchedulerNode();
-        azkabanSchedulerNode.setDWSNode(endNode);
+        azkabanSchedulerNode.setDssNode(endNode);
         flow.getSchedulerNodes().add((azkabanSchedulerNode));
         return flow;
     }
@@ -80,7 +80,7 @@ public class LinkisAzkabanFlowTuning extends AbstractFlowTuning {
         for (SchedulerNode job : flow.getSchedulerNodes()) {
             int flag = 0;
             for (SchedulerEdge link : flow.getSchedulerEdges()) {
-                if (job.getId().equals(link.getDWSEdge().getSource())) {
+                if (job.getId().equals(link.getDssEdge().getSource())) {
                     flag = 1;
                 }
             }

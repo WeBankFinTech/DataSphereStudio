@@ -18,8 +18,8 @@
 package com.webank.wedatasphere.dss.server.dao;
 
 
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -27,23 +27,23 @@ import java.util.List;
 
 
 public interface FlowMapper {
-    DWSFlow selectFlowByID(Long id);
+    DSSFlow selectFlowByID(Long id);
 
-    List<DWSFlow> listFlowByTaxonomyID(@Param("projectID") Long projectID, @Param("taxonomyID") Long taxonomyID, @Param("isRootFlow") Boolean isRootFlow);
+    List<DSSFlow> listFlowByTaxonomyID(@Param("projectID") Long projectID, @Param("taxonomyID") Long taxonomyID, @Param("isRootFlow") Boolean isRootFlow);
 
-    List<DWSFlowVersion> listFlowVersionsByFlowID(@Param("flowID") Long flowID, @Param("projectVersionID") Long projectVersionID);
+    List<DSSFlowVersion> listFlowVersionsByFlowID(@Param("flowID") Long flowID, @Param("projectVersionID") Long projectVersionID);
 
-    void insertFlow(DWSFlow dwsFlow) throws DuplicateKeyException;
+    void insertFlow(DSSFlow dssFlow) throws DuplicateKeyException;
 
-    void insertFlowVersion(DWSFlowVersion version);
+    void insertFlowVersion(DSSFlowVersion version);
 
-    void batchInsertFlowVersion(@Param("flowVersions") List<DWSFlowVersion> flowVersions);
+    void batchInsertFlowVersion(@Param("flowVersions") List<DSSFlowVersion> flowVersions);
 
     void insertFlowRelation(@Param("flowID") Long flowID, @Param("parentFlowID") Long parentFlowID);
 
-    DWSFlowVersion selectVersionByFlowID(@Param("flowID") Long flowID, @Param("version") String version, @Param("projectVersionID") Long projectVersionID);
+    DSSFlowVersion selectVersionByFlowID(@Param("flowID") Long flowID, @Param("version") String version, @Param("projectVersionID") Long projectVersionID);
 
-    void updateFlowBaseInfo(DWSFlow dwsFlow) throws DuplicateKeyException;
+    void updateFlowBaseInfo(DSSFlow dssFlow) throws DuplicateKeyException;
 
     List<Long> selectSubFlowIDByParentFlowID(Long parentFlowID);
 
@@ -55,17 +55,17 @@ public interface FlowMapper {
 
     Long selectParentFlowIDByFlowID(Long flowID);
 
-    List<DWSFlow> listFlowByProjectID(Long projectID);
+    List<DSSFlow> listFlowByProjectID(Long projectID);
 
-    List<DWSFlowVersion> listVersionByFlowIDAndProjectVersionID(@Param("flowID") Long flowID, @Param("projectVersionID") Long projectVersionID);
+    List<DSSFlowVersion> listVersionByFlowIDAndProjectVersionID(@Param("flowID") Long flowID, @Param("projectVersionID") Long projectVersionID);
 
     Boolean noVersions(Long flowID);
 
-    List<DWSFlowVersion> listLastFlowVersionsByProjectVersionID(@Param("projectVersionID") Long projectVersionId);
+    List<DSSFlowVersion> listLastFlowVersionsByProjectVersionID(@Param("projectVersionID") Long projectVersionId);
 
-    List<DWSFlowVersion> listLatestRootFlowVersionByProjectVersionID(Long projectVersionID);
+    List<DSSFlowVersion> listLatestRootFlowVersionByProjectVersionID(Long projectVersionID);
 
-    void batchUpdateFlowVersion(List<DWSFlowVersion> flowVersions);
+    void batchUpdateFlowVersion(List<DSSFlowVersion> flowVersions);
 
     Long getParentFlowID(Long flowID);
 }

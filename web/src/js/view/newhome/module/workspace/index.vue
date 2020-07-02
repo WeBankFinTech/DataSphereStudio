@@ -60,7 +60,6 @@
                     <li v-if="tag && tagIndex <= 2"  class="item" :key="tagIndex">{{tag}}</li>
                   </template>
                 </ul>
-                <!-- <Button size="small" class="editor" @click.stop="editor(item)">{{ $t('message.workspace.editWorkspace') }}</Button> -->
               </i-col>
             </Row>
             <div v-show="visual === 'table'" class="workspace-table">
@@ -103,6 +102,16 @@
       :add-project-show="workspaceShow"
       @show="workspaceShowAction"
       @confirm="workspaceConfirm"></WorkspaceForm>
+    <Modal
+      v-model="showVideo"
+      :title="video.title"
+      :footer-hide="true"
+      width="800"
+    >
+      <video v-if="showVideo" width="100%" controls autoplay>
+        <source :src="video.url" type="video/mp4" />
+      </video>
+    </Modal>
     <Spin
       v-if="loading"
       size="large"
@@ -125,6 +134,7 @@ export default {
   data() {
     return {
       loading: false,
+      showVideo: false,
       actionType: '',
       currentWorkspaceData: {
         name: '',
@@ -137,6 +147,7 @@ export default {
       cacheData: [],
       filteredData: [],
       visual: 'card',
+      video: {},
       videos: [],
       videoCache: [],
       visualCates: [
@@ -253,6 +264,10 @@ export default {
       } else {
         this.videos = this.videoCache.slice(0, this.pageSize);
       }
+    },
+    play(item) {
+      this.showVideo = true;
+      this.video = item
     }
   }
 }

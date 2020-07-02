@@ -18,7 +18,7 @@
 package com.webank.wedatasphere.dss.application.handler;
 
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
-import com.webank.wedatasphere.dss.application.service.DSSUserService;
+import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class UserFirstLoginHandler implements Handler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private DSSUserService dssUserService;
+    private DSSApplicationUserService dssApplicationUserService;
 
     @Override
     public int getOrder() {
@@ -44,7 +44,7 @@ public class UserFirstLoginHandler implements Handler {
     public void handle(DSSUser user) {
         logger.info("UserFirstLoginHandler:");
         synchronized (user.getUsername().intern()){
-            DSSUser userDb = dssUserService.getUserByName(user.getUsername());
+            DSSUser userDb = dssApplicationUserService.getUserByName(user.getUsername());
             if(userDb == null){
                 logger.info("User first enter dss, insert table dss_user");
                 userDb = new DSSUser();
@@ -52,7 +52,7 @@ public class UserFirstLoginHandler implements Handler {
                 userDb.setName(user.getName());
                 userDb.setFirstLogin(true);
                 userDb.setId(user.getId());
-                dssUserService.registerDSSUser(userDb);
+                dssApplicationUserService.registerDssUser(userDb);
             }
             // TODO: 2019/11/29 update  firstLogin
             user = userDb;

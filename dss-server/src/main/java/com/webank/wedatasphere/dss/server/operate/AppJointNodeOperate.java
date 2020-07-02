@@ -20,11 +20,10 @@ package com.webank.wedatasphere.dss.server.operate;
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.execution.core.CommonAppJointNode;
-import com.webank.wedatasphere.dss.appjoint.service.NodeService;
 import com.webank.wedatasphere.dss.server.function.FunctionInvoker;
 import com.webank.wedatasphere.dss.server.function.FunctionPool;
 import com.webank.wedatasphere.dss.server.function.NodeServiceFunction;
-import com.webank.wedatasphere.dss.server.service.DWSFlowService;
+import com.webank.wedatasphere.dss.server.service.DSSFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,17 +40,17 @@ public class AppJointNodeOperate implements Operate {
     }
 
     @Override
-    public void add(DWSFlowService dwsFlowService, Op op) throws AppJointErrorException {
+    public void add(DSSFlowService dssFlowService, Op op) throws AppJointErrorException {
         invokeNodeServiceFunction(op,FunctionPool.createNode);
     }
 
     @Override
-    public void update(DWSFlowService dwsFlowService,Op op) throws AppJointErrorException {
+    public void update(DSSFlowService dssFlowService, Op op) throws AppJointErrorException {
         invokeNodeServiceFunction(op,FunctionPool.updateNode);
     }
 
     @Override
-    public void delete(DWSFlowService dwsFlowService,Op op) throws AppJointErrorException {
+    public void delete(DSSFlowService dssFlowService, Op op) throws AppJointErrorException {
         invokeNodeServiceFunction(op, FunctionPool.deleteNode);
     }
 
@@ -64,7 +63,4 @@ public class AppJointNodeOperate implements Operate {
         node.setNodeType(op.getNodeType());
         functionInvoker.nodeServiceFunction(userName,op.getParams(),node,function);
     }
-
-
-
 }

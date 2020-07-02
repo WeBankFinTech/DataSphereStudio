@@ -18,9 +18,9 @@
 package com.webank.wedatasphere.dss.server.restful;
 
 
-import com.webank.wedatasphere.dss.server.service.DWSProjectTaxonomyService;
-import com.webank.wedatasphere.dss.server.service.DWSUserService;
-import com.webank.wedatasphere.dss.server.entity.DWSProjectTaxonomy;
+import com.webank.wedatasphere.dss.server.service.DSSProjectTaxonomyService;
+import com.webank.wedatasphere.dss.server.service.DSSUserService;
+import com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
@@ -46,9 +46,9 @@ import java.util.Date;
 public class ProjectTaxonomyRestfulApi {
 
     @Autowired
-    private DWSProjectTaxonomyService projectTaxonomyService;
+    private DSSProjectTaxonomyService projectTaxonomyService;
     @Autowired
-    private DWSUserService dwsUserService;
+    private DSSUserService dssUserService;
 
     @POST
     @Path("/addProjectTaxonomy")
@@ -57,14 +57,14 @@ public class ProjectTaxonomyRestfulApi {
         String name = json.get("name").getTextValue();
         String description = json.get("description").getTextValue();
         // TODO: 2019/5/16 空值校验，重复名校验
-        DWSProjectTaxonomy dwsProjectTaxonomy = new DWSProjectTaxonomy();
+        DSSProjectTaxonomy dssProjectTaxonomy = new DSSProjectTaxonomy();
         Date date = new Date();
-        dwsProjectTaxonomy.setName(name);
-        dwsProjectTaxonomy.setDescription(description);
-        dwsProjectTaxonomy.setCreatorID(dwsUserService.getUserID(userName));
-        dwsProjectTaxonomy.setCreateTime(date);
-        dwsProjectTaxonomy.setUpdateTime(date);
-        projectTaxonomyService.addProjectTaxonomy(dwsProjectTaxonomy);
+        dssProjectTaxonomy.setName(name);
+        dssProjectTaxonomy.setDescription(description);
+        dssProjectTaxonomy.setCreatorID(dssUserService.getUserID(userName));
+        dssProjectTaxonomy.setCreateTime(date);
+        dssProjectTaxonomy.setUpdateTime(date);
+        projectTaxonomyService.addProjectTaxonomy(dssProjectTaxonomy);
         return Message.messageToResponse(Message.ok());
     }
     @POST
@@ -74,12 +74,12 @@ public class ProjectTaxonomyRestfulApi {
         String description = json.get("description") == null?null:json.get("description").getTextValue();
         Long id = json.get("id").getLongValue();
         // TODO: 2019/5/16 空值校验，重复名校验
-        DWSProjectTaxonomy dwsProjectTaxonomy = new DWSProjectTaxonomy();
-        dwsProjectTaxonomy.setId(id);
-        dwsProjectTaxonomy.setName(name);
-        dwsProjectTaxonomy.setDescription(description);
-        dwsProjectTaxonomy.setUpdateTime(new Date());
-        projectTaxonomyService.updateProjectTaxonomy(dwsProjectTaxonomy);
+        DSSProjectTaxonomy dssProjectTaxonomy = new DSSProjectTaxonomy();
+        dssProjectTaxonomy.setId(id);
+        dssProjectTaxonomy.setName(name);
+        dssProjectTaxonomy.setDescription(description);
+        dssProjectTaxonomy.setUpdateTime(new Date());
+        projectTaxonomyService.updateProjectTaxonomy(dssProjectTaxonomy);
         return Message.messageToResponse(Message.ok());
     }
 

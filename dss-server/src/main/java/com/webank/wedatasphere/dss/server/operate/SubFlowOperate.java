@@ -18,8 +18,8 @@
 package com.webank.wedatasphere.dss.server.operate;
 
 
-import com.webank.wedatasphere.dss.server.service.DWSFlowService;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
+import com.webank.wedatasphere.dss.server.service.DSSFlowService;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,33 +41,33 @@ public class SubFlowOperate implements Operate {
     }
 
     @Override
-    public void add(DWSFlowService dwsFlowService, Op op)throws DSSErrorException {
-        afterOperateSubFlow(dwsFlowService,op);
+    public void add(DSSFlowService dssFlowService, Op op)throws DSSErrorException {
+        afterOperateSubFlow(dssFlowService,op);
     }
 
     @Override
-    public void update(DWSFlowService dwsFlowService,Op op) throws DSSErrorException {
+    public void update(DSSFlowService dssFlowService, Op op) throws DSSErrorException {
         logger.info("name:{},description:{}",op.getParams().get("name"),op.getParams().get("description"));
-        DWSFlow dwsFlow = new DWSFlow();
-        dwsFlow.setId(op.getId());
-        dwsFlow.setName(op.getParams().get("name").toString());
-        dwsFlow.setDescription(op.getParams().get("description").toString());
-        dwsFlowService.updateFlowBaseInfo(dwsFlow, Long.valueOf(op.getParams().get("projectVersionID").toString()), null);
-        afterOperateSubFlow(dwsFlowService,op);
+        DSSFlow dssFlow = new DSSFlow();
+        dssFlow.setId(op.getId());
+        dssFlow.setName(op.getParams().get("name").toString());
+        dssFlow.setDescription(op.getParams().get("description").toString());
+        dssFlowService.updateFlowBaseInfo(dssFlow, Long.valueOf(op.getParams().get("projectVersionID").toString()), null);
+        afterOperateSubFlow(dssFlowService,op);
     }
 
     @Override
-    public void delete(DWSFlowService dwsFlowService,Op op) throws DSSErrorException {
+    public void delete(DSSFlowService dssFlowService, Op op) throws DSSErrorException {
         logger.info("delete subFlow{}",op.getId());
-        dwsFlowService.batchDeleteFlow(Arrays.asList(op.getId()), Long.valueOf(op.getParams().get("projectVersionID").toString()));
-        afterOperateSubFlow(dwsFlowService,op);
+        dssFlowService.batchDeleteFlow(Arrays.asList(op.getId()), Long.valueOf(op.getParams().get("projectVersionID").toString()));
+        afterOperateSubFlow(dssFlowService,op);
     }
 
-    private void afterOperateSubFlow(DWSFlowService dwsFlowService,Op op) throws DSSErrorException {
+    private void afterOperateSubFlow(DSSFlowService dssFlowService, Op op) throws DSSErrorException {
         //更新工作流基本信息
-        DWSFlow dwsFlow = new DWSFlow();
-        dwsFlow.setId(op.getId());
-        dwsFlow.setHasSaved(true);
-        dwsFlowService.updateFlowBaseInfo(dwsFlow, Long.valueOf(op.getParams().get("projectVersionID").toString()), null);
+        DSSFlow dssFlow = new DSSFlow();
+        dssFlow.setId(op.getId());
+        dssFlow.setHasSaved(true);
+        dssFlowService.updateFlowBaseInfo(dssFlow, Long.valueOf(op.getParams().get("projectVersionID").toString()), null);
     }
 }

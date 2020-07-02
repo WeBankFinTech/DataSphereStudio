@@ -1,5 +1,5 @@
 <template>
-  <span>    
+  <span v-if="currentProject.id">    
     <span
       class="proj-select"
     >
@@ -10,7 +10,7 @@
       placement="bottom-start"
     >
       <div style="font-size:14px">
-        {{ currentProject.name }}
+        <p class="workspace-title">{{ currentProject.name }}</p>
         <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
       </div>
       <DropdownMenu slot="list" class="proj-list">

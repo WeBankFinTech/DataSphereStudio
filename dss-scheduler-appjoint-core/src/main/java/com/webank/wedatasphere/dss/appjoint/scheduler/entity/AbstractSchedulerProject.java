@@ -17,7 +17,7 @@
 
 package com.webank.wedatasphere.dss.appjoint.scheduler.entity;
 
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.ProjectVersion;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public abstract class AbstractSchedulerProject implements SchedulerProject {
     private String name;
     private String description;
 
-    private DWSProject dwsProject;
+    private DSSProject dssProject;
     private List<SchedulerFlow> schedulerFlows;
 
     private List<SchedulerProjectVersionForFlows> projectVersions;
@@ -101,12 +101,12 @@ public abstract class AbstractSchedulerProject implements SchedulerProject {
     }
 
     @Override
-    public DWSProject getDWSProject() {
-        return this.dwsProject;
+    public DSSProject getDssProject() {
+        return this.dssProject;
     }
 
     @Override
-    public void setDWSProject(DWSProject dwsProject) {
-        this.dwsProject = dwsProject;
+    public void setDssProject(DSSProject dssProject) {
+        this.dssProject = dssProject;
     }
 }

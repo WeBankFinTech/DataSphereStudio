@@ -17,13 +17,13 @@
 
 package com.webank.wedatasphere.dss.appjoint.scheduler.entity;
 
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 
 /**
  * Created by enjoyyin on 2019/9/16.
  */
 public interface SchedulerProject extends Project {
-    DWSProject getDWSProject();
-    void setDWSProject(DWSProject dwsProject);
+    DSSProject getDssProject();
+    void setDssProject(DSSProject dssProject);
 }

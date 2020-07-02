@@ -21,10 +21,10 @@ import com.webank.wedatasphere.dss.appjoint.scheduler.entity.AbstractSchedulerPr
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerProjectVersionForFlows;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerFlow;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerProject;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
-import com.webank.wedatasphere.dss.common.entity.project.DWSJSONProject;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSJSONFlow;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSJSONProject;
 import com.webank.wedatasphere.dss.common.entity.project.ProjectVersionForFlows;
 import org.springframework.beans.BeanUtils;
 
@@ -50,27 +50,27 @@ public abstract class AbstractProjectParser implements ProjectParser {
         return flowParsers;
     }
 
-    public DWSJSONProject parseToDWSJSONProject(DWSProject dwsProject){
-        DWSJSONProject dwsjsonProject = new DWSJSONProject();
-        BeanUtils.copyProperties(dwsProject,dwsjsonProject,"flows","projectVersions");
-        List<? extends DWSFlow> dwsFlows = dwsProject.getFlows();
-        List<DWSJSONFlow> dwsjsonFlows = dwsFlows.stream().map(this::toDWSJsonFlow).collect(Collectors.toList());
-        dwsjsonProject.setFlows(dwsjsonFlows);
-        return dwsjsonProject;
+    public DSSJSONProject parseToDssJsonProject(DSSProject dssProject){
+        DSSJSONProject dssJsonProject = new DSSJSONProject();
+        BeanUtils.copyProperties(dssProject, dssJsonProject,"flows","projectVersions");
+        List<? extends DSSFlow> dwsFlows = dssProject.getFlows();
+        List<DSSJSONFlow> dssJsonFlows = dwsFlows.stream().map(this::toDssJsonFlow).collect(Collectors.toList());
+        dssJsonProject.setFlows(dssJsonFlows);
+        return dssJsonProject;
     }
 
-    private DWSJSONFlow toDWSJsonFlow(DWSFlow dwsFlow){
-        DWSJSONFlow dwsjsonFlow = new DWSJSONFlow();
-        BeanUtils.copyProperties(dwsFlow,dwsjsonFlow,"children","flowVersions");
-        dwsjsonFlow.setJson(dwsFlow.getLatestVersion().getJson());
-        if(dwsFlow.getChildren() != null){
-            dwsjsonFlow.setChildren(dwsFlow.getChildren().stream().map(this::toDWSJsonFlow).collect(Collectors.toList()));
+    private DSSJSONFlow toDssJsonFlow(DSSFlow dssFlow){
+        DSSJSONFlow dssJsonFlow = new DSSJSONFlow();
+        BeanUtils.copyProperties(dssFlow, dssJsonFlow,"children","flowVersions");
+        dssJsonFlow.setJson(dssFlow.getLatestVersion().getJson());
+        if(dssFlow.getChildren() != null){
+            dssJsonFlow.setChildren(dssFlow.getChildren().stream().map(this::toDssJsonFlow).collect(Collectors.toList()));
         }
-        return dwsjsonFlow;
+        return dssJsonFlow;
     }
 
 
-    public SchedulerProject parseProject(DWSJSONProject project){
+    public SchedulerProject parseProject(DSSJSONProject project){
         AbstractSchedulerProject schedulerProject = createSchedulerProject();
         SchedulerProjectVersionForFlows projectVersionForFlows = new SchedulerProjectVersionForFlows();
         schedulerProject.setProjectVersions(new ArrayList<SchedulerProjectVersionForFlows>());
@@ -81,23 +81,23 @@ public abstract class AbstractProjectParser implements ProjectParser {
         return schedulerProject;
     }
 
-    private SchedulerFlow invokeFlowParser(ProjectVersionForFlows projectVersionForFlows, DWSJSONFlow dwsjsonFlow, FlowParser[] flowParsers){
-        List<FlowParser> flowParsersF = Arrays.stream(flowParsers).filter(f -> f.ifFlowCanParse(dwsjsonFlow)).collect(Collectors.toList());
+    private SchedulerFlow invokeFlowParser(ProjectVersionForFlows projectVersionForFlows, DSSJSONFlow dssJsonFlow, FlowParser[] flowParsers){
+        List<FlowParser> flowParsersF = Arrays.stream(flowParsers).filter(f -> f.ifFlowCanParse(dssJsonFlow)).collect(Collectors.toList());
         // TODO: 2019/9/25  如果flowParsers数量>1 ||<=0抛出异常
-        SchedulerFlow schedulerFlow = flowParsersF.get(0).parseFlow(dwsjsonFlow);
+        SchedulerFlow schedulerFlow = flowParsersF.get(0).parseFlow(dssJsonFlow);
         //收集所有的不分层级的flow？
         projectVersionForFlows.addFlow(schedulerFlow);
-        if(dwsjsonFlow.getChildren() != null){
-            List<SchedulerFlow> schedulerFlows = dwsjsonFlow.getChildren().stream().map(f -> invokeFlowParser(projectVersionForFlows,f, flowParsers)).collect(Collectors.toList());
+        if(dssJsonFlow.getChildren() != null){
+            List<SchedulerFlow> schedulerFlows = dssJsonFlow.getChildren().stream().map(f -> invokeFlowParser(projectVersionForFlows,f, flowParsers)).collect(Collectors.toList());
             schedulerFlow.setChildren(schedulerFlows);
         }
         return schedulerFlow;
     }
 
     @Override
-    public SchedulerProject parseProject(DWSProject dwsProject) {
-        SchedulerProject schedulerProject = parseProject(parseToDWSJSONProject(dwsProject));
-        schedulerProject.setDWSProject(dwsProject);
+    public SchedulerProject parseProject(DSSProject dssProject) {
+        SchedulerProject schedulerProject = parseProject(parseToDssJsonProject(dssProject));
+        schedulerProject.setDssProject(dssProject);
         return schedulerProject;
     }
 

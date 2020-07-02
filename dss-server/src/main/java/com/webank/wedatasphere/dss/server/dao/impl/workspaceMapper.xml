@@ -35,6 +35,9 @@
         m.`manual_button_url`,m.`icon`,m.`order`,app.`homepage_url` AS `access_button_url`,app.project_url, app.`name`
     </sql>
 
+    <sql id="favorite_main">
+        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`
+    </sql>
 
     <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.server.entity.DWSWorkspace">
         SELECT *
@@ -84,6 +87,7 @@
             `is_active` = 1 AND `menu_id` = #{id}
         </where>
     </select>
+
     <select id="getHomepageInstancesByMenuIdEn" resultType="com.webank.wedatasphere.dss.server.dto.response.HomepageDemoInstanceVo">
         SELECT `id`,`menu_id`,`name`,`url`,`title_en` AS `title`,`description`,`icon`,`order`
         FROM dss_homepage_demo_instance
@@ -99,6 +103,7 @@
             `is_active` = 1
         </where>
     </select>
+
     <select id="getHomepageVideosEn" resultType="com.webank.wedatasphere.dss.server.dto.response.HomepageVideoVo">
         SELECT `id`,`name`,`title_en` AS `title`,`url`,`description`,`order`
         FROM dss_homepage_video
@@ -114,6 +119,7 @@
             `is_active` = 0
         </where>
     </select>
+
     <select id="getManagementMenuEn" resultType="com.webank.wedatasphere.dss.server.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
         FROM dss_onestop_menu
@@ -129,6 +135,7 @@
             `is_active` = 1
         </where>
     </select>
+
     <select id="getApplicationMenuEn" resultType="com.webank.wedatasphere.dss.server.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
         FROM dss_onestop_menu
@@ -146,6 +153,7 @@
             m.`onestop_menu_id` = #{id}
         </where>
     </select>
+
     <select id="getMenuAppInstancesEn" resultType="com.webank.wedatasphere.dss.server.dto.response.OnestopMenuAppInstanceVo">
         SELECT <include refid = "menu_appInstances_en"/>
         FROM dss_onestop_menu_application m
@@ -155,4 +163,38 @@
             m.`onestop_menu_id` = #{id}
         </where>
     </select>
+
+    <select id="getWorkspaceFavoritesCn" resultType="com.webank.wedatasphere.dss.server.dto.response.WorkspaceFavoriteVo">
+        SELECT dss_onestop_user_favorites.id, dss_onestop_menu_application.id AS menuApplicationId , name, url, icon, title_cn AS title
+        FROM dss_onestop_user_favorites join dss_onestop_menu_application
+        on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
+        join dss_application on dss_application.id = dss_onestop_menu_application.application_id
+        <where>
+            dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+        </where>
+    </select>
+
+    <select id="getWorkspaceFavoritesEn" resultType="com.webank.wedatasphere.dss.server.dto.response.WorkspaceFavoriteVo">
+        SELECT dss_onestop_user_favorites.id, dss_onestop_menu_application.id AS menuApplicationId, name, url, icon, title_en AS `title`
+        FROM dss_onestop_user_favorites join dss_onestop_menu_application
+        on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
+        join dss_application on dss_application.id = dss_onestop_menu_application.application_id
+        <where>
+            dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+        </where>
+    </select>
+
+    <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.server.entity.DWSFavorite">
+        INSERT INTO dss_onestop_user_favorites (<include refid = "favorite_main" />)
+        VALUES
+        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})
+    </insert>
+
+    <delete id="deleteFavorite">
+        DELETE
+        FROM
+            dss_onestop_user_favorites
+        WHERE
+            id = #{favouritesId}
+    </delete>
 </mapper>

@@ -18,7 +18,7 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.ReadNode;
 
 import java.util.Arrays;
@@ -32,7 +32,7 @@ public abstract class AbstractReadNodeParser implements ContextNodeParser {
     @Override
     public String[] getShareNodeIds(SchedulerNode node) {
         //需根据节点的参数进行解析生成
-        Map<String, Object> jobParams =  node.getDWSNode().getParams();
+        Map<String, Object> jobParams =  node.getDssNode().getParams();
         if(jobParams == null) return null;
         Map<String, Object> configuration =(Map<String, Object>) jobParams.get("configuration");
         Map<String, Object> runtime = (Map<String, Object>) configuration.get("runtime");
@@ -57,16 +57,16 @@ public abstract class AbstractReadNodeParser implements ContextNodeParser {
     @Override
     public ReadNode parseNode(SchedulerNode node) {
         ReadNode readNode = createReadNode();
-        readNode.setDWSNode(node.getDWSNode());
+        readNode.setDssNode(node.getDssNode());
         readNode.setSchedulerNode(node);
         readNode.setShareNodeIds(getShareNodeIds(node));
         return readNode;
     }
 
     @Override
-    public SchedulerNode parseNode(DWSNode dwsNode) {
+    public SchedulerNode parseNode(DSSNode dssNode) {
         SchedulerNode schedulerNode = createSchedulerNode();
-        schedulerNode.setDWSNode(dwsNode);
+        schedulerNode.setDssNode(dssNode);
         return parseNode(schedulerNode);
     }
 

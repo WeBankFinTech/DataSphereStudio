@@ -235,4 +235,10 @@
       color: $primary-color;
     }
   }
+
+  .workspace-title {
+    display: inline-flex;
+    width: 100px;
+    overflow: hidden;
+  }
 }

@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.server.publish;
 
 
 import com.webank.wedatasphere.dss.server.conf.DSSServerConf;
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class PublishJobFactory {
     @Autowired
     private PublishManager publishManager;
     @Autowired
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
 
     public PublishSubmitJob createSubmitPublishJob(Long projectVersionID, String user, String comment){
         PublishSubmitJob job = new PublishSubmitJob(projectService, user, comment, projectVersionID);

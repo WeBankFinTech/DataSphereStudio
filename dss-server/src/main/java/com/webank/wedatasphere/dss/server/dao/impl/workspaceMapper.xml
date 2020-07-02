@@ -39,19 +39,19 @@
         id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`
     </sql>
 
-    <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.server.entity.DWSWorkspace">
+    <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.server.entity.DSSWorkspace">
         SELECT *
         FROM dss_workspace
         ORDER BY dss_workspace.`create_time` DESC
     </select>
 
-    <select id="getWorkspaceById" resultType="com.webank.wedatasphere.dss.server.entity.DWSWorkspace">
+    <select id="getWorkspaceById" resultType="com.webank.wedatasphere.dss.server.entity.DSSWorkspace">
         SELECT *
         FROM dss_workspace
         WHERE id = #{workspaceId}
     </select>
 
-    <select id="findByWorkspaceName" resultType="com.webank.wedatasphere.dss.server.entity.DWSWorkspace">
+    <select id="findByWorkspaceName" resultType="com.webank.wedatasphere.dss.server.entity.DSSWorkspace">
         SELECT *
         FROM dss_workspace
         <where>
@@ -59,7 +59,7 @@
         </where>
     </select>
 
-    <insert id="addWorkSpace" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.server.entity.DWSWorkspace">
+    <insert id="addWorkSpace" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.server.entity.DSSWorkspace">
         INSERT INTO dss_workspace (<include refid = "workspace_main" />)
         VALUES
         (#{id},#{name},#{label},#{description},#{department},#{product},#{source},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})
@@ -184,7 +184,7 @@
         </where>
     </select>
 
-    <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.server.entity.DWSFavorite">
+    <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.server.entity.DSSFavorite">
         INSERT INTO dss_onestop_user_favorites (<include refid = "favorite_main" />)
         VALUES
         (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})

@@ -17,7 +17,6 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobSignalKeyCreator;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;

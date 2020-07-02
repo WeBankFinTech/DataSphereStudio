@@ -15,11 +15,11 @@ import java.util.List;
  */
 public interface WorkspaceMapper {
 
-    List<DWSWorkspace> getWorkspaces();
+    List<DSSWorkspace> getWorkspaces();
 
-    List<DWSWorkspace> findByWorkspaceName(String name);
+    List<DSSWorkspace> findByWorkspaceName(String name);
 
-    void addWorkSpace(DWSWorkspace dwsWorkspace);
+    void addWorkSpace(DSSWorkspace dssWorkspace);
 
     List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
     List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
@@ -30,7 +30,7 @@ public interface WorkspaceMapper {
     List<HomepageVideoVo> getHomepageVideosEn();
     List<HomepageVideoVo> getHomepageVideosCn();
 
-    DWSWorkspace getWorkspaceById(Long workspaceId);
+    DSSWorkspace getWorkspaceById(Long workspaceId);
 
     List<OnestopMenuVo> getManagementMenuCn();
     List<OnestopMenuVo> getManagementMenuEn();
@@ -45,7 +45,7 @@ public interface WorkspaceMapper {
 
     List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
 
-    void addFavorite(DWSFavorite dwsFavorite);
+    void addFavorite(DSSFavorite dssFavorite);
 
     void deleteFavorite(Long favouritesId);
 }

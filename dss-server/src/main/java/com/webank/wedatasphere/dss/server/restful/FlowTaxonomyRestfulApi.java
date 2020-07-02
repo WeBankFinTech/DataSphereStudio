@@ -18,10 +18,10 @@
 package com.webank.wedatasphere.dss.server.restful;
 
 
-import com.webank.wedatasphere.dss.server.service.DWSFlowTaxonomyService;
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
-import com.webank.wedatasphere.dss.server.service.DWSUserService;
-import com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy;
+import com.webank.wedatasphere.dss.server.service.DSSFlowTaxonomyService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
+import com.webank.wedatasphere.dss.server.service.DSSUserService;
+import com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.server.publish.PublishManager;
 import com.webank.wedatasphere.linkis.server.Message;
@@ -48,11 +48,11 @@ import java.util.Date;
 public class FlowTaxonomyRestfulApi {
 
     @Autowired
-    private DWSFlowTaxonomyService flowTaxonomyService;
+    private DSSFlowTaxonomyService flowTaxonomyService;
     @Autowired
-    private DWSUserService dwsUserService;
+    private DSSUserService dssUserService;
     @Autowired
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
     @Autowired
     private PublishManager publishManager;
 
@@ -65,15 +65,15 @@ public class FlowTaxonomyRestfulApi {
         Long projectVersionID = json.get("projectVersionID").getLongValue();
         publishManager.checkeIsPublishing(projectVersionID);
         // TODO: 2019/5/16 空值校验，重复名校验
-        DWSFlowTaxonomy dwsFlowTaxonomy = new DWSFlowTaxonomy();
+        DSSFlowTaxonomy dssFlowTaxonomy = new DSSFlowTaxonomy();
         Date date = new Date();
-        dwsFlowTaxonomy.setName(name);
-        dwsFlowTaxonomy.setDescription(description);
-        dwsFlowTaxonomy.setCreatorID(dwsUserService.getUserID(userName));
-        dwsFlowTaxonomy.setCreateTime(date);
-        dwsFlowTaxonomy.setUpdateTime(date);
-        dwsFlowTaxonomy.setProjectID(projectService.getProjectByProjectVersionID(projectVersionID).getId());
-        flowTaxonomyService.addFlowTaxonomy(dwsFlowTaxonomy,projectVersionID);
+        dssFlowTaxonomy.setName(name);
+        dssFlowTaxonomy.setDescription(description);
+        dssFlowTaxonomy.setCreatorID(dssUserService.getUserID(userName));
+        dssFlowTaxonomy.setCreateTime(date);
+        dssFlowTaxonomy.setUpdateTime(date);
+        dssFlowTaxonomy.setProjectID(projectService.getProjectByProjectVersionID(projectVersionID).getId());
+        flowTaxonomyService.addFlowTaxonomy(dssFlowTaxonomy,projectVersionID);
         return Message.messageToResponse(Message.ok());
     }
     @POST
@@ -86,12 +86,12 @@ public class FlowTaxonomyRestfulApi {
         publishManager.checkeIsPublishing(projectVersionID);
         // TODO: 2019/6/13  projectVersionID的更新校验
         // TODO: 2019/5/16 空值校验，重复名校验
-        DWSFlowTaxonomy dwsFlowTaxonomy = new DWSFlowTaxonomy();
-        dwsFlowTaxonomy.setId(id);
-        dwsFlowTaxonomy.setName(name);
-        dwsFlowTaxonomy.setDescription(description);
-        dwsFlowTaxonomy.setUpdateTime(new Date());
-        flowTaxonomyService.updateFlowTaxonomy(dwsFlowTaxonomy,projectVersionID);
+        DSSFlowTaxonomy dssFlowTaxonomy = new DSSFlowTaxonomy();
+        dssFlowTaxonomy.setId(id);
+        dssFlowTaxonomy.setName(name);
+        dssFlowTaxonomy.setDescription(description);
+        dssFlowTaxonomy.setUpdateTime(new Date());
+        flowTaxonomyService.updateFlowTaxonomy(dssFlowTaxonomy,projectVersionID);
         return Message.messageToResponse(Message.ok());
     }
 

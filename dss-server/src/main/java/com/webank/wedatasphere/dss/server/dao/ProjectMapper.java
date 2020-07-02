@@ -18,9 +18,9 @@
 package com.webank.wedatasphere.dss.server.dao;
 
 
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProjectPublishHistory;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProjectPublishHistory;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,19 +28,19 @@ import java.util.Map;
 
 
 public interface ProjectMapper {
-    DWSProject selectProjectByID(Long id);
+    DSSProject selectProjectByID(Long id);
 
-    DWSProjectVersion selectLatestVersionByProjectID(Long projectID);
+    DSSProjectVersion selectLatestVersionByProjectID(Long projectID);
 
-    DWSProject selectProjectByVersionID(Long projectVersionID);
+    DSSProject selectProjectByVersionID(Long projectVersionID);
 
-    void addProject(DWSProject dwsProject);
+    void addProject(DSSProject dssProject);
 
-    void addProjectVersion(DWSProjectVersion dwsProjectVersion);
+    void addProjectVersion(DSSProjectVersion dssProjectVersion);
 
     void updateDescription(@Param("projectID") Long projectID, @Param("description") String description, @Param("product")String product ,@Param("applicationArea")Integer applicationArea ,@Param("business")String business);
 
-    List<DWSProjectVersion> listProjectVersionsByProjectID(Long projectID);
+    List<DSSProjectVersion> listProjectVersionsByProjectID(Long projectID);
 
     Boolean noPublished(Long projectID);
 
@@ -48,15 +48,15 @@ public interface ProjectMapper {
 
     void deleteProjectBaseInfo(long projectID);
 
-    DWSProjectVersion selectProjectVersionByID(Long id);
+    DSSProjectVersion selectProjectVersionByID(Long id);
 
-    DWSProjectVersion selectProjectVersionByProjectIDAndVersionID(@Param("projectID") Long projectId, @Param("version") String version);
+    DSSProjectVersion selectProjectVersionByProjectIDAndVersionID(@Param("projectID") Long projectId, @Param("version") String version);
 
     Integer updateLock(@Param("lock") Integer lock, @Param("projectVersionID") Long projectVersionID);
 
-    DWSProjectPublishHistory selectProjectPublishHistoryByProjectVersionID(Long projectVersionID);
+    DSSProjectPublishHistory selectProjectPublishHistoryByProjectVersionID(Long projectVersionID);
 
-    void insertPublishHistory(DWSProjectPublishHistory dwsProjectPublishHistory);
+    void insertPublishHistory(DSSProjectPublishHistory dssProjectPublishHistory);
 
     void updatePublishHistoryState(@Param("projectVersionID") Long projectVersionID, @Param("status") Integer status);
 

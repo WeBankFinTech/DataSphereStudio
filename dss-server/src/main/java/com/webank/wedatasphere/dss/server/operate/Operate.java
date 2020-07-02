@@ -20,7 +20,7 @@ package com.webank.wedatasphere.dss.server.operate;
 
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
-import com.webank.wedatasphere.dss.server.service.DWSFlowService;
+import com.webank.wedatasphere.dss.server.service.DSSFlowService;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
 
@@ -28,9 +28,9 @@ public interface Operate {
 
     boolean canInvokeOperate(Op op);
 
-    void add(DWSFlowService dwsFlowService, Op op) throws DSSErrorException, AppJointErrorException;
+    void add(DSSFlowService dssFlowService, Op op) throws DSSErrorException, AppJointErrorException;
 
-    void update(DWSFlowService dwsFlowService, Op op) throws DSSErrorException, AppJointErrorException;
+    void update(DSSFlowService dssFlowService, Op op) throws DSSErrorException, AppJointErrorException;
 
-    void delete(DWSFlowService dwsFlowService, Op op) throws DSSErrorException, AppJointErrorException;
+    void delete(DSSFlowService dssFlowService, Op op) throws DSSErrorException, AppJointErrorException;
 }

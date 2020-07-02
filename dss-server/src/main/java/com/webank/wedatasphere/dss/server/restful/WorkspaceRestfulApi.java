@@ -3,11 +3,11 @@ package com.webank.wedatasphere.dss.server.restful;
 import com.webank.wedatasphere.dss.server.dto.response.HomepageDemoMenuVo;
 import com.webank.wedatasphere.dss.server.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.server.dto.response.OnestopMenuVo;
-import com.webank.wedatasphere.dss.server.entity.DWSWorkspace;
+import com.webank.wedatasphere.dss.server.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.server.dto.response.WorkspaceDepartmentVo;
-import com.webank.wedatasphere.dss.application.service.DSSUserService;
 import com.webank.wedatasphere.dss.server.dto.response.*;
-import com.webank.wedatasphere.dss.server.service.DWSWorkspaceService;
+import com.webank.wedatasphere.dss.server.service.DSSUserService;
+import com.webank.wedatasphere.dss.server.service.DSSWorkspaceService;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.codehaus.jackson.JsonNode;
@@ -31,7 +31,7 @@ import java.util.List;
 public class WorkspaceRestfulApi {
 
     @Autowired
-    private DWSWorkspaceService dwsWorkspaceService;
+    private DSSWorkspaceService dssWorkspaceService;
 
     @Autowired
     private DSSUserService dssUserService;
@@ -40,28 +40,28 @@ public class WorkspaceRestfulApi {
     @Path("/workspaces")
     public Response getAllWorkspaces(@Context HttpServletRequest req) {
         // TODO: Order By time
-        List<DWSWorkspace> workspaces = dwsWorkspaceService.getWorkspaces();
+        List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces();
         return Message.messageToResponse(Message.ok().data("workspaces", workspaces));
     }
 
     @GET
     @Path("/workspaces/{id}")
     public Response getWorkspacesById(@Context HttpServletRequest req, @PathParam("id") Long id) {
-        DWSWorkspace workspace = dwsWorkspaceService.getWorkspacesById(id);
+        DSSWorkspace workspace = dssWorkspaceService.getWorkspacesById(id);
         return Message.messageToResponse(Message.ok().data("workspace", workspace));
     }
 
     @GET
     @Path("/workspaces/departments")
     public Response getAllWorkspaceDepartments(@Context HttpServletRequest req) {
-        List<WorkspaceDepartmentVo> departments = dwsWorkspaceService.getWorkSpaceDepartments();
+        List<WorkspaceDepartmentVo> departments = dssWorkspaceService.getWorkSpaceDepartments();
         return Message.messageToResponse(Message.ok().data("departments", departments));
     }
 
     @GET
     @Path("/workspaces/exists")
     public Response getUsernameExistence(@Context HttpServletRequest req, @QueryParam("name") String name) {
-        boolean exists = dwsWorkspaceService.existWorkspaceName(name);
+        boolean exists = dssWorkspaceService.existWorkspaceName(name);
         return Message.messageToResponse(Message.ok().data("workspaceNameExists", exists));
     }
 
@@ -70,13 +70,13 @@ public class WorkspaceRestfulApi {
     public Response addWorkspace(@Context HttpServletRequest req, JsonNode json) {
         String userName = SecurityFilter.getLoginUsername(req);
         String name = json.get("name").getTextValue();
-        if (dwsWorkspaceService.existWorkspaceName(name)) {
+        if (dssWorkspaceService.existWorkspaceName(name)) {
             return Message.messageToResponse(Message.error("工作空间名重复"));
         }
         String department = json.get("department").getTextValue();
         String label = json.get("label").getTextValue();
         String description = json.get("description").getTextValue();
-        Long workspaceId = dwsWorkspaceService.addWorkspace(userName, name, department, label, description);
+        Long workspaceId = dssWorkspaceService.addWorkspace(userName, name, department, label, description);
         return Message.messageToResponse(Message.ok().data("workspaceId", workspaceId));
     }
 
@@ -85,7 +85,7 @@ public class WorkspaceRestfulApi {
     public Response getAllHomepageDemos(@Context HttpServletRequest req) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
-        List<HomepageDemoMenuVo> homepageDemos = dwsWorkspaceService.getHomepageDemos(isChinese);
+        List<HomepageDemoMenuVo> homepageDemos = dssWorkspaceService.getHomepageDemos(isChinese);
         return Message.messageToResponse(Message.ok().data("demos", homepageDemos));
     }
 
@@ -94,7 +94,7 @@ public class WorkspaceRestfulApi {
     public Response getAllVideos(@Context HttpServletRequest req) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
-        List<HomepageVideoVo> homepageVideos = dwsWorkspaceService.getHomepageVideos(isChinese);
+        List<HomepageVideoVo> homepageVideos = dssWorkspaceService.getHomepageVideos(isChinese);
         return Message.messageToResponse(Message.ok().data("videos", homepageVideos));
     }
 
@@ -105,7 +105,7 @@ public class WorkspaceRestfulApi {
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
 
-        List<OnestopMenuVo> managements = dwsWorkspaceService.getWorkspaceManagements(workspaceId, username, isChinese);
+        List<OnestopMenuVo> managements = dssWorkspaceService.getWorkspaceManagements(workspaceId, username, isChinese);
         return Message.messageToResponse(Message.ok().data("managements", managements));
     }
 
@@ -115,7 +115,7 @@ public class WorkspaceRestfulApi {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<OnestopMenuVo> applications = dwsWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+        List<OnestopMenuVo> applications = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
         return Message.messageToResponse(Message.ok().data("applications", applications));
     }
 
@@ -125,7 +125,7 @@ public class WorkspaceRestfulApi {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceFavoriteVo> favorites = dwsWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese);
+        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese);
         return Message.messageToResponse(Message.ok().data("favorites", favorites));
     }
 
@@ -141,7 +141,7 @@ public class WorkspaceRestfulApi {
     public Response addFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, JsonNode json) {
         String username = SecurityFilter.getLoginUsername(req);
         Long menuApplicationId = json.get("menuApplicationId").getLongValue();
-        Long favoriteId = dwsWorkspaceService.addFavorite(username, workspaceId, menuApplicationId);
+        Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId);
         return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
     }
 
@@ -149,7 +149,7 @@ public class WorkspaceRestfulApi {
     @Path("/workspaces/{workspaceId}/favorites/{favouritesId}")
     public Response deleteFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, @PathParam("favouritesId") Long favouritesId) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dwsWorkspaceService.deleteFavorite(username, favouritesId);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, favouritesId);
         return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
     }
 }

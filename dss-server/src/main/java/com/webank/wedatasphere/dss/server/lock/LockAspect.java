@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.server.lock;
 
 import com.webank.wedatasphere.dss.server.constant.DSSServerConstant;
 import com.webank.wedatasphere.dss.server.dao.ProjectMapper;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProjectVersion;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import org.apache.commons.lang.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -70,11 +70,11 @@ public class LockAspect implements Ordered {
             return point.proceed();
         }
         logger.info("projectVersionID为：" + projectVersionID);
-        DWSProjectVersion dwsProjectVersion = projectMapper.selectProjectVersionByID(projectVersionID);
-        Integer lock = dwsProjectVersion.getLock();
+        DSSProjectVersion dssProjectVersion = projectMapper.selectProjectVersionByID(projectVersionID);
+        Integer lock = dssProjectVersion.getLock();
         try {
             Object proceed = point.proceed();
-            judge(lockAnnotation, dwsProjectVersion, lock, projectVersionID);
+            judge(lockAnnotation, dssProjectVersion, lock, projectVersionID);
             return proceed;
         } catch (Exception e) {
             logger.info("执行过程出现异常", e);
@@ -82,16 +82,16 @@ public class LockAspect implements Ordered {
         }
     }
 
-    private void judge(Lock  lockAnnotation, DWSProjectVersion dwsProjectVersion, Integer lock, Long projectVersionID) throws DSSErrorException {
+    private void judge(Lock  lockAnnotation, DSSProjectVersion dssProjectVersion, Integer lock, Long projectVersionID) throws DSSErrorException {
         if (lockAnnotation.type().equals(LockEnum.ADD)) {
             logger.info("projectVersion会增加");
-            List<DWSProjectVersion> dwsProjectVersions = projectMapper.listProjectVersionsByProjectID(dwsProjectVersion.getProjectID());
-            if (dwsProjectVersions.size() < 2 || !dwsProjectVersions.get(1).getId().equals(projectVersionID)) {
+            List<DSSProjectVersion> dssProjectVersions = projectMapper.listProjectVersionsByProjectID(dssProjectVersion.getProjectID());
+            if (dssProjectVersions.size() < 2 || !dssProjectVersions.get(1).getId().equals(projectVersionID)) {
                 throw new DSSErrorException(67457, "已经有别的用户对此project进行了版本更新操作，不能进行此操作！");
             }
         } else {
             logger.info("projectVersion不会增加");
-            DWSProjectVersion latest = projectMapper.selectLatestVersionByProjectID(dwsProjectVersion.getProjectID());
+            DSSProjectVersion latest = projectMapper.selectLatestVersionByProjectID(dssProjectVersion.getProjectID());
             if (!latest.getId().equals(projectVersionID)) {
                 throw new DSSErrorException(67455, "目前project版本已经不是最新，不能进行此操作！");
             }

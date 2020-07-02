@@ -16,7 +16,7 @@
  */
 package com.webank.wedatasphere.dss.application.service.impl;
 
-import com.webank.wedatasphere.dss.application.dao.DSSUserMapper;
+import com.webank.wedatasphere.dss.application.dao.DSSApplicationUserMapper;
 import com.webank.wedatasphere.dss.application.dao.LinkisUserMapper;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.LinkisUser;
@@ -33,7 +33,7 @@ public class LinkisUserServiceImpl implements LinkisUserService {
     @Autowired
     private LinkisUserMapper linkisUserMapper;
     @Autowired
-    private DSSUserMapper dssUserMapper;
+    private DSSApplicationUserMapper dssApplicationUserMapper;
 
     @Override
     public LinkisUser getUserByName(String username) {
@@ -55,6 +55,6 @@ public class LinkisUserServiceImpl implements LinkisUserService {
         dssUser.setName(userDb.getName());
         dssUser.setUsername(userDb.getUserName());
         dssUser.setFirstLogin(userDb.getFirstLogin());
-        dssUserMapper.registerDSSUser(dssUser);
+        dssApplicationUserMapper.registerDssUser(dssUser);
     }
 }

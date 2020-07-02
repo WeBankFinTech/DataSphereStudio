@@ -2,7 +2,7 @@
   <div class="page-bgc">
     <div class="page-bgc-header">
       <div class="header-info">
-        <h1>{{$t('message.project.infoHeader')}}</h1>
+        <h1>{{$t('message.workspace.infoHeader')}}</h1>
         <p>{{$t('message.project.infoBodyFirstRow')}}</p>
         <p>{{$t('message.project.infoBodySecondRow')}}</p>
       </div>

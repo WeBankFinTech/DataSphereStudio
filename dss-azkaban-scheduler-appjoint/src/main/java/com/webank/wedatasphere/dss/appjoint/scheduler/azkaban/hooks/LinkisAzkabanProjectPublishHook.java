@@ -75,7 +75,7 @@ public class LinkisAzkabanProjectPublishHook extends AbstractProjectPublishHook 
     }
 
     private void writeProjectResourcesToLocal(AzkabanSchedulerProject publishProject)throws DSSErrorException {
-        List<Resource> resources = publishProject.getDWSProject().getProjectResources();
+        List<Resource> resources = publishProject.getDssProject().getProjectResources();
         FileOutputStream os = null;
         try {
             String storePath = publishProject.getStorePath();

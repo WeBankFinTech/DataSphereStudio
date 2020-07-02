@@ -17,7 +17,8 @@
             "nameLength": "名称长度不能大于",
             "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
             "project": "工程",
-            "feedback": "反馈"
+            "feedback": "反馈",
+            "validNameExist": "名称不能重复"
         },
         "project": {
             "projectName": "工程名",
@@ -102,6 +103,32 @@
             "outputSubTitle": "数据发送",
             "deleteWtss": "是否同时删除scheduler工程?",
             "noData": "暂无数据请添加"
+        },
+        "workspace": {
+          "createWorkspace": "创建工作空间",
+          "searchWorkspace": "搜索工作空间",
+          "workspaceList": "工作空间列表",
+          "editWorkspace": "编辑",
+          "newWorkspace": "新建工作空间",
+          "editor": "编辑工作空间",
+          "workName": "工作空间名",
+          "department": "归属部门",
+          "selectDepartment": "请选择部门",
+          "label": "标签",
+          "addLabel": "添加标签",
+          "description": "描述",
+          "pleaseInputWorkspaceDesc": "请输入工作空间描述",
+          "createdSuccess": "工作空间创建成功！",
+          "createdFailed": "工作空间创建失败！",
+          "display": "展示方式",
+          "tableDisplay": "列表展示",
+          "cardDisplay": "图标展示",
+          "createTime": "创建时间"
+        },
+        "GLY": {
+          "ALTY": "案例体验",
+          "KSRM": "快速入门",
+          "HYP": "换一批"
         },
         "workflow": {
             "workflow": "工作流",
@@ -293,7 +320,7 @@
                 "WJYCZ": "文件已存在，请选择其它文件或选择其它文件夹！",
                 "WJMCBHF": "文件名称不合法，仅支持以字母、数字、中文、下划线、中短线且带后缀的命名！",
                 "SCBCG100": "上传文件不超过100M！",
-                "SCCG":  "文件 {name} 上传成功！",
+                "SCCG": "文件 {name} 上传成功！",
                 "WJCCXE": "文件大小超出限额！",
                 "WJBSC": "资源文件 {name} 已被成功删除！"
             }
@@ -490,7 +517,7 @@
             "cancel": "关闭",
             "timeout": "工程{name}发布超时！"
         },
-        "tableDetails" : {
+        "tableDetails": {
             "BZBSX": "表基本属性",
             "BZDXX": "表字段信息",
             "BTJXX": "表统计信息",
@@ -534,7 +561,6 @@
             "YES": "对",
             "GSHJX": "进行格式化成",
             "ZJXYGE": "组件需要的格式"
-
         },
         "logView": {
             "taskId": "任务ID：",
@@ -1019,6 +1045,20 @@
             },
             "error": {
                 "fileExists": "该文件已经存在！"
+            },
+            "home": {
+                "welcome": "欢迎来到 {text} 的工作空间!",
+                "setting": "设置",
+                "exit": "退出设置",
+                "enter": "进入{text}",
+                "dlgTitle": "新增快速入口",
+                "selectType": "请选择分类",
+                "selectApp": "请选择系统",
+                "save": "保存",
+                "cancel": "取消",
+                "running": "运行中",
+                "stop": "不可用",
+                "searchPlaceholder": "搜索应用系统"
             }
         },
         "database": {

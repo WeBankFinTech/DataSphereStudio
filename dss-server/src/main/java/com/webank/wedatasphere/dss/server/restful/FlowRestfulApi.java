@@ -19,11 +19,11 @@ package com.webank.wedatasphere.dss.server.restful;
 
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
-import com.webank.wedatasphere.dss.server.service.DWSFlowService;
-import com.webank.wedatasphere.dss.server.service.DWSProjectService;
-import com.webank.wedatasphere.dss.server.service.DWSUserService;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlow;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSFlowVersion;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
+import com.webank.wedatasphere.dss.server.service.DSSFlowService;
+import com.webank.wedatasphere.dss.server.service.DSSProjectService;
+import com.webank.wedatasphere.dss.server.service.DSSUserService;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.server.operate.Op;
 import com.webank.wedatasphere.dss.server.publish.PublishManager;
@@ -54,9 +54,9 @@ import java.util.List;
 public class FlowRestfulApi {
 
     @Autowired
-    private DWSFlowService flowService;
+    private DSSFlowService flowService;
     @Autowired
-    private DWSUserService dwsUserService;
+    private DSSUserService dssUserService;
     @Autowired
     private PublishManager publishManager;
 
@@ -65,7 +65,7 @@ public class FlowRestfulApi {
     @GET
     @Path("/listAllFlowVersions")
     public Response listAllVersions(@Context HttpServletRequest req, @QueryParam("id")Long flowID,@QueryParam("projectVersionID")Long projectVersionID) {
-        List<DWSFlowVersion> versions = flowService.listAllFlowVersions(flowID,projectVersionID);
+        List<DSSFlowVersion> versions = flowService.listAllFlowVersions(flowID,projectVersionID);
         return Message.messageToResponse(Message.ok().data("versions",versions));
     }
 
@@ -83,30 +83,30 @@ public class FlowRestfulApi {
         String uses = json.get("uses") == null?null:json.get("uses").getTextValue();
         if(taxonomyID == null && parentFlowID == null) throw new DSSErrorException(90009,"请求选择工作流分类");
         publishManager.checkeIsPublishing(projectVersionID);
-        DWSFlow dwsFlow = new DWSFlow();
-        dwsFlow.setProjectID(projectService.getProjectByProjectVersionID(projectVersionID).getId());
-        dwsFlow.setName(name);
-        dwsFlow.setDescription(description);
-        dwsFlow.setCreatorID(dwsUserService.getUserID(userName));
-        dwsFlow.setCreateTime(new Date());
-        dwsFlow.setState(false);
-        dwsFlow.setSource("create by user");
-        dwsFlow.setUses(uses);
+        DSSFlow dssFlow = new DSSFlow();
+        dssFlow.setProjectID(projectService.getProjectByProjectVersionID(projectVersionID).getId());
+        dssFlow.setName(name);
+        dssFlow.setDescription(description);
+        dssFlow.setCreatorID(dssUserService.getUserID(userName));
+        dssFlow.setCreateTime(new Date());
+        dssFlow.setState(false);
+        dssFlow.setSource("create by user");
+        dssFlow.setUses(uses);
         if(parentFlowID == null){
-            dwsFlow.setRootFlow(true);
-            dwsFlow.setRank(0);
-            dwsFlow.setHasSaved(true);
-            dwsFlow = flowService.addRootFlow(dwsFlow,taxonomyID,projectVersionID);
+            dssFlow.setRootFlow(true);
+            dssFlow.setRank(0);
+            dssFlow.setHasSaved(true);
+            dssFlow = flowService.addRootFlow(dssFlow,taxonomyID,projectVersionID);
         }else {
-            dwsFlow.setRootFlow(false);
+            dssFlow.setRootFlow(false);
             Integer rank = flowService.getParentRank(parentFlowID);
             // TODO: 2019/6/3 并发问题考虑for update
-            dwsFlow.setRank(rank+1);
-            dwsFlow.setHasSaved(false);
-            dwsFlow = flowService.addSubFlow(dwsFlow,parentFlowID,projectVersionID);
+            dssFlow.setRank(rank+1);
+            dssFlow.setHasSaved(false);
+            dssFlow = flowService.addSubFlow(dssFlow,parentFlowID,projectVersionID);
         }
         // TODO: 2019/5/16 空值校验，重复名校验
-        return Message.messageToResponse(Message.ok().data("flow",dwsFlow));
+        return Message.messageToResponse(Message.ok().data("flow", dssFlow));
     }
 
     @POST
@@ -121,12 +121,12 @@ public class FlowRestfulApi {
         publishManager.checkeIsPublishing(projectVersionID);
         // TODO: 2019/6/13  projectVersionID的更新校验
         //这里可以不做事务
-        DWSFlow dwsFlow = new DWSFlow();
-        dwsFlow.setId(flowID);
-        dwsFlow.setName(name);
-        dwsFlow.setDescription(description);
-        dwsFlow.setUses(uses);
-        flowService.updateFlowBaseInfo(dwsFlow,projectVersionID,taxonomyID);
+        DSSFlow dssFlow = new DSSFlow();
+        dssFlow.setId(flowID);
+        dssFlow.setName(name);
+        dssFlow.setDescription(description);
+        dssFlow.setUses(uses);
+        flowService.updateFlowBaseInfo(dssFlow,projectVersionID,taxonomyID);
         return Message.messageToResponse(Message.ok());
     }
 
@@ -134,14 +134,14 @@ public class FlowRestfulApi {
     @Path("/get")
     public Response get(@Context HttpServletRequest req, @QueryParam("id")Long flowID,@QueryParam("version")String version,@QueryParam("projectVersionID")Long projectVersionID) throws DSSErrorException {
         // TODO: 2019/5/23 id空值判断
-        DWSFlow dwsFlow;
+        DSSFlow dssFlow;
         if (StringUtils.isEmpty(version)){
-            dwsFlow = flowService.getLatestVersionFlow(flowID,projectVersionID);
-            dwsFlow.setFlowVersions(Arrays.asList(dwsFlow.getLatestVersion()));
+            dssFlow = flowService.getLatestVersionFlow(flowID,projectVersionID);
+            dssFlow.setFlowVersions(Arrays.asList(dssFlow.getLatestVersion()));
         }else {
-            dwsFlow = flowService.getOneVersionFlow(flowID, version,projectVersionID);
+            dssFlow = flowService.getOneVersionFlow(flowID, version,projectVersionID);
         }
-        return Message.messageToResponse(Message.ok().data("flow",dwsFlow));
+        return Message.messageToResponse(Message.ok().data("flow", dssFlow));
     }
 
     @POST
@@ -175,6 +175,6 @@ public class FlowRestfulApi {
     }
 
     @Autowired
-    private DWSProjectService projectService;
+    private DSSProjectService projectService;
 
 }

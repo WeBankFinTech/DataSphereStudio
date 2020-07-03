@@ -101,8 +101,9 @@ public class ProjectRestfulApi {
         String product = json.get("product").getTextValue();
         Integer applicationArea = json.get("applicationArea").getIntValue();
         String business = json.get("business").getTextValue();
+        Long workspaceId = json.get("workspaceId") == null ? 1 : json.get("workspaceId").getLongValue();
         // TODO: 2019/5/16 空值校验，重复名校验
-        projectService.addProject(userName, name, description, taxonomyID,product,applicationArea,business);
+        projectService.addProject(userName, name, description, taxonomyID,product,applicationArea,business, workspaceId);
         return Message.messageToResponse(Message.ok());
     }
 

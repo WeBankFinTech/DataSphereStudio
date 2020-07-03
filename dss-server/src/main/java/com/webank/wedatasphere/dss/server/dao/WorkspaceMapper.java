@@ -39,7 +39,7 @@ public interface WorkspaceMapper {
     List<OnestopMenuVo> getApplicationMenuEn();
 
     List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
-    List<OnestopMenuAppInstanceVo> getMenuAppInstanceEn(Long id);
+    List<OnestopMenuAppInstanceVo> getMenuAppInstancesEn(Long id);
 
     List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
 

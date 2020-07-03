@@ -209,7 +209,7 @@ export default {
       this.isNavMenuShow = false;
     },
     mouseover() {
-      this.isNavMenuShow = this.$route.path != '/project'
+      this.isNavMenuShow = (this.$route.path != '/project' && this.$route.path != '/newhome')
     },
     mouseleave() {
       this.isNavMenuShow = false

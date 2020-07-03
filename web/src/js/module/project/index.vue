@@ -3,10 +3,8 @@
     <div class="page-bgc-header">
       <div class="header-info">
         <h1>{{$t('message.project.infoHeader')}}</h1>
-        <p>{{$t('message.project.infoBodyFirstRow')}}</p>
-        <p>{{$t('message.project.infoBodySecondRow')}}</p>
       </div>
-      <feature @add-project="addProject"></feature>
+      <feature />
     </div>
     <template v-if="dataList.length > 0">
       <project-content-item
@@ -17,8 +15,10 @@
         :data-list="item.dssProjectList"
         :current-data="item"
         :precent-list="precentList"
+        source="project"
         tag-prop="business"
         @goto="gotoWorkflow"
+        @add="addProject"
         @modify="projectModify"
         @delete="deleteProject"
         @copy="copyProject"
@@ -158,6 +158,7 @@ export default {
       showResourceView: false, // 是否展示资源文件上传
       projectResources: [], // 工程级别资源文件
       activeItem: {},
+      workspaceId: 1 // 默认工作空间Id
     };
   },
   computed: {
@@ -171,7 +172,14 @@ export default {
       return this.$t('message.project.tips');
     }
   },
+  watch: {
+    $route() {
+      this.workspaceId = this.$route.query.workspaceId; //获取传来的参数
+      this.getclassListData();
+    }
+  },
   created() {
+    this.workspaceId = this.$route.query.workspaceId;
     // 获取所有分类和工程
     this.getclassListData();
   },
@@ -183,7 +191,7 @@ export default {
   methods: {
     getclassListData() {
       this.loading = true;
-      return api.fetch(`/dss/tree`, {}, 'get').then((res) => {
+      return api.fetch(`/dss/tree`, { workspaceId: this.workspaceId }, 'get').then((res) => {
         this.cacheData = res.data;
         this.dataList = this.cacheData;
         this.activeItem = this.dataList[0];
@@ -208,10 +216,11 @@ export default {
         return item.id === projectData.taxonomyID;
       });
       if (this.checkName(projectList[0].dssProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+      projectData.workspaceId = this.workspaceId;
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addProject', projectData, 'post').then(() => {
-          this.$Message.success(`${this.$t('message.project.createProject')}${this.$t('message.newConst.success')}`);
+          this.$Message.success(`${this.$t('message.project.createproject')}${this.$t('message.newConst.success')}`);
           this.getclassListData().then((data) => {
             // 新建完工程进到工作流页
             const currentProject = data[0].dssProjectList.filter((project) => project.name === projectData.name)[0];
@@ -221,6 +230,7 @@ export default {
                 projectTaxonomyID: 1,
                 projectID: currentProject.latestVersion.projectID,
                 projectVersionID: currentProject.latestVersion.id,
+                workspaceId: this.workspaceId
               }
             });
           });
@@ -312,7 +322,7 @@ export default {
         projectID: subItem.id,
         projectVersionID: subItem.latestVersion.id,
         projectName: subItem.name,
-        workspaceId: this.$route.query.workspaceId
+        workspaceId: this.workspaceId
       }
       this.$router.push({
         name: 'Workflow',

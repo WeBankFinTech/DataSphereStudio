@@ -12,7 +12,7 @@
         :key="item.id"
         :hide-button-bar="false"
         :hide-publish-andcopy="false"
-        :data-list="item.dwsProjectList"
+        :data-list="item.dssProjectList"
         :current-data="item"
         :precent-list="precentList"
         source="project"
@@ -158,6 +158,7 @@ export default {
       showResourceView: false, // 是否展示资源文件上传
       projectResources: [], // 工程级别资源文件
       activeItem: {},
+      workspaceId: 1 // 默认工作空间Id
     };
   },
   computed: {
@@ -171,7 +172,14 @@ export default {
       return this.$t('message.project.tips');
     }
   },
+  watch: {
+    $route() {
+      this.workspaceId = this.$route.query.workspaceId; //获取传来的参数
+      this.getclassListData();
+    }
+  },
   created() {
+    this.workspaceId = this.$route.query.workspaceId;
     // 获取所有分类和工程
     this.getclassListData();
   },
@@ -183,10 +191,10 @@ export default {
   methods: {
     getclassListData() {
       this.loading = true;
-      return api.fetch(`/dss/tree`, {}, 'get').then((res) => {
+      return api.fetch(`/dss/tree`, { workspaceId: this.workspaceId }, 'get').then((res) => {
         this.cacheData = res.data;
         this.dataList = this.cacheData;
-        // this.activeItem = this.dataList[0];
+        this.activeItem = this.dataList[0];
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t('message.project.updteTime');
         })
@@ -207,20 +215,22 @@ export default {
       let projectList = this.cacheData.filter((item) => {
         return item.id === projectData.taxonomyID;
       });
-      if (this.checkName(projectList[0].dwsProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+      if (this.checkName(projectList[0].dssProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+      projectData.workspaceId = this.workspaceId;
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addProject', projectData, 'post').then(() => {
-          this.$Message.success(`${this.$t('message.project.createProject')}${this.$t('message.newConst.success')}`);
+          this.$Message.success(`${this.$t('message.project.createproject')}${this.$t('message.newConst.success')}`);
           this.getclassListData().then((data) => {
             // 新建完工程进到工作流页
-            const currentProject = data[0].dwsProjectList.filter((project) => project.name === projectData.name)[0];
+            const currentProject = data[0].dssProjectList.filter((project) => project.name === projectData.name)[0];
             this.$router.push({
               name: 'Workflow',
               query: {
                 projectTaxonomyID: 1,
                 projectID: currentProject.latestVersion.projectID,
                 projectVersionID: currentProject.latestVersion.id,
+                workspaceId: this.workspaceId
               }
             });
           });
@@ -312,7 +322,7 @@ export default {
         projectID: subItem.id,
         projectVersionID: subItem.latestVersion.id,
         projectName: subItem.name,
-        workspaceId: this.$route.query.workspaceId
+        workspaceId: this.workspaceId
       }
       this.$router.push({
         name: 'Workflow',
@@ -332,7 +342,7 @@ export default {
         let tepArray = storage.get('projectList', 'local');
         this.dataList = tepArray.map((item) => {
           if (id === item.id) {
-            item.dwsProjectList = item.dwsProjectList.filter((subItem) => {
+            item.dssProjectList = item.dssProjectList.filter((subItem) => {
               return subItem.name.indexOf(event.target.value) != -1;
             });
           }
@@ -401,7 +411,7 @@ export default {
           let projectList = this.cacheData.filter((item) => {
             return item.id === this.currentProjectData.taxonomyID;
           });
-          if (this.checkName(projectList[0].dwsProjectList, name, this.currentProjectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
+          if (this.checkName(projectList[0].dssProjectList, name, this.currentProjectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
         };
         this.dispatch('Project:copy', copyCheckName);
       } else if (this.currentForm === 'publishForm') {
@@ -493,7 +503,7 @@ export default {
       this.sortType[id] = name === 'updateTime' ? this.$t('message.project.updteTime') : this.$t('message.project.name')
       this.dataList = this.dataList.map((item) => {
         if (!id || id === item.id) {
-          item.dwsProjectList = item.dwsProjectList.sort((a, b) => {
+          item.dssProjectList = item.dssProjectList.sort((a, b) => {
             if (name === 'updateTime') {
               return b.latestVersion[name] - a.latestVersion[name];
             } else {

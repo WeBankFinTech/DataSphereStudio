@@ -5,7 +5,6 @@
     </h3>
     <slot></slot>
     <Row
-      v-if="dataList.length > 0"
       class="content-item">
       <i-col
         :xs="12" :sm="8" :md="6" :lg="4"
@@ -163,9 +162,9 @@
       </i-col>
 
     </Row>
-    <div
+    <!-- <div
       class="no-data"
-      v-else>{{$t('message.workflowItem.nodata')}}</div>
+      v-else>{{$t('message.workflowItem.nodata')}}</div> -->
     <Page
       v-if="dataList.length > 0 && pagination.size < dataList.length "
       class="page-bar"

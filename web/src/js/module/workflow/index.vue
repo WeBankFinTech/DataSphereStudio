@@ -1,20 +1,11 @@
 <template>
   <div class="page-bgc">
-    <Row style="padding:20px 25px 10px">
-      <i-col
-        v-if="!myReadonly"
-        :xs="6" :sm="5" :md="4" :lg="4"
-        class="entry">
-        <div  @click="addProject">
-          <Icon
-            type="ios-add"
-            class="icon-blod"
-            size="25"
-          ></Icon>
-          <span>{{$t('message.workflow.createWorkflow')}}</span>
-        </div>
-      </i-col>
-    </Row>
+    <div class="page-bgc-header">
+      <div class="header-info">
+        <h1>{{$t('message.workflow.infoHeader')}}</h1>
+      </div>
+      <!-- <feature @add-project="addProject"></feature> -->
+    </div>
     <div>
       <template v-if="dataList.length > 0">
         <project-content-item
@@ -25,7 +16,9 @@
           :current-data="item"
           :data-list="item.dssFlowList"
           :readonly="myReadonly"
+          source="workflow"
           tag-prop="uses"
+          @add="addProject"
           @goto="gotoWorkflow"
           @detail="versionDetail"
           @modify="projectModify"
@@ -127,6 +120,7 @@ export default {
       flowTaxonomyID: 0, // 工作流分类的id
       readonly: 'false',
       currentWorkflowData: null,
+      workspaceId: null
       // publishModelShow: false,
     };
   },
@@ -151,6 +145,7 @@ export default {
     }
   },
   created() {
+    this.workspaceId = this.$route.query.workspaceId;
     this.fetchFlowData();
   },
   methods: {
@@ -162,9 +157,9 @@ export default {
     // 获取工作流的参数
     getParams(isRootFlow, flowTaxonomyID) {
       if (flowTaxonomyID) {
-        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&flowTaxonomyID=${flowTaxonomyID}&isRootFlow=${!isRootFlow}`;
+        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&flowTaxonomyID=${flowTaxonomyID}&isRootFlow=${!isRootFlow}&workspaceId=${this.workspaceId}`;
       } else {
-        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&isRootFlow=${!isRootFlow}`;
+        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&isRootFlow=${!isRootFlow}&workspaceId=${this.workspaceId}`;
       }
     },
     // 获取所有分类和工作流

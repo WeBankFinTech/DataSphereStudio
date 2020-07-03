@@ -59,16 +59,16 @@
                 <exclude>aopalliance:aopalliance:jar</exclude>
                 <exclude>asm:asm:jar</exclude>
                 <exclude>cglib:cglib:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-autoscaling:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-core:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-ec2:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-route53:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-sts:jar</exclude>
-                <exclude>com.amazonaws:jmespath-java:jar</exclude>
+<!--                <exclude>com.amazonaws:aws-java-sdk-autoscaling:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-core:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-ec2:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-route53:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-sts:jar</exclude>-->
+<!--                <exclude>com.amazonaws:jmespath-java:jar</exclude>-->
                 <exclude>com.fasterxml.jackson.core:jackson-annotations:jar</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-core:jar</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-databind:jar</exclude>
-                <exclude>com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar</exclude>
+<!--                <exclude>com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar</exclude>-->
                 <exclude>com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar</exclude>
                 <exclude>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar</exclude>
                 <exclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:jar</exclude>
@@ -264,7 +264,7 @@
                 <exclude>org.springframework:spring-web:jar</exclude>
                 <exclude>org.springframework:spring-webmvc:jar</exclude>
                 <exclude>org.yaml:snakeyaml:jar</exclude>
-                <exclude>software.amazon.ion:ion-java:jar</exclude>
+<!--                <exclude>software.amazon.ion:ion-java:jar</exclude>-->
                 <exclude>xmlpull:xmlpull:jar</exclude>
                 <exclude>xpp3:xpp3_min:jar</exclude>
             </excludes>

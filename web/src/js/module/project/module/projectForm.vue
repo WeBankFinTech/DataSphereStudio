@@ -16,15 +16,14 @@
         <Input
           v-model="projectDataCurrent.name"
           :placeholder="$t('message.newConst.enterName')"
-          :disabled="actionType === 'modify'"></Input>
+          :disabled="actionType === 'modify'"/>
       </FormItem>
       <FormItem
         :label="$t('message.project.product')"
         prop="product">
         <Input
           v-model="projectDataCurrent.product"
-          :placeholder="$t('message.newConst.enterName')">
-        </Input>
+          :placeholder="$t('message.newConst.enterName')"/>
       </FormItem>
       <FormItem
         :label="$t('message.project.appArea')"
@@ -54,7 +53,7 @@
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
-          :placeholder="$t('message.project.pleaseInputProjectDesc')"></Input>
+          :placeholder="$t('message.project.pleaseInputProjectDesc')"/>
       </FormItem>
     </Form>
     <div slot="footer">

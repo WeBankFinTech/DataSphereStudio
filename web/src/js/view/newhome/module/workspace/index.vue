@@ -45,8 +45,9 @@
             <h3 class="item-header">
               <span>{{ $t('message.workspace.workspaceList') }}</span>
             </h3>
-            <Row class="content-item" v-show="visual === 'card'">
+            <Row ref="row" class="content-item" v-show="visual === 'card'">
               <i-col
+                ref="col"
                 class="workspace-item"
                 :xs="12" :sm="8" :md="4" :lg="4"
                 v-for="item in originWorkspaceData"
@@ -147,12 +148,29 @@ export default {
       pageSize: 4,
       pageNum: 1,
       videosClick: 1,
-      videosMaxClick: null
+      videosMaxClick: null,
+      listWrap: 0,//屏幕宽度
     }
   },
   created() {
     this.getWorkspaces();
     this.getVideos();
+  },
+  mounted(){
+    this.listWrap = this.$refs.row.$el.offsetWidth;
+    this.initWorkspace();
+    window.onresize = () => {
+      const that = this
+      return (() => {
+        that.listWrap = this.$refs.row.$el.offsetWidth;
+      })()
+    }
+  },
+  watch: {
+    'listWrap': function(val){ //监听容器宽度变化
+      this.pageSize = Math.floor(val / 252)
+      this.initWorkspace();
+    },
   },
   methods: {
     getWorkspaces() {

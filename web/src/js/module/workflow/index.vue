@@ -14,7 +14,7 @@
           :hide-button-bar="false"
           :hide-publish-andcopy="true"
           :current-data="item"
-          :data-list="item.dwsFlowList"
+          :data-list="item.dssFlowList"
           :readonly="myReadonly"
           source="workflow"
           tag-prop="uses"
@@ -120,6 +120,7 @@ export default {
       flowTaxonomyID: 0, // 工作流分类的id
       readonly: 'false',
       currentWorkflowData: null,
+      workspaceId: null
       // publishModelShow: false,
     };
   },
@@ -144,6 +145,7 @@ export default {
     }
   },
   created() {
+    this.workspaceId = this.$route.query.workspaceId;
     this.fetchFlowData();
   },
   methods: {
@@ -155,9 +157,9 @@ export default {
     // 获取工作流的参数
     getParams(isRootFlow, flowTaxonomyID) {
       if (flowTaxonomyID) {
-        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&flowTaxonomyID=${flowTaxonomyID}&isRootFlow=${!isRootFlow}`;
+        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&flowTaxonomyID=${flowTaxonomyID}&isRootFlow=${!isRootFlow}&workspaceId=${this.workspaceId}`;
       } else {
-        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&isRootFlow=${!isRootFlow}`;
+        this.params = `?projectTaxonomyID=${this.$route.query.projectTaxonomyID}&projectVersionID=${this.$route.query.projectVersionID}&isRootFlow=${!isRootFlow}&workspaceId=${this.workspaceId}`;
       }
     },
     // 获取所有分类和工作流
@@ -184,7 +186,7 @@ export default {
       let flowList = this.cacheData.filter((item) => {
         return item.id === projectData.taxonomyID;
       });
-      if (this.checkName(flowList[0].dwsFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
+      if (this.checkName(flowList[0].dssFlowList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addFlow', projectData, 'post').then(() => {
@@ -356,8 +358,8 @@ export default {
         projectVersionID: +this.$route.query.projectVersionID,
       };
       for (let i = 0; i < this.dataList.length; i++) {
-        for (let j = 0; j < this.dataList[i].dwsFlowList.length; j++) {
-          if (this.dataList[i].dwsFlowList[j].id === project.id) {
+        for (let j = 0; j < this.dataList[i].dssFlowList.length; j++) {
+          if (this.dataList[i].dssFlowList[j].id === project.id) {
             this.flowTaxonomyID = this.dataList[i].id;
             break;
           }
@@ -378,7 +380,7 @@ export default {
         let tepArray = storage.get('flowsList');
         this.dataList = tepArray.map((item) => {
           if (id === item.id) {
-            item.dwsFlowList = item.dwsFlowList.filter((subItem) => {
+            item.dssFlowList = item.dssFlowList.filter((subItem) => {
               return subItem.name.indexOf(event.target.value) != -1;
             });
           }

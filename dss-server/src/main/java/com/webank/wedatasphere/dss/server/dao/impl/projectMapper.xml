@@ -22,7 +22,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.server.dao.ProjectMapper">
 
     <sql id="project_main">
-        id,`name`,`source`,`description`,`org_id`,`visibility`,`is_transfer`,`initial_org_id`,`user_id`,`create_time`,`create_by`,`product`,`application_area`,`business`
+        id,`name`,`source`,`description`,`org_id`,`visibility`,`is_transfer`,`initial_org_id`,`user_id`,`create_time`,`create_by`,`product`,`application_area`,`business`,`workspace_id`
     </sql>
 
     <sql id="project_version">
@@ -61,7 +61,7 @@
     <insert id="addProject" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.common.entity.project.DSSProject">
         INSERT INTO dss_project (<include refid = "project_main" />)
         VALUES
-        (#{id},#{name},#{source},#{description},#{orgID},#{visibility},#{isTransfer},#{initialOrgID},#{userID},#{createTime},#{createBy},#{product},#{applicationArea},#{business})
+        (#{id},#{name},#{source},#{description},#{orgID},#{visibility},#{isTransfer},#{initialOrgID},#{userID},#{createTime},#{createBy},#{product},#{applicationArea},#{business},#{workspaceId})
     </insert>
 
     <insert id="addProjectVersion" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.common.entity.project.DSSProjectVersion" >

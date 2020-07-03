@@ -216,7 +216,7 @@ export default {
         return item.id === projectData.taxonomyID;
       });
       if (this.checkName(projectList[0].dssProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.project.nameUnrepeatable'));
-      projectData.workspaceId = this.workspaceId;
+      projectData.workspaceId = Number(this.workspaceId);
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch('/dss/addProject', projectData, 'post').then(() => {

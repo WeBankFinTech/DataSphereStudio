@@ -18,28 +18,7 @@
           </div>
         </div>
       </div>
-      <!-- <div class="admin-box-right">
-        <p class="title">{{$t('message.GLY.KSRM')}}</p>
-        <div class="admin-box-video">
-          <div v-for="(item, index) in videos" :key="index" class="video-item" @click="play(item)">
-            <video width="100%" height="100" controls>
-              <source :src="item.url" type="video/mp4" />
-            </video>
-            <h3 class="video-title">{{item.title}}</h3>
-          </div>
-        </div>
-      </div> -->
     </div>
-    <Modal
-      v-model="showVideo"
-      :title="video.title"
-      :footer-hide="true"
-      width="800"
-    >
-      <video v-if="showVideo" width="100%" controls autoplay>
-        <source :src="video.url" type="video/mp4" />
-      </video>
-    </Modal>
   </div>
 </template>
 <script>
@@ -62,14 +41,12 @@ export default {
         {title: 'Scriptis',url: '/home',icon: 'fi-scriptis'},
         {title: 'Workflow',url: '/project',icon: 'fi-workflow1'},
       ],
-      showVideo: false,
       video: {},
       demos: [],
       videos: []
     }
   },
   created() {
-    // this.getVideos();
     this.getDemos();
   },
   methods: {
@@ -103,10 +80,6 @@ export default {
     getsrc(item) {
       return this.src[item.name];
     },
-    play(item) {
-      this.showVideo = true;
-      this.video = item
-    }
   }
 };
 </script>

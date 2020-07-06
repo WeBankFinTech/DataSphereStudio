@@ -29,6 +29,9 @@ const getVersion = () => {
   return pkg.version;
 }
 
+const host = "0.0.0.0";
+const port = "9001";
+
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
@@ -42,7 +45,7 @@ module.exports = {
     },
     proxy: {    //代理转发
       '^/api/rest_j/v1': {
-        target: 'http://host:port',  //后端服务地址
+        target: `http://${host}:${port}`,  //后端服务地址
         ws: true,
         changeOrigin: true,
         pathRewrite: {
@@ -50,7 +53,7 @@ module.exports = {
         }
       },
       '^/ws/api': {    //websocket
-        target: 'ws://host:port',
+        target: `ws://${host}:${port}`,
         ws: true,
         secure: false,
       },

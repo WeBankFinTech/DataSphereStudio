@@ -30,7 +30,7 @@ public interface DSSProjectTaxonomyService {
     List<DSSProjectTaxonomy> listProjectTaxonomyByUser(String userName);
 
     //----------------------
-    List<DSSProjectTaxonomy> listAllProjectTaxonomy(String userName);
+    List<DSSProjectTaxonomy> listAllProjectTaxonomy(String userName, Long workspaceId);
 
     List<DSSProjectTaxonomy> listProjectTaxonomy(Long taxonomyID, String userName);
 

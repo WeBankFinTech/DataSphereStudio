@@ -810,6 +810,7 @@ export default {
         cache: {},
       };
       this.script.resultList = null;
+      this._execute_last_progress = null;
     },
     resetProgress() {
       this.script.progress = {

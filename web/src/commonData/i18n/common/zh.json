@@ -23,7 +23,7 @@
         "project": {
             "projectName": "工程名",
             "gotoScriptis": "进入Scriptis",
-            "createProject": "创建工程",
+            "createproject": "创建工程",
             "editorProject": "修改工程",
             "search": "搜索工程",
             "deleteProject": "删除工程",
@@ -82,11 +82,11 @@
             "publishSuccess": "发布成功",
             "publishFailed": "发布失败",
             "infoTitle": "欢迎信息",
-            "infoHeader": "欢迎来到 DataSphere Studio !",
+            "infoHeader": "欢迎来到工作流开发首页！",
             "infoBodyFirstRow": "DataSphere Studio是微众银行大数据平台——WeDataSphere，自研的一站式数据应用开发管理门户。",
             "infoBodySecondRow": "基于Linkis计算中间件构建，可轻松整合上层各数据应用系统，让数据应用开发变得简洁又易用。",
             "appTitle": "应用导航",
-            "applicationStudio": "业务应用开发",
+            "workspace": "工作空间",
             "applicationMore": "了解更多",
             "applicationTipsFirst": "工程 > 工作流，是应用开发的基本组织结构。",
             "applictaionTipsSecond": "在工作流拖拽编辑页面，DataSphere Studio已集成的所有数据应用系统，都将以工作流节点的形式出现，让您能够以业务的视角将其编排串连起来，快速实现全部业务。",
@@ -105,6 +105,7 @@
             "noData": "暂无数据请添加"
         },
         "workspace": {
+          "infoHeader": "欢迎来到 DataSphere Studio !",
           "createWorkspace": "创建工作空间",
           "searchWorkspace": "搜索工作空间",
           "workspaceList": "工作空间列表",
@@ -131,8 +132,9 @@
           "HYP": "换一批"
         },
         "workflow": {
+            "infoHeader": "欢迎来到工作流！",
             "workflow": "工作流",
-            "createWorkflow": "创建工作流",
+            "createworkflow": "创建工作流",
             "gotoVisualis": "进入Visualis",
             "publishProject": "发布工程",
             "searchWorkflow": "搜索工作流",
@@ -806,6 +808,10 @@
             "clearCacheSuccess": "清除本地数据缓存成功!",
             "comingSoon": "尚未开源，敬请期待！"
         },
+        "header": {
+            "home": "首页",
+            "console": "控制台"
+        },
         "headerNavBar": {
             "Workflow": "工作流开发",
             "Exchangis": "数据交换组件",
@@ -1058,7 +1064,8 @@
                 "cancel": "取消",
                 "running": "运行中",
                 "stop": "不可用",
-                "searchPlaceholder": "搜索应用系统"
+                "searchPlaceholder": "搜索应用系统",
+                "tips": "没有数据或者未添加"
             }
         },
         "database": {

@@ -1,6 +1,6 @@
 <template>
   <div class="workspace-table">
-    <Table :columns="columns" :data="tableData" style="margin-bottom: 10px;">
+    <Table :columns="columns" :data="tableData" style="margin-bottom: 10px;" @on-row-click="gotoWorkspace">
       <template slot-scope="{ row }" slot="name">
         <span>{{ row.name }}</span>
       </template>
@@ -10,11 +10,13 @@
       </template>
 
       <template slot-scope="{ row }" slot="label" >
-        <Tag color="blue" v-for="(label, index) in row.label.split(',')" :key="index">{{label}}</Tag>
+        <template v-if="row.label">
+          <Tag color="blue" v-for="(label, index) in row.label.split(',')" :key="index">{{label}}</Tag>
+        </template>
       </template>
 
       <template slot-scope="{ row }" slot="description">
-        <span>{{ row.description }}</span>
+        <span class="desc">{{ row.description }}</span>
       </template>
     </Table>
   </div>
@@ -65,6 +67,20 @@ export default {
     dateFormat(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
     },
+    gotoWorkspace(workspace) {
+      this.$router.push({ path: '/workspace', query: { workspaceId: workspace.id }});
+    },
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.workspace-table {
+  .desc {
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+</style>

@@ -800,7 +800,8 @@
             "password": "请输入密码！",
             "loginSuccess": "登录成功",
             "haveLogin": "您已经登录，请不要重复登录",
-            "vaildFaild": "验证未通过！"
+            "vaildFaild": "验证未通过！",
+            "captcha": "请输入验证码"
         },
         "userMenu": {
             "title": "警告",
@@ -1065,7 +1066,8 @@
                 "running": "运行中",
                 "stop": "不可用",
                 "searchPlaceholder": "搜索应用系统",
-                "tips": "没有数据或者未添加"
+                "tips": "没有数据或者未添加",
+                "repeat": "不能重复添加相同的应用"
             }
         },
         "database": {

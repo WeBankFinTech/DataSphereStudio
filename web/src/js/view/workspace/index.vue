@@ -127,7 +127,7 @@
         <FormItem :label="$t('message.workSpace.home.selectApp')"
           prop="selectApp"> 
           <Select v-model="formDynamic.selectApp">
-            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had">{{ item.title }}</Option>
+            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had||!item.active">{{ item.title }}</Option>
           </Select>
         </FormItem>
       </Form>
@@ -218,8 +218,8 @@ export default {
         this.applications = data.applications || [];
       })
     },
-    deleteFavoriteApp(favouritesId, index){
-      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites/${favouritesId}`, 'delete').then(data=>{
+    deleteFavoriteApp(favoriteId, index){
+      api.fetch(`/dss/workspaces/${this.workspaceId}/favorites/${favoriteId}`, 'delete').then(data=>{
         this.favoriteApps.splice(index, 1);
       })
     },
@@ -228,14 +228,20 @@ export default {
       this.$refs.dynamicForm.validate((valid) => {
         if (valid) {
           // this.addAppLoading = true;
+          const menuApplicationId = parseInt(this.formDynamic.selectApp, 10);
+          const favoriteApp = this.findFavoriteAppsByMenuId(menuApplicationId);
+          if(favoriteApp) {
+            return this.$Message.error(`${this.$t('message.workSpace.home.repeat')}`);
+          }
           this.show = false;
-          api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, {menuApplicationId: parseInt(this.formDynamic.selectApp, 10)},'post').then(data=>{
+          api.fetch(`/dss/workspaces/${this.workspaceId}/favorites`, {menuApplicationId: menuApplicationId},'post').then(data=>{
             const app = this.findAppByApplicationId(this.formDynamic.selectApp)
             this.favoriteApps.push({
               ...app,
-              "id": data.favouritesId,
+              "id": data.favoriteId,
               "menuApplicationId": app.id, //application表里的id
-            })
+            });
+
           })
         }
       });
@@ -244,6 +250,12 @@ export default {
     findAppByApplicationId(id){
       const arr = this.flatApps();
       const result = arr.find(item=>item.id==id);
+      return result;
+    },
+
+    findFavoriteAppsByMenuId(menuId){
+      const arr = this.favoriteApps;
+      const result = arr.find(item=>item.menuApplicationId==menuId);
       return result;
     },
 

@@ -32,7 +32,7 @@ public interface DSSProjectService {
 
     DSSProject getProjectByID(Long id);
 
-    Long addProject(String userName, String name, String description, Long taxonomyID,String product,Integer applicationArea,String business) throws DSSErrorException, AppJointErrorException;
+    Long addProject(String userName, String name, String description, Long taxonomyID,String product,Integer applicationArea,String business, Long workspaceId) throws DSSErrorException, AppJointErrorException;
 
     void updateProject(long projectID, String name, String description, String userName , String product ,Integer applicationArea ,String business) throws AppJointErrorException;
 

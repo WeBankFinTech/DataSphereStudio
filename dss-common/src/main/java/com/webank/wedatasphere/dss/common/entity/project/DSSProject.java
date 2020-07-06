@@ -48,6 +48,7 @@ public class DSSProject implements Project {
     private String product;
     private Integer applicationArea;
     private String business;
+    private Long workspaceId;
 
     private DSSProjectVersion latestVersion;
     private Boolean isNotPublish;
@@ -281,5 +282,13 @@ public class DSSProject implements Project {
 
     public void setBusiness(String business) {
         this.business = business;
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

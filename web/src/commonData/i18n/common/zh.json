@@ -800,7 +800,8 @@
             "password": "请输入密码！",
             "loginSuccess": "登录成功",
             "haveLogin": "您已经登录，请不要重复登录",
-            "vaildFaild": "验证未通过！"
+            "vaildFaild": "验证未通过！",
+            "captcha": "请输入验证码"
         },
         "userMenu": {
             "title": "警告",

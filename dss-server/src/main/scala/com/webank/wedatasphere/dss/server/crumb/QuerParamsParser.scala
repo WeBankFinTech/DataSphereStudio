@@ -27,10 +27,11 @@ object QuerParamsParser {
 
   def getCrumbType(queryParams: String): CrumbType = {
     queryParams.split("&").size match {
-      case 1 => if ("".equals(queryParams)) CrumbType.All else CrumbType.SortProject
-      case 3 => CrumbType.Project
-      case 4 => CrumbType.SortFlow
-      case 5 => CrumbType.Flow
+      case 1 => CrumbType.All
+      case 2 => CrumbType.SortProject
+      case 4 => CrumbType.Project
+      case 5 => CrumbType.SortFlow
+      case 6 => CrumbType.Flow
     }
   }
 

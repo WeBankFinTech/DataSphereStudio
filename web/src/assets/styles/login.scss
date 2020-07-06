@@ -44,7 +44,6 @@
     }
     .login-main {
         width: 380px;
-        height: 300px;
         background-color: $body-background;
         margin-right: 9.5%;
         padding: 20px;
@@ -76,9 +75,15 @@
         }
     }
     .remember-user-name {
-        margin: 5px 0 0 10px;
+        margin: 0px 0 10px 10px;
     }
     .ivu-form-item {
         margin-bottom: 20px;
+    }
+    .captcha-wp {
+        display: flex;
+        img{
+            height: 44px;
+        }
     }
 }

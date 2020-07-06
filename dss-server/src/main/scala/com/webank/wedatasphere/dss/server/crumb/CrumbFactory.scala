@@ -104,7 +104,7 @@ class CrumbFactory {
 
   def createCrumbData(crumbType: CrumbType, params: java.util.Map[String, String],userName:String): Any = {
     crumbType match {
-      case CrumbType.All =>createAllData(userName)
+      case CrumbType.All =>createAllData(userName, params.get("workspaceId").toLong)
       case CrumbType.SortProject =>createSortProjectData(params.get("projectTaxonomyID").toLong,userName)
       case CrumbType.Project =>createProjectData(params.get("projectVersionID").toLong,params.get("isRootFlow").toBoolean)
       case CrumbType.SortFlow =>createSortFlowData(params.get("projectVersionID").toLong,params.get("flowTaxonomyID").toLong,params.get("isRootFlow").toBoolean)
@@ -112,8 +112,8 @@ class CrumbFactory {
     }
   }
 
-  private def createAllData(userName:String):java.util.List[DSSProjectTaxonomy] ={
-    projectTaxonomyService.listAllProjectTaxonomy(userName)
+  private def createAllData(userName:String, workspaceId: Long):java.util.List[DSSProjectTaxonomy] ={
+    projectTaxonomyService.listAllProjectTaxonomy(userName, workspaceId)
   }
 
   private def createSortProjectData(projectTaxonomyID:Long,userName:String):java.util.List[DSSProjectTaxonomy] ={

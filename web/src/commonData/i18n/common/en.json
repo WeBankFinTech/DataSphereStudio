@@ -800,7 +800,8 @@
             "password": "Please enter password！",
             "loginSuccess": "Login Success",
             "haveLogin": "You have already logged in, please do not login repeatedly",
-            "vaildFaild": "Authentication failed!"
+            "vaildFaild": "Authentication failed!",
+            "captcha": "Please enter captcha"
         },
         "userMenu": {
             "title": "Warning",
@@ -1065,7 +1066,8 @@
                 "running": "running",
                 "stop": "disable",
                 "searchPlaceholder": "Search application",
-                "tips": "No data or no addition"
+                "tips": "No data or no addition",
+                "repeat": "You cannot add the same application repeatedly"
             }
         },
         "database": {

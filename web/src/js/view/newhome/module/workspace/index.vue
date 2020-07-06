@@ -177,6 +177,9 @@ export default {
       })()
     }
   },
+  beforeDestroy(){
+    window.onresize = null;
+  },
   watch: {
     'listWrap': function(val){ //监听容器宽度变化
       this.pageSize = Math.floor(val / 252)

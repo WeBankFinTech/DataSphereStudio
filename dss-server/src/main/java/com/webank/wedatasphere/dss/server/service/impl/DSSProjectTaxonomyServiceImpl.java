@@ -62,18 +62,21 @@ public class DSSProjectTaxonomyServiceImpl implements DSSProjectTaxonomyService 
 
 
     @Override
-    public List<DSSProjectTaxonomy> listAllProjectTaxonomy(String userName) {
-        List<DSSProjectTaxonomy> dwsProjectTaxonomies = listProjectTaxonomyByUser(userName);
-        for (DSSProjectTaxonomy dssProjectTaxonomy : dwsProjectTaxonomies) {
+    public List<DSSProjectTaxonomy> listAllProjectTaxonomy(String userName, Long workspaceId) {
+        List<DSSProjectTaxonomy> dssProjectTaxonomies = listProjectTaxonomyByUser(userName);
+        for (DSSProjectTaxonomy dssProjectTaxonomy : dssProjectTaxonomies) {
             List<Long> projectIDs = listProjectIDByTaxonomyID(dssProjectTaxonomy.getId(), userName);
             ArrayList<DSSProject> dssProjectList = new ArrayList<>();
             for (Long projectID : projectIDs) {
                 DSSProject dssProject = projectService.getLatestVersionProject(projectID);
-                dssProjectList.add(dssProject);
+                // 只选择返回属于这个workspace的project，(某些用户拥有多个workspace的不同project)
+                if(workspaceId.equals(dssProject.getWorkspaceId())) {
+                    dssProjectList.add(dssProject);
+                }
             }
             dssProjectTaxonomy.setDssProjectList(dssProjectList);
         }
-        return dwsProjectTaxonomies;
+        return dssProjectTaxonomies;
     }
 
     @Override

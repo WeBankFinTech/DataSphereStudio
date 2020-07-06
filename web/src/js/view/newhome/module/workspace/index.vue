@@ -169,14 +169,17 @@ export default {
     this.getVideos();
   },
   mounted(){
-    this.listWrap = this.$refs.row.$el.offsetWidth;
+    this.listWrap = this.$refs.row.$el && this.$refs.row.$el.offsetWidth;
     this.initWorkspace();
     window.onresize = () => {
       const that = this
       return (() => {
-        that.listWrap = this.$refs.row.$el.offsetWidth;
+        that.listWrap = this.$refs.row.$el && this.$refs.row.$el.offsetWidth;
       })()
     }
+  },
+  beforeDestroy(){
+    window.onresize = null;
   },
   watch: {
     'listWrap': function(val){ //监听容器宽度变化

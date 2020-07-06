@@ -1065,7 +1065,8 @@
                 "running": "运行中",
                 "stop": "不可用",
                 "searchPlaceholder": "搜索应用系统",
-                "tips": "没有数据或者未添加"
+                "tips": "没有数据或者未添加",
+                "repeat": "不能重复添加相同的应用"
             }
         },
         "database": {

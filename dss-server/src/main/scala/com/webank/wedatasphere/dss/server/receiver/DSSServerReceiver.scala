@@ -19,8 +19,8 @@ package com.webank.wedatasphere.dss.server.receiver
 
 import com.webank.wedatasphere.dss.application.dao.ApplicationMapper
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
-import com.webank.wedatasphere.dss.common.protocol.{RequestDSSApplication, RequestDWSProject}
-import com.webank.wedatasphere.dss.server.service.DWSProjectService
+import com.webank.wedatasphere.dss.common.protocol.{RequestDSSApplication, RequestDSSProject}
+import com.webank.wedatasphere.dss.server.service.DSSProjectService
 import com.webank.wedatasphere.linkis.rpc.{Receiver, Sender}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -32,7 +32,7 @@ import scala.concurrent.duration.Duration
 class DSSServerReceiver extends Receiver{
 
   @Autowired
-  var dwsProjectService:DWSProjectService = _
+  var dwsProjectService:DSSProjectService = _
 
   @Autowired
   var applicationMapper:ApplicationMapper = _
@@ -40,7 +40,7 @@ class DSSServerReceiver extends Receiver{
   override def receive(message: Any, sender: Sender): Unit = {}
 
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
-    case f:RequestDWSProject => dwsProjectService.getExecutionDWSProject(f)
+    case f:RequestDSSProject => dwsProjectService.getExecutionDSSProject(f)
     case RequestDSSApplication(name) => applicationMapper.getApplication(name)
     case _ =>throw new DSSErrorException(90000,"")
   }

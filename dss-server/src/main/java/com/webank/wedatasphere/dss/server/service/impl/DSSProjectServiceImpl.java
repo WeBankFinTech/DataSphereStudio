@@ -99,7 +99,7 @@ public class DSSProjectServiceImpl implements DSSProjectService {
 
     @Transactional(rollbackFor = {DSSErrorException.class,AppJointErrorException.class})
     @Override
-    public Long addProject(String userName, String name, String description, Long taxonomyID,String product,Integer applicationArea,String business) throws DSSErrorException, AppJointErrorException {
+    public Long addProject(String userName, String name, String description, Long taxonomyID,String product,Integer applicationArea,String business, Long workspaceId) throws DSSErrorException, AppJointErrorException {
         DSSProject dssProject = new DSSProject();
         dssProject.setUserName(userName);
         dssProject.setName(name);
@@ -112,7 +112,7 @@ public class DSSProjectServiceImpl implements DSSProjectService {
         Map<Long,Long> appjointProjectIDAndAppID = createAppjointProject(dssProject);
         Long userID = dssUserMapper.getUserID(userName);
         //创建dss自己的project
-        Pair<Long, Long> pair = addDSSProject(userID, name, description,product,applicationArea,business);
+        Pair<Long, Long> pair = addDSSProject(userID, name, description,product,applicationArea,business, workspaceId);
         //添加关联
         projectTaxonomyMapper.addProjectTaxonomyRelation(pair.getFirst(), taxonomyID, userID);
         if(!appjointProjectIDAndAppID.isEmpty())projectMapper.addAccessProjectRelation(appjointProjectIDAndAppID,pair.getFirst());
@@ -132,7 +132,7 @@ public class DSSProjectServiceImpl implements DSSProjectService {
         return applicationProjectIDs;
     }
 
-    private Pair<Long,Long> addDSSProject(Long userID, String name, String description,String product,Integer applicationArea,String business) {
+    private Pair<Long,Long> addDSSProject(Long userID, String name, String description, String product, Integer applicationArea, String business, Long workspaceId) {
         DSSProject dssProject = new DSSProject();
         dssProject.setUserID(userID);
         dssProject.setName(name);
@@ -143,6 +143,7 @@ public class DSSProjectServiceImpl implements DSSProjectService {
         dssProject.setProduct(product);
         dssProject.setApplicationArea(applicationArea);
         dssProject.setBusiness(business);
+        dssProject.setWorkspaceId(workspaceId);
         projectMapper.addProject(dssProject);
         DSSProjectVersion dssProjectVersion = new DSSProjectVersion();
         dssProjectVersion.setComment(DSSServerConstant.DSS_PROJECT_FIRST_VERSION_COMMENT);

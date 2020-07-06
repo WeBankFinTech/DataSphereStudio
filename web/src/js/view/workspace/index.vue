@@ -127,7 +127,7 @@
         <FormItem :label="$t('message.workSpace.home.selectApp')"
           prop="selectApp"> 
           <Select v-model="formDynamic.selectApp">
-            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had">{{ item.title }}</Option>
+            <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had||!item.active">{{ item.title }}</Option>
           </Select>
         </FormItem>
       </Form>

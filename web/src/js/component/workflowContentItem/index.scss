@@ -31,6 +31,14 @@
         margin: 15px;
         box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
         background: #fff;
+        .project-add {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          cursor: pointer;
+        }
         .project-main {
             position: relative;
             height: 130px;

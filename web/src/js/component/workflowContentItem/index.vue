@@ -15,7 +15,7 @@
             class="icon-blod"
             size="60"
           ></Icon>
-          <span>{{$t(`message.${source}.create${source}`)}}</span>
+          <span>{{$t(`message.${source}`)}}</span>
         </div>
       </i-col>
       <i-col

@@ -27,11 +27,12 @@ export default {
         //     name: '用户管理',
         //     icon: 'ios-person-outline',
         // },
+        // {
+        //   id: 'FAQ',
+        //   name: this.$t('message.navMune.FAQ'),
+        //   icon: 'ios-help-circle-outline',
+        // }, 
         {
-          id: 'FAQ',
-          name: this.$t('message.navMune.FAQ'),
-          icon: 'ios-help-circle-outline',
-        }, {
           id: 'clearCache',
           name: this.$t('message.navMune.clearCache'),
           icon: 'ios-trash-outline',

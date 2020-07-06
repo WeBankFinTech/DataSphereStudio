@@ -75,7 +75,7 @@
       </div>
       <div
         class="icon-group">
-        <Icon
+        <!-- <Icon
           v-if="isSandbox"
           title="freedback"
           class="book"
@@ -90,7 +90,7 @@
           title="github"
           class="git"
           type="logo-github"
-          @click="linkTo('github')"></Icon>
+          @click="linkTo('github')"></Icon> -->
       </div>
     </div>
     <nav-menu

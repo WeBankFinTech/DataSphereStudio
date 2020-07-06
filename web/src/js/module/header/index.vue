@@ -19,7 +19,7 @@
           </h1>
           <img
             class="logo-img"
-            src="../../../assets/images/dssLogo6.png" :alt="$t('message.newConst.logoName')">
+            src="../../../assets/images/dssLogo6.svg" :alt="$t('message.newConst.logoName')">
         </div>
       </div>
       <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>

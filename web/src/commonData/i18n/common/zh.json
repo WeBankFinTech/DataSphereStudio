@@ -1,7 +1,7 @@
 {
     "message": {
         "newConst": {
-            "logoName": "DataSphere Studio",
+            "logoName": "CT-Luban",
             "ok": "确认",
             "cancel": "取消",
             "newCreate": "新建",
@@ -37,7 +37,7 @@
             "selectAppArea": "请选择应用领域",
             "business": "业务",
             "addBusiness": "新增业务",
-            "tips": "DataSphere Studio介绍:\nDataSphere Studio是微众银行大数据平台——WeDataSphere，自研的数据应用开发门户，基于Linkis数据中间件构建，轻松整合数据平台上层各应用组件，让数据应用开发变得简洁又易用。\nDataSphere Studio作为一站式数据研发、可视化、数据治理和调度的数据应用开发门户，定位为闭环涵盖数据应用的全流程，满足从数据导入、数据清洗、数据加工、数据可视化展现、数据治理到数据输出的数据应用全生命周期开发场景。\n创建一个工程，开始您的数据应用开发之旅吧！",
+            "tips": "CT-Luban介绍:\nCT-Luban是天翼云大数据平台——Luban，自研的数据应用开发门户，基于Linkis数据中间件构建，轻松整合数据平台上层各应用组件，让数据应用开发变得简洁又易用。\nCT-Luban作为一站式数据研发、可视化、数据治理和调度的数据应用开发门户，定位为闭环涵盖数据应用的全流程，满足从数据导入、数据清洗、数据加工、数据可视化展现、数据治理到数据输出的数据应用全生命周期开发场景。\n创建一个工程，开始您的数据应用开发之旅吧！",
             "updteTime": "修改时间",
             "nameUnrepeatable": "名称不可重复！",
             "eidtorProjectSuccess": "修改工程{name}成功！",
@@ -83,17 +83,17 @@
             "publishFailed": "发布失败",
             "infoTitle": "欢迎信息",
             "infoHeader": "欢迎来到工作流开发首页！",
-            "infoBodyFirstRow": "DataSphere Studio是微众银行大数据平台——WeDataSphere，自研的一站式数据应用开发管理门户。",
+            "infoBodyFirstRow": "CT-Luban是天翼云大数据平台——Luban，自研的一站式数据应用开发管理门户。",
             "infoBodySecondRow": "基于Linkis计算中间件构建，可轻松整合上层各数据应用系统，让数据应用开发变得简洁又易用。",
             "appTitle": "应用导航",
             "workspace": "工作空间",
             "applicationMore": "了解更多",
             "applicationTipsFirst": "工程 > 工作流，是应用开发的基本组织结构。",
-            "applictaionTipsSecond": "在工作流拖拽编辑页面，DataSphere Studio已集成的所有数据应用系统，都将以工作流节点的形式出现，让您能够以业务的视角将其编排串连起来，快速实现全部业务。",
+            "applictaionTipsSecond": "在工作流拖拽编辑页面，CT-Luban已集成的所有数据应用系统，都将以工作流节点的形式出现，让您能够以业务的视角将其编排串连起来，快速实现全部业务。",
             "integratedSystem": "已集成系统",
             "howToIntegratedsystem": "如何集成新系统",
-            "systemTipsFrist": "AppJoint—应用关节，是DataSphere Studio集成外部系统的核心概念。",
-            "systemTipsSecond": "AppJoint定义了一套统一且规范的前后台接入标准，让外部系统可简单快速地接入，成为DataSphere Studio全生命周期数据应用开发中的一环。",
+            "systemTipsFrist": "AppJoint—应用关节，是CT-Luban集成外部系统的核心概念。",
+            "systemTipsSecond": "AppJoint定义了一套统一且规范的前后台接入标准，让外部系统可简单快速地接入，成为CT-Luban全生命周期数据应用开发中的一环。",
             "clickMeAndSkip": "点我了解如何集成",
             "exchangisSubTitle": "数据交换",
             "scriptisSubTitle": "数据开发探索",
@@ -105,7 +105,7 @@
             "noData": "暂无数据请添加"
         },
         "workspace": {
-          "infoHeader": "欢迎来到 DataSphere Studio !",
+          "infoHeader": "欢迎来到 CT-Luban !",
           "createWorkspace": "创建工作空间",
           "searchWorkspace": "搜索工作空间",
           "workspaceList": "工作空间列表",
@@ -793,7 +793,7 @@
             "viewTableColumns": "更多字段请在“查看表字段”页面查看"
         },
         "login": {
-            "loginTitle": "欢迎登录DataSphere Studio系统！",
+            "loginTitle": "欢迎登录CT-Luban系统！",
             "userName": "请输入用户名",
             "remenber": "记住当前用户",
             "login": "登录",
@@ -1167,7 +1167,7 @@
                     "save": "保存",
                     "saveAs": "另存为"
                 },
-                "tips": "什么是Scriptis？\nScriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。\nScriptis？\n1. 选中工作空间的目录，创建文件夹；\n2. 右键某个文件夹 =>新建脚本；\n3. 选择脚本类型，如：SQL、Pyspark、HQL等；\n4. 书写脚本，点击执行，生成结果集。",
+                "tips": "什么是Scriptis？\nScriptis是天翼云(Luban)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。\nScriptis？\n1. 选中工作空间的目录，创建文件夹；\n2. 右键某个文件夹 =>新建脚本；\n3. 选择脚本类型，如：SQL、Pyspark、HQL等；\n4. 书写脚本，点击执行，生成结果集。",
                 "warning": {
                     "noDBInfo": "未获取到数据库表信息，脚本联想词功能可能存在异常！可刷新重试！",
                     "noUDF": "未获取到UDF和方法函数信息，脚本联想词功能可能存在异常！可刷新重试！",

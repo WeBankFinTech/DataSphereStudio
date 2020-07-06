@@ -21,7 +21,7 @@ var path = require('path');
 var archiver = require('archiver');
 
 var pkg = require('./package.json');
-var outputFileName = `wedatasphere-scriptis-${pkg.version}-dist.zip`;
+var outputFileName = `Luban-scriptis-${pkg.version}-dist.zip`;
 
 var outputFilePath = path.join(__dirname, outputFileName);
 

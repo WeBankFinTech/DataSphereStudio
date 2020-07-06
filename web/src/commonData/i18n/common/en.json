@@ -1,7 +1,7 @@
 {
     "message": {
         "newConst": {
-            "logoName": "DataSphere Studio",
+            "logoName": "CT-Luban",
             "ok": "OK",
             "cancel": "Cancel",
             "newCreate": "ADD",
@@ -36,7 +36,7 @@
             "selectAppArea": "Please choose an application domain",
             "business": "Business",
             "addBusiness": "New Business",
-            "tips": "DataSphere Studio Introduction:\nDataSphere Studio is a self-developed gateway for data application development of Webank big data platform -- WeDataSphere. It is built on top of Linkis data middleware and easily integrates various applications/components on the upper-level of data platforms, making data application development easier and concise.\nAs a one-stop data application development gateway for data development, data visualization, data governance and scheduling, DataSphere Studio is keen on covering the whole lifecycle of data application development, including scenarios of data importing, data cleansing, data visualization, data governance and data exporting. \n Create a project, and enjoy your journey of data application development! ",
+            "tips": "CT-Luban Introduction:\nCT-Luban is a self-developed gateway for data application development of Ctyun big data platform -- Luban. It is built on top of Linkis data middleware and easily integrates various applications/components on the upper-level of data platforms, making data application development easier and concise.\nAs a one-stop data application development gateway for data development, data visualization, data governance and scheduling, CT-Luban is keen on covering the whole lifecycle of data application development, including scenarios of data importing, data cleansing, data visualization, data governance and data exporting. \n Create a project, and enjoy your journey of data application development! ",
             "updteTime": "Updated At",
             "nameUnrepeatable": "Duplicated name!",
             "eidtorProjectSuccess": "Successfully updated project{name}!",
@@ -82,18 +82,18 @@
             "publishFailed": "Publish failed",
             "infoTitle": "Welcome",
             "infoHeader": "Welcome to My Project !",
-            "infoBodyFirstRow": "DataSphere Studio is a one-stop portal focusing on development and management of data application, as a part of WeDataSphere -- the big data platform of WeBank.",
+            "infoBodyFirstRow": "CT-Luban is a one-stop portal focusing on development and management of data application, as a part of Luban -- the big data platform of Ctyun.",
             "infoBodySecondRow": "Based on Linkis computation middleware, it's able to easily integrate various data application systems, making the development of data application easier and simpler.",
             "workspace": "Workspace",
             "appTitle": "Application Navigation",
             "applicationStudio": "Business Application Development",
             "applicationMore": "More Information",
             "applicationTipsFirst": "Project > Workflow is the basic structure of application development.",
-            "applictaionTipsSecond": "On the D&D enalbed workflow editor page, all the data application systems that have been integrated by DataSphere Studio are represented as workflow nodes, so that you can arrange them from the business perspective and then achieve fast implementation of business logics.",
+            "applictaionTipsSecond": "On the D&D enalbed workflow editor page, all the data application systems that have been integrated by CT-Luban are represented as workflow nodes, so that you can arrange them from the business perspective and then achieve fast implementation of business logics.",
             "integratedSystem": "Systems Already Integrated",
             "howToIntegratedsystem": "How to integrate with a new system",
-            "systemTipsFrist": "AppJoint— Application Joint is the core concept for the external system integration of DataSphere Studio.",
-            "systemTipsSecond": "AppJoint defines a unified integration standard for both frontend and backend, so that external systems can be integrated simply and fast, becoming a part of the data application development lifecycle in DataSphere Studio.",
+            "systemTipsFrist": "AppJoint— Application Joint is the core concept for the external system integration of CT-Luban.",
+            "systemTipsSecond": "AppJoint defines a unified integration standard for both frontend and backend, so that external systems can be integrated simply and fast, becoming a part of the data application development lifecycle in CT-Luban.",
             "clickMeAndSkip": "Click here to know how to integrate",
             "exchangisSubTitle": "Data exchange",
             "scriptisSubTitle": "Data development",
@@ -105,7 +105,7 @@
             "noData": "No data please add"
         },
         "workspace": {
-          "infoHeader": "Welcome to DataSphere Studio !",
+          "infoHeader": "Welcome to CT-Luban !",
           "createWorkspace": "Create Workspace",
           "searchWorkspace": "Search Workspace",
           "workspaceList": "Workspace List",
@@ -793,7 +793,7 @@
             "viewTableColumns": "For more columns, please check on the 'view table columns' page"
         },
         "login": {
-            "loginTitle": "Welcome to login DataSphere Studio！",
+            "loginTitle": "Welcome to login CT-Luban！",
             "userName": "Please enter your username",
             "remenber": "Remember the current user",
             "login": "Login",
@@ -1167,7 +1167,7 @@
                     "save": "Save",
                     "saveAs": "Save As"
                 },
-                "tips": "What is Scriptis？\nScriptis is a one-stop interactive data analysis & exploration tool built by WeDataSphere at WeBank. Using Linkis as its kernel, Scriptis provides functionalities including multiple computation engines(Spark, Hive, TiSpark...), Hive database management, resource management(such as Yarn resource and server resource), application management and user resource management(such as UDF and variables). \nScriptis？\n1. Select a directory in workspace, and create a sub directory; \n2. Right-click a directory => Create script; \n3. Select script type, for example: SQL, Pyspark, HQL, etc... \n4. Edit script, click & run, wait for result sets.",
+                "tips": "What is Scriptis？\nScriptis is a one-stop interactive data analysis & exploration tool built by Luban at ctyun. Using Linkis as its kernel, Scriptis provides functionalities including multiple computation engines(Spark, Hive, TiSpark...), Hive database management, resource management(such as Yarn resource and server resource), application management and user resource management(such as UDF and variables). \nScriptis？\n1. Select a directory in workspace, and create a sub directory; \n2. Right-click a directory => Create script; \n3. Select script type, for example: SQL, Pyspark, HQL, etc... \n4. Edit script, click & run, wait for result sets.",
                 "warning": {
                     "noDBInfo": "Failed to request database/table information, word association in script may not be working well! Please refresh to retry!",
                     "noUDF": "Failed to request UDF and Method information, word association in script may not be working well! Please refresh to retry!",

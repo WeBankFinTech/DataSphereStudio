@@ -32,7 +32,7 @@ const router = new VueRouter({
       redirect: '/newhome',
       component: Layout,
       meta: {
-        title: 'DataSphere Studio',
+        title: 'CT-Luban',
         publicPage: true, // 权限公开
       },
       children: [
@@ -40,7 +40,7 @@ const router = new VueRouter({
           path: 'newhome',
           name: 'Newhome',
           meta: {
-            title: 'DataSphere Studio',
+            title: 'CT-Luban',
             publicPage: true,
           },
           component: () => import('../view/newhome/index.vue'),
@@ -59,7 +59,7 @@ const router = new VueRouter({
           path: 'project',
           name: 'Project',
           meta: {
-            title: 'DataSphere Studio',
+            title: 'CT-Luban',
             publicPage: true,
           },
           component: () => import('../view/project/index.vue'),
@@ -193,7 +193,7 @@ const router = new VueRouter({
     {
       path: '*',
       meta: {
-        title: 'DataSphere Studio',
+        title: 'CT-Luban',
         publicPage: true,
       },
       component: () => import('../view/404.vue'),
@@ -228,7 +228,7 @@ router.beforeEach((to, from, next) => {
 });
 router.afterEach((to) => {
   if (to.meta) {
-    document.title = to.meta.title || 'DataSphere Studio';
+    document.title = to.meta.title || 'CT-Luban';
   }
 });
 

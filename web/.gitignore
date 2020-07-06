@@ -7,6 +7,7 @@ node_modules/
 dist/
 
 package-lock.json
+Luban-*.zip
 wedatasphere-*.zip
 ./cn.json
 .env.*

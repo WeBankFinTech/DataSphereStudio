@@ -1065,7 +1065,8 @@
                 "running": "running",
                 "stop": "disable",
                 "searchPlaceholder": "Search application",
-                "tips": "No data or no addition"
+                "tips": "No data or no addition",
+                "repeat": "You cannot add the same application repeatedly"
             }
         },
         "database": {

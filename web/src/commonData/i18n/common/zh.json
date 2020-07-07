@@ -24,6 +24,7 @@
             "projectName": "工程名",
             "gotoScriptis": "进入Scriptis",
             "createproject": "创建工程",
+            "createProject": "创建工程",
             "editorProject": "修改工程",
             "search": "搜索工程",
             "deleteProject": "删除工程",

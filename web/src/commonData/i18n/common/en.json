@@ -23,6 +23,7 @@
             "projectName": "Project Name",
             "gotoScriptis": "Visit Scriptis",
             "createproject": "Create Project",
+            "createProject": "Create Project",
             "editorProject": "Edit Project",
             "search": "Search Project",
             "deleteProject": "Delete Project",

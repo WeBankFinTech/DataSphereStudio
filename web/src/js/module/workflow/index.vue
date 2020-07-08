@@ -16,7 +16,7 @@
           :current-data="item"
           :data-list="item.dssFlowList"
           :readonly="myReadonly"
-          source="workflow"
+          source="workflow.createWorkflow"
           tag-prop="uses"
           @add="addProject"
           @goto="gotoWorkflow"

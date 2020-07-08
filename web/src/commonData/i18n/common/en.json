@@ -22,7 +22,7 @@
         "project": {
             "projectName": "Project Name",
             "gotoScriptis": "Visit Scriptis",
-            "createproject": "Create Project",
+            "createProject": "Create Project",
             "editorProject": "Edit Project",
             "search": "Search Project",
             "deleteProject": "Delete Project",
@@ -134,7 +134,7 @@
         "workflow": {
             "infoHeader": "Welcome to Workflow!",
             "workflow": "Workflow",
-            "createworkflow": "Create workflow",
+            "createWorkflow": "Create workflow",
             "gotoVisualis": "Enter Visualis",
             "publishProject": "Publish project",
             "searchWorkflow": "Search for workflow",
@@ -800,7 +800,8 @@
             "password": "Please enter password！",
             "loginSuccess": "Login Success",
             "haveLogin": "You have already logged in, please do not login repeatedly",
-            "vaildFaild": "Authentication failed!"
+            "vaildFaild": "Authentication failed!",
+            "captcha": "Please enter captcha"
         },
         "userMenu": {
             "title": "Warning",
@@ -1065,7 +1066,8 @@
                 "running": "running",
                 "stop": "disable",
                 "searchPlaceholder": "Search application",
-                "tips": "No data or no addition"
+                "tips": "No data or no addition",
+                "repeat": "You cannot add the same application repeatedly"
             }
         },
         "database": {

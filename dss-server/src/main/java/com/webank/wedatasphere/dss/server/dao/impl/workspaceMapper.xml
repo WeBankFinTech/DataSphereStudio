@@ -31,7 +31,7 @@
     </sql>
     <sql id="menu_appInstances_en">
         m.`id`,m.`title_en` AS `title`, m.`desc_en` AS `description`,m.`labels_en` AS `labels`,
-        m.`access_button_en` AS `access_button`,m.`manual_button_en` AS `manualButton`,m.`is_active`
+        m.`access_button_en` AS `access_button`,m.`manual_button_en` AS `manualButton`,m.`is_active`,
         m.`manual_button_url`,m.`icon`,m.`order`,app.`homepage_url` AS `access_button_url`,app.project_url, app.`name`
     </sql>
 

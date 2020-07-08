@@ -5,15 +5,15 @@
         <div
           class="nav-menu-left-item"
           :key="index"
-          :class="{'actived':current && item.subTitle === current.subTitle}"
+          :class="{'actived':current && item.id === current.id}"
           @mouseover.stop="onMouseOver(item)">
           <!-- <p class="nav-menu-left-sub-title">{{item.subTitle}}</p> -->
-          <p class="nav-menu-left-main-title">{{item.mainTitle}}</p>
+          <p class="nav-menu-left-main-title">{{item.title}}</p>
           <Icon
             size="14"
             type="ios-arrow-forward"
             class="nav-menu-left-icon"
-            v-if="item.children"></Icon>
+            v-if="item.appInstances"></Icon>
         </div>
       </template>
     </div>
@@ -22,121 +22,68 @@
       v-if="current">
       <div
         class="nav-menu-right-item"
-        v-for="(item, index) in current.children"
-        :key="index">
-        <div class="nav-menu-right-item-title">{{item.classify}}</div>
+        :key="current.id">
+        <div class="nav-menu-right-item-title">{{current.title}}</div>
         <div
+          v-for="item in current.appInstances"
           class="nav-menu-right-item-child"
-          v-for="(child) in item.children"
-          :key="child.title"
-          @click.stop="handleClick(child)">
+          :key="item.title"
+          @click.stop="handleClick(item)">
           <i
-            :class="child.icon"
             class="nav-menu-right-item-icon"
+            :class="iconSplit(item.icon)[0]" 
+            :style="`color: ${iconSplit(item.icon)[1]}`"
           ></i>
-          <span>{{child.title}}</span>
+          <span>{{item.title}}</span>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-
+import api from '@/js/service/api';
+import storage from '@/js/helper/storage';
 export default {
   data() {
     return {
-      menuList: [{
-        mainTitle: this.$t('message.headerNavBar.Workflow'),
-        subTitle: 'Workflow Development',
-        children: [{
-          classify: this.$t('message.headerNavBar.Workflow'),
-          children: [{
-            title: 'Workflow',
-            path: 'workflow',
-            icon: 'fi-workflow1',
-          }]
-        }]
-      }, {
-        mainTitle: this.$t('message.headerNavBar.Exchangis'),
-        subTitle: 'Exchangis',
-        children: [{
-          classify: this.$t('message.headerNavBar.Exchangis'),
-          children: [{
-            title: 'Exchangis',
-            path: '',
-            icon: 'fi-exchange',
-          }]
-        }]
-      },{
-        mainTitle: this.$t('message.headerNavBar.Scriptis'),
-        subTitle: 'Application Development',
-        children: [{
-          classify: this.$t('message.headerNavBar.Scriptis'),
-          children: [{
-            title: 'Scriptis',
-            path: 'linkis',
-            icon: 'fi-scriptis',
-          }]
-        }]
-      }, {
-        mainTitle: this.$t('message.headerNavBar.Visualis'),
-        subTitle: 'Data Visualization',
-        children: [{
-          classify: this.$t('message.headerNavBar.Visualis'),
-          children: [{
-            title: 'Visualis',
-            path: 'visualis',
-            icon: 'fi-visualis',
-          }]
-        }]
-      }, {
-        mainTitle: this.$t('message.headerNavBar.Qualitis'),
-        subTitle: 'Data Development',
-        children: [{
-          classify: this.$t('message.headerNavBar.Qualitis'),
-          children: [{
-            title: 'Qualitis',
-            path: 'qualitis',
-            icon: 'fi-qualitis',
-          }]
-        }]
-      }, {
-        mainTitle: this.$t('message.headerNavBar.Schedulis'),
-        subTitle: 'Schedulis',
-        children: [{
-          classify: this.$t('message.headerNavBar.Schedulis'),
-          children: [{
-            title: 'Schedulis',
-            path: 'schedulis',
-            icon: 'fi-schedule',
-          }]
-        }]
-      }, {
-        mainTitle: this.$t('message.headerNavBar.LinkisConsole'),
-        subTitle: 'Linkis Console',
-        children: [{
-          classify: this.$t('message.headerNavBar.LinkisConsole'),
-          children: [{
-            title: 'Linkis Console',
-            path: 'console',
-            icon: 'fi-resource',
-          }]
-        }]
-      }],
+      menuList: [
+      ],
       current: null
     }
   },
+  watch: {
+    '$route'(newValue) {
+      const workspaceId = this.$route.query.workspaceId;
+      const list = storage.get(`application-${workspaceId}`);
+      if(list) {
+        this.menuList = list
+      }else {
+        if(workspaceId){
+          api.fetch(`dss/workspaces/${workspaceId}/applications`, 'get').then(data=>{
+            this.menuList = data.applications || [];
+            storage.set(`application-${workspaceId}`, this.menuList);
+          })
+        } 
+      }
+    }
+  },
   methods: {
+    iconSplit(icon){
+      if(icon){
+        return icon.split('|')
+      }
+      return ['','']
+    },
     onMouseOver(item) {
-      if (item.children) {
+      if (item.appInstances) {
         return this.current = item;
       }
       this.current = null;
     },
     handleClick(child) {
-      if (child.path) {
+      if (child.name) {
         let query = this.$route.query;
-        this.gotoCommonIframe(child.path, query);
+        this.gotoCommonIframe(child.name, query);
       } else {
         this.$Message.warning(this.$t('message.constants.warning.comingSoon'));
       }

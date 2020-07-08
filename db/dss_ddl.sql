@@ -154,6 +154,7 @@ CREATE TABLE `dss_project` (
   `name` varchar(200) COLLATE utf8_bin DEFAULT NULL,
   `source` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT 'Source of the dss_project',
   `description` text COLLATE utf8_bin,
+  `workspace_id` bigint(20) DEFAULT 1,
   `user_id` bigint(20) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `create_by` bigint(20) DEFAULT NULL,
@@ -372,6 +373,7 @@ DROP TABLE IF EXISTS `dss_onestop_user_favorites`;
 CREATE TABLE `dss_onestop_user_favorites` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `username` varchar(64) DEFAULT NULL,
+  `workspace_id` bigint(20) DEFAULT 1,
   `menu_application_id` int(20) DEFAULT NULL,
   `order` int(2) DEFAULT NULL,
   `create_by` varchar(255) DEFAULT NULL,

@@ -52,6 +52,14 @@
   color: #39f;
 }
 
+.nodata-tips {
+  font-size: 12px;
+  margin: auto;
+  height: 70px;
+  line-height: 70px;
+  text-align: center;
+}
+
 .workspace-main {
   padding: 10px 25px;
   display: -webkit-box;
@@ -205,6 +213,8 @@
             display: flex;
             align-items: center;
             margin-top: -10px;
+            margin-right: 50px;
+            flex-wrap: wrap;
 
             .title-sub {
               margin-right: 10px;

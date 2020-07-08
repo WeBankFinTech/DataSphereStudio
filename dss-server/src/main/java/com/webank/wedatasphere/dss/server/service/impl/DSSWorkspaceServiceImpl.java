@@ -111,7 +111,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private List<OnestopMenuVo> getMenuAppInstances(List<OnestopMenuVo> menuVos, boolean isChinese) {
         for (OnestopMenuVo menuVo : menuVos) {
             Long menuId = menuVo.getId();
-            List<OnestopMenuAppInstanceVo> menuAppInstanceVos = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstanceEn(menuId);
+            List<OnestopMenuAppInstanceVo> menuAppInstanceVos = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstancesEn(menuId);
             menuVo.setAppInstances(menuAppInstanceVos);
         }
         return menuVos;

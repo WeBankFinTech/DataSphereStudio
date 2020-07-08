@@ -81,9 +81,10 @@
             "publishSuccess": "Successfully published",
             "publishFailed": "Publish failed",
             "infoTitle": "Welcome",
-            "infoHeader": "Welcome to DataSphere Studio !",
+            "infoHeader": "Welcome to My Project !",
             "infoBodyFirstRow": "DataSphere Studio is a one-stop portal focusing on development and management of data application, as a part of WeDataSphere -- the big data platform of WeBank.",
             "infoBodySecondRow": "Based on Linkis computation middleware, it's able to easily integrate various data application systems, making the development of data application easier and simpler.",
+            "workspace": "Workspace",
             "appTitle": "Application Navigation",
             "applicationStudio": "Business Application Development",
             "applicationMore": "More Information",
@@ -104,6 +105,7 @@
             "noData": "No data please add"
         },
         "workspace": {
+          "infoHeader": "Welcome to DataSphere Studio !",
           "createWorkspace": "Create Workspace",
           "searchWorkspace": "Search Workspace",
           "workspaceList": "Workspace List",
@@ -130,6 +132,7 @@
           "HYP": "Change"
         },
         "workflow": {
+            "infoHeader": "Welcome to Workflow!",
             "workflow": "Workflow",
             "createWorkflow": "Create workflow",
             "gotoVisualis": "Enter Visualis",
@@ -797,13 +800,18 @@
             "password": "Please enter password！",
             "loginSuccess": "Login Success",
             "haveLogin": "You have already logged in, please do not login repeatedly",
-            "vaildFaild": "Authentication failed!"
+            "vaildFaild": "Authentication failed!",
+            "captcha": "Please enter captcha"
         },
         "userMenu": {
             "title": "Warning",
             "content": "<p>This operation will clear the local database cache, leading to loose your script logs, history and result set information, please confirm whether there are scripts unsaved!</p><p>Click OK button to continue?</p>",
             "clearCacheSuccess": "Successfully cleared local cache!",
             "comingSoon": "Not yet open source, please stay tuned!"
+        },
+        "header": {
+            "home": "Home",
+            "console": "Console"
         },
         "headerNavBar": {
             "Workflow": "Workflow Development",
@@ -1057,7 +1065,9 @@
                 "cancel": "Cancel",
                 "running": "running",
                 "stop": "disable",
-                "searchPlaceholder": "Search application"
+                "searchPlaceholder": "Search application",
+                "tips": "No data or no addition",
+                "repeat": "You cannot add the same application repeatedly"
             }
         },
         "database": {

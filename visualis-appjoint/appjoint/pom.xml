@@ -22,7 +22,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>0.7.0</version>
+        <version>0.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -51,6 +51,12 @@
             <version>${linkis.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.databinder.dispatch/dispatch-core -->
+        <dependency>
+            <groupId>net.databinder.dispatch</groupId>
+            <artifactId>dispatch-core_2.11</artifactId>
+            <version>0.12.3</version>
         </dependency>
 
     </dependencies>

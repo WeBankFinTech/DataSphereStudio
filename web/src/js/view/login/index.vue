@@ -134,7 +134,7 @@ export default {
           const params = {
             userName: this.loginForm.user,
             password: this.loginForm.password,
-            captcha: this.loginForm.captcha,
+            captcha: this.loginForm.captcha.toLocaleLowerCase(),
           };
           api
             .fetch(`/user/login`, params)

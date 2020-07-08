@@ -22,7 +22,7 @@
         "project": {
             "projectName": "Project Name",
             "gotoScriptis": "Visit Scriptis",
-            "createproject": "Create Project",
+            "createProject": "Create Project",
             "editorProject": "Edit Project",
             "search": "Search Project",
             "deleteProject": "Delete Project",
@@ -134,7 +134,7 @@
         "workflow": {
             "infoHeader": "Welcome to Workflow!",
             "workflow": "Workflow",
-            "createworkflow": "Create workflow",
+            "createWorkflow": "Create workflow",
             "gotoVisualis": "Enter Visualis",
             "publishProject": "Publish project",
             "searchWorkflow": "Search for workflow",

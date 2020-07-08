@@ -2,7 +2,7 @@
   <div class="page-bgc">
     <div class="page-bgc-header">
       <div class="header-info">
-        <h1>{{$t('message.project.infoHeader')}}</h1>
+        <h1>{{$t('message.workspace.infoHeader')}}</h1>
         <p>{{$t('message.project.infoBodyFirstRow')}}</p>
         <p>{{$t('message.project.infoBodySecondRow')}}</p>
       </div>
@@ -45,8 +45,9 @@
             <h3 class="item-header">
               <span>{{ $t('message.workspace.workspaceList') }}</span>
             </h3>
-            <Row class="content-item" v-show="visual === 'card'">
+            <Row ref="row" class="content-item" v-show="visual === 'card'">
               <i-col
+                ref="col"
                 class="workspace-item"
                 :xs="12" :sm="8" :md="4" :lg="4"
                 v-for="item in originWorkspaceData"
@@ -60,7 +61,6 @@
                     <li v-if="tag && tagIndex <= 2"  class="item" :key="tagIndex">{{tag}}</li>
                   </template>
                 </ul>
-                <!-- <Button size="small" class="editor" @click.stop="editor(item)">{{ $t('message.workspace.editWorkspace') }}</Button> -->
               </i-col>
             </Row>
             <div v-show="visual === 'table'" class="workspace-table">
@@ -103,6 +103,16 @@
       :add-project-show="workspaceShow"
       @show="workspaceShowAction"
       @confirm="workspaceConfirm"></WorkspaceForm>
+    <Modal
+      v-model="showVideo"
+      :title="video.title"
+      :footer-hide="true"
+      width="800"
+    >
+      <video v-if="showVideo" width="100%" controls autoplay>
+        <source :src="video.url" type="video/mp4" />
+      </video>
+    </Modal>
     <Spin
       v-if="loading"
       size="large"
@@ -125,6 +135,7 @@ export default {
   data() {
     return {
       loading: false,
+      showVideo: false,
       actionType: '',
       currentWorkspaceData: {
         name: '',
@@ -137,6 +148,7 @@ export default {
       cacheData: [],
       filteredData: [],
       visual: 'card',
+      video: {},
       videos: [],
       videoCache: [],
       visualCates: [
@@ -145,14 +157,35 @@ export default {
       ],
       total: null,
       pageSize: 4,
+      videoSize: 4,
       pageNum: 1,
       videosClick: 1,
-      videosMaxClick: null
+      videosMaxClick: null,
+      listWrap: 0,//屏幕宽度
     }
   },
   created() {
     this.getWorkspaces();
     this.getVideos();
+  },
+  mounted(){
+    this.listWrap = this.$refs.row.$el && this.$refs.row.$el.offsetWidth;
+    this.initWorkspace();
+    window.onresize = () => {
+      const that = this
+      return (() => {
+        that.listWrap = this.$refs.row.$el && this.$refs.row.$el.offsetWidth;
+      })()
+    }
+  },
+  beforeDestroy(){
+    window.onresize = null;
+  },
+  watch: {
+    'listWrap': function(val){ //监听容器宽度变化
+      this.pageSize = Math.floor(val / 252)
+      this.initWorkspace();
+    },
   },
   methods: {
     getWorkspaces() {
@@ -218,7 +251,8 @@ export default {
       this.changePage(this.pageNum);
     },
     gotoWorkspace(workspace) {
-      this.$router.push({ path: '/workspace', query: { workspaceId: workspace.id }});
+      const workspaceId = workspace.workspaceId || workspace.id;
+      this.$router.push({ path: '/workspace', query: { workspaceId: workspaceId}});
     },
     workspaceShowAction(val) {
       this.workspaceShow = val;
@@ -241,18 +275,22 @@ export default {
     changeVideos() {
       this.videosClick += 1;
       this.videosClick = this.videosClick > this.videosMaxClick ? 1 : this.videosClick;
-      const start = ( this.videosClick - 1 ) * this.pageSize;
-      const end = this.videosClick * this.pageSize;
+      const start = ( this.videosClick - 1 ) * this.videoSize;
+      const end = this.videosClick * this.videoSize;
       this.videos = this.videoCache.slice(start, end);
     },
     initVideos() {
       const videosTotal = this.videoCache.length;
-      this.videosMaxClick = Math.ceil(videosTotal / this.pageSize);
-      if (videosTotal < this.pageSize) {
+      this.videosMaxClick = Math.ceil(videosTotal / this.videoSize);
+      if (videosTotal < this.videoSize) {
         this.videos = this.videoCache;
       } else {
-        this.videos = this.videoCache.slice(0, this.pageSize);
+        this.videos = this.videoCache.slice(0, this.videoSize);
       }
+    },
+    play(item) {
+      this.showVideo = true;
+      this.video = item
     }
   }
 }

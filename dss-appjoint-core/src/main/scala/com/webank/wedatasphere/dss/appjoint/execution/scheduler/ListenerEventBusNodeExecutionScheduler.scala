@@ -17,6 +17,8 @@
 
 package com.webank.wedatasphere.dss.appjoint.execution.scheduler
 
+import java.util.concurrent.ArrayBlockingQueue
+
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException
 import com.webank.wedatasphere.dss.appjoint.execution.common.{AsyncNodeExecutionResponse, CompletedNodeExecutionResponse, LongTermNodeExecutionAction}
 import com.webank.wedatasphere.dss.appjoint.execution.conf.NodeExecutionConfiguration._
@@ -55,7 +57,7 @@ class ListenerEventBusNodeExecutionScheduler(eventQueueCapacity: Int, name: Stri
     val field1 = ru.typeOf[ListenerEventBus[_, _]].decl(ru.TermName("eventQueue")).asMethod
     val result = listenerEventBusClass.reflectMethod(field1)
     result() match {
-      case queue: BlockingLoopArray[AsyncNodeExecutionResponseEvent] => queue
+      case queue: ArrayBlockingQueue[AsyncNodeExecutionResponseEvent] => queue
     }
   }
 
@@ -104,18 +106,18 @@ class ListenerEventBusNodeExecutionScheduler(eventQueueCapacity: Int, name: Stri
 
   protected def addEvent(event: AsyncNodeExecutionResponseEvent): Unit = synchronized {
     listenerEventBus.post(event)
-    event.getResponse.getAction match {
-      case longTermAction: LongTermNodeExecutionAction =>
-        longTermAction.setSchedulerId(eventQueue.max)
-      case _ =>
-    }
+//    event.getResponse.getAction match {
+//      case longTermAction: LongTermNodeExecutionAction =>
+//        longTermAction.setSchedulerId(eventQueue.max)
+//      case _ =>
+//    }
   }
 
-  override def removeAsyncResponse(action: LongTermNodeExecutionAction): Unit =
-    getAsyncResponse(action).setCompleted(true)
+  override def removeAsyncResponse(action: LongTermNodeExecutionAction): Unit = {
 
-  override def getAsyncResponse(action: LongTermNodeExecutionAction): AsyncNodeExecutionResponse =
-    eventQueue.get(action.getSchedulerId).getResponse
+    }
+
+  override def getAsyncResponse(action: LongTermNodeExecutionAction): AsyncNodeExecutionResponse = null
 
   override def start(): Unit = listenerEventBus.start()
 

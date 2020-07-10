@@ -162,6 +162,8 @@ export default {
       videosClick: 1,
       videosMaxClick: null,
       listWrap: 0,//屏幕宽度
+      workspaceItemWidth: 0, // workspaceItem 宽度
+      workspaceItemMargin: 30
     }
   },
   created() {
@@ -170,7 +172,6 @@ export default {
   },
   mounted(){
     this.listWrap = this.$refs.row.$el && this.$refs.row.$el.offsetWidth;
-    this.initWorkspace();
     window.onresize = () => {
       const that = this
       return (() => {
@@ -183,7 +184,8 @@ export default {
   },
   watch: {
     'listWrap': function(val){ //监听容器宽度变化
-      this.pageSize = Math.floor(val / 252)
+      this.listWrap = val;
+      this.pageSize = Math.floor(this.listWrap / this.workspaceItemWidth)
       this.initWorkspace();
     },
   },
@@ -192,9 +194,13 @@ export default {
       // 获取工作空间数据
       this.loading = true;
       api.fetch('dss/workspaces', {}, 'get').then((res) => {
-        this.filteredData = this.cacheData = res.workspaces;
-        this.initWorkspace();
-        this.loading = false;
+        this.originWorkspaceData = this.filteredData = this.cacheData = res.workspaces;
+        this.$nextTick(() => {
+          this.workspaceItemWidth = this.$refs.col[0] && this.$refs.col[0].$el.offsetWidth;
+          this.pageSize = Math.floor(this.listWrap / (this.workspaceItemWidth + this.workspaceItemMargin))
+          this.initWorkspace();
+          this.loading = false;
+        })
       }).catch(() => {
         this.loading = false;
       });

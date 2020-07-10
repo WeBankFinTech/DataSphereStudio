@@ -2,7 +2,7 @@
 
 
 ## 1. Ready work
-1.Click [release](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.7.0/linkis-jobtype-0.7.0.zip) to select the corresponding installation package to download:
+1.Click [release](https://github.com/WeBankFinTech/DataSphereStudio/releases/download/0.8.0/linkis-jobtype-0.8.0.zip) to select the corresponding installation package to download:
 
 - linkis-jobtype-$version.zip
 

@@ -157,6 +157,7 @@ export default {
       ],
       total: null,
       pageSize: 4,
+      videoSize: 4,
       pageNum: 1,
       videosClick: 1,
       videosMaxClick: null,
@@ -274,17 +275,17 @@ export default {
     changeVideos() {
       this.videosClick += 1;
       this.videosClick = this.videosClick > this.videosMaxClick ? 1 : this.videosClick;
-      const start = ( this.videosClick - 1 ) * this.pageSize;
-      const end = this.videosClick * this.pageSize;
+      const start = ( this.videosClick - 1 ) * this.videoSize;
+      const end = this.videosClick * this.videoSize;
       this.videos = this.videoCache.slice(start, end);
     },
     initVideos() {
       const videosTotal = this.videoCache.length;
-      this.videosMaxClick = Math.ceil(videosTotal / this.pageSize);
-      if (videosTotal < this.pageSize) {
+      this.videosMaxClick = Math.ceil(videosTotal / this.videoSize);
+      if (videosTotal < this.videoSize) {
         this.videos = this.videoCache;
       } else {
-        this.videos = this.videoCache.slice(0, this.pageSize);
+        this.videos = this.videoCache.slice(0, this.videoSize);
       }
     },
     play(item) {

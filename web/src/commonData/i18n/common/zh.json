@@ -135,7 +135,7 @@
         "workflow": {
             "infoHeader": "欢迎来到工作流！",
             "workflow": "工作流",
-            "createworkflow": "创建工作流",
+            "createWorkflow": "创建工作流",
             "gotoVisualis": "进入Visualis",
             "publishProject": "发布工程",
             "searchWorkflow": "搜索工作流",

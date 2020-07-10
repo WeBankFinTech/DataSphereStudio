@@ -1633,9 +1633,10 @@ export default {
         const type = ext[node.type];
         const match = supportModes.find((item) => item.flowType === type);
         const fileName = `${time.getTime()}${match.ext}`;
+        const fileContent = (rst.fileContent instanceof Array) ? rst.fileContent[0][0]: rst.fileContent;
         const params = {
           fileName,
-          scriptContent: rst.fileContent[0][0],
+          scriptContent: fileContent,
           metadata: rst.params,
         };
         api.fetch('/filesystem/saveScriptToBML', params, 'post')

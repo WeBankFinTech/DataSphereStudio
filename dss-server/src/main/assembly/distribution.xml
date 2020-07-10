@@ -82,7 +82,6 @@
                 <exclude>com.netflix.ribbon:ribbon-loadbalancer:jar</exclude>
                 <exclude>com.netflix.ribbon:ribbon-transport:jar</exclude>
                 <exclude>com.netflix.servo:servo-core:jar</exclude>
-                <exclude>com.ning:async-http-client:jar</exclude>
                 <exclude>com.sun.jersey.contribs:jersey-apache-client4:jar</exclude>
                 <exclude>com.sun.jersey:jersey-client:jar</exclude>
                 <exclude>com.sun.jersey:jersey-core:jar</exclude>
@@ -137,8 +136,6 @@
                 <exclude>joda-time:joda-time:jar</exclude>
                 <exclude>log4j:log4j:jar</exclude>
                 <exclude>mysql:mysql-connector-java:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-core_2.11:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-json4s-jackson_2.11:jar</exclude>
                 <exclude>org.antlr:antlr-runtime:jar</exclude>
                 <exclude>org.antlr:stringtemplate:jar</exclude>
                 <exclude>org.apache.commons:commons-compress:jar</exclude>

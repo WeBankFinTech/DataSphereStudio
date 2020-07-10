@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.linkis.appjoint.entrance.job.AppJointExecuteR
 import com.webank.wedatasphere.linkis.common.exception.ErrorException
 import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
 import com.webank.wedatasphere.linkis.entrance.execute.{EngineExecuteAsynReturn, EntranceEngine, EntranceJob}
+import com.webank.wedatasphere.linkis.entrance.interceptor.impl.CustomVariableUtils
 import com.webank.wedatasphere.linkis.protocol.engine.{JobProgressInfo, RequestTask}
 import com.webank.wedatasphere.linkis.protocol.query.RequestPersistTask
 import com.webank.wedatasphere.linkis.scheduler.executer._
@@ -156,6 +157,9 @@ class AppJointEntranceEngine(properties: util.Map[String, Any])
       val nodeType = nodeContext.getAppJointNode.getNodeType
       val realAppJointType = if (nodeType.contains(".")) nodeType.substring(0, nodeType.indexOf(".")) else nodeType
       val appJoint = AppJointManager.getAppJoint(realAppJointType)
+      if((realAppJointType.toLowerCase()).contains("datacheck")){
+        replaceCustomVariables(nodeContext.getRuntimeMap)
+      }
       val user = if (null != runTimeMap.get("user")) runTimeMap.get("user").toString else null
       val session = if (StringUtils.isNotEmpty(user)){
         if (appJoint.getSecurityService != null) appJoint.getSecurityService.login(user) else null
@@ -189,7 +193,18 @@ class AppJointEntranceEngine(properties: util.Map[String, Any])
       ErrorExecuteResponse(s"cannot do this executeRequest $executeRequest",
         new ErrorException(80056, s"cannot do this executeRequest $executeRequest"))
   }
+  private def replaceCustomVariables(runTimeMap:java.util.Map[String, Object]):Unit = {
+    val key = "check.object"
+    val value:String = if (null != runTimeMap.get(key)) runTimeMap.get(key).toString else ""
+    val task = new RequestPersistTask
+    task.setExecutionCode(value)
+    task.setParams(new util.HashMap[String, Object]())
+    val (result, code) = CustomVariableUtils.replaceCustomVar(task, "sql")
+    logger.info(s"after code replace code is $code")
+    if (result) runTimeMap(key) = code
+  }
 }
+
 
 case class AppJointEntranceExecuteException(errMsg:String) extends ErrorException(70046, errMsg)
 

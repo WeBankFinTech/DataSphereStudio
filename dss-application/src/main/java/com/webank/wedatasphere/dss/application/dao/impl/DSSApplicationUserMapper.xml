@@ -29,7 +29,7 @@
         select * from  dss_user where `username` = #{username}
     </select>
 
-    <insert id="registerDSSUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.application.entity.DSSUser" >
+    <insert id="registerDssUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.application.entity.DSSUser" >
         INSERT INTO dss_user(<include refid = "dss_user" />)
         VALUES (#{id},#{username},#{name},#{isFirstLogin})
     </insert>

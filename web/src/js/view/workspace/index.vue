@@ -67,9 +67,9 @@
                   <div class="app-title-wrap">
 
                     <div class="app-title">
-                      <i class="app-icon title-sub" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
-                      <span class="label title-sub">{{item.title}}</span>
-                      <Tag class="app-tag title-sub" v-for="tag in (item.labels ? item.labels.split(','):[])" :key="tag">{{tag}}</Tag>
+                      <i class="app-icon sub-margin" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
+                      <span class="label sub-margin sub-title">{{item.title}}</span>
+                      <Tag class="app-tag sub-margin" v-for="tag in (item.labels ? item.labels.split(','):[])" :key="tag">{{tag}}</Tag>
                     </div>
                     
 

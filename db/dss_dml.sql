@@ -69,7 +69,6 @@ insert into `linkis_config_key_tree` VALUES(NULL,@key_id1,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id2,@tree_id1);
 insert into `linkis_config_key_tree` VALUES(NULL,@key_id3,@tree_id1);
 
-ALTER TABLE dss_project ADD workspace_id bigint(20) DEFAULT 1;
 INSERT INTO dss_workspace (id, name, label, description, department, product, source, create_by, create_time, last_update_time, last_update_user) VALUES (1, 'default', 'default', 'default user workspace', NULL, NULL, 'create by user', 'root', NULL, NULL, 'root');
 
 INSERT INTO dss_homepage_demo_instance (id, menu_id, name, url, title_en, title_cn, description, is_active, icon, `order`, click_num, create_by, create_time, last_update_time, last_update_user) VALUES (NULL, 1, '工作流编辑执行', 'https://github.com/WeBankFinTech/DataSphereStudio', 'workflow edit execution', '工作流编辑执行', '工作流编辑执行', 1, NULL, 1, 0, NULL, NULL, NULL, NULL);

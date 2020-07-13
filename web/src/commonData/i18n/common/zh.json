@@ -17,7 +17,8 @@
             "nameLength": "名称长度不能大于",
             "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
             "project": "工程",
-            "feedback": "反馈"
+            "feedback": "反馈",
+            "validNameExist": "名称不能重复"
         },
         "project": {
             "projectName": "工程名",
@@ -81,11 +82,11 @@
             "publishSuccess": "发布成功",
             "publishFailed": "发布失败",
             "infoTitle": "欢迎信息",
-            "infoHeader": "欢迎来到 DataSphere Studio !",
+            "infoHeader": "欢迎来到工作流开发首页！",
             "infoBodyFirstRow": "DataSphere Studio是微众银行大数据平台——WeDataSphere，自研的一站式数据应用开发管理门户。",
             "infoBodySecondRow": "基于Linkis计算中间件构建，可轻松整合上层各数据应用系统，让数据应用开发变得简洁又易用。",
             "appTitle": "应用导航",
-            "applicationStudio": "业务应用开发",
+            "workspace": "工作空间",
             "applicationMore": "了解更多",
             "applicationTipsFirst": "工程 > 工作流，是应用开发的基本组织结构。",
             "applictaionTipsSecond": "在工作流拖拽编辑页面，DataSphere Studio已集成的所有数据应用系统，都将以工作流节点的形式出现，让您能够以业务的视角将其编排串连起来，快速实现全部业务。",
@@ -103,7 +104,35 @@
             "deleteWtss": "是否同时删除scheduler工程?",
             "noData": "暂无数据请添加"
         },
+        "workspace": {
+          "infoHeader": "欢迎来到 DataSphere Studio !",
+          "createWorkspace": "创建工作空间",
+          "searchWorkspace": "搜索工作空间",
+          "workspaceList": "工作空间列表",
+          "editWorkspace": "编辑",
+          "newWorkspace": "新建工作空间",
+          "editor": "编辑工作空间",
+          "workName": "工作空间名",
+          "department": "归属部门",
+          "selectDepartment": "请选择部门",
+          "label": "标签",
+          "addLabel": "添加标签",
+          "description": "描述",
+          "pleaseInputWorkspaceDesc": "请输入工作空间描述",
+          "createdSuccess": "工作空间创建成功！",
+          "createdFailed": "工作空间创建失败！",
+          "display": "展示方式",
+          "tableDisplay": "列表展示",
+          "cardDisplay": "图标展示",
+          "createTime": "创建时间"
+        },
+        "GLY": {
+          "ALTY": "案例体验",
+          "KSRM": "快速入门",
+          "HYP": "换一批"
+        },
         "workflow": {
+            "infoHeader": "欢迎来到工作流！",
             "workflow": "工作流",
             "createWorkflow": "创建工作流",
             "gotoVisualis": "进入Visualis",
@@ -293,7 +322,7 @@
                 "WJYCZ": "文件已存在，请选择其它文件或选择其它文件夹！",
                 "WJMCBHF": "文件名称不合法，仅支持以字母、数字、中文、下划线、中短线且带后缀的命名！",
                 "SCBCG100": "上传文件不超过100M！",
-                "SCCG":  "文件 {name} 上传成功！",
+                "SCCG": "文件 {name} 上传成功！",
                 "WJCCXE": "文件大小超出限额！",
                 "WJBSC": "资源文件 {name} 已被成功删除！"
             }
@@ -490,7 +519,7 @@
             "cancel": "关闭",
             "timeout": "工程{name}发布超时！"
         },
-        "tableDetails" : {
+        "tableDetails": {
             "BZBSX": "表基本属性",
             "BZDXX": "表字段信息",
             "BTJXX": "表统计信息",
@@ -534,7 +563,6 @@
             "YES": "对",
             "GSHJX": "进行格式化成",
             "ZJXYGE": "组件需要的格式"
-
         },
         "logView": {
             "taskId": "任务ID：",
@@ -772,13 +800,18 @@
             "password": "请输入密码！",
             "loginSuccess": "登录成功",
             "haveLogin": "您已经登录，请不要重复登录",
-            "vaildFaild": "验证未通过！"
+            "vaildFaild": "验证未通过！",
+            "captcha": "请输入验证码"
         },
         "userMenu": {
             "title": "警告",
             "content": "<p>此操作将清空本地数据库缓存，这样会丢失您的脚本日志、历史和结果集等相关信息，请确认是否有未保存的脚本！</p><p>点击确认按钮继续操作？</p>",
             "clearCacheSuccess": "清除本地数据缓存成功!",
             "comingSoon": "尚未开源，敬请期待！"
+        },
+        "header": {
+            "home": "首页",
+            "console": "控制台"
         },
         "headerNavBar": {
             "Workflow": "工作流开发",
@@ -1019,6 +1052,22 @@
             },
             "error": {
                 "fileExists": "该文件已经存在！"
+            },
+            "home": {
+                "welcome": "欢迎来到 {text} 的工作空间!",
+                "setting": "设置",
+                "exit": "退出设置",
+                "enter": "进入{text}",
+                "dlgTitle": "新增快速入口",
+                "selectType": "请选择分类",
+                "selectApp": "请选择系统",
+                "save": "保存",
+                "cancel": "取消",
+                "running": "运行中",
+                "stop": "不可用",
+                "searchPlaceholder": "搜索应用系统",
+                "tips": "没有数据或者未添加",
+                "repeat": "不能重复添加相同的应用"
             }
         },
         "database": {

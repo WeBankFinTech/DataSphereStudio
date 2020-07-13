@@ -159,7 +159,7 @@
       .label {
         margin-left: 10px;
         // width: 110px;
-        // font-weight: 700;
+        font-weight: 700;
         font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -216,8 +216,12 @@
             margin-right: 50px;
             flex-wrap: wrap;
 
-            .title-sub {
+            .sub-margin {
               margin-right: 10px;
+            }
+
+            .sub-title {
+              font-weight: 700;
             }
 
             .app-tag {

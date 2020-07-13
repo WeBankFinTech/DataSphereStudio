@@ -103,7 +103,7 @@ class DefaultNodeRunner extends NodeRunner with Logging {
   override def run(): Unit = {
     info(s"start to run node of ${node.getName}")
     try {
-      val jobProps = node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.PROPS_MAP) match {
+      val jobProps = node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.PROPS_MAP) match {
         case propsMap: util.Map[String, String] => propsMap
         case _ => new util.HashMap[String, String]()
       }

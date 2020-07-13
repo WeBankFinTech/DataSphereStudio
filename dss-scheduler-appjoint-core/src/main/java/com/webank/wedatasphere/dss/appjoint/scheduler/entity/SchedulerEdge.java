@@ -17,13 +17,13 @@
 
 package com.webank.wedatasphere.dss.appjoint.scheduler.entity;
 
-import com.webank.wedatasphere.dss.common.entity.node.DWSEdge;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 
 /**
  * Created by enjoyyin on 2019/9/7.
  */
 public interface SchedulerEdge {
-    DWSEdge getDWSEdge();
+    DSSEdge getDssEdge();
 
-    void setDWSEdge(DWSEdge dwsEdge);
+    void setDssEdge(DSSEdge dssEdge);
 }

@@ -23,13 +23,23 @@
           <Input
             v-model="loginForm.password"
             type="password"
-            placeholder="请输入密码"
+            :placeholder="this.$t('message.login.password')"
             size="large" />
-          <Checkbox
-            v-model="rememberUserNameAndPass"
-            class="remember-user-name"
-            style="">{{$t('message.login.remenber')}}</Checkbox>
         </FormItem>
+        <FormItem prop="captcha" v-if="captImg">
+          <div class="captcha-wp">
+            <Input
+              v-model="loginForm.captcha"
+              type="text"
+              :placeholder="$t('message.login.captcha')"
+              size="large"/>
+            <div><img :src="captImg" @click="getCapt"></div>
+          </div>
+        </FormItem>
+        <Checkbox
+          v-model="rememberUserNameAndPass"
+          class="remember-user-name"
+          style="">{{$t('message.login.remenber')}}</Checkbox>
         <FormItem>
           <Button
             :loading="loading"
@@ -47,13 +57,17 @@
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import socket from '@js/module/webSocket';
+import axios from 'axios';
 export default {
   data() {
     return {
       loading: false,
+      captImg: null,
+
       loginForm: {
         user: '',
         password: '',
+        captcha: ''
       },
       ruleInline: {
         user: [
@@ -64,6 +78,10 @@ export default {
           { required: true, message: this.$t('message.login.password'), trigger: 'blur' },
           // {type: 'string', pattern: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,18}$/, message: '请输入6至12位的密码', trigger: 'change'},
         ],
+        captcha: [
+          { required: true, message: this.$t('message.login.captcha'), trigger: 'blur' }
+        ]
+
       },
       rememberUserNameAndPass: false,
     };
@@ -75,6 +93,7 @@ export default {
       this.loginForm.user = userNameAndPass.split('&')[0];
       this.loginForm.password = userNameAndPass.split('&')[1];
     }
+    this.getCapt();
   },
   mounted() {
     // 如果有登录状态，且用户手动跳转到login页，则判断登录态是否过期
@@ -85,6 +104,18 @@ export default {
     socket.methods.close();
   },
   methods: {
+    getCapt(){
+      axios.get('/api/rest_j/v1/user/captcha').then(data=>{
+        api.fetch('/user/captcha', 'get').then((data)=>{
+          this.captImg = data.image
+        }).catch(()=>{
+          this.captImg = null;        
+        })
+      }).catch(err=>{
+        this.captImg = null;
+        console.warn('err', err);
+      })
+    },
     getIfLogin() {
       api.fetch('/dss/getBaseInfo', 'get').then(() => {
         this.$router.push('/');
@@ -103,6 +134,7 @@ export default {
           const params = {
             userName: this.loginForm.user,
             password: this.loginForm.password,
+            captcha: this.loginForm.captcha.toLocaleLowerCase(),
           };
           api
             .fetch(`/user/login`, params)
@@ -133,6 +165,7 @@ export default {
           this.$Message.error(this.$t('message.login.vaildFaild'));
         }
       });
+      this.getCapt();
     },
     clearSession() {
       storage.clear();

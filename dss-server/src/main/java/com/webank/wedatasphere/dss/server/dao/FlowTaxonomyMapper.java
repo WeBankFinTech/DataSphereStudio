@@ -18,7 +18,7 @@
 package com.webank.wedatasphere.dss.server.dao;
 
 
-import com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy;
+import com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -26,11 +26,11 @@ import java.util.List;
 
 
 public interface FlowTaxonomyMapper {
-    DWSFlowTaxonomy selectFlowTaxonomyByID(Long id);
+    DSSFlowTaxonomy selectFlowTaxonomyByID(Long id);
 
-    void insertFlowTaxonomy(DWSFlowTaxonomy dwsFlowTaxonomy) throws DuplicateKeyException;
+    void insertFlowTaxonomy(DSSFlowTaxonomy dssFlowTaxonomy) throws DuplicateKeyException;
 
-    void updateFlowTaxonomy(DWSFlowTaxonomy dwsFlowTaxonomy) throws DuplicateKeyException;
+    void updateFlowTaxonomy(DSSFlowTaxonomy dssFlowTaxonomy) throws DuplicateKeyException;
 
     Long hasFlows(Long flowTaxonomyID);
 
@@ -47,5 +47,5 @@ public interface FlowTaxonomyMapper {
 
     void deleteFlowTaxonomyByProjectID(Long projectID);
 
-    List<DWSFlowTaxonomy> listFlowTaxonomyByProjectID(Long projectID);
+    List<DSSFlowTaxonomy> listFlowTaxonomyByProjectID(Long projectID);
 }

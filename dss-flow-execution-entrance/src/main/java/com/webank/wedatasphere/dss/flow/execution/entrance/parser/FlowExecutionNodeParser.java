@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.AbstractNodeParser;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.FlowExecutionNode;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +31,14 @@ import org.springframework.stereotype.Component;
 public class FlowExecutionNodeParser extends AbstractNodeParser {
 
     @Override
-    public SchedulerNode parseNode(DWSNode dwsNode) {
+    public SchedulerNode parseNode(DSSNode dssNode) {
         FlowExecutionNode node = new FlowExecutionNode();
-        node.setDWSNode(dwsNode);
+        node.setDssNode(dssNode);
         return node;
     }
 
     @Override
-    public Boolean ifNodeCanParse(DWSNode dwsNode) {
+    public Boolean ifNodeCanParse(DSSNode dssNode) {
         return true;
     }
 

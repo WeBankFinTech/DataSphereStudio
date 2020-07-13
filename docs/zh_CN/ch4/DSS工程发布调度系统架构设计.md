@@ -17,10 +17,10 @@
 
 （1）从数据库读取最新版本的工程、工作流信息，获取所有的保存在BML库工作流JSON文件。
 
-（2）将上面的数据库内容，JSON文件内容分别转成DSS中的DWSProject，DWSFlow，如果存在子flow，则需要一并设置到flow中，保持原来的层级关系和依赖关系，构建好DWSProject，其中包含了工程下所有的DWSFlow。
+（2）将上面的数据库内容，JSON文件内容分别转成DSS中的DSSProject，DSSFlow，如果存在子flow，则需要一并设置到flow中，保持原来的层级关系和依赖关系，构建好DSSProject，其中包含了工程下所有的DSSFlow。
      一个工作流JSON包含了所有节点的定义，并存储了节点之间的依赖关系，以及工作流自身的属性信息。
 
-（3）将DWSProject经过工程转换器转成SchedulerProject，转成SchedulerProject的过程中，同时完成了DWSJSONFlow到SchedulerFlow的转换，也完成了DWSNode到SchedulerNode的转换。
+（3）将DSSProject经过工程转换器转成SchedulerProject，转成SchedulerProject的过程中，同时完成了DSSJSONFlow到SchedulerFlow的转换，也完成了DSSNode到SchedulerNode的转换。
 
 （4）使用ProjectTuning对整个SchedulerProject工程进行tuning操作，用于完成工程发布前的整体调整操作，在Azkaban的实现中主要完成了工程的路径设置和工作流的存储路径设置。
 

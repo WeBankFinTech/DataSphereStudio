@@ -53,7 +53,7 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
 
       val nodeName = node.getName
       val propsMap = new util.HashMap[String, String]()
-      val proxyUser = if (node.getDWSNode.getUserProxy == null) flowEntranceJob.getUser else node.getDWSNode.getUserProxy
+      val proxyUser = if (node.getDssNode.getUserProxy == null) flowEntranceJob.getUser else node.getDssNode.getUserProxy
       propsMap.put(PROJECT_NAME, project.getName)
       propsMap.put(FLOW_NAME, flow.getName)
       propsMap.put(JOB_ID, nodeName)
@@ -62,12 +62,12 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
       propsMap.put(LinkisJobExecutionConfiguration.LINKIS_TYPE, node.getNodeType)
 
       propsMap.put(PROXY_USER, proxyUser)
-      propsMap.put(COMMAND, LinkisJobExecutionUtils.gson.toJson(node.getDWSNode.getJobContent))
+      propsMap.put(COMMAND, LinkisJobExecutionUtils.gson.toJson(node.getDssNode.getJobContent))
 
-      var params = node.getDWSNode.getParams
+      var params = node.getDssNode.getParams
       if (params == null) {
         params = new util.HashMap[String,AnyRef]()
-        node.getDWSNode.setParams(params)
+        node.getDssNode.setParams(params)
       }
       val flowVar = new util.HashMap[String, AnyRef]()
       val properties = flow.getFlowProperties

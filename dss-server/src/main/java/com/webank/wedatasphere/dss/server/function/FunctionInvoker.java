@@ -25,7 +25,7 @@ import com.webank.wedatasphere.dss.appjoint.service.SecurityService;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import com.webank.wedatasphere.dss.server.dao.ProjectMapper;
 import org.apache.commons.math3.util.Pair;
@@ -66,7 +66,7 @@ public class FunctionInvoker {
         return jobContent;
     }
 
-    public List<Pair<Project,String>> projectServiceAddFunction(DWSProject project, ProjectServiceAddFunction projectServiceAddFunction, List<AppJoint> appJoints) throws AppJointErrorException {
+    public List<Pair<Project,String>> projectServiceAddFunction(DSSProject project, ProjectServiceAddFunction projectServiceAddFunction, List<AppJoint> appJoints) throws AppJointErrorException {
         ArrayList<Pair<Project,String>> projects = new ArrayList<>();
         for (AppJoint appJoint : appJoints) {
             Project appJointProject = null;
@@ -84,7 +84,7 @@ public class FunctionInvoker {
         return projects;
     }
 
-    public void projectServiceFunction(DWSProject project, ProjectServiceFunction projectServiceFunction, List<AppJoint> appJoints) throws AppJointErrorException {
+    public void projectServiceFunction(DSSProject project, ProjectServiceFunction projectServiceFunction, List<AppJoint> appJoints) throws AppJointErrorException {
         for (AppJoint appJoint : appJoints) {
             Session session = null;
             if(appJoint.getSecurityService() != null){

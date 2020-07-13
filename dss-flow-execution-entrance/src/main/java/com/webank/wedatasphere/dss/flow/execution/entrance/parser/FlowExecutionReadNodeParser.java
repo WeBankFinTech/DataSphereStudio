@@ -20,7 +20,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.parser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.ReadNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.AbstractReadNodeParser;
-import com.webank.wedatasphere.dss.common.entity.node.DWSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.FlowExecutionNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.FlowExecutonReadNode;
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils;
@@ -39,8 +39,8 @@ public class FlowExecutionReadNodeParser extends AbstractReadNodeParser {
     }
 
     @Override
-    public Boolean ifNodeCanParse(DWSNode dwsNode) {
-        return FlowExecutionUtils.isReadNode(dwsNode.getNodeType());
+    public Boolean ifNodeCanParse(DSSNode dssNode) {
+        return FlowExecutionUtils.isReadNode(dssNode.getNodeType());
     }
 
     @Override

@@ -1,5 +1,11 @@
 {
     "message": {
+        "page": {
+            "total": "total",
+            "show": "show",
+            "to": "to",
+            "record": "record"
+        },
         "newConst": {
             "logoName": "DataSphere Studio",
             "ok": "OK",
@@ -156,6 +162,191 @@
             "addUse": "New usage",
             "workflowDesc": "Workflow description:",
             "inputWorkflowDesc": "Please enter workflow description"
+        },
+        "oneService": {
+            "title": "Data Service",
+            "sideNavList": {
+                "function": {
+                    "name": "Function",
+                    "children": {
+                        "apiMarket": "API Market"
+                    }
+                }
+            },
+            "apiPublish": {
+                "title": "PublishAPI",
+                "button": {
+                    "addApi": "API Add",
+                    "updateApi": "API Update"
+                },
+                "addApiModal": {
+                    "modalTitle": "Add API",
+                    "contentTitle": "Base Info",
+                    "paramConfirmTitle": "Params Confirm",
+                    "apiName": "API Name",
+                    "apiPath": "API Path",
+                    "protocol": "Protocol",
+                    "requestType": "Request Type",
+                    "tag": "Tag",
+                    "visible": "Visible",
+                    "describe": "Describe",
+                    "nextStep": "Next",
+                    "cancel": "Cancel",
+                    "confirm": "Confirm"
+                },
+                "updateApiModal": {
+                    "modalTitle": "Update API",
+                    "selectApi": "API Name",
+                    "apiPath": "API Path",
+                    "apiVersion": "API Version",
+                    "apiVersionUpgrade": "New Version",
+                    "paramConfirm": "Please confirm param"
+                },
+                "paramTable": {
+                    "paramName": "Param Name",
+                    "paramType": "Param Type",
+                    "require": {
+                        "title": "Require",
+                        "yes": "Yes",
+                        "no": "No"
+                    },
+                    "defaultValue": "Default Value",
+                    "describe": "Describe"
+                },
+                "rule": {
+                    "nameRule": "Please input api name!",
+                    "pathRule": "Please input api path!",
+                    "pathRegRule": "Api path illegal!",
+                    "requestTypeRule": "Please select request type!",
+                    "protocolRule": "Please select protocol!",
+                    "contentLengLimit": "Length limit 255",
+                    "pathRepeat": "Api path exists",
+                    "nameRepeat": "Api name exists"
+                },
+                "visible": {
+                    "workspace": "Workspace",
+                    "personal": "Personal",
+                    "public": "Public"
+                },
+                "notice": {
+                    "publishSuccess": "Publish Success"
+                },
+                "tagPlaceholder": "tag，click enter add"
+            },
+            "apiManager": {
+                "title": "Data Service",
+                "query": {
+                    "apiName": "Data Service Title",
+                    "tag": "Tag",
+                    "status": "Service Status",
+                    "commiter": "Commiter",
+                    "buttonText": "Query",
+                    "clearButtonText": "Clear"
+                },
+                "apiTable": {
+                    "apiName": "Data Service Name",
+                    "apiPath": "API Path",
+                    "status": "Status",
+                    "type": "Type",
+                    "describe": "Describe",
+                    "calledCount": "Call count",
+                    "responsiblePerson": "Responsible Person",
+                    "belongTo": "Belong To",
+                    "tag": "Tag",
+                    "operation": {
+                        "title": "Operation",
+                        "test": "Test",
+                        "copy": "Copy",
+                        "disable": "Disable",
+                        "enable": "Enable",
+                        "manager": "Manager"
+                    },
+                    "reconfirm": {
+                        "title": "Confirm",
+                        "disable": "Confirm disable this API？",
+                        "enable": "Confirm enable this API？"
+                    }
+                }
+            },
+            "apiCopy": {
+                "copy": "Copy",
+                "apiVersion": "API Version",
+                "apiInfo": "Produce API Info",
+                "cancel": "Cancel",
+                "copySuccess": "Copy Success"
+            },
+            "apiUpdate": {
+                "title": "Data API Manager",
+                "apiName": "API Name",
+                "tag": "tag",
+                "describe": "Describe"
+            },
+            "apiTest": {
+                "tabs": {
+                    "apiInfo": {
+                        "title": "API Info",
+                        "tag": "Tag",
+                        "metrics": "API Metrics",
+                        "monthCall": "Call Total This Month",
+                        "weekCall": "Call Total This Week",
+                        "dayCall": "Call Total Today",
+                        "averageTime": "Average Call Time",
+                        "callSuccess": "Success Percent",
+                        "topQps": "TOP QPS",
+                        "use": "API Call Info",
+                        "selectCallTime": "Select Call Time",
+                        "version": "Version",
+                        "callStatus": "Call Info",
+                        "callUser": "调用者",
+                        "callApp": "调用方",
+                        "callIp": "Call IP",
+                        "callTime": "Call Time",
+                        "callVersion": "Call Version",
+                        "operation": "Operation",
+                        "query": {
+                            "clearButtonText": "Clear",
+                            "buttonText": "Query"
+                        }
+                    },
+                    "apiTestInfo": {
+                        "title": "API Test",
+                        "testApi": "Test API",
+                        "apiVersion": "Version",
+                        "paramTable": {
+                            "paramName": "Param Name",
+                            "paramType": "Param Type",
+                            "require": {
+                                "title": "Require",
+                                "yes": "YES",
+                                "no": "NO"
+                            },
+                            "defaultValue": "Test Value"
+                        },
+                        "testResult": "Test Result"
+                    },
+                    "apiVersionInfo": {
+                        "title": "API Version",
+                        "versionInfoTable": {
+                            "version": "Version",
+                            "status": "Status",
+                            "source": "Source",
+                            "creator": "Publisher",
+                            "publishDate": "Publish Time",
+                            "updateDate": "Update Time",
+                            "operation": "Operation",
+                            "query": {
+                                "title": "Query",
+                                "clear": "Clear",
+                                "publishDate": "Select Publish Time"
+                            }
+                        }
+                    }
+                }
+            },
+            "apiStatus": {
+                "enable": "Running",
+                "disable": "Stop"
+            }
         },
         "process": {
             "stop": "Stop",

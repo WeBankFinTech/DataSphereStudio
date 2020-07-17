@@ -1,6 +1,7 @@
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'linkis', null, '0', '1', NULL, '0', '/home', NULL, '0', '/home', NULL);
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'workflow', null, '0', '1', NULL, '0', '/workflow', NULL, '0', '/project', NULL);
 INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'console', null, '0', '1', NULL, '0', '/console', NULL, '0', '/console', NULL);
+INSERT INTO `dss_application` (`id`, `name`, `url`, `is_user_need_init`, `level`, `user_init_url`, `exists_project_service`, `project_url`, `enhance_json`, `if_iframe`, `homepage_url`, `redirect_url`) VALUES (NULL, 'oneService', null, '0', '1', NULL, '0', '/oneService', NULL, '0', '/oneService', NULL);
 
 SELECT @linkis_appid:=id from dss_application WHERE `name` = 'linkis';
 SELECT @workflow_appid:=id from dss_application WHERE `name` = 'workflow';

@@ -1636,12 +1636,12 @@ export default {
         const params = {
           fileName,
           scriptContent: rst.fileContent[0][0],
-          metadata: rst.params,
+          metadata: rst.metadata,
         };
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
             this.$Message.success(this.$t('message.process.associaSuccess'));
-            node.params = rst.params;
+            node.params = rst.metadata;
             const params = {
               fileName,
               resourceId: res.resourceId,

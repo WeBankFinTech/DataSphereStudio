@@ -18,6 +18,9 @@
         v-if="work.type==='node'"
         ref="envVariable"
         :script="script"></env-variable> -->
+      <datasource
+        v-if="work.type === 'workspaceScript' && script.scriptType === 'jdbc'"
+        :script="script"></datasource>
     </div>
   </div>
 </template>
@@ -25,6 +28,7 @@
 import customVariable from '../setting/customVariable.vue';
 // import runtimeArgs from '../setting/runTimeArgs.vue';
 // import envVariable from '../setting/envVariable.vue';
+import datasource from '../setting/datasource'
 import { isEqual } from 'lodash';
 export default {
   name: 'Setting',
@@ -32,6 +36,7 @@ export default {
     customVariable,
     // runtimeArgs,
     // envVariable,
+    datasource
   },
   props: {
     work: {

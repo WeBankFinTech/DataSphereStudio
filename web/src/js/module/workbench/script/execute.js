@@ -401,7 +401,7 @@ Execute.prototype.updateLastHistory = function(option, cb) {
  * @param {*} ret
  */
 function deconstructStatusIfKill(execute, ret) {
-  if (ret.status !== 'Cancelled') {
+  if (ret.status !== 'Cancelled' && ret.status !== 'Succeed' && ret.status !== 'Failed' && ret.status !== 'WaitForRetry') {
     setTimeout(() => {
       execute.queryStatus({ isKill: true });
     }, 5000);

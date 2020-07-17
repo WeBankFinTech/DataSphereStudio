@@ -23,7 +23,8 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>0.9.0</version>
+        <version>0.10.0</version>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>linkis-jobtype</artifactId>
@@ -36,7 +37,6 @@
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-linkis-node-execution</artifactId>
-            <version>${dss.version}</version>
         </dependency>
 
         <dependency>

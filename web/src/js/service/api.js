@@ -150,6 +150,9 @@ const success = function(response) {
   }
   let data;
   if (response) {
+    if (response.status >= 500) {
+      throw new Error('后台接口异常，请联系开发处理！');
+    }
     if (util.isString(response.data)) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {

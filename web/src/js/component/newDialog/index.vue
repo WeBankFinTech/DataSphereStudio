@@ -5,7 +5,7 @@
       width="300">
       <span>{{ modalTitle }}</span>
     </div>
-    <div>
+    <div @keydown.enter="submitForm('newForm')">
       <Form
         ref="newForm"
         :model="newForm"
@@ -31,7 +31,7 @@
           <Input
             v-model="newForm.scriptName"
             :placeholder="$t('message.newDialog.placeholder')"
-            style="width: 360px;"></Input>
+            style="width: 360px;" v-focus></Input>
           <span>{{ ext }}</span>
         </FormItem>
         <FormItem
@@ -39,8 +39,9 @@
           :label="$t('message.newDialog.catalogName')"
           prop="name">
           <Input
+            ref="input"
             v-model="newForm.name"
-            :placeholder="$t('message.newDialog.placeholder')"></Input>
+            :placeholder="$t('message.newDialog.placeholder')" v-focus></Input>
         </FormItem>
         <Form-item
           v-if="isLeaf && scriptType.length"
@@ -181,6 +182,13 @@ export default {
         targetScriptPath: [
           { required: true, message: this.$t('message.newDialog.rules.targetScriptPath.required'), trigger: 'change' }
         ]
+      }
+    }
+  },
+  directives: {
+    focus: {
+      update: (el) => {
+        el.children[0].getElementsByTagName('input')[0].focus()
       }
     }
   },

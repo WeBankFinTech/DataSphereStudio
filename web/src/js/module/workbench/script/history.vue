@@ -175,6 +175,10 @@ export default {
       if (!params.row.logPath) {
         await api.fetch(`/jobhistory/${params.row.taskID}/get`, 'get').then((rst) => {
           params.row.logPath = rst.task.logPath;
+          if (rst.task.sourceJson) {
+            var sourceJson = JSON.parse(rst.task.sourceJson)
+            params.row.filePath = sourceJson['scriptPath']
+          }
         });
       }
       const name = `history_item_${params.row.taskID}${ext}`;
@@ -183,7 +187,7 @@ export default {
         id: md5Id, // 唯一标识，就算文件名修改，它都能标识它是它
         taskID: params.row.taskID,
         filename: name,
-        filepath: '',
+        filepath: params.row.filePath,
         // saveAs表示临时脚本，需要关闭或保存时另存
         saveAs: true,
         code: params.row.data,

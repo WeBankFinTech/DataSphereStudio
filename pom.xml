@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
 
     <modules>
         <module>dss-common</module>
@@ -44,14 +44,15 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
+        <module>oneservice/dss-oneservice-server</module>
     </modules>
 
     <properties>
-        <dss.version>0.9.0</dss.version>
-        <linkis.version>0.9.4</linkis.version>
+        <linkis.version>0.13.0</linkis.version>
         <scala.version>2.11.8</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
+        <jersey.version>2.16</jersey.version>
     </properties>
     <dependencies>
         <dependency>
@@ -80,6 +81,96 @@
             <version>2.6</version>
         </dependency>
     </dependencies>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-appjoint-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-appjoint-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-appjoint-loader</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-assembly</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-azkaban-scheduler-appjoint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-datachecker-appjoint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-eventchecker-appjoint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-flow-execution-entrance</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-linkis-node-execution</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-qualitis-appjoint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-scheduler-appjoint-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-sendmail-appjoint-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-visualis-appjoint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>dss-oneservice-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>

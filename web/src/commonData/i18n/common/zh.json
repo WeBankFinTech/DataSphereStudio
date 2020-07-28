@@ -1418,6 +1418,10 @@
                     "runTimeArgs": {
                         "settingTitle": "命令行参数",
                         "placeholder": "请使用空格分开多个参数"
+                    },
+                    "datasource": {
+                        "title": "数据源",
+                        "datasourceSelect": "请选择数据源"
                     }
                 },
                 "script": {

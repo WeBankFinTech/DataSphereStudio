@@ -1418,6 +1418,10 @@
                     "runTimeArgs": {
                         "settingTitle": "Command line Arguments",
                         "placeholder": "Please use space to separate multiple arguments"
+                    },
+                    "datasource": {
+                        "title": "DataSource",
+                        "datasourceSelect": "Please select datasource"
                     }
                 },
                 "script": {

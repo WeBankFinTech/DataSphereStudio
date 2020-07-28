@@ -94,14 +94,14 @@ public class OneServiceServiceImpl implements OneServiceService {
             Map<String, String> uploadResult = uploadBml(user, scriptPath,
                     oneService.getMetadata(), oneService.getContent());
 
-            // insert linkis_oneservice_config
+            // insert dss_oneservice_config
             String version = uploadResult.get("version");
             resourceId = uploadResult.get("resourceId");
             oneService.setResourceId(resourceId);
             oneService.setVersion(version);
             oneServiceConfigDao.insert(oneService);
 
-            // insert linkis_oneservice_params
+            // insert dss_oneservice_params
             List<ParamVo> params = oneService.getParams();
             if (params != null && !params.isEmpty()) {
                 for (ParamVo param : params) {

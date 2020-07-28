@@ -32,14 +32,14 @@
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ParamVo">
-        <![CDATA[INSERT INTO `linkis_oneservice_param`(]]>
+        <![CDATA[INSERT INTO `dss_oneservice_param`(]]>
 
         <include refid="fields"/>
         <![CDATA[) VALUES(#{configId}, #{version}, #{name}, #{type}, #{required}, #{description})]]>
     </insert>
 
     <update id="update">
-        <![CDATA[UPDATE `linkis_oneservice_param`]]>
+        <![CDATA[UPDATE `dss_oneservice_param`]]>
         <set>
             <if test="name != null and name != ''">
                 <![CDATA[ `name` = #{name}, ]]>
@@ -65,7 +65,7 @@
     <select id="queryByConfigIdAndVersion" resultMap="paramMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
-        <![CDATA[ FROM `linkis_oneservice_param` ]]>
+        <![CDATA[ FROM `dss_oneservice_param` ]]>
         <where>
             `config_id` = #{configId} and `version` = #{version}
         </where>

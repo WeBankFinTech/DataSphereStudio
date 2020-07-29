@@ -46,6 +46,24 @@ const router = new VueRouter({
           component: () => import('../view/newhome/index.vue'),
         },
         {
+          name: 'API',
+          path: 'api',
+          component: () => import('../module/dataAPI/index.vue'),
+          meta: {
+            title: 'API',
+            publicPage: true
+          }
+        },
+        {
+          name: 'NewAPI',
+          path: 'newApi',
+          component: () => import('../module/dataAPI/ApiForm.vue'),
+          meta: {
+            title: 'NewAPI',
+            publicPage: true
+          }
+        },
+        {
           path: 'home',
           name: 'Home',
           meta: {
@@ -149,7 +167,8 @@ const router = new VueRouter({
               title: 'FAQ',
               publicPage: true,
             },
-          }],
+          },
+          ],
         },
       ],
     },
@@ -198,7 +217,6 @@ const router = new VueRouter({
       },
       component: () => import('../view/404.vue'),
     },
-
   ],
 });
 router.beforeEach((to, from, next) => {

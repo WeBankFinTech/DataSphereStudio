@@ -7,10 +7,8 @@
       </div>
     </div>
 
-   
-
     <div class="workspace-main">
-      
+
       <Card class="left">
         <h3 class="item-header">
           <span >{{this.$t('message.console.sideNavList.function.name')}}</span>
@@ -22,7 +20,6 @@
             <i class="app-icon" :class="iconSplit(item.icon)[0]" :style="`color: ${iconSplit(item.icon)[1]}`"></i>
             <span class="label">{{$t('message.workSpace.home.enter', {text: item.title})}}</span>
           </div>
-          
 
           <div v-if="setting" class="app-item-add" @click="show = true">
             <i class="fi-plus add"></i>
@@ -38,8 +35,6 @@
         </div>
       </Card>
 
-      
-
       <Card class="right">
         <div class="nodata-tips" v-if="!adminApps.title">{{$t('message.workSpace.home.tips')}}</div>
         <h3 v-if="adminApps.title" class="item-header">
@@ -52,8 +47,7 @@
           </div>
         </div>
 
-       
-      </Card>     
+      </Card>
     </div>
 
     <div class="app-list-main">
@@ -71,7 +65,6 @@
                       <span class="label sub-margin sub-title">{{item.title}}</span>
                       <Tag class="app-tag sub-margin" v-for="tag in (item.labels ? item.labels.split(','):[])" :key="tag">{{tag}}</Tag>
                     </div>
-                    
 
                     <p>{{item.description}}</p>
                   </div>
@@ -95,17 +88,17 @@
                   <Button class="entrace-btn" size="small" type="primary" disabled @click="navTo(item, item.accessButtonUrl)">{{item.accessButton}}</Button>
                   <Button class="entrace-btn" size="small" @click="navTo(item, item.manualButtonUrl)">{{item.manualButton}}</Button>
                 </div>
-              </Card>    
+              </Card>
 
             </div>
-            
+
           </Tab-pane>
         </Tabs>
-        
+
         <div class="input-wrap">
           <Input icon="ios-search" :placeholder="$t('message.workSpace.home.searchPlaceholder')" style="width: 200px" @on-change="onSearch" />
         </div>
-        
+
       </div>
     </div>
     <Modal
@@ -125,7 +118,7 @@
         </FormItem>
 
         <FormItem :label="$t('message.workSpace.home.selectApp')"
-          prop="selectApp"> 
+          prop="selectApp">
           <Select v-model="formDynamic.selectApp">
             <Option v-for="item in apps" :value="`${item.id}`" :key="`${item.id}`" :disabled="item.had||!item.active">{{ item.title }}</Option>
           </Select>
@@ -142,8 +135,8 @@
           @click="addFavoriteApp"
         >{{$t('message.workSpace.home.save')}}</Button>
       </div>
-          
-    </Modal>  
+
+    </Modal>
   </div>
 </template>
 
@@ -155,7 +148,7 @@ export default {
     this.init();
   },
 
-  
+
   watch: {
     $route() {
       this.workspaceId= this.$route.query.workspaceId; //获取传来的参数 
@@ -175,7 +168,7 @@ export default {
       show: false,
       applications: [],
       searchResult: [],
-      
+
       formDynamic: {
         selectType: "",
         selectApp: "",
@@ -201,7 +194,7 @@ export default {
       return ['','']
     },
     init(){
-    
+
       api.fetch(`/dss/workspaces/${this.workspaceId}`, 'get').then(data=>{
         this.workspaceData = data.workspace;
       })
@@ -224,7 +217,7 @@ export default {
       })
     },
     addFavoriteApp(){
-      
+
       this.$refs.dynamicForm.validate((valid) => {
         if (valid) {
           // this.addAppLoading = true;
@@ -260,13 +253,13 @@ export default {
     },
 
     flatApps(){
-      const arr = []; 
+      const arr = [];
       this.applications.forEach(item=>{
         arr.push(...item.appInstances)
       })
       return arr;
     },
-    
+
     onSearch(event){
       const value = event.target.value;
       if(value){
@@ -297,8 +290,7 @@ export default {
         console.warn('path error', path);
       }
     }
-  },  
-  
+  },
   computed: {
     types: function(){
       return this.applications.map(item=>({title: item.title, id: item.id}))
@@ -330,7 +322,6 @@ export default {
 <style>
    .hideBar > .ivu-tabs > .ivu-tabs-bar {
       visibility: hidden;
-      
       padding-top: 35px;
     }
 

@@ -29,8 +29,8 @@ const getVersion = () => {
   return pkg.version;
 }
 
-const host = "0.0.0.0";
-const port = "9001";
+const host = "42.123.106.20";
+const port = "8088";
 
 module.exports = {
   publicPath: './',
@@ -44,12 +44,28 @@ module.exports = {
       errors: true
     },
     proxy: {    //代理转发
+      '^/api/rest_j/v1/test': {
+        target: 'http://192.168.9.171:8980',  //后端服务地址
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/rest_j/v1/test': '/api/rest_j/v1'
+        }
+      },
       '^/api/rest_j/v1': {
         target: `http://${host}:${port}`,  //后端服务地址
         ws: true,
         changeOrigin: true,
         pathRewrite: {
           '^/api/rest_j/v1': '/api/rest_j/v1'
+        }
+      },
+      '^/api/rest_j/v2': {
+        target: 'http://192.168.9.171:8980',  //后端服务地址
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/rest_j/v2': '/api/rest_j/v2'
         }
       },
       '^/ws/api': {    //websocket

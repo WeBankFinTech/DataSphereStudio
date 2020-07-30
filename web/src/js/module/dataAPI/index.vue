@@ -33,15 +33,11 @@ export default {
       columns: [
         {
           title: this.$t('message.api.name'),
-          slot: 'name'
+          slot: 'apiName'
         },
         {
           title: this.$t('message.api.frequency'),
           slot: 'frequency'
-        },
-        {
-          title: this.$t('message.api.createTime'),
-          slot: 'createTime',
         },
         {
           title: this.$t('message.api.action'),
@@ -57,9 +53,8 @@ export default {
     init() {
       // 获取api列表
       this.loading = true;
-      // jobEngine/listAll
-      api.fetch('test/jobEngine/listAll', {}, 'get').then((res) => {
-        this.apiData = res.workspaces;
+      api.fetch('data/jobEngine/listAll', {}, 'get').then((res) => {
+        this.apiData = res;
         this.loading = false;
       }).catch(() => {
         this.loading = false;
@@ -67,7 +62,7 @@ export default {
     },
     start(row) {
       this.loading = true;
-      api.fetch(`jobEngine/start/${row.id}`, {}, 'get').then((res) => {
+      api.fetch(`data/jobEngine/start/${row.id}`, {}, 'get').then((res) => {
         this.loading = false;
         this.$Message.success(this.$t('message.api.startSuccess'));
       }).catch(() => {
@@ -77,7 +72,7 @@ export default {
     },
     stop(row) {
       this.loading = true;
-      api.fetch(`jobEngine/stop/${row.id}`, {}, 'get').then((res) => {
+      api.fetch(`data/jobEngine/stop/${row.id}`, {}, 'get').then((res) => {
         this.loading = false;
         this.$Message.success(this.$t('message.api.stopSuccess'));
       }).catch(() => {

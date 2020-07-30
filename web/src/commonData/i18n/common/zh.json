@@ -164,7 +164,8 @@
           "selectType": "请选择类型",
           "relation": "字段映射",
           "enterMapping": "请输入字段映射",
-          "successNotice": "创建成功！"
+          "successNotice": "创建成功！",
+          "failedNotice": "创建失败！"
         },
         "GLY": {
           "ALTY": "案例体验",

@@ -1,17 +1,17 @@
 <template>
   <div class="api-table">
     <Table :columns="columns" :data="tableData" style="margin-bottom: 10px;">
-      <template slot-scope="{ row }" slot="name">
-        <span>{{ row.name }}</span>
+      <template slot-scope="{ row }" slot="apiName">
+        <span>{{ row.apiName }}</span>
       </template>
 
       <template slot-scope="{ row }" slot="frequency">
-        <span>{{ dateFormat(row.frequency) }}</span>
+        <span>{{ row.frequency }}</span>
       </template>
 
-      <template slot-scope="{ row }" slot="createTime">
+      <!-- <template slot-scope="{ row }" slot="createTime">
         <span>{{ dateFormat(row.createTime) }}</span>
-      </template>
+      </template> -->
 
       <template slot-scope="{ row }" slot="action">
         <Button type="primary" size="small" style="margin-right: 5px" @click="start(row)">执行</Button>

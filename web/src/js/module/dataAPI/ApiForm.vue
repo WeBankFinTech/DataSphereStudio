@@ -171,18 +171,18 @@ export default {
       index: 1,
       frequency: 0,
       apiData: {
-        apiName: 'httpreader',
-        url: 'http://9p8yse.natappfree.cc/api',
-        successCode: '200',
-        successCodeJsonPath: '$.code',
-        dataJsonPath: '$.data',
-        defaultFS: 'hdfs://192.168.9.180:9000',
-        fileName: 'orc_table',
-        path: '/user/hive/warehouse/orc_table',
+        apiName: '',
+        url: '',
+        successCode: '',
+        successCodeJsonPath: '',
+        dataJsonPath: '',
+        defaultFS: '',
+        fileName: '',
+        path: '',
         frequency: ''
       },
       getParams: [
-        { key: 'sex', value: '1', index: 1 },
+        { key: '', value: '', index: 1 },
       ],
       open: false,
       loading: false
@@ -247,22 +247,23 @@ export default {
           const { apiName, dataJsonPath, successCode, successCodeJsonPath, defaultFS, path, fileName } = this.apiData;
           const data = {
             frequency: this.frequency,
-            // apiName,
+            apiName,
             reader: {
-              dataJsonPath, successCode: Number(successCode), successCodeJsonPath, url: [url],
-              httpMethod: 'get', delayTime: 300,
-              column: this.$refs.readerCol.formData
+              parameter: {
+                dataJsonPath, successCode: Number(successCode), successCodeJsonPath, url: [url], httpMethod: 'get', delayTime: 300, column: this.$refs.readerCol.formData, requestParam: []
+              }
             },
             writer: {
-              defaultFS, path, fileName, column: this.$refs.writerCol.formData
+              parameter: {
+                defaultFS, path, fileName, column: this.$refs.writerCol.formData
+              }
             }
           };
-          console.log(data)
           this.loading = true;
-          api.fetch('/api/rest_j/v1/test/jobEngine/addConfig', data, 'post').then(() => {
+          api.fetch('data/jobEngine/addConfig', data, 'post').then(() => {
             this.loading = false;
             // 跳转到api列表
-            // this.gotoApiList();
+            this.gotoApiList();
             this.$Message.success(this.$t('message.api.successNotice'));
           }).catch(() => {
             this.loading = false;

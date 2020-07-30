@@ -17,9 +17,12 @@
           <h1 class="logo-title">
             {{$t('message.newConst.logoName')}} <span style="font-size:14px" v-if="moudleName">/ {{moudleName}}</span>
           </h1>
+          
           <img
             class="logo-img"
             src="../../../assets/images/dssLogo6.svg" :alt="$t('message.newConst.logoName')">
+
+          <span>{{$t('message.header.appName')}}</span>
         </div>
       </div>
       <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>

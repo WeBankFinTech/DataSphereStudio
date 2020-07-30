@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "../../../../../../2020-datavs-server"
+		},
+		{
+			"path": "../../../../../../autoInstallHadoop"
+		}
+	],
+	"settings": {}
+}

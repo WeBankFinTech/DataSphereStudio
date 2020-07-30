@@ -2,9 +2,9 @@
   <div class="page-bgc">
     <div class="page-bgc-header">
       <div class="header-info">
-        <h1>{{$t('message.workspace.infoHeader')}}</h1>
+        <h1><span>{{$t('message.workspace.infoHeader')}}</span><span class="second-title">{{$t('message.project.infoBodyFirstSubtitle')}}</span></h1>
         <p>{{$t('message.project.infoBodyFirstRow')}}</p>
-        <p>{{$t('message.project.infoBodySecondRow')}}</p>
+        <!-- <p>{{$t('message.project.infoBodySecondRow')}}</p> -->
       </div>
     </div>
     <div class="workspace-main">

@@ -55,7 +55,7 @@
     vertical-align: top;
     font-size: 20px;
     color: $body-background;
-    margin-top: 2px;
+    
 
     .logo-title {
       text-indent: -10000px;
@@ -66,7 +66,10 @@
     }
 
     .logo-img {
+      margin-top: -5px;
+      margin-right: 20px;
       height: 36px;
+      vertical-align: middle;
     }
   }
 

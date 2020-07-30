@@ -82,8 +82,9 @@
             "publishSuccess": "Successfully published",
             "publishFailed": "Publish failed",
             "infoTitle": "Welcome",
-            "infoHeader": "Welcome to My Project !",
-            "infoBodyFirstRow": "CT-Luban is a one-stop portal focusing on development and management of data application, as a part of Luban -- the big data platform of Ctyun.",
+            "infoHeader": "Welcome to Feilong.Luban !",
+            "infoBodyFirstRow": "Luban is a one-stop portal focusing on development and management of data application, as a part of Luban -- the big data platform of Ctyun.",
+            "infoBodyFirstSubtitle":"The mechanism, the philosophy of Numbers",
             "infoBodySecondRow": "Based on Linkis computation middleware, it's able to easily integrate various data application systems, making the development of data application easier and simpler.",
             "workspace": "Workspace",
             "appTitle": "Application Navigation",
@@ -106,7 +107,7 @@
             "noData": "No data please add"
         },
         "workspace": {
-          "infoHeader": "Welcome to CT-Luban !",
+          "infoHeader": "Welcome to Feilong.Luban !",
           "createWorkspace": "Create Workspace",
           "searchWorkspace": "Search Workspace",
           "workspaceList": "Workspace List",
@@ -812,7 +813,8 @@
         },
         "header": {
             "home": "Home",
-            "console": "Console"
+            "console": "Console",
+            "appName": "Luban"
         },
         "headerNavBar": {
             "Workflow": "Workflow Development",

@@ -1,7 +1,7 @@
 <template>
   <div class="api-form">
     <Form
-      :label-width="100"
+      :label-width="120"
       label-position="left"
       ref="apiForm"
       :model="apiData"
@@ -53,7 +53,7 @@
         prop="dataJsonPath">
         <Input
           v-model="apiData.dataJsonPath"
-          :placeholder="$t('message.api.enterDataPath')"
+          placeholder="$.data(data是API返回的数据字段名)"
         />
       </FormItem>
       <FormItem
@@ -61,7 +61,7 @@
         prop="successCode">
         <Input
           v-model="apiData.successCode"
-          :placeholder="$t('message.api.enterCode')"
+          placeholder="200"
         />
       </FormItem>
       <FormItem
@@ -69,7 +69,7 @@
         prop="successCodeJsonPath">
         <Input
           v-model="apiData.successCodeJsonPath"
-          :placeholder="$t('message.api.enterCodePath')"
+          placeholder="$.code(code是API返回的成功码字段)"
         />
       </FormItem>
       <!-- 定时 -->
@@ -94,7 +94,7 @@
         prop="defaultFS">
         <Input
           v-model="apiData.defaultFS"
-          :placeholder="$t('message.api.enterHive')"
+          placeholder="hdfs://"
         />
       </FormItem>
       <FormItem

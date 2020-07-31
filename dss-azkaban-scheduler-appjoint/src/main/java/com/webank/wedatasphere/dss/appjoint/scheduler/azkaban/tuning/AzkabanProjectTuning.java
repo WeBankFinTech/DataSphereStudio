@@ -60,7 +60,7 @@ public class AzkabanProjectTuning extends AbstractProjectTuning {
         SimpleDateFormat dateFormat = new SimpleDateFormat(AzkabanSchedulerProject.DATE_FORMAT);
         Date date = new Date();
         String dataStr = dateFormat.format(date);
-        String userName = azkabanSchedulerProject.getDWSProject().getUserName();
+        String userName = azkabanSchedulerProject.getDssProject().getUserName();
         String name = azkabanSchedulerProject.getName();
         String storePath = AzkabanConf.DEFAULT_STORE_PATH.getValue() + File.separator + userName
                 + File.separator + dataStr + File.separator +name;

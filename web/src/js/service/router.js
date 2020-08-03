@@ -228,6 +228,10 @@ router.beforeEach((to, from, next) => {
       next('/');
     }
   }
+
+  if(to.path==="/login"){
+    window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088";
+  }
   // 直接进入某个工程
   // const query = from.query;
   // if (query && query.projectID && query.projectTaxonomyID && query.projectVersionID && (to.name === 'Kanban' || to.name === 'Home' || to.name === 'Workflow')) {

@@ -109,10 +109,19 @@ export default {
       this.logout();
     },
     logout() {
-      api.fetch('/user/logout', 'get').then(() => {
-        this.$emit('clear-session');
-        this.$router.push({ path: '/login' });
-      });
+      console.log("process.env.VUE_APP_CTYUN_SSO", process.env.VUE_APP_CTYUN_SSO);
+      if(process.env.VUE_APP_CTYUN_SSO){
+        api.fetch('/user/logout', 'get').then(() => {
+          this.$emit('clear-session');
+          window.location = process.env.VUE_APP_CTYUN_SSO;
+          this.$router.push({ path: '/login' });
+        });
+      }else {
+        api.fetch('/user/logout', 'get').then(() => {
+          this.$emit('clear-session');
+          this.$router.push({ path: '/login' });
+        });
+      }
     },
     changeLang() {
       // 中文切换英文

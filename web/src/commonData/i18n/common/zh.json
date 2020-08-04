@@ -85,7 +85,7 @@
             "infoTitle": "欢迎信息",
             "infoHeader": "欢迎来到飞龙.鲁班！ ",
             "infoBodyFirstRow": "鲁班是天翼云联合开源社区合作共建的一站式大数据开发与服务平台，支持细粒度资源管控、多租户隔离、高可用，高并发，可扩展，高性能等优秀特性。通过高度融合业界前沿的各种大数据技术，为用户提供从数据交换、存储、开发、治理、可视化、服务、安全等全链路大数据解决方案。 ",
-            "infoBodyFirstSubtitle":"机关，数字的哲学",
+            "infoBodyFirstSubtitle":"机关，是数字的哲学",
             "infoBodySecondRow": "基于Linkis计算中间件构建，可轻松整合上层各数据应用系统，让数据应用开发变得简洁又易用。",
             "appTitle": "应用导航",
             "workspace": "工作空间",

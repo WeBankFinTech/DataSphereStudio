@@ -448,3 +448,17 @@ CREATE TABLE `dss_homepage_video` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for ctyun_user
+-- ----------------------------
+DROP TABLE IF EXISTS `ctyun_user`;
+CREATE TABLE `ctyun_user` (
+  `id` char(32) NOT NULL COMMENT '天翼云userId',
+  `username` varchar(64) NOT NULL COMMENT 'DSS用户名',
+  `name` varchar(128) COMMENT '天翼云用户name',
+  `ctyun_username` varchar(128) NOT NULL COMMENT '天翼云用户注册邮箱',
+  `password` varchar(64) NOT NULL,
+  `expire_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `work_order_item_config` JSON DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

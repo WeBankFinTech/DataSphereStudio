@@ -114,7 +114,7 @@ export default {
         api.fetch('/user/logout', 'get').then(() => {
           this.$emit('clear-session');
           window.location = process.env.VUE_APP_CTYUN_SSO;
-          this.$router.push({ path: '/login' });
+          // this.$router.push({ path: '/login' });
         });
       }else {
         api.fetch('/user/logout', 'get').then(() => {

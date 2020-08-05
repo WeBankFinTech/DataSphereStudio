@@ -17,6 +17,7 @@
 
 import VueRouter from 'vue-router';
 import Layout from '../view/layout.vue';
+import api from '@/js/service/api';
 
 // 解决重复点击路由跳转报错
 const originalPush = VueRouter.prototype.push
@@ -219,19 +220,34 @@ const router = new VueRouter({
     },
   ],
 });
-router.beforeEach((to, from, next) => {
-  if (to.meta) {
-    if (to.meta.publicPage) {
-      // 公共页面不需要权限控制（404，500）
-      next();
-    } else {
-      next('/');
+router.beforeEach(async (to, from, next) => {
+  if(process.env.VUE_APP_CTYUN_SSO){
+    try {
+      await api.fetch('/dss/getBaseInfo', 'get').then(data=>{
+        if (to.meta) {
+          if (to.meta.publicPage) {
+            // 公共页面不需要权限控制（404，500）
+            next();
+          } else {
+            next('/');
+          }
+        }
+      })
+    } catch (error) {
+      window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+    }
+  }else {
+    if (to.meta) {
+      if (to.meta.publicPage) {
+        // 公共页面不需要权限控制（404，500）
+        next();
+      } else {
+        next('/');
+      }
     }
   }
+  
 
-  if(to.path==="/login"){
-    window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088";
-  }
   // 直接进入某个工程
   // const query = from.query;
   // if (query && query.projectID && query.projectTaxonomyID && query.projectVersionID && (to.name === 'Kanban' || to.name === 'Home' || to.name === 'Workflow')) {

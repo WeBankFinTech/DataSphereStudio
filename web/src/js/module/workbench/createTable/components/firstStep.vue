@@ -310,7 +310,7 @@ export default {
       const tbList = that.dbList[that.currentDb].children;
       const isDupl = tbList.find((el) => el.name === val);
       if (isDupl) {
-        return cb(new Error(this.$t('message.createTable.canned')));
+        return cb(new Error(that.$t('message.createTable.canned')));  //this指向错误，loadsh.debounce 传入箭头函数指向的是组件本身 不是vue根
       }
       return cb();
     }, 300),

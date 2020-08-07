@@ -1,24 +1,26 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.azkaban;
 
+import java.io.IOException;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
 import com.webank.wedatasphere.dss.appjoint.scheduler.SchedulerAppJoint;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.hooks.LinkisAzkabanProjectPublishHook;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.parser.AzkabanProjectParser;
+import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.service.AzkabanProjectService;
+import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.service.CtyunAzkabanSecurityService;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.tuning.AzkabanProjectTuning;
 import com.webank.wedatasphere.dss.appjoint.scheduler.hooks.ProjectPublishHook;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.ProjectParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerProjectService;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerSecurityService;
-import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.service.AzkabanProjectService;
-import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.service.AzkabanSecurityService;
 import com.webank.wedatasphere.dss.appjoint.scheduler.tuning.ProjectTuning;
 import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Created by cooperyang on 2019/9/16.
@@ -45,7 +47,7 @@ public final class AzkabanSchedulerAppJoint extends AppJointUrlImpl implements S
             basicUrl = AzkabanConf.AZKABAN_BASE_URL.getValue();
             LOGGER.warn("basic url in db is empty,read it from conf{}",basicUrl);
         }
-        securityService = new AzkabanSecurityService();
+        securityService = new CtyunAzkabanSecurityService();
         securityService.setBaseUrl(basicUrl);
 
         projectService = new AzkabanProjectService();

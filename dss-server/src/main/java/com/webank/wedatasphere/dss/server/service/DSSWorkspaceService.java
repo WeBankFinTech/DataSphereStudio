@@ -30,7 +30,7 @@ import java.util.List;
  * Created by schumiyi on 2020/6/22
  */
 public interface DSSWorkspaceService {
-    List<DSSWorkspace> getWorkspaces();
+    List<DSSWorkspace> getWorkspaces(String userName);
 
     Long addWorkspace(String userName, String name, String department, String label, String description);
 

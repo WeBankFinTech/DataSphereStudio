@@ -31,6 +31,8 @@
         "dt-sql-parser": "^1.1.10",
         "highlight.js": "^9.12.0",
         "iview": "^3.4.2",
+        "less": "^3.9.0",
+        "less-loader": "^4.1.0",
         "lodash": "^4.17.10",
         "md5": "^2.2.1",
         "mitt": "^1.1.3",

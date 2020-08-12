@@ -863,7 +863,7 @@ export default {
       // this.work.code = this.script.data;
       const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
       if (this.script.data) {
-        if (this.work.unsave && !isHdfs) {
+        if (this.work.unsave) {
           if (this.work.filepath) {
             this.work.unsave = false;
             const timeout = setTimeout(() => {
@@ -1053,6 +1053,7 @@ export default {
     },
     convertSettingParams(params) {
       const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
+      const datasource = params.configuration.datasource ? (params.configuration.datasource.datasourceId ? params.configuration.datasource : {}) : {};
       // const configuration = isEmpty(params.configuration) ? {} :{
       //     special: {},
       //     runtime: {
@@ -1061,10 +1062,11 @@ export default {
       //     },
       //     startup: {},
       // };
-      const configuration = isEmpty(params.variable) ? {} : {
+      const configuration = isEmpty(params.configuration) ? {} : {
         special: {},
         runtime: {},
         startup: {},
+        datasource: datasource
       };
       return {
         variable,

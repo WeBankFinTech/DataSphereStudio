@@ -38,9 +38,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private WorkspaceMapper workspaceMapper;
 
     @Override
-    public List<DSSWorkspace> getWorkspaces() {
+    public List<DSSWorkspace> getWorkspaces(String userName) {
 
-        return workspaceMapper.getWorkspaces();
+        return workspaceMapper.getWorkspaces(userName);
     }
 
     @Override

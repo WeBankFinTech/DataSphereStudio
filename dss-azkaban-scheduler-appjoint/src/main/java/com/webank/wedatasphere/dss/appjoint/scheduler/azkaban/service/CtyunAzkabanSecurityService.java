@@ -135,10 +135,12 @@ public final class CtyunAzkabanSecurityService extends AppJointUrlImpl implement
             throw new AppJointErrorException(90020, "用户token为空");
 
         // 密码解密
+        while (user.length() < 8) {
+            user += user;
+        }
         byte[] key = user.getBytes();
         Arrays.sort(key);
         DES des = SecureUtil.des(key);
-        // 密码加密
         return des.decryptStr(token, CharsetUtil.CHARSET_UTF_8);
     }
 

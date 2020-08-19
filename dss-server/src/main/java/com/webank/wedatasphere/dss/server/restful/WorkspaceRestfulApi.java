@@ -56,8 +56,9 @@ public class WorkspaceRestfulApi {
     @GET
     @Path("/workspaces")
     public Response getAllWorkspaces(@Context HttpServletRequest req) {
+        String userName = SecurityFilter.getLoginUsername(req);
         // TODO: Order By time
-        List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces();
+        List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(userName);
         return Message.messageToResponse(Message.ok().data("workspaces", workspaces));
     }
 

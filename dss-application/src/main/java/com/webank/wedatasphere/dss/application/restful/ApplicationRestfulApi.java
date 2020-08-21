@@ -59,7 +59,7 @@ public class ApplicationRestfulApi {
     @Path("getBaseInfo")
     public Response getBaseInfo(@Context HttpServletRequest req){
         String username = SecurityFilter.getLoginUsername(req);
-        applicationHandlerChain.handle(username);
+//        applicationHandlerChain.handle(username);  //在授权模块去做
         List<Application> applicationList = applicationService.listApplications();
         for (Application application : applicationList) {
             String redirectUrl = application.getRedirectUrl();

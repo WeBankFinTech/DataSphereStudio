@@ -87,6 +87,7 @@ export default {
     };
   },
   created() {
+    this.logout();
     let userNameAndPass = storage.get('saveUserNameAndPass', 'local');
     if (userNameAndPass) {
       this.rememberUserNameAndPass = true;
@@ -94,6 +95,15 @@ export default {
       this.loginForm.password = userNameAndPass.split('&')[1];
     }
     this.getCapt();
+  },
+  logout(){
+    if(process.env.VUE_APP_CTYUN_SSO){
+      api.fetch('/user/logout', 'get').then(() => {
+        this.$emit('clear-session');
+        this.$router.push('/');
+        // this.$router.push({ path: '/login' });
+      });
+    }
   },
   mounted() {
     // 如果有登录状态，且用户手动跳转到login页，则判断登录态是否过期

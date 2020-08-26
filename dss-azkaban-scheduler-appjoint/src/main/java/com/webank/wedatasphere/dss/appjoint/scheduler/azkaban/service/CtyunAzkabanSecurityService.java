@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
+import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerSecurityService;
 import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
@@ -48,38 +48,23 @@ public final class CtyunAzkabanSecurityService extends AppJointUrlImpl implement
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CtyunAzkabanSecurityService.class);
 
-    private static final String LINKIS_PROPERTIES_FILE_NAME = "linkis.properties";
-    private static Properties linkisProps;
-    private static DataSource dataSource;
+    private static final DataSource dataSource = dataSource();
 
     private static final long EXPIRE_TIME = 1000 * 60 * 10L;
     private static final String USER_NAME_KEY = "username";
-    private static final String USER_TOKEN_KEY = "userpwd";
+    private static final String USER_TOKEN_KEY = AzkabanConf.AZKABAN_LOGIN_PWD.getValue();
     private static final String SESSION_ID_KEY = "azkaban.browser.session.id";
 
     private ConcurrentHashMap<String, Session> sessionCache = new ConcurrentHashMap<>();
     private Interner<String> pool = Interners.newWeakInterner();
     private String securityUrl;
 
-    static {
-        LOGGER.info("dss-azkaban-scheduler-appjoint从{}文件读取数据库配置", LINKIS_PROPERTIES_FILE_NAME);
-        Properties properties = new Properties();
-        try {
-            properties
-                .load(AzkabanSecurityService.class.getClassLoader().getResourceAsStream(LINKIS_PROPERTIES_FILE_NAME));
-            linkisProps = properties;
-            dataSource = dataSource();
-        } catch (IOException e) {
-            LOGGER.error("读取{}文件失败:", LINKIS_PROPERTIES_FILE_NAME, e);
-        }
-    }
-
     private static DataSource dataSource() {
-        String dbUrl = linkisProps.getProperty("wds.linkis.server.mybatis.datasource.url", "");
-        String username = linkisProps.getProperty("wds.linkis.server.mybatis.datasource.username", "");
-        String password = linkisProps.getProperty("wds.linkis.server.mybatis.datasource.password", "");
-        String driverClassName =
-            linkisProps.getProperty("wds.linkis.server.mybatis.datasource.driver-class-name", "com.mysql.jdbc.Driver");
+        LOGGER.info("建立数据库连接，读取用户token");
+        String dbUrl = AzkabanConf.DATASOURCE_URL.getValue();
+        String username = AzkabanConf.DATASOURCE_USERNAME.getValue();
+        String password = AzkabanConf.DATASOURCE_PASSWORD.getValue();
+        String driverClassName = AzkabanConf.DATASOURCE_DRIVER_CLASS_NAME.getValue();
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
@@ -135,10 +120,12 @@ public final class CtyunAzkabanSecurityService extends AppJointUrlImpl implement
             throw new AppJointErrorException(90020, "用户token为空");
 
         // 密码解密
+        while (user.length() < 8) {
+            user += user;
+        }
         byte[] key = user.getBytes();
         Arrays.sort(key);
         DES des = SecureUtil.des(key);
-        // 密码加密
         return des.decryptStr(token, CharsetUtil.CHARSET_UTF_8);
     }
 

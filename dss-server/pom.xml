@@ -147,6 +147,12 @@
             <artifactId>dss-scheduler-appjoint-core</artifactId>
             <version>0.9.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-crypto</artifactId>
+            <version>5.3.10</version>
+        </dependency>
     </dependencies>
 
     <build>

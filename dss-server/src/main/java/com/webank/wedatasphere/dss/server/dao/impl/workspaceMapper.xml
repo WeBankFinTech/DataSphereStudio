@@ -42,6 +42,7 @@
     <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.server.entity.DSSWorkspace">
         SELECT *
         FROM dss_workspace
+        WHERE dss_workspace.`create_by`=#{userName}
         ORDER BY dss_workspace.`create_time` DESC
     </select>
 

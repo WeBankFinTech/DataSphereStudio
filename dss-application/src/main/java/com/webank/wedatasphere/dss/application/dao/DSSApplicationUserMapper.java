@@ -18,6 +18,7 @@
 package com.webank.wedatasphere.dss.application.dao;
 
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
+import com.webank.wedatasphere.dss.application.entity.WorkOrder;
 
 /**
  * Created by chaogefeng on 2019/10/11.
@@ -28,4 +29,6 @@ public interface DSSApplicationUserMapper {
     void registerDssUser(DSSUser userDb);
 
     void updateUserFirstLogin(Long userId);
+
+    WorkOrder getUserOrderInfoByName(Integer workOrderType, String username);
 }

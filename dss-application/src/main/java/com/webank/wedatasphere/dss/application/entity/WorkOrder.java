@@ -27,11 +27,11 @@ public class WorkOrder {
     /**
      * 施工单进度
      */
-    private Integer progress = 0;
+    private Integer progress;
     /**
      * 施工单状态
      */
-    private Boolean isSuccess = false;
+    private Integer isSuccess;
 
     public Long getId() {
         return id;
@@ -73,11 +73,11 @@ public class WorkOrder {
         this.progress = progress;
     }
 
-    public Boolean getSuccess() {
+    public Integer getSuccess() {
         return isSuccess;
     }
 
-    public void setSuccess(Boolean success) {
+    public void setSuccess(Integer success) {
         isSuccess = success;
     }
 

@@ -30,5 +30,5 @@ public interface DSSApplicationUserMapper {
 
     void updateUserFirstLogin(Long userId);
 
-    WorkOrder getUserOrderInfoByName(Integer workOrderType, String username);
+    WorkOrder getUserOrderInfoByName(String username);
 }

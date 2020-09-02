@@ -36,7 +36,7 @@ public class DSSApplicationUserServiceImpl implements DSSApplicationUserService 
     @Override
     public DSSUser getUserByName(String username) {
         DSSUser user = dssApplicationUserMapper.getUserByName(username);
-        WorkOrder order = dssApplicationUserMapper.getUserOrderInfoByName(1, user.getUsername());
+        WorkOrder order = dssApplicationUserMapper.getUserOrderInfoByName(user.getUsername());
         if (order.getSuccess() == 2) {
             user.setStatus(3);
         } else if (order.getSuccess() == 1) {

@@ -39,7 +39,7 @@
         from work_order wo
         left join linkis_user lu on wo.ctyun_user_id=lu.ctyun_user_id
         left join dss_user du on lu.username=du.username
-        where wo.work_order_type=#{workOrderType} and du.username=#{username}
+        where wo.work_order_type=1 and du.username=#{username}
     </select>
 
     <update id="updateUserFirstLogin">

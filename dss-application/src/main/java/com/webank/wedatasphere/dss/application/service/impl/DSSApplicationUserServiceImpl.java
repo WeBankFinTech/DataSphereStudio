@@ -37,7 +37,9 @@ public class DSSApplicationUserServiceImpl implements DSSApplicationUserService 
     public DSSUser getUserByName(String username) {
         DSSUser user = dssApplicationUserMapper.getUserByName(username);
         WorkOrder order = dssApplicationUserMapper.getUserOrderInfoByName(user.getUsername());
-        if (order.getSuccess() == 2) {
+        if (order == null) {
+            user.setStatus(0);
+        } else if (order.getSuccess() == 2) {
             user.setStatus(3);
         } else if (order.getSuccess() == 1) {
             user.setStatus(2);

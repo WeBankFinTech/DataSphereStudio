@@ -37,7 +37,7 @@
           <span class="navbar-item-name">{{ $t('message.workBench.body.script.editor.navBar.stop') }}</span>
         </div>
         <div
-          v-if="!script.readOnly && !isHdfs"
+          v-if="!script.readOnly"
           class="workbench-body-navbar-item"
           title="Ctrl+S"
           @click="save">
@@ -45,7 +45,7 @@
           <span class="navbar-item-name">{{ $t('message.workBench.body.script.editor.navBar.save') }}</span>
         </div>
         <div
-          v-if="!script.readOnly && !isHdfs && isSupport"
+          v-if="!script.readOnly && isSupport"
           class="workbench-body-navbar-item"
           @click="config">
           <Icon type="ios-build" />

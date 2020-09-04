@@ -96,15 +96,6 @@ export default {
     }
     this.getCapt();
   },
-  logout(){
-    if(process.env.VUE_APP_CTYUN_SSO){
-      api.fetch('/user/logout', 'get').then(() => {
-        this.$emit('clear-session');
-        this.$router.push('/');
-        // this.$router.push({ path: '/login' });
-      });
-    }
-  },
   mounted() {
     // 如果有登录状态，且用户手动跳转到login页，则判断登录态是否过期
     const userInfo = storage.get('userInfo');
@@ -114,6 +105,15 @@ export default {
     socket.methods.close();
   },
   methods: {
+    logout(){
+      if(process.env.VUE_APP_CTYUN_SSO){
+        api.fetch('/user/logout', 'get').then(() => {
+          this.$emit('clear-session');
+          this.$router.push('/');
+        // this.$router.push({ path: '/login' });
+        });
+      }
+    },
     getCapt(){
       axios.get('/api/rest_j/v1/user/captcha').then(data=>{
         api.fetch('/user/captcha', 'get').then((data)=>{

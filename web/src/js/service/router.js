@@ -17,7 +17,9 @@
 
 import VueRouter from 'vue-router';
 import Layout from '../view/layout.vue';
-import api from '@/js/service/api';
+// import api from '@/js/service/api';
+import storage from '@/js/helper/storage';
+import { Modal } from 'iview';
 
 // 解决重复点击路由跳转报错
 const originalPush = VueRouter.prototype.push
@@ -220,22 +222,47 @@ const router = new VueRouter({
     },
   ],
 });
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
+  const userInfo = storage.get('userInfo');
   if(process.env.VUE_APP_CTYUN_SSO){
-    try {
-      await api.fetch('/dss/getBaseInfo', 'get').then(data=>{
-        if (to.meta) {
-          if (to.meta.publicPage) {
-            // 公共页面不需要权限控制（404，500）
-            next();
-          } else {
-            next('/');
-          }
-        }
-      })
-    } catch (error) {
+    // try {
+    //   await api.fetch('/dss/getBaseInfo', 'get').then(data=>{
+    //     if (to.meta) {
+    //       if (to.meta.publicPage) {
+    //         // 公共页面不需要权限控制（404，500）
+    //         next();
+    //       } else {
+    //         next('/');
+    //       }
+    //     }
+    //   })
+    // } catch (error) {
+    //   window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+    // }
+    if(to.path === '/login'){
+      storage.clear('cookie');
       window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+    } else if (to.path === '/newhome') {
+      next()
+    } else {
+      if (userInfo.basic && userInfo.basic.status === 0) {
+        Modal.confirm({
+          title: '开通资源',
+          content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+          okText: '去开通',
+          cancelText: '再看看案例和入门',
+          onOk: () => {
+            window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+          },
+          onCancel: () => {
+            console.log('Clicked cancel');
+          }
+        });
+      } else {
+        next()
+      }
     }
+
   }else {
     if (to.meta) {
       if (to.meta.publicPage) {
@@ -246,23 +273,6 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   }
-  
-
-  // 直接进入某个工程
-  // const query = from.query;
-  // if (query && query.projectID && query.projectTaxonomyID && query.projectVersionID && (to.name === 'Kanban' || to.name === 'Home' || to.name === 'Workflow')) {
-  //   next({
-  //     path: to.path,
-  //     query,
-  //   })
-  //   return;
-  // }
-  // if (to.name === 'Workflow' && !query.projectID && from.name !== 'Project') {
-  //   next({
-  //     path: '/project',
-  //   })
-  //   return;
-  // }
 });
 router.afterEach((to) => {
   if (to.meta) {

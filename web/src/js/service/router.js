@@ -17,6 +17,8 @@
 
 import VueRouter from 'vue-router';
 import Layout from '../view/layout.vue';
+import storage from '@/js/helper/storage';
+import { Modal } from 'iview';
 
 // 解决重复点击路由跳转报错
 const originalPush = VueRouter.prototype.push
@@ -220,12 +222,26 @@ const router = new VueRouter({
   ],
 });
 router.beforeEach((to, from, next) => {
-  if (to.meta) {
-    if (to.meta.publicPage) {
-      // 公共页面不需要权限控制（404，500）
-      next();
+  const userInfo = storage.get('userInfo');
+
+  if (to.path === '/newhome') {
+    next()
+  } else {
+    if (userInfo.basic && userInfo.basic.status === 0) {
+      Modal.confirm({
+        title: '开通资源',
+        content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+        okText: '去开通',
+        cancelText: '再看看案例和入门',
+        onOk: () => {
+          window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+        },
+        onCancel: () => {
+          console.log('Clicked cancel');
+        }
+      });
     } else {
-      next('/');
+      next()
     }
   }
   // 直接进入某个工程

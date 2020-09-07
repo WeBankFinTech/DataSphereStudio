@@ -442,7 +442,7 @@ export default {
         path: option.path,
       }, 'get').then((rst) => {
         const ismodifyByOldTab = option.code && !rst.fileContent[0][0];
-        const params = ismodifyByOldTab ? option.params : this.convertSettingParams(rst.params);
+        const params = ismodifyByOldTab ? option.params : this.convertSettingParams(rst.metadata);
         this[methodName]({
           id: md5Path,
           filename: option.filename,

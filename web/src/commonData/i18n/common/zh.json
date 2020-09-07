@@ -23,7 +23,7 @@
         "project": {
             "projectName": "工程名",
             "gotoScriptis": "进入Scriptis",
-            "createproject": "创建工程",
+            "createProject": "创建工程",
             "editorProject": "修改工程",
             "search": "搜索工程",
             "deleteProject": "删除工程",
@@ -134,7 +134,7 @@
         "workflow": {
             "infoHeader": "欢迎来到工作流！",
             "workflow": "工作流",
-            "createworkflow": "创建工作流",
+            "createWorkflow": "创建工作流",
             "gotoVisualis": "进入Visualis",
             "publishProject": "发布工程",
             "searchWorkflow": "搜索工作流",

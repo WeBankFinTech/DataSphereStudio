@@ -22,7 +22,7 @@
         "project": {
             "projectName": "Project Name",
             "gotoScriptis": "Visit Scriptis",
-            "createproject": "Create Project",
+            "createProject": "Create Project",
             "editorProject": "Edit Project",
             "search": "Search Project",
             "deleteProject": "Delete Project",
@@ -81,7 +81,7 @@
             "publishSuccess": "Successfully published",
             "publishFailed": "Publish failed",
             "infoTitle": "Welcome",
-            "infoHeader": "Welcome to My Project !",
+            "infoHeader": "Welcome to Workflow Development !",
             "infoBodyFirstRow": "DataSphere Studio is a one-stop portal focusing on development and management of data application, as a part of WeDataSphere -- the big data platform of WeBank.",
             "infoBodySecondRow": "Based on Linkis computation middleware, it's able to easily integrate various data application systems, making the development of data application easier and simpler.",
             "workspace": "Workspace",
@@ -134,7 +134,7 @@
         "workflow": {
             "infoHeader": "Welcome to Workflow!",
             "workflow": "Workflow",
-            "createworkflow": "Create workflow",
+            "createWorkflow": "Create workflow",
             "gotoVisualis": "Enter Visualis",
             "publishProject": "Publish project",
             "searchWorkflow": "Search for workflow",

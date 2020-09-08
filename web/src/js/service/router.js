@@ -237,11 +237,11 @@ router.beforeEach((to, from, next) => {
     //     }
     //   })
     // } catch (error) {
-    //   window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+    //   window.location = "http://www.ctyun.cn/cas/login?service=http://luban.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
     // }
     if(to.path === '/login'){
       storage.clear('cookie');
-      window.location = "http://www.ctyun.cn/cas/login?service=http://ai.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+      window.location = "http://www.ctyun.cn/cas/login?service=http://luban.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
     } else if (to.path === '/newhome') {
       next()
     } else {

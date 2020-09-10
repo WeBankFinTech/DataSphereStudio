@@ -56,7 +56,7 @@
         SELECT *
         FROM dss_workspace
         <where>
-            dss_workspace.`name` = #{name}
+            dss_workspace.`name` = #{name} AND dss_workspace.`create_by` = #{username}
         </where>
     </select>
 

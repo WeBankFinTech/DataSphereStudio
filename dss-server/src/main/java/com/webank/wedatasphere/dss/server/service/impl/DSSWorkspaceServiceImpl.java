@@ -64,8 +64,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public boolean existWorkspaceName(String name) {
-        return !workspaceMapper.findByWorkspaceName(name).isEmpty();
+    public boolean existWorkspaceName(String name, String username) {
+        return !workspaceMapper.findByWorkspaceName(name, username).isEmpty();
     }
 
     @Override

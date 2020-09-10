@@ -121,7 +121,7 @@ import newDialog from '@js/component/newDialog';
 import uploadDialog from '@/js/component/uploadDialog';
 import weImportToHive from '@js/component/importToHive';
 import deleteDialog from '@js/component/deleteDialog';
-const PREFIX = 'file://';
+const PREFIX = 'hdfs://';
 export default {
   name: 'WorkSidebar',
   components: {

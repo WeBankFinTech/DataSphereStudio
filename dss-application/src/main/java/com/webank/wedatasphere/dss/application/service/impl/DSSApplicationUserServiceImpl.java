@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.application.service.impl;
 
 import com.webank.wedatasphere.dss.application.dao.DSSApplicationUserMapper;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
-import com.webank.wedatasphere.dss.application.entity.WorkOrder;
 import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,25 +34,12 @@ public class DSSApplicationUserServiceImpl implements DSSApplicationUserService 
 
     @Override
     public DSSUser getUserByName(String username) {
-        DSSUser user = dssApplicationUserMapper.getUserByName(username);
-        WorkOrder order = dssApplicationUserMapper.getUserOrderInfoByName(user.getUsername());
-        if (order == null) {
-            user.setStatus(0);
-        } else if (order.getSuccess() == 2) {
-            user.setStatus(3);
-        } else if (order.getSuccess() == 1) {
-            user.setStatus(2);
-        } else if (order.getSuccess() == 0 && order.getProgress() == 0) {
-            user.setStatus(0);
-        } else {
-            user.setStatus(1);
-        }
-        return user;
+        return dssApplicationUserMapper.getUserByName(username);
     }
 
     @Override
     public void registerDssUser(DSSUser userDb) {
-        dssApplicationUserMapper.registerDssUser( userDb);
+        dssApplicationUserMapper.registerDssUser(userDb);
     }
 
     @Override

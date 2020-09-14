@@ -34,7 +34,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <unpack>false</unpack>
-            <useStrictFiltering>true</useStrictFiltering>
+            <useStrictFiltering>false</useStrictFiltering>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <!--<excludes>
                 <exclude>log4j:log4j:*</exclude>

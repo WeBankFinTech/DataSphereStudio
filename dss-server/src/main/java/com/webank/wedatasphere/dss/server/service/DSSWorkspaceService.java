@@ -34,7 +34,7 @@ public interface DSSWorkspaceService {
 
     Long addWorkspace(String userName, String name, String department, String label, String description);
 
-    boolean existWorkspaceName(String name);
+    boolean existWorkspaceName(String name, String username);
 
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 

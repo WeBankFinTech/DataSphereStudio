@@ -48,6 +48,12 @@
             <version>${dss.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.htrace</groupId>
+            <artifactId>htrace-core</artifactId>
+            <version>3.1.0-incubating</version>
+        </dependency>
+
     </dependencies>
 
 

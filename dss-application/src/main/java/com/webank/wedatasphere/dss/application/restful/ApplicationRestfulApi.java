@@ -20,9 +20,11 @@ package com.webank.wedatasphere.dss.application.restful;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.DSSUserVO;
+import com.webank.wedatasphere.dss.application.entity.LinkisUser;
 import com.webank.wedatasphere.dss.application.handler.ApplicationHandlerChain;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
+import com.webank.wedatasphere.dss.application.service.LinkisUserService;
 import com.webank.wedatasphere.dss.application.util.ApplicationUtils;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
@@ -54,6 +56,8 @@ public class ApplicationRestfulApi {
     private DSSApplicationUserService dataworkisUserService;
     @Autowired
     private ApplicationHandlerChain applicationHandlerChain;
+    @Autowired
+    private LinkisUserService linkisUserService;
 
     @GET
     @Path("getBaseInfo")
@@ -69,6 +73,8 @@ public class ApplicationRestfulApi {
             }
         }
         DSSUser dssUser = dataworkisUserService.getUserByName(username);
+        LinkisUser linkisUser = linkisUserService.getUserByName(username);
+        dssUser.setStatus(linkisUser.getStatus());
         DSSUserVO dataworkisUserVO = new DSSUserVO();
         dataworkisUserVO.setBasic(dssUser);
         return Message.messageToResponse(Message.ok().data("applications",applicationList).data("userInfo",dataworkisUserVO));

@@ -308,15 +308,18 @@ export default {
                 const isIn = list.indexOf(work.data.id);
                 const methodName = 'Workbench:add';
                 if (isIn === -1) {
-                  this[methodName]({
-                    id: work.data.id,
-                    filename: work.filename,
-                    filepath: work.filepath,
-                    code: work.data.data,
-                    type: work.type,
-                    data: work.data,
-                    saveAs: work.saveAs,
-                  });
+                  let _this = this;
+                  setTimeout(function () {
+                    _this[methodName]({
+                      id: work.data.id,
+                      filename: work.filename,
+                      filepath: work.filepath,
+                      code: work.data.data,
+                      type: work.type,
+                      data: work.data,
+                      saveAs: work.saveAs,
+                    });
+                  }, 10);
                 }
               }
             });
@@ -874,16 +877,20 @@ export default {
           env: [],
         },
         startup: {},
+        datasource: {
+          datasourceId: null
+        }
       };
       if (!isEmpty(params)) {
         variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
         configuration = isEmpty(params.configuration) ? {} : {
           special: {},
           runtime: {
-            args: params.configuration.runtime.args || '',
-            env: isEmpty(params.configuration.runtime.env) ? [] : util.convertObjectToArray(params.configuration.runtime.env),
+            args: params.configuration.runtime ? params.configuration.runtime.args || '' : '',
+            env: params.configuration.runtime ? (isEmpty(params.configuration.runtime.env) ? [] : util.convertObjectToArray(params.configuration.runtime.env)) : [],
           },
           startup: {},
+          datasource: params.configuration.datasource ? params.configuration.datasource : {datasourceId: null}
         };
       }
       return {

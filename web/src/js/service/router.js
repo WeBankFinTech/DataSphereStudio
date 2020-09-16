@@ -102,6 +102,32 @@ const router = new VueRouter({
           component: () => import('../view/commonIframe/index.vue'),
         },
         {
+          path: 'oneService',
+          name: 'OneService',
+          meta: {
+            title: 'One Service',
+            publicPage: true,
+          },
+          component: () => import('../view/oneService/index.vue'),
+          children: [{
+            name: 'apiMarket',
+            path: 'apiMarket',
+            component: () => import('../module/oneService/apiManager.vue'),
+            meta: {
+              title: 'Api Market',
+              publicPage: true,
+            },
+          }, {
+            name: 'apiTest',
+            path: 'apiTest',
+            component: () => import('../module/oneService/apiTest.vue'),
+            meta: {
+              title: 'Api Test',
+              publicPage: true,
+            },
+          }]
+        },
+        {
           path: 'console',
           name: 'Console',
           meta: {

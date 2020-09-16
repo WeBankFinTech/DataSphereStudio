@@ -37,7 +37,7 @@
           <span class="navbar-item-name">{{ $t('message.workBench.body.script.editor.navBar.stop') }}</span>
         </div>
         <div
-          v-if="!script.readOnly && !isHdfs"
+          v-if="!script.readOnly"
           class="workbench-body-navbar-item"
           title="Ctrl+S"
           @click="save">
@@ -45,12 +45,17 @@
           <span class="navbar-item-name">{{ $t('message.workBench.body.script.editor.navBar.save') }}</span>
         </div>
         <div
-          v-if="!script.readOnly && !isHdfs && isSupport"
+          v-if="!script.readOnly && isSupport"
           class="workbench-body-navbar-item"
           @click="config">
           <Icon type="ios-build" />
           <span class="navbar-item-name">{{ $t('message.workBench.body.script.editor.navBar.config') }}</span>
         </div>
+        <api-publish
+          :script="script"
+          :work="work"
+          :script-type="scriptType"
+          @on-save="save"></api-publish>
       </div>
     </div>
     <div class="editor-content">
@@ -78,12 +83,14 @@
 </template>
 <script>
 import setting from './setting.vue';
+import apiPublish from '../../oneService/apiPublish'
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import { throttle } from 'lodash';
 export default {
   components: {
     setting,
+    apiPublish,
   },
   props: {
     script: {
@@ -111,7 +118,8 @@ export default {
       return this.script.running;
     },
     isHdfs() {
-      return this.work.filepath.indexOf('hdfs') === 0;
+      // return this.work.filepath.indexOf('hdfs') === 0;
+      return false;
     },
     isSupport() {
       return this.script.executable;
@@ -200,6 +208,14 @@ export default {
     },
     config() {
       this.showConfig = !this.showConfig;
+    },
+    publishApiPanel(name) {
+      console.log('publishApi - name:' + name)
+      if ('addApi' === name) {
+
+      } else if ('updateApi' === name) {
+
+      }
     },
     settingClose() {
       this.showConfig = false;

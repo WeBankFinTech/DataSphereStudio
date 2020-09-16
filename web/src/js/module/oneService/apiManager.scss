@@ -1,0 +1,208 @@
+
+@import "../../../assets/styles/variables.scss";
+
+.api-manager-title {
+  color: $title-color;
+  margin-bottom: 10px;
+}
+
+.api-manager{
+  padding: 10px;
+
+  .data-service-tbl{
+
+  // .hideBar > .ivu-tabs > .ivu-tabs-bar {
+  //   visibility: hidden;
+
+  //   padding-top: 35px;
+  // }
+
+  // .ivu-tabs > .ivu-tabs-bar > .ivu-tabs-nav-container{
+  //   display: block;
+  // }
+  // .hideBar > .ivu-tabs > .ivu-tabs-bar > .ivu-tabs-nav-container {
+  //   display: none;
+  // }
+
+  // .app-tag > .ivu-tag-text {
+  // color: #fff;
+  // border-radius: 2px;
+  // border-radius: 2px;
+  // }
+  // .scrollerWrap{
+
+  //   position:absolute;
+  //   width:100%;
+  //   height:90%;//有header的时候可能会出现滚动条，所以最好高度是除去header的高度
+  //   top:40px;//一般页面有header的时候需要留出header的高度
+  //   bottom:20px;
+  //   main{
+  //     height:100%;
+  //   }
+
+
+  .api-list {
+    padding: 10px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .api-list-main-left {
+      flex: 1;
+      .left {
+        // flex: 1;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+        border-color: #eee;
+        max-height: 480px;
+        margin: 15px 15px;
+        width: 100%;
+        .api-list-content {
+
+          .content-item {
+            height: 400px;
+            overflow: auto;
+            .api-list-item {
+              height: 180px;
+              margin: 15px 15px 15px 15px;
+              box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+              background: #fff;
+              padding: 10px;
+              position: relative;
+              background: center center no-repeat;
+              background-size: cover;
+              width: 30%;
+              border:1px groove rgb(230, 226, 226);
+              // box-sizing: border-box;
+              // content: "\E918";
+              .name {
+                display: block;
+                font-size: 20px;
+                font-weight: 600;
+                word-wrap: break-word ;
+                color: black;
+                margin: 0 0 auto;
+                .api-name{
+                  margin: 45px 45px;
+                  padding-top: initial;
+                }
+
+              }
+              .describe {
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                word-wrap: break-word ;
+                color: rgb(69, 67, 67);
+                margin: 20px 20px auto;
+              }
+              .right-run {
+                top: 18px;
+                position: absolute;
+                color: black;
+                height: 0px;
+                right: 0px;
+                width: 80px;
+                font-size: 16px;
+                padding: 0px;
+                .run{
+                  position: absolute;
+                  margin: 3px -25px;
+                  width: 20px;
+                  filter: drop-shadow(#04f338 0px 0);
+                  background-color: greenyellow;
+                  border-radius: 10px;
+                  border-left: 0px solid transparent;
+                  border-right: 0px solid transparent;
+                  // overflow:hidden;
+                  padding-top: initial;
+                }
+                .stop{
+                  position: absolute;
+                  margin: 3px -25px;
+                  width: 20px;
+                  border-radius: 15px;
+                  // fill: ;
+                  filter: drop-shadow(#fe0303 0px 0);
+                  background-color: red;
+                  padding-top: initial;
+                }
+              }
+
+              .item-header {
+                font-size: 14px;
+                margin: 20px 15px 10px;
+                font-weight: bold;
+                padding-left: 5px;
+                border-left: 3px solid $primary-color;
+              }
+              .desc {
+                width: 100%;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-all;
+                color: white;
+              }
+
+              .lable-list {
+                position: absolute;
+                left: 10px;
+                bottom: 50px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: flex-start;
+                width: 100%;
+                .item {
+                  display: inline-block;
+                  font-size: 10px;
+                  padding: .1em .10em;
+                  margin: 0 .8em .10em 0;
+                  white-space: nowrap;
+                  background-color: #f1f8ff;
+                  border-radius: 3px;
+                  color: #0366d6;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 100%;
+                }
+              }
+              .bottom{
+                position: absolute;
+                bottom: 8px;
+                left: 50px;
+                text-align: center;
+                align-items: flex-start;
+                .enter{
+                  text-align: center;
+                  font-size: 18px;
+                  color: white;
+                  font-family: sans-serif;
+                  margin:10px 100px auto;
+                  background-color: rgb(9, 245, 9);
+                }
+              }
+              .editor {
+                position: absolute;
+                right: 10px;
+                bottom: 10px;
+              }
+            }
+          }
+          .api-list-table {
+            margin: 20px 15px 10px;
+          }
+          .page {
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
+      }
+    }
+  }
+  }
+
+//}
+}
+

@@ -1,5 +1,11 @@
 {
     "message": {
+        "page": {
+          "total": "共",
+          "show": "显示",
+          "to": "到",
+          "record": "条记录"
+        },
         "newConst": {
             "logoName": "DataSphere Studio",
             "ok": "确认",
@@ -100,6 +106,7 @@
             "visualisSubTitle": "数据可视化",
             "qualitisSubTitle": "数据质量",
             "schedulisSubTitle": "数据调度",
+            "dataServiceSubTitle": "数据服务",
             "outputSubTitle": "数据发送",
             "deleteWtss": "是否同时删除scheduler工程?",
             "noData": "暂无数据请添加"
@@ -156,6 +163,206 @@
             "addUse": "新增用途",
             "workflowDesc": "工作流描述:",
             "inputWorkflowDesc": "请输入工作流描述"
+        },
+        "oneService": {
+            "title": "数据服务",
+            "sideNavList": {
+                "function": {
+                    "name": "功能",
+                    "children": {
+                        "apiMarket": "API市场",
+                        "resource": "资源管理器",
+                        "setting": "设置",
+                        "dateReport": "全局变量",
+                        "globalValiable": "常见问题"
+                    }
+                }
+            },
+            "apiPublish": {
+                "title": "发布为数据API",
+                "button": {
+                    "addApi": "新建数据API",
+                    "updateApi": "更新数据API"
+                },
+                "addApiModal": {
+                    "modalTitle": "数据服务API新增",
+                    "contentTitle": "基本信息补充",
+                    "paramConfirmTitle": "参数确认",
+                    "apiName": "API 名称",
+                    "apiPath": "API Path",
+                    "protocol": "协议",
+                    "requestType": "请求方式",
+                    "tag": "标签",
+                    "visible": "可见范围",
+                    "describe": "描述",
+                    "nextStep": "下一步",
+                    "cancel": "取消",
+                    "confirm": "确认",
+                    "displayName": "展示名"
+                },
+                "updateApiModal": {
+                    "modalTitle": "数据服务API更新",
+                    "selectApi": "API 名称",
+                    "apiPath": "API 路径",
+                    "apiVersion": "API版本",
+                    "apiVersionUpgrade": "生成新版本",
+                    "paramConfirm": "请确认参数"
+                },
+                "paramTable": {
+                    "paramName": "参数名称",
+                    "paramType": "参数类型",
+                    "require": {
+                        "title": "是否必填",
+                        "yes": "是",
+                        "no": "否"
+                    },
+                    "defaultValue": "默认值",
+                    "describe": "描述",
+                    "displayName": "展示名(必填)"
+                },
+                "rule": {
+                    "nameRule": "请填写API名称",
+                    "pathRule": "请填写API路径",
+                    "pathRegRule": "API路径不合法",
+                    "requestTypeRule": "请选择请求方式",
+                    "protocolRule": "请选择协议",
+                    "contentLengthLimit": "长度不能大于255",
+                    "pathRepeat": "API路径已存在",
+                    "nameRepeat": "API名称已存在"
+                },
+                "visible": {
+                    "workspace": "工作空间",
+                    "personal": "个人",
+                    "public": "公开"
+                },
+                "notice": {
+                    "publishSuccess": "发布成功"
+                },
+                "tagPlaceholder": "标签，按 enter 创建"
+            },
+            "apiManager": {
+                "title": "数据服务",
+                "query": {
+                    "apiName": "数据服务名称",
+                    "tag": "标签",
+                    "status": "服务状态",
+                    "commiter": "提交人",
+                    "buttonText": "查询",
+                    "clearButtonText": "清空"
+                },
+                "apiTable": {
+                    "labelEmpty": "无标签",
+                    "apiName": "数据服务名称",
+                    "apiPath": "API 路径",
+                    "status": "状态",
+                    "type": "类型",
+                    "describe": "描述",
+                    "calledCount": "调用次数",
+                    "responsiblePerson": "责任人",
+                    "belongTo": "API归属",
+                    "tag": "标签",
+                    "operation": {
+                        "title": "操作",
+                        "test": "测试",
+                        "copy": "复制",
+                        "disable": "禁用",
+                        "enable": "启用",
+                        "manager": "管理",
+                        "enter": "进入使用"
+                    },
+                    "reconfirm": {
+                        "title": "确认",
+                        "disable": "确定禁用该API吗？",
+                        "enable": "确定启动该API吗？"
+                    }
+                }
+            },
+            "apiCopy": {
+                "copy": "复制",
+                "apiVersion": "API 版本",
+                "apiInfo": "生成API信息",
+                "cancel": "取消",
+                "copySuccess": "复制成功"
+            },
+            "apiUpdate": {
+                "title": "数据API管理",
+                "apiName": "API 名称",
+                "tag": "标签",
+                "describe": "描述"
+            },
+            "apiTest": {
+                "tabs": {
+                    "apiInfo": {
+                        "title": "API信息",
+                        "tag": "标签",
+                        "metrics": "API Metrics",
+                        "monthCall": "本月总调用次数",
+                        "weekCall": "本周总调用次数",
+                        "dayCall": "今日调用次数",
+                        "averageTime": "平均调用时长",
+                        "callSuccess": "调用成功率",
+                        "topQps": "最高QPS",
+                        "use": "API调用情况",
+                        "selectCallTime": "请选择调用时间",
+                        "version": "版本",
+                        "callStatus": "调用情况",
+                        "callUser": "调用者",
+                        "callApp": "调用方",
+                        "callIp": "调用IP",
+                        "callTime": "调用时长",
+                        "callVersion": "调用版本",
+                        "operation": "操作",
+                        "query": {
+                            "clearButtonText": "清空",
+                            "buttonText": "查询"
+                        }
+                    },
+                    "apiTestInfo": {
+                        "title": "API测试",
+                        "testApi": "测试API",
+                        "apiVersion": "请求版本",
+                        "params": "筛选条件",
+                        "moreParams": "更多筛选条件...",
+                        "selectParams": "已选择过滤条件",
+                        "allSelect": "全选",
+                        "allSelectParams": "可选择参数列表",
+                        "paramTable": {
+                            "paramName": "参数名称",
+                            "paramType": "参数类型",
+                            "description": "参数描述",
+                            "displayName": "展示名",
+                            "require": {
+                                "title": "是否必填",
+                                "yes": "是",
+                                "no": "否"
+                            },
+                            "defaultValue": "测试值"
+                        },
+                        "testResult": "测试结果"
+                    },
+                    "apiVersionInfo": {
+                        "title": "API版本",
+                        "versionInfoTable": {
+                            "version": "版本",
+                            "status": "状态",
+                            "source": "来源",
+                            "creator": "发布者",
+                            "publishDate": "发布时间",
+                            "updateDate": "最后更新时间",
+                            "operation": "操作",
+                            "query": {
+                                "title": "查询",
+                                "clear": "清空",
+                                "publishDate": "请选择发布时间"
+                            }
+                        }
+                    }
+                }
+            },
+            "apiStatus": {
+                "enable": "运行中",
+                "disable": "已禁用"
+            }
         },
         "process": {
             "stop": "停止",
@@ -1227,6 +1434,10 @@
                     "runTimeArgs": {
                         "settingTitle": "命令行参数",
                         "placeholder": "请使用空格分开多个参数"
+                    },
+                    "datasource": {
+                        "title": "数据源",
+                        "datasourceSelect": "请选择数据源"
                     }
                 },
                 "script": {

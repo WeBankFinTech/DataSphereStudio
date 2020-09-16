@@ -44,7 +44,7 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
-        <module>dss-oneservice-server</module>
+        <module>dss-apiservice-server</module>
     </modules>
 
     <properties>
@@ -53,6 +53,7 @@
         <scala.version>2.11.8</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
+        <harbor.reposity>zhangrong1027/linkis</harbor.reposity>
     </properties>
     <dependencies>
         <dependency>

@@ -147,6 +147,6 @@ public class LinkisUser {
         return status;
     }
     public void setStatus(Integer status) {
-
+        this.status = status;
     }
 }

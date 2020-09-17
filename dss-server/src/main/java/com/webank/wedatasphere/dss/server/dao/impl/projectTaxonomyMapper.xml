@@ -51,7 +51,7 @@
         LEFT JOIN dss_user bdu ON ptr.creator_id = bdu.id
         WHERE
             ptr.taxonomy_id = #{taxonomyID}
-        AND bdu.`name` = #{userName}
+        AND bdu.`username` = #{userName}
     </select>
 
     <insert id="insertProjectTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DSSProjectTaxonomy">

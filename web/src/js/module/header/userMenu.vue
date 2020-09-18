@@ -66,6 +66,9 @@ export default {
         case 'clearCache':
           this.clearCache();
           break;
+        case 'workOrder':
+          this.gotoWorkOrder();
+          break;
         case 'logout':
           this.getRunningJob();
           break;
@@ -119,6 +122,9 @@ export default {
         this.$emit('clear-session');
         this.$router.push({ path: '/login' });
       });
+    },
+    gotoWorkOrder() {
+      this.$router.push('/workOrder');
     },
     changeLang() {
       // 中文切换英文

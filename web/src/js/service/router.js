@@ -236,7 +236,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/newhome') {
     next()
   } else {
-    if (userInfo.basic && userInfo.basic.status === 0) {
+    if (userInfo && userInfo.basic.status === 0) {
       Modal.confirm({
         title: '开通资源',
         content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',

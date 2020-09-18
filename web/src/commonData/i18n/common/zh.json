@@ -848,7 +848,7 @@
             "title": "警告",
             "content": "<p>此操作将清空本地数据库缓存，这样会丢失您的脚本日志、历史和结果集等相关信息，请确认是否有未保存的脚本！</p><p>点击确认按钮继续操作？</p>",
             "clearCacheSuccess": "清除本地数据缓存成功!",
-            "comingSoon": "尚未开源，敬请期待！"
+            "comingSoon": "暂未开放！"
         },
         "header": {
             "home": "首页",
@@ -963,7 +963,7 @@
                 "data": "数据请求中，请稍候！",
                 "waiting": "请等待接口返回！",
                 "biLoading": "正在和Visualis系统通讯，请稍候！",
-                "comingSoon": "尚未开源，敬请期待！"
+                "comingSoon": "暂未开放！"
             },
             "success": {
                 "delete": "删除成功！",

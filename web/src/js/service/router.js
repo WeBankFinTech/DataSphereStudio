@@ -57,6 +57,15 @@ const router = new VueRouter({
           }
         },
         {
+          name: 'WorkOrder',
+          path: 'workOrder',
+          component: () => import('../module/workOrder/index.vue'),
+          meta: {
+            title: 'WorkOrder',
+            publicPage: true
+          }
+        },
+        {
           name: 'NewAPI',
           path: 'newApi',
           component: () => import('../module/dataAPI/ApiForm.vue'),

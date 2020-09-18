@@ -29,7 +29,7 @@ const getVersion = () => {
   return pkg.version;
 }
 
-const host = "10.30.66.29";
+const host = "luban.ctyun.cn";
 const port = "8088";
 
 module.exports = {

@@ -636,7 +636,8 @@
         "navMune": {
             "FAQ": "FAQ",
             "clearCache": "Clear cache",
-            "logOut": "Log out"
+            "logOut": "Log out",
+            "workOrder": "Work Order"
         },
         "shape": {
             "dataDev": "Data development",

@@ -33,6 +33,11 @@ export default {
         //   icon: 'ios-help-circle-outline',
         // }, 
         {
+          id: 'workOrder',
+          name: this.$t('message.navMune.workOrder'),
+          icon: 'ios-paper-outline',
+        },
+        {
           id: 'clearCache',
           name: this.$t('message.navMune.clearCache'),
           icon: 'ios-trash-outline',
@@ -60,6 +65,9 @@ export default {
           break;
         case 'clearCache':
           this.clearCache();
+          break;
+        case 'workOrder':
+          this.gotoWorkOrder();
           break;
         case 'logout':
           this.getRunningJob();
@@ -123,6 +131,9 @@ export default {
           this.$router.push({ path: '/login' });
         });
       }
+    },
+    gotoWorkOrder() {
+      this.$router.push('/workOrder');
     },
     changeLang() {
       // 中文切换英文

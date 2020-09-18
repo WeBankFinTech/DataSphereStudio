@@ -31,7 +31,13 @@ export default {
           id: 'FAQ',
           name: this.$t('message.navMune.FAQ'),
           icon: 'ios-help-circle-outline',
-        }, {
+        },
+        {
+          id: 'workOrder',
+          name: this.$t('message.navMune.workOrder'),
+          icon: 'ios-paper-outline',
+        },
+        {
           id: 'clearCache',
           name: this.$t('message.navMune.clearCache'),
           icon: 'ios-trash-outline',

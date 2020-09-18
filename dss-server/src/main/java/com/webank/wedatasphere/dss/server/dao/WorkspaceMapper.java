@@ -34,7 +34,7 @@ public interface WorkspaceMapper {
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
-    List<DSSWorkspace> findByWorkspaceName(String name, String username);
+    List<DSSWorkspace> findByWorkspaceName(@Param("name") String name, @Param("username") String username);
 
     void addWorkSpace(DSSWorkspace dssWorkspace);
 

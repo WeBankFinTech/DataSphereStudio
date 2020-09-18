@@ -20,14 +20,19 @@ package com.webank.wedatasphere.dss.application.restful;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.DSSUserVO;
+import com.webank.wedatasphere.dss.application.entity.LinkisUser;
 import com.webank.wedatasphere.dss.application.handler.ApplicationHandlerChain;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
+import com.webank.wedatasphere.dss.application.service.LinkisUserService;
 import com.webank.wedatasphere.dss.application.util.ApplicationUtils;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import scala.util.parsing.json.JSON;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -54,6 +59,9 @@ public class ApplicationRestfulApi {
     private DSSApplicationUserService dataworkisUserService;
     @Autowired
     private ApplicationHandlerChain applicationHandlerChain;
+    @Autowired
+    private LinkisUserService linkisUserService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationRestfulApi.class);
 
     @GET
     @Path("getBaseInfo")
@@ -69,6 +77,9 @@ public class ApplicationRestfulApi {
             }
         }
         DSSUser dssUser = dataworkisUserService.getUserByName(username);
+        LinkisUser linkisUser = linkisUserService.getUserByName(username);
+        dssUser.setCtyunUserId(linkisUser.getCtyunUserId());
+        dssUser.setStatus(linkisUser.getStatus());
         DSSUserVO dataworkisUserVO = new DSSUserVO();
         dataworkisUserVO.setBasic(dssUser);
         return Message.messageToResponse(Message.ok().data("applications",applicationList).data("userInfo",dataworkisUserVO));

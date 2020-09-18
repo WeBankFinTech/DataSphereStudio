@@ -313,8 +313,7 @@ CREATE TABLE `dss_workspace` (
   `create_time` datetime DEFAULT NULL,
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------

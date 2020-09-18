@@ -37,11 +37,12 @@ export default {
           name: this.$t('message.navMune.clearCache'),
           icon: 'ios-trash-outline',
         },
+        // {
+        //   id: 'changeLang',
+        //   name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : '简体中文',
+        //   icon: 'md-repeat',
+        // }, 
         {
-          id: 'changeLang',
-          name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : '简体中文',
-          icon: 'md-repeat',
-        }, {
           id: 'logout',
           name: this.$t('message.navMune.logOut'),
           icon: 'ios-log-out',

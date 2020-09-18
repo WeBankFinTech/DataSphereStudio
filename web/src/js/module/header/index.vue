@@ -169,7 +169,7 @@ export default {
     init() {
       api.fetch('/dss/getBaseInfo', 'get').then((rst) => {
         if (!isEmpty(rst)) {
-          this.userName = rst.userInfo.basic.username;
+          this.userName = rst.userInfo.basic.name || rst.userInfo.basic.username;
           storage.set('baseInfo', rst);
           storage.set('userInfo', rst.userInfo);
           // window.$Wa.setParam('openId', rst.userInfo.basic.userName);

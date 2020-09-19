@@ -43,6 +43,7 @@
 <script>
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
+import { indexOf } from 'lodash';
 export default {
   data() {
     return {
@@ -81,8 +82,17 @@ export default {
       this.current = null;
     },
     handleClick(child) {
+
       if (child.name) {
+        
         let query = this.$route.query;
+        if(child.name==="workflow"){
+          if(!query.workspaceId){
+            this.$router.push({path: '/newhome'})
+            return;
+          }
+        }
+
         this.gotoCommonIframe(child.name, query);
       } else {
         this.$Message.warning(this.$t('message.constants.warning.comingSoon'));

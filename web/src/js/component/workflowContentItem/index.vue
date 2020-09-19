@@ -50,13 +50,13 @@
                     :title="$t('message.workflowItem.viewVersion')"
                     @click.stop="detail(currentData.id, subitem)"
                   ></Icon>
-                  <Icon
+                  <!-- <Icon
                     type="ios-copy"
                     size="20"
                     :title="$t('message.newConst.copy')"
                     v-if="!hidePublishAndcopy"
                     @click.stop="copy(currentData.id, subitem)"
-                  ></Icon>
+                  ></Icon> -->
                   <Icon
                     type="ios-cog"
                     size="20"

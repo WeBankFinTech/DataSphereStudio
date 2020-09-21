@@ -1426,7 +1426,7 @@
                         "emptyText": "暂无数据",
                         "resultSetPlaceholder": "请选择结果集",
                         "resultSet": "结果集",
-                        "watermaskText": "由DataWorkShop生成，仅供内部参考，严禁对外分享"
+                        "watermaskText": "由飞龙+鲁班生成，仅供内部参考，严禁对外分享"
                     },
                     "resultsExport": {
                         "header": "结果集导出",

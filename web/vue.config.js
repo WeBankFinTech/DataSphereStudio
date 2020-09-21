@@ -92,6 +92,9 @@ module.exports = {
       new CopyWebpackPlugin([{
         from: 'node_modules/monaco-editor/dev/vs',
         to: 'static/vs',
+      },{
+        from: 'src/luban-doc',
+        to: 'luban-doc',
       }]),
       new MonacoWebpackPlugin({}),
     ]

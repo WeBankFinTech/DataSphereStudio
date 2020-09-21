@@ -84,6 +84,8 @@ export default {
         content: "<p>退订之后，您的资源和数据将在15天内被回收，确认退订请点击确定按钮.</p>",
         onOk: () => {
           console.log(row)
+          const url = `https://bigdata.ctyun.cn:8180/eorder/flydragon/unsubscribe?orderId=${row.workOrderId}`
+          window.open(url)
         }
       });
     }

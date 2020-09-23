@@ -271,7 +271,8 @@ export default {
   computed: {
     newNodes() {
       return this.nodes.filter((item) => {
-        return item.key !== this.currentNode.key;
+        return ['linkis.appjoint.visualis.display', 'linkis.appjoint.visualis.dashboard'].indexOf(item.type)!==-1;
+        // return item.key !== this.currentNode.key;
       })
     },
     formRule() {

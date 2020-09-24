@@ -25,13 +25,13 @@ import com.webank.wedatasphere.dss.appjoint.sendemail.Attachment
 /**
   * Created by shanhuang on 2019/10/12.
   */
-class PngAttachment(name: String, b64: String) extends Attachment {
+class PngAttachment(name: String, b64: String, file: File) extends Attachment {
 
   override def getName: String = name
 
   override def getBase64Str: String = b64
 
-  override def getFile: File = null //TODO write b64 to file
+  override def getFile: File = file
 
   override def getMediaType = "image/png"
 

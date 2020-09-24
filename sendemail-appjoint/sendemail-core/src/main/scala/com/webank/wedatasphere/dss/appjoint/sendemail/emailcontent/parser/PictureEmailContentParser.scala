@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
 import java.util.{Base64, UUID}
 
+import com.webank.wedatasphere.dss.appjoint.sendemail.conf.SendEmailAppJointConfiguration
 import javax.imageio.ImageIO
 import com.webank.wedatasphere.dss.appjoint.sendemail.conf.SendEmailAppJointConfiguration.EMAIL_IMAGE_HEIGHT
 import com.webank.wedatasphere.dss.appjoint.sendemail.email.{AbstractEmail, MultiContentEmail, PngAttachment}
@@ -61,12 +62,15 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
     } else Array(bufferedImage)
     imagesCuts.indices.map { index =>
       val image = imagesCuts(index)
-      val imageName = index + "_" + imageUUID
+      val imageName = index + "_" + imageUUID + ".png"
       val os = new ByteArrayOutputStream
       val b64Stream = new Base64OutputStream(os)
       ImageIO.write(image, "png", b64Stream)
+      val imageFile = new File(SendEmailAppJointConfiguration.EMAIL_IMAGE_TMP_PATH.getValue + imageName + ".png")
+      imageFile.createNewFile();
+      ImageIO.write(image, "png", imageFile)
       val b64 = os.toString(Configuration.BDP_ENCODING.getValue)
-      email.addAttachment(new PngAttachment(imageName, b64))
+      email.addAttachment(new PngAttachment(imageName, b64, imageFile))
       s"""<img style="width:${image.getWidth}px; height:${image.getHeight}px;" src="cid:$imageName"></img>"""
     }.toArray
   }

@@ -40,4 +40,5 @@ object SendEmailAppJointConfiguration {
   val EMAIL_SMTP_SSL_ENABLED = CommonVars("wds.dataworkis.appjoint.email.smtp.ssl.enable", "true")
   val EMAIL_SMTP_TIMEOUT = CommonVars("wds.dataworkis.appjoint.email.smtp.timeout", "25000")
 
+  val EMAIL_IMAGE_TMP_PATH = CommonVars("wds.dataworkis.appjoint.email.image.tmp.path", "/tmp/")
 }

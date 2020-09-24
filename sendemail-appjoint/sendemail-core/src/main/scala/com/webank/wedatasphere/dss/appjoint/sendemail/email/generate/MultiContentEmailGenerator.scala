@@ -25,6 +25,9 @@ import com.webank.wedatasphere.dss.appjoint.sendemail.EmailContent
 import com.webank.wedatasphere.dss.appjoint.sendemail.email.{AbstractEmail, MultiContentEmail}
 import com.webank.wedatasphere.dss.appjoint.sendemail.emailcontent._
 import com.webank.wedatasphere.linkis.storage.resultset.ResultSetFactory
+import org.apache.commons.lang.StringUtils
+
+import scala.tools.scalap.scalax.util.StringUtil
 
 /**
   * Created by shanhuang on 2019/10/12.
@@ -44,12 +47,13 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
           val resultSetFactory = ResultSetFactory.getInstance
           nodeContext.getJobIdsOfShareNode.foreach { jobId =>
             nodeContext.getResultSetPathsByJobId(jobId).foreach { fsPath =>
-              val resultSet = resultSetFactory.getResultSetByPath(fsPath)
+              val schemaFsPath = FsPath.getFsPath("hdfs://" + StringUtils.remove(fsPath.getPath, "file://"))
+              val resultSet = resultSetFactory.getResultSetByPath(schemaFsPath)
               val emailContent = resultSet.resultSetType() match {
-                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath)
-                case ResultSetFactory.HTML_TYPE => new HtmlEmailContent(fsPath)
-                case ResultSetFactory.TABLE_TYPE => new TableEmailContent(fsPath)
-                case ResultSetFactory.TEXT_TYPE => new FileEmailContent(fsPath)
+                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(schemaFsPath)
+                case ResultSetFactory.HTML_TYPE => new HtmlEmailContent(schemaFsPath)
+                case ResultSetFactory.TABLE_TYPE => new TableEmailContent(schemaFsPath)
+                case ResultSetFactory.TEXT_TYPE => new FileEmailContent(schemaFsPath)
               }
               multiContentEmail.addEmailContent(emailContent)
             }

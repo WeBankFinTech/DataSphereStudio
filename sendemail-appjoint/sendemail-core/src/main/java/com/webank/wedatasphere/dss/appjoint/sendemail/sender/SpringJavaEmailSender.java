@@ -28,8 +28,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import javax.activation.CommandMap;
+import javax.activation.MailcapCommandMap;
+import javax.mail.Header;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -49,11 +53,14 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
         javaMailSender.setPassword(SendEmailAppJointConfiguration.EMAIL_PASSWORD().getValue());
         try {
             Properties prop = new Properties();
-            prop.put("mail.smtp.auth", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_AUTH().getValue()));
-            prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
-            prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
-            prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
-            prop.put("mail.smtp.timeout", Integer.parseInt(SendEmailAppJointConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
+            prop.put("mail.smtp.auth", SendEmailAppJointConfiguration.EMAIL_SMTP_AUTH().getValue());
+            prop.put("mail.smtp.starttls.enable", SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue());
+            prop.put("mail.smtp.starttls.required", SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue());
+            prop.put("mail.smtp.ssl.enable", SendEmailAppJointConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue());
+            prop.put("mail.smtp.timeout", SendEmailAppJointConfiguration.EMAIL_SMTP_TIMEOUT().getValue());
+            if(Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue())){
+                prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            }
             javaMailSender.setJavaMailProperties(prop);
         } catch (Exception e) {
             logger.error("Failed to read mail properties, roll back to default values.", e);
@@ -64,6 +71,14 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     public void send(Email email) throws EmailSendFailedException {
         logger.info("Begin to send Email(" + email.getSubject() + ").");
         try {
+            MailcapCommandMap mc = (MailcapCommandMap)CommandMap.getDefaultCommandMap();
+            mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+            mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+            mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+            mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+            mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+            CommandMap.setDefaultCommandMap(mc);
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             javaMailSender.send(parseToMimeMessage(email));
         } catch (Exception e) {
             logger.error("Send email failed: ", e);
@@ -77,19 +92,27 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     private MimeMessage parseToMimeMessage(Email email) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
-            if(StringUtils.isBlank(email.getFrom())) {
-                messageHelper.setFrom(SendEmailAppJointConfiguration.DEFAULT_EMAIL_FROM().getValue());
-            } else {
-                messageHelper.setFrom(email.getFrom());
-            }
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");
+            logger.info("use default from");
+            messageHelper.setFrom(SendEmailAppJointConfiguration.DEFAULT_EMAIL_FROM().getValue());
             messageHelper.setSubject(email.getSubject());
-            messageHelper.setTo(email.getTo());
-            messageHelper.setCc(email.getCc());
-            messageHelper.setBcc(email.getBcc());
-            for(Attachment attachment: email.getAttachments()){
-                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(attachment.getBase64Str(), attachment.getMediaType()));
+            if(StringUtils.isNotBlank(email.getTo())){
+                logger.info("message to: " + email.getTo());
+                messageHelper.setTo(email.getTo().split(";"));
             }
+            if(StringUtils.isNotBlank(email.getCc())){
+                logger.info("message cc: " + email.getCc());
+                messageHelper.setCc(email.getCc().split(";"));
+            }
+            if(StringUtils.isNotBlank(email.getBcc())){
+                logger.info("message bcc: " + email.getBcc());
+                messageHelper.setBcc(email.getBcc().split(";"));
+            }
+            for(Attachment attachment: email.getAttachments()){
+                //messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(attachment.getBase64Str(), attachment.getMediaType()));
+                messageHelper.addInline(attachment.getName(), attachment.getFile());
+            }
+            logger.info("mail content: " + email.getContent());
             messageHelper.setText(email.getContent(), true);
         } catch (Exception e) {
             logger.error("Send mail failed", e);

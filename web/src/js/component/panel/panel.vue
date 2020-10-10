@@ -33,6 +33,7 @@ export default {
       readyToAllocationHeight: 0,
       readyToAllocationItemLength: 0,
       moveIndex: null,
+      currentChange: 0
     };
   },
   computed: {

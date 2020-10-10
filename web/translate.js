@@ -38,7 +38,7 @@ var jsonValue = JSON.parse(jsonStr);
 //     ]
 // }
 
-var url = 'http://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=';
+var url = 'https://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i=';
 
 function translateReq(text, cb) {
   http.get(`${url}${encodeURIComponent(text)}`, {

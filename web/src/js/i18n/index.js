@@ -35,6 +35,7 @@ if (localStorage.getItem('locale')) {
     localStorage.setItem('locale', 'en');
   }
 }
+Vue.config.lang = 'zh-CN';
 Vue.locale = () => {};
 const messages = {
   'en': Object.assign(en, processlang.en, require('../../commonData/i18n/common/en.json')),

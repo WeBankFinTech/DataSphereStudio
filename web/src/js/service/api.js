@@ -48,7 +48,7 @@ let cutReq = (config) => {
 };
 
 const instance = axios.create({
-  baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `http://${window.location.host}/api/rest_j/v1/`,
+  baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `https://${window.location.host}/api/rest_j/v1/`,
   timeout: 30000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json;charset=UTF-8' },

@@ -43,6 +43,10 @@ let util = {
       cookies: document.cookie,
       ...obj
     }
+    if(url.indexOf('https://saas.ctyun.cn:8091')!==-1){
+      obj.dssurl = 'http://luban.ctyun.cn:8088';
+    }
+    window.console.log('sssss', obj, url)
     let dist = url.split('?')
     let params = qs.parse(dist[1])
     const holderReg = /\$\{([^}]*)}/g;

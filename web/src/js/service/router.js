@@ -234,23 +234,9 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const userInfo = storage.get('userInfo');
   if(process.env.VUE_APP_CTYUN_SSO){
-    // try {
-    //   await api.fetch('/dss/getBaseInfo', 'get').then(data=>{
-    //     if (to.meta) {
-    //       if (to.meta.publicPage) {
-    //         // 公共页面不需要权限控制（404，500）
-    //         next();
-    //       } else {
-    //         next('/');
-    //       }
-    //     }
-    //   })
-    // } catch (error) {
-    //   window.location = "http://www.ctyun.cn/cas/login?service=http://luban.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
-    // }
     if(to.path === '/login'){
       storage.clear('cookie');
-      window.location = "http://www.ctyun.cn/cas/login?service=http://luban.ctyun.cn:8088/api/rest_j/v1/application/ssologin";
+      window.location = "https://www.ctyun.cn/cas/login?service=https://saas.ctyun.cn:8086/api/rest_j/v1/application/ssologin";
     } else if (to.path === '/newhome') {
       next()
     } else {

@@ -36,7 +36,7 @@ export default {
       if (this.$route.query.isSkip) {
         const errCode = this.$route.query.errCode;
         const addr = module.data.ENVIR === 'dev' ? 'test.com' : window.location.host;
-        this.visualSrc = `http://${addr}/dss/help/errorcode/${errCode}.html`;
+        this.visualSrc = `https://${addr}/dss/help/errorcode/${errCode}.html`;
         this.isSkip = true;
       } else {
         this.isSkip = false;

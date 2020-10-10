@@ -29,14 +29,15 @@ const getVersion = () => {
   return pkg.version;
 }
 
-const host = "luban.ctyun.cn";
-const port = "8088";
+const host = "saas.ctyun.cn";
+const port = "8086";
 
 module.exports = {
-  publicPath: './',
+  publicPath: '/luban/',
   outputDir: 'dist/dist',
   devServer: {
     port: 8080,
+    https: true,
     open: true,
     disableHostCheck: true,
     overlay: {
@@ -45,7 +46,7 @@ module.exports = {
     },
     proxy: {    //代理转发
       '^/api/rest_j/v1': {
-        target: `http://${host}:${port}`,  //后端服务地址
+        target: `https://${host}:${port}`,  //后端服务地址
         ws: true,
         changeOrigin: true,
         pathRewrite: {
@@ -53,7 +54,7 @@ module.exports = {
         }
       },
       '^/ws/api': {    //websocket
-        target: `ws://${host}:${port}`,
+        target: `wss://${host}:${port}`,
         ws: true,
         secure: false,
       },

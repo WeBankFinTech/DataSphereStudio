@@ -41,7 +41,7 @@ const module = {
         return;
       }
       manager.socket = new Socket({
-        url: `wss://${process.env.VUE_APP_HOST || window.location.host}${process.env.VUE_APP_MN_CONFIG_SOCKET}`,
+        url: `${process.env.VUE_APP_MN_SOCKET || window.location.host}${process.env.VUE_APP_MN_CONFIG_SOCKET}`,
         errHandler: (e) => {
           // window.$Wa.log(JSON.stringify(e));
         },

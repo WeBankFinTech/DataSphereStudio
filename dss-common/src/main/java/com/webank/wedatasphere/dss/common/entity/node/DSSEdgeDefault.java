@@ -32,7 +32,7 @@ public class DSSEdgeDefault implements DSSEdge {
     }
 
     @Override
-    public void setSource() {
+    public void setSource(String source) {
         this.source = source;
     }
 

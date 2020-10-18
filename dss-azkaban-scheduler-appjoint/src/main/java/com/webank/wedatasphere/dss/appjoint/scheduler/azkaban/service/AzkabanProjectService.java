@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.entity.AzkabanSchedulerProject;
 import com.webank.wedatasphere.dss.appjoint.scheduler.service.SchedulerProjectService;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
+import com.webank.wedatasphere.dss.common.entity.flow.Flow;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.appjoint.scheduler.azkaban.util.AzkabanUtils;
@@ -220,4 +221,8 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
         return zipPath;
     }
 
+    @Override
+    public void deleteFlowExtra(Project project, Flow flow, Session session) throws AppJointErrorException {
+
+    }
 }

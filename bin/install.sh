@@ -46,10 +46,10 @@ fi
 
 function isSuccess(){
 if [ $? -ne 0 ]; then
-    echo "Failed to " + $1
+    echo "Failed to $1"
     exit 1
 else
-    echo "Succeed to" + $1
+    echo "Succeed to $1"
 fi
 }
 
@@ -186,10 +186,10 @@ elif [[ '3' = "$INSTALL_MODE" ]];then
   if [[ $IGNORECHECK = "" ]];then
   checkExternalServer
   fi
-  #check  azkaban serivice
-  SERVER_NAME=AZKABAN
-  EXTERNAL_SERVER_IP=$AZKABAN_ADRESS_IP
-  EXTERNAL_SERVER_PORT=$AZKABAN_ADRESS_PORT
+  #check  airflow serivice
+  SERVER_NAME=AIRFLOW
+  EXTERNAL_SERVER_IP=$AIRFLOW_ADRESS_IP
+  EXTERNAL_SERVER_PORT=$AIRFLOW_ADRESS_PORT
   if [[ $IGNORECHECK = "" ]];then
   checkExternalServer
   fi
@@ -223,15 +223,15 @@ if [ "$WORKSPACE_USER_ROOT_PATH" != "" ]
 then
   localRootDir=$WORKSPACE_USER_ROOT_PATH
   if [[ $WORKSPACE_USER_ROOT_PATH == file://* ]];then
-    localRootDir=${WORKSPACE_USER_ROOT_PATH#file://}
+        localRootDir=${WORKSPACE_USER_ROOT_PATH#file://}
         mkdir -p $localRootDir/$deployUser
         sudo chmod -R 775 $localRootDir/$deployUser
   elif [[ $WORKSPACE_USER_ROOT_PATH == hdfs://* ]];then
-    localRootDir=${WORKSPACE_USER_ROOT_PATH#hdfs://}
+        localRootDir=${WORKSPACE_USER_ROOT_PATH#hdfs://}
         hdfs dfs -mkdir -p $localRootDir/$deployUser
         hdfs dfs -chmod -R 775 $localRootDir/$deployUser
   else
-    echo "does not support $WORKSPACE_USER_ROOT_PATH filesystem types"        
+    echo "does not support $WORKSPACE_USER_ROOT_PATH filesystem types"
   fi
 isSuccess "create  $WORKSPACE_USER_ROOT_PATH directory"
 fi
@@ -241,15 +241,15 @@ if [ "$RESULT_SET_ROOT_PATH" != "" ]
 then
   localRootDir=$RESULT_SET_ROOT_PATH
   if [[ $RESULT_SET_ROOT_PATH == file://* ]];then
-    localRootDir=${RESULT_SET_ROOT_PATH#file://}
+        localRootDir=${RESULT_SET_ROOT_PATH#file://}
         mkdir -p $localRootDir/$deployUser
         sudo chmod -R 775 $localRootDir/$deployUser
   elif [[ $RESULT_SET_ROOT_PATH == hdfs://* ]];then
-    localRootDir=${RESULT_SET_ROOT_PATH#hdfs://}
+        localRootDir=${RESULT_SET_ROOT_PATH#hdfs://}
         hdfs dfs -mkdir -p $localRootDir/$deployUser
         hdfs dfs -chmod -R 775 $localRootDir/$deployUser
   else
-    echo "does not support $RESULT_SET_ROOT_PATH filesystem types"        
+    echo "does not support $RESULT_SET_ROOT_PATH filesystem types"
   fi
 isSuccess "create  $RESULT_SET_ROOT_PATH directory"
 fi
@@ -267,7 +267,7 @@ then
         hdfs dfs -mkdir -p $localRootDir
         hdfs dfs -chmod -R 775 $localRootDir
   else
-    echo "does not support $WDS_SCHEDULER_PATH filesystem types"        
+    echo "does not support $WDS_SCHEDULER_PATH filesystem types"
   fi
 isSuccess "create  $WDS_SCHEDULER_PATH directory"
 fi
@@ -308,19 +308,19 @@ if [[ '2' = "$MYSQL_INSTALL_MODE" ]];then
     fi
 
     if [[ '3' = "$INSTALL_MODE" ]];then
-	   echo "azkaban and qualitis support, azkaban and qualitis database will be initialized !"
-       #azkaban
-       if [ $AZKABAN_ADRESS_IP == "127.0.0.1" ];then
-           echo "AZKABAN_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
-           AZKABAN_ADRESS_IP_2=$LOCAL_IP
+	   echo "airflow and qualitis support, airflow and qualitis database will be initialized !"
+       #airflow
+       if [ $AIRFLOW_ADRESS_IP == "127.0.0.1" ];then
+           echo "AIRFLOW_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
+           AIRFLOW_ADRESS_IP_2=$LOCAL_IP
        else
-            AZKABAN_ADRESS_IP_2=$AZKABAN_ADRESS_IP
+            AIRFLOW_ADRESS_IP_2=$AIRFLOW_ADRESS_IP
        fi
-       echo $AZKABAN_ADRESS_IP_2
-       sed -i "s/AZKABAN_ADRESS_IP_2/$AZKABAN_ADRESS_IP_2/g" ${workDir}/db/azkaban.sql
-       sed -i "s/AZKABAN_ADRESS_PORT/$AZKABAN_ADRESS_PORT/g" ${workDir}/db/azkaban.sql
-       mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/azkaban.sql"
-	   isSuccess "source azkaban.sql"
+       echo $AIRFLOW_ADRESS_IP_2
+       sed -i "s/AIRFLOW_ADRESS_IP_2/$AIRFLOW_ADRESS_IP_2/g" ${workDir}/db/airflow.sql
+       sed -i "s/AIRFLOW_ADRESS_PORT/$AIRFLOW_ADRESS_PORT/g" ${workDir}/db/airflow.sql
+       mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source ${workDir}/db/airflow.sql"
+	   isSuccess "source airflow.sql"
        #qualitis
        if [ $QUALITIS_ADRESS_IP == "127.0.0.1" ];then
            echo "QUALITIS_ADRESS_IP is equals 127.0.0.1 ,we will change it to ip address"
@@ -448,7 +448,8 @@ SERVER_CONF_PATH=$SERVER_HOME/$SERVERNAME/conf/linkis.properties
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.url.*#wds.linkis.server.mybatis.datasource.url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?characterEncoding=UTF-8#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.username.*#wds.linkis.server.mybatis.datasource.username=$MYSQL_USER#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.server.mybatis.datasource.password.*#wds.linkis.server.mybatis.datasource.password=$MYSQL_PASSWORD#g\" $SERVER_CONF_PATH"
-executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.azkaban.address.*#wds.dss.appjoint.scheduler.azkaban.address=http://${AZKABAN_ADRESS_IP}:${AZKABAN_ADRESS_PORT}#g\" $SERVER_CONF_PATH"
+executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.airflow.host.*#wds.dss.appjoint.scheduler.airflow.host=${AIRFLOW_ADRESS_IP}#g\" $SERVER_CONF_PATH"
+executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.airflow.port.*#wds.dss.appjoint.scheduler.airflow.port=${AIRFLOW_ADRESS_PORT}#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.gateway.ip.*#wds.linkis.gateway.ip=$GATEWAY_INSTALL_IP#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g\" $SERVER_CONF_PATH"
 executeCMD $SERVER_IP "sed -i  \"s#wds.dss.appjoint.scheduler.project.store.dir.*#wds.dss.appjoint.scheduler.project.store.dir=$WDS_SCHEDULER_PATH#g\" $SERVER_CONF_PATH"

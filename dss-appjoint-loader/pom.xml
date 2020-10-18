@@ -22,12 +22,12 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>0.9.0</version>
+        <version>0.9.0.nio</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-appjoint-loader</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.0.nio</version>
 
     <dependencies>
         <dependency>

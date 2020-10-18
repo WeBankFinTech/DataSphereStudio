@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.appjoint.service.SecurityService;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import com.webank.wedatasphere.dss.server.dao.ProjectMapper;
@@ -98,6 +99,24 @@ public class FunctionInvoker {
             if(appJoint.getProjectService() != null){
                 logger.info("projectService is exist");
                 projectServiceFunction.accept(appJoint.getProjectService(),project,session);
+            }
+        }
+    }
+
+    public void projectServiceFlowFunction(DSSProject project, DSSFlow flow, ProjectServiceFlowFunction projectServiceFlowFunction, List<AppJoint> appJoints) throws AppJointErrorException {
+        for (AppJoint appJoint : appJoints) {
+            Session session = null;
+            if(appJoint.getSecurityService() != null){
+                logger.info("securityService is exist,{}login..",project.getUserName());
+                session = appJoint.getSecurityService().login(project.getUserName());
+            }
+            //通过projectID获取到appjointID
+            Application application = applicationService.getApplication(appJoint.getAppJointName());
+            Long appjointProjectID = projectMapper.getAppjointProjectID(project.getId(), application.getId());
+            if(appjointProjectID != null) project.setId(appjointProjectID);
+            if(appJoint.getProjectService() != null){
+                logger.info("projectService is exist");
+               projectServiceFlowFunction.accept(appJoint.getProjectService(), project, flow, session);
             }
         }
     }

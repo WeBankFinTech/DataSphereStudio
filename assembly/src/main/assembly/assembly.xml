@@ -114,7 +114,8 @@
 
     <fileSet>
       <directory>
-        ${project.parent.basedir}/dss-azkaban-scheduler-appjoint/target/
+        <!-- ${project.parent.basedir}/dss-azkaban-scheduler-appjoint/target/ -->
+        ${project.parent.basedir}/dss-airflow-scheduler-appjoint/target/
       </directory>
       <outputDirectory>share/appjoints/schedulis</outputDirectory>
       <includes>

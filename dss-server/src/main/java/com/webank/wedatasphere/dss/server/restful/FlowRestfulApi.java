@@ -150,13 +150,15 @@ public class FlowRestfulApi {
         Long flowID = json.get("id").getLongValue();
         Boolean sure = json.get("sure") == null?false:json.get("sure").getBooleanValue();
         Long projectVersionID = json.get("projectVersionID").getLongValue();
+        String userName = SecurityFilter.getLoginUsername(req);
         // TODO: 2019/6/13  projectVersionID的更新校验
         //state为true代表曾经发布过
         if(flowService.getFlowByID(flowID).getState() && !sure) {
             return Message.messageToResponse(Message.ok().data("warmMsg","该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？"));
         }
         publishManager.checkeIsPublishing(projectVersionID);
-        flowService.batchDeleteFlow(Arrays.asList(flowID),projectVersionID);
+        flowService.batchDeleteFlow(Arrays.asList(flowID),projectVersionID, true, userName); // 对于airflow调度器，会在前端删除单个flow时候，同步删除airflow中对应的dag
+
         return Message.messageToResponse(Message.ok());
     }
 

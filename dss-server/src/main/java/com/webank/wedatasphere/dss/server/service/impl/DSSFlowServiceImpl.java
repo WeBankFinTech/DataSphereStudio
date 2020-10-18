@@ -19,12 +19,17 @@ package com.webank.wedatasphere.dss.server.service.impl;
 
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
+import com.webank.wedatasphere.dss.appjoint.scheduler.SchedulerAppJoint;
+import com.webank.wedatasphere.dss.appjoint.service.ProjectService;
+import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.common.entity.flow.DSSFlow;
 import com.webank.wedatasphere.dss.common.entity.flow.DSSFlowVersion;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.server.dao.DSSUserMapper;
 import com.webank.wedatasphere.dss.server.dao.FlowMapper;
 import com.webank.wedatasphere.dss.server.dao.FlowTaxonomyMapper;
+import com.webank.wedatasphere.dss.server.function.FunctionInvoker;
 import com.webank.wedatasphere.dss.server.lock.Lock;
 import com.webank.wedatasphere.dss.server.operate.Op;
 import com.webank.wedatasphere.dss.server.operate.Operate;
@@ -60,6 +65,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private Operate[] operates;
     @Autowired
     private BMLService bmlService;
+    @Autowired
+    private ApplicationService applicationService;
+    @Autowired
+    private FunctionInvoker functionInvoker;
+
+    private SchedulerAppJoint schedulerAppJoint=null;
 
     @Override
     public DSSFlow getFlowByID(Long id) {
@@ -179,9 +190,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
-    public void batchDeleteFlow(List<Long> flowIDlist, Long projectVersionID) {
+    public void batchDeleteFlow(List<Long> flowIDlist, Long projectVersionID, Boolean ifDelScheduler, String userName) {
         flowIDlist.stream().forEach(f -> {
-            deleteFlow(f, projectVersionID);
+            deleteFlow(f, projectVersionID, ifDelScheduler, userName);
         });
     }
 
@@ -256,10 +267,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return rank;
     }
 
-    public void deleteFlow(Long flowId, Long projectVersionID) {
+    public void deleteFlow(Long flowId, Long projectVersionID, Boolean ifDelScheduler, String userName) {
+        logger.info(String.format("Begin to delete flow id %d with project version id %d", flowId, projectVersionID));
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
         for (Long subFlowID : subFlowIDs) {
-            deleteFlow(subFlowID, projectVersionID);
+            deleteFlow(subFlowID, projectVersionID, false, userName); // 目前subflow不支持删除scheduler
         }
         for (Long subFlowID : subFlowIDs) {
             deleteDSSDB(subFlowID, projectVersionID);
@@ -267,16 +279,47 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // TODO: 2019/6/5 json中资源的删除
             // TODO: 2019/6/5 事务的保证
         }
+        try {
+            DSSProject dssProject = projectService.getProjectByProjectVersionID(projectVersionID);
+            dssProject.setUserName(userName);
+            DSSFlow dssFlow = getFlowByID(flowId);
+            if (ifDelScheduler) {
+                if (applicationService.getApplication("schedulis") != null) {
+                    if (getSchedulerAppJoint() != null) {
+                        functionInvoker.projectServiceFlowFunction(dssProject, dssFlow, ProjectService::deleteFlowExtra, Arrays.asList(getSchedulerAppJoint()));
+                    } else {
+                        logger.error("Delete scheduler project failed for scheduler appjoint is null");
+                    }
+                }
+            }
+            functionInvoker.projectServiceFlowFunction(dssProject, dssFlow, ProjectService::deleteFlowExtra, applicationService.listAppjoint());
+        } catch (AppJointErrorException e) {
+            logger.error("Delete flow from scheduler failed!", e);
+        }
         deleteDSSDB(flowId, projectVersionID);
     }
 
     private void deleteDSSDB(Long flowID, Long projectVersionID) {
         flowMapper.deleteFlowVersions(flowID, projectVersionID);
-        if (projectVersionID == null || (flowMapper.noVersions(flowID) != null && flowMapper.noVersions(flowID))) {
+        Boolean flowNoVersions = flowMapper.noVersions(flowID);
+        if (projectVersionID == null || (flowNoVersions != null && flowNoVersions)) {
             flowMapper.deleteFlowBaseInfo(flowID);
             flowMapper.deleteFlowRelation(flowID);
             flowTaxonomyMapper.deleteFlowTaxonomyRelation(flowID);
+        } else {
+            logger.warn(String.format("Flow id %d still has version and cannot not delete this flow completely, please check db integrity", flowID));
         }
         //第一期没有工作流的发布，所以不需要删除DSS工作流的发布表
+    }
+
+    private SchedulerAppJoint getSchedulerAppJoint(){
+        if(schedulerAppJoint == null){
+            try {
+                schedulerAppJoint = (SchedulerAppJoint)applicationService.getAppjoint("schedulis");
+            } catch (AppJointErrorException e) {
+                logger.error("Schedule system init failed!", e);
+            }
+        }
+        return schedulerAppJoint;
     }
 }

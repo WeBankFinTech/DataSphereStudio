@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.0.nio</version>
 
     <modules>
         <module>dss-common</module>
@@ -35,19 +35,21 @@
         <module>dss-linkis-node-execution</module>
         <module>dss-flow-execution-entrance</module>
         <module>dss-azkaban-scheduler-appjoint</module>
+        <module>dss-airflow-scheduler-appjoint</module>
         <module>dss-server</module>
         <module>visualis-appjoint/appjoint</module>
         <module>qualitis-appjoint/appjoint</module>
         <module>eventchecker-appjoint</module>
         <module>datachecker-appjoint</module>
         <module>sendemail-appjoint/sendemail-core</module>
+        <module>plugins/airflow/linkis-airflow-client</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
     </modules>
 
     <properties>
-        <dss.version>0.9.0</dss.version>
+        <dss.version>0.9.0.nio</dss.version>
         <linkis.version>0.9.4</linkis.version>
         <scala.version>2.11.8</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

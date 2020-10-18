@@ -59,7 +59,7 @@ public class SubFlowOperate implements Operate {
     @Override
     public void delete(DSSFlowService dssFlowService, Op op) throws DSSErrorException {
         logger.info("delete subFlow{}",op.getId());
-        dssFlowService.batchDeleteFlow(Arrays.asList(op.getId()), Long.valueOf(op.getParams().get("projectVersionID").toString()));
+        dssFlowService.batchDeleteFlow(Arrays.asList(op.getId()), Long.valueOf(op.getParams().get("projectVersionID").toString()), false, null);
         afterOperateSubFlow(dssFlowService,op);
     }
 

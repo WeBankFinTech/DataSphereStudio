@@ -33,7 +33,7 @@ const host = "saas.ctyun.cn";
 const port = "8086";
 
 module.exports = {
-  publicPath: '/luban/',
+  publicPath: './',
   outputDir: 'dist/dist',
   devServer: {
     port: 8080,

@@ -40,8 +40,9 @@ const module = {
         }
         return;
       }
+      const socketPrefix = window.location.protocol === 'https:' ? 'wss:':'ws:';
       manager.socket = new Socket({
-        url: `${process.env.VUE_APP_MN_SOCKET || window.location.host}${process.env.VUE_APP_MN_CONFIG_SOCKET}`,
+        url: `${socketPrefix}${process.env.VUE_APP_MN_SOCKET || window.location.host}${process.env.VUE_APP_MN_CONFIG_SOCKET}`,
         errHandler: (e) => {
           // window.$Wa.log(JSON.stringify(e));
         },

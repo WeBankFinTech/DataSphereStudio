@@ -236,7 +236,8 @@ router.beforeEach((to, from, next) => {
   if(process.env.VUE_APP_CTYUN_SSO){
     if(to.path === '/login'){
       storage.clear('cookie');
-      window.location = "https://www.ctyun.cn/cas/login?service=https://saas.ctyun.cn:8086/api/rest_j/v1/application/ssologin";
+      
+      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}${process.env.VUE_APP_MN_CONFIG_PREFIX}application/ssologin`;
     } else if (to.path === '/newhome') {
       next()
     } else {

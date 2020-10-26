@@ -99,7 +99,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
 
     private void autoAddUser(RestTemplate restTemplate, String username) throws Exception {
         String path = AUTO_ADD_USER_PATH.replace("{username}", username);
-        URI url = buildUrI(getHost(), getPort(), path, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
+        URI url = buildUrI(getBaseUrl(), path, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity entity = new HttpEntity(headers);
@@ -123,7 +123,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
     }
 
     private Map<String, Object> createProjectReal(RestTemplate restTemplate, HttpEntity<Object> entity) throws Exception {
-        URI url = buildUrI(getHost(), getPort(), CREATE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
+        URI url = buildUrI(getBaseUrl(), CREATE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
         LOGGER.info("Start to add project to qualitis. url: {}, method: {}, body: {}", url, HttpMethod.PUT, entity);
         Map<String, Object> response = restTemplate.exchange(url, org.springframework.http.HttpMethod.PUT, entity, Map.class).getBody();
         LOGGER.info("Succeed to add project to qualitis. response: {}", response);
@@ -149,7 +149,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisDeleteProjectRequest);
 
-            URI url = buildUrI(getHost(), getPort(), DELETE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
+            URI url = buildUrI(getBaseUrl(), DELETE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
             LOGGER.info("Start to delete project in qualitis. url: {}, method: {}, body: {}", url, javax.ws.rs.HttpMethod.POST, entity);
             Map<String, Object> response = restTemplate.postForObject(url, entity, Map.class);
             LOGGER.info("Succeed to delete project in qualitis. response: {}", response);
@@ -192,7 +192,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisUpdateProjectRequest);
 
-            URI url = buildUrI(getHost(), getPort(), UPDATE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
+            URI url = buildUrI(getBaseUrl(), UPDATE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
             LOGGER.info("Start to update project in qualitis. url: {}, method: {}, body: {}", url, javax.ws.rs.HttpMethod.POST, entity);
             Map<String, Object> response = restTemplate.postForObject(url, entity, Map.class);
             LOGGER.info("Succeed to update project in qualitis. response: {}", response);
@@ -230,10 +230,10 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
         return new HttpEntity<Object>(gson.toJson(submitRequest), headers);
     }
 
-    private URI buildUrI(String host, int port, String path, String appId, String appToken,
+    private URI buildUrI(String url, String path, String appId, String appToken,
                          String nonce, String timestamp) throws Exception {
         String signature = getSignature(appId, appToken, nonce, timestamp);
-        String urlStr = "http://" + host + ":" + port;
+        String urlStr = url;
         URI uri = UriBuilder.fromUri(urlStr)
                 .path(path)
                 .queryParam("app_id", appId)

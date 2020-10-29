@@ -19,6 +19,7 @@ import VueRouter from 'vue-router';
 import Layout from '../view/layout.vue';
 // import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
+import Cookies from 'js-cookie';
 import { Modal } from 'iview';
 
 // 解决重复点击路由跳转报错
@@ -236,8 +237,9 @@ router.beforeEach((to, from, next) => {
   if(process.env.VUE_APP_CTYUN_SSO){
     if(to.path === '/login'){
       storage.clear('cookie');
-      
-      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}${process.env.VUE_APP_MN_CONFIG_PREFIX}application/ssologin`;
+      //清除cookie，防止用户之间登陆用户不一致
+      Cookies.remove('bdp-user-ticket-id');
+      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}application/ssologin`;
     } else if (to.path === '/newhome') {
       next()
     } else {

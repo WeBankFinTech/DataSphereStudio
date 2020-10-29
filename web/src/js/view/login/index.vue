@@ -115,7 +115,7 @@ export default {
       }
     },
     getCapt(){
-      axios.get('/api/rest_j/v1/user/captcha').then(data=>{
+      axios.get(`${process.env.VUE_APP_PREFIX}/api/rest_j/v1/user/captcha`).then(data=>{
         api.fetch('/user/captcha', 'get').then((data)=>{
           this.captImg = data.image
         }).catch(()=>{

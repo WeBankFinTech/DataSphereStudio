@@ -55,12 +55,6 @@ export default {
       storage.set('baseInfo', '');
 
       //清除cookie，防止用户之间登陆用户不一致
-      var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
-      if(keys) {
-        for(var i = keys.length; i--;)
-          document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
-      }
-
     },
     setInit() {
       this.isInit = true;

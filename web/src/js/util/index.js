@@ -39,7 +39,7 @@ let util = {
    */
   replaceHolder(url, obj = {}) {
     obj = {
-      dssurl: location.origin,
+      dssurl: location.origin + process.env.VUE_APP_PREFIX,
       cookies: document.cookie,
       ...obj
     }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.SSLContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
@@ -21,11 +22,16 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,7 +155,20 @@ public final class CtyunAzkabanSecurityService extends AppJointUrlImpl implement
         HttpClientContext context;
         String responseContent;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            LOGGER.info("获取session-url", httpPost.getURI());
+            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+            SSLContext sslContext = null;
+            try {
+                sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+            HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
+            if(securityUrl.startsWith("https://")){
+                httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+            }
+            httpClient = httpClientBuilder.build();
             context = HttpClientContext.create();
             response = httpClient.execute(httpPost, context);
             HttpEntity entity = response.getEntity();

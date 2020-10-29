@@ -44,7 +44,7 @@ class AppJointAuthImpl private() extends AppJointAuth with Logging {
   }
 
   protected def getDWSClient(dssUrl: String): DWSHttpClient = {
-    val baseUrl = getBaseUrl(dssUrl)
+    val baseUrl = dssUrl
     if(!dwsHttpClients.containsKey(baseUrl)) baseUrl.intern synchronized {
       if(!dwsHttpClients.containsKey(baseUrl)) {
         info("create a new DSSClient for url " + baseUrl)

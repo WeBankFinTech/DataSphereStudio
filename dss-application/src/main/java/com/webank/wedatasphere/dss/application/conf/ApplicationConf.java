@@ -26,4 +26,5 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 public class ApplicationConf {
 
     public static final CommonVars<String> FAQ = CommonVars.apply("wds.linkis.application.dws.params","");
+    public static final CommonVars<Boolean> SSO = CommonVars.apply("wds.linkis.gateway.conf.enable.sso",false);
 }

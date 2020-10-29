@@ -24,18 +24,24 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -90,7 +96,19 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+            SSLContext sslContext = null;
+            try {
+                sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+            HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
+            if(projectUrl.startsWith("https://")){
+                httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+            }
+            httpClient = httpClientBuilder.build();
             response = httpClient.execute(httpPost);
             HttpEntity ent = response.getEntity();
             String entStr = IOUtils.toString(ent.getContent(), "utf-8");

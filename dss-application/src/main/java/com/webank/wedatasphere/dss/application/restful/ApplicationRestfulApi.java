@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.application.service.LinkisUserService;
 import com.webank.wedatasphere.dss.application.util.ApplicationUtils;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.dss.application.conf.ApplicationConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,9 @@ public class ApplicationRestfulApi {
     @Path("getBaseInfo")
     public Response getBaseInfo(@Context HttpServletRequest req){
         String username = SecurityFilter.getLoginUsername(req);
-//        applicationHandlerChain.handle(username);  //在授权模块去做
+        if(ApplicationConf.SSO.getValue()){
+            applicationHandlerChain.handle(username);  //在授权模块去做
+        }
         List<Application> applicationList = applicationService.listApplications();
         for (Application application : applicationList) {
             String redirectUrl = application.getRedirectUrl();

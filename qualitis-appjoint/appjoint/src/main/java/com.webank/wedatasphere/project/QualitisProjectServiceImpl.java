@@ -10,16 +10,28 @@ import com.webank.wedatasphere.dss.appjoint.service.session.Session;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +77,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             qualitisAddProjectRequest.setDescription(project.getDescription());
             qualitisAddProjectRequest.setUsername(dssProject.getUserName());
 
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = this.restTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisAddProjectRequest);
 
             Map<String, Object> response = createProjectReal(restTemplate, entity);
@@ -95,6 +107,33 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             LOGGER.error("Failed to add project to qualitis, caused by: {}", e.getMessage(), e);
             throw new AppJointErrorException(500, e.getMessage());
         }
+    }
+
+    public RestTemplate restTemplate()  {
+        TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+        CloseableHttpClient httpClient;
+        if(getBaseUrl().startsWith("https:")){
+            httpClient = HttpClients.custom()
+                    .setSSLSocketFactory(connectionSocketFactory)
+                    .build();
+        }else {
+            httpClient = HttpClients.custom()
+                    .build();
+        }
+
+        HttpComponentsClientHttpRequestFactory requestFactory =
+                new HttpComponentsClientHttpRequestFactory();
+
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        return restTemplate;
     }
 
     private void autoAddUser(RestTemplate restTemplate, String username) throws Exception {
@@ -146,7 +185,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             qualitisDeleteProjectRequest.setProjectId(project.getId());
             qualitisDeleteProjectRequest.setUsername(dssProject.getUserName());
 
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = this.restTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisDeleteProjectRequest);
 
             URI url = buildUrI(getBaseUrl(), DELETE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));
@@ -189,7 +228,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             qualitisUpdateProjectRequest.setDescription(project.getDescription());
             qualitisUpdateProjectRequest.setUsername(dssProject.getUserName());
 
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = this.restTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisUpdateProjectRequest);
 
             URI url = buildUrI(getBaseUrl(), UPDATE_PROJECT_PATH, appId, appToken, RandomStringUtils.randomNumeric(5), String.valueOf(System.currentTimeMillis()));

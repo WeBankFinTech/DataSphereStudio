@@ -240,7 +240,7 @@ router.beforeEach((to, from, next) => {
       //清除cookie，防止用户之间登陆用户不一致
       Cookies.remove('bdp-user-ticket-id');
       Cookies.remove('JSESSIONID', {path: '/luban/schedule'});
-      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}application/ssologin`;
+      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
     } else if (to.path === '/newhome') {
       next()
     } else {

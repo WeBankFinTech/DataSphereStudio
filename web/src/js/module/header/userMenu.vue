@@ -17,6 +17,7 @@
 </template>
 <script>
 import api from '@/js/service/api';
+import Cookies from 'js-cookie';
 export default {
   name: 'Menu',
   data() {
@@ -119,6 +120,16 @@ export default {
     },
     logout() {
       console.log("process.env.VUE_APP_CTYUN_SSO", process.env.VUE_APP_CTYUN_SSO);
+      Cookies.remove('bdp-user-ticket-id');
+      
+      var keys = document.cookie.match(/[^ =;]+(?==)/g)
+      console.log('keys', keys, document.domain);
+      if (keys) {
+        for (var i = keys.length; i--;) {
+          document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString() // 清除当前域名下的
+          document.cookie = keys[i] + '=0;path=/luban/schedule;domain=' + document.domain + ';expires=' + new Date(0).toUTCString() // 清除当前域名路径下的cookie
+        }
+      }
       if(process.env.VUE_APP_CTYUN_SSO){
         api.fetch('/user/logout', 'get').then(() => {
           this.$emit('clear-session');

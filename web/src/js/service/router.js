@@ -239,7 +239,15 @@ router.beforeEach((to, from, next) => {
       storage.clear('cookie');
       //清除cookie，防止用户之间登陆用户不一致
       Cookies.remove('bdp-user-ticket-id');
-      Cookies.remove('JSESSIONID', {path: '/luban/schedule'});
+      
+      var keys = document.cookie.match(/[^ =;]+(?==)/g)
+      console.log('keys', keys, document.domain);
+      if (keys) {
+        for (var i = keys.length; i--;) {
+          document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString() // 清除当前域名下的
+          document.cookie = keys[i] + '=0;path=/luban/schedule;domain=' + document.domain + ';expires=' + new Date(0).toUTCString() // 清除当前域名路径下的cookie
+        }
+      }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
     } else if (to.path === '/newhome') {
       next()

@@ -96,19 +96,7 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try {
-            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
-            SSLContext sslContext = null;
-            try {
-                sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
-            HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
-            if(projectUrl.startsWith("https://")){
-                httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
-            }
-            httpClient = httpClientBuilder.build();
+            httpClient = this.getHttpClient(projectUrl, cookieStore);
             response = httpClient.execute(httpPost);
             HttpEntity ent = response.getEntity();
             String entStr = IOUtils.toString(ent.getContent(), "utf-8");
@@ -148,7 +136,7 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
             String finalUrl = projectUrl + "?" + EntityUtils.toString(new UrlEncodedFormEntity(params));
             HttpGet httpGet = new HttpGet(finalUrl);
             httpGet.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpClient = this.getHttpClient(projectUrl, cookieStore);
             response = httpClient.execute(httpGet, context);
             Header[] allHeaders = context.getRequest().getAllHeaders();
             Optional<Header> header = Arrays.stream(allHeaders).filter(f -> "Cookie".equals(f.getName())).findFirst();
@@ -160,6 +148,23 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
             IOUtils.closeQuietly(response);
             IOUtils.closeQuietly(httpClient);
         }
+    }
+
+    private CloseableHttpClient getHttpClient(String url, CookieStore cookieStore){
+        TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+        HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
+        if(url.startsWith("https://")){
+            httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+        }
+        CloseableHttpClient httpClient = httpClientBuilder.build();
+        return  httpClient;
     }
 
     private void parseCookie(Header header) {
@@ -199,7 +204,7 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
         CloseableHttpClient httpClient = null;
         InputStream inputStream = null;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpClient = this.getHttpClient(projectUrl, cookieStore);
             MultipartEntityBuilder entityBuilder =  MultipartEntityBuilder.create();
             entityBuilder.addBinaryBody("file",file);
             entityBuilder.addTextBody("ajax", "upload");

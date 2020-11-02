@@ -20,31 +20,59 @@ import api from '@/js/service/api';
 
 export default {
   data: function() {
-    return {
-      SUPPORTED_LANG_MODES: Object.freeze([
-        { rule: /[表详情]|(Table\sdetails)/, executable: false, isCanBeOpen: true },
-        { rule: /[建表向导]|(Table\screation\sguide)/, executable: false, isCanBeOpen: true },
-        { rule: /\.(bi)$/i, executable: false, logo: 'fi-bi', isCanBeNew: false, isCanBeOpen: true },
-        { rule: /\.(sql)$/i, lang: 'hql', executable: true, application: 'spark', runType: 'sql', ext: '.sql', scriptType: 'hive', abbr: 'sql', logo: 'fi-spark', isCanBeNew: true, label: 'Sql', isCanBeOpen: true, flowType: 'sparksql' },
-        { rule: /\.(hql)$/i, lang: 'hql', executable: true, application: 'hive', runType: 'hql', ext: '.hql', scriptType: 'hql', abbr: 'hql', logo: 'fi-hive', isCanBeNew: true, label: 'Hive', isCanBeOpen: true, flowType: 'hql' },
-        { rule: /\.(out)$/i, lang: 'hql', executable: true, application: 'pipeline', runType: 'pipeline', ext: '.out', scriptType: 'storage', abbr: 'stor', logo: 'fi-storage', isCanBeNew: true, label: 'Storage', isCanBeOpen: true },
-        { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'scala', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: true, label: 'Scala', isCanBeOpen: true, flowType: 'scala' },
-        { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'function.mdq', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: false, label: 'Scala', isCanBeOpen: true },
-        { rule: /\.jdbc$/i, lang: 'hql', executable: true, application: 'jdbc', runType: 'jdbc', ext: '.jdbc', scriptType: 'jdbc', abbr: 'jdbc', logo: 'fi-jdbc', isCanBeNew: true, label: 'JDBC', isCanBeOpen: true, flowType: 'jdbc' },
-        { rule: /\.python$/i, lang: 'python', executable: true, application: 'python', runType: 'python', ext: '.python', scriptType: 'python', abbr: 'py', logo: 'fi-python', isCanBeNew: true, label: 'Python', isCanBeOpen: true, flowType: 'python' },
-        { rule: /\.py$/i, lang: 'python', executable: true, application: 'spark', runType: 'python', ext: '.py', scriptType: 'pythonSpark', abbr: 'py', logo: 'fi-spark-python', isCanBeNew: true, label: 'PythonSpark', isCanBeOpen: true, flowType: 'pyspark' },
-        // { rule: /\.r$/i, lang: 'r', executable: true, application: 'spark', runType: 'r', ext: '.r', scriptType: 'r', abbr: 'r', logo: 'fi-r', isCanBeNew: true, label: 'R', isCanBeOpen: true },
-        // { rule: /\.sh$/i, lang: 'sh', executable: true, application: 'shell', runType: 'shell', ext: '.sh', scriptType: 'shell', abbr: 'shell', logo: 'fi-r', isCanBeNew: true, label: 'Shell', isCanBeOpen: true, flowType: 'shell' },
-        { rule: /\.qmlsql$/i, lang: 'hql', executable: false, application: 'spark', runType: 'sql', ext: '.qmlsql', scriptType: 'qmlsql', abbr: 'qmlsql', logo: 'fi-spark', isCanBeNew: false, label: 'QMLSQL', isCanBeOpen: true },
-        { rule: /\.qmlpy$/i, lang: 'python', executable: false, application: 'spark', runType: 'python', ext: '.qmlpy', scriptType: 'qmlpy', abbr: 'qmlpy', logo: 'fi-python', isCanBeNew: false, label: 'QMLPy', isCanBeOpen: true },
-        { rule: /\.txt$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.txt', scriptType: 'txt', abbr: '', logo: 'fi-txt', isCanBeNew: false, isCanBeOpen: true },
-        { rule: /\.log$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.log', scriptType: 'txt', abbr: '', logo: 'fi-log', isCanBeNew: false, isCanBeOpen: true },
-        { rule: /\.xls$/i, logo: 'fi-xls', isCanBeNew: false, isCanBeOpen: false },
-        { rule: /\.xlsx$/i, logo: 'fi-xlsx', isCanBeNew: false, isCanBeOpen: false },
-        { rule: /\.csv$/i, logo: 'fi-csv', isCanBeNew: false, isCanBeOpen: false },
-        { rule: /\.jar$/i, logo: 'fi-jar', isCanBeNew: false, isCanBeOpen: false },
-      ]),
-    };
+    if(process.env.VUE_APP_CTYUN_SSO){
+      return {
+        SUPPORTED_LANG_MODES: Object.freeze([
+          { rule: /[表详情]|(Table\sdetails)/, executable: false, isCanBeOpen: true },
+          { rule: /[建表向导]|(Table\screation\sguide)/, executable: false, isCanBeOpen: true },
+          { rule: /\.(bi)$/i, executable: false, logo: 'fi-bi', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.(sql)$/i, lang: 'hql', executable: true, application: 'spark', runType: 'sql', ext: '.sql', scriptType: 'hive', abbr: 'sql', logo: 'fi-spark', isCanBeNew: true, label: 'Sql', isCanBeOpen: true, flowType: 'sparksql' },
+          { rule: /\.(hql)$/i, lang: 'hql', executable: true, application: 'hive', runType: 'hql', ext: '.hql', scriptType: 'hql', abbr: 'hql', logo: 'fi-hive', isCanBeNew: true, label: 'Hive', isCanBeOpen: true, flowType: 'hql' },
+          { rule: /\.(out)$/i, lang: 'hql', executable: true, application: 'pipeline', runType: 'pipeline', ext: '.out', scriptType: 'storage', abbr: 'stor', logo: 'fi-storage', isCanBeNew: true, label: 'Storage', isCanBeOpen: true },
+          { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'scala', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: true, label: 'Scala', isCanBeOpen: true, flowType: 'scala' },
+          { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'function.mdq', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: false, label: 'Scala', isCanBeOpen: true },
+          { rule: /\.jdbc$/i, lang: 'hql', executable: true, application: 'jdbc', runType: 'jdbc', ext: '.jdbc', scriptType: 'jdbc', abbr: 'jdbc', logo: 'fi-jdbc', isCanBeNew: true, label: 'JDBC', isCanBeOpen: true, flowType: 'jdbc' },
+          { rule: /\.python$/i, lang: 'python', executable: true, application: 'python', runType: 'python', ext: '.python', scriptType: 'python', abbr: 'py', logo: 'fi-python', isCanBeNew: true, label: 'Python', isCanBeOpen: true, flowType: 'python' },
+          { rule: /\.py$/i, lang: 'python', executable: true, application: 'spark', runType: 'python', ext: '.py', scriptType: 'pythonSpark', abbr: 'py', logo: 'fi-spark-python', isCanBeNew: true, label: 'PythonSpark', isCanBeOpen: true, flowType: 'pyspark' },
+          // { rule: /\.r$/i, lang: 'r', executable: true, application: 'spark', runType: 'r', ext: '.r', scriptType: 'r', abbr: 'r', logo: 'fi-r', isCanBeNew: true, label: 'R', isCanBeOpen: true },
+          // { rule: /\.sh$/i, lang: 'sh', executable: true, application: 'shell', runType: 'shell', ext: '.sh', scriptType: 'shell', abbr: 'shell', logo: 'fi-r', isCanBeNew: true, label: 'Shell', isCanBeOpen: true, flowType: 'shell' },
+          { rule: /\.qmlsql$/i, lang: 'hql', executable: false, application: 'spark', runType: 'sql', ext: '.qmlsql', scriptType: 'qmlsql', abbr: 'qmlsql', logo: 'fi-spark', isCanBeNew: false, label: 'QMLSQL', isCanBeOpen: true },
+          { rule: /\.qmlpy$/i, lang: 'python', executable: false, application: 'spark', runType: 'python', ext: '.qmlpy', scriptType: 'qmlpy', abbr: 'qmlpy', logo: 'fi-python', isCanBeNew: false, label: 'QMLPy', isCanBeOpen: true },
+          { rule: /\.txt$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.txt', scriptType: 'txt', abbr: '', logo: 'fi-txt', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.log$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.log', scriptType: 'txt', abbr: '', logo: 'fi-log', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.xls$/i, logo: 'fi-xls', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.xlsx$/i, logo: 'fi-xlsx', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.csv$/i, logo: 'fi-csv', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.jar$/i, logo: 'fi-jar', isCanBeNew: false, isCanBeOpen: false },
+        ]),
+      };
+    }else {
+      return {
+        SUPPORTED_LANG_MODES: Object.freeze([
+          { rule: /[表详情]|(Table\sdetails)/, executable: false, isCanBeOpen: true },
+          { rule: /[建表向导]|(Table\screation\sguide)/, executable: false, isCanBeOpen: true },
+          { rule: /\.(bi)$/i, executable: false, logo: 'fi-bi', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.(sql)$/i, lang: 'hql', executable: true, application: 'spark', runType: 'sql', ext: '.sql', scriptType: 'hive', abbr: 'sql', logo: 'fi-spark', isCanBeNew: true, label: 'Sql', isCanBeOpen: true, flowType: 'sparksql' },
+          { rule: /\.(hql)$/i, lang: 'hql', executable: true, application: 'hive', runType: 'hql', ext: '.hql', scriptType: 'hql', abbr: 'hql', logo: 'fi-hive', isCanBeNew: true, label: 'Hive', isCanBeOpen: true, flowType: 'hql' },
+          { rule: /\.(out)$/i, lang: 'hql', executable: true, application: 'pipeline', runType: 'pipeline', ext: '.out', scriptType: 'storage', abbr: 'stor', logo: 'fi-storage', isCanBeNew: true, label: 'Storage', isCanBeOpen: true },
+          { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'scala', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: true, label: 'Scala', isCanBeOpen: true, flowType: 'scala' },
+          { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'function.mdq', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: false, label: 'Scala', isCanBeOpen: true },
+          { rule: /\.jdbc$/i, lang: 'hql', executable: true, application: 'jdbc', runType: 'jdbc', ext: '.jdbc', scriptType: 'jdbc', abbr: 'jdbc', logo: 'fi-jdbc', isCanBeNew: true, label: 'JDBC', isCanBeOpen: true, flowType: 'jdbc' },
+          { rule: /\.python$/i, lang: 'python', executable: true, application: 'python', runType: 'python', ext: '.python', scriptType: 'python', abbr: 'py', logo: 'fi-python', isCanBeNew: true, label: 'Python', isCanBeOpen: true, flowType: 'python' },
+          { rule: /\.py$/i, lang: 'python', executable: true, application: 'spark', runType: 'python', ext: '.py', scriptType: 'pythonSpark', abbr: 'py', logo: 'fi-spark-python', isCanBeNew: true, label: 'PythonSpark', isCanBeOpen: true, flowType: 'pyspark' },
+          // { rule: /\.r$/i, lang: 'r', executable: true, application: 'spark', runType: 'r', ext: '.r', scriptType: 'r', abbr: 'r', logo: 'fi-r', isCanBeNew: true, label: 'R', isCanBeOpen: true },
+          { rule: /\.sh$/i, lang: 'sh', executable: true, application: 'shell', runType: 'shell', ext: '.sh', scriptType: 'shell', abbr: 'shell', logo: 'fi-r', isCanBeNew: true, label: 'Shell', isCanBeOpen: true, flowType: 'shell' },
+          { rule: /\.qmlsql$/i, lang: 'hql', executable: false, application: 'spark', runType: 'sql', ext: '.qmlsql', scriptType: 'qmlsql', abbr: 'qmlsql', logo: 'fi-spark', isCanBeNew: false, label: 'QMLSQL', isCanBeOpen: true },
+          { rule: /\.qmlpy$/i, lang: 'python', executable: false, application: 'spark', runType: 'python', ext: '.qmlpy', scriptType: 'qmlpy', abbr: 'qmlpy', logo: 'fi-python', isCanBeNew: false, label: 'QMLPy', isCanBeOpen: true },
+          { rule: /\.txt$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.txt', scriptType: 'txt', abbr: '', logo: 'fi-txt', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.log$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.log', scriptType: 'txt', abbr: '', logo: 'fi-log', isCanBeNew: false, isCanBeOpen: true },
+          { rule: /\.xls$/i, logo: 'fi-xls', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.xlsx$/i, logo: 'fi-xlsx', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.csv$/i, logo: 'fi-csv', isCanBeNew: false, isCanBeOpen: false },
+          { rule: /\.jar$/i, logo: 'fi-jar', isCanBeNew: false, isCanBeOpen: false },
+        ]),
+      };
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (typeof this.beforeLeaveHook === 'function') {

@@ -27,15 +27,29 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
 /**
  * Created by shanhuang on 2019/10/12.
  */
@@ -66,7 +80,7 @@ public class HttpUtils {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpClient = createSSLClientDefault(url, cookieStore);
             response = httpClient.execute(httpPost);
             HttpEntity ent = response.getEntity();
             resultString = IOUtils.toString(ent.getContent(), "utf-8");
@@ -95,7 +109,7 @@ public class HttpUtils {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpClient = createSSLClientDefault(url, cookieStore);
             response = httpClient.execute(httpdelete);
             HttpEntity ent = response.getEntity();
             resultString = IOUtils.toString(ent.getContent(), "utf-8");
@@ -135,7 +149,7 @@ public class HttpUtils {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            httpClient = createSSLClientDefault(url, cookieStore);
             response = httpClient.execute(httpPut);
             HttpEntity ent = response.getEntity();
             resultString = IOUtils.toString(ent.getContent(), "utf-8");
@@ -148,6 +162,54 @@ public class HttpUtils {
             IOUtils.closeQuietly(httpClient);
         }
         return resultString;
+    }
+
+    private static CloseableHttpClient getHttpClient(String url, CookieStore cookieStore){
+        TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+            HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
+            if(url.startsWith("https://")){
+                httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+            }
+            CloseableHttpClient httpClient = httpClientBuilder.build();
+            return  httpClient;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return HttpClients.createDefault();
+    }
+
+    public static CloseableHttpClient createSSLClientDefault(String url, CookieStore cookieStore) {
+        try {
+            //使用 loadTrustMaterial() 方法实现一个信任策略，信任所有证书
+            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                // 信任所有
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    return true;
+                }
+            }).build();
+            //NoopHostnameVerifier类:  作为主机名验证工具，实质上关闭了主机名验证，它接受任何
+            //有效的SSL会话并匹配到目标主机。
+            HostnameVerifier hostnameVerifier = NoopHostnameVerifier.INSTANCE;
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+            HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore);
+            if(url.startsWith("https://")){
+                httpClientBuilder.setSSLSocketFactory(sslsf);
+            }
+            CloseableHttpClient httpClient = httpClientBuilder.build();
+            return httpClient;
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        return HttpClients.createDefault();
+
     }
 
 }

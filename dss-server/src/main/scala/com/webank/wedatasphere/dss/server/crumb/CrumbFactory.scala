@@ -112,7 +112,7 @@ class CrumbFactory {
     }
   }
 
-  private def createAllData(userName:String, workgetBaseInfospaceId: Long):java.util.List[DSSProjectTaxonomy] ={
+  private def createAllData(userName:String, workspaceId: Long):java.util.List[DSSProjectTaxonomy] ={
     projectTaxonomyService.listAllProjectTaxonomy(userName, workspaceId)
   }
 

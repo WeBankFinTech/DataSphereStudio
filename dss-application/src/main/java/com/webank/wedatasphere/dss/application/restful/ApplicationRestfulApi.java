@@ -68,7 +68,7 @@ public class ApplicationRestfulApi {
     @Path("getBaseInfo")
     public Response getBaseInfo(@Context HttpServletRequest req){
         String username = SecurityFilter.getLoginUsername(req);
-        if(ApplicationConf.SSO.getValue()){
+        if(!ApplicationConf.SSO.getValue()){
             applicationHandlerChain.handle(username);  //在授权模块去做
         }
         List<Application> applicationList = applicationService.listApplications();

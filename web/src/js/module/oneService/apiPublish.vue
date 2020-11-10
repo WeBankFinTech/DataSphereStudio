@@ -680,7 +680,7 @@ export default {
           env: isEmpty(params.configuration.runtime.env) ? {} : util.convertArrayToObject(params.configuration.runtime.env),
         },
         startup: params.configuration.startup,
-        datasource: params.configuration.datasource ? params.configuration.datasource : {}
+        datasource: params.configuration.runtime.datasource ? params.configuration.runtime.datasource : {}
       };
       return {
         variable,

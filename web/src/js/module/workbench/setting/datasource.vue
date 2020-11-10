@@ -5,10 +5,10 @@
     </div>
     <Form
       ref="datasource"
-      :model="script.params.configuration.datasource">
+      :model="script.params.configuration.runtime.datasource">
       <FormItem
         :label="$t('message.workBench.body.setting.datasource.datasourceSelect')">
-        <Select v-model="script.params.configuration.datasource.datasourceId" style="width:200px" clearable>
+        <Select v-model="script.params.configuration.runtime.datasource.datasourceId" style="width:200px" clearable>
           <Option v-for="item in datasourceList" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
       </FormItem>
@@ -30,15 +30,15 @@ export default {
   data() {
     return {
       datasourceList: [
-        
+
       ]
     }
   },
   created() {
-    if (this.script.params.configuration.datasource && this.script.params.configuration.datasource.datasourceId) {
-      this.script.params.configuration.datasource.datasourceId = parseInt(this.script.params.configuration.datasource.datasourceId)
+    if (this.script.params.configuration.runtime.datasource && this.script.params.configuration.runtime.datasource.datasourceId) {
+      this.script.params.configuration.runtime.datasource.datasourceId = parseInt(this.script.params.configuration.runtime.datasource.datasourceId)
     } else {
-      this.script.params.configuration['datasource'] = {
+      this.script.params.configuration['runtime']['datasource'] = {
         datasourceId: null
       }
     }
@@ -59,7 +59,7 @@ export default {
               label: item.dataSourceName,
               value: item.id
             })
-          }) 
+          })
         }
       }).catch((err) => {
       });

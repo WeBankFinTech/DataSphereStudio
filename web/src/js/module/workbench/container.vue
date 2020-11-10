@@ -875,11 +875,11 @@ export default {
         runtime: {
           args: '',
           env: [],
+          datasource: {
+            datasourceId: null
+          }
         },
         startup: {},
-        datasource: {
-          datasourceId: null
-        }
       };
       if (!isEmpty(params)) {
         variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
@@ -888,9 +888,9 @@ export default {
           runtime: {
             args: params.configuration.runtime ? params.configuration.runtime.args || '' : '',
             env: params.configuration.runtime ? (isEmpty(params.configuration.runtime.env) ? [] : util.convertObjectToArray(params.configuration.runtime.env)) : [],
+            datasource: params.configuration.runtime.datasource ? params.configuration.runtime.datasource : {datasourceId: null}
           },
           startup: {},
-          datasource: params.configuration.datasource ? params.configuration.datasource : {datasourceId: null}
         };
       }
       return {

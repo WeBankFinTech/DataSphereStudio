@@ -4,7 +4,7 @@
       <Form v-model="apiTestInfo"
         :label-width="90"
         inline>
-        <FormItem :label="$t('message.oneService.apiTest.tabs.apiTestInfo.apiVersion')">
+        <FormItem :label="$t('message.apiService.apiTest.tabs.apiTestInfo.apiVersion')">
           <Select v-model="apiTestInfo.apiVersion" @on-change="apiVersionChange">
             <Option v-for="item in apiVersionList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
@@ -13,7 +13,7 @@
           <Button
             type="primary"
             style="margin-left: 8px"
-            @click="testApiClick">{{$t('message.oneService.apiTest.tabs.apiTestInfo.testApi')}}</Button>
+            @click="testApiClick">{{$t('message.apiService.apiTest.tabs.apiTestInfo.testApi')}}</Button>
         </FormItem>
       </Form>
       <Table :columns="paramInfoColumns" :data="apiTestInfo.paramList"></Table>
@@ -23,7 +23,7 @@
       v-if="scriptViewState.showPanel == 'result'"
       v-show="!scriptViewState.bottomPanelMin"
       class="workbench-container">
-      <h1>{{$t('message.oneService.apiTest.tabs.apiTestInfo.testResult')}}</h1>
+      <h1>{{$t('message.apiService.apiTest.tabs.apiTestInfo.testResult')}}</h1>
       <!--
       <we-progress
         v-if="scriptViewState.showPanel == 'progress'"
@@ -60,7 +60,7 @@
 import { isEmpty, find, dropRight, toArray, values, isString, findIndex, last, isUndefined, debounce } from 'lodash';
 import api from '@/js/service/api';
 import DataTable from '@/js/component/table/dataTable'
-import result from '@/js/module/oneService/result.vue';
+import result from '@/js/module/apiService/result.vue';
 // import log from '@/js/module/workbench/script/log.vue';
 // import weProgress from '@/js/module/workbench/script/progress.vue';
 export default {
@@ -85,20 +85,20 @@ export default {
     return {
       paramInfoColumns: [
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiTestInfo.paramTable.paramName'),
+          title: this.$t('message.apiService.apiTest.tabs.apiTestInfo.paramTable.paramName'),
           key: 'paramName'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiTestInfo.paramTable.paramType'),
+          title: this.$t('message.apiService.apiTest.tabs.apiTestInfo.paramTable.paramType'),
           key: 'paramType',
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiTestInfo.paramTable.require.title'),
+          title: this.$t('message.apiService.apiTest.tabs.apiTestInfo.paramTable.require.title'),
           align: 'center',
           key: 'require'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiTestInfo.paramTable.defaultValue'),
+          title: this.$t('message.apiService.apiTest.tabs.apiTestInfo.paramTable.defaultValue'),
           key: 'defaultValue',
           width: '200',
           render: (h, params) => {
@@ -178,7 +178,7 @@ export default {
       let _this = this;
       _this.apiTestInfo.paramList = []
 
-      api.fetch('/oneservice/apiParamQuery', {
+      api.fetch('/apiservice/apiParamQuery', {
         scriptPath: _this.scriptPath,
         version: _this.apiTestInfo.apiVersion
       }, 'get').then((rst) => {
@@ -198,7 +198,7 @@ export default {
 
       });
 
-      api.fetch('/oneservice/query', {
+      api.fetch('/apiservice/query', {
         scriptPath: _this.scriptPath
       }, 'get').then((rst) => {
         if (rst.result) {
@@ -215,7 +215,7 @@ export default {
     },
     apiVersionQueryPageList() {
       let _this = this;
-      api.fetch('/oneservice/apiVersionQuery', {
+      api.fetch('/apiservice/apiVersionQuery', {
         scriptPath: _this.scriptPath
       }, 'get').then((rst) => {
         if (rst.result) {
@@ -251,7 +251,7 @@ export default {
         params[item.paramName] = item.defaultValue;
       })
 
-      api.fetch('/oneservice/execute/' + this.apiTestInfo.path, {
+      api.fetch('/apiservice/execute/' + this.apiTestInfo.path, {
         moduleName: 'test',
         params: params
       }, 'get').then((rst) => {

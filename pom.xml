@@ -44,7 +44,7 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
-        <module>oneservice/dss-oneservice-server</module>
+        <module>apiservice/dss-apiservice-server</module>
     </modules>
 
     <properties>
@@ -166,7 +166,7 @@
             </dependency>
             <dependency>
                 <groupId>com.webank.wedatasphere.dss</groupId>
-                <artifactId>dss-oneservice-server</artifactId>
+                <artifactId>dss-apiservice-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

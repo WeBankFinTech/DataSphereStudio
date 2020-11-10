@@ -2,7 +2,7 @@
   <div class="api-update">
     <Modal
       width="680"
-      :title="$t('message.oneService.apiUpdate.title')"
+      :title="$t('message.apiService.apiUpdate.title')"
       v-model="updateModalShow"
       @on-cancel="cancel"
       @on-ok="updateApiOk">
@@ -11,15 +11,15 @@
         :model="updateApiData"
         :label-width="100" >
         <FormItem
-          :label="$t('message.oneService.apiUpdate.apiName')">
+          :label="$t('message.apiService.apiUpdate.apiName')">
           <Input v-model="updateApiData.apiName"></Input>
         </FormItem>
         <FormItem
-          :label="$t('message.oneService.apiUpdate.tag')">
+          :label="$t('message.apiService.apiUpdate.tag')">
           <Input v-model="updateApiData.tag"></Input>
         </FormItem>
         <FormItem
-          :label="$t('message.oneService.apiUpdate.describe')">
+          :label="$t('message.apiService.apiUpdate.describe')">
           <Input v-model="updateApiData.describe"></Input>
         </FormItem>
       </Form>
@@ -82,7 +82,7 @@ export default {
     },
     updateApiOk() {
       let _this = this;
-      api.fetch('/oneservice/api/' + _this.updateApiData.id, {
+      api.fetch('/apiservice/api/' + _this.updateApiData.id, {
         apiName: _this.updateApiData.apiName,
         tag: _this.updateApiData.tag,
         describe: _this.updateApiData.describe

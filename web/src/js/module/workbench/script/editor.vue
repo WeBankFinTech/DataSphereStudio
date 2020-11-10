@@ -83,7 +83,7 @@
 </template>
 <script>
 import setting from './setting.vue';
-import apiPublish from '../../oneService/apiPublish'
+import apiPublish from '../../apiService/apiPublish'
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import { throttle } from 'lodash';

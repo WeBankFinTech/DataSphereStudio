@@ -2,14 +2,14 @@
   <div>
     <Tabs value="api-test">
       <!--
-      <TabPane :label="$t('message.oneService.apiTest.tabs.apiInfo.title')" name="api-info">
+      <TabPane :label="$t('message.apiService.apiTest.tabs.apiInfo.title')" name="api-info">
         <ApiCallSatistics/>
       </TabPane>
       -->
-      <TabPane :label="$t('message.oneService.apiTest.tabs.apiTestInfo.title')" name="api-test">
+      <TabPane :label="$t('message.apiService.apiTest.tabs.apiTestInfo.title')" name="api-test">
         <ApiTestRun :scriptPath="scriptPath"/>
       </TabPane>
-      <TabPane :label="$t('message.oneService.apiTest.tabs.apiVersionInfo.title')" name="api-version">
+      <TabPane :label="$t('message.apiService.apiTest.tabs.apiVersionInfo.title')" name="api-version">
         <ApiVersionManager :scriptPath="scriptPath"/>
       </TabPane>
     </Tabs>
@@ -18,9 +18,9 @@
 
 <script>
 import api from '@/js/service/api';
-import ApiCallSatistics from '@/js/module/oneService/apiCallSatistics'
-import ApiTestRun from '@/js/module/oneService/apiTestRun'
-import ApiVersionManager from '@/js/module/oneService/apiVersionManager'
+import ApiCallSatistics from '@/js/module/apiService/apiCallSatistics'
+import ApiTestRun from '@/js/module/apiService/apiTestRun'
+import ApiVersionManager from '@/js/module/apiService/apiVersionManager'
 import Base64 from 'js-base64';
 export default {
   name: "apiTest",

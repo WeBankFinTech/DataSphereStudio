@@ -3,7 +3,7 @@
     <div class="console-page-content">
       <div class="console-page-content-head">
         <div>
-          <span class="console-page-content-title">{{ $t('message.oneService.title') }}</span>
+          <span class="console-page-content-title">{{ $t('message.apiService.title') }}</span>
         </div>
       </div>
       <div class="console-page-content-body">
@@ -30,7 +30,7 @@
           class="content-body-side-right">
           <div class="content-body-side-right-title">
             <Breadcrumb>
-              <BreadcrumbItem to="/oneService">{{ breadcrumbFirstName }}</BreadcrumbItem>
+              <BreadcrumbItem to="/apiService">{{ breadcrumbFirstName }}</BreadcrumbItem>
               <BreadcrumbItem>{{ breadcrumbSecondName }}</BreadcrumbItem>
             </Breadcrumb>
           </div>
@@ -51,16 +51,16 @@ export default {
     return {
       sideNavList: [{
         key: '1',
-        name: this.$t('message.oneService.sideNavList.function.name'),
+        name: this.$t('message.apiService.sideNavList.function.name'),
         padding: 0,
         icon: 'ios-options',
         children: [
-          { key: '1-1', name: this.$t('message.oneService.sideNavList.function.children.apiMarket'), path: '/oneService/apiMarket' },
-          // { key: '1-2', name: '', path: '/oneService/apiTest' },
+          { key: '1-1', name: this.$t('message.apiService.sideNavList.function.children.apiMarket'), path: '/apiService/apiMarket' },
+          // { key: '1-2', name: '', path: '/apiService/apiTest' },
         ],
       }],
-      breadcrumbFirstName: this.$t('message.oneService.sideNavList.function.name'),
-      breadcrumbSecondName: this.$t('message.oneService.sideNavList.function.children.apiMarket'),
+      breadcrumbFirstName: this.$t('message.apiService.sideNavList.function.name'),
+      breadcrumbSecondName: this.$t('message.apiService.sideNavList.function.children.apiMarket'),
       contentHeight: 0,
     };
   },
@@ -101,8 +101,8 @@ export default {
   beforeRouteEnter(to, from, next) {
     if (to.name === 'FAQ' && from.name === 'Home') {
       next((vm) => {
-        vm.breadcrumbFirstName = this.$t('message.oneService.sideNavList.function.name');
-        vm.breadcrumbSecondName = this.$t('message.oneService.sideNavList.function.children.apiMarket');
+        vm.breadcrumbFirstName = this.$t('message.apiService.sideNavList.function.name');
+        vm.breadcrumbSecondName = this.$t('message.apiService.sideNavList.function.children.apiMarket');
       });
     } else if (to.name === 'Console' && from.name === 'Home') {
       const lastActiveConsole = storage.get('lastActiveConsole');

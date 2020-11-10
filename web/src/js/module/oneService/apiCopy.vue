@@ -10,14 +10,14 @@
         <Row>
           <Col span="18">
           <FormItem
-            :label="$t('message.oneService.apiCopy.apiVersion')">
+            :label="$t('message.apiService.apiCopy.apiVersion')">
             <Select v-model="copyApiData.apiVersion">
               <Option v-for="item in apiVersionList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           </Col>
           <Col span="6" style="text-align: center">
-          <Button type="primary" @click="produceApiInfo">{{$t('message.oneService.apiCopy.apiInfo')}}</Button>
+          <Button type="primary" @click="produceApiInfo">{{$t('message.apiService.apiCopy.apiInfo')}}</Button>
           </Col>
         </Row>
         <Row>
@@ -28,10 +28,10 @@
       </Form>
       <div slot="footer">
         <Button
-          @click="cancel">{{$t('message.oneService.apiCopy.cancel')}}</Button>
+          @click="cancel">{{$t('message.apiService.apiCopy.cancel')}}</Button>
         <Button
           type="primary"
-          @click="copyApiOk">{{$t('message.oneService.apiCopy.copy')}}</Button>
+          @click="copyApiOk">{{$t('message.apiService.apiCopy.copy')}}</Button>
       </div>
     </Modal>
   </div>
@@ -76,7 +76,7 @@ export default {
   methods: {
     init() {
       let _this = this;
-      api.fetch('/oneservice/apiVersionQuery', {
+      api.fetch('/apiservice/apiVersionQuery', {
         scriptPath: this.apiData.scriptPath
       }, 'get').then((rst) => {
         if (rst.result) {
@@ -95,7 +95,7 @@ export default {
     },
     produceApiInfo() {
       let _this = this;
-      api.fetch('/oneservice/apiParamQuery', {
+      api.fetch('/apiservice/apiParamQuery', {
         scriptPath: this.apiData.scriptPath,
         version: this.apiData.apiVersion
       }, 'get').then((rst) => {
@@ -124,7 +124,7 @@ export default {
         _this.$copyText(_this.copyApiData.apiInfo).then(function (e) {
           _this.$emit('on-copy');
 
-          _this.$Message.success(_this.$t('message.oneService.apiCopy.copySuccess'));
+          _this.$Message.success(_this.$t('message.apiService.apiCopy.copySuccess'));
         }, function (e) {
           console.log("copy error")
         })

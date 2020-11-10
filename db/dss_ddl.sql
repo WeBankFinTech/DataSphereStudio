@@ -340,7 +340,7 @@ CREATE TABLE `dss_oneservice_param` (
   `description` varchar(200) DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`),
   KEY `idx_dss_oneservice_param_config_id_version` (`config_id`,`version`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='oneservice 参数表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice 参数表';
 
 -- ----------------------------
 -- Table structure for dss_workspace

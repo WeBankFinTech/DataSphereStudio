@@ -9,10 +9,10 @@
         placement="bottom-end"
         transfer
         @on-click="publishApiPanel">
-        <span class="navbar-item-name">{{ $t('message.oneService.apiPublish.title') }}</span>
+        <span class="navbar-item-name">{{ $t('message.apiService.apiPublish.title') }}</span>
         <DropdownMenu slot="list">
-          <DropdownItem v-if="0 == hasApi" name="addApi">{{ $t('message.oneService.apiPublish.button.addApi') }}</DropdownItem>
-          <DropdownItem v-if="1 == hasApi" name="updateApi">{{ $t('message.oneService.apiPublish.button.updateApi') }}</DropdownItem>
+          <DropdownItem v-if="0 == hasApi" name="addApi">{{ $t('message.apiService.apiPublish.button.addApi') }}</DropdownItem>
+          <DropdownItem v-if="1 == hasApi" name="updateApi">{{ $t('message.apiService.apiPublish.button.updateApi') }}</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </div>
@@ -23,19 +23,19 @@
       <div
         class="api-module-title"
         slot="header">
-        {{$t('message.oneService.apiPublish.addApiModal.modalTitle')}}
+        {{$t('message.apiService.apiPublish.addApiModal.modalTitle')}}
       </div>
       <div
         v-show="addApiBaseInfoShow"
         class="api-module-content-title"
         slot="header">
-        {{$t('message.oneService.apiPublish.addApiModal.contentTitle')}}
+        {{$t('message.apiService.apiPublish.addApiModal.contentTitle')}}
       </div>
       <div
         v-show="addApiParamInfoShow"
         class="api-module-content-title"
         slot="header">
-        {{$t('message.oneService.apiPublish.addApiModal.paramConfirmTitle')}}
+        {{$t('message.apiService.apiPublish.addApiModal.paramConfirmTitle')}}
       </div>
       <Form
         ref="addApi"
@@ -44,13 +44,13 @@
         <div v-show="addApiBaseInfoShow">
           <FormItem
             prop="apiName"
-            :label="$t('message.oneService.apiPublish.addApiModal.apiName')"
+            :label="$t('message.apiService.apiPublish.addApiModal.apiName')"
             :rules="[
               {
                 required: true,
-                message: $t('message.oneService.apiPublish.rule.nameRule')
+                message: $t('message.apiService.apiPublish.rule.nameRule')
               },{
-                message: $t('message.oneService.apiPublish.rule.contentLengthLimit'),
+                message: $t('message.apiService.apiPublish.rule.contentLengthLimit'),
                 max: 255
               }, {
                 validator: checkApiName,
@@ -61,17 +61,17 @@
           </FormItem>
           <FormItem
             prop="apiPath"
-            :label="$t('message.oneService.apiPublish.addApiModal.apiPath')"
+            :label="$t('message.apiService.apiPublish.addApiModal.apiPath')"
             :rules="[
               {
                 required: true,
-                message: $t('message.oneService.apiPublish.rule.pathRule')
+                message: $t('message.apiService.apiPublish.rule.pathRule')
               }, {
-                message: $t('message.oneService.apiPublish.rule.contentLengthLimit'),
+                message: $t('message.apiService.apiPublish.rule.contentLengthLimit'),
                 max: 255
               }, {
                 pattern: /^([\/][\w-]+)*$/,
-                message: $t('message.oneService.apiPublish.rule.pathRegRule'),
+                message: $t('message.apiService.apiPublish.rule.pathRegRule'),
               }, {
                 validator: checkApiPath,
                 trigger: 'blur'
@@ -81,8 +81,8 @@
           </FormItem>
           <FormItem
             prop="protocol"
-            :label="$t('message.oneService.apiPublish.addApiModal.protocol')"
-            :rules="[{ required: true, message: $t('message.oneService.apiPublish.rule.protocolRule') }]">
+            :label="$t('message.apiService.apiPublish.addApiModal.protocol')"
+            :rules="[{ required: true, message: $t('message.apiService.apiPublish.rule.protocolRule') }]">
             <RadioGroup v-model="addApiData.protocol">
               <Radio :key="protocol.label" :label="protocol.value" v-for="protocol in protocolList">
                 <span>{{protocol.label}}</span>
@@ -91,27 +91,27 @@
           </FormItem>
           <FormItem
             prop="requestType"
-            :label="$t('message.oneService.apiPublish.addApiModal.requestType')"
-            :rules="[{ required: true, message: $t('message.oneService.apiPublish.rule.requestTypeRule') }]">
+            :label="$t('message.apiService.apiPublish.addApiModal.requestType')"
+            :rules="[{ required: true, message: $t('message.apiService.apiPublish.rule.requestTypeRule') }]">
             <Select v-model="addApiData.requestType">
               <Option v-for="item in requestTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <FormItem
             prop="tag"
-            :label="$t('message.oneService.apiPublish.addApiModal.tag')">
-            <tags-input :source.sync='addApiData.tagArr' :placeholder="$t('message.oneService.apiPublish.tagPlaceholder')"/>
+            :label="$t('message.apiService.apiPublish.addApiModal.tag')">
+            <tags-input :source.sync='addApiData.tagArr' :placeholder="$t('message.apiService.apiPublish.tagPlaceholder')"/>
           </FormItem>
           <FormItem
             prop="visible"
-            :label="$t('message.oneService.apiPublish.addApiModal.visible')">
+            :label="$t('message.apiService.apiPublish.addApiModal.visible')">
             <Select v-model="addApiData.visible">
               <Option v-for="item in visibleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <FormItem
             prop="describe"
-            :label="$t('message.oneService.apiPublish.addApiModal.describe')">
+            :label="$t('message.apiService.apiPublish.addApiModal.describe')">
             <Input v-model="addApiData.describe" show-word-limit type="textarea"></Input>
           </FormItem>
         </div>
@@ -122,15 +122,15 @@
       <div slot="footer">
         <Button
           v-show="addApiBaseInfoShow"
-          @click="nextStep">{{$t('message.oneService.apiPublish.addApiModal.nextStep')}}</Button>
+          @click="nextStep">{{$t('message.apiService.apiPublish.addApiModal.nextStep')}}</Button>
         <Button
           v-show="addApiParamInfoShow"
-          @click="cancel">{{$t('message.oneService.apiPublish.addApiModal.cancel')}}</Button>
+          @click="cancel">{{$t('message.apiService.apiPublish.addApiModal.cancel')}}</Button>
         <Button
           v-show="addApiParamInfoShow"
           type="primary"
           :disabled="loadding"
-          @click="saveApiOk">{{$t('message.oneService.apiPublish.addApiModal.confirm')}}</Button>
+          @click="saveApiOk">{{$t('message.apiService.apiPublish.addApiModal.confirm')}}</Button>
       </div>
     </Modal>
     <Modal
@@ -139,29 +139,29 @@
       <div
         class="api-module-title"
         slot="header">
-        {{$t('message.oneService.apiPublish.updateApiModal.modalTitle')}}
+        {{$t('message.apiService.apiPublish.updateApiModal.modalTitle')}}
       </div>
       <Form
         ref="updateApi"
         :model="updateApiData"
         :label-width="100" >
         <FormItem
-          :label="$t('message.oneService.apiPublish.updateApiModal.selectApi')">
+          :label="$t('message.apiService.apiPublish.updateApiModal.selectApi')">
           <Input v-model="updateApiData.apiName" disabled></Input>
         </FormItem>
         <FormItem
           prop="apiPath"
-          :label="$t('message.oneService.apiPublish.updateApiModal.apiPath')"
+          :label="$t('message.apiService.apiPublish.updateApiModal.apiPath')"
           :rules="[
             {
               required: true,
-              message: $t('message.oneService.apiPublish.rule.pathRule')
+              message: $t('message.apiService.apiPublish.rule.pathRule')
             }, {
-              message: $t('message.oneService.apiPublish.rule.contentLengthLimit'),
+              message: $t('message.apiService.apiPublish.rule.contentLengthLimit'),
               max: 255
             }, {
               pattern: /^([\/][\w-]+)*$/,
-              message: $t('message.oneService.apiPublish.rule.pathRegRule'),
+              message: $t('message.apiService.apiPublish.rule.pathRegRule'),
             }, {
               validator: checkApiPath,
               trigger: 'blur'
@@ -170,19 +170,19 @@
           <Input v-model="updateApiData.apiPath"></Input>
         </FormItem>
         <FormItem
-          :label="$t('message.oneService.apiPublish.updateApiModal.apiVersion')">
-          <Checkbox v-model="updateApiData.apiVersionUpgrade">{{$t('message.oneService.apiPublish.updateApiModal.apiVersionUpgrade')}}</Checkbox>
+          :label="$t('message.apiService.apiPublish.updateApiModal.apiVersion')">
+          <Checkbox v-model="updateApiData.apiVersionUpgrade">{{$t('message.apiService.apiPublish.updateApiModal.apiVersionUpgrade')}}</Checkbox>
         </FormItem>
-        {{$t('message.oneService.apiPublish.updateApiModal.paramConfirm')}}
+        {{$t('message.apiService.apiPublish.updateApiModal.paramConfirm')}}
         <Table :columns="paramInfoColumns" :data="updateApiData.paramList"></Table>
       </Form>
       <div slot="footer">
         <Button
-          @click="updateApiCancel">{{$t('message.oneService.apiPublish.addApiModal.cancel')}}</Button>
+          @click="updateApiCancel">{{$t('message.apiService.apiPublish.addApiModal.cancel')}}</Button>
         <Button
           type="primary"
           :disabled="loadding"
-          @click="updateApiOk">{{$t('message.oneService.apiPublish.addApiModal.confirm')}}</Button>
+          @click="updateApiOk">{{$t('message.apiService.apiPublish.addApiModal.confirm')}}</Button>
       </div>
     </Modal>
 
@@ -244,21 +244,21 @@ export default {
       ],
       requireList: [
         {
-          label: this.$t('message.oneService.apiPublish.paramTable.require.yes'),
+          label: this.$t('message.apiService.apiPublish.paramTable.require.yes'),
           value: 1
         },
         {
-          label: this.$t('message.oneService.apiPublish.paramTable.require.no'),
+          label: this.$t('message.apiService.apiPublish.paramTable.require.no'),
           value: 0
         }
       ],
       paramInfoColumns: [
         {
-          title: this.$t('message.oneService.apiPublish.paramTable.paramName'),
+          title: this.$t('message.apiService.apiPublish.paramTable.paramName'),
           key: 'paramName'
         },
         {
-          title: this.$t('message.oneService.apiPublish.paramTable.paramType'),
+          title: this.$t('message.apiService.apiPublish.paramTable.paramType'),
           key: 'paramType',
           // width: '100',
           render: (h, params) => {
@@ -292,7 +292,7 @@ export default {
           }
         },
         {
-          title: this.$t('message.oneService.apiPublish.paramTable.require.title'),
+          title: this.$t('message.apiService.apiPublish.paramTable.require.title'),
           key: 'require',
           // width: '100',
           render: (h, params) => {
@@ -326,7 +326,7 @@ export default {
           }
         },
         // {
-        //   title: this.$t('message.oneService.apiPublish.paramTable.defaultValue'),
+        //   title: this.$t('message.apiService.apiPublish.paramTable.defaultValue'),
         //   key: 'defaultValue',
         //   render: (h, params) => {
         //     return h('div', [
@@ -348,7 +348,7 @@ export default {
         //   }
         // },
         {
-          title: this.$t('message.oneService.apiPublish.paramTable.describe'),
+          title: this.$t('message.apiService.apiPublish.paramTable.describe'),
           key: 'describe',
           width: '200',
           render: (h, params) => {
@@ -405,15 +405,15 @@ export default {
       visibleList: [
         {
           value: 'workspace',
-          label: this.$t('message.oneService.apiPublish.visible.workspace')
+          label: this.$t('message.apiService.apiPublish.visible.workspace')
         },
         {
           value: 'private',
-          label: this.$t('message.oneService.apiPublish.visible.personal')
+          label: this.$t('message.apiService.apiPublish.visible.personal')
         },
         {
           value: 'public',
-          label: this.$t('message.oneService.apiPublish.visible.public')
+          label: this.$t('message.apiService.apiPublish.visible.public')
         }
       ],
       apiList: [
@@ -462,7 +462,7 @@ export default {
     },
     initApiInfo() {
       let _this = this;
-      api.fetch('/oneservice/query', {
+      api.fetch('/apiservice/query', {
         scriptPath: this.work.filepath
       }, 'get').then((rst) => {
         if (rst.result) {
@@ -594,7 +594,7 @@ export default {
           })
 
           this.saveLoading = true;
-          api.fetch('/oneservice/api', {
+          api.fetch('/apiservice/api', {
             name: this.addApiData.apiName,
             path: this.addApiData.apiPath,
             protocol: this.addApiData.protocol,
@@ -643,7 +643,7 @@ export default {
 
           this.saveLoading = true;
           this.loadding = true;
-          api.fetch('/oneservice/api/' + this.updateApiData.id, {
+          api.fetch('/apiservice/api/' + this.updateApiData.id, {
             name: this.updateApiData.apiName,
             path: this.updateApiData.apiPath,
             protocol: this.updateApiData.protocol,
@@ -662,7 +662,7 @@ export default {
             this.updateApiModalShow = false
             this.saveLoading = false;
             this.loadding = false;
-            this.$Message.success(this.$t('message.oneService.apiPublish.notice.publishSuccess'));
+            this.$Message.success(this.$t('message.apiService.apiPublish.notice.publishSuccess'));
           }).catch((err) => {
             this.saveLoading = false;
             this.loadding = false;
@@ -690,17 +690,17 @@ export default {
     checkApiPath(rule, value, callback) {
       let _this = this;
       if (value) {
-        api.fetch('/oneservice/checkPath/', {
+        api.fetch('/apiservice/checkPath/', {
           scriptPath: this.work.filepath,
           path: value
         }, 'get').then((rst) => {
           if (rst && !rst.result) {
             callback();
           } else {
-            return callback(new Error(_this.$t('message.oneService.apiPublish.rule.pathRepeat')));
+            return callback(new Error(_this.$t('message.apiService.apiPublish.rule.pathRepeat')));
           }
         }).catch((err) => {
-          return callback(new Error(_this.$t('message.oneService.apiPublish.rule.pathRepeat')));
+          return callback(new Error(_this.$t('message.apiService.apiPublish.rule.pathRepeat')));
         });
       } else {
         callback();
@@ -709,16 +709,16 @@ export default {
     checkApiName(rule, value, callback) {
       let _this = this;
       if (value) {
-        api.fetch('/oneservice/checkName/', {
+        api.fetch('/apiservice/checkName/', {
           name: value
         }, 'get').then((rst) => {
           if (rst && !rst.result) {
             callback();
           } else {
-            return callback(new Error(_this.$t('message.oneService.apiPublish.rule.nameRepeat')));
+            return callback(new Error(_this.$t('message.apiService.apiPublish.rule.nameRepeat')));
           }
         }).catch((err) => {
-          return callback(new Error(_this.$t('message.oneService.apiPublish.rule.pathRepeat')));
+          return callback(new Error(_this.$t('message.apiService.apiPublish.rule.pathRepeat')));
         });
       } else {
         callback();

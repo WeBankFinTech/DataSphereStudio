@@ -163,7 +163,7 @@
             "workflowDesc": "工作流描述:",
             "inputWorkflowDesc": "请输入工作流描述"
         },
-        "oneService": {
+        "apiService": {
             "title": "数据服务",
             "sideNavList": {
                   "function": {

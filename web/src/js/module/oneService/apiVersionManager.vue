@@ -6,7 +6,7 @@
       inline>
       <!--
       <FormItem
-        :label="$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.query.publishDate')">
+        :label="$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.query.publishDate')">
         <Input ></Input>
       </FormItem>
 
@@ -14,7 +14,7 @@
         <Button
           type="primary"
           style="margin-left: 8px"
-          @click="apiVersionQueryBtnClick">{{$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.query.title')}}</Button>
+          @click="apiVersionQueryBtnClick">{{$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.query.title')}}</Button>
       </FormItem>
       -->
     </Form>
@@ -42,37 +42,37 @@ export default {
     return {
       versionInfoColumns: [
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.version'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.version'),
           align: 'center',
           key: 'version'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.status'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.status'),
           align: 'center',
           key: 'statusStr',
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.source'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.source'),
           align: 'center',
           key: 'scriptPath'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.creator'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.creator'),
           align: 'center',
           key: 'creator'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.publishDate'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.publishDate'),
           align: 'center',
           key: 'publishDateStr'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.updateDate'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.updateDate'),
           align: 'center',
           key: 'updateDateStr'
         },
         {
-          title: this.$t('message.oneService.apiTest.tabs.apiVersionInfo.versionInfoTable.operation'),
+          title: this.$t('message.apiService.apiTest.tabs.apiVersionInfo.versionInfoTable.operation'),
           align: 'center',
           render: (h, params) => {
             let currentRow = params.row;
@@ -94,7 +94,7 @@ export default {
             //         this.testApi(currentRow._index, currentRow.id);
             //       }
             //     }
-            //   }, this.$t('message.oneService.apiManager.apiTable.operation.test')));
+            //   }, this.$t('message.apiService.apiManager.apiTable.operation.test')));
 
             if (1 === status) {
               btns.push(
@@ -110,7 +110,7 @@ export default {
                       this.disableApi(currentRow._index, currentRow.id);
                     }
                   }
-                }, this.$t('message.oneService.apiManager.apiTable.operation.disable')));
+                }, this.$t('message.apiService.apiManager.apiTable.operation.disable')));
             } else if (0 === status) {
               btns.push(h('Button', {
                 props: {
@@ -124,7 +124,7 @@ export default {
                     this.enableApi(currentRow._index, currentRow.id);
                   }
                 }
-              }, this.$t('message.oneService.apiManager.apiTable.operation.enable')));
+              }, this.$t('message.apiService.apiManager.apiTable.operation.enable')));
             }
             return h('div', btns)
           }
@@ -157,7 +157,7 @@ export default {
     },
     apiVersionQueryPageList() {
       let _this = this;
-      api.fetch('/oneservice/apiVersionQuery', {
+      api.fetch('/apiservice/apiVersionQuery', {
         scriptPath: _this.scriptPath
       }, 'get').then((rst) => {
         if (rst.result) {
@@ -170,10 +170,10 @@ export default {
     disableApi(index, id) {
       let _this = this;
       this.$Modal.confirm({
-        title: this.$t("message.oneService.apiManager.apiTable.reconfirm.title"),
-        content: '<p>' + this.$t("message.oneService.apiManager.apiTable.reconfirm.disable") + '</p>',
+        title: this.$t("message.apiService.apiManager.apiTable.reconfirm.title"),
+        content: '<p>' + this.$t("message.apiService.apiManager.apiTable.reconfirm.disable") + '</p>',
         onOk: () => {
-          api.fetch('/oneservice/apiDisable', {
+          api.fetch('/apiservice/apiDisable', {
             id: id
           }, 'get').then((rst) => {
             _this.apiVersionQueryPageList();
@@ -186,10 +186,10 @@ export default {
     enableApi(index, id) {
       let _this = this;
       this.$Modal.confirm({
-        title: this.$t("message.oneService.apiManager.apiTable.reconfirm.title"),
-        content: '<p>' + this.$t("message.oneService.apiManager.apiTable.reconfirm.enable") + '</p>',
+        title: this.$t("message.apiService.apiManager.apiTable.reconfirm.title"),
+        content: '<p>' + this.$t("message.apiService.apiManager.apiTable.reconfirm.enable") + '</p>',
         onOk: () => {
-          api.fetch('/oneservice/apiEnable', {
+          api.fetch('/apiservice/apiEnable', {
             id: id
           }, 'get').then((rst) => {
             _this.apiVersionQueryPageList();

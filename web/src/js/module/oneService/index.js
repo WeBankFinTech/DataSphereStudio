@@ -16,12 +16,12 @@
  */
 
 export default {
-  name: 'OneService',
+  name: 'ApiService',
   // 规范模块监测什么事件
   events: [],
   // 规范模块能够触发什么事件
   dispatchs: {
-    OneService: [],
+    ApiService: [],
     IndexedDB: [
       'appendLog', 'clearLog', 'getLog', 'changeLogKey',
       'updateHistory', 'appendHistory', 'getHistory', 'clearHistory', 'changeHistoryKey',

@@ -2,7 +2,7 @@
   <div class="api-manager">
     <div class="api-query" @keydown.enter="queryBtnClick">
       <!--
-      <h1 class="api-manager-title">{{$t('message.oneService.apiManager.title')}}</h1>
+      <h1 class="api-manager-title">{{$t('message.apiService.apiManager.title')}}</h1>
       -->
       <Form
         ref="apiQueryForm"
@@ -11,35 +11,35 @@
         inline>
 
         <FormItem
-          :label="$t('message.oneService.apiManager.query.apiName')">
+          :label="$t('message.apiService.apiManager.query.apiName')">
           <Input v-model="dataServiceQueryData.apiName"></Input>
         </FormItem>
 
         <FormItem
-          :label="$t('message.oneService.apiManager.query.tag')">
+          :label="$t('message.apiService.apiManager.query.tag')">
           <Input v-model="dataServiceQueryData.tag"></Input>
         </FormItem>
 
         <FormItem
-          :label="$t('message.oneService.apiManager.query.status')">
+          :label="$t('message.apiService.apiManager.query.status')">
           <Select v-model="dataServiceQueryData.status" clearable>
             <Option v-for="item in query.apiStatusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
 
         <FormItem
-          :label="$t('message.oneService.apiManager.query.commiter')">
+          :label="$t('message.apiService.apiManager.query.commiter')">
           <Input v-model="dataServiceQueryData.commiter"></Input>
         </FormItem>
 
         <FormItem>
           <Button
-            @click="clearBtnClick('apiQueryForm')">{{$t('message.oneService.apiManager.query.clearButtonText')}}</Button>
+            @click="clearBtnClick('apiQueryForm')">{{$t('message.apiService.apiManager.query.clearButtonText')}}</Button>
 
           <Button
             type="primary"
             style="margin-left: 8px"
-            @click="queryBtnClick">{{$t('message.oneService.apiManager.query.buttonText')}}</Button>
+            @click="queryBtnClick">{{$t('message.apiService.apiManager.query.buttonText')}}</Button>
         </FormItem>
       </Form>
     </div>
@@ -74,55 +74,55 @@ export default {
         loading: false,
         titles: [
           {
-            title: this.$t('message.oneService.apiManager.apiTable.apiName'),
+            title: this.$t('message.apiService.apiManager.apiTable.apiName'),
             key: 'apiName'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.apiPath'),
+            title: this.$t('message.apiService.apiManager.apiTable.apiPath'),
             key: 'apiPath'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.status'),
+            title: this.$t('message.apiService.apiManager.apiTable.status'),
             key: 'status',
             align: 'center',
             render: (h, params) => {
               let currentRow = params.row;
               var status = currentRow.status;
               if (0 === status) {
-                return h('div', this.$t('message.oneService.apiStatus.disable'));
+                return h('div', this.$t('message.apiService.apiStatus.disable'));
               } else if (1 === status) {
-                return h('div', this.$t('message.oneService.apiStatus.enable'));
+                return h('div', this.$t('message.apiService.apiStatus.enable'));
               } else {
                 return h('div', '');
               }
             }
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.type'),
+            title: this.$t('message.apiService.apiManager.apiTable.type'),
             key: 'type',
             align: 'center'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.describe'),
+            title: this.$t('message.apiService.apiManager.apiTable.describe'),
             key: 'describe'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.calledCount'),
+            title: this.$t('message.apiService.apiManager.apiTable.calledCount'),
             key: 'calledCount',
             align: 'center'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.responsiblePerson'),
+            title: this.$t('message.apiService.apiManager.apiTable.responsiblePerson'),
             key: 'responsiblePerson',
             align: 'center'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.belongTo'),
+            title: this.$t('message.apiService.apiManager.apiTable.belongTo'),
             key: 'belongTo',
             align: 'center'
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.tag'),
+            title: this.$t('message.apiService.apiManager.apiTable.tag'),
             key: 'tagArr',
             align: 'center',
             render: (h, params) => {
@@ -159,7 +159,7 @@ export default {
             }
           },
           {
-            title: this.$t('message.oneService.apiManager.apiTable.operation.title'),
+            title: this.$t('message.apiService.apiManager.apiTable.operation.title'),
             align: 'center',
             render: (h, params) => {
               let currentRow = params.row;
@@ -181,7 +181,7 @@ export default {
                       this.testApi(currentRow._index, currentRow.id);
                     }
                   }
-                }, this.$t('message.oneService.apiManager.apiTable.operation.test')));
+                }, this.$t('message.apiService.apiManager.apiTable.operation.test')));
 
               btns.push(
                 h('Button', {
@@ -196,7 +196,7 @@ export default {
                       this.copyApi(currentRow._index, currentRow.id);
                     }
                   }
-                }, this.$t('message.oneService.apiManager.apiTable.operation.copy')));
+                }, this.$t('message.apiService.apiManager.apiTable.operation.copy')));
 
               if (1 === status) {
                 btns.push(
@@ -212,7 +212,7 @@ export default {
                         this.disableApi(currentRow._index, currentRow.id);
                       }
                     }
-                  }, this.$t('message.oneService.apiManager.apiTable.operation.disable')));
+                  }, this.$t('message.apiService.apiManager.apiTable.operation.disable')));
               } else if (0 === status) {
                 btns.push(h('Button', {
                   props: {
@@ -226,7 +226,7 @@ export default {
                       this.enableApi(currentRow._index, currentRow.id);
                     }
                   }
-                }, this.$t('message.oneService.apiManager.apiTable.operation.enable')));
+                }, this.$t('message.apiService.apiManager.apiTable.operation.enable')));
               }
 
               // btns.push(
@@ -242,7 +242,7 @@ export default {
               //         this.updateApi(currentRow._index, currentRow.id);
               //       }
               //     }
-              //   }, this.$t('message.oneService.apiManager.apiTable.operation.manager')));
+              //   }, this.$t('message.apiService.apiManager.apiTable.operation.manager')));
 
               return h('div', btns)
             }
@@ -259,11 +259,11 @@ export default {
       query: {
         apiStatusList: [
           {
-            label: this.$t("message.oneService.apiStatus.enable"),
+            label: this.$t("message.apiService.apiStatus.enable"),
             value: 1
           },
           {
-            label: this.$t("message.oneService.apiStatus.disable"),
+            label: this.$t("message.apiService.apiStatus.disable"),
             value: 0
           }
         ],
@@ -320,7 +320,7 @@ export default {
         return;
       }
       this.tableParam.loading = true;
-      api.fetch('/oneservice/search', {
+      api.fetch('/apiservice/search', {
         name: _this.dataServiceQueryData.apiName,
         tag: _this.dataServiceQueryData.tag,
         status: _this.dataServiceQueryData.status,
@@ -355,10 +355,10 @@ export default {
     disableApi(index, id) {
       let _this = this;
       this.$Modal.confirm({
-        title: this.$t("message.oneService.apiManager.apiTable.reconfirm.title"),
-        content: '<p>' + this.$t("message.oneService.apiManager.apiTable.reconfirm.disable") + '</p>',
+        title: this.$t("message.apiService.apiManager.apiTable.reconfirm.title"),
+        content: '<p>' + this.$t("message.apiService.apiManager.apiTable.reconfirm.disable") + '</p>',
         onOk: () => {
-          api.fetch('/oneservice/apiDisable', {
+          api.fetch('/apiservice/apiDisable', {
             id: id
           }, 'get').then((rst) => {
             _this.pageList();
@@ -371,10 +371,10 @@ export default {
     enableApi(index, id) {
       let _this = this;
       this.$Modal.confirm({
-        title: this.$t("message.oneService.apiManager.apiTable.reconfirm.title"),
-        content: '<p>' + this.$t("message.oneService.apiManager.apiTable.reconfirm.enable") + '</p>',
+        title: this.$t("message.apiService.apiManager.apiTable.reconfirm.title"),
+        content: '<p>' + this.$t("message.apiService.apiManager.apiTable.reconfirm.enable") + '</p>',
         onOk: () => {
-          api.fetch('/oneservice/apiEnable', {
+          api.fetch('/apiservice/apiEnable', {
             id: id
           }, 'get').then((rst) => {
             _this.pageList();
@@ -387,7 +387,7 @@ export default {
     testApi(index, id) {
       let _this = this;
       this.$router.push({
-        'path': '/oneService/apiTest',
+        'path': '/apiService/apiTest',
         'query': {
           'scriptPath': _this.tableParam.data[index].scriptPath
         }

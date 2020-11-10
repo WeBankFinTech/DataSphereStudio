@@ -163,7 +163,7 @@
             "workflowDesc": "Workflow description:",
             "inputWorkflowDesc": "Please enter workflow description"
         },
-        "oneService": {
+        "apiService": {
             "title": "Data Service",
             "sideNavList": {
                 "function": {

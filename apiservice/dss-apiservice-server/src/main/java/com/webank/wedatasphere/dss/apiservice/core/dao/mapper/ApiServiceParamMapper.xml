@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.apiservice.core.dao.ApiServiceParamDao">
+    <resultMap id="paramMap" type="ParamVo">
+        <result property="id" column="id"/>
+        <result property="configId" column="config_id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="required" column="required"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <sql id="fields">
+        `config_id`,`version`,`name`,`type`,`required`,`description`
+    </sql>
+
+    <sql id="fields_query">
+        `id`, `config_id`,`version`, `name`,`type`,`required`,`description`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ParamVo">
+        <![CDATA[INSERT INTO `dss_oneservice_param`(]]>
+
+        <include refid="fields"/>
+        <![CDATA[) VALUES(#{configId}, #{version}, #{name}, #{type}, #{required}, #{description})]]>
+    </insert>
+
+    <update id="update">
+        <![CDATA[UPDATE `dss_oneservice_param`]]>
+        <set>
+            <if test="name != null and name != ''">
+                <![CDATA[ `name` = #{name}, ]]>
+            </if>
+            <if test="type != null and type != ''">
+                <![CDATA[ `type` = #{type}, ]]>
+            </if>
+
+            <if test="required != null and required != ''">
+                <![CDATA[ `required` = #{required}, ]]>
+            </if>
+
+            <if test="description != null and description != ''">
+                <![CDATA[ `description` = #{description}, ]]>
+            </if>
+            <![CDATA[ `modify_time` = now() ]]>
+        </set>
+        <where>
+            `id` = #{id}
+        </where>
+    </update>
+
+    <select id="queryByConfigIdAndVersion" resultMap="paramMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_oneservice_param` ]]>
+        <where>
+            `config_id` = #{configId} and `version` = #{version}
+        </where>
+    </select>
+</mapper>

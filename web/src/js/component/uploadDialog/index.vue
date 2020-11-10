@@ -90,7 +90,7 @@ export default {
       if (data.nameList) {
         this.listName = data.nameList;
       }
-      this.uploadData = { path: data.type + this.path };
+      this.uploadData = { path: this.path.startsWith('hdfs://') ? this.path : (data.type + this.path) };
       this.show = true;
       if (data.type === 'file://') {
         this.msg = `(${this.$t('message.uploadDialog.LIMIT2M')})`;
@@ -146,6 +146,7 @@ export default {
           this.refresh();
         }, 800);
       } else {
+        this.isUploading = false;
         this.$Message.warning(response.message);
       }
     },

@@ -1641,7 +1641,7 @@ export default {
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
             this.$Message.success(this.$t('message.process.associaSuccess'));
-            node.params = rst.params;
+            node.params = rst.metadata;
             const params = {
               fileName,
               resourceId: res.resourceId,

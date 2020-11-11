@@ -19,6 +19,7 @@ fi
 
 # 前端放置目录，默认为解压目录
 dss_basepath=$workDir
+base_path='/luban'
 
 #To be compatible with MacOS and Linux
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -75,24 +76,90 @@ dssConf(){
             listen       $dss_web_port;# 访问端口
             server_name  localhost;
             #charset koi8-r;
-            #access_log  /var/log/nginx/host.access.log  main;
-            location /dss/visualis {
-            root   ${dss_basepath}; # 静态文件目录
+            access_log  /var/log/nginx/host.access.log  main;
+            error_log  /var/log/nginx/host.access.log  main;
+
+            location /luban/schedule {
+            port_in_redirect off;
+            proxy_set_header Host $s_host;
+            proxy_set_header X-Real-IP $s_remote_addr;
+            proxy_set_header x_real_ipP $s_remote_addr;
+            proxy_set_header remote_addr $s_remote_addr;
+            proxy_set_header X-Forwarded-For $s_proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_pass $linkis_gateway_url;
+            }
+
+            location /luban/exchangis {
+            port_in_redirect off;
+            proxy_set_header Host $s_host;
+            proxy_set_header X-Real-IP $s_remote_addr;
+            proxy_set_header x_real_ipP $s_remote_addr;
+            proxy_set_header remote_addr $s_remote_addr;
+            proxy_set_header X-Forwarded-For $s_proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_pass $linkis_gateway_url;
+            }
+
+            location /luban/datav {
+            port_in_redirect off;
+            proxy_set_header Host $s_host;
+            proxy_set_header X-Real-IP $s_remote_addr;
+            proxy_set_header x_real_ipP $s_remote_addr;
+            proxy_set_header remote_addr $s_remote_addr;
+            proxy_set_header X-Forwarded-For $s_proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_pass $linkis_gateway_url;
+            }
+
+            location /luban/qualitis {
+            port_in_redirect off;
+            proxy_set_header Host $s_host;
+            proxy_set_header X-Real-IP $s_remote_addr;
+            proxy_set_header x_real_ipP $s_remote_addr;
+            proxy_set_header remote_addr $s_remote_addr;
+            proxy_set_header X-Forwarded-For $s_proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_pass $linkis_gateway_url;
+            }
+
+            location ${base_path}/dss/visualis {
+            alias   ${dss_basepath}/dss/visualis; # 静态文件目录
             autoindex on;
             }
-            location / {
-            root   ${dss_basepath}/dist; # 静态文件目录
+            location ${base_path} {
+            alias  ${dss_basepath}/dist; # 静态文件目录
             index  index.html index.html;
             }
-            location /ws {
-            proxy_pass $linkis_gateway_url;#后端Linkis的地址
+            location ${base_path}/ws {
+            proxy_pass $linkis_gateway_url/ws;#后端Linkis的地址
             proxy_http_version 1.1;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection "upgrade";
             }
 
-            location /api {
-            proxy_pass $linkis_gateway_url; #后端Linkis的地址
+            location ${base_path}/api {
+            proxy_pass $linkis_gateway_url/api; #后端Linkis的地址
             proxy_set_header Host $s_host;
             proxy_set_header X-Real-IP $s_remote_addr;
             proxy_set_header x_real_ipP $s_remote_addr;

@@ -5,4 +5,4 @@ dss_web_port="8088"
 linkis_gateway_url="http://localhost:9001"
 
 #dss nginx ip
-dss_nginx_ip=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'|awk 'NR==1')
+dss_nginx_ip=$(ip addr | awk '/^[0-9]+: / {}; /inet .*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'|awk 'NR==1')

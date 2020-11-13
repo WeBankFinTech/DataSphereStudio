@@ -76,8 +76,8 @@ dssConf(){
             listen       $dss_web_port;# 访问端口
             server_name  localhost;
             #charset koi8-r;
-            access_log  /var/log/nginx/host.access.log  main;
-            error_log  /var/log/nginx/host.access.log  main;
+            access_log  /var/log/nginx/${dss_web_port}.access.log  main;
+            error_log  /var/log/nginx/${dss_web_port}.error.log;
 
             location /luban/schedule {
             port_in_redirect off;
@@ -92,7 +92,7 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass $linkis_gateway_url;
+            proxy_pass http://127.0.0.1:8091;
             }
 
             location /luban/exchangis {
@@ -108,7 +108,7 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass $linkis_gateway_url;
+            proxy_pass http://127.0.0.1:9503;
             }
 
             location /luban/datav {
@@ -124,7 +124,7 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass $linkis_gateway_url;
+            proxy_pass http://127.0.0.1:8000;
             }
 
             location /luban/qualitis {
@@ -140,7 +140,7 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass $linkis_gateway_url;
+            proxy_pass http://127.0.0.1:8090;
             }
 
             location ${base_path}/dss/visualis {

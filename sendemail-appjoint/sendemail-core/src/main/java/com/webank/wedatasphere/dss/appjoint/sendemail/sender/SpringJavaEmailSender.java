@@ -47,13 +47,20 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
         javaMailSender.setProtocol(SendEmailAppJointConfiguration.EMAIL_PROTOCOL().getValue());
         javaMailSender.setUsername(SendEmailAppJointConfiguration.EMAIL_USERNAME().getValue());
         javaMailSender.setPassword(SendEmailAppJointConfiguration.EMAIL_PASSWORD().getValue());
+        javaMailSender.setDefaultEncoding("UTF-8");
         try {
             Properties prop = new Properties();
             prop.put("mail.smtp.auth", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_AUTH().getValue()));
-            prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
-            prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
+           // prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
+           // prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
             prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(SendEmailAppJointConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
             prop.put("mail.smtp.timeout", Integer.parseInt(SendEmailAppJointConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
+            prop.put("mail.smtp.port", SendEmailAppJointConfiguration.EMAIL_PORT().getValue());//设置端口
+            prop.put("mail.smtp.socketFactory.port", SendEmailAppJointConfiguration.EMAIL_PORT().getValue());//设置ssl端口
+            prop.put("mail.smtp.socketFactory.fallback", "false");
+            prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            prop.put("mail.debug", "true");//启用调试
+
             javaMailSender.setJavaMailProperties(prop);
         } catch (Exception e) {
             logger.error("Failed to read mail properties, roll back to default values.", e);

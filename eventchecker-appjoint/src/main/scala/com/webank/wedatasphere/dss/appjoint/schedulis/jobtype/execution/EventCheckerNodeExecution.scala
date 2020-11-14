@@ -125,7 +125,7 @@ class  EventCheckerNodeExecution extends  LongTermNodeExecution  with   AppJoint
             Utils.tryFinally {
               resultSetWriter.addMetaData(null)
               resultSetWriter.addRecord(new LineRecord(action.saveKeyAndValue))
-            }(IOUtils.closeQuietly(resultSetWriter))
+            }(Utils.tryQuietly(resultSetWriter.close()))
           }
           response.setIsSucceed(true)
         }else{

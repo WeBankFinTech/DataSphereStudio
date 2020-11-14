@@ -69,7 +69,6 @@ class AppJointEntranceJob extends EntranceExecutionJob{
     info(s"$getId starts to run")
     getLogListener.foreach(_.onLogUpdate(this, LogUtils.generateInfo(s"$getId starts to execute.")))
     startTime = System.currentTimeMillis
-    Utils.tryAndErrorMsg(transition(Running))(s"transition $getId from Scheduler to Running failed.")
     getExecutor match {
       case appjointEntranceEngine:AppJointEntranceEngine => appjointEntranceEngine.setJob(this)
         appjointEntranceEngine.setInstance(Sender.getThisInstance)

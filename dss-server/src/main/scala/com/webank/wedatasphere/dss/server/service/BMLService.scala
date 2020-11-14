@@ -99,7 +99,7 @@ class BMLService {
   }
 
   private def inputstremToString(inputStream: InputStream): String = {
-    scala.io.Source.fromInputStream(inputStream).mkString
+    scala.io.Source.fromInputStream(inputStream,"UTF-8").mkString
   }
 
   private def createBMLClient(userName: String): BmlClient = {

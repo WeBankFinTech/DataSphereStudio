@@ -27,6 +27,7 @@ import com.webank.wedatasphere.linkis.common.utils.Utils
 import com.webank.wedatasphere.linkis.entrance.execute.StorePathExecuteRequest
 import com.webank.wedatasphere.linkis.entrance.job.EntranceExecutionJob
 import com.webank.wedatasphere.linkis.protocol.query.RequestPersistTask
+import com.webank.wedatasphere.linkis.rpc.Sender
 import com.webank.wedatasphere.linkis.scheduler.executer._
 import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEventState._
 import org.apache.commons.lang.StringUtils
@@ -71,7 +72,9 @@ class AppJointEntranceJob extends EntranceExecutionJob{
     Utils.tryAndErrorMsg(transition(Running))(s"transition $getId from Scheduler to Running failed.")
     getExecutor match {
       case appjointEntranceEngine:AppJointEntranceEngine => appjointEntranceEngine.setJob(this)
+        appjointEntranceEngine.setInstance(Sender.getThisInstance)
     }
+    Utils.tryAndErrorMsg(transition(Running))(s"transition $getId from Scheduler to Running failed.")
     val rs = Utils.tryCatch(getExecutor.execute(jobToExecuteRequest())){
       case e:ErrorException => logger.error(s"execute job $getId failed", e)
         ErrorExecuteResponse(s"execute job $getId failed", e)

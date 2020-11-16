@@ -4,7 +4,7 @@ mysql_ip=
 mysql_user=
 mysql_pwd=
 linkis_database=
-dss_domain=https://ai.luban.cn:8088/luban
+dss_domain=
 
 mysql -h$mysql_ip -u$mysql_user -p$mysql_pwd -e "
 use $linkis_database;

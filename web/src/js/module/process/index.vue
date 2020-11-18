@@ -53,7 +53,7 @@
           <Ide
             v-if="item.type === 'IDE'"
             v-show="index===active"
-            :key="index"
+            :key="'IDE'+item.key"
             :parameters="item.data"
             :node="item.node"
             :in-flows-index="index"

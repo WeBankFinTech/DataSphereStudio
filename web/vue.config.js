@@ -29,8 +29,8 @@ const getVersion = () => {
   return pkg.version;
 }
 
-const host = "ai.ctyun.cn";
-const port = "8088";
+const host = "saas.ctyun.cn";
+const port = "443";
 
 module.exports = {
   publicPath: process.env.VUE_APP_PREFIX,
@@ -49,9 +49,10 @@ module.exports = {
         target: `https://${host}:${port}`,  //后端服务地址
         ws: true,
         changeOrigin: true,
-        pathRewrite: {
-          '^/luban/api/rest_j/v1': '/luban/api/rest_j/v1'
-        }
+        // pathRewrite: {
+        //   '^/luban/api/rest_j/v1': '/luban/api/rest_j/v1'
+        // },
+        logLevel: "debug"
       },
       '^/luban/ws/api': {    //websocket
         target: `wss://${host}:${port}`,

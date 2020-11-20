@@ -1,5 +1,6 @@
 <template>
   <div class="iframeClass">
+    
     <iframe
       class="iframeClass"
       v-if="isRefresh"
@@ -7,7 +8,10 @@
       :src="visualSrc"
       frameborder="0"
       width="100%"
+      @load="loading=false"
       :height="height"/>
+
+    <Spin size="large" fix v-if="loading"></Spin>
   </div>
 </template>
 <script>
@@ -17,7 +21,8 @@ export default {
     return {
       height: 0,
       visualSrc: '',
-      isRefresh: true
+      isRefresh: true,
+      loading: true,
     };
   },
   watch: {
@@ -53,8 +58,10 @@ export default {
       this.visualSrc = util.replaceHolder(url, {
         projectId: appJointProjectId
       });
+      this.loading = true;
     },
     reload() {
+      this.loading = true;
       this.isRefresh = false;
       this.$nextTick(() => this.isRefresh = true);
     }

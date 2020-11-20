@@ -79,7 +79,7 @@ dssConf(){
             access_log  /var/log/nginx/${dss_web_port}.access.log  main;
             error_log  /var/log/nginx/${dss_web_port}.error.log;
 
-            location /luban/schedule {
+            location /luban/schedule/ {
             port_in_redirect off;
             proxy_set_header Host $s_host;
             proxy_set_header X-Real-IP $s_remote_addr;
@@ -92,10 +92,24 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass http://127.0.0.1:8091;
+            proxy_pass http://127.0.0.1:8091/;
             }
 
-            location /luban/exchangis {
+            location /api/v1 {
+            proxy_set_header Host $host;
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_pass http://127.0.0.1:9503;
+            }
+
+            location /luban/exchangis/ {
             port_in_redirect off;
             proxy_set_header Host $s_host;
             proxy_set_header X-Real-IP $s_remote_addr;
@@ -108,7 +122,7 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass http://127.0.0.1:9503;
+            proxy_pass http://127.0.0.1:9503/;
             }
 
             location /luban/datav {
@@ -127,7 +141,7 @@ dssConf(){
             proxy_pass http://127.0.0.1:8000;
             }
 
-            location /luban/qualitis {
+            location /luban/qualitis/ {
             port_in_redirect off;
             proxy_set_header Host $s_host;
             proxy_set_header X-Real-IP $s_remote_addr;
@@ -140,17 +154,25 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
-            proxy_pass http://127.0.0.1:8090;
+            proxy_pass http://127.0.0.1:8090/;
             }
 
-            location ${base_path}/dss/visualis {
-            alias   ${dss_basepath}/dss/visualis; # 静态文件目录
-            autoindex on;
+            location /luban/ttyd {
+            port_in_redirect off;
+            proxy_set_header Host $s_host;
+            proxy_set_header X-Real-IP $s_remote_addr;
+            proxy_set_header x_real_ipP $s_remote_addr;
+            proxy_set_header remote_addr $s_remote_addr;
+            proxy_set_header X-Forwarded-For $s_proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $s_http_upgrade;
+            proxy_set_header Connection upgrade;
+            proxy_pass http://127.0.0.1:8088;
             }
-            location ${base_path} {
-            alias  ${dss_basepath}/dist; # 静态文件目录
-            index  index.html index.html;
-            }
+
             location ${base_path}/ws {
             proxy_pass $linkis_gateway_url/ws;#后端Linkis的地址
             proxy_http_version 1.1;
@@ -171,6 +193,15 @@ dssConf(){
             proxy_send_timeout 12s;
             proxy_set_header Upgrade $s_http_upgrade;
             proxy_set_header Connection upgrade;
+            }
+
+            location ${base_path}/dss/visualis {
+            alias   ${dss_basepath}/dss/visualis; # 静态文件目录
+            autoindex on;
+            }
+            location ${base_path} {
+            alias  ${dss_basepath}/dist; # 静态文件目录
+            index  index.html index.html;
             }
 
             #error_page  404              /404.html;

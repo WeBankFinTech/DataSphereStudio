@@ -17,9 +17,10 @@
 
 package com.webank.wedatasphere.dss.server.service
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{BufferedReader, ByteArrayInputStream, InputStream, InputStreamReader}
 import java.util
 import java.util.UUID
+import java.util.stream.Collectors
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.linkis.bml.client.{BmlClient, BmlClientFactory}
@@ -99,7 +100,9 @@ class BMLService {
   }
 
   private def inputstremToString(inputStream: InputStream): String = {
-    scala.io.Source.fromInputStream(inputStream).mkString
+    // 中文问题
+//    scala.io.Source.fromInputStream(inputStream).mkString
+    new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"))
   }
 
   private def createBMLClient(userName: String): BmlClient = {

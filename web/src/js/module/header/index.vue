@@ -24,7 +24,7 @@
 
           <span>{{$t('message.header.appName')}}</span>
         </div>
-        <span>v1.0.0</span>
+        <span>v1.0.1</span>
       </div>
       <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
       <span

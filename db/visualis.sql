@@ -9,26 +9,5 @@ UPDATE `dss_workflow_node` SET jump_url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_N
 INSERT INTO `linkis_application` (`id`, `name`, `chinese_name`, `description`) VALUES (NULL, 'visualis', NULL, NULL);
 select @application_id:=id from `linkis_application` where `name` = 'visualis';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+SELECT @data_ana_onestopid:=id from dss_onestop_menu WHERE `name` = '数据分析';
+INSERT INTO dss_onestop_menu_application (id, application_id, onestop_menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user) VALUES (NULL, @visualis_appid, @data_ana_onestopid,'Visualis','Visualis','Visualis is a data visualization BI tool based on Davinci, with Linkis as the kernel, it supports the analysis mode of data development exploration.','Visualis支持拖拽式报表定义、图表联动、钻取、全局筛选、多维分析、实时查询等数据开发探索的分析模式，并做了水印、数据质量校验等金融级增强。','visualization, statement','可视化,报表',1,'enter Visualis','进入Visualis','user manual','用户手册','https://www.ctyun.cn','fi-visualis|rgb(0, 153, 255)',NULL,NULL,NULL,NULL,NULL);

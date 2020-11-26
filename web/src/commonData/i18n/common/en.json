@@ -85,7 +85,7 @@
             "infoHeader": "Welcome to Feilong.Luban !",
             "infoBodyFirstRow": "Luban is a one-stop portal focusing on development and management of data application, as a part of Luban -- the big data platform of Ctyun.",
             "infoBodyFirstSubtitle":"The mechanism, the philosophy of Numbers",
-            "infoBodySecondRow": "Based on Linkis computation middleware, it's able to easily integrate various data application systems, making the development of data application easier and simpler.",
+            "infoBodySecondRow": "At present, the core open source products of The integration in Lubuntu include Apache Hadoop 3.2.1, support storage EC and other excellent features, Apache Spark 3.0.1, support dynamic resource tuning and provide higher performance, and WeDataSphere DSS 0.9.0, Linkis 0.9.4 and other products jointly created by WeDataSphere DSS open source and jointly created by Webank, which are equipped with finance-level data development, fine-granularity resource management and control and other capabilities.",
             "workspace": "Workspace",
             "appTitle": "Application Navigation",
             "applicationStudio": "Business Application Development",

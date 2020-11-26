@@ -1,6 +1,7 @@
 <template>
   <div class="iframeClass">
-    <iframe class="iframeClass" id="iframe" :src="visualSrc" frameborder="0" width="100%" height="100%" />
+    <iframe class="iframeClass" @load="loading=false" id="iframe" :src="visualSrc" frameborder="0" width="100%" height="100%" />
+    <Spin size="large" fix v-if="loading"></Spin>
   </div>
 </template>
 <script>
@@ -22,6 +23,7 @@ export default {
     return {
       height: 1200,
       visualSrc: '',
+      loading: true
     };
   },
   mounted() {
@@ -45,6 +47,7 @@ export default {
           nodeName: this.node.title
         });
         this.visualSrc = url;
+        this.loading = true;
       })
 
     },

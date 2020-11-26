@@ -1,0 +1,314 @@
+<template>
+  <div class="container">
+    <Card class="detail-card">
+      <p slot="title">
+        <Icon type="md-arrow-round-back" class="back-icon" @click="$router.go(-1)"/>
+        {{ $t('message.newsNotice.detail.title') }}
+      </p>
+      <Collapse v-model="panelAction">
+        <Panel v-for="(item, index) in notifyList" :key="index" :name="`notify_${index}`">
+          <span slot="">
+            <span style="padding-right: 15px;">{{ parseTime(item.createdTime) }}</span>
+            <span>{{ item.woSubject }}</span>
+          </span>
+          <div slot="content" class="panel-detail">
+            <Row>
+              <Col>
+              <div class="item-title">{{ $t('message.newsNotice.detail.detailForm.status') }}</div>
+              <div>{{ item.statusName }}</div>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+              <div class="item-title">{{ $t('message.newsNotice.detail.detailForm.woDesc') }}</div>
+              <div>{{ item.woDesc }}</div>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+              <div class="item-title">{{ $t('message.newsNotice.detail.detailForm.resolvedResult') }}</div>
+              <div>
+                {{ item.resolvedResult? item.resolvedResult : $t('message.newsNotice.detail.emptyText') }}
+              </div>
+              </Col>
+            </Row>
+          </div>
+        </Panel>
+      </Collapse>
+      <Row class="attach">
+        <Col>
+        <div class="item-title">{{ $t('message.newsNotice.detail.detailForm.attach') }}</div>
+        <div>
+          <div
+            v-for="(item, index) in attachList"
+            :key="index"
+            class="attach-item"
+          >
+            <span class="attach-item-name" @click="downLoadFile(item)">
+              {{item.filename}}
+            </span>
+            <Icon type="md-trash" @click="deleteFile(item)" style="cursor: pointer;" />
+          </div>
+        </div>
+        </Col>
+      </Row>
+    </Card>
+    <div class="footer">
+      <div class="btn">
+        <Button type="primary" size="large" style="margin-right: 10px;" :disabled="appendDisabled" @click="openFeedback">{{ $t('message.newsNotice.detail.appendFeedback') }}</Button>
+        <Button type="success" size="large" @click="openResloved" :disabled="reslovedDisabled" :loading="reslovedLoading">{{ $t('message.newsNotice.detail.resloved') }}</Button>
+      </div>
+    </div>
+    <FeedBackDialog
+      ref="feedBackForm"
+      :action-type="feedBackActionType"
+      :feedBackFormShow="feedBackShow"
+      :feedBackType="feedBackType"
+      :issueId="Number(issueId)"
+      source="detail"
+      @show="feedBackShowAction"
+      @refresh-detail="getNotifyDetail"
+    />
+    <Spin fix v-if="loading"></Spin>
+  </div>
+</template>
+<script>
+// import wangEditor from '@/js/component/wangEditor/index.vue'
+import axios from 'axios';
+import { isEmpty } from 'lodash';
+import storage from '@/js/helper/storage';
+import moment from 'moment';
+import module from '../index';
+import api from '@/js/service/api';
+import FeedBackDialog from '@/js/module/feedBack/index.vue';
+
+export default {
+  name: 'Detail',
+  components: {
+    // wangEditor,
+    FeedBackDialog
+  },
+  data() {
+    return {
+      loading: false,
+      notifyList: [],
+      attachList: [],
+      issueId: null,
+      panelAction: '',
+      feedBackShow: false,
+      feedBackActionType: '',
+      feedBackType: '',
+      userName: '',
+      url: module.data.API_PATH,
+      reslovedDisabled: true,
+      reslovedLoading: false,
+      appendDisabled: true,
+    };
+  },
+  created() {
+    this.issueId = this.$route.query.id;
+    const issueStatus = this.$route.query.status;
+    // 状态为处理中和已处理
+    if (issueStatus === 'istatus.processing' || issueStatus === 'istatus.resolved') {
+      this.appendDisabled = false;
+    }
+    // 状态为已处理
+    if (issueStatus === 'istatus.resolved') {
+      this.reslovedDisabled = false;
+    }
+    const userInfo = storage.get('userInfo');
+    this.userName = userInfo.basic.username;
+  },
+  mounted() {
+    this.initData();
+  },
+  methods: {
+    initData() {
+      this.getNotifyDetail();
+    },
+    getNotifyDetail() {
+      this.loading = true;
+      api.fetch(`${this.url}userFeedBacks/${this.issueId}/details`, { username: this.userName }, 'get').then((data) => {
+        if (!isEmpty(data.workOrderList)) {
+          this.notifyList = data.workOrderList;
+          this.panelAction = `notify_${this.notifyList.length - 1}`;
+        }
+        if (!isEmpty(data.attachList)) {
+          this.attachList = data.attachList;
+        }
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      });
+    },
+    // 追加反馈
+    openFeedback() {
+      // 判断能否追加反馈
+      api.fetch(`${this.url}userFeedBacks/${this.issueId}/judgeFeedBack`, { username: this.userName }, 'get').then((data) => {
+        if (data) {
+          this.feedBackActionType = 'append';
+          this.feedBackType = 'itype.luban.functionAdvice';
+          this.feedBackShow = true;
+        } else {
+          this.$Modal.warning({
+            title: this.$t('message.newsNotice.confirm.title'),
+            content: this.$t('message.newsNotice.confirm.judgeFeedBackContent')
+          });
+        }
+      }).catch((err) => {
+        this.$Message.error(err.message);
+      });
+    },
+    // 确认已解决
+    openResloved() {
+      this.$Modal.confirm({
+        title: this.$t('message.newsNotice.confirm.title'),
+        content: this.$t('message.newsNotice.confirm.reslovedContent'),
+        onOk: () => {
+          // 确认解决接口
+          this.reslovedLoading = true;
+          api.fetch(`${this.url}issues/${this.issueId}/close`, { closeReason: 'luban', status: 'istatus.closed', tableName: 0 }, 'put').then((data) => {
+            if (data) {
+              this.appendDisabled = true;
+              this.reslovedDisabled = true;
+              this.reslovedLoading = false;
+              this.$bus.$emit('pendin-news-count');
+              this.$Message.success(this.$t('message.newsNotice.success.reslovedMsg'));
+              // this.getNotifyDetail();
+              this.$router.go(-1);
+            }
+          }).catch(() => {
+            this.appendDisabled = false;
+            this.reslovedLoading = false;
+          });
+        },
+        onCancel: () => {
+        },
+      });
+    },
+    feedBackShowAction(val) {
+      this.feedBackShow = val;
+    },
+    downLoadFile(file) {
+      axios.get(`${this.url}issues/files/${file.fileId}`, {
+        responseType: 'blob',
+        headers: { 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjpudWxsLCJwaG9uZSI6IjE3NzE3MjkxMzQxIiwicm9sZXMiOiJzdXBlclVzZXIiLCJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjI4NzUxNTg0LCJuYmYiOjE1OTcyMTU1ODR9.XxG57DsnayGZY_J90gIpyRrMe5x95lKf9hzJh320XmM' }
+      }).then((response) => {
+        const link = document.createElement('a');
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+        link.href = window.URL.createObjectURL(blob);
+        link.download = file.filename;
+        let event = null;
+        if (window.MouseEvent) {
+          event = new MouseEvent('click');
+        } else {
+          event = document.createEvent('MouseEvents');
+        }
+        const flag = link.dispatchEvent(event);
+        this.$nextTick(() => {
+          if (flag) {
+            this.$Message.success(this.$t('message.workBench.body.script.history.success.download'));
+          }
+        });
+      }).catch((err) => {
+        this.$Message.error(err.message);
+      });
+    },
+    deleteFile(file) {
+      this.$Modal.confirm({
+        title: this.$t('message.newsNotice.confirm.title'),
+        content: this.$t('message.newsNotice.confirm.deleteFile'),
+        onOk: () => {
+          api.fetch(`${this.url}issues/${this.issueId}/files/${file.fileId}`, { username: this.userName }, 'delete').then((data) => {
+            if (data) {
+              this.$Message.success(this.$t('message.newsNotice.success.attachMsg'));
+              this.getNotifyDetail();
+            }
+          });
+        },
+        onCancel: () => {
+        },
+      });
+    },
+    parseTime(time) {
+      let newDate = '';
+      if (time && time.toString().length === 13) {
+        const date = new Date(parseInt(time));
+        newDate = moment(date).format('YYYY-MM-DD');
+      } else if (time && time.toString().indexOf('T') > 0) {
+        const date = new Date(time).toJSON();
+        newDate = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');
+      }
+      return newDate;
+    },
+  },
+};
+</script>
+<style lang="scss" scoped>
+.container {
+  background: #f7f7f7;
+  height: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
+  .detail-card {
+    margin-bottom: 50px;
+    .back-icon {
+      position: relative;
+      margin-bottom: 3px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .panel-detail .ivu-col > div:nth-child(2) {
+      font-size: 12px;
+    }
+  }
+  padding: 20px;
+  /deep/ .ivu-row {
+    line-height: 32px;
+  }
+  .item-title {
+    font-weight: bold;
+  }
+  .attach {
+    margin: 8px 15px;
+  }
+  .attach-item {
+    display: inline-block;
+    padding-right: 15px;
+    padding-bottom: 8px;
+    .attach-item-name {
+      color: #2d8cf0;
+      padding-right: 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+  }
+  .footer {
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 60px;
+    padding: 0 20px 0 280px;
+    line-height: 60px;
+    background: #ffffff;
+    box-shadow: 0 -2px 4px rgba(0, 21, 41, 0.08);
+    z-index: 500;
+    .btn {
+      width: 100%;
+      margin-bottom: 10px;
+      text-align: right;
+    }
+  }
+}
+/deep/ .vertical-center-modal{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ivu-modal{
+    top: 0;
+  }
+}
+</style>

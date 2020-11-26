@@ -290,10 +290,8 @@ export default {
       params.pageNum = this.page.current;
       params.pageSize = this.page.size;
       params.username = this.userName;
-      console.log('-----查询参数---', params);
       this.loading = true;
       api.fetch(`${this.url}userFeedBacks/search`, params, 'post').then((data) => {
-        console.log('-----列表数据---', data);
         this.noticeList = data.list;
         this.page.total = data.total;
         this.loading = false;

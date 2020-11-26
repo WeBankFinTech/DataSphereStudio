@@ -73,7 +73,6 @@
   </div>
 </template>
 <script>
-// import wangEditor from '@/js/component/wangEditor/index.vue'
 import axios from 'axios';
 import { isEmpty } from 'lodash';
 import storage from '@/js/helper/storage';
@@ -85,7 +84,6 @@ import FeedBackDialog from '@/js/module/feedBack/index.vue';
 export default {
   name: 'Detail',
   components: {
-    // wangEditor,
     FeedBackDialog
   },
   data() {

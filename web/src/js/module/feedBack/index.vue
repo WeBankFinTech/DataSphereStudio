@@ -26,10 +26,6 @@
               <Poptip trigger="hover" word-wrap width="200" title="" :content="item.content" placement="bottom">
                 <div style="text-align: center; font-size: 14px;">{{ item.title }}</div>
               </Poptip>
-              <!-- <div style="text-align: center; font-size: 16px; font-weight: 700;">{{ item.title }}</div>
-              <Poptip trigger="hover" word-wrap width="200" title="" :content="item.content" placement="bottom">
-                <div class="card-content">{{ item.content }}</div>
-              </Poptip> -->
             </Card>
           </div>
           </Col>
@@ -44,7 +40,6 @@
         :label="$t('message.feedBack.pdesc')"
         prop="pdesc">
         <Input v-model="feedBackForm.pdesc" type="textarea" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
-        <!-- <Input v-model="feedBackForm.description" type="textarea" :autosize="{minRows: 2,maxRows: 5}" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" /> -->
       </FormItem>
       <FormItem>
         <Upload
@@ -92,10 +87,8 @@ import api from '@/js/service/api';
 import util from '@/js/util';
 import module from './index';
 import axios from 'axios';
-// import wangEditor from '@/js/component/wangEditor/index.vue'
 const FILE_TYPE = ['jpg', 'png', 'gif', 'pdf', 'doc', 'docx', 'zip'];
 export default {
-  // name: 'FeedBackForm',
   props: {
     feedBackFormShow: {
       type: Boolean,

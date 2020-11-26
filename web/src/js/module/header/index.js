@@ -18,5 +18,9 @@
 export default {
   name: 'Header',
   component: () => import('./index.vue'),
+  data: {
+    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `${window.location.protocol}//${window.location.host}/operationApi/`,
+    // API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `${window.location.protocol}//${window.location.host}/testApi/`,
+  },
   dispatchs: ['Footer:getRunningJob', 'IndexedDB:deleteDb'],
 };

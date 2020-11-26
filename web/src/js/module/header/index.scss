@@ -162,6 +162,7 @@
       }
 
       .user-menu-item {
+        position: relative;
         list-style: none;
         padding-left: 20px;
         height: 40px;
@@ -179,6 +180,49 @@
         .user-menu-item-icon {
           font-size: 16px;
           font-weight: bold;
+        }
+        
+        .pending-news {
+          position: relative;
+          width: 80px;
+          top: 18px !important;
+          left: 18px !important;
+          .ivu-poptip-content {
+            width: 80px;
+          }
+          .ivu-poptip-body {
+            padding: 0;
+          }
+          .pending-news-content {
+            color: #333;
+            &:hover {
+              color: #2d8cf0;
+            }
+          }
+        }
+        .pending-news-count {
+          position: absolute;
+          top: -32px;
+          left: -17px;
+          font-size: 12px;
+          font-weight: bold;
+          color: #ed4014;
+        }
+        .blink-icon {
+          color: #ed4014;
+          animation:fade 1.5s infinite;
+          -webkit-animation:fade 1.5s infinite;
+        }
+        @keyframes fade {
+          from { opacity: 1.0; }
+          50% { opacity: 0.4; }
+          to { opacity: 1.0; }
+        }
+        
+        @-webkit-keyframes fade {
+          from { opacity: 1.0; }
+          50% { opacity: 0.4; }
+          to { opacity: 1.0; }
         }
       }
     }

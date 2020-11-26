@@ -183,6 +183,57 @@ const router = new VueRouter({
           },
           ],
         },
+        {
+          path: 'newsNotice',
+          name: 'NewsNotice',
+          meta: {
+            title: 'newsNotice',
+            publicPage: true,
+          },
+          component: () => import('../module/newsNotice/index.vue'),
+          children: [{
+            name: 'Detail',
+            path: 'detail',
+            component: () => import('../module/newsNotice/detail/Detail.vue'),
+            meta: {
+              title: 'notifyDetail',
+              publicPage: true,
+            },
+          }]
+          // path: 'newsNotice',
+          // name: 'NewsNotice',
+          // meta: {
+          //   title: 'newsNotice',
+          //   publicPage: true,
+          // },
+          // component: () => import('../module/newsNotice/index.vue'),
+          // children: [{
+          //   // path: 'detail/:id(\\d+)',
+          //   name: 'Detail',
+          //   path: 'detail',
+          //   component: () => import('../module/newsNotice/Detail.vue'),
+          //   meta: {
+          //     title: 'detail',
+          //     publicPage: true,
+          //   },
+          // },
+          // ],
+        },
+        {
+          // path: 'detail/:id(\\d+)',
+          path: 'noticeDetail',
+          name: 'NoticeDetail',
+          component: () => import('../module/newsNotice/detail/Detail.vue'),
+          meta: {
+            title: 'notifyDetail',
+            publicPage: true,
+          },
+        },
+        {
+          path: '/redirect/:path*',
+          hidden: true,
+          component: () => import('../view/redirect/index')
+        }
       ],
     },
     {
@@ -249,25 +300,26 @@ router.beforeEach((to, from, next) => {
         }
       }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
-    } else if (to.path === '/newhome') {
+    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail') {
       next()
     } else {
-      if (userInfo.basic && userInfo.basic.status === 0) {
-        Modal.confirm({
-          title: '开通资源',
-          content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
-          okText: '去开通',
-          cancelText: '再看看案例和入门',
-          onOk: () => {
-            window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
-          },
-          onCancel: () => {
-            console.log('Clicked cancel');
-          }
-        });
-      } else {
-        next()
-      }
+      // if (userInfo.basic && userInfo.basic.status === 0) {
+      //   Modal.confirm({
+      //     title: '开通资源',
+      //     content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+      //     okText: '去开通',
+      //     cancelText: '再看看案例和入门',
+      //     onOk: () => {
+      //       window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+      //     },
+      //     onCancel: () => {
+      //       console.log('Clicked cancel');
+      //     }
+      //   });
+      // } else {
+      //   next()
+      // }
+      next()
     }
 
   }else {

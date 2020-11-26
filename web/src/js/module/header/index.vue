@@ -75,7 +75,9 @@
           class="user-icon"/>
         <userMenu
           v-show="isUserMenuShow"
-          @clear-session="clearSession"/>
+          :pendingNewsCount="pendingNewsCount"
+          @clear-session="clearSession"
+        />
       </div>
       <div
         class="icon-group">
@@ -110,9 +112,10 @@ import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import userMenu from './userMenu.vue';
 import workspaceMenu from './workspaceMenu';
-import clickoutside from '@js/helper/clickoutside';
-import navMenu from '@/js/component/navMenu/index.vue'
-import weMenu from '@/js/component/menu/index.vue'
+import clickoutside from '@/js/helper/clickoutside';
+import navMenu from '@/js/component/navMenu/index.vue';
+import weMenu from '@/js/component/menu/index.vue';
+import module from './index';
 export default {
   directives: {
     clickoutside,
@@ -130,14 +133,21 @@ export default {
       currentProject: {},
       projectList: [],
       workspaces: [],
-      isSandbox: process.env.NODE_ENV === 'sandbox'
+      isSandbox: process.env.NODE_ENV === 'sandbox',
+      pendingNewsCount: 0,
     };
   },
   created() {
     this.init();
   },
   mounted() {
+    this.$bus.$on('pendin-news-count', () => {
+      this.getPendingNewsCount();
+    });
     this.getCurrentProject();
+  },
+  beforeDestroy() {
+    this.$bus.$off('pendin-news-count');
   },
   computed: {
     moudleName() {
@@ -175,7 +185,7 @@ export default {
           storage.set('userInfo', rst.userInfo);
           // window.$Wa.setParam('openId', rst.userInfo.basic.userName);
           this.$router.app.$emit('username', rst.userInfo.basic.username);
-
+          this.getPendingNewsCount();
           this.$emit('set-init');
         }
         this.getWorkSpace();
@@ -185,6 +195,13 @@ export default {
       api.fetch(`/dss/workspaces`, 'get').then(rst=>{
         if (!isEmpty(rst)) {
           this.workspaces = rst.workspaces;
+        }
+      })
+    },
+    getPendingNewsCount() {
+      api.fetch(`${module.data.API_PATH}userFeedBacks/commission`, { username: this.userName }, 'get').then((rst) => {
+        if (rst > 0) {
+          this.pendingNewsCount = rst;
         }
       })
     },
@@ -281,7 +298,7 @@ export default {
     },
     changeWorkspace(data){
       this.$router.push({query: Object.assign({}, this.$route.query, {workspaceId: data.id})});
-    }
+    },
   },
 };
 </script>

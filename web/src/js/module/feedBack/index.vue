@@ -14,12 +14,12 @@
       :model="feedBackForm"
       :rules="formValid"
       label-position="right"
-      label-width="80"
+      :label-width="80"
       class="form-content">
       <FormItem
         :label="$t('message.feedBack.submitType')"
         prop="submitType">
-        <Row type="flex" justify="left">
+        <Row type="flex" justify="start">
           <Col span="3" v-for="(item, index) in submitTypeList" :key="index" :offset="index!==0? 1 : 0">
           <div @click="selectSubmitType(item)">
             <Card :class="submitTypeStyle(item.code)">

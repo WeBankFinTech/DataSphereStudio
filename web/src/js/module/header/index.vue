@@ -81,6 +81,11 @@
       </div>
       <div
         class="icon-group">
+        <span @click="gotoNewsNotice">
+          <Badge :count="pendingNewsCount">
+            <Icon type="ios-notifications-outline"></Icon>
+          </Badge>
+        </span>
         <!-- <Icon
           v-if="isSandbox"
           title="freedback"
@@ -299,6 +304,15 @@ export default {
     changeWorkspace(data){
       this.$router.push({query: Object.assign({}, this.$route.query, {workspaceId: data.id})});
     },
+    gotoNewsNotice() {
+      this.$router.replace({
+        path: '/redirect/newsNotice',
+        query: {
+          menuName: this.$t('message.navMune.newsNotice'),
+          status: 'istatus.resolved'
+        }
+      });
+    }
   },
 };
 </script>

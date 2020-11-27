@@ -30,7 +30,7 @@
             <span v-if="row.status === 'istatus.resolved'">
               <img
                 style="width: 25px;"
-                src="../../../assets/images/new.gif"/>
+                src="../../../assets/images/message.svg"/>
             </span>
           </template>
           <template slot-scope="{ row }" slot="createdTime">
@@ -95,6 +95,7 @@ import moment from 'moment';
 import module from './index';
 import api from '@/js/service/api';
 import FeedBackDialog from '../feedBack/index.vue';
+import { Transform } from 'stream';
 
 export default {
   name: 'NewsNotice',
@@ -103,21 +104,16 @@ export default {
   },
   data() {
     this.statusOptions = [
-      { label: this.$t('message.newsNotice.statusType.processing'), value: 'istatus.processing' },
-      { label: this.$t('message.newsNotice.statusType.processed'), value: 'istatus.resolved' },
-      { label: this.$t('message.newsNotice.statusType.resloved'), value: 'istatus.closed_isDelete0' },
-      { label: this.$t('message.newsNotice.statusType.closed'), value: 'istatus.closed_isDelete1' },
+      { label: this.$t('message.newsNotice.statusType.processing'), value: 'istatus.processing', selected: false },
+      { label: this.$t('message.newsNotice.statusType.processed'), value: 'istatus.resolved', selected: false },
+      { label: this.$t('message.newsNotice.statusType.resloved'), value: 'istatus.closed_isDelete0', selected: false },
+      { label: this.$t('message.newsNotice.statusType.closed'), value: 'istatus.closed_isDelete1', selected: false },
     ];
     this.dateOptions = {
       disabledDate (date) {
         return date && date.valueOf() > Date.now();
       }
     };
-    // this.operate = [
-    //   { name: this.$t('message.newsNotice.columns.operate.button.detail'), value: 'detail', click: this.gotoDetail },
-    //   { name: this.$t('message.newsNotice.columns.operate.button.recall'), value: 'recall', click: this.handleRecall },
-    //   { name: this.$t('message.newsNotice.columns.operate.button.appendFeedBack'), value: 'appendFeedBack', click: this.openFeedBack }
-    // ];
     this.columns = [
       {
         // title: null,
@@ -147,47 +143,49 @@ export default {
             h('span', {
               style: { paddingRight: '6px' }
             }, '状态'),
-            h('Select', {
-              style: { width: '290px', textAlign: 'left' },
+            h('Poptip', {
               props: {
-                // value: params.row.statusName, // 获取选择的下拉框的值
-                size: 'small',
-                multiple: true
-              },
-              on: {
-                'on-change': e => {
-                  this.status = e;
-                  this.handleSearch();
-                }
+                placement: 'bottom',
+                trigger: 'hover'
               }
-            }, this.statusOptions.map((item) => { // this.productTypeList下拉框里的data
-              return h('Option', { // 下拉框的值
+            }, [
+              h('Icon', {
                 props: {
-                  value: item.value,
-                  label: item.label
+                  type: 'ios-funnel'
+                },
+                style: {
+                  cursor: 'pointer'
                 }
+              }),
+              h('div', {
+                slot: 'content',
+                minxWidth: '80'
+              }, 
+              this.statusOptions.map((item) => {
+                return h('div', {
+                  class: {
+                    statusItem: true
+                  },
+                  on: {
+                    click: ($this)=> {
+                      item.selected = !item.selected;
+                      if (item.selected) {
+                        $this.target.classList.add("statusSelected");
+                        if (!this.status.includes(item.value)) {
+                        }
+                      } else {
+                        $this.target.classList.remove("statusSelected");
+                      }
+                      const statusTemp = this.statusOptions.filter((ele) => ele.selected);
+                      this.status = statusTemp.map((ele) => ele.value);
+                      this.handleSearch();
+                    }
+                  }
+                }, item.label)
               })
-            }))
+              )
+            ]),
           ])
-
-          // return h('Select', {
-          //   props: {
-          //     value: params.row.value
-          //   },
-          //   on： {
-          //     'on-change': e=> {
-          //       params.row.value = e;
-          //     }
-          //   }
-          // },
-          // this.statusOptions.map((item) => {
-          //   return h('Option', {
-          //     props: {
-          //       value: item.value,
-          //       label: item.label
-          //     }
-          //   })
-          // }))
         }
       },
       {
@@ -460,6 +458,50 @@ export default {
       .ivu-table th {
         background-color: #2d8cf0;
         color: #fff;
+      }
+      /deep/ .ivu-poptip-popper {
+        min-width: 80px;
+        /deep/ .ivu-poptip-body {
+          padding: 8px 0;
+          /deep/ .ivu-list-bordered {
+            border: none;
+          }
+          .statusItem {
+            height: 32px;
+            line-height: 32px;
+            font-weight: 400;
+            color: #515a6e;
+            cursor: pointer;
+            &:hover {
+              background: #f3f3f3;
+              color: #515a6e;
+            }
+          }
+          .statusSelected, .statusSelected:hover {
+            // background: #2d8cf0;
+            // color: #fff;
+            color: #2d8cf0;
+            font-weight: 600;
+          }
+          // /deep/ .ivu-list-bordered .ivu-list-item {
+          //   display: block;
+          //   cursor: pointer;
+          //   padding: 6px;
+          //   &:hover {
+          //     background: #f3f3f3;
+          //   }
+          //   // &:active {
+          //   //   background: #2d8cf0;
+          //   //   color: #fff;
+          //   // }
+          //   .statusBtn, .statusBtn:hover, .statusBtn:focus {
+          //     background: transparent;
+          //     border: none;
+          //     box-shadow: none;
+          //     padding: 0;
+          //   }
+          // }
+        }
       }
     }
     .table-page {

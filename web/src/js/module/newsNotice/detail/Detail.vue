@@ -141,6 +141,13 @@ export default {
     },
     // 追加反馈
     openFeedback() {
+      if (this.notifyList.length === 4) {
+        this.$Modal.warning({
+          title: this.$t('message.newsNotice.warning.title'),
+          content: this.$t('message.newsNotice.warning.appendFeedBackMax')
+        });
+        return;
+      }
       // 判断能否追加反馈
       api.fetch(`${this.url}userFeedBacks/${this.issueId}/judgeFeedBack`, { username: this.userName }, 'get').then((data) => {
         if (data) {

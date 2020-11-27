@@ -1748,13 +1748,6 @@
             }
         },
         "newsNotice": {
-            "confirm": {
-                "title": "提示",
-                "recallContent": "请确认是否撤回该问题？",
-                "judgeFeedBackContent": "该问题不可再追加反馈！",
-                "reslovedContent": "请确认该问题是否已解决？",
-                "deleteFile": "确认删除该附件？"
-            },
             "columns": {
                 "status": "状态",
                 "subject": "标题",
@@ -1798,6 +1791,17 @@
                 "recall": "撤回成功！",
                 "reslovedMsg": "提交成功！",
                 "attachMsg": "附件删除成功！"
+            },
+            "confirm": {
+                "title": "提示",
+                "recallContent": "请确认是否撤回该问题？",
+                "judgeFeedBackContent": "该问题不可再追加反馈！",
+                "reslovedContent": "请确认该问题是否已解决？",
+                "deleteFile": "确认删除该附件？"
+            },
+            "warning": {
+                "title": "提示",
+                "appendFeedBackMax": "该问题已超过最大反馈次数，不可再追加！"
             }
         }
     }

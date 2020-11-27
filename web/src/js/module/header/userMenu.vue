@@ -7,18 +7,18 @@
       v-for="(menu) in menuList"
       :key="menu.id"
       @click="handleClick(menu.id)">
-      <Icon
+      <!-- <Icon
         class="user-menu-item-icon"
         :class="{ 'blink-icon': menu.id==='newsNotice' && pendingNewsCount > 0 }"
         :type="menu.icon"
       >
+      </Icon> -->
+      <Icon
+        class="user-menu-item-icon"
+        :type="menu.icon"
+      >
       </Icon>
-      <!-- <Poptip v-if="menu.id==='newsNotice' && pendingNewsCount > 0" trigger="hover" placement="bottom-start" width="80" popper-class="pending-news">
-        <span class="pending-news-count">({{ pendingNewsCount }})</span>
-        <span slot="content" class="pending-news-content" @click.stop="gotoNewsNotice('istatus.resolved')">{{ menu.children.name}}</span>
-      </Poptip> -->
       <span>{{ menu.name }}</span>
-      <!-- <span v-if="menu.id==='newsNotice' && pendingNewsCount > 0" class="pending-news-count">({{ pendingNewsCount }})</span> -->
     </li>
   </ul>
 </template>
@@ -49,11 +49,6 @@ export default {
           id: 'feedBack',
           name: this.$t('message.navMune.feedBack'),
           icon: 'ios-create-outline',
-        },
-        {
-          id: 'newsNotice',
-          name: this.$t('message.navMune.newsNotice'),
-          icon: 'ios-notifications',
         },
         {
           id: 'clearCache',
@@ -100,11 +95,7 @@ export default {
           this.changeLang();
           break;
         case 'feedBack':
-          // this.feedBack();
-          this.gotoNewsNotice(this.$t('message.navMune.feedBack'));
-          break;
-        case 'newsNotice':
-          this.gotoNewsNotice(this.$t('message.navMune.newsNotice'), 'istatus.resolved');
+          this.gotoMyFeedBack(this.$t('message.navMune.feedBack'));
           break;
       }
     },
@@ -185,10 +176,7 @@ export default {
       }
       window.location.reload();
     },
-    // feedBack() {
-    //   this.$emit('feedBack-show');
-    // },
-    gotoNewsNotice(menuName, status) {
+    gotoMyFeedBack(menuName, status) {
       this.$router.replace({
         path: '/redirect/newsNotice',
         query: {

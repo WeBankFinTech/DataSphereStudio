@@ -85,16 +85,6 @@
             <Icon type="ios-notifications-outline"></Icon>
           </Badge>
         </span>
-        <!-- <Tooltip trigger="hover"> 
-          <span @click="gotoNewsNotice">
-            <Badge :count="unreadNewscount">
-              <Icon type="ios-notifications-outline"></Icon>
-            </Badge>
-          </span>
-          <div slot="content" @click="gotoNewsNotice">
-            {{ $t('message.navMune.newsNotice') }}
-          </div>
-        </Tooltip> -->
         <!-- <Icon
           v-if="isSandbox"
           title="freedback"

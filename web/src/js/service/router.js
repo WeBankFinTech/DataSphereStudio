@@ -276,22 +276,70 @@ router.beforeEach((to, from, next) => {
     } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
       next()
     } else {
-      if (userInfo.basic && userInfo.basic.status === 0) {
-        Modal.confirm({
-          title: '开通资源',
-          content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
-          okText: '去开通',
-          cancelText: '再看看案例和入门',
-          onOk: () => {
-            window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
-          },
-          onCancel: () => {
-            console.log('Clicked cancel');
-          }
-        });
-      } else {
+      if(userInfo.basic){
+        console.log('userInfo.basic.status', userInfo.basic.status);
+        const arrInfo = ["", "开通中", "开通成功", "订购开通失败", "订购已到期，请尽快续费，资源近期回收！", "用户销户中","用户销户失败","销户成功"]
+        switch (userInfo.basic.status) {
+          case 0:
+          case 7:
+            Modal.confirm({
+              title: '开通资源',
+              content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+              okText: '去开通',
+              cancelText: '再看看案例和入门',
+              onOk: () => {
+                window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+              },
+              onCancel: () => {
+                console.log('Clicked cancel');
+              }
+            });
+            break;
+          
+          case 1:
+          case 3:
+            Modal.confirm({
+              title: '开通状态',
+              content: `<p>${arrInfo[userInfo.basic.status]}</p>`,
+              okText: '请等待处理，或者联系客服 400-810-9889',
+            });
+            break;
+
+          case 4:
+            Modal.confirm({
+              title: '服务到期',
+              content: `<p>${arrInfo[userInfo.basic.status]}</p>`,
+              okText: '去续费',
+              onOk: () => {
+                window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+              },
+            });
+            break;
+        
+          default:
+            next();
+            break;
+        }
+          
+      }else{
         next()
       }
+      // if (userInfo.basic && userInfo.basic.status === 0) {
+      //   Modal.confirm({
+      //     title: '开通资源',
+      //     content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+      //     okText: '去开通',
+      //     cancelText: '再看看案例和入门',
+      //     onOk: () => {
+      //       window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+      //     },
+      //     onCancel: () => {
+      //       console.log('Clicked cancel');
+      //     }
+      //   });
+      // } else {
+      //   next()
+      // }
     }
 
   }else {
@@ -308,6 +356,20 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to) => {
   if (to.meta) {
     document.title = to.meta.title || 'CT-Luban';
+  }
+  if(process.env.VUE_APP_CTYUN_SSO){
+    setTimeout(()=>{
+      var _hmt = _hmt || [];
+      (function() {
+        //每次执行前，先移除上次插入的代码
+        document.getElementById('baidu_tj') && document.getElementById('baidu_tj').remove();
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?cb396c1e4ce898b950eaffb369083a8e";
+        hm.id = "baidu_tj"
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    },0);
   }
 });
 

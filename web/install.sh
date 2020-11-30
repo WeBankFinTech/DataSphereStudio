@@ -96,9 +96,9 @@ dssConf(){
             }
 
             location /api/v1 {
-            proxy_set_header Host $host;
-            proxy_set_header  X-Real-IP        $remote_addr;
-            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_set_header Host $s_host;
+            proxy_set_header  X-Real-IP $s_remote_addr;
+            proxy_set_header  X-Forwarded-For $s_proxy_add_x_forwarded_for;
             proxy_http_version 1.1;
             proxy_connect_timeout 4s;
             proxy_read_timeout 600s;

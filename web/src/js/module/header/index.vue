@@ -75,17 +75,21 @@
           class="user-icon"/>
         <userMenu
           v-show="isUserMenuShow"
-          :pendingNewsCount="pendingNewsCount"
           @clear-session="clearSession"
         />
       </div>
       <div
         class="icon-group">
-        <span @click="gotoNewsNotice">
-          <Badge :count="pendingNewsCount">
-            <Icon type="ios-notifications-outline"></Icon>
-          </Badge>
-        </span>
+        <Tooltip trigger="hover"> 
+          <span @click="gotoNewsNotice">
+            <Badge :count="unreadNewscount">
+              <Icon type="ios-notifications-outline"></Icon>
+            </Badge>
+          </span>
+          <div slot="content" @click="gotoNewsNotice">
+            {{ $t('message.navMune.newsNotice') }}
+          </div>
+        </Tooltip>
         <!-- <Icon
           v-if="isSandbox"
           title="freedback"
@@ -112,6 +116,7 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 import { isEmpty } from 'lodash';
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
@@ -120,7 +125,6 @@ import workspaceMenu from './workspaceMenu';
 import clickoutside from '@/js/helper/clickoutside';
 import navMenu from '@/js/component/navMenu/index.vue';
 import weMenu from '@/js/component/menu/index.vue';
-import module from './index';
 export default {
   directives: {
     clickoutside,
@@ -131,6 +135,7 @@ export default {
     workspaceMenu,
   },
   data() {
+    this.REFRESH_TIME = 60000;
     return {
       isUserMenuShow: false,
       userName: '',
@@ -139,20 +144,16 @@ export default {
       projectList: [],
       workspaces: [],
       isSandbox: process.env.NODE_ENV === 'sandbox',
-      pendingNewsCount: 0,
     };
   },
   created() {
     this.init();
   },
   mounted() {
-    this.$bus.$on('pendin-news-count', () => {
-      this.getPendingNewsCount();
-    });
     this.getCurrentProject();
   },
   beforeDestroy() {
-    this.$bus.$off('pendin-news-count');
+    clearInterval(this.timer);
   },
   computed: {
     moudleName() {
@@ -169,13 +170,22 @@ export default {
         }
       })
       return moudleName
-    }
+    },
+    ...mapGetters([
+      'unreadNewscount',
+      'newsNoticeIsTimer'
+    ])
   },
   watch: {
     '$route'(newValue) {
       this.projectID = newValue.query.projectID;
       this.getCurrentProject();
       this.getWorkSpace();
+    },
+    newsNoticeIsTimer(val) {
+      if (!val) {
+        clearInterval(this.timer);
+      }
     }
   },
   methods: {
@@ -190,8 +200,8 @@ export default {
           storage.set('userInfo', rst.userInfo);
           // window.$Wa.setParam('openId', rst.userInfo.basic.userName);
           this.$router.app.$emit('username', rst.userInfo.basic.username);
-          this.getPendingNewsCount();
           this.$emit('set-init');
+          this.createTimer();
         }
         this.getWorkSpace();
       });
@@ -200,13 +210,6 @@ export default {
       api.fetch(`/dss/workspaces`, 'get').then(rst=>{
         if (!isEmpty(rst)) {
           this.workspaces = rst.workspaces;
-        }
-      })
-    },
-    getPendingNewsCount() {
-      api.fetch(`${module.data.API_PATH}userFeedBacks/commission`, { username: this.userName }, 'get').then((rst) => {
-        if (rst > 0) {
-          this.pendingNewsCount = rst;
         }
       })
     },
@@ -312,7 +315,11 @@ export default {
           status: 'istatus.resolved'
         }
       });
-    }
+    },
+    createTimer() {
+      this.$store.dispatch('newsNotice/getUnreadNewsCount', { username: this.userName });
+      this.timer = setInterval(() => { this.$store.dispatch('newsNotice/getUnreadNewsCount'); }, this.REFRESH_TIME);
+    },
   },
 };
 </script>

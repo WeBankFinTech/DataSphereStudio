@@ -300,26 +300,25 @@ router.beforeEach((to, from, next) => {
         }
       }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
-    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail') {
+    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
       next()
     } else {
-      // if (userInfo.basic && userInfo.basic.status === 0) {
-      //   Modal.confirm({
-      //     title: '开通资源',
-      //     content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
-      //     okText: '去开通',
-      //     cancelText: '再看看案例和入门',
-      //     onOk: () => {
-      //       window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
-      //     },
-      //     onCancel: () => {
-      //       console.log('Clicked cancel');
-      //     }
-      //   });
-      // } else {
-      //   next()
-      // }
-      next()
+      if (userInfo.basic && userInfo.basic.status === 0) {
+        Modal.confirm({
+          title: '开通资源',
+          content: '<p>尊敬的用户，使用本功能需要计算和存储资源，您可以去申请开通资源</p>',
+          okText: '去开通',
+          cancelText: '再看看案例和入门',
+          onOk: () => {
+            window.open(process.env.VUE_APP_CTYUN_SUBSCRIBE);
+          },
+          onCancel: () => {
+            console.log('Clicked cancel');
+          }
+        });
+      } else {
+        next()
+      }
     }
 
   }else {

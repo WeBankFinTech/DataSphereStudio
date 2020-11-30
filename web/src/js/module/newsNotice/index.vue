@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="list-container">
     <div class="page-container-warp">{{ menuTitle }}</div>
     <div class="page-content">
       <div class="header">
@@ -26,12 +26,22 @@
           :loading="loading"
           @on-sort-change="handleSortChange"
         >
-          <template slot-scope="{ row }" slot="icon">
+          <!-- <template slot-scope="{ row }" slot="icon">
             <span v-if="row.status === 'istatus.resolved'">
               <img
                 style="width: 25px;"
                 src="../../../assets/images/message.svg"/>
             </span>
+          </template> -->
+          <template slot-scope="{ row }" slot="subject">
+            <div style="position: relative;">
+              {{ row.subject }}
+              <span v-if="row.status === 'istatus.resolved'" class="subject-icon">
+                <img
+                  style="width: 22px;"
+                  src="../../../assets/images/message.svg"/>
+              </span>
+            </div>
           </template>
           <template slot-scope="{ row }" slot="createdTime">
             <span>{{ row.createdTime ? parseTime(row.createdTime) : '' }}</span>
@@ -115,19 +125,20 @@ export default {
       }
     };
     this.columns = [
-      {
-        // title: null,
-        // key: '',
-        slot: 'icon',
-        width: 40,
-        align: 'left',
-        renderHeader: (h) => {
-          return h('span', {}, '')
-        }
-      },
+      // {
+      //   // title: null,
+      //   // key: '',
+      //   slot: 'icon',
+      //   width: 40,
+      //   align: 'left',
+      //   renderHeader: (h) => {
+      //     return h('span', {}, '')
+      //   }
+      // },
       {
         title: this.$t('message.newsNotice.columns.subject'),
         key: 'subject',
+        slot: 'subject',
         ellipsis: true,
         align: 'left'
       },
@@ -141,13 +152,18 @@ export default {
             style: { whiteSpace: 'nowrap' }
           }, [
             h('span', {
-              style: { paddingRight: '6px' }
+              style: {
+                marginLeft: '6px',
+                paddingRight: '6px'
+              }
             }, '状态'),
             h('Poptip', {
               props: {
                 placement: 'bottom',
-                trigger: 'hover'
-              }
+                // trigger: 'hover'
+                transfer: true,
+                popperClass: 'newsStatusPopper'
+              },
             }, [
               h('Icon', {
                 props: {
@@ -158,8 +174,7 @@ export default {
                 }
               }),
               h('div', {
-                slot: 'content',
-                minxWidth: '80'
+                slot: 'content'
               }, 
               this.statusOptions.map((item) => {
                 return h('div', {
@@ -408,106 +423,32 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.container {
-  background: #f7f7f7;
-  height: 100%;
-  font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
-  .page-container-warp {
-    height: 62px;
-    line-height: 62px;
-    font-size: 20px;
-    font-weight: 600;
-    background: #ffffff;
-    padding: 0 20px;
-    color: rgba(0,0,0,.85);
-  }
-  .page-content {
-    margin: 20px;
-    padding: 20px;
-    background: #ffffff;
-    .header {
-      display: flex;
-      justify-content: space-between;
-      /deep/ .ivu-select-dropdown {
-        max-width: none;
-      }
+<style lang="scss" scoped src="../../../assets/styles/newsNotice.scss"></style>
+<style lang="scss">
+.newsStatusPopper {
+  min-width: 80px !important;
+  /deep/ .ivu-poptip-body {
+    padding: 8px 0;
+    /deep/ .ivu-list-bordered {
+      border: none;
     }
-    .operate {
-      .operate-btn {
-        color: #2d8cf0;
-      }
-      .operate-btn, .operate-btn:hover, .operate-btn:focus {
-        background: transparent;
-        border: none;
-        padding: 5px;
-        box-shadow: none;
-      }
-      .operate-btn:hover {
-        color: #57a3f3;
-      }
-      .disabled-color, .disabled-color:hover {
-        color: #808695;
-      }
-    }
-    .table-content {
-      // display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 16px;
-      .ivu-table th {
-        background-color: #2d8cf0;
-        color: #fff;
-      }
-      /deep/ .ivu-poptip-popper {
-        min-width: 80px;
-        /deep/ .ivu-poptip-body {
-          padding: 8px 0;
-          /deep/ .ivu-list-bordered {
-            border: none;
-          }
-          .statusItem {
-            height: 32px;
-            line-height: 32px;
-            font-weight: 400;
-            color: #515a6e;
-            cursor: pointer;
-            &:hover {
-              background: #f3f3f3;
-              color: #515a6e;
-            }
-          }
-          .statusSelected, .statusSelected:hover {
-            // background: #2d8cf0;
-            // color: #fff;
-            color: #2d8cf0;
-            font-weight: 600;
-          }
-          // /deep/ .ivu-list-bordered .ivu-list-item {
-          //   display: block;
-          //   cursor: pointer;
-          //   padding: 6px;
-          //   &:hover {
-          //     background: #f3f3f3;
-          //   }
-          //   // &:active {
-          //   //   background: #2d8cf0;
-          //   //   color: #fff;
-          //   // }
-          //   .statusBtn, .statusBtn:hover, .statusBtn:focus {
-          //     background: transparent;
-          //     border: none;
-          //     box-shadow: none;
-          //     padding: 0;
-          //   }
-          // }
-        }
-      }
-    }
-    .table-page {
-      margin-top: 10px;
-      width: 100%;
+    .statusItem {
+      height: 32px;
+      line-height: 32px;
+      font-weight: 400;
       text-align: center;
+      color: #515a6e;
+      cursor: pointer;
+      &:hover {
+        background: #f3f3f3;
+        color: #515a6e;
+      }
+    }
+    .statusSelected, .statusSelected:hover {
+      // background: #2d8cf0;
+      // color: #fff;
+      color: #2d8cf0;
+      font-weight: 600;
     }
   }
 }

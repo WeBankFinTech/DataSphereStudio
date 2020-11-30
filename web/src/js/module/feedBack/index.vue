@@ -335,7 +335,8 @@ export default {
           });
         });
       } else {
-        return true;
+        const result = { success: 0 };
+        return result;
       }
     },
     handleMaxSize(file, fileList) {

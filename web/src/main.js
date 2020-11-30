@@ -25,6 +25,7 @@ import component from './js/component'
 import mixin from '../src/js/service/mixin'
 import i18n from './js/i18n'
 import Bus from '../src/js/service/bus';
+import store from '../src/js/store';
 
 import 'iview/dist/styles/iview.css'
 
@@ -43,6 +44,7 @@ Vue.prototype.$Message.config({
 
 new Vue({
   router,
+  store,
   i18n,
   render: (h) => h(App)
 }).$mount('#app')

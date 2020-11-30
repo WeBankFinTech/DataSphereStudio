@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="detail-container">
     <Card class="detail-card">
       <p slot="title">
         <Icon type="md-arrow-round-back" class="back-icon" @click="$router.go(-1)"/>
@@ -169,6 +169,7 @@ export default {
       this.$Modal.confirm({
         title: this.$t('message.newsNotice.confirm.title'),
         content: this.$t('message.newsNotice.confirm.reslovedContent'),
+        className: 'verticalCenterModal',
         onOk: () => {
           // 确认解决接口
           this.reslovedLoading = true;
@@ -177,7 +178,7 @@ export default {
               this.appendDisabled = true;
               this.reslovedDisabled = true;
               this.reslovedLoading = false;
-              this.$bus.$emit('pendin-news-count');
+              this.$store.dispatch('newsNotice/getUnreadNewsCount', { username: this.userName });
               this.$Message.success(this.$t('message.newsNotice.success.reslovedMsg'));
               // this.getNotifyDetail();
               this.$router.go(-1);
@@ -249,65 +250,9 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.container {
-  background: #f7f7f7;
-  height: 100%;
-  font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
-  .detail-card {
-    margin-bottom: 50px;
-    .back-icon {
-      position: relative;
-      margin-bottom: 3px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .panel-detail .ivu-col > div:nth-child(2) {
-      font-size: 12px;
-    }
-  }
-  padding: 20px;
-  /deep/ .ivu-row {
-    line-height: 32px;
-  }
-  .item-title {
-    font-weight: bold;
-  }
-  .attach {
-    margin: 8px 15px;
-  }
-  .attach-item {
-    display: inline-block;
-    padding-right: 15px;
-    padding-bottom: 8px;
-    .attach-item-name {
-      color: #2d8cf0;
-      padding-right: 10px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-  }
-  .footer {
-    position: fixed;
-    display: flex;
-    justify-content: space-between;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 60px;
-    padding: 0 20px 0 280px;
-    line-height: 60px;
-    background: #ffffff;
-    box-shadow: 0 -2px 4px rgba(0, 21, 41, 0.08);
-    z-index: 500;
-    .btn {
-      width: 100%;
-      margin-bottom: 10px;
-      text-align: right;
-    }
-  }
-}
-/deep/ .vertical-center-modal{
+<style lang="scss" scoped src="../../../../assets/styles/newsNotice.scss"></style>
+<style lang="scss">
+.verticalCenterModal{
   display: flex;
   align-items: center;
   justify-content: center;

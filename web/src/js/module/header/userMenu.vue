@@ -7,12 +7,6 @@
       v-for="(menu) in menuList"
       :key="menu.id"
       @click="handleClick(menu.id)">
-      <!-- <Icon
-        class="user-menu-item-icon"
-        :class="{ 'blink-icon': menu.id==='newsNotice' && pendingNewsCount > 0 }"
-        :type="menu.icon"
-      >
-      </Icon> -->
       <Icon
         class="user-menu-item-icon"
         :type="menu.icon"
@@ -66,12 +60,6 @@ export default {
           icon: 'ios-log-out',
         }],
     };
-  },
-  props: {
-    pendingNewsCount: {
-      type: Number,
-      default: 0
-    }
   },
   methods: {
     handleClick(type) {

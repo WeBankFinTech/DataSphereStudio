@@ -333,6 +333,18 @@ router.afterEach((to) => {
   if (to.meta) {
     document.title = to.meta.title || 'CT-Luban';
   }
+  setTimeout(()=>{
+    var _hmt = _hmt || [];
+    (function() {
+      //每次执行前，先移除上次插入的代码
+      document.getElementById('baidu_tj') && document.getElementById('baidu_tj').remove();
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?cb396c1e4ce898b950eaffb369083a8e";
+      hm.id = "baidu_tj"
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  },0);
 });
 
 export default router

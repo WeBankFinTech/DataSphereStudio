@@ -19,17 +19,11 @@
       <FormItem
         :label="$t('message.feedBack.submitType')"
         prop="submitType">
-        <Row type="flex" justify="start">
-          <Col span="3" v-for="(item, index) in submitTypeList" :key="index" :offset="index!==0? 1 : 0">
-          <div @click="selectSubmitType(item)">
-            <Card :class="submitTypeStyle(item.code)">
-              <Poptip trigger="hover" word-wrap width="200" title="" :content="item.content" placement="bottom">
-                <div style="text-align: center; font-size: 14px;">{{ item.title }}</div>
-              </Poptip>
-            </Card>
-          </div>
-          </Col>
-        </Row>
+        <span v-for="(item, index) in submitTypeList" :key="index">
+          <Poptip trigger="hover" word-wrap width="200" title="" :content="item.content" placement="bottom">
+            <Button class="type-btn-item" :class="submitTypeStyle(item.code)" :disabled="actionType === 'append'"  @click="selectSubmitType(item)">{{ item.title }}</Button>
+          </Poptip>
+        </span>
       </FormItem>
       <FormItem
         :label="$t('message.feedBack.subject')"
@@ -41,7 +35,7 @@
         prop="pdesc">
         <Input v-model="feedBackForm.pdesc" type="textarea" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
       </FormItem>
-      <FormItem>
+      <FormItem style="width: 100%;">
         <Upload
           ref="upload"
           name="fileName"
@@ -55,9 +49,6 @@
           :on-exceeded-size="handleMaxSize"
           :on-format-error="fileFormatError"
           :before-upload="beforeUpload"
-          :on-success="handleSuccess"
-          :on-error="handleError"
-          :on-progress="handleProgress"
           :on-remove="handleRemove"
           :on-preview="handlePreview"
         >
@@ -120,7 +111,7 @@ export default {
         { required: true, message: this.$t('message.feedBack.pleaseInputProblemDesc'), trigger: 'blur' },
       ],
     };
-    this.maxSize = 10485760; // 100M: 104857600
+    this.maxSize = 10485760;
     return {
       loading: false,
       feedBackForm: {
@@ -135,7 +126,7 @@ export default {
         reporter: 18,
         reporterName: 'luban',
         tableName: 0,
-        remark: '',
+        // remark: '',
       },
       submitTypeList: [],
       feedBackShow: false,
@@ -144,7 +135,6 @@ export default {
       defaultFile: [],
       saveLoading: false,
       url: module.data.API_PATH,
-      // closeType: 'cancel',
     };
   },
   computed: {
@@ -163,9 +153,7 @@ export default {
     submitTypeStyle() {
       return (code) => {
         return {
-          'card-type': this.actionType === 'add',
-          'disabled-card-type': this.actionType === 'append',
-          'card-type-selected': this.feedBackForm.itype === code
+          'type-btn-item-selected': this.feedBackForm.itype === code
         }
       }
     }
@@ -173,24 +161,16 @@ export default {
   watch: {
     feedBackFormShow(val) {
       this.feedBackShow = val;
-      // this.closeType = 'cancel';
+      if (val) {
+        this.open();
+      }
     },
     feedBackShow(val) {
       if (!val) {
         this.resetForm();
       }
       this.$emit('show', val);
-    },
-    feedBackType(val) { // 提交反馈类型
-      this.feedBackForm.itype = val;
-    },
-    actionType(val) { // 新增或追究
-      if (val === 'add') {
-        this.feedBackForm.itype = 'itype.luban.other';
-      }
     }
-  },
-  created() {
   },
   mounted() {
     const feedBackTypeOptions = storage.get('feedBackTypeOptions');
@@ -242,7 +222,6 @@ export default {
             this.$Message.warning(this.$t('message.feedBack.nonExitUserName'));
             return false;
           }
-          this.defaultParams.remark = userInfo.basic.username;
           if (this.actionType === 'add') {
             this.addFeedBack();
           } else {
@@ -255,6 +234,7 @@ export default {
     addFeedBack() {
       const params = assign(this.defaultParams, this.feedBackForm);
       params.status = 'istatus.processing';
+      params.remark = storage.get('userInfo').basic.username;
       this.saveLoading = true;
       api.fetch(`${this.url}userFeedBacks`, params, 'post').then(async (data) => {
         // 上传文件
@@ -288,7 +268,7 @@ export default {
       // 上传文件
       const uploadRst = await this.handleUpload(this.issueId);
       if (uploadRst.success === 0) {
-        api.fetch(`${this.url}workOrders`, params, 'post').then(async (data) => {
+        api.fetch(`${this.url}userFeedBacks/addition`, params, 'post').then(async (data) => {
           this.saveLoading = false;
           this.feedBackShow = false;
           if (this.source === 'detail') {
@@ -315,6 +295,13 @@ export default {
       this.$refs.feedBackForm.resetFields();
       this.defaultFile = [];
       this.uploadFile = [];
+    },
+    open() {
+      if (this.actionType === 'add') {
+        this.feedBackForm.itype = 'itype.luban.other';
+      } else {
+        this.feedBackForm.itype = this.feedBackType;
+      }
     },
     // 手动上传文件
     handleUpload(id) {
@@ -371,23 +358,6 @@ export default {
       this.defaultFile.push(file);
       this.uploadFile.push(file);
       return false;
-    },// 成功时的回调
-    handleSuccess(response, file, fileList) {
-      // console.log('文件上传成功时的钩子-----');
-      // console.log(response);
-      // if (response.success === 0) {
-      //   // fileList.splice(fileList.findIndex((item) => item.uid===file.uid && item.status==='uploading'), 1);
-      // }
-      // this.saveLoading = false;
-    },
-    // 错误时的回调
-    handleError(err, file, fileList) {
-      // this.$Message.error(file.message);
-      // this.saveLoading = false;
-    },
-    // 上传文件过程中的回调
-    handleProgress(event, file, fileList) {
-      // fileList.splice(fileList.findIndex((item) => item.uid===file.uid && item.status==='uploading'), 1);
     },
     handleRemove(file, fileList) {
       if (file) {
@@ -431,8 +401,25 @@ export default {
       /deep/ textarea.ivu-input {
         font-size: 12px;
       }
+      .type-btn-item, .type-btn-item:hover {
+        width: 100px;
+        margin-right: 10px;
+      }
+      .type-btn-item:focus {
+        box-shadow: none;
+      }
+      .type-btn-item-selected {
+        border-color: #2d8cf0;
+        color: #57a3f3;
+      }
+      .disabled-submit-type {
+        box-shadow: none;
+        background: #f8f8f9;
+      }
+      .disabled-color, .disabled-color:hover {
+        color: #808695;
+      }
       /deep/ .ivu-card-body {
-        // min-height: 50px;
         text-align: center;
         padding: 6px;
       }
@@ -462,17 +449,6 @@ export default {
     height: 60px;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .card-type {
-    cursor: pointer;
-  }
-  .disabled-card-type {
-    box-shadow: none;
-    background: #f8f8f9;
-  }
-  .card-type-selected {
-    // border: 1px solid #2d8cf0;
-    border-color: #2d8cf0;
   }
 }
 </style>

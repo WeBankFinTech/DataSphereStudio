@@ -190,34 +190,7 @@ const router = new VueRouter({
             title: 'newsNotice',
             publicPage: true,
           },
-          component: () => import('../module/newsNotice/index.vue'),
-          children: [{
-            name: 'Detail',
-            path: 'detail',
-            component: () => import('../module/newsNotice/detail/Detail.vue'),
-            meta: {
-              title: 'notifyDetail',
-              publicPage: true,
-            },
-          }]
-          // path: 'newsNotice',
-          // name: 'NewsNotice',
-          // meta: {
-          //   title: 'newsNotice',
-          //   publicPage: true,
-          // },
-          // component: () => import('../module/newsNotice/index.vue'),
-          // children: [{
-          //   // path: 'detail/:id(\\d+)',
-          //   name: 'Detail',
-          //   path: 'detail',
-          //   component: () => import('../module/newsNotice/Detail.vue'),
-          //   meta: {
-          //     title: 'detail',
-          //     publicPage: true,
-          //   },
-          // },
-          // ],
+          component: () => import('../module/newsNotice/index.vue')
         },
         {
           // path: 'detail/:id(\\d+)',

@@ -1,5 +1,5 @@
 <template>
-  <div class="list-container">
+  <div class="container">
     <div class="page-container-warp">{{ menuTitle }}</div>
     <div class="page-content">
       <div class="header">
@@ -26,13 +26,6 @@
           :loading="loading"
           @on-sort-change="handleSortChange"
         >
-          <!-- <template slot-scope="{ row }" slot="icon">
-            <span v-if="row.status === 'istatus.resolved'">
-              <img
-                style="width: 25px;"
-                src="../../../assets/images/message.svg"/>
-            </span>
-          </template> -->
           <template slot-scope="{ row }" slot="subject">
             <div style="position: relative;">
               {{ row.subject }}
@@ -125,16 +118,6 @@ export default {
       }
     };
     this.columns = [
-      // {
-      //   // title: null,
-      //   // key: '',
-      //   slot: 'icon',
-      //   width: 40,
-      //   align: 'left',
-      //   renderHeader: (h) => {
-      //     return h('span', {}, '')
-      //   }
-      // },
       {
         title: this.$t('message.newsNotice.columns.subject'),
         key: 'subject',
@@ -148,59 +131,54 @@ export default {
         align: 'center',
         width: 350,
         renderHeader: (h, params) => {
-          return h('div', {
-            style: { whiteSpace: 'nowrap' }
+          return h('Poptip', {
+            props: {
+              placement: 'bottom',
+              trigger: 'hover',
+              transfer: true,
+              popperClass: 'newsStatusPopper'
+            },
           }, [
             h('span', {
               style: {
-                marginLeft: '6px',
-                paddingRight: '6px'
+                paddingRight: '6px',
+                cursor: 'pointer'
               }
             }, '状态'),
-            h('Poptip', {
+            h('Icon', {
               props: {
-                placement: 'bottom',
-                // trigger: 'hover'
-                transfer: true,
-                popperClass: 'newsStatusPopper'
+                type: 'ios-funnel'
               },
-            }, [
-              h('Icon', {
-                props: {
-                  type: 'ios-funnel'
+              style: {
+                cursor: 'pointer'
+              }
+            }),
+            h('div', {
+              slot: 'content'
+            }, 
+            this.statusOptions.map((item) => {
+              return h('div', {
+                class: {
+                  statusItem: true,
+                  statusSelected: item.selected
                 },
-                style: {
-                  cursor: 'pointer'
-                }
-              }),
-              h('div', {
-                slot: 'content'
-              }, 
-              this.statusOptions.map((item) => {
-                return h('div', {
-                  class: {
-                    statusItem: true
-                  },
-                  on: {
-                    click: ($this)=> {
-                      item.selected = !item.selected;
-                      if (item.selected) {
-                        $this.target.classList.add("statusSelected");
-                        if (!this.status.includes(item.value)) {
-                        }
-                      } else {
-                        $this.target.classList.remove("statusSelected");
-                      }
-                      const statusTemp = this.statusOptions.filter((ele) => ele.selected);
-                      this.status = statusTemp.map((ele) => ele.value);
-                      this.handleSearch();
+                on: {
+                  click: ($this)=> {
+                    item.selected = !item.selected;
+                    if (item.selected) {
+                      $this.target.classList.add("statusSelected");
+                    } else {
+                      $this.target.classList.remove("statusSelected");
                     }
+                    const statusTemp = this.statusOptions.filter((ele) => ele.selected);
+                    this.status = statusTemp.map((ele) => ele.value);
+                    this.handleSearch();
                   }
-                }, item.label)
-              })
-              )
-            ]),
-          ])
+                }
+              }, item.label)
+            })
+            )
+          ]);
         }
       },
       {
@@ -271,7 +249,6 @@ export default {
     this.initSearchForm();
   },
   mounted() {
-    // this.tableHeight = this.$route.query.height - 90;
     this.handleSearch();
   },
   methods: {
@@ -280,6 +257,7 @@ export default {
       if (!isEmpty(status)) {
         this.addBtnShow = false;
         this.status.push(status);
+        this.statusOptions[1].selected = true;
       } else {
         this.addBtnShow = true;
       }
@@ -332,14 +310,6 @@ export default {
     },
     // 查看详情
     gotoDetail(row) {
-      // this.$router.push({
-      //   path: '/newsNotice/detail',
-      //   query: {
-      //     id: row.id,
-      //     status: row.status
-      //   }
-      // });
-      // this.$router.push(`/newsNotice/detail/${row.id}`);
       this.$router.push({
         path: '/noticeDetail',
         query: {
@@ -377,20 +347,28 @@ export default {
     },
     // 追加反馈
     async openFeedBack(row) {
-      // 判断能否追加反馈
-      api.fetch(`${this.url}userFeedBacks/${row.id}/judgeFeedBack`, { username: this.userName }, 'get').then((data) => {
-        if (data) {
-          this.feedBackActionType = 'append';
-          this.issueId = row.id;
-          this.feedBackType = row.itype
-          this.feedBackShow = true;
-        } else {
-          this.$Modal.warning({
-            title: this.$t('message.newsNotice.confirm.title'),
-            content: this.$t('message.newsNotice.confirm.judgeFeedBackContent')
-          });
-        }
-      });
+      if (row.woNumber > 3) {
+        this.$Modal.warning({
+          title: this.$t('message.newsNotice.warning.title'),
+          content: this.$t('message.newsNotice.warning.appendFeedBackMax')
+        });
+        return;
+      } else {
+        // 判断能否追加反馈
+        api.fetch(`${this.url}userFeedBacks/${row.id}/judgeFeedBack`, { username: this.userName }, 'get').then((data) => {
+          if (data) {
+            this.feedBackActionType = 'append';
+            this.issueId = row.id;
+            this.feedBackType = row.itype
+            this.feedBackShow = true;
+          } else {
+            this.$Modal.warning({
+              title: this.$t('message.newsNotice.confirm.title'),
+              content: this.$t('message.newsNotice.confirm.judgeFeedBackContent')
+            });
+          }
+        });
+      }
     },
     feedBackShowAction(val) {
       this.feedBackShow = val;
@@ -423,7 +401,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped src="../../../assets/styles/newsNotice.scss"></style>
+<style lang="scss" scoped src="./index.scss"></style>
 <style lang="scss">
 .newsStatusPopper {
   min-width: 80px !important;
@@ -445,8 +423,6 @@ export default {
       }
     }
     .statusSelected, .statusSelected:hover {
-      // background: #2d8cf0;
-      // color: #fff;
       color: #2d8cf0;
       font-weight: 600;
     }

@@ -1801,7 +1801,7 @@
             },
             "warning": {
                 "title": "提示",
-                "appendFeedBackMax": "该问题已超过最大反馈次数，不可再追加！"
+                "appendFeedBackMax": "最多可追加3次反馈！"
             }
         }
     }

@@ -80,7 +80,12 @@
       </div>
       <div
         class="icon-group">
-        <Tooltip trigger="hover"> 
+        <span @click="gotoNewsNotice">
+          <Badge :count="unreadNewscount">
+            <Icon type="ios-notifications-outline"></Icon>
+          </Badge>
+        </span>
+        <!-- <Tooltip trigger="hover"> 
           <span @click="gotoNewsNotice">
             <Badge :count="unreadNewscount">
               <Icon type="ios-notifications-outline"></Icon>
@@ -89,7 +94,7 @@
           <div slot="content" @click="gotoNewsNotice">
             {{ $t('message.navMune.newsNotice') }}
           </div>
-        </Tooltip>
+        </Tooltip> -->
         <!-- <Icon
           v-if="isSandbox"
           title="freedback"
@@ -317,8 +322,10 @@ export default {
       });
     },
     createTimer() {
-      this.$store.dispatch('newsNotice/getUnreadNewsCount', { username: this.userName });
-      this.timer = setInterval(() => { this.$store.dispatch('newsNotice/getUnreadNewsCount'); }, this.REFRESH_TIME);
+      this.$store.dispatch('newsNotice/getUnreadNewsCount');
+      this.timer = setInterval(() => {
+        this.$store.dispatch('newsNotice/getUnreadNewsCount');
+      }, this.REFRESH_TIME);
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="detail-container">
+  <div class="container">
     <Card class="detail-card">
       <p slot="title">
         <Icon type="md-arrow-round-back" class="back-icon" @click="$router.go(-1)"/>
@@ -141,7 +141,7 @@ export default {
     },
     // 追加反馈
     openFeedback() {
-      if (this.notifyList.length === 4) {
+      if (this.notifyList.length > 3) {
         this.$Modal.warning({
           title: this.$t('message.newsNotice.warning.title'),
           content: this.$t('message.newsNotice.warning.appendFeedBackMax')
@@ -178,9 +178,8 @@ export default {
               this.appendDisabled = true;
               this.reslovedDisabled = true;
               this.reslovedLoading = false;
-              this.$store.dispatch('newsNotice/getUnreadNewsCount', { username: this.userName });
+              this.$store.dispatch('newsNotice/getUnreadNewsCount');
               this.$Message.success(this.$t('message.newsNotice.success.reslovedMsg'));
-              // this.getNotifyDetail();
               this.$router.go(-1);
             }
           }).catch(() => {
@@ -250,7 +249,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped src="../../../../assets/styles/newsNotice.scss"></style>
+<style lang="scss" scoped src="./index.scss"></style>
 <style lang="scss">
 .verticalCenterModal{
   display: flex;

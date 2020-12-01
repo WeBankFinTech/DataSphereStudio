@@ -391,7 +391,7 @@ export default {
       let newDate = '';
       if (time && time.toString().length === 13) {
         const date = new Date(parseInt(time));
-        newDate = moment(date).format('YYYY-MM-DD');
+        newDate = moment(date).format('YYYY-MM-DD HH:mm');
       } else if (time && time.toString().indexOf('T') > 0) {
         const date = new Date(time).toJSON();
         newDate = new Date(+new Date(date) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');

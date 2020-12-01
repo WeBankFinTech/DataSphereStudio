@@ -7,9 +7,9 @@
   >
     <p slot="header">
       <span>{{ actionType === 'add' ? $t('message.feedBack.addTitle') : $t('message.feedBack.appendTitle') }}</span>
-      <span style="padding-left: 10px; font-size: 12px; font-weight: 400;">
+      <span class="titleTips">
         ({{ $t('message.feedBack.titleTips') }}
-        <span style="font-weight: 700; vertical-align: initial;">{{ $t('message.feedBack.titleTipsPhone') }}</span>
+        <span class="titleTipsPhone">{{ $t('message.feedBack.titleTipsPhone') }}</span>
         )
       </span>
     </p>
@@ -396,6 +396,15 @@ export default {
 <style lang="scss" scoped>
 .modal-container {
   font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
+  .titleTips {
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  .titleTipsPhone {
+    font-weight: 700;
+    vertical-align: initial;
+  }
   /deep/ .ivu-modal-body {
       height: 450px;
       overflow-y: auto;

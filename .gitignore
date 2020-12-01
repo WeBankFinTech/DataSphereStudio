@@ -21,3 +21,5 @@ plugins/linkis/linkis-appjoint-entrance/target/
 
 sendemail-appjoint/sendemail-core/target/
 visualis-appjoint/appjoint/target/
+qualitis-appjoint/appjoint/target/
+logs

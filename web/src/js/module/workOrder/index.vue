@@ -25,6 +25,7 @@
       </template>
       <template slot-scope="{ row }" slot="action">
         <Button v-show="row.isSuccess === 1" type="warning" style="margin-right: 5px" @click="quit(row)">退订</Button>
+        <span v-if="Date.now()<1609430399000">公测期间退订后不能续费</span>
       </template>
     </Table>
     <Spin v-if="loading" size="large" fix />

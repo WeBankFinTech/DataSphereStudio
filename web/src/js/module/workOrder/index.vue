@@ -25,7 +25,7 @@
       </template>
       <template slot-scope="{ row }" slot="action">
         <Button v-show="row.isSuccess === 1" type="warning" style="margin-right: 5px" @click="quit(row)">退订</Button>
-        <span v-if="Date.now()<1609430399000">公测期间退订后不能续费</span>
+        <span v-if="row.isSuccess === 1 && Date.now()<1609430399000">公测期间退订后不能续费</span>
       </template>
     </Table>
     <Spin v-if="loading" size="large" fix />
@@ -125,7 +125,6 @@ export default {
         title: "提示",
         content: "<p>退订之后，您的资源和数据将在15天内被回收，确认退订请点击确定按钮。</p>",
         onOk: () => {
-          console.log(row)
           const url = `https://saas.ctyun.cn/eorder/luban/unsubscribe?orderId=${row.workOrderId}`
           window.open(url)
         }

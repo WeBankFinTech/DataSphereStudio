@@ -1,9 +1,9 @@
 #!/bin/sh
-# sudo sed -i "" "s/#VUE_APP_CTYUN_SSO=\/\/www.ctyun.cn\/cas\/logout/VUE_APP_CTYUN_SSO=\/\/www.ctyun.cn\/cas\/logout/g" .env
+sudo sed -i "" "s/#VUE_APP_CTYUN_SSO=\/\/www.ctyun.cn\/cas\/logout/VUE_APP_CTYUN_SSO=\/\/www.ctyun.cn\/cas\/logout/g" .env
 
-# npm run build
-# cd dist
-# tar -zcvf dss-web.tar.gz ./dist
+npm run build
+cd dist
+tar -zcvf dss-web.tar.gz ./dist
 
 
 PUTFILE=dss-web.tar.gz

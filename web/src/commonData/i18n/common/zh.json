@@ -1713,7 +1713,8 @@
         "feedBack": {
             "addTitle": "提交问题反馈",
             "appendTitle": "追加问题反馈",
-            "titleTips": "紧急情况请联系XXX",
+            "titleTips": "紧急情况请联系",
+            "titleTipsPhone": "400-810-9889",
             "submitType": "提交类型",
             "subject": "标题",
             "pdesc": "问题详情",

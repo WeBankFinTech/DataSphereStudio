@@ -7,8 +7,12 @@
   >
     <p slot="header">
       <span>{{ actionType === 'add' ? $t('message.feedBack.addTitle') : $t('message.feedBack.appendTitle') }}</span>
-      <span style="padding-left: 10px; font-size: 12px; font-weight: 400; color: #606266;">({{ $t('message.feedBack.titleTips') }})</span>
-    </p>               
+      <span style="padding-left: 10px; font-size: 12px; font-weight: 400;">
+        ({{ $t('message.feedBack.titleTips') }}
+        <span style="font-weight: 700; vertical-align: initial;">{{ $t('message.feedBack.titleTipsPhone') }}</span>
+        )
+      </span>
+    </p>
     <Form
       ref="feedBackForm"
       :model="feedBackForm"

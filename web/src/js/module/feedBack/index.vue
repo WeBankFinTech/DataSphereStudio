@@ -223,7 +223,10 @@ export default {
           let params = {};
           const userInfo = storage.get('userInfo');
           if (!userInfo.basic.username) {
-            this.$Message.warning(this.$t('message.feedBack.nonExitUserName'));
+            this.$Message.warning({
+              content: this.$t('message.feedBack.nonExitUserName'),
+              duration: Number(this.$t('message.feedBack.messageDuration'))
+            });
             return false;
           }
           if (this.actionType === 'add') {
@@ -247,14 +250,23 @@ export default {
         if (uploadRst.success === 0) {
           this.feedBackShow = false;
           this.$emit('refresh-notice');
-          this.$Message.success(this.$t('message.feedBack.success.saveMsg'));
+          this.$Message.success({
+            content: this.$t('message.feedBack.success.saveMsg'),
+            duration: Number(this.$t('message.feedBack.messageDuration'))
+          });
         } else {
-          this.$Message.warning(uploadRst.message);
+          this.$Message.warning({
+            content: uploadRst.message,
+            duration: Number(this.$t('message.feedBack.messageDuration'))
+          });
         }
       }).catch((err) => {
         console.log(err);
         this.saveLoading = false;
-        this.$Message.warning(this.$t('message.feedBack.fail.saveMsg'));
+        this.$Message.warning({
+          content: this.$t('message.feedBack.fail.saveMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
       });
     },
     // 追加反馈
@@ -280,14 +292,23 @@ export default {
           } else {
             this.$emit('refresh-notice');
           }
-          this.$Message.success(this.$t('message.feedBack.success.saveMsg'));
+          this.$Message.success({
+            content: this.$t('message.feedBack.success.saveMsg'),
+            duration: Number(this.$t('message.feedBack.messageDuration'))
+          });
         }).catch(() => {
           this.saveLoading = false;
-          this.$Message.warning(this.$t('message.feedBack.fail.saveMsg'));
+          this.$Message.warning({
+            content: this.$t('message.feedBack.fail.saveMsg'),
+            duration: Number(this.$t('message.feedBack.messageDuration'))
+          });
         });
       } else {
         this.saveLoading = false;
-        this.$Message.warning(uploadRst.message);
+        this.$Message.warning({
+          content: uploadRst.message,
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
       }
     },
     cancel() {
@@ -331,32 +352,50 @@ export default {
       }
     },
     handleMaxSize(file, fileList) {
-      this.$Message.warning(this.$t('message.project.uploadOver'));
+      this.$Message.warning({
+        content: this.$t('message.project.uploadOver'),
+        duration: Number(this.$t('message.feedBack.messageDuration'))
+      });
     },
     fileFormatError(file, fileList) {
-      this.$Message.warning(this.$t('message.feedBack.uploadFileTypeMsg'));
+      this.$Message.warning({
+        content: this.$t('message.feedBack.uploadFileTypeMsg'),
+        duration: Number(this.$t('message.feedBack.messageDuration'))
+      });
     },
     beforeUpload(file) {
       // 判断文件类型
       const fileExt = file.name.replace(/.+\./, ""); // 取得文件的后缀名
       if (!FILE_TYPE.includes(fileExt.toLowerCase())) {
-        this.$Message.warning(this.$t('message.feedBack.uploadFileTypeMsg'));
+        this.$Message.warning({
+          content: this.$t('message.feedBack.uploadFileTypeMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
         return false;
       }
       // 判断文件大小
-      if (file.size > 10485760) { // 10485760
-        this.$Message.warning(this.$t('message.feedBack.uploadFileSizeMsg'));
+      if (file.size === 0 || file.size > 10485760) {
+        this.$Message.warning({
+          content: this.$t('message.feedBack.uploadFileSizeMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
         return false;
       }
       // 上传文件个数最多为10个
       if (this.uploadFile.length === 10) {
-        this.$Message.warning(this.$t('message.feedBack.uploadMaxFileMsg'));
+        this.$Message.warning({
+          content: this.$t('message.feedBack.uploadMaxFileMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
         return false;
       }
       // 判断文件是否重名
       const exitFile = this.uploadFile.find((item) => item.name === file.name);
       if (exitFile) {
-        this.$Message.warning(this.$t('message.feedBack.uploadFileRenameMsg'));
+        this.$Message.warning({
+          content: this.$t('message.feedBack.uploadFileRenameMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
         return false;
       }
       this.defaultFile.push(file);
@@ -386,7 +425,10 @@ export default {
       const flag = link.dispatchEvent(event);
       this.$nextTick(() => {
         if (flag) {
-          this.$Message.success(this.$t('message.workBench.body.script.history.success.download'));
+          this.$Message.success({
+            content: this.$t('message.workBench.body.script.history.success.download'),
+            duration: Number(this.$t('message.feedBack.messageDuration'))
+          });
         }
       });
     }

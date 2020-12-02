@@ -179,7 +179,10 @@ export default {
               this.reslovedDisabled = true;
               this.reslovedLoading = false;
               this.$store.dispatch('newsNotice/getUnreadNewsCount');
-              this.$Message.success(this.$t('message.newsNotice.success.reslovedMsg'));
+              this.$Message.success({
+                content: this.$t('message.newsNotice.success.reslovedMsg'),
+                duration: Number(this.$t('message.feedBack.messageDuration'))
+              });
               this.$router.go(-1);
             }
           }).catch(() => {
@@ -212,7 +215,10 @@ export default {
         const flag = link.dispatchEvent(event);
         this.$nextTick(() => {
           if (flag) {
-            this.$Message.success(this.$t('message.workBench.body.script.history.success.download'));
+            this.$Message.success({
+              content: this.$t('message.workBench.body.script.history.success.download'),
+              duration: Number(this.$t('message.feedBack.messageDuration'))
+            });
           }
         });
       }).catch((err) => {
@@ -226,7 +232,10 @@ export default {
         onOk: () => {
           api.fetch(`${this.url}issues/${this.issueId}/files/${file.fileId}`, { username: this.userName }, 'delete').then((data) => {
             if (data) {
-              this.$Message.success(this.$t('message.newsNotice.success.attachMsg'));
+              this.$Message.success({
+                content: this.$t('message.newsNotice.success.attachMsg'),
+                duration: Number(this.$t('message.feedBack.messageDuration'))
+              });
               this.getNotifyDetail();
             }
           });

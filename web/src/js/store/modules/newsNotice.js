@@ -1,6 +1,6 @@
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
-const prefix = process.env.VUE_APP_MN_CONFIG_PREFIX || `${window.location.protocol}//${window.location.host}/operationApi/`;
+const prefix = process.env.VUE_APP_MN_CONFIG_PREFIX || `${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/operationApi/`;
 
 const state = {
   unreadNewscount: 0,

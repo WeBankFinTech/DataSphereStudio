@@ -61,12 +61,12 @@ module.exports = {
         ws: true,
         secure: false,
       },
-      '^/operationApi': {
+      '^/luban/operationApi': {
         target: 'http://10.30.90.89:30011/delta-yunying',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
-          '^/operationApi': ''
+          '^/luban/operationApi': ''
         },
       },
     }

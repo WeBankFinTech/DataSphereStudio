@@ -9,7 +9,8 @@
       @click="handleClick(menu.id)">
       <Icon
         class="user-menu-item-icon"
-        :type="menu.icon">
+        :type="menu.icon"
+      >
       </Icon>
       <span>{{ menu.name }}</span>
     </li>
@@ -37,6 +38,11 @@ export default {
           id: 'workOrder',
           name: this.$t('message.navMune.workOrder'),
           icon: 'ios-paper-outline',
+        },
+        {
+          id: 'feedBack',
+          name: this.$t('message.navMune.feedBack'),
+          icon: 'ios-create-outline',
         },
         {
           id: 'clearCache',
@@ -75,6 +81,9 @@ export default {
           break;
         case 'changeLang':
           this.changeLang();
+          break;
+        case 'feedBack':
+          this.gotoMyFeedBack(this.$t('message.navMune.feedBack'));
           break;
       }
     },
@@ -154,7 +163,16 @@ export default {
         localStorage.setItem('locale', 'zh-CN');
       }
       window.location.reload();
-    }
+    },
+    gotoMyFeedBack(menuName, status) {
+      this.$router.replace({
+        path: '/redirect/newsNotice',
+        query: {
+          menuName,
+          status
+        }
+      });
+    },
   },
 };
 </script>

@@ -57,6 +57,7 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
+  config.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjpudWxsLCJwaG9uZSI6IjE3NzE3MjkxMzQxIiwicm9sZXMiOiJzdXBlclVzZXIiLCJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjI4NzUxNTg0LCJuYmYiOjE1OTcyMTU1ODR9.XxG57DsnayGZY_J90gIpyRrMe5x95lKf9hzJh320XmM';
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -115,7 +116,8 @@ const api = {
     },
   },
   constructionOfResponse: {
-    codePath: 'status',
+    // codePath: 'status',
+    codePath: [ 'status', 'success' ],
     successCode: '0',
     messagePath: 'message',
     resultPath: 'data',
@@ -126,8 +128,18 @@ const getData = function(data) {
   let _arr = ['codePath', 'messagePath', 'resultPath'];
   let res = {};
   _arr.forEach((item) => {
-    let pathArray = api.constructionOfResponse[item].split('.');
-    let result = pathArray.length === 1 && pathArray[0] === '*' ? data : data[pathArray[0]];
+    let pathArray = '';
+    let result = '';
+    if (item === 'codePath') {
+      api.constructionOfResponse[item].some((ele) => {
+        pathArray = ele.split('.');
+        result = pathArray.length === 1 && pathArray[0] === '*' ? data : data[pathArray[0]];
+        if (result !== undefined) return true;
+      });
+    } else {
+      pathArray = api.constructionOfResponse[item].split('.');
+      result = pathArray.length === 1 && pathArray[0] === '*' ? data : data[pathArray[0]];
+    }
     for (let j = 1; j < pathArray.length; j++) {
       result = result[pathArray[j]];
       if (!result) {

@@ -183,6 +183,30 @@ const router = new VueRouter({
           },
           ],
         },
+        {
+          path: 'newsNotice',
+          name: 'NewsNotice',
+          meta: {
+            title: 'newsNotice',
+            publicPage: true,
+          },
+          component: () => import('../module/newsNotice/index.vue')
+        },
+        {
+          // path: 'detail/:id(\\d+)',
+          path: 'noticeDetail',
+          name: 'NoticeDetail',
+          component: () => import('../module/newsNotice/detail/Detail.vue'),
+          meta: {
+            title: 'notifyDetail',
+            publicPage: true,
+          },
+        },
+        {
+          path: '/redirect/:path*',
+          hidden: true,
+          component: () => import('../view/redirect/index')
+        }
       ],
     },
     {
@@ -249,7 +273,7 @@ router.beforeEach((to, from, next) => {
         }
       }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
-    } else if (to.path === '/newhome') {
+    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
       next()
     } else {
       if(userInfo.basic){

@@ -678,7 +678,9 @@
             "FAQ": "常见问题",
             "clearCache": "清理缓存",
             "logOut": "退出登录",
-            "workOrder": "我的订单"
+            "workOrder": "我的订单",
+            "feedBack": "我的反馈",
+            "newsNotice": "消息通知"
         },
         "shape": {
             "dataDev": "数据开发",
@@ -1706,6 +1708,101 @@
             },
             "success": {
                 "update": "全局变量更新成功！"
+            }
+        },
+        "feedBack": {
+            "addTitle": "提交问题反馈",
+            "appendTitle": "追加问题反馈",
+            "titleTips": "紧急情况请联系",
+            "titleTipsPhone": "400-810-9889",
+            "submitType": "提交类型",
+            "subject": "标题",
+            "pdesc": "问题详情",
+            "uploadFile": "上传附件",
+            "uploadTips": "只能上传jpg/png/gif/pdf/doc/docx/zip文件，且每个文件不超过10M，总文件数不超过10个",
+            "pleaseInputTitle": "请输入标题",
+            "pleaseInputProblemDesc": "请输入问题详情",
+            "uploadFileTypeMsg": "上传文件类型错误！",
+            "uploadFileSizeMsg": "上传文件单个大小最大为10M！",
+            "uploadMaxFileMsg": "已超过最大上传文件数，最多可上传10个文件！",
+            "uploadFileRenameMsg": "上传文件名重复！",
+            "nonExitUserName": "未获取到用户名，请稍后提交",
+            "submitTypeContent": {
+                "productAdvice": {
+                    "content": "请输入您对天翼云鲁班大数据开发服务平台在XXX场景下的建议",
+                    "ipriority": "ipriority.mid"
+                },
+                "functionAdvice": {
+                    "content": "请输入您在使用天翼云鲁班大数据开发服务平台时遇到的阻碍或者问题",
+                    "ipriority": "ipriority.high"
+                },
+                "other": {
+                    "content": "请输入您对天翼云鲁班的咨询类问题，如账号、代金券、订单等",
+                    "ipriority": "ipriority.low"
+                }
+            },
+            "success": {
+                "saveMsg": "提交成功！"
+            },
+            "fail": {
+                "saveMsg": "提交失败！"
+            }
+        },
+        "newsNotice": {
+            "columns": {
+                "status": "状态",
+                "subject": "标题",
+                "createdTime": "创建时间",
+                "updatedTime": "更新时间",
+                "operate": {
+                    "colTitle": "操作",
+                    "button": {
+                        "detail": "查看",
+                        "recall": "撤回",
+                        "appendFeedBack": "追加反馈"
+                    }
+                }
+            },
+            "statusType": {
+                "processing": "处理中",
+                "processed": "已处理",
+                "resloved": "已解决",
+                "closed": "已撤回"
+            },
+            "detail": {
+                "title": "消息详情",
+                "appendFeedback": "追加反馈",
+                "resloved": "确认已解决",
+                "emptyText": "暂无",
+                "detailForm": {
+                    "status": "状态",
+                    "subject": "标题",
+                    "createdTime": "创建时间",
+                    "finishTime": "完成时间",
+                    "woDesc": "问题详情",
+                    "resolvedResult": "反馈结果",
+                    "attach": "附件"
+                }
+            },
+            "placeholderMsg": {
+                "pleaseInputSubject": "请输入标题查询",
+                "pleaseSelectStatus": "请选择状态"
+            },
+            "success": {
+                "recall": "撤回成功！",
+                "reslovedMsg": "提交成功！",
+                "attachMsg": "附件删除成功！"
+            },
+            "confirm": {
+                "title": "提示",
+                "recallContent": "请确认是否撤回该问题？",
+                "judgeFeedBackContent": "该问题不可再追加反馈！",
+                "reslovedContent": "请确认该问题是否已解决？",
+                "deleteFile": "确认删除该附件？"
+            },
+            "warning": {
+                "title": "提示",
+                "appendFeedBackMax": "该问题已超过最大反馈次数，不可再追加！"
             }
         }
     }

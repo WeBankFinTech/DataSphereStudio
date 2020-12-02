@@ -24,6 +24,8 @@ import router from './js/service/router'
 import component from './js/component'
 import mixin from '../src/js/service/mixin'
 import i18n from './js/i18n'
+import Bus from '../src/js/service/bus';
+import store from '../src/js/store';
 
 import 'iview/dist/styles/iview.css'
 
@@ -31,6 +33,7 @@ Vue.use(VueRouter)
 Vue.use(component)
 Vue.mixin(mixin);
 Vue.config.productionTip = false
+Vue.prototype.$bus = Bus;
 
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
@@ -41,6 +44,7 @@ Vue.prototype.$Message.config({
 
 new Vue({
   router,
+  store,
   i18n,
   render: (h) => h(App)
 }).$mount('#app')

@@ -29,6 +29,9 @@ const getVersion = () => {
   return pkg.version;
 }
 
+// const host = "ai.ctyun.cn";
+// const port = "8088";
+
 const host = "saas.ctyun.cn";
 const port = "443";
 
@@ -49,15 +52,22 @@ module.exports = {
         target: `https://${host}:${port}`,  //后端服务地址
         ws: true,
         changeOrigin: true,
-        // pathRewrite: {
-        //   '^/luban/api/rest_j/v1': '/luban/api/rest_j/v1'
-        // },
-        logLevel: "debug"
+        pathRewrite: {
+          '^/luban/api/rest_j/v1': '/luban/api/rest_j/v1'
+        }
       },
       '^/luban/ws/api': {    //websocket
         target: `wss://${host}:${port}`,
         ws: true,
         secure: false,
+      },
+      '^/operationApi': {
+        target: 'http://10.30.90.89:30011/delta-yunying',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/operationApi': ''
+        },
       },
     }
     // after: require('./mock/mock-server.js')

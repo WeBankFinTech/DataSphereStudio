@@ -41,6 +41,9 @@ const module = {
         return;
       }
       const socketPrefix = window.location.protocol === 'https:' ? 'wss:':'ws:';
+      console.log(window.location.host);
+      console.log(process.env.VUE_APP_PREFIX);
+      console.log(process.env.VUE_APP_MN_CONFIG_SOCKET);
       manager.socket = new Socket({
         // wss://saas.ctyun.cn:8086/ws/api/entrance/connect
         url: `${socketPrefix}${window.location.host}${process.env.VUE_APP_PREFIX}${process.env.VUE_APP_MN_CONFIG_SOCKET}`,

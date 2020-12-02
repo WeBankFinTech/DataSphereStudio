@@ -339,7 +339,10 @@ export default {
     },
     withdraw(id) {
       api.fetch(`${this.url}userFeedBacks/${id}/withdraw`, { username: this.userName }, 'put').then((data) => {
-        this.$Message.success(this.$t('message.newsNotice.success.recall'));
+        this.$Message.success({
+          content: this.$t('message.newsNotice.success.recall'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
         this.handleSearch();
       }).catch(() => {
         this.loading = false;  

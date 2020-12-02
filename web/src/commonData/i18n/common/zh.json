@@ -1723,10 +1723,11 @@
             "pleaseInputTitle": "请输入标题",
             "pleaseInputProblemDesc": "请输入问题详情",
             "uploadFileTypeMsg": "上传文件类型错误！",
-            "uploadFileSizeMsg": "上传文件单个大小最大为10M！",
+            "uploadFileSizeMsg": "上传文件不允许为空且单个大小最大为10M！",
             "uploadMaxFileMsg": "已超过最大上传文件数，最多可上传10个文件！",
             "uploadFileRenameMsg": "上传文件名重复！",
             "nonExitUserName": "未获取到用户名，请稍后提交",
+            "messageDuration": "3",
             "submitTypeContent": {
                 "productAdvice": {
                     "content": "请输入您对天翼云鲁班大数据开发服务平台在XXX场景下的建议",

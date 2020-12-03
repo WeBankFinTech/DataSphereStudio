@@ -32,12 +32,12 @@
       <FormItem
         :label="$t('message.feedBack.subject')"
         prop="subject">
-        <Input v-model="feedBackForm.subject" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
+        <Input v-model="feedBackForm.subject" :maxlength="200" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
       </FormItem>
       <FormItem
         :label="$t('message.feedBack.pdesc')"
         prop="pdesc">
-        <Input v-model="feedBackForm.pdesc" type="textarea" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
+        <Input v-model="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
       </FormItem>
       <FormItem style="width: 100%;">
         <Upload
@@ -110,9 +110,11 @@ export default {
     this.formValid = {
       subject: [
         { required: true, message: this.$t('message.feedBack.pleaseInputTitle'), trigger: 'blur' },
+        { type: 'string', max: 200, message: this.$t('message.feedBack.inputTitleMax'), trigger: 'blur' }
       ],
       pdesc: [
         { required: true, message: this.$t('message.feedBack.pleaseInputProblemDesc'), trigger: 'blur' },
+        { type: 'string', max: 2000, message: this.$t('message.feedBack.inputProblemDescMax'), trigger: 'blur' }
       ],
     };
     this.maxSize = 10485760;

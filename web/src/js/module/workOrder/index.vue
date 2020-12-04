@@ -24,7 +24,7 @@
         <span>{{ parseType(row.workOrderType) }}</span>
       </template>
       <template slot-scope="{ row }" slot="action">
-        <Button v-show="row.isSuccess === 2" type="warning" style="margin-right: 5px" @click="quit(row)">退订</Button>
+        <Button v-show="row.isSuccess === 1" type="warning" style="margin-right: 5px" @click="quit(row)">退订</Button>
       </template>
     </Table>
     <Spin v-if="loading" size="large" fix />
@@ -44,14 +44,23 @@ const ORDER_TYPE = [
   { code: '7', desc: '销毁' },
 ];
 
+// const ORDER_STATUS = [
+//   { code: 0, desc: '未订购' },
+//   { code: 1, desc: '订购开通中' },
+//   { code: 2, desc: '使用中' },
+//   { code: 3, desc: '订购开通失败' },
+//   { code: 4, desc: '失效' },
+//   { code: 5, desc: '销户中' },
+//   { code: 6, desc: '销户失败' }
+// ];
+
 const ORDER_STATUS = [
-  { code: 0, desc: '未订购' },
-  { code: 1, desc: '订购开通中' },
-  { code: 2, desc: '使用中' },
-  { code: 3, desc: '订购开通失败' },
-  { code: 4, desc: '失效' },
-  { code: 5, desc: '销户中' },
-  { code: 6, desc: '销户失败' }
+  { code: 0, desc: '订购开通中' },
+  { code: 1, desc: '使用中' },
+  { code: 2, desc: ' 订购开通失败' },
+  { code: 3, desc: '到期失效' },
+  { code: 4, desc: '已退订' },
+  { code: -1, desc: '异常订单' },
 ];
 
 export default {
@@ -127,10 +136,7 @@ export default {
     },
     parseStorage(storageResource) {
       const { workOrderItemConfig: { value } } = storageResource;
-      if (value > 1024) {
-        return `${value/1024} TB`;
-      }
-      return `${value} GB`;
+      return `${value} TB`;
     },
     parseCycle(computeResource) {
       const { workOrderItemConfig: { cycleCnt } } = computeResource;

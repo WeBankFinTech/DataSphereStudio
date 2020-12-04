@@ -1,0 +1,61 @@
+.container {
+  background: #f7f7f7;
+  height: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
+  .page-container-warp {
+    height: 62px;
+    line-height: 62px;
+    font-size: 20px;
+    font-weight: 600;
+    background: #ffffff;
+    padding: 0 20px;
+    color: rgba(0,0,0,.85);
+  }
+  .page-content {
+    margin: 20px;
+    padding: 20px;
+    background: #ffffff;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      /deep/ .ivu-select-dropdown {
+        max-width: none;
+      }
+    }
+    .operate {
+      .operate-btn {
+        color: #2d8cf0;
+      }
+      .operate-btn, .operate-btn:hover, .operate-btn:focus {
+        background: transparent;
+        border: none;
+        padding: 5px;
+        box-shadow: none;
+      }
+      .operate-btn:hover {
+        color: #57a3f3;
+      }
+      .disabled-color, .disabled-color:hover {
+        color: #808695;
+      }
+    }
+    .table-content {
+      justify-content: center;
+      align-items: center;
+      margin-top: 16px;
+      .ivu-table th {
+        background-color: #2d8cf0;
+        color: #fff;
+      }
+    }
+    .table-page {
+      margin-top: 10px;
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .subject-icon {
+    position: absolute;
+    top: -6px;
+  }
+}

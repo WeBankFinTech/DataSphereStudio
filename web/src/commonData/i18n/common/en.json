@@ -637,7 +637,9 @@
             "FAQ": "FAQ",
             "clearCache": "Clear cache",
             "logOut": "Log out",
-            "workOrder": "Work Order"
+            "workOrder": "Work Order",
+            "feedBack": "Feed Back",
+            "newsNotice": "News Notice"
         },
         "shape": {
             "dataDev": "Data development",

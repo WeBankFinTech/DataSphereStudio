@@ -1746,9 +1746,6 @@
             },
             "success": {
                 "saveMsg": "提交成功！"
-            },
-            "fail": {
-                "saveMsg": "提交失败！"
             }
         },
         "newsNotice": {

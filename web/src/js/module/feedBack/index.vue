@@ -39,12 +39,12 @@
         prop="pdesc">
         <Input v-model="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
       </FormItem>
-      <FormItem style="width: 100%;">
+      <FormItem class="upload-row-item" style="width: 100%;">
         <Upload
           ref="upload"
           name="fileName"
           multiple
-          :action="uploadUrl"
+          action=""
           :headers="headers"
           :data="getFileConfig"
           :default-file-list="defaultFile"
@@ -79,9 +79,7 @@
 import { isEmpty, assign } from 'lodash';
 import storage from '@/js/helper/storage';
 import api from '@/js/service/api';
-import util from '@/js/util';
 import module from './index';
-import axios from 'axios';
 const FILE_TYPE = ['jpg', 'png', 'gif', 'pdf', 'doc', 'docx', 'zip'];
 export default {
   props: {
@@ -131,12 +129,10 @@ export default {
         processUid: 18,
         reporter: 18,
         reporterName: 'luban',
-        tableName: 0,
-        // remark: '',
+        tableName: 0
       },
       submitTypeList: [],
       feedBackShow: false,
-      uploadUrl: '',
       uploadFile: [],
       defaultFile: [],
       saveLoading: false,
@@ -195,7 +191,6 @@ export default {
           const [lubanType] = itype.filter((item) => item.dictItemId === 'itype.luban');
           if (!isEmpty(lubanType) && lubanType.children.length > 0) {
             lubanType.children.forEach((item) => {
-              // const contentCode = item.dictItemId.substring(item.dictItemId.lastIndexOf('.'), );
               const itypeCodeAry = item.dictItemId.split('.');
               this.submitTypeList.push({
                 title: item.dictItemName,
@@ -239,36 +234,28 @@ export default {
         }
       });
     },
-    // 新增反馈
     addFeedBack() {
       const params = assign(this.defaultParams, this.feedBackForm);
       params.status = 'istatus.processing';
       params.remark = storage.get('userInfo').basic.username;
+      let formData = new FormData();
+      if (this.uploadFile.length > 0) {
+        this.uploadFile.forEach((itemFile) => {
+          formData.append('files', itemFile);
+        });
+      }
+      formData.append('body', new Blob([JSON.stringify(params)], {type: "application/json"}));
       this.saveLoading = true;
-      api.fetch(`${this.url}userFeedBacks`, params, 'post').then(async (data) => {
-        // 上传文件
-        const uploadRst = await this.handleUpload(data);
+      api.fetch(`${this.url}userFeedBacks`, formData, 'post').then(async (data) => {
         this.saveLoading = false;
-        if (uploadRst.success === 0) {
-          this.feedBackShow = false;
-          this.$emit('refresh-notice');
-          this.$Message.success({
-            content: this.$t('message.feedBack.success.saveMsg'),
-            duration: Number(this.$t('message.feedBack.messageDuration'))
-          });
-        } else {
-          this.$Message.warning({
-            content: uploadRst.message,
-            duration: Number(this.$t('message.feedBack.messageDuration'))
-          });
-        }
-      }).catch((err) => {
-        console.log(err);
-        this.saveLoading = false;
-        this.$Message.warning({
-          content: this.$t('message.feedBack.fail.saveMsg'),
+        this.feedBackShow = false;
+        this.$emit('refresh-notice');
+        this.$Message.success({
+          content: this.$t('message.feedBack.success.saveMsg'),
           duration: Number(this.$t('message.feedBack.messageDuration'))
         });
+      }).catch(() => {
+        this.saveLoading = false;
       });
     },
     // 追加反馈
@@ -282,36 +269,29 @@ export default {
         status: 'wostatus.processing'
       }
       const params = assign(this.defaultParams, form);
-      this.saveLoading = true;
-      // 上传文件
-      const uploadRst = await this.handleUpload(this.issueId);
-      if (uploadRst.success === 0) {
-        api.fetch(`${this.url}userFeedBacks/addition`, params, 'post').then(async (data) => {
-          this.saveLoading = false;
-          this.feedBackShow = false;
-          if (this.source === 'detail') {
-            this.$emit('refresh-detail');
-          } else {
-            this.$emit('refresh-notice');
-          }
-          this.$Message.success({
-            content: this.$t('message.feedBack.success.saveMsg'),
-            duration: Number(this.$t('message.feedBack.messageDuration'))
-          });
-        }).catch(() => {
-          this.saveLoading = false;
-          this.$Message.warning({
-            content: this.$t('message.feedBack.fail.saveMsg'),
-            duration: Number(this.$t('message.feedBack.messageDuration'))
-          });
-        });
-      } else {
-        this.saveLoading = false;
-        this.$Message.warning({
-          content: uploadRst.message,
-          duration: Number(this.$t('message.feedBack.messageDuration'))
+      let formData = new FormData();
+      if (this.uploadFile.length > 0) {
+        this.uploadFile.forEach((itemFile) => {
+          formData.append('files', itemFile);
         });
       }
+      formData.append('body', new Blob([JSON.stringify(params)], {type: "application/json"}));
+      this.saveLoading = true;
+      api.fetch(`${this.url}userFeedBacks/addition`, formData, 'post').then(async (data) => {
+        this.saveLoading = false;
+        this.feedBackShow = false;
+        if (this.source === 'detail') {
+          this.$emit('refresh-detail');
+        } else {
+          this.$emit('refresh-notice');
+        }
+        this.$Message.success({
+          content: this.$t('message.feedBack.success.saveMsg'),
+          duration: Number(this.$t('message.feedBack.messageDuration'))
+        });
+      }).catch(() => {
+        this.saveLoading = false;
+      });
     },
     cancel() {
       this.feedBackShow = false;
@@ -328,29 +308,6 @@ export default {
         this.feedBackForm.itype = 'itype.luban.other';
       } else {
         this.feedBackForm.itype = this.feedBackType;
-      }
-    },
-    // 手动上传文件
-    handleUpload(id) {
-      if (this.uploadFile.length > 0) {
-        this.uploadUrl = `${this.url}issues/${id}/files`;
-        let formData = new FormData();
-        formData.append('tableName', 0);
-        this.uploadFile.forEach((itemFile) => {
-          formData.append('fileName', itemFile);
-        });
-        return new Promise(async (resolve, reject) => {
-          await axios.post(this.uploadUrl, formData, {
-            headers: this.headers
-          }).then((response) => {
-            resolve(response.data);
-          }).catch((err) => {
-            reject(err);
-          });
-        });
-      } else {
-        const result = { success: 0 };
-        return result;
       }
     },
     handleMaxSize(file, fileList) {
@@ -491,6 +448,9 @@ export default {
         width: calc(100% - 100px);
         display: inline-block;
         margin-left: 0 !important;
+      }
+      .upload-row-item /deep/ .ivu-form-item-content {
+        width: calc(100% - 20px);
       }
     }
   /deep/ .vertical-center-modal{

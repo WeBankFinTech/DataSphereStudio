@@ -203,10 +203,19 @@ const router = new VueRouter({
           },
         },
         {
-          path: '/redirect/:path*',
+          path: 'redirect/:path*',
           hidden: true,
           component: () => import('../view/redirect/index')
-        }
+        },
+        {
+          path: 'myResource',
+          name: 'MyResource',
+          component: () => import('../module/myResource/index.vue'),
+          meta: {
+            title: 'myResource',
+            publicPage: true,
+          },
+        },
       ],
     },
     {
@@ -257,6 +266,7 @@ const router = new VueRouter({
   ],
 });
 router.beforeEach((to, from, next) => {
+  console.log(to)
   const userInfo = storage.get('userInfo');
   if(process.env.VUE_APP_CTYUN_SSO){
     if(to.path === '/login'){
@@ -273,7 +283,7 @@ router.beforeEach((to, from, next) => {
         }
       }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
-    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
+    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice' || to.path === '/myResource') {
       next()
     } else {
       if(userInfo.basic){
@@ -320,7 +330,6 @@ router.beforeEach((to, from, next) => {
             next();
             break;
         }
-          
       }else{
         next()
       }

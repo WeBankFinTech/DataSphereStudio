@@ -266,7 +266,6 @@ const router = new VueRouter({
   ],
 });
 router.beforeEach((to, from, next) => {
-  console.log(to)
   const userInfo = storage.get('userInfo');
   if(process.env.VUE_APP_CTYUN_SSO){
     if(to.path === '/login'){

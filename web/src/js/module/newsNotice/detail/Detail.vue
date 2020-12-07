@@ -131,9 +131,7 @@ export default {
           this.notifyList = data.workOrderList;
           this.panelAction = `notify_${this.notifyList.length - 1}`;
         }
-        if (!isEmpty(data.attachList)) {
-          this.attachList = data.attachList;
-        }
+        this.attachList = data.attachList;
         this.loading = false;
       }).catch(() => {
         this.loading = false;

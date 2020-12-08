@@ -1805,6 +1805,47 @@
                 "title": "提示",
                 "appendFeedBackMax": "该问题已超过最大反馈次数，不可再追加！"
             }
+        },
+        "myResource": {
+            "resourceInfo": {
+                "title": "我的资源",
+                "errorText": "个异常情况",
+                "coreNumber": "核数",
+                "memory": "内存",
+                "storageSpace": "存储空间",
+                "expireTime": "到期时间",
+                "expansion": "扩容",
+                "renew": "续费"
+            },
+            "history": {
+                "title": "资源历史",
+                "columns": {
+                    "workOrderId": "订单号",
+                    "workOrderInfo": {
+                        "headerTitle": "订单详情",
+                        "info": {
+                            "comptResource": "计算资源",
+                            "storageCycle": "存储周期",
+                            "orderCycle": "订购周期"
+                        }
+                    },
+                    "status": "订单状态",
+                    "orderType": "订单类型",
+                    "createTime": "创建时间"
+                },
+                "stateType": {
+                    "processing": "订购开通中",
+                    "success": "订购开通成功",
+                    "error": "订购开通失败",
+                    "warning": "订购异常",
+                    "expired": "订购已到期"
+                },
+                "orderCycle": {
+                    "year": "年",
+                    "month": "月",
+                    "day": "日"
+                }
+            }
         }
     }
 }

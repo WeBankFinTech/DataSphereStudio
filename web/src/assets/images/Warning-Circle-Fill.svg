@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>1.通用组件/2.Icon图标/2.Fill填充/Warning-Circle-Fill</title>
+    <desc>Created with Sketch.</desc>
+    <g id="鲁班我的资源和打包" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="我的资源" transform="translate(-113.000000, -69.000000)">
+            <g id="编组-3" transform="translate(112.000000, 67.000000)">
+                <g id="1.通用组件/2.Icon图标/2.Fill填充/Warning-Circle-Fill" transform="translate(0.000000, 1.000000)">
+                    <rect id="矩形" fill="#000000" fill-rule="nonzero" opacity="0" x="0" y="0" width="16" height="16"></rect>
+                    <path d="M8,1 C4.134375,1 1,4.134375 1,8 C1,11.865625 4.134375,15 8,15 C11.865625,15 15,11.865625 15,8 C15,4.134375 11.865625,1 8,1 Z M7.5,4.625 C7.5,4.55625 7.55625,4.5 7.625,4.5 L8.375,4.5 C8.44375,4.5 8.5,4.55625 8.5,4.625 L8.5,8.875 C8.5,8.94375 8.44375,9 8.375,9 L7.625,9 C7.55625,9 7.5,8.94375 7.5,8.875 L7.5,4.625 Z M8,11.5 C7.5859375,11.5 7.25,11.1640625 7.25,10.75 C7.25,10.3359375 7.5859375,10 8,10 C8.4140625,10 8.75,10.3359375 8.75,10.75 C8.75,11.1640625 8.4140625,11.5 8,11.5 Z" id="形状" fill="#FF4D4F"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

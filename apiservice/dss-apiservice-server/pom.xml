@@ -35,25 +35,25 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
-            <artifactId>linkis-module</artifactId>
-            <version>${linkis.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>asm</artifactId>
-                    <groupId>org.ow2.asm</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hk2-api</artifactId>
-                    <groupId>org.glassfish.hk2</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jersey-common</artifactId>
-                    <groupId>org.glassfish.jersey.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.webank.wedatasphere.linkis</groupId>-->
+            <!--<artifactId>linkis-module</artifactId>-->
+            <!--<version>${linkis.version}</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>asm</artifactId>-->
+                    <!--<groupId>org.ow2.asm</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>hk2-api</artifactId>-->
+                    <!--<groupId>org.glassfish.hk2</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>jersey-common</artifactId>-->
+                    <!--<groupId>org.glassfish.jersey.core</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
         <!--jersey bean validation-->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
@@ -84,11 +84,6 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-ujes-client</artifactId>
             <version>${linkis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.12</version>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
@@ -127,6 +122,18 @@
                     <artifactId>spring-web</artifactId>
                     <groupId>org.springframework</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hk2-api</artifactId>
+                    <groupId>org.glassfish.hk2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jersey-common</artifactId>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -156,11 +163,6 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-datasourcemanager-common</artifactId>
             <version>${linkis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>0.7.5</version>
         </dependency>
     </dependencies>
 
@@ -200,7 +202,7 @@
                 </executions>
                 <configuration>
                     <skipAssembly>false</skipAssembly>
-                    <finalName>dss-os-server</finalName>
+                    <finalName>dss-apiservice-server</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <descriptors>

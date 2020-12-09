@@ -14,7 +14,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.webank.wedatasphere.dss.apiservice.core.dao.ApiServiceConfigDao">
-    <resultMap id="oneServiceMap" type="OneServiceVo">
+    <resultMap id="apiServiceMap" type="ApiServiceVo">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="path" column="path"/>
@@ -45,7 +45,7 @@
         `modify_time`,`creator`,`modifier`,`script_path`,`resource_id`,`version`
     </sql>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="OneServiceVo">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ApiServiceVo">
         <![CDATA[INSERT INTO `dss_oneservice_config`(]]>
         <include refid="fields"/>
         <![CDATA[) VALUES(#{name}, #{path}, #{protocol}, #{method}, #{tag}, #{scope}, #{description},
@@ -102,7 +102,7 @@
         </where>
     </update>
 
-    <select id="query" resultMap="oneServiceMap">
+    <select id="query" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_oneservice_config` ]]>
@@ -140,7 +140,7 @@
         </where>
     </select>
 
-    <select id="queryByScriptPath" resultMap="oneServiceMap">
+    <select id="queryByScriptPath" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_oneservice_config` ]]>
@@ -149,7 +149,7 @@
         </where>
     </select>
 
-    <select id="queryByScriptPathVersion" resultMap="oneServiceMap">
+    <select id="queryByScriptPathVersion" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_oneservice_config` ]]>
@@ -160,7 +160,7 @@
         </where>
     </select>
 
-    <select id="queryByPath" resultMap="oneServiceMap">
+    <select id="queryByPath" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_oneservice_config` ]]>

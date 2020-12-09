@@ -30,14 +30,14 @@ public interface ApiServiceConfigDao {
     /**
      * Insert
      *
-     * @param apiServiceVo oneServiceVo
+     * @param apiServiceVo apiServiceVo
      */
     void insert(ApiServiceVo apiServiceVo);
 
     /**
      * Update
      *
-     * @param apiServiceVo oneServiceVo
+     * @param apiServiceVo apiServiceVo
      */
     void update(ApiServiceVo apiServiceVo);
 

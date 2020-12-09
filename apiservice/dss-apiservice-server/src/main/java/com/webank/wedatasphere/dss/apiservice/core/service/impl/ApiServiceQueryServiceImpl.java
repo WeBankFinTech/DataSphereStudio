@@ -29,7 +29,6 @@ import com.webank.wedatasphere.dss.apiservice.core.restful.exception.ApiServiceR
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
 import com.webank.wedatasphere.dss.apiservice.core.util.DateUtil;
-import com.webank.wedatasphere.dss.apiservice.core.util.ModelMapperUtil;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiVersionVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiServiceVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ParamType;
@@ -47,6 +46,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -205,7 +205,8 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
         paramMap.keySet()
                 .forEach(keyItem -> {
                     ParamVo paramVo = paramMap.get(keyItem);
-                    TestParamVo testParamVo = ModelMapperUtil.strictMap(paramVo, TestParamVo.class);
+                    TestParamVo testParamVo = new TestParamVo();
+                    BeanUtils.copyProperties(paramVo, testParamVo);
                     testParamVo.setTestValue(variableMap.containsKey(keyItem) ? variableMap.get(keyItem).toString() : "");
                     testParamVo.setRequireStr(RequireEnum.getEnum(paramVo.getRequired()).getName());
                     testParamVo.setType(ParamTypeEnum.getEnum(Integer.valueOf(paramVo.getType())).getName());

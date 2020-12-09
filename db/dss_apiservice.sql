@@ -2,10 +2,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for dss_oneservice_config
+-- Table structure for dss_apiservice_config
 -- ----------------------------
-DROP TABLE IF EXISTS `dss_oneservice_config`;
-CREATE TABLE `dss_oneservice_config` (
+DROP TABLE IF EXISTS `dss_apiservice_config`;
+CREATE TABLE `dss_apiservice_config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(200) NOT NULL COMMENT '服务名称',
   `path` varchar(200) NOT NULL COMMENT '服务路径',
@@ -24,17 +24,17 @@ CREATE TABLE `dss_oneservice_config` (
   `resource_id` varchar(50) NOT NULL COMMENT 'bml资源id',
   `version` varchar(20) NOT NULL COMMENT 'bml版本',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_dss_oneservice_config_name` (`name`),
-  UNIQUE KEY `uniq_dss_oneservice_config_path` (`path`),
-  UNIQUE KEY `uniq_dss_oneservice_config_script_path` (`script_path`),
-  KEY `idx_dss_oneservice_config_script_path` (`script_path`)
+  UNIQUE KEY `uniq_dss_apiservice_config_name` (`name`),
+  UNIQUE KEY `uniq_dss_apiservice_config_path` (`path`),
+  UNIQUE KEY `uniq_dss_apiservice_config_script_path` (`script_path`),
+  KEY `idx_dss_apiservice_config_script_path` (`script_path`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='服务api配置表';
 
 -- ----------------------------
--- Table structure for dss_oneservice_param
+-- Table structure for dss_apiservice_param
 -- ----------------------------
-DROP TABLE IF EXISTS `dss_oneservice_param`;
-CREATE TABLE `dss_oneservice_param` (
+DROP TABLE IF EXISTS `dss_apiservice_param`;
+CREATE TABLE `dss_apiservice_param` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `config_id` bigint(20) NOT NULL COMMENT '服务api配置id',
   `version` varchar(20) NOT NULL COMMENT '版本',
@@ -43,7 +43,7 @@ CREATE TABLE `dss_oneservice_param` (
   `required` tinyint(1) DEFAULT '0' COMMENT '是否必须: 0, 1',
   `description` varchar(200) DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`),
-  KEY `idx_dss_oneservice_param_config_id_version` (`config_id`,`version`)
+  KEY `idx_dss_apiservice_param_config_id_version` (`config_id`,`version`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice 参数表';
 
 

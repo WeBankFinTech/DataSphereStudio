@@ -127,6 +127,7 @@
                     <groupId>org.glassfish.jersey.core</groupId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

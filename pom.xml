@@ -36,6 +36,7 @@
         <module>dss-flow-execution-entrance</module>
         <module>dss-azkaban-scheduler-appjoint</module>
         <module>dss-server</module>
+        <module>apiservice/dss-apiservice-server</module>
         <module>visualis-appjoint/appjoint</module>
         <module>qualitis-appjoint/appjoint</module>
         <module>eventchecker-appjoint</module>
@@ -44,7 +45,6 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
-        <module>apiservice/dss-apiservice-server</module>
     </modules>
 
     <properties>

@@ -69,6 +69,14 @@ module.exports = {
           '^/luban/operationApi': ''
         },
       },
+      '^/luban/test': {
+        target: 'http://192.168.20.142:9030/api/rest_j/v1',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/luban/test': ''
+        },
+      },
     }
     // after: require('./mock/mock-server.js')
   },

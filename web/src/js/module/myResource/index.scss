@@ -1,6 +1,5 @@
 .container {
   padding: 20px;
-  height: 100%;
   font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
   .container-warp {
     font-family: PingFangSC-Medium;
@@ -43,56 +42,83 @@
       color: #FFFFFF;
       position: relative;
       .resoure-item-img {
+        // height: 128px;
         width: 100%;
-        // padding: 0 8px;
-        position: absolute;
         text-align: center;
+        position: absolute;
         bottom: 0;
       }
       .resoure-item-content {
         width: 100%;
-        height: 60px;
         position: absolute;
         top: 50%;
-        margin-top: -30px;
+        margin-top: -32px;
+        padding: 0 30px;
       }
       .content-left {
         width: 65%;
         display: inline-block;
-        padding-left: 30px;
       }
       .content-right {
         width: 35%;
         display: inline-block;
         text-align: right;
-        padding-right: 30px;
         float: right;
+        .right-box {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+        }
+      }
+      .text-top {
+        height: 22px;
+        line-height: 22px;
+        margin-bottom: 4px;
       }
       .left-text {
         font-family: PingFangSC-Regular;
         font-size: 14px;
-        line-height: 22px;
       }
       .left-value {
         font-family: HelveticaNeue;
         font-size: 30px;
+        height: 38px;
         line-height: 38px;
       }
       .right-text {
         font-family: PingFangSC-Medium;
         font-size: 12px;
-        line-height: 22px;
         display: inline-block;
-        cursor: pointer;
       }
       .operate-img {
         width: 14px;
         height: 14px;
         display: inline-block;
         position: absolute;
-        top: 3px;
-        right: 55px;
-        cursor: pointer;
+        right: 25px;
+        top: 4px;
+      }
+      .more-item {
+        width: 16px;
+        margin-left: 5px;
+        /deep/ .ivu-select-dropdown {
+          max-width: none;
+          width: auto;
+          padding: 0;
+        }
+        /deep/ .ivu-dropdown-menu {
+          min-width: auto;
+          width: auto;
+        }
+        /deep/ .ivu-dropdown-item:hover {
+          background: none;
+          color: #2d8cf0;
+        }
+      }
+      .more-item-img {
+        position: absolute;
+        display: flex;
+        margin-top: -12px;
       }
     }
     /deep/ .ivu-table-wrapper {

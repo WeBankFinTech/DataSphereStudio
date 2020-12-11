@@ -1814,8 +1814,11 @@
                 "memory": "内存",
                 "storageSpace": "存储空间",
                 "expireTime": "到期时间",
-                "expansion": "扩容",
-                "renew": "续费"
+                "operateText": {
+                    "expansion": "扩容",
+                    "renewOrder": "续费",
+                    "cancelOrder": "退订"
+                }
             },
             "history": {
                 "title": "资源历史",
@@ -1845,6 +1848,10 @@
                     "month": "月",
                     "day": "日"
                 }
+            },
+            "warning": {
+                "expansion": "当前状态不支持扩容！",
+                "renew": "当前状态不支持续费！"
             }
         }
     }

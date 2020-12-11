@@ -52,7 +52,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * OneServiceRestfulApi
+ * ApiServiceRestfulApi
  *
  * @author lidongzhang
  */

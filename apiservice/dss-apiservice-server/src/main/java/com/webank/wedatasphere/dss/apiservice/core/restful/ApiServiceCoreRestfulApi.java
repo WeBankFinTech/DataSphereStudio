@@ -113,9 +113,9 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @PUT
-    @Path("/api/{one_service_id}")
+    @Path("/api/{api_service_id}")
     public Response update(ApiServiceVo apiService,
-                           @PathParam("one_service_id") Long oneServiceId,
+                           @PathParam("api_service_id") Long apiServiceId,
                            @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             if (StringUtils.isBlank(apiService.getScriptPath())) {
@@ -159,12 +159,12 @@ public class ApiServiceCoreRestfulApi {
             if (result.size() > 0) {
                 throw new ConstraintViolationException(result);
             }
-            apiService.setId(oneServiceId);
+            apiService.setId(apiServiceId);
             apiService.setModifier(userName);
 //            apiService.setModifyTime(Calendar.getInstance().getTime());
             apiServiceService.update(apiService);
-            return Message.ok().data("update_id", oneServiceId);
-        }, "/apiservice/api/" + oneServiceId, "Fail to update service api[更新服务api失败]");
+            return Message.ok().data("update_id", apiServiceId);
+        }, "/apiservice/api/" + apiServiceId, "Fail to update service api[更新服务api失败]");
     }
 
     @GET

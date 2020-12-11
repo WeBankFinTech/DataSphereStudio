@@ -94,14 +94,14 @@ public class ApiServiceServiceImpl implements ApiServiceService {
             Map<String, String> uploadResult = uploadBml(user, scriptPath,
                     apiService.getMetadata(), apiService.getContent());
 
-            // insert dss_oneservice_config
+            // insert dss_apiservice_config
             String version = uploadResult.get("version");
             resourceId = uploadResult.get("resourceId");
             apiService.setResourceId(resourceId);
             apiService.setVersion(version);
             apiServiceConfigDao.insert(apiService);
 
-            // insert dss_oneservice_params
+            // insert dss_apiservice_params
             List<ParamVo> params = apiService.getParams();
             if (params != null && !params.isEmpty()) {
                 for (ParamVo param : params) {
@@ -158,8 +158,8 @@ public class ApiServiceServiceImpl implements ApiServiceService {
         List<ApiServiceVo> queryList = apiServiceConfigDao.query(apiServiceQuery);
         // query param
 //        if (queryList != null && !queryList.isEmpty()) {
-//            for (OneServiceVo oneServiceVo : queryList) {
-//                oneServiceVo.setParams(oneServiceParamDao.query(oneServiceVo.getId()));
+//            for (ApiServiceVo apiServiceVo : queryList) {
+//                apiServiceVo.setParams(apiServiceParamDao.query(apiServiceVo.getId()));
 //            }
 //        }
         PageInfo<ApiServiceVo> pageInfo = new PageInfo<>(queryList);

@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.apiservice.core.restful.exception;
 
 /**
- * OneserviceRuntimeException
+ * ApiServiceRuntimeException
  *
  * @author lidongzhang
  */

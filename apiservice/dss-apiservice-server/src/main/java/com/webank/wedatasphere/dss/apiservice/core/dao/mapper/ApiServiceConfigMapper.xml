@@ -46,7 +46,7 @@
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ApiServiceVo">
-        <![CDATA[INSERT INTO `dss_oneservice_config`(]]>
+        <![CDATA[INSERT INTO `dss_apiservice_config`(]]>
         <include refid="fields"/>
         <![CDATA[) VALUES(#{name}, #{path}, #{protocol}, #{method}, #{tag}, #{scope}, #{description},
         #{status}, #{type}, now(), now(), #{creator}, #{modifier}, #{scriptPath},#{resourceId},#{version}
@@ -54,7 +54,7 @@
     </insert>
 
     <update id="update">
-        <![CDATA[UPDATE `dss_oneservice_config`]]>
+        <![CDATA[UPDATE `dss_apiservice_config`]]>
         <set>
             <if test="path != null and path != ''">
                 <![CDATA[ `path` = #{path}, ]]>
@@ -105,7 +105,7 @@
     <select id="query" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ 1 = 1 ]]>
             <if test="name != null and name != ''">
@@ -143,7 +143,7 @@
     <select id="queryByScriptPath" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ `script_path` = #{scriptPath} ]]>
         </where>
@@ -152,7 +152,7 @@
     <select id="queryByScriptPathVersion" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ `script_path` = #{scriptPath} ]]>
             and
@@ -163,7 +163,7 @@
     <select id="queryByPath" resultMap="apiServiceMap">
         <![CDATA[SELECT ]]>
         <include refid="fields_query"/>
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ `path` = #{path} ]]>
         </where>
@@ -172,7 +172,7 @@
     <select id="queryCountByPath" resultType="java.lang.Integer">
         <![CDATA[SELECT ]]>
         count(1)
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ `script_path` != #{scriptPath} ]]>
             and 
@@ -183,14 +183,14 @@
     <select id="queryCountByName" resultType="java.lang.Integer">
         <![CDATA[SELECT ]]>
         count(1)
-        <![CDATA[ FROM `dss_oneservice_config` ]]>
+        <![CDATA[ FROM `dss_apiservice_config` ]]>
         <where>
             <![CDATA[ `name` = #{name} ]]>
         </where>
     </select>
     
     <update id="enableApi">
-        <![CDATA[update `dss_oneservice_config` ]]>
+        <![CDATA[update `dss_apiservice_config` ]]>
         <set>
             <![CDATA[ `status` = 1 ]]>
         </set>
@@ -200,7 +200,7 @@
     </update>
 
     <update id="disableApi">
-        <![CDATA[update `dss_oneservice_config` ]]>
+        <![CDATA[update `dss_apiservice_config` ]]>
         <set>
             <![CDATA[ `status` = 0 ]]>
         </set>

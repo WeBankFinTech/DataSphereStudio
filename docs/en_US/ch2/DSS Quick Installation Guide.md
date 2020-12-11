@@ -17,7 +17,7 @@ DSS also implements the integration of many external systems, such as [Qualitis]
 DSS environment configuration can be divided into three steps, including basic software installation, backend environment configuration, and frontend environment configuration. The details are as below:
 
 ### 2.1 Frontend and backend basic software installation
-Linkis standard version (above 0.9.4). How to install [Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
+Linkis standard version (above 0.10.0). How to install [Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
 
 JDK (above 1.8.0_141). How to install [JDK](https://www.runoob.com/java/java-environment-setup.html)
 
@@ -111,7 +111,7 @@ The environment is ready, click me to enter ****[4. Installation and use](https:
 ## Three Standard DSS environment configuration preparation
 The standard DSS environment preparation is also divided into three parts, the frontEnd-end and back-end basic software installation, back-end environment preparation, and frontEnd-end environment preparation. The details are as follows:
 ### 3.1 frontEnd and BackEnd basic software installation
-Linkis standard version (above 0.9.4), [How to install Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
+Linkis standard version (above 0.10.0), [How to install Linkis](https://github.com/WeBankFinTech/Linkis/blob/master/docs/en_US/ch1/deploy.md)
 
 JDK (above 1.8.0_141), How to install [JDK](https://www.runoob.com/java/java-environment-setup.html)
 

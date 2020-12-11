@@ -187,7 +187,7 @@
                             </goals>
                             <configuration>
                                     <skipAssembly>false</skipAssembly>
-                                    <finalName>wedatasphere-dss-${dss.version}-dist</finalName>
+                                    <finalName>wedatasphere-dss-${project.version}-dist</finalName>
                                     <appendAssemblyId>false</appendAssemblyId>
                                     <attach>false</attach>
                                     <descriptors>

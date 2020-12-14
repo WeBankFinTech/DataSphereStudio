@@ -32,12 +32,12 @@
       <FormItem
         :label="$t('message.feedBack.subject')"
         prop="subject">
-        <Input v-model="feedBackForm.subject" :maxlength="200" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
+        <Input v-model.trim="feedBackForm.subject" :maxlength="200" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
       </FormItem>
       <FormItem
         :label="$t('message.feedBack.pdesc')"
         prop="pdesc">
-        <Input v-model="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
+        <Input v-model.trim="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
       </FormItem>
       <FormItem class="upload-row-item" style="width: 100%;">
         <Upload

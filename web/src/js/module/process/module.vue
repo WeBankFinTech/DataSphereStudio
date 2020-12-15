@@ -650,6 +650,8 @@ export default {
         }
       }, 1000 * 60 * 5);
     }
+
+    this.$bus.$on('workflow:save', this.onSave);
   },
   beforeDestroy() {
     if (this.timer) {
@@ -1260,6 +1262,23 @@ export default {
         return;
       }
       this.saveModal = true;
+    },
+    onSave(resourceId){
+      
+      let nodeNoInit = true;
+      let json = JSON.parse(JSON.stringify(this.json));
+      json.nodes.forEach((node) => {
+
+        if (!node.resources) {
+          node.resources = [];
+        }
+        if(node.resources.indexOf(resourceId) !== -1){
+          nodeNoInit = false;
+        }
+      });
+      if(nodeNoInit){
+        this.autoSave("自动保存", true);
+      }
     },
     /**
          * 保存工作流

@@ -698,6 +698,7 @@ export default {
             resourceId: res.resourceId,
             version: res.version,
           }, this.node);
+          this.$bus.$emit('workflow:save', res.resourceId);
           this.work.unsave = false;
           // 提交最新的内容，更新script.data和script.oldData
           this.script.oldData = this.script.data;

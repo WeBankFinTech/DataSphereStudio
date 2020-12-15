@@ -1052,20 +1052,30 @@ export default {
       }
     },
     convertSettingParams(params) {
-      const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
-      // const configuration = isEmpty(params.configuration) ? {} :{
-      //     special: {},
-      //     runtime: {
-      //         args: params.configuration.runtime.args,
-      //         env: isEmpty(params.configuration.runtime.env) ? {} : util.convertArrayToObject(params.configuration.runtime.env),
-      //     },
-      //     startup: {},
-      // };
-      const configuration = isEmpty(params.variable) ? {} : {
+      let variable = {};
+      let configuration = {
         special: {},
-        runtime: {},
+        runtime: {
+          args: '',
+          env: [],
+          datasource: {
+            datasourceId: null
+          }
+        },
         startup: {},
       };
+      if (!isEmpty(params)) {
+        variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
+        configuration = isEmpty(params.configuration) ? {} : {
+          special: {},
+          runtime: {
+            args: params.configuration.runtime ? params.configuration.runtime.args || '' : '',
+            env: params.configuration.runtime ? (isEmpty(params.configuration.runtime.env) ? [] : util.convertObjectToArray(params.configuration.runtime.env)) : [],
+            datasource: params.configuration.runtime.datasource ? params.configuration.runtime.datasource : {datasourceId: null}
+          },
+          startup: {},
+        };
+      }
       return {
         variable,
         configuration,

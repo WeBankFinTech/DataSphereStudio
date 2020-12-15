@@ -130,7 +130,9 @@ public class ApiServiceQueryRestfulApi {
 
             validParam(queryRequest);
 
-            List<Map<String, Object>> query = queryService.query("/" + path,
+            String newpath = path.startsWith("/") ? path : "/" + path;
+            
+            List<Map<String, Object>> query = queryService.query(newpath,
                     queryRequest.getParams() == null ? new HashMap<>() : queryRequest.getParams(),
                     queryRequest.getModuleName(), httpMethod);
 

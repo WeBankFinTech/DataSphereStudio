@@ -50,7 +50,7 @@ export default {
   methods: {
     init() {
       let _this = this;
-      api.fetch('/dsm/info', {
+      api.fetch('/datasource/info', {
         "system": "BDP"
       }, 'get').then((rst) => {
         if (rst.query_list) {

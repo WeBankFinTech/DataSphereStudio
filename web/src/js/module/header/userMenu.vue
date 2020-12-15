@@ -39,11 +39,11 @@ export default {
           name: this.$t('message.navMune.workOrder'),
           icon: 'ios-paper-outline',
         },
-        {
-          id: 'feedBack',
-          name: this.$t('message.navMune.feedBack'),
-          icon: 'ios-create-outline',
-        },
+        // {
+        //   id: 'feedBack',
+        //   name: this.$t('message.navMune.feedBack'),
+        //   icon: 'ios-create-outline',
+        // },
         {
           id: 'clearCache',
           name: this.$t('message.navMune.clearCache'),

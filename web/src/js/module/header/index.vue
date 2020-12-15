@@ -80,11 +80,11 @@
       </div>
       <div
         class="icon-group">
-        <span @click="gotoNewsNotice">
+        <!-- <span @click="gotoNewsNotice">
           <Badge :count="unreadNewscount">
             <Icon type="ios-notifications-outline"></Icon>
           </Badge>
-        </span>
+        </span> -->
         <!-- <Icon
           v-if="isSandbox"
           title="freedback"
@@ -196,7 +196,7 @@ export default {
           // window.$Wa.setParam('openId', rst.userInfo.basic.userName);
           this.$router.app.$emit('username', rst.userInfo.basic.username);
           this.$emit('set-init');
-          this.createTimer();
+          // this.createTimer();
         }
         this.getWorkSpace();
       });

@@ -7,7 +7,7 @@
         <span class="error-text">{{ errorMsg }}</span>
       </span>
       <span class="refresh">
-        <Icon type="md-refresh" @click="refresh"/>
+        <Icon type="md-refresh" @click="search"/>
       </span>
     </div>
     <div class="resource-list">
@@ -133,6 +133,7 @@ export default {
       errorCount: 0, //异常情况数
       userId: null,
       userStatus: null,
+      nearWorkOrder: {}, // 最新的订单
       timer: ''
     };
   },
@@ -175,7 +176,7 @@ export default {
       this.getHistory();
     },
     getResourceInfo() {
-      api.fetch(`${module.data.API_PATH}luban/users/resources?ctyunUserId=8bdca937f2444172b3942198924de416`, 'get').then((rst) => {
+      api.fetch(`${module.data.API_PATH}luban/users/resources?ctyunUserId=${this.userId}`, 'get').then((rst) => {
         this.resourceInfo = rst;
       }).catch(() => {});
     },
@@ -185,12 +186,7 @@ export default {
         this.historyList = rst;
         this.errorCount = this.historyList.filter((item) => item.status === 2).length;
         this.errorMsg = this.errorCount > 0 ? `${this.errorCount}个异常情况` : '';
-        const time = Date.parse(new Date());
-        console.log('======', time)
-        this.historyList.forEach((item) => {
-          const subTime = time - item.createTime;
-          console.log('--------', subTime)
-        });
+        this.nearWorkOrder = this.getNearWorkOrder();
         this.loading = false;
       }).catch(() => {
         this.loading = false;
@@ -202,7 +198,7 @@ export default {
       console.log(this.userStatus)
       console.log(this.userStatus === 10)
       if (this.userStatus === 10) { // status = 10为使用中可扩容
-        window.open(`this.expansionUrl?orderId=${this.historyList[0].workOrderId}`);
+        window.open(`this.expansionUrl?orderId=${this.nearWorkOrder.workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持扩容！');
       }
@@ -212,7 +208,7 @@ export default {
       await this.getUserInfo();
       // status = 9|10 为账户失效或者使用中可进行续订
       if (this.userStatus === 9 || this.userStatus === 10) {
-        window.open(`this.prolongUrl?orderId=${this.historyList[0].workOrderId}`);
+        window.open(`this.prolongUrl?orderId=${this.nearWorkOrder.workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持续订！');
       }
@@ -229,15 +225,12 @@ export default {
           title: "提示",
           content: "<p>退订之后，您的资源和数据将在15天内被回收，确认退订请点击确定按钮。</p>",
           onOk: () => {
-            window.open(`${this.quitUrl}?orderId=${this.historyList[0].workOrderId}`);
+            window.open(`${this.quitUrl}?orderId=${this.nearWorkOrder.workOrderId}`);
           }
         });
       } else {
         this.$Message.warning('当前状态不支持退订！');
       }
-    },
-    refresh() {
-      this.search();
     },
     getUserInfo() {
       api.fetch('/dss/getBaseInfo', 'get').then((rst) => {
@@ -256,10 +249,25 @@ export default {
       this.feedBackShow = val;
     },
     createTimer() {
-      this.timer = setInterval(this.refresh, this.REFRESH_TIME);
+      this.timer = setInterval(this.search, this.REFRESH_TIME);
     },
     parseDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    },
+    getNearWorkOrder() {
+      // let arrs = this.historyList.map((item) => {
+      //   return item.createTime;
+      // })
+      // console.log(arrs)
+      // console.log(...arrs)
+      // console.log(Math.max(...arrs))
+
+      const maxCreateTime = Math.max.apply(Math, this.historyList.map(item => item.createTime));
+      return this.historyList.find(item => maxCreateTime === item.createTime);
+      // return {
+      //   product: JSON.parse(JSON.stringify(this.historyList.find(item => maxCreateTime === item.createTime))),
+      //   index: this.historyList.findIndex(item => maxCreateTime === item.createTime)
+      // }
     }
   },
 };

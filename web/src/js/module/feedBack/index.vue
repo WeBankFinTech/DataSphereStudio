@@ -108,12 +108,11 @@ export default {
     this.formValid = {
       subject: [
         { required: true, message: this.$t('message.feedBack.pleaseInputTitle'), trigger: 'blur' },
-        { type: 'string', max: 200, message: this.$t('message.feedBack.inputTitleMax'), trigger: 'blur' },
-        { validator: (rule, value, callback) => { this.inputTitleMaxlength(rule, value, callback); }, trigger: 'blur' }
+        { validator: (rule, value, callback) => { this.inputTitle(rule, value, callback); }, trigger: 'blur' }
       ],
       pdesc: [
         { required: true, message: this.$t('message.feedBack.pleaseInputProblemDesc'), trigger: 'blur' },
-        { type: 'string', max: 2000, message: this.$t('message.feedBack.inputProblemDescMax'), trigger: 'blur' }
+        { validator: (rule, value, callback) => { this.inputProblemDesc(rule, value, callback); }, trigger: 'blur' }
       ],
     };
     this.maxSize = 10485760;
@@ -392,13 +391,24 @@ export default {
         }
       });
     },
-    inputTitleMaxlength(rule, value, callback) {
+    inputTitle(rule, value, callback) {
       value = value ? value.trim() : '';
       if (!value) {
         return callback(new Error(this.$t('message.feedBack.pleaseInputTitle')));
       }
       if (value.length > 200) {
         callback(new Error(this.$t('message.feedBack.inputTitleMax')));
+      } else {
+        callback();
+      }
+    },
+    inputProblemDesc(rule, value, callback) {
+      value = value ? value.trim() : '';
+      if (!value) {
+        return callback(new Error(this.$t('message.feedBack.pleaseInputProblemDesc')));
+      }
+      if (value.length > 2000) {
+        callback(new Error(this.$t('message.feedBack.inputProblemDescMax')));
       } else {
         callback();
       }

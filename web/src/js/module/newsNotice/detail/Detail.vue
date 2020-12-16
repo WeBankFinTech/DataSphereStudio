@@ -47,7 +47,7 @@
             <span class="attach-item-name" @click="downLoadFile(item)">
               {{item.filename}}
             </span>
-            <Icon type="md-trash" @click="deleteFile(item)" style="cursor: pointer;" />
+            <Icon v-if="deleteFileShow" type="md-trash" @click="deleteFile(item)" style="cursor: pointer;" />
           </div>
         </div>
         </Col>
@@ -101,6 +101,7 @@ export default {
       reslovedDisabled: true,
       reslovedLoading: false,
       appendDisabled: true,
+      deleteFileShow: false,
     };
   },
   created() {
@@ -109,6 +110,7 @@ export default {
     // 状态为处理中和已处理
     if (issueStatus === 'istatus.processing' || issueStatus === 'istatus.resolved') {
       this.appendDisabled = false;
+      this.deleteFileShow = true;
     }
     // 状态为已处理
     if (issueStatus === 'istatus.resolved') {

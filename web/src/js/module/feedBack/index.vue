@@ -32,12 +32,12 @@
       <FormItem
         :label="$t('message.feedBack.subject')"
         prop="subject">
-        <Input v-model.trim="feedBackForm.subject" :maxlength="200" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
+        <Input v-model="feedBackForm.subject" :maxlength="200" :placeholder="$t('message.feedBack.pleaseInputTitle')" />
       </FormItem>
       <FormItem
         :label="$t('message.feedBack.pdesc')"
         prop="pdesc">
-        <Input v-model.trim="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
+        <Input v-model="feedBackForm.pdesc" type="textarea" :maxlength="2000" :rows="4" :placeholder="$t('message.feedBack.pleaseInputProblemDesc')" />
       </FormItem>
       <FormItem class="upload-row-item" style="width: 100%;">
         <Upload
@@ -108,7 +108,8 @@ export default {
     this.formValid = {
       subject: [
         { required: true, message: this.$t('message.feedBack.pleaseInputTitle'), trigger: 'blur' },
-        { type: 'string', max: 200, message: this.$t('message.feedBack.inputTitleMax'), trigger: 'blur' }
+        { type: 'string', max: 200, message: this.$t('message.feedBack.inputTitleMax'), trigger: 'blur' },
+        { validator: (rule, value, callback) => { this.inputTitleMaxlength(rule, value, callback); }, trigger: 'blur' }
       ],
       pdesc: [
         { required: true, message: this.$t('message.feedBack.pleaseInputProblemDesc'), trigger: 'blur' },
@@ -390,7 +391,18 @@ export default {
           });
         }
       });
-    }
+    },
+    inputTitleMaxlength(rule, value, callback) {
+      value = value ? value.trim() : '';
+      if (!value) {
+        return callback(new Error(this.$t('message.feedBack.pleaseInputTitle')));
+      }
+      if (value.length > 200) {
+        callback(new Error(this.$t('message.feedBack.inputTitleMax')));
+      } else {
+        callback();
+      }
+    },
   },
 };
 </script>

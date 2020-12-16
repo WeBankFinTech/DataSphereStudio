@@ -171,21 +171,8 @@ export default {
   },
   methods: {
     search() {
-      // this.userInfo.basic.ctyunUserId
       this.getResourceInfo();
       this.getHistory();
-      // Promise.all([this.getResourceInfo(), this.getHistory()]).then((result) => {
-      //   console.log(result)
-      //   const [resourceInfo, historyData] = result;
-      //   this.resourceInfo = resourceInfo;
-      //   this.historyList = historyData;
-      //   if (!isEmpty(this.historyList)) {
-      //     this.errorCount = this.historyList.filter((item) => item.status === 2).length;
-      //     this.errorMsg = `${this.errorCount}${this.$t('message.myResource.resourceInfo.errorText')}`;
-      //   }
-      // }).catch((error) => {
-      //   console.log(error)
-      // })
     },
     getResourceInfo() {
       api.fetch(`${module.data.API_PATH}luban/users/resources?ctyunUserId=8bdca937f2444172b3942198924de416`, 'get').then((rst) => {
@@ -193,50 +180,63 @@ export default {
       }).catch(() => {});
     },
     getHistory() {
-      console.log('----获取订单信息')
       this.loading = true;
       api.fetch(`${module.data.API_PATH}workOrder?ctyunUserId=7962606d99764abba58e6eb37f135d1b`, 'get').then((rst) => {
         this.historyList = rst;
         this.errorCount = this.historyList.filter((item) => item.status === 2).length;
-        console.log(this.errorCount)
         this.errorMsg = this.errorCount > 0 ? `${this.errorCount}个异常情况` : '';
+        const time = Date.parse(new Date());
+        console.log('======', time)
+        this.historyList.forEach((item) => {
+          const subTime = time - item.createTime;
+          console.log('--------', subTime)
+        });
         this.loading = false;
       }).catch(() => {
         this.loading = false;
       });
     },
     // 扩容
-    handleExpansion() {
+    async handleExpansion() {
+      await this.getUserInfo();
+      console.log(this.userStatus)
+      console.log(this.userStatus === 10)
       if (this.userStatus === 10) { // status = 10为使用中可扩容
-        // window.location.href = 'https://saas.ctyun.cn/eorder/luban/prolong?orderId=e916d0ec912241d3829a9b8a8d453d2d';
-        window.open(`${this.expansionUrl}?userId=e916d0ec912241d3829a9b8a8d453d2d`);
+        window.open(`this.expansionUrl?orderId=${this.historyList[0].workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持扩容！');
       }
     },
     // 续订
-    handleRenewOrder() {
+    async handleRenewOrder() {
+      await this.getUserInfo();
       // status = 9|10 为账户失效或者使用中可进行续订
-      // window.open(`${process.env.VUE_APP_CTYUN_PROLONG}?orderId=e916d0ec912241d3829a9b8a8d453d2d`);
       if (this.userStatus === 9 || this.userStatus === 10) {
-        // window.location.href = 'https://saas.ctyun.cn/eorder/luban/expansion?orderId=e916d0ec912241d3829a9b8a8d453d2d';
-        window.open(`${this.prolongUrl}?userId=e916d0ec912241d3829a9b8a8d453d2d`);
+        window.open(`this.prolongUrl?orderId=${this.historyList[0].workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持续订！');
       }
     },
     // 退订
-    handleCancelOrder() {
-      this.$Modal.confirm({
-        title: "提示",
-        content: "<p>退订之后，您的资源和数据将在15天内被回收，确认退订请点击确定按钮。</p>",
-        onOk: () => {
-          window.open(`${this.quitUrl}?orderId=e916d0ec912241d3829a9b8a8d453d2d`);
-        }
-      });
+    async handleCancelOrder() {
+      await this.getUserInfo();
+      if (this.historyList.length === 0) {
+        this.$Message.warning('不存在可退订的历史资源订单！');
+        return;
+      }
+      if (this.userStatus === 10) { // 正常使用可退订
+        this.$Modal.confirm({
+          title: "提示",
+          content: "<p>退订之后，您的资源和数据将在15天内被回收，确认退订请点击确定按钮。</p>",
+          onOk: () => {
+            window.open(`${this.quitUrl}?orderId=${this.historyList[0].workOrderId}`);
+          }
+        });
+      } else {
+        this.$Message.warning('当前状态不支持退订！');
+      }
     },
     refresh() {
-      this.getUserInfo();
       this.search();
     },
     getUserInfo() {
@@ -256,7 +256,6 @@ export default {
       this.feedBackShow = val;
     },
     createTimer() {
-      this.handleSearch();
       this.timer = setInterval(this.refresh, this.REFRESH_TIME);
     },
     parseDate(date) {

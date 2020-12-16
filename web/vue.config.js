@@ -70,7 +70,7 @@ module.exports = {
         },
       },
       '^/luban/test': {
-        target: 'http://192.168.20.142:9030/api/rest_j/v1',
+        target: 'http://192.168.10.83:9030/api/rest_j/v1',
         ws: true,
         changeOrigin: true,
         pathRewrite: {

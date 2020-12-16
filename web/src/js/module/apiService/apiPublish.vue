@@ -678,9 +678,9 @@ export default {
         runtime: {
           args: params.configuration.runtime.args,
           env: isEmpty(params.configuration.runtime.env) ? {} : util.convertArrayToObject(params.configuration.runtime.env),
+          datasource: params.configuration.runtime.datasource ? params.configuration.runtime.datasource : {}
         },
-        startup: params.configuration.startup,
-        datasource: params.configuration.runtime.datasource ? params.configuration.runtime.datasource : {}
+        startup: params.configuration.startup
       };
       return {
         variable,

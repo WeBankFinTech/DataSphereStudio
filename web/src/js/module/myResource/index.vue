@@ -163,6 +163,10 @@ export default {
     },
     // 扩容
     async handleExpansion() {
+      if (isEmpty(this.nearWorkOrder.workOrderId)) {
+        this.$Message.warning('不存在可扩容的资源订单！');
+        return;
+      }
       await this.getUserInfo();
       if (this.userStatus === 10) { // status = 10为使用中可扩容
         window.open(`${this.expansionUrl}?orderId=${this.nearWorkOrder.workOrderId}`);
@@ -172,6 +176,10 @@ export default {
     },
     // 续订
     async handleRenewOrder() {
+      if (isEmpty(this.nearWorkOrder.workOrderId)) {
+        this.$Message.warning('不存在可续订的资源订单！');
+        return;
+      }
       await this.getUserInfo();
       // status = 9|10 为账户失效或者使用中可进行续订
       if (this.userStatus === 9 || this.userStatus === 10) {
@@ -182,12 +190,11 @@ export default {
     },
     // 退订
     async handleCancelOrder() {
-      await this.getUserInfo();
-      if (this.historyList.length === 0) {
+      if (isEmpty(this.nearWorkOrder.workOrderId)) {
         this.$Message.warning('不存在可退订的资源订单！');
         return;
       }
-      console.log(this.nearWorkOrder);
+      await this.getUserInfo();
       if (this.userStatus === 10) { // 正常使用可退订
         this.$Modal.confirm({
           title: "提示",

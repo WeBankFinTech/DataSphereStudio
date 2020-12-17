@@ -282,7 +282,7 @@ router.beforeEach((to, from, next) => {
         }
       }
       window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
-    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice' || to.path === '/myResource') {
+    } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
       next()
     } else {
       if(userInfo.basic){

@@ -39,11 +39,11 @@ export default {
           name: this.$t('message.navMune.myResource'),
           icon: 'ios-paper-outline',
         },
-        {
-          id: 'workOrder',
-          name: this.$t('message.navMune.workOrder'),
-          icon: 'ios-paper-outline',
-        },
+        // {
+        //   id: 'workOrder',
+        //   name: this.$t('message.navMune.workOrder'),
+        //   icon: 'ios-paper-outline',
+        // },
         {
           id: 'feedBack',
           name: this.$t('message.navMune.feedBack'),

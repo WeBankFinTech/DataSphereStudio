@@ -4,7 +4,7 @@
       我的资源
       <span v-if="errorMsgShow" class="error-msg" @click="openFeedBack">
         <img src="../../../assets/images/Warning-Circle-Fill.svg" class="error-img"/>
-        <span class="error-text">{{ errorMsg }}</span>
+        <span class="error-text">异常情况</span>
       </span>
       <span class="refresh">
         <Icon type="md-refresh" @click="search"/>
@@ -24,16 +24,13 @@
       <Table
         :columns="columns"
         :data="historyList"
-        :loading="loading"
-        :border="false"
         max-height="600"
       >
         <template slot-scope="{ row }" slot="resourceInfo">
           <div class="table-column">
             <div class="table-column-item">
               <span>计算资源</span>
-              <span>{{ row.resourceInfo.coreNum }}</span>
-              <span>{{ row.resourceInfo.memSize }}</span>
+              <span>{{ parseComputed(row.resourceInfo) }}</span>
             </div>
             <div class="table-column-item">
               <span>存储周期</span>
@@ -41,7 +38,7 @@
             </div>
             <div class="table-column-item">
               <span>订购周期</span>
-              <span>{{ row.resourceInfo.cycleTime }}</span>
+              <span>{{ parseCycle(row.resourceInfo.cycleTime) }}</span>
             </div>
           </div>
         </template>
@@ -62,17 +59,16 @@
       :feedBackType="feedBackType"
       @show="feedBackShowAction"
     />
+    <Spin fix v-if="loading"></Spin>
   </div>
 </template>
 <script>
 import { find, isEmpty } from 'lodash';
 import storage from '@/js/helper/storage';
 import moment from 'moment';
-import module from './index';
 import api from '@/js/service/api';
 import ResourceInfo from './resourceInfo.vue';
 import FeedBackDialog from '../feedBack/index.vue';
-const REFRESH_TIME = 60000;
 const ORDER_STATUS = [
   { code: 0, desc: '订购开通中', status: 'processing' },
   { code: 1, desc: '使用中', status: 'success' },
@@ -124,39 +120,16 @@ export default {
     ];
     return {
       loading: false,
-      errorMsg: '',
+      errorMsgShow: false,
       resourceInfo: {},
       historyList: [],
       feedBackShow: false,
       feedBackActionType: '',
       feedBackType: '',
-      errorCount: 0, //异常情况数
       userId: null,
       userStatus: null,
       nearWorkOrder: {}, // 最新的订单
-      timer: ''
     };
-  },
-  computed: {
-    errorMsgShow() {
-      // 当用户处于“开通/扩容/退订/续订失败”状态，显示错误警示框
-      if ((this.userStatus === 2 || this.userStatus === 4 || this.userStatus === 6 || this.userStatus === 8) && this.errorCount > 0) {
-        return true;
-      }
-      return false;
-    },
-    parseStatus() {
-      return (status) => {
-        const orderStatus = find(ORDER_STATUS, ['code', status]).status;
-        return orderStatus ? orderStatus : '';
-      }
-    },
-    parseStatusDesc() {
-      return (status) => {
-        const orderStatusDesc = find(ORDER_STATUS, ['code', status]).desc;
-        return orderStatusDesc ? orderStatusDesc : '';
-      }
-    }
   },
   created() {
     const userInfo = storage.get('userInfo');
@@ -165,40 +138,34 @@ export default {
   },
   mounted() {
     this.search();
-    // this.createTimer();
-  },
-  beforeDestroy() {
-    clearInterval(this.timer);
   },
   methods: {
     search() {
-      this.getResourceInfo();
-      this.getHistory();
-    },
-    getResourceInfo() {
-      api.fetch(`${module.data.API_PATH}luban/users/resources?ctyunUserId=${this.userId}`, 'get').then((rst) => {
-        this.resourceInfo = rst;
-      }).catch(() => {});
-    },
-    getHistory() {
       this.loading = true;
-      api.fetch(`${module.data.API_PATH}workOrder?ctyunUserId=7962606d99764abba58e6eb37f135d1b`, 'get').then((rst) => {
-        this.historyList = rst;
-        this.errorCount = this.historyList.filter((item) => item.status === 2).length;
-        this.errorMsg = this.errorCount > 0 ? `${this.errorCount}个异常情况` : '';
-        this.nearWorkOrder = this.getNearWorkOrder();
+      Promise.all([this.getResourceInfo(), this.getHistory()]).then(() => {
         this.loading = false;
       }).catch(() => {
         this.loading = false;
+      })
+    },
+    async getResourceInfo() {
+      await api.fetch('luban/users/resources', { ctyunUserId: this.userId }, 'get').then((rst) => {
+        this.resourceInfo = rst;
+      });
+    },
+    async getHistory() {
+      this.errorMsgShow = false;
+      await api.fetch('workOrder', { ctyunUserId: this.userId }, 'get').then((rst) => {
+        this.historyList = rst;
+        this.nearWorkOrder = this.getNearWorkOrder();
+        if (this.nearWorkOrder.status === 2) this.errorMsgShow = true;
       });
     },
     // 扩容
     async handleExpansion() {
       await this.getUserInfo();
-      console.log(this.userStatus)
-      console.log(this.userStatus === 10)
       if (this.userStatus === 10) { // status = 10为使用中可扩容
-        window.open(`this.expansionUrl?orderId=${this.nearWorkOrder.workOrderId}`);
+        window.open(`${this.expansionUrl}?orderId=${this.nearWorkOrder.workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持扩容！');
       }
@@ -208,7 +175,7 @@ export default {
       await this.getUserInfo();
       // status = 9|10 为账户失效或者使用中可进行续订
       if (this.userStatus === 9 || this.userStatus === 10) {
-        window.open(`this.prolongUrl?orderId=${this.nearWorkOrder.workOrderId}`);
+        window.open(`${this.prolongUrl}?orderId=${this.nearWorkOrder.workOrderId}`);
       } else {
         this.$Message.warning('当前状态不支持续订！');
       }
@@ -217,9 +184,10 @@ export default {
     async handleCancelOrder() {
       await this.getUserInfo();
       if (this.historyList.length === 0) {
-        this.$Message.warning('不存在可退订的历史资源订单！');
+        this.$Message.warning('不存在可退订的资源订单！');
         return;
       }
+      console.log(this.nearWorkOrder);
       if (this.userStatus === 10) { // 正常使用可退订
         this.$Modal.confirm({
           title: "提示",
@@ -248,26 +216,35 @@ export default {
     feedBackShowAction(val) {
       this.feedBackShow = val;
     },
-    createTimer() {
-      this.timer = setInterval(this.search, this.REFRESH_TIME);
-    },
     parseDate(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
     },
     getNearWorkOrder() {
-      // let arrs = this.historyList.map((item) => {
-      //   return item.createTime;
-      // })
-      // console.log(arrs)
-      // console.log(...arrs)
-      // console.log(Math.max(...arrs))
-
-      const maxCreateTime = Math.max.apply(Math, this.historyList.map(item => item.createTime));
+      const createTimeAry = this.historyList.map((item) => {
+        return item.createTime;
+      })
+      const maxCreateTime = Math.max(...createTimeAry);
       return this.historyList.find(item => maxCreateTime === item.createTime);
-      // return {
-      //   product: JSON.parse(JSON.stringify(this.historyList.find(item => maxCreateTime === item.createTime))),
-      //   index: this.historyList.findIndex(item => maxCreateTime === item.createTime)
-      // }
+    },
+    parseComputed(resourceInfo) {
+      const { coreNum, memSize } = resourceInfo;
+      return `${coreNum} ${memSize}`;
+    },
+    parseCycle(cycleTime) {
+      if (cycleTime > 12) {
+        const year = cycleTime / 12;
+        const month = cycleTime % 12;
+        return month ? `${year}年${month}个月` : `${year}年`;
+      }
+      return `${cycleTime}个月`;
+    },
+    parseStatus(status) {
+      const orderStatus = find(ORDER_STATUS, ['code', status]).status;
+      return orderStatus ? orderStatus : '';
+    },
+    parseStatusDesc(status) {
+      const orderStatusDesc = find(ORDER_STATUS, ['code', status]).desc;
+      return orderStatusDesc ? orderStatusDesc : '';
     }
   },
 };

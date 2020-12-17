@@ -134,8 +134,8 @@
       padding: 10px 0;
       .table-column-item {
         line-height: 32px;
-        span:nth-child(2) {
-          padding: 0 5px 0 10px;
+        span:nth-child(1) {
+          padding: 0 10px 0 0;
         }
       }
       /deep/ .ivu-badge-status-text {

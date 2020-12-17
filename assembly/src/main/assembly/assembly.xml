@@ -90,6 +90,17 @@
       </includes>
     </fileSet>
 
+    <!--dss-apiservice-server-->
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/apiservice/dss-apiservice-server/target/
+      </directory>
+      <outputDirectory>share/dss/dss-apiservice-server</outputDirectory>
+      <includes>
+        <include>*.zip</include>
+      </includes>
+    </fileSet>
+
 
   <!--datachecker-appjoint-->
   <fileSet>

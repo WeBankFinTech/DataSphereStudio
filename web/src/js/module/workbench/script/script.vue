@@ -1065,7 +1065,7 @@ export default {
         startup: {},
       };
       if (!isEmpty(params)) {
-        variable = isEmpty(params.variable) ? [] : util.convertArrayToObject(params.variable);
+        variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
         configuration = isEmpty(params.configuration) ? {} : {
           special: {},
           runtime: {

@@ -281,7 +281,7 @@ router.beforeEach((to, from, next) => {
           document.cookie = keys[i] + '=0;path=/luban/schedule;domain=' + document.domain + ';expires=' + new Date(0).toUTCString() // 清除当前域名路径下的cookie
         }
       }
-      window.location = `https://www.ctyun.cn/cas/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
+      window.location = `https://www.ctyun.cn/login?service=${window.location.protocol}//${window.location.host}${process.env.VUE_APP_PREFIX}/api/rest_j/v1/application/ssologin`;
     } else if (to.path === '/newhome' || to.path === '/newsNotice' || to.path === '/noticeDetail' || to.path === '/redirect/newsNotice') {
       next()
     } else {

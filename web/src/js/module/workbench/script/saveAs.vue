@@ -1,7 +1,7 @@
 <template>
   <Modal
     v-model="show"
-    width="430"
+    width="600"
     class="save-as-modal">
     <div slot="header">
       <span>{{ $t('message.workBench.body.script.saveAs.header') }}</span>

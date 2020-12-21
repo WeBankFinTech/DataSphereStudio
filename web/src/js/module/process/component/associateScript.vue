@@ -1,10 +1,11 @@
 <template>
   <Modal
     v-model="show"
-    width="430"
+    :width="defaultWidth"
     class="associate-script">
     <div slot="header">
       <span>{{$t('message.process.associateBar.XZGLJB')}}</span>
+      <a type="code-working" @click="maxWidth">{{dlgLabel}}</a>
     </div>
     <div>
       <Form
@@ -60,6 +61,8 @@ export default {
       },
       nodeData: null,
       supportModes: null,
+      defaultWidth: 600,
+      dlgLabel: "宽屏显示"
     };
   },
   methods: {
@@ -133,6 +136,15 @@ export default {
         });
       }
     },
+    maxWidth(){
+      if(this.defaultWidth === 600){
+        this.defaultWidth = '90%';
+        this.dlgLabel = '默认显示';
+      }else {
+        this.defaultWidth = 600;
+        this.dlgLabel = '宽屏显示';
+      }
+    }
   },
 };
 </script>

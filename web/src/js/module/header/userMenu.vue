@@ -33,12 +33,17 @@ export default {
         //   id: 'FAQ',
         //   name: this.$t('message.navMune.FAQ'),
         //   icon: 'ios-help-circle-outline',
-        // }, 
+        // },
         {
-          id: 'workOrder',
-          name: this.$t('message.navMune.workOrder'),
+          id: 'myResource',
+          name: this.$t('message.navMune.myResource'),
           icon: 'ios-paper-outline',
         },
+        // {
+        //   id: 'workOrder',
+        //   name: this.$t('message.navMune.workOrder'),
+        //   icon: 'ios-paper-outline',
+        // },
         // {
         //   id: 'feedBack',
         //   name: this.$t('message.navMune.feedBack'),
@@ -72,6 +77,9 @@ export default {
           break;
         case 'clearCache':
           this.clearCache();
+          break;
+        case 'myResource': 
+          this.gotoMyResource();
           break;
         case 'workOrder':
           this.gotoWorkOrder();
@@ -151,6 +159,9 @@ export default {
           this.$router.push({ path: '/login' });
         });
       }
+    },
+    gotoMyResource() {
+      this.$router.push('/myResource'); 
     },
     gotoWorkOrder() {
       this.$router.push('/workOrder');

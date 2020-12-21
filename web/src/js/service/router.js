@@ -203,10 +203,19 @@ const router = new VueRouter({
           },
         },
         {
-          path: '/redirect/:path*',
+          path: 'redirect/:path*',
           hidden: true,
           component: () => import('../view/redirect/index')
-        }
+        },
+        {
+          path: 'myResource',
+          name: 'MyResource',
+          component: () => import('../module/myResource/index.vue'),
+          meta: {
+            title: 'myResource',
+            publicPage: true,
+          },
+        },
       ],
     },
     {
@@ -320,7 +329,6 @@ router.beforeEach((to, from, next) => {
             next();
             break;
         }
-          
       }else{
         next()
       }

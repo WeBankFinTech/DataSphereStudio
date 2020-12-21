@@ -139,6 +139,7 @@ export default {
       projectList: [],
       workspaces: [],
       isSandbox: process.env.NODE_ENV === 'sandbox',
+      timer: '',
     };
   },
   created() {

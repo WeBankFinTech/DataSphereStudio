@@ -68,7 +68,7 @@ module.exports = {
         pathRewrite: {
           '^/luban/operationApi': ''
         },
-      },
+      }
     }
     // after: require('./mock/mock-server.js')
   },

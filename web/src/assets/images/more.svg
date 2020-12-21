@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>画板</title>
+    <desc>Created with Sketch.</desc>
+    <g id="画板" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-20备份">
+            <rect id="Rectangle-4-Copy-3" x="0" y="0" width="16" height="16"></rect>
+            <g id="ellipsis" transform="translate(2.000000, 7.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M0,1 C0,1.55228475 0.44771525,2 1,2 C1.55228475,2 2,1.55228475 2,1 C2,0.44771525 1.55228475,0 1,0 C0.44771525,0 0,0.44771525 0,1 Z" id="Shape"></path>
+                <path d="M5,1 C5,1.55228475 5.44771525,2 6,2 C6.55228475,2 7,1.55228475 7,1 C7,0.44771525 6.55228475,0 6,0 C5.44771525,0 5,0.44771525 5,1 Z" id="Shape"></path>
+                <path d="M10,1 C10,1.55228475 10.4477153,2 11,2 C11.5522847,2 12,1.55228475 12,1 C12,0.44771525 11.5522847,0 11,0 C10.4477153,0 10,0.44771525 10,1 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

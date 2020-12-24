@@ -59,17 +59,19 @@ export default {
   },
   mounted() {
     // Airflow DAG pre-set params
-    this.$refs.dynamicForm.formDynamic.list = [
-      {
-        key: 'dag.start.time', value: '2020-09-15 00:00:00', 
-      },
-      {
-        key: 'dag.end.time', value: '2120-09-15 00:00:00', 
-      },
-      {
-        key: 'dag.schedule.interval', value: 'hourly',
-      }
-    ];
+    if (this.$use_airflow == 1) {
+      this.$refs.dynamicForm.formDynamic.list = [
+        {
+          key: 'dag.start.time', value: '2020-09-15 00:00:00', 
+        },
+        {
+          key: 'dag.end.time', value: '2120-09-15 00:00:00', 
+        },
+        {
+          key: 'dag.schedule.interval', value: 'hourly',
+        }
+      ];
+    }
   },
   methods: {
     setData() {
@@ -88,17 +90,19 @@ export default {
       } else {
         this.settingForm.proxyuser = '';
         // Airflow DAG pre-set params
-        this.$refs.dynamicForm.formDynamic.list = [
-          {
-            key: 'dag.start.time', value: '2020-09-15 00:00:00', 
-          },
-          {
-            key: 'dag.end.time', value: '2120-09-15 00:00:00', 
-          },
-          {
-            key: 'dag.schedule.interval', value: 'hourly',
-          }
-        ];
+        if (this.$use_airflow == 1) {
+          this.$refs.dynamicForm.formDynamic.list = [
+            {
+              key: 'dag.start.time', value: '2020-09-15 00:00:00', 
+            },
+            {
+              key: 'dag.end.time', value: '2120-09-15 00:00:00', 
+            },
+            {
+              key: 'dag.schedule.interval', value: 'hourly',
+            }
+          ];
+        }
       }
     },
     onProxyUserChange() {

@@ -55,7 +55,7 @@ HIVE_META_URL=jdbc:mysql://127.0.0.1:3306/hivemeta?characterEncoding=UTF-8
 HIVE_META_USER=xxx
 HIVE_META_PASSWORD=xxx
 
-#Used to store the azkaban project transformed by DSS
+#Used to store the airflow project transformed by DSS
 WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
 
 ###The IP address and port are written into the database here, so be sure to plan ahead
@@ -69,9 +69,9 @@ VISUALIS_NGINX_PORT=8088
 ### Eventchecker APPJOINT
 ### This service is used to provide Eventchecker capability. it's config in db.sh same as dss-server.
 
-#azkaban address for check
-AZKABAN_ADRESS_IP=127.0.0.1
-AZKABAN_ADRESS_PORT=8081
+#airflow address for check
+AIRFLOW_ADRESS_IP=127.0.0.1
+AIRFLOW_ADRESS_PORT=8080
 
 #qualitis.address for check
 QUALITIS_ADRESS_IP=127.0.0.1

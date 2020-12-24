@@ -279,7 +279,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // TODO: 2019/6/5 json中资源的删除
             // TODO: 2019/6/5 事务的保证
         }
-<<<<<<< HEAD:dss-server/src/main/java/com/webank/wedatasphere/dss/server/service/impl/DSSFlowServiceImpl.java
         try {
             DSSProject dssProject = projectService.getProjectByProjectVersionID(projectVersionID);
             dssProject.setUserName(userName);
@@ -297,8 +296,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } catch (AppJointErrorException e) {
             logger.error("Delete flow from scheduler failed!", e);
         }
-=======
->>>>>>> 8cc4d5bf688f7e8045fa4eecdcfcc1746cc0a44a:dss-server/src/main/java/com/webank/wedatasphere/dss/server/service/impl/DSSFlowServiceImpl.java
         deleteDSSDB(flowId, projectVersionID);
     }
 
@@ -323,10 +320,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 logger.error("Schedule system init failed!", e);
             }
         }
-<<<<<<< HEAD:dss-server/src/main/java/com/webank/wedatasphere/dss/server/service/impl/DSSFlowServiceImpl.java
         return schedulerAppJoint;
-=======
-        //第一期没有工作流的发布，所以不需要删除DSS工作流的发布表
->>>>>>> 8cc4d5bf688f7e8045fa4eecdcfcc1746cc0a44a:dss-server/src/main/java/com/webank/wedatasphere/dss/server/service/impl/DSSFlowServiceImpl.java
     }
 }

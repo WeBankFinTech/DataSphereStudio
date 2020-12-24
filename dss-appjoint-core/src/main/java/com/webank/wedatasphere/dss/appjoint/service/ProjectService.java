@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.appjoint.service;
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
+import com.webank.wedatasphere.dss.common.entity.flow.Flow;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 
 import java.util.List;
@@ -40,4 +41,6 @@ public interface ProjectService extends AppJointUrl {
     }
 
     void updateProject(Project project, Session session) throws AppJointErrorException;
+
+    void deleteFlowExtra(Project project, Flow flow, Session session) throws AppJointErrorException;
 }

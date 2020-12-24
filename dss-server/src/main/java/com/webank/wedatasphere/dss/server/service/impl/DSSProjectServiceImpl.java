@@ -214,7 +214,7 @@ public class DSSProjectServiceImpl implements DSSProjectService {
         }
         flowTaxonomyMapper.deleteFlowTaxonomyByProjectID(projectID);
         List<DSSFlow> dssFlowList = flowMapper.listFlowByProjectID(projectID);
-        flowService.batchDeleteFlow(dssFlowList.stream().map(f -> f.getId()).distinct().collect(Collectors.toList()), null);
+        flowService.batchDeleteFlow(dssFlowList.stream().map(f -> f.getId()).distinct().collect(Collectors.toList()), null, false, userName);
         projectMapper.deleteProjectVersions(projectID);
         projectMapper.deleteProjectBaseInfo(projectID);
         projectTaxonomyMapper.deleteProjectTaxonomyRelationByProjectID(projectID);

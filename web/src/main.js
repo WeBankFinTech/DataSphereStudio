@@ -39,6 +39,8 @@ Vue.prototype.$Message.config({
   duration: 3
 })
 
+Vue.prototype.$use_airflow = process.env.VUE_APP_USE_AIRFLOW
+
 new Vue({
   router,
   i18n,

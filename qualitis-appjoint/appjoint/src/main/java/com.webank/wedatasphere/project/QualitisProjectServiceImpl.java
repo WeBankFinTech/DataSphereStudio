@@ -7,6 +7,7 @@ import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.appjoint.service.ProjectService;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
+import com.webank.wedatasphere.dss.common.entity.flow.Flow;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import org.apache.commons.lang.RandomStringUtils;
@@ -215,6 +216,11 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             LOGGER.error("Failed to update project in qualitis, caused by: {}", e.getMessage(), e);
             throw new AppJointErrorException(500, e.getMessage());
         }
+    }
+
+    @Override
+    public void deleteFlowExtra(Project project, Flow flow, Session session) throws AppJointErrorException {
+
     }
 
     private Boolean checkResponse(Map<String, Object> response) {

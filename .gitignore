@@ -9,6 +9,7 @@ dss-appjoint-auth/target/
 dss-appjoint-core/target/
 dss-appjoint-loader/target/
 dss-application/target/
+dss-airflow-scheduler-appjoint/target/
 dss-azkaban-scheduler-appjoint/target/
 dss-common/target/
 dss-flow-execution-entrance/target/
@@ -16,8 +17,10 @@ dss-linkis-node-execution/target/
 dss-scheduler-appjoint-core/target/
 dss-server/target/
 eventchecker-appjoint/target/
+plugins/airflow/linkis-airflow-client/target/
 plugins/azkaban/linkis-jobtype/target/
 plugins/linkis/linkis-appjoint-entrance/target/
 
 sendemail-appjoint/sendemail-core/target/
 visualis-appjoint/appjoint/target/
+qualitis-appjoint/appjoint/target/

@@ -145,7 +145,7 @@
                 <exclude>javax.annotation:javax.annotation-api:jar</exclude>
                 <exclude>javax.inject:javax.inject:jar</exclude>
                 <exclude>javax.servlet:javax.servlet-api:jar</exclude>
-                <exclude>javax.servlet.jsp:jsp-api:jar</exclude>
+<!--                <exclude>javax.servlet.jsp:jsp-api:jar</exclude>-->
                 <exclude>javax.validation:validation-api:jar</exclude>
                 <exclude>javax.websocket:javax.websocket-api:jar</exclude>
                 <exclude>javax.ws.rs:javax.ws.rs-api:jar</exclude>

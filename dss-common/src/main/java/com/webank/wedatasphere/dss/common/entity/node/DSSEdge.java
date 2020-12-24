@@ -24,7 +24,7 @@ public interface DSSEdge {
 
     String getSource();
 
-    void setSource();
+    void setSource(String source);
 
     String getTarget();
 

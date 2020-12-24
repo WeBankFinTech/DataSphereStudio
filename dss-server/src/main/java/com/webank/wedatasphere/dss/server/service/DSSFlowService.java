@@ -62,7 +62,7 @@ public interface DSSFlowService {
 
     void updateFlowTaxonomyRelation(Long flowID, Long taxonomyID) throws DSSErrorException;
 
-    void batchDeleteFlow(List<Long> flowIDlist, Long projectVersionID);
+    void batchDeleteFlow(List<Long> flowIDlist, Long projectVersionID, Boolean ifDelScheduler, String userName);
 
     String saveFlow(Long flowID, String jsonFlow, String comment, String userName, Long projectVersionID, List<Op> ops) throws DSSErrorException, AppJointErrorException;
 

@@ -35,12 +35,14 @@
         <module>dss-linkis-node-execution</module>
         <module>dss-flow-execution-entrance</module>
         <module>dss-azkaban-scheduler-appjoint</module>
+        <module>dss-airflow-scheduler-appjoint</module>
         <module>dss-server</module>
         <module>visualis-appjoint/appjoint</module>
         <module>qualitis-appjoint/appjoint</module>
         <module>eventchecker-appjoint</module>
         <module>datachecker-appjoint</module>
         <module>sendemail-appjoint/sendemail-core</module>
+        <module>plugins/airflow/linkis-airflow-client</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>

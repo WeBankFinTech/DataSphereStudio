@@ -44,6 +44,7 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/linkis-appjoint-entrance</module>
         <module>assembly</module>
+        <module>dss-user-manager</module>
     </modules>
 
     <properties>

@@ -1,14 +1,12 @@
 package com.webank.wedatasphpere.dss.user.service.impl;
 
-import com.webank.wedatasphpere.dss.user.conf.DSSUserManagerConfig;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.Command;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.util.List;
 
 /**
  * @program: luban-authorization
@@ -21,23 +19,34 @@ public class WorkspaceCommand extends AbsCommand {
 
     @Override
     public String authorization(AuthorizationBody body) {
-        String rootPath = DSSUserManagerConfig.LOCAL_USER_ROOT_PATH;
-        System.out.println(rootPath);
+        List<String> paths = body.getPaths();
+
+
+        for(Integer i=0; i<paths.size(); i++){
+            String rst = createDir(paths.get(i), body);
+            if(rst != Command.SUCCESS){
+                return rst;
+            }
+        }
+        return Command.SUCCESS;
+    }
+
+    private String createDir(String path, AuthorizationBody body) {
         String bashCommand;
-        BufferedReader br = null;
-        BufferedWriter wr = null;
+        BufferedReader br;
         try {
-            if(rootPath.indexOf("hdfs:") == -1){
+            if(path.indexOf("hdfs:") != -1){
+                path = path.replace("hdfs://", "");
                 bashCommand = this.getClass().getClassLoader().getResource("./default/LinuxPath.sh").getPath();
             }else {
-                bashCommand = this.getClass().getClassLoader().getResource("default/LinuxPath.sh").getPath();
+                path = path.replace("file://", "");
+                bashCommand = this.getClass().getClassLoader().getResource("./default/LinuxPath.sh").getPath();
             }
 
             Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("sudo sh " + bashCommand + " " + body.getUsername() + " " + "/Users/test22");
+            Process process = runtime.exec("sudo sh " + bashCommand + " " + body.getUsername() + " " + path + "/" + body.getUsername());
 
             br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            wr = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             String inline;
             while ((inline = br.readLine()) != null) {
@@ -60,7 +69,7 @@ public class WorkspaceCommand extends AbsCommand {
 
             int status = process.waitFor();
             if (status != 0){
-                return "restart go server error";
+                System.out.println("restart go server error:"+status); ;
             }
             return Command.SUCCESS;
         }

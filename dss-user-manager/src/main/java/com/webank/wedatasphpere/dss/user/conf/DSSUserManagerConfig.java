@@ -3,6 +3,8 @@ package com.webank.wedatasphpere.dss.user.conf;
 import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 import com.webank.wedatasphere.linkis.common.conf.CommonVars$;
 
+import java.util.ResourceBundle;
+
 /**
  * @program: dss-appjoint-auth
  * @description: 用户模块配置文件
@@ -12,5 +14,6 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars$;
 
 
 public class DSSUserManagerConfig {
-    public final static CommonVars LOCAL_USER_ROOT_PATH = CommonVars$.MODULE$.apply("wds.linkis.workspace.filesystem.localuserrootpath","hdfs:///dss_workspace");
+    private final static ResourceBundle resource = ResourceBundle.getBundle("linkis");
+    public final static String LOCAL_USER_ROOT_PATH = resource.getString("wds.dss.user.root.dir");
 }

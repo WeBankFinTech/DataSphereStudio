@@ -21,8 +21,8 @@ public class WorkspaceCommand extends AbsCommand {
 
     @Override
     public String authorization(AuthorizationBody body) {
-        String rootPath = "hdfs://";
-//        DSSUserManagerConfig.LOCAL_USER_ROOT_PATH.getValue();
+        String rootPath = DSSUserManagerConfig.LOCAL_USER_ROOT_PATH;
+        System.out.println(rootPath);
         String bashCommand;
         BufferedReader br = null;
         BufferedWriter wr = null;

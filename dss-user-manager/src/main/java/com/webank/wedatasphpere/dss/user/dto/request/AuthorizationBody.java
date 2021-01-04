@@ -13,7 +13,16 @@ public class AuthorizationBody {
 
     private String username;
     private String password;
-    private List<String> hdfsList;
+
+    public List<String> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(List<String> paths) {
+        this.paths = paths;
+    }
+
+    private List<String> paths;
 
     public String getUsername() {
         return username;
@@ -31,15 +40,10 @@ public class AuthorizationBody {
         this.password = password;
     }
 
-
     public String getDatabaseName(){
         return this.username + "_default";
     }
 
-    public List<String> getUserPath(){
-//        hdfsList.add("")
-        return hdfsList;
-    }
 
 
 }

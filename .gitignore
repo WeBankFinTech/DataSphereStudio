@@ -22,4 +22,5 @@ plugins/linkis/linkis-appjoint-entrance/target/
 sendemail-appjoint/sendemail-core/target/
 visualis-appjoint/appjoint/target/
 
+dss-user-manager/target/
 logs

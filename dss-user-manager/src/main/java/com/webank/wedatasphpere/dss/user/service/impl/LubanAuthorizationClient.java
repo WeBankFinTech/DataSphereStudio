@@ -1,8 +1,7 @@
 package com.webank.wedatasphpere.dss.user.service.impl;
 
 
-//import cn.ctyun.lubanauthorization.dto.request.AuthorizationBody;
-//import entity.LinkisUserDo;
+import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 
 /**
  * @program: luban-authorization
@@ -15,23 +14,10 @@ public class LubanAuthorizationClient {
     private LubanMacroCommand lubanCommand = new LubanMacroCommand();
 
     public LubanAuthorizationClient(){
-        lubanCommand.add(new YarnCommand());
-//        lubanCommand.add(new LDAPCommand());
+        lubanCommand.add(new WorkspaceCommand());
     }
 
-//    public String authorization(AuthorizationBody json, LinkisUserDo userInfo) {
-//        return lubanCommand.authorization(json, userInfo);
-//    }
-//
-//    public String undoAuthorization(AuthorizationBody json, LinkisUserDo userInfo) {
-//        return lubanCommand.undoAuthorization(json, userInfo);
-//    }
-//
-//    public String renew(AuthorizationBody json, LinkisUserDo userInfo) {
-//        return lubanCommand.renew(json, userInfo);
-//    }
-//
-//    public String capacity(AuthorizationBody json, LinkisUserDo userInfo) {
-//        return lubanCommand.capacity(json, userInfo);
-//    }
+    public String authorization(AuthorizationBody body) {
+        return lubanCommand.authorization(body);
+    }
 }

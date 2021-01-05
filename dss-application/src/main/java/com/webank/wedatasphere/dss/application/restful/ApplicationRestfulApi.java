@@ -17,9 +17,11 @@
 
 package com.webank.wedatasphere.dss.application.restful;
 
+import com.webank.wedatasphere.dss.application.conf.ApplicationConf;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.DSSUserVO;
+import com.webank.wedatasphere.dss.application.entity.WorkSpacePath;
 import com.webank.wedatasphere.dss.application.handler.ApplicationHandlerChain;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
@@ -70,7 +72,41 @@ public class ApplicationRestfulApi {
         }
         DSSUser dssUser = dataworkisUserService.getUserByName(username);
         DSSUserVO dataworkisUserVO = new DSSUserVO();
+        String superUserName = ApplicationConf.SUPER_USER_NAME;
+        //是否超级用户登录
+        if(username.equals(superUserName)){
+            dssUser.setIsSuperUser(1);
+        }else{
+            dssUser.setIsSuperUser(0);
+        }
+
         dataworkisUserVO.setBasic(dssUser);
         return Message.messageToResponse(Message.ok().data("applications",applicationList).data("userInfo",dataworkisUserVO));
+    }
+
+
+    @GET
+    @Path("getWorkSpace")
+    public Response getWorkSpace(@Context HttpServletRequest req){
+
+        String username = SecurityFilter.getLoginUsername(req);
+        applicationHandlerChain.handle(username);
+        List<Application> applicationList = applicationService.listApplications();
+        for (Application application : applicationList) {
+            String redirectUrl = application.getRedirectUrl();
+            if(redirectUrl != null) {
+                application.setHomepageUrl(ApplicationUtils.redirectUrlFormat(redirectUrl,application.getHomepageUrl()));
+                application.setProjectUrl(ApplicationUtils.redirectUrlFormat(redirectUrl,application.getProjectUrl()));
+            }
+        }
+
+        WorkSpacePath workSpacePath = new WorkSpacePath();
+        workSpacePath.setHdfsRootPath(ApplicationConf.HDFS_USER_ROOT_PATH);
+        workSpacePath.setResultRootPath(ApplicationConf.RESULT_SET_ROOT_PATH);
+        workSpacePath.setSchedulerPath(ApplicationConf.WDS_SCHEDULER_PATH);
+        workSpacePath.setWorkspaceRootPath(ApplicationConf.WORKSPACE_USER_ROOT_PATH);
+
+        return Message.messageToResponse(Message.ok().data("applications",applicationList).data("workSpacePath",workSpacePath));
+
     }
 }

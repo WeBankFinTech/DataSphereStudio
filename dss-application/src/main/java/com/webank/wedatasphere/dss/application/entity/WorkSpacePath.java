@@ -1,41 +1,48 @@
 package com.webank.wedatasphere.dss.application.entity;
 
 public class WorkSpacePath {
-    private String WorkspaceRootPath;
-    private String HdfsRootPath;
+    private String workspaceRootPath;
+    private String hdfsRootPath;
+    private String resultRootPath;
+    private String schedulerPath;
 
     public String getWorkspaceRootPath() {
-        return WorkspaceRootPath;
+        return workspaceRootPath;
     }
 
     public void setWorkspaceRootPath(String workspaceRootPath) {
-        WorkspaceRootPath = workspaceRootPath;
+        this.workspaceRootPath = workspaceRootPath;
     }
 
     public String getHdfsRootPath() {
-        return HdfsRootPath;
+        return hdfsRootPath;
     }
 
     public void setHdfsRootPath(String hdfsRootPath) {
-        HdfsRootPath = hdfsRootPath;
+        this.hdfsRootPath = hdfsRootPath;
     }
 
     public String getResultRootPath() {
-        return ResultRootPath;
+        return resultRootPath;
     }
 
     public void setResultRootPath(String resultRootPath) {
-        ResultRootPath = resultRootPath;
+        this.resultRootPath = resultRootPath;
     }
 
     public String getSchedulerPath() {
-        return SchedulerPath;
+        return schedulerPath;
     }
 
     public void setSchedulerPath(String schedulerPath) {
-        SchedulerPath = schedulerPath;
+        this.schedulerPath = schedulerPath;
     }
 
-    private String ResultRootPath;
-    private String SchedulerPath;
+
+
+
+
+
+
+
 }

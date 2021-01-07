@@ -39,6 +39,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,26 +89,14 @@ public class ApplicationRestfulApi {
 
     @GET
     @Path("getWorkSpace")
-    public Response getWorkSpace(@Context HttpServletRequest req){
-
-        String username = SecurityFilter.getLoginUsername(req);
-        applicationHandlerChain.handle(username);
-        List<Application> applicationList = applicationService.listApplications();
-        for (Application application : applicationList) {
-            String redirectUrl = application.getRedirectUrl();
-            if(redirectUrl != null) {
-                application.setHomepageUrl(ApplicationUtils.redirectUrlFormat(redirectUrl,application.getHomepageUrl()));
-                application.setProjectUrl(ApplicationUtils.redirectUrlFormat(redirectUrl,application.getProjectUrl()));
-            }
-        }
-
+    public Response getWorkSpace(@Context HttpServletRequest req) throws Exception {
         WorkSpacePath workSpacePath = new WorkSpacePath();
         workSpacePath.setHdfsRootPath(ApplicationConf.HDFS_USER_ROOT_PATH);
         workSpacePath.setResultRootPath(ApplicationConf.RESULT_SET_ROOT_PATH);
         workSpacePath.setSchedulerPath(ApplicationConf.WDS_SCHEDULER_PATH);
         workSpacePath.setWorkspaceRootPath(ApplicationConf.WORKSPACE_USER_ROOT_PATH);
-
-        return Message.messageToResponse(Message.ok().data("applications",applicationList).data("workSpacePath",workSpacePath));
+        ArrayList<HashMap<String,Object>> responses = ApplicationUtils.convertToMap(workSpacePath);
+        return Message.messageToResponse(Message.ok().data("paths",responses));
 
     }
 }

@@ -6,7 +6,9 @@ import com.webank.wedatasphpere.dss.user.service.Command;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @program: luban-authorization
@@ -19,15 +21,21 @@ public class WorkspaceCommand extends AbsCommand {
 
     @Override
     public String authorization(AuthorizationBody body) {
-        List<String> paths = body.getPaths();
-
-
-        for(Integer i=0; i<paths.size(); i++){
-            String rst = createDir(paths.get(i), body);
-            if(rst != Command.SUCCESS){
-                return rst;
-            }
+        List<HashMap<String,String>> paths = body.getPaths();
+        for(HashMap<String,String> map : paths){
+          String path = map.get("value");
+          String rst = createDir(path, body);
+          if(rst != Command.SUCCESS){
+              return rst;
+          }
         }
+
+//        for(Integer i=0; i<paths.size(); i++){
+//            String rst = createDir(paths.get(i), body);
+//            if(rst != Command.SUCCESS){
+//                return rst;
+//            }
+//        }
         return Command.SUCCESS;
     }
 

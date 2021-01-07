@@ -24,3 +24,10 @@ visualis-appjoint/appjoint/target/
 
 dss-user-manager/target/
 logs
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+
+out
+gen

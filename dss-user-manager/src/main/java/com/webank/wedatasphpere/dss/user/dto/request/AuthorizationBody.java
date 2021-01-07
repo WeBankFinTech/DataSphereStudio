@@ -1,6 +1,7 @@
 package com.webank.wedatasphpere.dss.user.dto.request;
 
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -14,15 +15,16 @@ public class AuthorizationBody {
     private String username;
     private String password;
 
-    public List<String> getPaths() {
+
+    public List<HashMap<String, String>> getPaths() {
         return paths;
     }
 
-    public void setPaths(List<String> paths) {
+    public void setPaths(List<HashMap<String, String>> paths) {
         this.paths = paths;
     }
 
-    private List<String> paths;
+    private List<HashMap<String,String>> paths;
 
     public String getUsername() {
         return username;

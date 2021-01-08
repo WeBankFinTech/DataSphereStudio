@@ -1,6 +1,6 @@
 #!/bin/bash
 
 user=$1
-dic=$2
-hdfs dfs -mkdir $dic
+dir=$2
+hdfs dfs -mkdir $dir
 hdfs dfs -chown $user:$user

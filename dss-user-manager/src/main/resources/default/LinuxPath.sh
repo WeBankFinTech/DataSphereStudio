@@ -1,7 +1,7 @@
 #!/bin/bash
 
 user=$1
-dic=$2
+dir=$2
 echo $1 $2;
-sudo mkdir -p $dic
-sudo chown $user:$user $dic
+sudo mkdir -p $dir
+sudo chown $user:$user $dir

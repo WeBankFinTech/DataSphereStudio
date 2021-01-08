@@ -634,7 +634,8 @@
         "navMune": {
             "FAQ": "常见问题",
             "clearCache": "清理缓存",
-            "logOut": "退出登录"
+            "logOut": "退出登录",
+            "userManager": "用户管理"
         },
         "shape": {
             "dataDev": "数据开发",

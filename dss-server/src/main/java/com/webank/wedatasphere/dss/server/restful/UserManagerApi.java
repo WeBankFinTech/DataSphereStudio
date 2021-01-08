@@ -48,11 +48,4 @@ public class UserManagerApi {
     }
 
 
-    @GET
-    @Path("/paths")
-    public Response getPaths(@Context HttpServletRequest req) {
-        List<String> paths = new ArrayList<>();
-        paths.add("hdfs:///dss_workspace/linkis");
-        return Message.messageToResponse(Message.ok().data("paths", paths));
-    }
 }

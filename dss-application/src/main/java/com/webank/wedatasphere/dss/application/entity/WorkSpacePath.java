@@ -5,6 +5,17 @@ public class WorkSpacePath {
     private String hdfsRootPath;
     private String resultRootPath;
     private String schedulerPath;
+    private String userPath;
+
+    public String getUserPath() {
+        return userPath;
+    }
+
+    public void setUserPath(String userPath) {
+        this.userPath = userPath;
+    }
+
+
 
     public String getWorkspaceRootPath() {
         return workspaceRootPath;

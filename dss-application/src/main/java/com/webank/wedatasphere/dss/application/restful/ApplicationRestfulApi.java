@@ -88,13 +88,14 @@ public class ApplicationRestfulApi {
 
 
     @GET
-    @Path("getWorkSpace")
+    @Path("getPath")
     public Response getWorkSpace(@Context HttpServletRequest req) throws Exception {
         WorkSpacePath workSpacePath = new WorkSpacePath();
         workSpacePath.setHdfsRootPath(ApplicationConf.HDFS_USER_ROOT_PATH);
         workSpacePath.setResultRootPath(ApplicationConf.RESULT_SET_ROOT_PATH);
         workSpacePath.setSchedulerPath(ApplicationConf.WDS_SCHEDULER_PATH);
         workSpacePath.setWorkspaceRootPath(ApplicationConf.WORKSPACE_USER_ROOT_PATH);
+        workSpacePath.setUserPath(ApplicationConf.WDS_USER_PATH);
         ArrayList<HashMap<String,Object>> responses = ApplicationUtils.convertToMap(workSpacePath);
         return Message.messageToResponse(Message.ok().data("paths",responses));
 

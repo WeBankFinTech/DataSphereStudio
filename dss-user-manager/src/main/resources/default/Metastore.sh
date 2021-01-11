@@ -1,11 +1,13 @@
 #!/bin/bash
 
-user_name = $1
-db_name = $2
-path = $3
+user_name=$1
+db_name=$2
+path=$3
+realm=$4
+host_name=`hostname`
 
 #一、kerberos认证
-kinit -kt /etc/security/keytabs/${user_name}.keytab ${user_name}/nm-bigdata-030066029.ctc.local@EWS.BIGDATA.CHINATELECOM.CN.UAT
+kinit -kt /etc/security/keytabs/${user_name}.keytab ${user_name}/${host_name}@${realm}
 
 #二、metastore操作
 hive -e "create database is not exists $db_name"

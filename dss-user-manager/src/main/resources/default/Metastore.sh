@@ -12,7 +12,7 @@ hive -e "create database is not exists $db_name"
 if [[ $? -ne 0 ]]; then
     echo "create database failed"
 else
-   #修改数据库所属，需要hive metastore开启赋权功能，并将hdfs用户添加到admin中
+   #修改数据库所属，需要hive metastore开启赋权功能，并将principal用户添加到metastore侧hive-site.xml hive.users.in.admin.role中
    hive -e "set role admin ; grant all on database $db_name to user $user_name"
 fi
 

@@ -15,6 +15,7 @@ public class LubanAuthorizationClient {
 
     public LubanAuthorizationClient(){
         lubanCommand.add(new WorkspaceCommand());
+        lubanCommand.add(new MetastoreCommand());
     }
 
     public String authorization(AuthorizationBody body) {

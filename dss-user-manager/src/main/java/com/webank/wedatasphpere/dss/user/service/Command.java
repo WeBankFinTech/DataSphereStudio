@@ -3,7 +3,7 @@ package com.webank.wedatasphpere.dss.user.service;
 
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 public interface Command {
 
@@ -13,7 +13,7 @@ public interface Command {
      * @param body
      * @return 成功 success  其他失败
      */
-    public String authorization(AuthorizationBody body);
+    public String authorization(AuthorizationBody body) throws IOException;
 
     /**
      * 关闭授权

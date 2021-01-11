@@ -25,13 +25,14 @@ public class MetastoreCommand extends AbsCommand {
 
         String bashCommand;
         String userName = body.getUsername();
+        String realm = parms.getString("realm");
         String res = null;
         if (userName != null) {
                 String dbName = userName + parms.getString("db_tail");
                 String path = parms.getString("base_path") + dbName + ".db";
                 bashCommand = this.getClass().getClassLoader().getResource(parms.getString("metastore_sh")).getPath();
                 Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec("sudo sh " + bashCommand + " " + userName + " " + dbName + "" + path);
+                Process process = runtime.exec("sudo sh " + bashCommand + " " + userName + " " + dbName + "" + path+ "" + realm);
                 res = CommonFun.process(process);
         }
         return res;

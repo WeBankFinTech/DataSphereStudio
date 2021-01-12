@@ -1,6 +1,7 @@
 *.iml
 .idea
 .DS_Store
+*.class
 
 assembly/target
 

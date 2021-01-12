@@ -2,6 +2,7 @@ package com.webank.wedatasphpere.dss.user.service;
 
 
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
+import org.dom4j.DocumentException;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public interface Command {
      * @param body
      * @return 成功 success  其他失败
      */
-    public String authorization(AuthorizationBody body) throws IOException;
+    public String authorization(AuthorizationBody body) throws DocumentException;
 
     /**
      * 关闭授权

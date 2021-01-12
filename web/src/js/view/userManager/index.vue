@@ -6,22 +6,31 @@
       </div>
       <feature />
     </div>
-    <div style="width: 500px; margin: auto; margin-top: 50px;">
+    <div style="width: 500px; margin: auto;">
       <Form ref="createUserForm" :model="formCreateUser" label-position="left" :label-width="100" :rules="rules">
-        <FormItem :label="$t('message.userManager.username')" prop="username">
+        <FormItem label-width=120 :label="$t('message.userManager.username')" prop="username">
           <Input v-model="formCreateUser.username" />
         </FormItem>
-        <FormItem :label="$t('message.userManager.password')" prop="password">
+        <FormItem label-width=120 :label="$t('message.userManager.password')" prop="password">
           <Input v-model="formCreateUser.password" />
         </FormItem>
 
-        <FormItem 
+        <FormItem label-width=120 :label="$t('message.userManager.dssInstallDir')">
+          <Input v-model="formCreateUser.dssInstallDir" />
+        </FormItem>
+
+        <FormItem label-width=120 :label="$t('message.userManager.azkabanInstallDir')">
+          <Input v-model="formCreateUser.azkakanDir" />
+        </FormItem>
+
+        <FormItem label-width=120
           v-for="(item) in formCreateUser.paths"
           :key="item.value"
           :label="item.key"
         >
           <Input v-model="item.value" :placeholder="item.value" />
         </FormItem>
+        
 
         <FormItem>
           <Row>
@@ -49,8 +58,8 @@ export default {
         username: '',
         password: '',
         paths: [{key: 'rootPath', value: 'hdfs:///dss_workspace/linkis'}],
-        // rootPath: '',
-        // spacePath: '',
+        dssInstallDir: '',
+        azkakanDir: '',
         // hdfsPath: '',
         // resultPath: '',
         // schedulerPath: '',
@@ -63,7 +72,8 @@ export default {
   },
   created(){
     api.fetch(`/dss/paths`, null, {method: 'get'}).then((rst)=>{
-      // this.formCreateUser = {...this.formCreateUser, ...rst};
+      window.console.log("rst", rst);
+      this.formCreateUser = {...this.formCreateUser, ...rst};
     })
   },
   methods: {

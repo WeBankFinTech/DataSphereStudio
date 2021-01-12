@@ -88,7 +88,7 @@ public class ApplicationRestfulApi {
 
 
     @GET
-    @Path("getPath")
+    @Path("paths")
     public Response getWorkSpace(@Context HttpServletRequest req) throws Exception {
         WorkSpacePath workSpacePath = new WorkSpacePath();
         workSpacePath.setHdfsRootPath(ApplicationConf.HDFS_USER_ROOT_PATH);
@@ -97,7 +97,9 @@ public class ApplicationRestfulApi {
         workSpacePath.setWorkspaceRootPath(ApplicationConf.WORKSPACE_USER_ROOT_PATH);
         workSpacePath.setUserPath(ApplicationConf.WDS_USER_PATH);
         ArrayList<HashMap<String,Object>> responses = ApplicationUtils.convertToMap(workSpacePath);
-        return Message.messageToResponse(Message.ok().data("paths",responses));
+        return Message.messageToResponse(Message.ok().data("paths",responses)
+                .data("dssInstallDir", ApplicationConf.DSS_INSTALL_DIR)
+                .data("azkakanDir", ApplicationConf.AZKABAN_INSTALL_DIR));
 
     }
 }

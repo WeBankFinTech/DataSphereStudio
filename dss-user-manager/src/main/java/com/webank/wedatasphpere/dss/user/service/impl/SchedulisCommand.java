@@ -18,6 +18,9 @@ import java.util.Map;
 
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.DES;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -29,16 +32,18 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public class SchedulisCommand extends AbsCommand {
 
+    private static final Logger logger = LoggerFactory.getLogger(SchedulisCommand.class);
+
     @Override
     public String authorization(AuthorizationBody body) {
         String username = body.getUsername();
-        System.out.println("开始新增调度用户：" + username);
+        logger.info("开始新增调度用户：{}", username);
         String password = body.getPassword();
         String encryptionPwd = getEncryptionPwd(username, password);
         Connection connection;
         Statement stmt;
         try {
-            System.out.println("开始插入ctyun_user表");
+            logger.info("开始插入ctyun_user表");
             connection = getConnection();
             stmt = connection.createStatement();
             String sql = "INSERT INTO `ctyun_user` (`id`,`name`,`username`,`email`,`password`,`work_order_item_config`) VALUES (?,?,?,?,?,NULL) ON DUPLICATE KEY UPDATE `password` = ?";
@@ -52,13 +57,13 @@ public class SchedulisCommand extends AbsCommand {
             statement.executeUpdate();
             stmt.close();
             connection.close();
-            System.out.println("完成插入ctyun_user表");
+            logger.info("完成插入ctyun_user表");
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
-        System.out.println("开始调用接口新增schedulis用户");
+        logger.info("开始调用接口新增schedulis用户");
         addSchedulisUser(username, password);
-        System.out.println("结束调用接口新增schedulis用户");
+        logger.info("结束调用接口新增schedulis用户");
         return Command.SUCCESS;
     }
 
@@ -72,7 +77,7 @@ public class SchedulisCommand extends AbsCommand {
             String password = DSSUserManagerConfig.BDP_SERVER_MYBATIS_DATASOURCE_PASSWORD;
             return DriverManager.getConnection(url, user, password);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return null;
     }
@@ -91,7 +96,7 @@ public class SchedulisCommand extends AbsCommand {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(fullUrl);
         URI uri = builder.build().encode().toUri();
         ResponseEntity<JsonNode> responseEntity = restTemplate.getForEntity(uri, JsonNode.class);
-        return "OK".equals(responseEntity.getStatusCode());
+        return HttpStatus.OK.equals(responseEntity.getStatusCode());
     }
 
     private static String addParams(String url, Map<String, String> params) {

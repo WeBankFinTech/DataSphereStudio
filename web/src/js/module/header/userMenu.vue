@@ -20,6 +20,9 @@ import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 export default {
   name: 'Menu',
+  props: {
+    isSuperUser: Number
+  },
   data() {
     return {
       menuList: [
@@ -43,19 +46,20 @@ export default {
         }],
     };
   },
-  created(){
-    const userInfo = storage.get('userInfo');
-    if(userInfo.isSuperUser === 1){
-      if(this.menuList[0].id !== 'user-management'){
-        this.menuList.shift({
-          id: 'user-management',
-          name: this.$t('message.navMune.userManager'),
-          icon: 'ios-person-outline',
-        },)
-      }
-    }else {
-      if(this.menuList[0].id === 'user-management') {
-        this.menuList.unshift();
+  watch: { 
+    isSuperUser: function(newVal){
+      if(newVal === 1){
+        if(this.menuList[0].id !== 'user-management'){
+          this.menuList.unshift({
+            id: 'user-management',
+            name: this.$t('message.navMune.userManager'),
+            icon: 'ios-person-outline',
+          },)
+        }
+      }else {
+        if(this.menuList[0].id === 'user-management') {
+          this.menuList.shift();
+        }
       }
     }
   },

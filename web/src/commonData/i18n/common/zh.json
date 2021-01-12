@@ -1676,7 +1676,9 @@
             "usernameNotNull": "用户名不能为空",
             "passwordNotNull": "密码不能为空",
             "createSuccess": "创建账号成功",
-            "createFail": "创建账号失败"
+            "createFail": "创建账号失败",
+            "dssInstallDir": "DSS 安装目录",
+            "azkabanInstallDir": "Azkaban 安装目录"
         }
     }
 }

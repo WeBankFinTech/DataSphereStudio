@@ -24,54 +24,14 @@ public class LdapCommand extends AbsCommand {
     public String authorization(AuthorizationBody body) {
 
         String userName = body.getUsername();
-        String passWord = body.getPassword();
+        String password = body.getPassword();
         String ldapScriptServer = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_SERVER;
         String ldapScriptRoot = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_ROOT;
         String ldapScript = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT;
-        createLdap(ldapScriptServer,ldapScriptRoot,ldapScript,userName,passWord);
-        return Command.SUCCESS;
+
+        String bashCommand = this.getClass().getClassLoader().getResource("default/CreateLdapAccount.sh").getPath();
+        String[] args = {ldapScriptServer, ldapScriptRoot,ldapScript,userName,password};
+        return this.runShell(bashCommand, args);
     }
 
-    private String createLdap(String ldapScriptServer,String ldapScriptRoot,String ldapScript,String userName, String password) {
-        String bashCommand;
-        BufferedReader br;
-        try {
-
-            bashCommand = this.getClass().getClassLoader().getResource("./default/CreateLdapAccount.sh").getPath();
-
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec("sudo sh " + bashCommand + " " + ldapScriptServer + " " + ldapScriptRoot + " " + ldapScript + " " + userName+ " " + password);
-
-            br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-            String inline;
-            while ((inline = br.readLine()) != null) {
-                if (!inline.equals("")) {
-                    inline = inline.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-
-                    System.out.println(inline);
-                } else {
-                    System.out.println("\n");
-                }
-            }
-            br.close();
-            br = new BufferedReader(new InputStreamReader(process.getErrorStream()));    //错误信息
-            while ((inline = br.readLine()) != null) {
-                if (!inline.equals(""))
-                    System.out.println( inline );
-                else
-                    System.out.println("\n");
-            }
-
-            int status = process.waitFor();
-            if (status != 0){
-                System.out.println("create ldap server error:"+status); ;
-            }
-            return Command.SUCCESS;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return e.getMessage();
-        }
-    }
 }

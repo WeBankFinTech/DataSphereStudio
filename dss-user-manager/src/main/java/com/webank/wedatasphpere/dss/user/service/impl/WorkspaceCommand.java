@@ -33,11 +33,11 @@ public class WorkspaceCommand extends AbsCommand {
         String bashCommand;
 
         if(path.contains("hdfs:")){
-            path = path.replace("hdfs://", "");
-            bashCommand = this.getClass().getClassLoader().getResource("./default/HdfsPath.sh").getPath();
+            path = path.replace("hdfs://", "") + "/" + body.getUsername();
+            bashCommand = this.getClass().getClassLoader().getResource("default/HdfsPath.sh").getPath();
         }else {
-            path = path.replace("file://", "");
-            bashCommand = this.getClass().getClassLoader().getResource("./default/LinuxPath.sh").getPath();
+            path = path.replace("file://", "") + "/" + body.getUsername();
+            bashCommand = this.getClass().getClassLoader().getResource("default/LinuxPath.sh").getPath();
         }
         String[] args = {body.getUsername(), path};
         return this.runShell(bashCommand, args);

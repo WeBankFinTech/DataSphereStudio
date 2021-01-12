@@ -2,5 +2,5 @@
 
 user=$1
 dir=$2
-hdfs dfs -mkdir $dir
-hdfs dfs -chown $user:$user
+hdfs dfs -mkdir -p $dir
+hdfs dfs -chown $user:$user $dir

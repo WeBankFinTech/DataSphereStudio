@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.server.restful;
 
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
+import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.impl.LubanAuthorizationClient;
 import org.springframework.stereotype.Component;
 
@@ -37,14 +38,16 @@ public class UserManagerApi {
     @Path("/user")
     public Response createUser(@Context HttpServletRequest req, AuthorizationBody body) {
 
-        final Future<String> futureRate = executor.submit(new Callable<String>() {
-            public String call() {
-                //以异步处理
-                return client.authorization(body);
-            }
-        });
+        String result = client.authorization(body);
 
-        return Message.messageToResponse(Message.ok());
+        if(result.equals(AbsCommand.SUCCESS)){
+            return Message.messageToResponse(Message.ok());
+        }else {
+            return Message.messageToResponse(Message.error(result));
+        }
+
+
+
     }
 
 

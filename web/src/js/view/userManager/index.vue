@@ -4,26 +4,25 @@
       <div class="header-info">
         <h1>{{$t('message.userManager.createUser')}}</h1>
       </div>
-      <feature />
     </div>
     <div style="width: 500px; margin: auto;">
-      <Form ref="createUserForm" :model="formCreateUser" label-position="left" :label-width="100" :rules="rules">
-        <FormItem label-width=120 :label="$t('message.userManager.username')" prop="username">
+      <Form ref="createUserForm" :model="formCreateUser" label-position="left" :label-width=120 :rules="rules">
+        <FormItem :label="$t('message.userManager.username')" prop="username">
           <Input v-model="formCreateUser.username" />
         </FormItem>
-        <FormItem label-width=120 :label="$t('message.userManager.password')" prop="password">
+        <FormItem :label="$t('message.userManager.password')" prop="password">
           <Input v-model="formCreateUser.password" />
         </FormItem>
 
-        <FormItem label-width=120 :label="$t('message.userManager.dssInstallDir')">
+        <FormItem :label="$t('message.userManager.dssInstallDir')">
           <Input v-model="formCreateUser.dssInstallDir" />
         </FormItem>
 
-        <FormItem label-width=120 :label="$t('message.userManager.azkabanInstallDir')">
+        <FormItem :label="$t('message.userManager.azkabanInstallDir')">
           <Input v-model="formCreateUser.azkakanDir" />
         </FormItem>
 
-        <FormItem label-width=120
+        <FormItem
           v-for="(item) in formCreateUser.paths"
           :key="item.value"
           :label="item.key"
@@ -60,9 +59,6 @@ export default {
         paths: [{key: 'rootPath', value: 'hdfs:///dss_workspace/linkis'}],
         dssInstallDir: '',
         azkakanDir: '',
-        // hdfsPath: '',
-        // resultPath: '',
-        // schedulerPath: '',
       },
       rules: {
         username: [{required: true, message: this.$t('message.userManager.usernameNotNull'), trigger: 'blur'}],
@@ -72,7 +68,6 @@ export default {
   },
   created(){
     api.fetch(`/dss/paths`, null, {method: 'get'}).then((rst)=>{
-      window.console.log("rst", rst);
       this.formCreateUser = {...this.formCreateUser, ...rst};
     })
   },

@@ -1676,7 +1676,9 @@
             "usernameNotNull": "username cannot be empty",
             "passwordNotNull": "password cannot be empty",
             "createSuccess": "create user Success",
-            "createFail": "create user Fail"
+            "createFail": "create user Fail",
+            "dssInstallDir": "dss install directory",
+            "azkabanInstallDir": "Azkaban install directory"
         }
     }
 }

@@ -71,6 +71,7 @@
           class="user-icon"/>
         <userMenu
           v-show="isUserMenuShow"
+          :isSuperUser="userInfo.isSuperUser"
           @clear-session="clearSession"/>
       </div>
       <div
@@ -126,7 +127,8 @@ export default {
       currentProject: {},
       projectList: [],
       workspaces: [],
-      isSandbox: process.env.NODE_ENV === 'sandbox'
+      isSandbox: process.env.NODE_ENV === 'sandbox',
+      userInfo: {}
     };
   },
   created() {
@@ -171,7 +173,7 @@ export default {
           storage.set('userInfo', rst.userInfo);
           // window.$Wa.setParam('openId', rst.userInfo.basic.userName);
           this.$router.app.$emit('username', rst.userInfo.basic.username);
-
+          this.userInfo = rst.userInfo.basic;
           this.$emit('set-init');
         }
         this.getWorkSpace();

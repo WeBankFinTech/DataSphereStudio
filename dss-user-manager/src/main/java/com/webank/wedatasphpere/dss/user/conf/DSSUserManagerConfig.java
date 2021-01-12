@@ -18,4 +18,8 @@ public class DSSUserManagerConfig {
     public static final String BDP_SERVER_LDAP_SCRIPT_SERVER = CommonVars.apply("wds.linkis.ldap.script.server", "").getValue();
     public static final String BDP_SERVER_LDAP_SCRIPT_ROOT = CommonVars.apply("wds.linkis.ldap.script.root", "").getValue();
     public static final String  BDP_SERVER_LDAP_SCRIPT = CommonVars.apply("wds.linkis.ldap.script", "").getValue();
+    public static final String BDP_SERVER_MYBATIS_DATASOURCE_URL = CommonVars.apply("wds.linkis.server.mybatis.datasource.url", "").getValue();
+    public static final String BDP_SERVER_MYBATIS_DATASOURCE_USERNAME =  CommonVars.apply("wds.linkis.server.mybatis.datasource.username", "").getValue();
+    public static final String BDP_SERVER_MYBATIS_DATASOURCE_PASSWORD = CommonVars.apply("wds.linkis.server.mybatis.datasource.password", "").getValue();
+    public static final String SCHEDULER_ADDRESS = CommonVars.apply("wds.dss.appjoint.scheduler.azkaban.address", "").getValue();
 }

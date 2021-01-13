@@ -29,7 +29,8 @@ public class AzkabanCommand extends AbsCommand {
         try{
             this.xmlHandler(body.getAzkakanDir()+"/conf/azkaban-users.xml", body);
             String[] args = {body.getUsername(), body.getPassword(), body.getDssInstallDir()+"/conf/"};
-            return this.runShell("./default/AddschedulerUser.sh", args);
+            String path = getResource("default/AddschedulerUser.sh");
+            return this.runShell(path, args);
         }catch (Exception err){
             logger.error("AzkabanCommand auth error:", err);
             return err.getMessage();

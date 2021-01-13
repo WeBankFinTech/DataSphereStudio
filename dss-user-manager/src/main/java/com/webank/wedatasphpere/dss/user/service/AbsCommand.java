@@ -43,7 +43,7 @@ public abstract class AbsCommand implements Command {
     protected String runShell(String scriptPath, String[] args){
         String bashCommand;
         try {
-            bashCommand = "sudo sh " + scriptPath + " " + String.join(" ", args);
+            bashCommand = "sh " + scriptPath + " " + String.join(" ", args);
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(bashCommand);
 

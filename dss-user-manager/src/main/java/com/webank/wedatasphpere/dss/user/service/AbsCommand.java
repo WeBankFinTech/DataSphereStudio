@@ -33,6 +33,7 @@ public abstract class AbsCommand implements Command {
 
     @Override
     public String authorization(AuthorizationBody body) throws DocumentException { return Command.SUCCESS; }
+//    public String authorization(AuthorizationBody body) throws IOException { return Command.SUCCESS; }
 
     public String toMessage(String msg) {
         return this.getClass().getSimpleName() + "模块开始执行："+ msg;

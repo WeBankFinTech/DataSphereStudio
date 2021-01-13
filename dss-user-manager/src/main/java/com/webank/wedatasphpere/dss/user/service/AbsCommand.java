@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 /**
  * 各模块的授权 继承这个类 根据需要实现自己的类。
@@ -49,7 +50,7 @@ public abstract class AbsCommand implements Command {
             return this.getString(process);
         }
         catch (Exception e){
-            logger.error(e.getMessage());
+            logger.error(scriptPath, e);
             return e.getMessage();
         }
     }
@@ -80,5 +81,15 @@ public abstract class AbsCommand implements Command {
             logger.error("shell error: "+status);
         }
         return Command.SUCCESS;
+    }
+
+    protected String getResource(String path){
+        try {
+            URL url = this.getClass().getClassLoader().getResource(path);
+            return url.getPath();
+        }catch (Exception e){
+            logger.error("File does not exist " + path, e);
+        }
+        return null;
     }
 }

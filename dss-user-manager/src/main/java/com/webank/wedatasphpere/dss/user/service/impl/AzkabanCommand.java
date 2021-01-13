@@ -30,16 +30,16 @@ public class AzkabanCommand extends AbsCommand {
             this.xmlHandler(body.getAzkakanDir()+"/conf/azkaban-users.xml", body);
             String[] args = {body.getUsername(), body.getPassword(), body.getDssInstallDir()+"/conf/"};
             return this.runShell("./default/AddschedulerUser.sh", args);
-        }catch (DocumentException | IOException err){
+        }catch (Exception err){
+            logger.error("AzkabanCommand auth error:", err);
             return err.getMessage();
         }
     }
 
     private void xmlHandler(String azkPath, AuthorizationBody body) throws DocumentException, IOException {
         SAXReader reader = new SAXReader();
-        String filePath = this.getClass().getClassLoader().getResource(azkPath).getPath();
 
-        File file = new File(filePath);
+        File file = new File(azkPath);
 
         Document document = reader.read(file);
         Element root = document.getRootElement();

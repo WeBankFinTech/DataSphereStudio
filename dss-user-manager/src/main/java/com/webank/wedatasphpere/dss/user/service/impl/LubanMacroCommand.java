@@ -7,6 +7,8 @@ import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.Command;
 import com.webank.wedatasphpere.dss.user.service.MacroCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +24,9 @@ import java.util.concurrent.ExecutionException;
  **/
 public class LubanMacroCommand implements MacroCommand {
 
-    private List<AbsCommand> commandList = new ArrayList<>();
+    private List<AbsCommand> commandList =   new ArrayList<>();
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static Integer RETRY_COUNT = 1;
 
@@ -105,10 +109,13 @@ public class LubanMacroCommand implements MacroCommand {
             try {
                 retryer.call(callable);
             } catch (ExecutionException e) {
+                logger.error(funName + " error: ", e);
                 return e.getMessage();
             } catch (RetryException e) {//需要通知到我们处理为什么开通失败
+                logger.error(funName + " Retry error: ", e);
                 return command.toMessage(e.getNumberOfFailedAttempts()+"重试失败");
             } catch (Exception e){
+                logger.error(funName + " other error: ", e);
                 return e.getMessage();
             }
         }
@@ -123,15 +130,15 @@ public class LubanMacroCommand implements MacroCommand {
 
         @Override
         public <CMSResultDTO> void onRetry(Attempt<CMSResultDTO> attempt) {
-//            logger.info("[retry]time=" + attempt.getAttemptNumber());
+            logger.info("[retry]time=" + attempt.getAttemptNumber());
             if (attempt.hasException()) {
-//                logger.error("retry exception", attempt.getExceptionCause());
+                logger.error("retry exception", attempt.getExceptionCause());
             }
             if (attempt.hasResult()) {
                 if (attempt.getResult() == null) {
-//                    logger.info("retry return data is null");
+                    logger.info("retry return data is null");
                 } else {
-//                    logger.info("retry return data is:{}", attempt.getResult());
+                    logger.info("retry return data is:{}", attempt.getResult());
                 }
             }
         }

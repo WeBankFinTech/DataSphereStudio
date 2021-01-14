@@ -60,6 +60,17 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
         },0,10, TimeUnit.MINUTES);
     }
 
+    public void reloadToken(){
+        LOGGER.info("开始读取用户token文件");
+        Properties properties = new Properties();
+        try {
+            properties.load(AzkabanSecurityService.class.getClassLoader().getResourceAsStream(AzkabanConstant.TOKEN_FILE_NAME));
+            userToken = properties;
+        } catch (IOException e) {
+            LOGGER.error("读取文件失败:",e);
+        }
+    }
+
     @Override
     public void setBaseUrl(String baseUrl) {
         this.securityUrl = baseUrl + "/checkin";

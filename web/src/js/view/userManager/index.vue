@@ -44,6 +44,10 @@
         </FormItem>
       </Form>
     </div>
+    <Spin
+      v-if="loading"
+      fix/>
+    
   </div>
   
   

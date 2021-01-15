@@ -86,7 +86,7 @@ public class SchedulisCommand extends AbsCommand {
         RestTemplate restTemplate = new RestTemplate();
         String schedulisUrl = DSSUserManagerConfig.SCHEDULER_ADDRESS;
         String url = new StringBuilder().append(schedulisUrl)
-            .append("/system")
+            .append("/luban/schedule/system")
             .toString();
         Map<String, String> params = new HashMap<>(4);
         params.put("userId", username);

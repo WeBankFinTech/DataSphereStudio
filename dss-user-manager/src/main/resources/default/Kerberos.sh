@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#需要将当前登录用户，如dss加入到sudoers
+
 #函数
 check_principal_exist(){
     all_principal=`timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo /usr/sbin/kadmin.local -q \"list_principals\""`    #echo "all_principal:"$all_principal
@@ -37,7 +39,18 @@ gen_keytab(){
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo rm -rf /tmp/$host.$user.keytab"
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo /usr/sbin/kadmin.local -q \"xst -norandkey -k  /tmp/$host.$user.keytab $user/$host\""
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo chmod 755 /tmp/$host.$user.keytab"
-    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDCSERVER:/tmp/$host.$user.keytab $CENTER_KEYTAB_PATHs
+    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDCSERVER:/tmp/$host.$user.keytab $CENTER_KEYTAB_PATH
+    if [[  -f "$host.$user.keytab" ]]; then
+       mv $CENTER_KEYTAB_PATH/$host.$user.keytab $CENTER_KEYTAB_PATH/$user.keytab
+       if [[ $? != 0 ]];then
+           echo "rename keytab failed!"
+       else
+           kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal
+           sudo su - $user -c "crontab -l > conf && echo '* */12 * * *  kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
+       fi
+    else
+       echo "the $user.keytab does not exist, please check your previous steps!"
+    fi
 }
 
 gen_keytab_user(){
@@ -49,7 +62,16 @@ gen_keytab_user(){
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo /usr/sbin/kadmin.local -q \"xst -norandkey -k  /tmp/$user.keytab $user\""
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDCSERVER "sudo chmod 755 /tmp/$user.keytab"
     timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDCSERVER:/tmp/$user.keytab $CENTER_KEYTAB_PATH
+    if [[  -f "$user.keytab" ]]; then
+        kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal
+        sudo su - op -c "crontab -l > conf && echo '* */12 * * *  kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
+    else
+        echo "the $user.keytab does not exist, please check your previous steps!"
+    fi
+
 }
+
+
 
 #第一个参数为功能参数（必须有）,第二个为user（必须有），第三个为host（可以有）
 if [ $# -lt 2 ] || [ $# -gt 7 ]; then

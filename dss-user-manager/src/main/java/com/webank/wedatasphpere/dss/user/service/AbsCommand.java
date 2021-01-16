@@ -1,13 +1,11 @@
 package com.webank.wedatasphpere.dss.user.service;
 
 
-import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,9 +31,7 @@ public abstract class AbsCommand implements Command {
     public String undoAuthorization(AuthorizationBody body) { return Command.SUCCESS; }
 
     @Override
-//    public String authorization(AuthorizationBody body) throws DocumentException { return Command.SUCCESS; }
-    public String authorization(AuthorizationBody body) throws IOException { return Command.SUCCESS; }
-
+    public String authorization(AuthorizationBody body) throws IOException,DocumentException { return Command.SUCCESS; }
     public String toMessage(String msg) {
         return this.getClass().getSimpleName() + "模块开始执行："+ msg;
     }

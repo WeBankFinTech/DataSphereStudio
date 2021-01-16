@@ -14,7 +14,7 @@ public interface Command {
      * @param body
      * @return 成功 success  其他失败
      */
-    public String authorization(AuthorizationBody body) throws DocumentException;
+    public String authorization(AuthorizationBody body) throws IOException,DocumentException;
 
     /**
      * 关闭授权

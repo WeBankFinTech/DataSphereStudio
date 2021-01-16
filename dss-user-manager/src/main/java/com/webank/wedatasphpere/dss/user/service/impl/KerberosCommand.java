@@ -31,20 +31,20 @@ public class KerberosCommand extends AbsCommand {
         if(userName != null){
             res = callShell(parms.getString("shellFile"), userName,hostName,
                     parms.getString("keytabPath"),parms.getString("sshPort"),
-                    parms.getString("kdcNode"),parms.getString("password"),parms.getString("realm"));
+                    parms.getString("kdcNode"),parms.getString("kdcUser"),parms.getString("password"),parms.getString("realm"));
         }
         return res;
     }
 
     private String callShell(String shellFile, String username, String hostName, String keytabPath,
-                             String sshPort, String kdcNode, String password, String realm)  throws IOException{
+                             String sshPort, String kdcNode, String kdcUser,String password, String realm)  throws IOException{
 
         String bashCommand = this.getClass().getClassLoader().getResource(shellFile).getPath();
         String scriptCmd ;
         if(null != hostName){
-            scriptCmd = String.format("%s %s %s %s %s %s %s %s", bashCommand,username,hostName,keytabPath,sshPort,kdcNode,password,realm);
+            scriptCmd = String.format("%s %s %s %s %s %s %s %s %s", bashCommand,username,hostName,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
         }else {
-            scriptCmd = String.format("%s %s %s %s %s %s %s", bashCommand,username,keytabPath,sshPort,kdcNode,password,realm);
+            scriptCmd = String.format("%s %s %s %s %s %s %s %s", bashCommand,username,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
         }
         Process process = Runtime.getRuntime().exec("sudo sh " + scriptCmd);
         return CommonFun.process(process);

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 
 /**
  * 各模块的授权 继承这个类 根据需要实现自己的类。

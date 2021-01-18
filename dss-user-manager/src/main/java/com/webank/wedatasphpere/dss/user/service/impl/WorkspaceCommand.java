@@ -3,9 +3,9 @@ package com.webank.wedatasphpere.dss.user.service.impl;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.Command;
+
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @program: luban-authorization

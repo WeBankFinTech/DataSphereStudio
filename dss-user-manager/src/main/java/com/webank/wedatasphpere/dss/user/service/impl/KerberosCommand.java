@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigFactory;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.Command;
-import com.webank.wedatasphpere.dss.user.service.common.CommonFun;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -37,17 +36,17 @@ public class KerberosCommand extends AbsCommand {
     }
 
     private String callShell(String shellFile, String username, String hostName, String keytabPath,
-                             String sshPort, String kdcNode, String kdcUser,String password, String realm)  throws IOException{
+                             String sshPort, String kdcNode, String kdcUser,String password, String realm){
 
-        String bashCommand = this.getClass().getClassLoader().getResource(shellFile).getPath();
+        String bashCommand = getResource(shellFile);
         String scriptCmd ;
         if(null != hostName){
-            scriptCmd = String.format("%s %s %s %s %s %s %s %s %s", bashCommand,username,hostName,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
+            scriptCmd = String.format("%s %s %s %s %s %s %s %s", username,hostName,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
         }else {
-            scriptCmd = String.format("%s %s %s %s %s %s %s %s", bashCommand,username,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
+            scriptCmd = String.format("%s %s %s %s %s %s %s", username,keytabPath,sshPort,kdcNode,kdcUser,password,realm);
         }
-        Process process = Runtime.getRuntime().exec("sudo sh " + scriptCmd);
-        return CommonFun.process(process);
+        String[] args = scriptCmd.split(" ");
+        return this.runShell(bashCommand, args);
     }
 
 }

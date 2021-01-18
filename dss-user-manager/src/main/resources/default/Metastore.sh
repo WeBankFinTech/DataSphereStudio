@@ -9,7 +9,7 @@ ktPath=$6
 host_name=`hostname`
 
   #一、kerberos认证
-kinit -kt $ktPath/$admin.keytab hdfs/${host_name}@${realm}
+kinit -kt $ktPath/$admin.keytab $admin/${host_name}@${realm}
 
   #二、metastore操作
 hive -e "create database if not exists $db_name"

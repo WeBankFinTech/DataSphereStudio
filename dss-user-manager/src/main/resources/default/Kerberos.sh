@@ -30,23 +30,39 @@ add_principal(){
     fi
 }
 
+generate_user(){
+  username=$1
+  if id -u $username >/dev/null 2>&1; then
+          echo "user exists"
+  else
+          echo "user does not exist, so we will create!"
+          sudo useradd $username
+  fi
+}
+
 gen_keytab(){
     user=$1
     host=$2
     principalPrefix="$user/$host"
     principal="$user/$host@$REALM"
     add_principal $principalPrefix
+    if [[ $? -ne 0 ]];then
+       echo "create keytab failed!!!"
+       exit 1
+    fi
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo rm -rf /tmp/$host.$user.keytab"
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo /usr/sbin/kadmin.local -q \"xst -norandkey -k  /tmp/$host.$user.keytab $user/$host\""
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo chmod 755 /tmp/$host.$user.keytab"
-    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDC_USER@$KDCSERVER:/tmp/$host.$user.keytab $CENTER_KEYTAB_PATH
+    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDC_USER@$KDCSERVER:/tmp/$host.$user.keytab ./
     if [[  -f "$host.$user.keytab" ]]; then
-       mv $CENTER_KEYTAB_PATH/$host.$user.keytab $CENTER_KEYTAB_PATH/$user.keytab
+       sudo mv ./$host.$user.keytab $CENTER_KEYTAB_PATH/$user.keytab
        if [[ $? != 0 ]];then
            echo "rename keytab failed!"
        else
-           kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal
-           sudo su - $user -c "crontab -l > conf && echo '* */12 * * *  kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
+           generate_user $user
+           sudo chown $user $CENTER_KEYTAB_PATH/$user.keytab
+           sudo su - $user -c "kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal"
+           sudo su - op -c "crontab -l > conf && echo '* */12 * * *  sudo -u $user kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
        fi
     else
        echo "the $user.keytab does not exist, please check your previous steps!"
@@ -61,10 +77,13 @@ gen_keytab_user(){
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo rm -rf /tmp/$user.keytab"
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo /usr/sbin/kadmin.local -q \"xst -norandkey -k  /tmp/$user.keytab $user\""
     timeout 30 sshpass -p $PASSWORD ssh -p $SSH_PORT $KDC_USER@$KDCSERVER "sudo chmod 755 /tmp/$user.keytab"
-    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDC_USER@$KDCSERVER:/tmp/$user.keytab $CENTER_KEYTAB_PATH
+    timeout 30 sshpass -p $PASSWORD scp -P $SSH_PORT $KDC_USER@$KDCSERVER:/tmp/$user.keytab ./
     if [[  -f "$user.keytab" ]]; then
-        kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal
-        sudo su - op -c "crontab -l > conf && echo '* */12 * * *  kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
+        sudo mv ./$user.keytab $CENTER_KEYTAB_PATH/$user.keytab
+        generate_user $user
+        sudo chown $user $CENTER_KEYTAB_PATH/$user.keytab
+        sudo su - $user -c "kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal"
+        sudo su - op -c "crontab -l > conf && echo '* */12 * * *  sudo -u $user kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
     else
         echo "the $user.keytab does not exist, please check your previous steps!"
     fi

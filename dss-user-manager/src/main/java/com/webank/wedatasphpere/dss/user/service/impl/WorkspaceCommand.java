@@ -19,14 +19,21 @@ public class WorkspaceCommand extends AbsCommand {
     @Override
     public String authorization(AuthorizationBody body) {
         List<HashMap<String,String>> paths = body.getPaths();
+        String result = "";
+        Boolean isSuccess = true;
         for(HashMap<String,String> map : paths){
           String path = map.get("value");
           String rst = createDir(path, body);
-          if(rst.equals(Command.SUCCESS)){
-              return rst;
+          result += rst;
+          if(!rst.equals(Command.SUCCESS)){
+              isSuccess = false;
           }
         }
-        return Command.SUCCESS;
+        if(isSuccess){
+            return Command.SUCCESS;
+        }
+        logger.error(result);
+        return result;
     }
 
     private String createDir(String path, AuthorizationBody body) {

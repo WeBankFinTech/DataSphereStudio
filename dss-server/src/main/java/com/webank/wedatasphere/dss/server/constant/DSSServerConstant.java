@@ -28,4 +28,6 @@ public class DSSServerConstant {
     public static final String EMVEDDEDFLOWID = "\"embeddedFlowId\":";
     public static final String VERSION_FORMAT = "%06d";
     public static final String VERSION_PREFIX = "v";
+    public static final String SUPER_USER_LOGIN_ERROR = "没有创建权限，请使用超级用户登录";
+
 }

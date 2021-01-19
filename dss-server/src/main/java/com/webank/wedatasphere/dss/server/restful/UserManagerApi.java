@@ -2,8 +2,11 @@ package com.webank.wedatasphere.dss.server.restful;
 
 import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.scheduler.SchedulerAppJoint;
+import com.webank.wedatasphere.dss.application.conf.ApplicationConf;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
+import com.webank.wedatasphere.dss.server.constant.DSSServerConstant;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import com.webank.wedatasphpere.dss.user.service.AbsCommand;
 import com.webank.wedatasphpere.dss.user.service.impl.LubanAuthorizationClient;
@@ -49,13 +52,21 @@ public class UserManagerApi {
     @POST
     @Path("/user")
     public Response createUser(@Context HttpServletRequest req, AuthorizationBody body) {
-
+        String username = SecurityFilter.getLoginUsername(req);
+        String superUserName = ApplicationConf.SUPER_USER_NAME;
+        if(!username.equals(superUserName)){
+            return Message.messageToResponse(Message.error(DSSServerConstant.SUPER_USER_LOGIN_ERROR));
+        }
         String result = client.authorization(body);
-
         if(result.equals(AbsCommand.SUCCESS)){
             schedulerAppJoint = getSchedulerAppJoint();
             if(schedulerAppJoint != null){
-                schedulerAppJoint.getSecurityService().reloadToken();
+                try{
+                    schedulerAppJoint.getSecurityService().reloadToken();
+                }catch (Throwable throwable){
+                    logger.warn("choose schedulies,don not care");
+                }
+
             }
             return Message.messageToResponse(Message.ok());
         }else {

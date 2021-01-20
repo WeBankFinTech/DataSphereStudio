@@ -23,14 +23,28 @@ public class LdapCommand extends AbsCommand {
     @Override
     public String authorization(AuthorizationBody body) {
 
-        String userName = body.getUsername();
-        String password = body.getPassword();
+
         String ldapScriptServer = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_SERVER;
-        String ldapScriptRoot = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_ROOT;
-        String ldapScript = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT;
+        String ldapLoginUser = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_LOGIN_USER;
+        String ldapLoginPassword = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_LOGIN_PASSWORD;
+        String ldapPythonPath = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_PYTHON_PATH;
+        String ldapSourcePath = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_SOURCE_PATH;
+        String ldapSshPort = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_SERVER_SSH_PORT;
+        String userName = body.getUsername();
+        String UserPassword = body.getPassword();
 
         String bashCommand = this.getClass().getClassLoader().getResource("default/CreateLdapAccount.sh").getPath();
-        String[] args = {ldapScriptServer, ldapScriptRoot,ldapScript,userName,password};
+        String[] args = {
+                ldapScriptServer,
+                ldapLoginUser,
+                ldapLoginPassword,
+                ldapPythonPath,
+                ldapSourcePath,
+                userName,
+                UserPassword,
+                ldapSshPort,
+        };
+
         return this.runShell(bashCommand, args);
     }
 

@@ -83,7 +83,7 @@ export default {
         name: [
           { required: true, message: this.$t('message.newConst.enterName'), trigger: 'blur' },
           { message: `${this.$t('message.newConst.nameLength')}20`, max: 20 },
-          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.newConst.validNameDesc'), trigger: 'blur' },
+          { type: 'string', pattern: /^[\u4e00-\u9fa5a-z][a-zA-z0-9_\u4e00-\u9fa5]*$/, message: this.$t('message.newConst.validNameDesc'), trigger: 'blur' },
         ],
       }
     }

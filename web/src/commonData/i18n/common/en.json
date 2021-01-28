@@ -15,7 +15,7 @@
             "failedNotice": "Invalid items found, please check and then retry!",
             "enterName": "Please enter the name",
             "nameLength": "The name length should not be greater than",
-            "validNameDesc": "Must starts with alphabetic characters, followed by only alphanumeric, underscore and Chinese characters",
+            "validNameDesc": "Must starts with alphabetic characters or Chinese characters , followed by only alphanumeric, underscore and Chinese characters",
             "project": "Project",
             "feedback": "Feedback"
         },

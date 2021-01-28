@@ -15,7 +15,7 @@
             "failedNotice": "验证项未通过，请检查后再试！",
             "enterName": "请输入名称",
             "nameLength": "名称长度不能大于",
-            "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
+            "validNameDesc": "必须以字母或中文开头，且只支持字母、数字、下划线和中文",
             "project": "工程",
             "feedback": "反馈",
             "validNameExist": "名称不能重复"

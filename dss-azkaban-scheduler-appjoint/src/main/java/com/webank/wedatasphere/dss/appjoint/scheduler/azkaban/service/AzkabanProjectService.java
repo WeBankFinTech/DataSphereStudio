@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -185,7 +186,9 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
             MultipartEntityBuilder entityBuilder =  MultipartEntityBuilder.create();
             entityBuilder.addBinaryBody("file",file);
             entityBuilder.addTextBody("ajax", "upload");
-            entityBuilder.addTextBody("project", projectName);
+            ContentType contentType = ContentType.create("text/plain", Charset.forName("UTF-8"));
+            entityBuilder.addTextBody("project", projectName, contentType);
+
             httpPost.setEntity(entityBuilder.build());
             response = httpClient.execute(httpPost);
             HttpEntity httpEntity = response.getEntity();

@@ -29,8 +29,10 @@ const getVersion = () => {
   return pkg.version;
 }
 
-const host = "0.0.0.0";
-const port = "9001";
+// const host = "0.0.0.0";
+// const port = "9001";
+const host = "***REMOVED***";
+const port = "8088";
 
 module.exports = {
   publicPath: './',
@@ -80,6 +82,7 @@ module.exports = {
     }
   },
   configureWebpack: {
+    devtool: 'eval-source-map',
     resolve: {
       alias: {
         'vue$': 'vue/dist/vue.esm.js',

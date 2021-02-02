@@ -1678,7 +1678,16 @@
             "createSuccess": "create user Success",
             "createFail": "create user Fail",
             "dssInstallDir": "dss install directory",
-            "azkabanInstallDir": "Azkaban install directory"
+            "azkabanInstallDir": "Azkaban install directory",
+            "linuxHost" : "linuxHost",
+            "linuxLoginUser" : "linuxLoginUser",
+            "linuxLoginPassword" : "linuxLoginPassword",
+            "serverSettings": "serverSettings",
+            "userSettings": "userSettings",
+            "XYB": "Next step",
+            "SYB": "Previous step",
+            "addServer": "Add server",
+            "deleteTip": "Are you sure you want to delete this server?"
         }
     }
 }

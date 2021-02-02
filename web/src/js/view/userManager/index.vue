@@ -2,106 +2,238 @@
   <div class="page-bgc">
     <div class="page-bgc-header">
       <div class="header-info">
-        <h1>{{$t('message.userManager.createUser')}}</h1>
+        <h1>{{ $t("message.userManager.createUser") }}</h1>
       </div>
     </div>
-    <div style="width: 500px; margin: auto;">
-      <Form ref="createUserForm" :model="formCreateUser" label-position="left" :label-width=120 :rules="rules">
-        <FormItem :label="$t('message.userManager.username')" prop="username">
-          <Input v-model="formCreateUser.username" />
-        </FormItem>
-        <FormItem :label="$t('message.userManager.password')" prop="password">
-          <Input v-model="formCreateUser.password" />
-        </FormItem>
-
-        <FormItem :label="$t('message.userManager.dssInstallDir')">
-          <Input v-model="formCreateUser.dssInstallDir" />
-        </FormItem>
-
-        <FormItem :label="$t('message.userManager.azkabanInstallDir')">
-          <Input v-model="formCreateUser.azkakanDir" />
-        </FormItem>
-
-        <FormItem
-          v-for="(item) in formCreateUser.paths"
-          :key="item.value"
-          :label="item.key"
+    <div style="width: 800px; margin: auto;">
+      <Steps :current="active">
+        <Step
+          :title="$t('message.userManager.serverSettings')"
+          :status="active === 0 ? 'process' : 'finish'"
         >
-          <Input v-model="item.value" :placeholder="item.value" />
-        </FormItem>
-        
+        </Step>
+        <Step
+          :title="$t('message.userManager.userSettings')"
+          :status="active === 1 ? 'process' : 'wait'"
+        >
+        </Step>
+      </Steps>
+      <Form
+        ref="createUserForm"
+        :model="formCreateUser"
+        label-position="left"
+        :label-width="120"
+        :rules="rules"
+      >
+        <div v-show="active === 0" style="margin-top: 20px;">
+          <div
+            v-for="(item, index) in formCreateUser.servers"
+            :key="index"
+            style="position:relative;padding-top:20px;"
+          >
+            <div
+              style="position: absolute; top:-10px; right: 10px; cursor:pointer"
+              v-show="
+                (index === 0 && formCreateUser.servers.length > 1) ||
+                  index !== 0
+              "
+            >
+              <Poptip
+                confirm
+                :title="$t('message.userManager.deleteTip')"
+                @on-ok="deleteServer(index)"
+                @on-cancel="cancel"
+              >
+                <Icon type="md-trash" size="20" />
+              </Poptip>
+            </div>
+            <Row gutter="20">
+              <Col span="8">
+                <FormItem
+                  :label="$t('message.userManager.linuxHost')"
+                  label-width="70"
+                >
+                  <Input v-model="item.linuxHost" />
+                </FormItem>
+              </Col>
+              <Col span="8">
+                <FormItem
+                  :label="$t('message.userManager.linuxLoginUser')"
+                  label-width="90"
+                >
+                  <Input v-model="item.linuxLoginUser" />
+                </FormItem>
+              </Col>
+              <Col span="8">
+                <FormItem
+                  :label="$t('message.userManager.linuxLoginPassword')"
+                  label-width="110"
+                >
+                  <Input v-model="item.linuxLoginPassword" /> </FormItem
+              ></Col>
+            </Row>
+            <Divider></Divider>
+          </div>
+        </div>
+        <div v-show="active === 1" style="margin-top: 20px;">
+          <FormItem :label="$t('message.userManager.username')" prop="username">
+            <Input v-model="formCreateUser.username" />
+          </FormItem>
+          <FormItem :label="$t('message.userManager.password')" prop="password">
+            <Input v-model="formCreateUser.password" />
+          </FormItem>
 
+          <FormItem :label="$t('message.userManager.dssInstallDir')">
+            <Input v-model="formCreateUser.dssInstallDir" />
+          </FormItem>
+
+          <FormItem :label="$t('message.userManager.azkabanInstallDir')">
+            <Input v-model="formCreateUser.azkakanDir" />
+          </FormItem>
+          <FormItem
+            v-for="item in formCreateUser.paths"
+            :key="item.value"
+            :label="item.key"
+          >
+            <Input v-model="item.value" :placeholder="item.value" />
+          </FormItem>
+        </div>
         <FormItem>
           <Row>
-            <Col span="18"><Button type="primary" @click="handleSubmit('createUserForm')">{{$t('message.constants.submit')}}</Button></Col>
-            <Col span="6"><Button @click="handleCancel">{{$t('message.newConst.back')}}</Button></Col>
+            <Col span="19" v-show="active === 0"
+              ><Button type="primary" @click="addServer">{{
+                $t("message.userManager.addServer")
+              }}</Button></Col
+            >
+            <Col span="19" v-show="active === 1"
+              ><Button
+                type="primary"
+                @click="handleSubmit('createUserForm')"
+                :loading="confirmLoading"
+                >{{ $t("message.constants.submit") }}</Button
+              ></Col
+            >
+            <Col span="3" v-show="active === 0"
+              ><Button @click="setStep('next')">{{
+                $t("message.userManager.XYB")
+              }}</Button></Col
+            >
+            <Col span="3" v-show="active === 1"
+              ><Button @click="setStep('prev')" :disabled="confirmLoading">{{
+                $t("message.userManager.SYB")
+              }}</Button></Col
+            >
+            <Col span="2"
+              ><Button @click="handleCancel" :disabled="confirmLoading">{{
+                $t("message.newConst.back")
+              }}</Button></Col
+            >
           </Row>
-        
-        
         </FormItem>
-        <FormItem>
-        
-        </FormItem>
+
+        <FormItem> </FormItem>
       </Form>
     </div>
-    <Spin
-      v-if="loading"
-      fix/>
-    
+    <Spin v-if="loading" fix />
   </div>
-  
-  
 </template>
 <script>
-import api from '@/js/service/api';
+import api from "@/js/service/api";
 export default {
-  data () {
+  data() {
     return {
       formCreateUser: {
-        username: '',
-        password: '',
-        paths: [{key: 'rootPath', value: 'hdfs:///dss_workspace/linkis'}],
-        dssInstallDir: '',
-        azkakanDir: '',
+        username: "",
+        password: "",
+        paths: [{ key: "rootPath", value: "hdfs:///dss_workspace/linkis" }],
+        dssInstallDir: "",
+        azkakanDir: "",
+        servers: [{ linuxHost: "", linuxLoginUser: "", linuxLoginPassword: "" }]
       },
       rules: {
-        username: [{required: true, message: this.$t('message.userManager.usernameNotNull'), trigger: 'blur'}],
-        password: [{required: true, message: this.$t('message.userManager.passwordNotNull'), trigger: 'blur'}]
-      }
-    }
+        username: [
+          {
+            required: true,
+            message: this.$t("message.userManager.usernameNotNull"),
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: this.$t("message.userManager.passwordNotNull"),
+            trigger: "blur"
+          }
+        ]
+      },
+      active: 0,
+      confirmLoading: false
+    };
   },
-  created(){
-    api.fetch(`/dss/paths`, null, {method: 'get'}).then((rst)=>{
-      this.formCreateUser = {...this.formCreateUser, ...rst};
-    })
+  created() {
+    const servers = localStorage.getItem("serverConfigs");
+    if (servers) {
+      this.formCreateUser = {
+        ...this.formCreateUser,
+        servers: JSON.parse(servers)
+      };
+    }
+    api.fetch(`/dss/paths`, null, { method: "get" }).then(rst => {
+      this.formCreateUser = { ...this.formCreateUser, ...rst };
+    });
   },
   methods: {
-    handleSubmit(name){
-      this.loading = false;
-      this.$refs[name].validate((valid) => {
+    handleSubmit(name) {
+      this.confirmLoading = true;
+      this.$refs[name].validate(valid => {
         if (valid) {
+          const {servers, ...rest} = this.formCreateUser;
+          const validServers = servers.filter(item => {
+            return Object.keys(item).every(key => !!item[key]);
+          });
+          
           api
-            .fetch(`dss/user`, this.formCreateUser)
-            .then((rst) => {
-              this.loading = false;
+            .fetch(`dss/user`, validServers.length > 0 ? {...rest, servers: validServers} : rest, null, 5)
+            .then(rst => {
+              this.confirmLoading = false;
+              localStorage.setItem(
+                "serverConfigs",
+                JSON.stringify(this.formCreateUser.servers)
+              );
               if (rst) {
-                this.$Message.success(this.$t('message.userManager.createSuccess'));
+                this.$Message.success(
+                  this.$t("message.userManager.createSuccess")
+                );
               }
             })
-            .catch((err) => {
-              this.loading = false;
+            .catch(err => {
+              this.confirmLoading = false;
             });
-        }else {
-          this.loading = false;
+        } else {
+          this.confirmLoading = false;
         }
       });
     },
-    handleCancel(){
-      this.$router.push('/');
+    handleCancel() {
+      this.$router.push("/");
+    },
+    setStep(action) {
+      if (action === "next") {
+        this.active = this.active + 1;
+      } else {
+        this.active = this.active - 1;
+      }
+    },
+    addServer() {
+      this.formCreateUser.servers.push({
+        linuxHost: "",
+        linuxLoginUser: "",
+        linuxLoginPassword: ""
+      });
+    },
+    deleteServer(index) {
+      this.formCreateUser.servers.splice(index, 1);
     }
   }
-}
+};
 </script>
-
-
-

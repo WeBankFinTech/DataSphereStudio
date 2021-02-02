@@ -241,14 +241,14 @@ const param = function(url, data, option) {
   return instance.request(option);
 };
 
-const action = function(url, data, option) {
+const action = function(url, data, option, errorTipDuration = 1.5) {
   return param(url, data, option)
     .then(success, fail)
     .then(function(response) {
       return response;
     })
     .catch(function(error) {
-      error.message && Message.error(error.message);
+      error.message && Message.error({content: error.message, duration: errorTipDuration || 1.5});
       throw error;
     });
 };

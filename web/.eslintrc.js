@@ -37,13 +37,13 @@ module.exports = {
         'keyword-spacing': 0,
         'no-useless-escape': 0,
         'operator-linebreak': 0,
-        // 'indent': [
-        //     'error',
-        //     2,
-        //     {
-        //         'SwitchCase': 1
-        //     }
-        // ],
+        'indent': [
+            'error',
+            2,
+            {
+                'SwitchCase': 1
+            }
+        ],
         'no-const-assign': 'warn',
         'no-this-before-super': 'warn',
         'no-undef': 2,
@@ -63,11 +63,11 @@ module.exports = {
             'invalid-first-character-of-tag-name': false
         }],
         'no-tabs': 0,
-        // 'vue/html-indent': [2, 2, {
-        //     'attribute': 1,
-        //     'closeBracket': 0,
-        //     'alignAttributesVertically': false
-        // }],
+        'vue/html-indent': [2, 2, {
+            'attribute': 1,
+            'closeBracket': 0,
+            'alignAttributesVertically': false
+        }],
         'vue/require-default-prop': 0,
         'vue/component-name-in-template-casing': 0,
         'vue/html-closing-bracket-spacing': 0,

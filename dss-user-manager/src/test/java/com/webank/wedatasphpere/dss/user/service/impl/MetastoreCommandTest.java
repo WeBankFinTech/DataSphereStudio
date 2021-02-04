@@ -14,7 +14,11 @@ class MetastoreCommandTest {
         body.setPassword("123321");
         MetastoreCommand test = new MetastoreCommand();
 
+        try {
             test.authorization(body);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         System.out.println("当前测试方法结束");
     }

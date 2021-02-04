@@ -16,7 +16,11 @@ class WorkspaceCommandTest {
         body.setUsername("luxl");
         body.setPassword("123321");
         WorkspaceCommand test = new WorkspaceCommand();
-        test.authorization(body);
+        try {
+            test.authorization(body);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         System.out.println("当前测试方法结束");
 
 //        DSSUserManagerConfig.LOCAL_USER_ROOT_PATH.getValue();

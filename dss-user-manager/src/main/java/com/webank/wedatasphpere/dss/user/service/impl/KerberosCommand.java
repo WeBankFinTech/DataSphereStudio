@@ -16,13 +16,13 @@ import java.net.InetAddress;
 public class KerberosCommand extends AbsCommand {
 
     @Override
-    public String authorization(AuthorizationBody body) throws IOException {
+    public String authorization(AuthorizationBody body) throws Exception {
         Config parms = ConfigFactory.load("config/properties.conf");
         String rst = createKt(body, parms);
         return rst != Command.SUCCESS ? rst : Command.SUCCESS;
     }
 
-    private String createKt(AuthorizationBody body, Config parms) throws IOException {
+    private String createKt(AuthorizationBody body, Config parms) throws Exception {
 
         String userName = body.getUsername();
         String hostName = InetAddress.getLocalHost().getHostName();
@@ -36,7 +36,7 @@ public class KerberosCommand extends AbsCommand {
     }
 
     private String callShell(String shellFile, String username, String hostName, String keytabPath,
-                             String sshPort, String kdcNode, String kdcUser,String password, String realm){
+                             String sshPort, String kdcNode, String kdcUser,String password, String realm) throws Exception {
 
         String bashCommand = getResource(shellFile);
         String scriptCmd ;

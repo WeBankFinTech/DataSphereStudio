@@ -9,7 +9,7 @@ package com.webank.wedatasphpere.dss.user.service;
  **/
 public interface MacroCommand extends Command {
 
-    public void add(AbsCommand command);
+    public void add(AbsCommand command) throws Exception;
 
 
 }

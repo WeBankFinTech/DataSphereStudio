@@ -36,7 +36,7 @@ public abstract class AbsCommand implements Command {
         return this.getClass().getSimpleName() + "模块开始执行："+ msg;
     }
 
-    protected String runShell(String scriptPath, String[] args){
+    protected String runShell(String scriptPath, String[] args) throws Exception {
         String bashCommand;
         try {
             bashCommand = "sh " + scriptPath + " " + String.join(" ", args);
@@ -51,14 +51,14 @@ public abstract class AbsCommand implements Command {
         }
     }
 
-    protected String getString(Process process) throws IOException, InterruptedException {
+    protected String getString(Process process) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         String inline;
         while ((inline = br.readLine()) != null) {
             if (!inline.equals("")) {
                 inline = inline.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-                logger.info(inline);
+                logger.info("shell info:"+inline);
             } else {
                 logger.info("\n");
             }
@@ -67,9 +67,10 @@ public abstract class AbsCommand implements Command {
         br = new BufferedReader(new InputStreamReader(process.getErrorStream()));    //错误信息
         while ((inline = br.readLine()) != null) {
             if (!inline.equals(""))
-                logger.warn(inline);
+                logger.error("shell error:"+inline);
             else
-                logger.warn("\n");
+                logger.error("\n");
+//            throw new Exception(inline);
         }
 
         int status = process.waitFor();

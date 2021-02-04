@@ -21,7 +21,7 @@ import java.util.List;
 public class LdapCommand extends AbsCommand {
 
     @Override
-    public String authorization(AuthorizationBody body) {
+    public String authorization(AuthorizationBody body) throws Exception {
 
 
         String ldapScriptServer = DSSUserManagerConfig.BDP_SERVER_LDAP_SCRIPT_SERVER;

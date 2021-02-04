@@ -1,5 +1,6 @@
 package com.webank.wedatasphpere.dss.user.dto.request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +16,19 @@ public class AuthorizationBody {
     private String password;
     private String dssInstallDir;
     private String azkakanDir;
+    private ArrayList<LinuxServer> servers;
+
+
+    public ArrayList<LinuxServer> getServers() {
+        return servers;
+    }
+
+    public void setServers(ArrayList<LinuxServer> servers) {
+        this.servers = servers;
+    }
+
+
+
 
     public String getAzkakanDir() {
         return azkakanDir;

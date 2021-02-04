@@ -161,7 +161,7 @@ public class DSSSpringApplication extends SpringBootServletInitializer {
         }
         DWCException.setApplicationName(serviceInstance.getApplicationName());
         DWCException.setHostname(Utils.getComputerName());
-        DWCException.setHostPort(Integer.parseInt(applicationContext.getEnvironment().getProperty("server.port")));
+        DWCException.setHostPort(Integer.parseInt(applicationContext.getEnvironment().getProperty("server.port","9004")));
     }
 
     private static void setServiceInstance(ServiceInstance serviceInstance) throws Exception {

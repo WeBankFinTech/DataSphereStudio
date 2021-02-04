@@ -37,39 +37,31 @@ public class LubanMacroCommand implements MacroCommand {
     }
 
     @Override
-    public String authorization(AuthorizationBody body) {
-        try{
+    public String authorization(AuthorizationBody body) throws Exception {
+
             return this.execute("authorization", body);
-        }catch (Exception e){
-            return e.getMessage();
-        }
+
     }
 
     @Override
-    public String undoAuthorization(AuthorizationBody json) {
-        try{
+    public String undoAuthorization(AuthorizationBody json) throws Exception {
+
             return this.execute("undoAuthorization", json);
-        }catch (Exception e){
-            return e.getMessage();
-        }
+
     }
 
     @Override
-    public String capacity(AuthorizationBody json) {
-        try{
+    public String capacity(AuthorizationBody json) throws Exception {
+
             return this.execute("capacity", json);
-        }catch (Exception e){
-            return e.getMessage();
-        }
+
     }
 
     @Override
-    public String renew(AuthorizationBody json) {
-        try{
+    public String renew(AuthorizationBody json) throws Exception {
+
             return this.execute("renew", json);
-        }catch (Exception e){
-            return e.getMessage();
-        }
+
     }
 
 
@@ -81,69 +73,28 @@ public class LubanMacroCommand implements MacroCommand {
      * @throws ClassNotFoundException
      * @throws NoSuchMethodException
      */
-    private String execute(String funName, AuthorizationBody body) {
+    private String execute(String funName, AuthorizationBody body) throws Exception {
 
         for (AbsCommand command : commandList) {
-            Callable<String> callable = () -> {
-                switch (funName){
-                    case "authorization":
-                        return command.authorization(body);
 
-                    case "undoAuthorization":
-                        return command.undoAuthorization(body);
+            switch (funName) {
+                case "authorization":
+                     command.authorization(body);
 
-                    case "capacity":
-                        return command.capacity(body);
-                }
-                return command.authorization(body);
-            };
+                case "undoAuthorization":
+                    command.undoAuthorization(body);
 
-            Retryer<String> retryer = RetryerBuilder.<String>newBuilder()
-                    .retryIfResult(Predicates.not(Predicates.equalTo(Command.SUCCESS)))
-                    .retryIfExceptionOfType(IOException.class)
-                    .retryIfRuntimeException()
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(RETRY_COUNT))
-                    .withRetryListener(new SMRetryListener())
-                    .build();
-
-            try {
-                retryer.call(callable);
-            } catch (ExecutionException e) {
-                logger.error(funName + " error: ", e);
-                return e.getMessage();
-            } catch (RetryException e) {//需要通知到我们处理为什么开通失败
-                logger.error(funName + " Retry error: ", e);
-                return command.toMessage(e.getNumberOfFailedAttempts()+"重试失败");
-            } catch (Exception e){
-                logger.error(funName + " other error: ", e);
-                return e.getMessage();
+                case "capacity":
+                    command.capacity(body);
             }
+
         }
+
         return "success";
     }
 
-    /**
-     * 重试监听器
-     * @param <CMSResultDTO>
-     */
-    private class SMRetryListener<CMSResultDTO> implements RetryListener {
-
-        @Override
-        public <CMSResultDTO> void onRetry(Attempt<CMSResultDTO> attempt) {
-            logger.info("[retry]time=" + attempt.getAttemptNumber());
-            if (attempt.hasException()) {
-                logger.error("retry exception", attempt.getExceptionCause());
-            }
-            if (attempt.hasResult()) {
-                if (attempt.getResult() == null) {
-                    logger.info("retry return data is null");
-                } else {
-                    logger.info("retry return data is:{}", attempt.getResult());
-                }
-            }
-        }
 
     }
 
 
-}
+

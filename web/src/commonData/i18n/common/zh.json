@@ -1675,6 +1675,7 @@
             "schedulerPath": "调度存储根目录",
             "usernameNotNull": "用户名不能为空",
             "passwordNotNull": "密码不能为空",
+            "passwordNotWeak": "密码以字母开头，含有字母、数字和特殊字符，不少于8位",
             "createSuccess": "创建账号成功",
             "createFail": "创建账号失败",
             "dssInstallDir": "DSS 安装目录",

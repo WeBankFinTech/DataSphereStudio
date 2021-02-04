@@ -17,7 +17,7 @@ import java.util.List;
 public class WorkspaceCommand extends AbsCommand {
 
     @Override
-    public String authorization(AuthorizationBody body) {
+    public String authorization(AuthorizationBody body) throws Exception {
         List<HashMap<String,String>> paths = body.getPaths();
         String result = "";
         Boolean isSuccess = true;
@@ -36,7 +36,7 @@ public class WorkspaceCommand extends AbsCommand {
         return result;
     }
 
-    private String createDir(String path, AuthorizationBody body) {
+    private String createDir(String path, AuthorizationBody body) throws Exception {
         String bashCommand;
 
         if(path.contains("hdfs:")){

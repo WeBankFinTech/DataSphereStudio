@@ -57,21 +57,28 @@ public class UserManagerApi {
         if(!username.equals(superUserName)){
             return Message.messageToResponse(Message.error(DSSServerConstant.SUPER_USER_LOGIN_ERROR));
         }
-        String result = client.authorization(body);
-        if(result.equals(AbsCommand.SUCCESS)){
-            schedulerAppJoint = getSchedulerAppJoint();
-            if(schedulerAppJoint != null){
-                try{
-                    schedulerAppJoint.getSecurityService().reloadToken();
-                }catch (Throwable throwable){
-                    logger.warn("choose schedulies,don not care");
-                }
 
+        try {
+            String result = client.authorization(body);
+
+            if(result.equals(AbsCommand.SUCCESS)){
+                schedulerAppJoint = getSchedulerAppJoint();
+                if(schedulerAppJoint != null){
+                    try{
+                        schedulerAppJoint.getSecurityService().reloadToken();
+                    }catch (Throwable throwable){
+                        logger.warn("choose schedulies,don not care");
+                    }
+
+                }
+                return Message.messageToResponse(Message.ok());
+            }else {
+                return Message.messageToResponse(Message.error(AbsCommand.ERROR));
             }
-            return Message.messageToResponse(Message.ok());
-        }else {
-            return Message.messageToResponse(Message.error(result));
+        } catch (Exception e) {
+            return Message.messageToResponse(Message.error(e.getMessage()));
         }
+
 
 
 

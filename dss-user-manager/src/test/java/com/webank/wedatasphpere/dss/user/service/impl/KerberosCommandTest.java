@@ -17,7 +17,7 @@ class KerberosCommandTest {
         KerberosCommand test = new KerberosCommand();
         try {
             test.authorization(body);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("当前测试方法结束");

@@ -31,7 +31,7 @@ public class LubanAuthorizationClient {
         }
     }
 
-    public String authorization(AuthorizationBody body) {
+    public String authorization(AuthorizationBody body) throws Exception {
         return lubanCommand.authorization(body);
     }
 

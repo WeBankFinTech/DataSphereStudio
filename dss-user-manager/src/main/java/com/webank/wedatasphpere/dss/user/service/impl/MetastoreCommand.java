@@ -13,13 +13,13 @@ import com.webank.wedatasphpere.dss.user.service.Command;
 public class MetastoreCommand extends AbsCommand {
 
     @Override
-    public String authorization(AuthorizationBody body) {
+    public String authorization(AuthorizationBody body) throws Exception {
         Config parms = ConfigFactory.load("config/properties.conf");
         String rst = createDb(body,parms);
         return rst != Command.SUCCESS ? rst : Command.SUCCESS;
     }
 
-    private String createDb(AuthorizationBody body, Config parms){
+    private String createDb(AuthorizationBody body, Config parms) throws Exception {
 
         String bashCommand = null;
         String scriptCmd = null;

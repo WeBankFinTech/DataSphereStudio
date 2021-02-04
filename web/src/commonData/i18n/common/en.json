@@ -1675,6 +1675,7 @@
             "schedulerPath": "Scheduler root Path",
             "usernameNotNull": "username cannot be empty",
             "passwordNotNull": "password cannot be empty",
+            "passwordNotWeak": "password begins with a letter, contains letters, numbers, and special characters, not less than 8 digits",
             "createSuccess": "create user Success",
             "createFail": "create user Fail",
             "dssInstallDir": "dss install directory",

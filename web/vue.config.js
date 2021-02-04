@@ -29,10 +29,8 @@ const getVersion = () => {
   return pkg.version;
 }
 
-// const host = "0.0.0.0";
-// const port = "9001";
-const host = "10.30.66.30";
-const port = "8088";
+const host = "0.0.0.0";
+const port = "9001";
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',

@@ -148,7 +148,7 @@ export default {
           specialChar.test(value)
         )
       ) {
-        callback(new Error('qqq'))
+        callback(new Error(this.$t('message.userManager.passwordNotWeak')))
       } else {
         callback()
       }
@@ -175,7 +175,6 @@ export default {
         password: [
           {
             required: true,
-            //message: this.$t("message.userManager.passwordNotNull"),
             trigger: 'blur',
             validator: validatePwd,
           },
@@ -201,7 +200,6 @@ export default {
     handleSubmit(name) {
       this.confirmLoading = true
       this.$refs[name].validate((valid) => {
-        return
         if (valid) {
           const { servers, ...rest } = this.formCreateUser
           const validServers = servers.filter((item) => {
@@ -214,7 +212,7 @@ export default {
               validServers.length > 0
                 ? { ...rest, servers: validServers }
                 : rest,
-              null,
+              {method: 'post', timeout: 120000},
               5
             )
             .then((rst) => {

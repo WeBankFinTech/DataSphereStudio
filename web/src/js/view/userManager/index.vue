@@ -17,11 +17,10 @@
         ></Step>
       </Steps>
       <Form
-        ref="createUserForm"
+        ref="createServerForm"
         :model="formCreateUser"
         label-position="left"
-        :label-width="120"
-        :rules="rules"
+        :label-width=140
       >
         <div v-show="active === 0" style="margin-top: 20px">
           <div
@@ -29,6 +28,19 @@
             :key="index"
             style="position: relative; padding-top: 20px"
           >
+            <div
+              style="
+                position: absolute;
+                top: -10px;
+                left: 10px;
+              "
+              v-show="
+                (index === 0 && formCreateUser.servers.length > 1) ||
+                  index !== 0
+              "
+            >
+              {{index + 1 }}
+            </div>
             <div
               style="
                 position: absolute;
@@ -45,24 +57,26 @@
                 confirm
                 :title="$t('message.userManager.deleteTip')"
                 @on-ok="deleteServer(index)"
-                @on-cancel="cancel"
               >
-                <Icon type="md-trash" size="20" />
+                <Icon type="md-trash" :size=20 />
               </Poptip>
             </div>
-            <Row gutter="20">
+            <Row :gutter=20>
               <Col span="8">
-                <FormItem :label="$t('message.userManager.linuxHost')" label-width="70">
+                <FormItem :label="$t('message.userManager.linuxHost')" :label-width=70 :prop=" 'servers.' + index + '.linuxHost'"
+                 :rules="{required: true, message: $t('message.userManager.linuxHostNotNull'), trigger: 'blur'}">
                   <Input v-model="item.linuxHost" />
                 </FormItem>
               </Col>
               <Col span="8">
-                <FormItem :label="$t('message.userManager.linuxLoginUser')" label-width="90">
+                <FormItem :label="$t('message.userManager.linuxLoginUser')" :label-width=100 :prop=" 'servers.' + index + '.linuxLoginUser'"
+                 :rules="{required: true, message: $t('message.userManager.linuxLoginUserNotNull'), trigger: 'blur'}">
                   <Input v-model="item.linuxLoginUser" />
                 </FormItem>
               </Col>
               <Col span="8">
-                <FormItem :label="$t('message.userManager.linuxLoginPassword')" label-width="110">
+                <FormItem :label="$t('message.userManager.linuxLoginPassword')" :label-width=110 :prop=" 'servers.' + index + '.linuxLoginPassword'"
+                 :rules="{required: true, message: $t('message.userManager.linuxLoginPasswordNotNull'), trigger: 'blur'}">
                   <Input v-model="item.linuxLoginPassword" />
                 </FormItem>
               </Col>
@@ -70,6 +84,14 @@
             <Divider></Divider>
           </div>
         </div>
+      </Form>
+      <Form
+        ref="createUserForm"
+        :model="formCreateUser"
+        label-position="left"
+        :label-width=140
+        :rules="rules"
+      >
         <div v-show="active === 1" style="margin-top: 20px">
           <FormItem :label="$t('message.userManager.username')" prop="username">
             <Input v-model="formCreateUser.username" />
@@ -85,8 +107,9 @@
           <FormItem :label="$t('message.userManager.azkabanInstallDir')">
             <Input v-model="formCreateUser.azkakanDir" />
           </FormItem>
-          <FormItem v-for="item in formCreateUser.paths" :key="item.value" :label="item.key">
-            <Input v-model="item.value" :placeholder="item.value" />
+          <FormItem v-for="(item, index) in formCreateUser.paths" :key="item.key" :label="item.key" :prop=" 'paths.' + index + '.value'" 
+           :rules="{required: true, message: $t('message.userManager.pathNotNull'), trigger: 'blur'}">
+            <Input v-model="item.value" />
           </FormItem>
         </div>
         <FormItem>
@@ -153,6 +176,16 @@ export default {
         callback()
       }
     }
+    const validateUser = (rule, value, callback) => {
+      const userReg = /^[A-Za-z][A-Za-z0-9_]*$/;
+      if (!value) {
+        callback(new Error(this.$t('message.userManager.usernameNotNull')))
+      } else if (!userReg.test(value)) {
+        callback(new Error(this.$t('message.userManager.usernameFormat')))
+      } else {
+        callback()
+      }
+    }
     return {
       formCreateUser: {
         username: '',
@@ -168,8 +201,8 @@ export default {
         username: [
           {
             required: true,
-            message: this.$t('message.userManager.usernameNotNull'),
             trigger: 'blur',
+            validator: validateUser,
           },
         ],
         password: [
@@ -198,9 +231,18 @@ export default {
   },
   methods: {
     handleSubmit(name) {
+      const paths = this.formCreateUser.paths;
+      paths.forEach(item => {
+        item.value = item.value && item.value.trim();
+      })
+      this.formCreateUser.paths = paths;
       this.confirmLoading = true
       this.$refs[name].validate((valid) => {
         if (valid) {
+          this.$Message.info({
+              content: this.$t('message.userManager.createTip'),
+              duration: 20
+          });
           const { servers, ...rest } = this.formCreateUser
           const validServers = servers.filter((item) => {
             return Object.keys(item).every((key) => !!item[key])
@@ -225,6 +267,7 @@ export default {
                 this.$Message.success(
                   this.$t('message.userManager.createSuccess')
                 )
+                this.$router.push('/')
               }
             })
             .catch((err) => {
@@ -240,7 +283,63 @@ export default {
     },
     setStep(action) {
       if (action === 'next') {
-        this.active = this.active + 1
+     
+        this.formCreateUser.servers =this.formCreateUser.servers.map(server => {
+          const obj = {...server};
+          Object.keys(server).forEach(key => {obj[key] = obj[key] && obj[key].trim()} );
+          return obj
+
+        });
+        this.$refs["createServerForm"].validate(valid => {
+
+          if(valid){
+            const servers = this.formCreateUser.servers;
+            //检测服务器ip与用户名是否有完全相同的
+            if(servers.length > 1){
+              const serversTemp = servers.map(server => {
+                const arr = Object.keys(server).map(key => {
+                  if(key !== 'linuxLoginPassword'){
+                    return key + server[key];
+                  }
+                  return "";
+                });
+                return arr.join("$--$");
+              });
+              const hadIn = [];
+              const repeats = [];
+              for(let i =0; i< serversTemp.length; i++){
+                if(!hadIn.includes(i)){
+                  hadIn.push(i);
+                  const str = serversTemp[i];
+                  const ar = [i + 1];
+                  for(let j = i + 1; j < serversTemp.length; j++){
+                    const str2 = serversTemp[j];
+                    if(str === str2){
+                      ar.push(j + 1);
+                      hadIn.push(j);
+                    }
+                  }
+                  if(ar.length > 1){
+                    repeats.push(ar.join(','));
+                  }
+                }
+
+              }
+              if(repeats.length > 0){
+                this.$Message.error({content: repeats.join(" / ") + this.$t('message.userManager.serverSame'), duration: 6});
+                return
+              }
+
+
+            }
+
+            this.active = this.active + 1;
+
+          }else{
+            this.$Message.error(this.$t('message.userManager.serverNull'))
+          }
+        })
+
       } else {
         this.active = this.active - 1
       }

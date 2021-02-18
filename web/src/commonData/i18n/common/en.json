@@ -1674,6 +1674,7 @@
             "resultPath": "Result root Path",
             "schedulerPath": "Scheduler root Path",
             "usernameNotNull": "username cannot be empty",
+            "usernameFormat": "username begins with a letter, contains only letters, numbers, or underscores",
             "passwordNotNull": "password cannot be empty",
             "passwordNotWeak": "password begins with a letter, contains letters, numbers, and special characters, not less than 8 digits",
             "createSuccess": "create user Success",
@@ -1683,12 +1684,19 @@
             "linuxHost" : "linuxHost",
             "linuxLoginUser" : "linuxLoginUser",
             "linuxLoginPassword" : "linuxLoginPassword",
+            "linuxHostNotNull" : "linuxHost cannot be empty",
+            "linuxLoginUserNotNull" : "linuxLoginUser cannot be empty",
+            "linuxLoginPasswordNotNull" : "linuxLoginPassword cannot be empty",
             "serverSettings": "serverSettings",
             "userSettings": "userSettings",
             "XYB": "Next step",
             "SYB": "Previous step",
             "addServer": "Add server",
-            "deleteTip": "Are you sure you want to delete this server?"
+            "deleteTip": "Are you sure you want to delete this server?",
+            "serverSame": " server's host and user is the same, please keep one server with the same configuration",
+            "serverNull": "The server configuration option cannot be empty",
+            "pathNotNull": "Cannot be empty",
+            "createTip": "It will take some time to create, please wait patiently, if successful, return to the home page, fail to stay on this page"
         }
     }
 }

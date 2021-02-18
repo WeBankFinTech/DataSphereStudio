@@ -1674,6 +1674,7 @@
             "resultPath": "结果存储根目录",
             "schedulerPath": "调度存储根目录",
             "usernameNotNull": "用户名不能为空",
+            "usernameFormat": "账号以字母开头，仅能含有字母、数字或者下划线",
             "passwordNotNull": "密码不能为空",
             "passwordNotWeak": "密码以字母开头，含有字母、数字和特殊字符，不少于8位",
             "createSuccess": "创建账号成功",
@@ -1683,12 +1684,19 @@
             "linuxHost" : "服务器ip",
             "linuxLoginUser" : "服务器用户名",
             "linuxLoginPassword" : "服务器密码",
+            "linuxHostNotNull" : "服务器ip不能为空",
+            "linuxLoginUserNotNull" : "服务器用户名不能为空",
+            "linuxLoginPasswordNotNull" : "服务器密码不能为空",
             "serverSettings": "服务器配置",
             "userSettings": "用户配置",
             "XYB": "下一步",
             "SYB": "上一步",
             "addServer": "添加服务器",
-            "deleteTip": "确认删除该服务器?"
+            "deleteTip": "确认删除该服务器?",
+            "serverSame": " 服务器ip与用户名配置相同，相同配置的服务器只能保留一个",
+            "serverNull": "服务器配置选项不能为空",
+            "pathNotNull": "不能为空",
+            "createTip": "创建需要一段时间，请耐心等候，如果成功则返回首页，失败则停留本页"
         }
     }
 }

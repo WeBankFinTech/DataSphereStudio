@@ -225,8 +225,16 @@ export default {
         servers: JSON.parse(servers),
       }
     }
+    const dirConfigs = localStorage.getItem('dirConfigs');
+    const dirs = dirConfigs ? JSON.parse(dirConfigs) : {};
     api.fetch(`/dss/paths`, null, { method: 'get' }).then((rst) => {
-      this.formCreateUser = { ...this.formCreateUser, ...rst }
+      const {dssInstallDir, azkakanDir, ...rest} =  rst || {};
+      this.formCreateUser = { 
+        ...this.formCreateUser, 
+        ...rest,
+        dssInstallDir: dssInstallDir || dirs.dssInstallDir || "",
+        azkakanDir: azkakanDir || dirs.azkakanDir || "",
+      }
     })
   },
   methods: {
@@ -239,6 +247,13 @@ export default {
       this.confirmLoading = true
       this.$refs[name].validate((valid) => {
         if (valid) {
+          localStorage.setItem(
+            'dirConfigs',
+            JSON.stringify({
+              dssInstallDir: this.formCreateUser.dssInstallDir || "",
+              azkakanDir: this.formCreateUser.azkakanDir || ""
+            })
+          )
           this.$Message.info({
               content: this.$t('message.userManager.createTip'),
               duration: 20
@@ -259,10 +274,6 @@ export default {
             )
             .then((rst) => {
               this.confirmLoading = false
-              localStorage.setItem(
-                'serverConfigs',
-                JSON.stringify(this.formCreateUser.servers)
-              )
               if (rst) {
                 this.$Message.success(
                   this.$t('message.userManager.createSuccess')
@@ -332,6 +343,11 @@ export default {
 
 
             }
+
+            localStorage.setItem(
+              'serverConfigs',
+              JSON.stringify(this.formCreateUser.servers)
+            )
 
             this.active = this.active + 1;
 

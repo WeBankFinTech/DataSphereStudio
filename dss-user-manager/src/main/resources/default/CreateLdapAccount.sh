@@ -9,5 +9,10 @@ ldap_user=$6
 ldap_password=$7
 echo "$server_login_password ssh $server_login_user@$server_host sudo python $server_python_path add_with_pw $ldap_user -p $ldap_password"
 sshpass -p $server_login_password ssh $server_login_user@$server_host "sudo python $server_python_path add_with_pw $ldap_user -p $ldap_password"
+#sshpass -p $server_login_password ssh $server_login_user@$server_host "sudo su - root -c 'source /etc/profile && source $server_ldap_source_path && sudo python $server_python_path add_with_pw $ldap_user -p $ldap_password && deactivate'"
 
 echo "******************LDAP USER CREATED***********************"
+
+
+
+

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source /etc/profile
 #需要将当前登录用户，如dss加入到sudoers
 
 #函数
@@ -62,7 +62,8 @@ gen_keytab(){
            generate_user $user
            sudo chown $user $CENTER_KEYTAB_PATH/$user.keytab
            sudo su - $user -c "kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal"
-           sudo su - op -c "crontab -l > conf && echo '* */12 * * *  sudo -u $user kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
+           deployUser=`whoami`
+           sudo su - $deployUser -c "crontab -l > conf && echo '* */12 * * *  sudo -u $user kinit -kt $CENTER_KEYTAB_PATH/$user.keytab $principal' >> conf && crontab conf && rm -f conf"
        fi
     else
        echo "the $user.keytab does not exist, please check your previous steps!"

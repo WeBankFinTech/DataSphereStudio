@@ -30,7 +30,7 @@ public class KerberosCommand extends AbsCommand {
         if(userName != null){
             res = callShell(DSSUserManagerConfig.KERBEROS_SCRIPT_PATH, userName,hostName,
                     DSSUserManagerConfig.KERBEROS_KEYTAB_PATH,DSSUserManagerConfig.KERBEROS_SSH_PORT,
-                    DSSUserManagerConfig.KERBEROS_KDC_NODE,DSSUserManagerConfig.KERBEROS_KDC_USER_NAME,DSSUserManagerConfig.KERBEROS_KDC_USER_PASSWORD,DSSUserManagerConfig.KERBEROS_REALM,DSSUserManagerConfig.KEBBEROS_ENABLE_SWITCH);
+                    DSSUserManagerConfig.KERBEROS_KDC_NODE,DSSUserManagerConfig.KERBEROS_KDC_USER_NAME,DSSUserManagerConfig.KERBEROS_KDC_USER_PASSWORD,DSSUserManagerConfig.KERBEROS_REALM,DSSUserManagerConfig.KERBEROS_ENABLE_SWITCH);
         }
         return res;
     }

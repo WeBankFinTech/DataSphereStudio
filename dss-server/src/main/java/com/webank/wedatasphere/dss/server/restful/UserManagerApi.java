@@ -40,7 +40,6 @@ import java.util.concurrent.Future;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserManagerApi {
 
-    private ExecutorService executor = Executors.newCachedThreadPool();
     private LubanAuthorizationClient client = new LubanAuthorizationClient();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

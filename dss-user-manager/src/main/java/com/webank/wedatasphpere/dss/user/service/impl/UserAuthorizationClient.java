@@ -13,17 +13,17 @@ import org.slf4j.LoggerFactory;
  * @author: luxl@chinatelecom.cn
  * @create: 2020-08-10 14:24
  **/
-public class LubanAuthorizationClient {
+public class UserAuthorizationClient {
 
-    public LubanMacroCommand lubanCommand = new LubanMacroCommand();
-    protected final Logger logger = LoggerFactory.getLogger(LubanAuthorizationClient.class);
+    public UserMacroCommand userMacroCommand = new UserMacroCommand();
+    protected final Logger logger = LoggerFactory.getLogger(UserAuthorizationClient.class);
 
-    public LubanAuthorizationClient()  {
+    public UserAuthorizationClient()  {
 
         String[] commandPaths = DSSUserManagerConfig.USER_ACCOUNT_COMMANDS.split(",");
         for(String classPath: commandPaths){
             try {
-                lubanCommand.add((AbsCommand) Class.forName(classPath).newInstance());
+                userMacroCommand.add((AbsCommand) Class.forName(classPath).newInstance());
             } catch (Exception e) {
                 logger.info(e.getMessage());
                 e.printStackTrace();
@@ -32,7 +32,7 @@ public class LubanAuthorizationClient {
     }
 
     public String authorization(AuthorizationBody body) throws Exception {
-        return lubanCommand.authorization(body);
+        return userMacroCommand.authorization(body);
     }
 
 

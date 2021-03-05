@@ -15,10 +15,10 @@ do
    echo "${server_host},${server_user_name},${server_user_password}"
 
    sudo sshpass -p $server_user_password ssh -o ConnectTimeout=1  $server_user_name@$server_host "echo success"
-   [ $? -ne 0 ] && echo "登录主机${server_host}失败" && exit 254
+   [ $? -ne 0 ] && echo "logon server:${server_host} failed" && exit 254
 done
 
-echo "************服务器网络校验通过,开始创建用户*****************"
+echo "************Start creating user*****************"
 
 for server_user_str in ${server_user_array[@]}
 do
@@ -27,9 +27,8 @@ do
    server_host=${server_user_info[0]}
    server_user_name=${server_user_info[1]}
    server_user_password=${server_user_info[2]}
-
    #sshpass -p $server_user_password ssh $server_user_name@$server_host "sudo useradd $add_user_name && echo $add_user_password |sudo -i  passwd --stdin $add_user_name"
-    sshpass -p $server_user_password ssh $server_user_name@$server_host "sudo useradd $add_user_name -s /sbin/nologin"
+   sshpass -p $server_user_password ssh $server_user_name@$server_host "sudo useradd $add_user_name -s /sbin/nologin"
 
-   [ $? -ne 0 ] && echo "创建用户失败：${host}失败" && exit 254
+   [ $? -ne 0 ] && echo "create user failed:${host}" && exit 254
 done

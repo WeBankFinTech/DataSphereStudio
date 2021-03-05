@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
  * @author: luxl@chinatelecom.cn
  * @create: 2020-08-10 14:24
  **/
-public class LubanMacroCommand implements MacroCommand {
+public class UserMacroCommand implements MacroCommand {
 
     private List<AbsCommand> commandList =   new ArrayList<>();
 

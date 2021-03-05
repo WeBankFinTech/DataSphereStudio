@@ -25,13 +25,12 @@ public class DSSUser {
     private String username;
     private String name;
     private Boolean isFirstLogin;
-    //增加是否超级用户表示 0-不是超级用户 1-是超级用户
-    private int isSuperUser = 0;
+    private boolean isSuperUser = false;
 
-    public int getIsSuperUser() {
+    public boolean getIsSuperUser() {
         return isSuperUser;
     }
-    public void setIsSuperUser(int isSuperUser) {
+    public void setIsSuperUser(boolean isSuperUser) {
         this.isSuperUser = isSuperUser;
     }
 

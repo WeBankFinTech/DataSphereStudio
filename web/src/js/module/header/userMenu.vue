@@ -17,11 +17,10 @@
 </template>
 <script>
 import api from '@/js/service/api';
-import storage from '@/js/helper/storage';
 export default {
   name: 'Menu',
   props: {
-    isSuperUser: Number
+    isSuperUser: Boolean
   },
   data() {
     return {
@@ -48,7 +47,7 @@ export default {
   },
   watch: { 
     isSuperUser: function(newVal){
-      if(newVal === 1){
+      if(newVal){
         if(this.menuList[0].id !== 'user-management'){
           this.menuList.unshift({
             id: 'user-management',

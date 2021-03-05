@@ -75,11 +75,10 @@ public class ApplicationRestfulApi {
         DSSUser dssUser = dataworkisUserService.getUserByName(username);
         DSSUserVO dataworkisUserVO = new DSSUserVO();
         String superUserName = ApplicationConf.SUPER_USER_NAME;
-        //是否超级用户登录
         if(username.equals(superUserName)){
-            dssUser.setIsSuperUser(1);
+            dssUser.setIsSuperUser(true);
         }else{
-            dssUser.setIsSuperUser(0);
+            dssUser.setIsSuperUser(false);
         }
 
         dataworkisUserVO.setBasic(dssUser);

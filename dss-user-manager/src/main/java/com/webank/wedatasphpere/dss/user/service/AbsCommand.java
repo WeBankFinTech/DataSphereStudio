@@ -37,7 +37,7 @@ public abstract class AbsCommand implements Command {
     public String authorization(AuthorizationBody body) throws IOException, Exception { return Command.SUCCESS; }
 
     public String toMessage(String msg) {
-        return this.getClass().getSimpleName() + "模块开始执行："+ msg;
+        return this.getClass().getSimpleName() + "the module starts execution"+ msg;
     }
 
     protected String runShell(String scriptPath, String[] args){

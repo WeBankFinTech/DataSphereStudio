@@ -7,9 +7,14 @@ realm=$4
 admin=$5
 ktPath=$6
 host_name=`hostname`
-
-  #一、kerberos认证
-kinit -kt $ktPath/$admin.keytab $admin/${host_name}@${realm}
+kerberos_enable=$7
+echo $kerberos_enable
+if [ $kerberos_enable = "0" ]; then
+   echo "kerberos is disabled"
+else
+ echo "kerberos is enabled"
+ kinit -kt $ktPath/$admin.keytab $admin/${host_name}@${realm}
+fi
 
   #二、metastore操作
 hive -e "create database if not exists $db_name"

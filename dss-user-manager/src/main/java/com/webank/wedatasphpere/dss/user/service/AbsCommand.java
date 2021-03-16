@@ -1,11 +1,13 @@
 package com.webank.wedatasphpere.dss.user.service;
 
 
+import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphpere.dss.user.dto.request.AuthorizationBody;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,12 +33,14 @@ public abstract class AbsCommand implements Command {
     public String undoAuthorization(AuthorizationBody body) { return Command.SUCCESS; }
 
     @Override
-    public String authorization(AuthorizationBody body) throws IOException,DocumentException, Exception { return Command.SUCCESS; }
+//    public String authorization(AuthorizationBody body) throws DocumentException { return Command.SUCCESS; }
+    public String authorization(AuthorizationBody body) throws IOException, Exception { return Command.SUCCESS; }
+
     public String toMessage(String msg) {
         return this.getClass().getSimpleName() + "模块开始执行："+ msg;
     }
 
-    protected String runShell(String scriptPath, String[] args) throws Exception {
+    protected String runShell(String scriptPath, String[] args){
         String bashCommand;
         try {
             bashCommand = "sh " + scriptPath + " " + String.join(" ", args);
@@ -51,14 +55,14 @@ public abstract class AbsCommand implements Command {
         }
     }
 
-    protected String getString(Process process) throws Exception {
+    protected String getString(Process process) throws IOException, InterruptedException {
         BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         String inline;
         while ((inline = br.readLine()) != null) {
             if (!inline.equals("")) {
                 inline = inline.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-                logger.info("shell info:"+inline);
+                logger.info(inline);
             } else {
                 logger.info("\n");
             }
@@ -67,10 +71,9 @@ public abstract class AbsCommand implements Command {
         br = new BufferedReader(new InputStreamReader(process.getErrorStream()));    //错误信息
         while ((inline = br.readLine()) != null) {
             if (!inline.equals(""))
-                logger.error("shell error:"+inline);
+                logger.warn(inline);
             else
-                logger.error("\n");
-//            throw new Exception(inline);
+                logger.warn("\n");
         }
 
         int status = process.waitFor();

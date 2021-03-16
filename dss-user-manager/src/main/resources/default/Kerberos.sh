@@ -93,13 +93,13 @@ gen_keytab_user(){
 
 
 #第一个参数为功能参数（必须有）,第二个为user（必须有），第三个为host（可以有）
-if [ $# -lt 2 ] || [ $# -gt 8 ]; then
+if [ $# -lt 3 ] || [ $# -gt 9 ]; then
     echo -e "\033[31m \033[05m请确认您的操作,输入格式如下 功能参数 [user|user hostname]\033[0m"
     echo "Usage: $0 genenateKeytab {username|username hostname}"
     echo `date '+%Y-%m-%d %H:%M:%S'`" parameters:"$* >>/tmp/deltaKerberos.log
     exit 1
 else
-    if [ $# -eq 7 ]; then
+    if [ $# -eq 8 ]; then
         user=$1
         CENTER_KEYTAB_PATH=$2
         SSH_PORT=$3
@@ -107,8 +107,20 @@ else
         KDC_USER=$5
         PASSWORD=$6
         REALM=$7
-        echo `date '+%Y-%m-%d %H:%M:%S'`" in genenate_key_tab username:"$user >>/tmp/deltaKerberos.log
-        gen_keytab_user $user
+        KERBEROS_ENABLE=$8
+        echo $user
+        echo $CENTER_KEYTAB_PATH
+        echo $SSH_PORT
+        echo $KDCSERVER_$KDC_USER
+        echo $REALM
+        echo $KERBEROS_ENABLE
+        if [ $KERBEROS_ENABLE = "0" ]; then
+           echo "kerberos is disabled"
+        else
+         echo "kerberos is enable"
+         echo `date '+%Y-%m-%d %H:%M:%S'`" in genenate_key_tab username:"$user >>/tmp/deltaKerberos.log
+         gen_keytab_user $user
+       fi
     else
         user=$1
         host=$2
@@ -118,8 +130,16 @@ else
         KDC_USER=$6
         PASSWORD=$7
         REALM=$8
-        echo `date '+%Y-%m-%d %H:%M:%S'`" in genenate_key_tab username:"$user" hostname:"$host >>/tmp/deltaKerberos.log
-        gen_keytab $user $host
+        KERBEROS_ENABLE=$9
+        echo $REALM
+        echo $KERBEROS_ENABLE
+        if [ $KERBEROS_ENABLE = "0" ]; then
+           echo "kerberos is disabled"
+        else
+          echo "kerberos1 is enable"
+          echo `date '+%Y-%m-%d %H:%M:%S'`" in genenate_key_tab username:"$user" hostname:"$host >>/tmp/deltaKerberos.log
+          gen_keytab $user $host
+        fi
     fi
 fi
 exit 0

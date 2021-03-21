@@ -22,7 +22,7 @@ CREATE TABLE `cron_job` (
   `update_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `name_UNIQUE` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- ----------------------------
 -- Table structure for dashboard
@@ -661,6 +661,6 @@ CREATE TABLE `share_download_record` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+alter table widget modify  view_id bigint null;
 
 SET FOREIGN_KEY_CHECKS = 1;
-INSERT INTO `source` (id,name,description,config,type,project_id,create_by,create_time,update_by,update_time,parent_id,full_parent_id,is_folder,`index`) VALUES (1,'hiveDataSource','','{"parameters":"","password":"","url":"test","username":"hiveDataSource-token"}','hive',-1,null,null,null,null,null,null,null,null);

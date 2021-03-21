@@ -596,7 +596,7 @@ export default {
           }
           if (!this.workflowIsExecutor) {
             if (type === 'node') {
-              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA].includes(node.type)) {
+              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.JDBC].includes(node.type)) {
                 arr.push({
                   text: this.$t('message.process.associate'),
                   value: 'associate',
@@ -797,7 +797,7 @@ export default {
               'msgName': '',
               'queryFrequency': 10,
               'maxReceiveHours': 12,
-              'msgSavekey': '',
+              'msgSavekey': 'msg.body',
               'onlyReceiveToday': 'true',
             },
           });
@@ -908,6 +908,22 @@ export default {
               'executeUser': ''
             },
           });
+        } else if (this.clickCurrentNode.type === NODETYPE.JDBC) {
+          if (this.clickCurrentNode.jobContent) {
+            this.$set(this.clickCurrentNode.jobContent, 'jobParams', {
+              'jdbcUrl': '',
+              'jdbcUsername': '',
+              'jdbcPassword': ''
+            });
+          } else {
+            this.$set(this.clickCurrentNode, 'jobContent', {
+              jobParams: {
+                'jdbcUrl': '',
+                'jdbcUsername': '',
+                'jdbcPassword': ''
+              },
+            });
+          }
         }
       }
       // 节点参数位置发生改变，先定义一个新的configuration用来存储数据，后面把jobparams干掉
@@ -1619,7 +1635,7 @@ export default {
         const fileName = `${time.getTime()}${match.ext}`;
         const params = {
           fileName,
-          scriptContent: rst.fileContent,
+          scriptContent: rst.fileContent[0][0],
           metadata: rst.params,
         };
         api.fetch('/filesystem/saveScriptToBML', params, 'post')

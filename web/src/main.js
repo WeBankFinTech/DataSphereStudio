@@ -18,26 +18,46 @@
 import Vue from 'vue'
 import iView from 'iview'
 import VueRouter from 'vue-router'
-import './js/module'
-import App from './js/view/app.vue'
-import router from './js/service/router'
-import component from './js/component'
-import mixin from '../src/js/service/mixin'
-import i18n from './js/i18n'
-
+import { apps } from './dynamic-apps'
+import component from './components'
+import App from './dss/view/app.vue'
+import router from './router'
+import i18n from './common/i18n'
+import mixinDispatch from './common/service/moduleMixin'
+// import wa from './common/service/wa'
+// 导入各模块的公共路径常量
+import API_PATH from './common/config/apiPath.js'
 import 'iview/dist/styles/iview.css'
+
+// Icon
+import './components/svgIcon/index.js'
+import './dss/module/index.js'
+
+// moduleMixin
+if (apps.requireComponent) {
+  apps.requireComponent.forEach(item=>{
+    mixinDispatch(item)
+  })
+}
+if (apps.requireComponentVue) {
+  apps.requireComponentVue.forEach(item=>{
+    mixinDispatch(undefined, item)
+  })
+}
 
 Vue.use(VueRouter)
 Vue.use(component)
-Vue.mixin(mixin);
-Vue.config.productionTip = false
-
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
 })
+
+Vue.config.productionTip = false
 Vue.prototype.$Message.config({
   duration: 3
 })
+// 全局变量
+Vue.prototype.$API_PATH = API_PATH;
+// wa();
 
 new Vue({
   router,

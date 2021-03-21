@@ -1,40 +1,29 @@
 <!--
-  ~ Copyright 2019 WeBank
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~  you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  ~
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
   -->
 
 <assembly>
   <id>dist</id>
   <formats>
     <format>tar.gz</format>
-    <format>dir</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
 
-  <dependencySets>
-    <dependencySet>
-      <!-- Enable access to all projects in the current multimodule build! <useAllReactorProjects>true</useAllReactorProjects> -->
-      <!-- Now, select which projects to include in this module-set. -->
-      <outputDirectory>lib</outputDirectory>
-      <useProjectArtifact>true</useProjectArtifact>
-      <useTransitiveDependencies>true</useTransitiveDependencies>
-      <unpack>false</unpack>
-      <useStrictFiltering>true</useStrictFiltering>
-      <useTransitiveFiltering>true</useTransitiveFiltering>
-    </dependencySet>
-  </dependencySets>
+
 
   <fileSets>
     <fileSet>
@@ -47,11 +36,13 @@
       </includes>
     </fileSet>
 
+
+
     <fileSet>
       <directory>
-        ${project.parent.basedir}/conf/
+        ${project.parent.basedir}/assembly/config/
       </directory>
-      <outputDirectory>conf</outputDirectory>
+      <outputDirectory>config</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
@@ -60,7 +51,7 @@
 
     <fileSet>
       <directory>
-        ${project.parent.basedir}/bin/
+        ${project.parent.basedir}/assembly/bin/
       </directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
@@ -71,7 +62,7 @@
 
     <fileSet>
       <directory>
-        ${project.parent.basedir}/db/
+        ${project.parent.basedir}/db
       </directory>
       <outputDirectory>db</outputDirectory>
       <includes>
@@ -79,118 +70,16 @@
       </includes>
     </fileSet>
 
-    <!--dss-server-->
+    <!--dss-framework-project-server-->
     <fileSet>
       <directory>
-          ${project.parent.basedir}/dss-server/target/
+        ${project.parent.basedir}/assembly/dss-package/target/out
       </directory>
-      <outputDirectory>share/dss/dss-server</outputDirectory>
+      <outputDirectory></outputDirectory>
       <includes>
-        <include>*.zip</include>
+        <include>**/*</include>
       </includes>
     </fileSet>
 
-
-  <!--datachecker-appjoint-->
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/datachecker-appjoint/target/
-    </directory>
-    <outputDirectory>share/appjoints/datachecker</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
-
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/eventchecker-appjoint/target/
-    </directory>
-    <outputDirectory>share/appjoints/eventchecker</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
-
-    <fileSet>
-      <directory>
-        ${project.parent.basedir}/dss-azkaban-scheduler-appjoint/target/
-      </directory>
-      <outputDirectory>share/appjoints/schedulis</outputDirectory>
-      <includes>
-        <include>*.zip</include>
-      </includes>
-    </fileSet>
-
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/dss-flow-execution-entrance/target/
-    </directory>
-    <outputDirectory>share/dss/dss-flow-execution-entrance</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
-
-
-  <!--visualis-appjoint-->
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/visualis-appjoint/appjoint/target/
-    </directory>
-    <outputDirectory>share/appjoints/visualis</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
-
-    <!--qualtis-appjoint-->
-    <fileSet>
-      <directory>
-        ${project.parent.basedir}/qualitis-appjoint/appjoint/target/
-      </directory>
-      <outputDirectory>share/appjoints/qualitis</outputDirectory>
-      <includes>
-        <include>*.zip</include>
-      </includes>
-    </fileSet>
-
-    <!--visualis-server-->
-    <fileSet>
-      <directory>
-        ${project.parent.basedir}/visualis-appjoint/server/assembly/target/
-      </directory>
-      <outputDirectory>share/visualis-server/</outputDirectory>
-      <includes>
-        <include>*.zip</include>
-      </includes>
-    </fileSet>
-
-  <!--linkis-appjoint-entrance-->
-  <fileSet>
-    <directory>
-      ${project.parent.basedir}/plugins/linkis/linkis-appjoint-entrance/target/
-    </directory>
-    <outputDirectory>share/plugins/linkis/linkis-appjoint-entrance</outputDirectory>
-    <includes>
-      <include>*.zip</include>
-    </includes>
-  </fileSet>
-
-  <!--<dependencySets>-->
-    <!--<dependencySet>-->
-      <!--<outputDirectory>lib</outputDirectory>-->
-      <!--<useTransitiveDependencies>true</useTransitiveDependencies>-->
-      <!--<unpack>false</unpack>-->
-      <!--<scope>runtime</scope>-->
-      <!--<useProjectArtifact>false</useProjectArtifact>-->
-      <!--<excludes>-->
-        <!--<exclude>org.apache.hadoop:*:jar</exclude>-->
-        <!--<exclude>org.apache.spark:*:jar</exclude>-->
-        <!--<exclude>org.apache.zookeeper:*:jar</exclude>-->
-        <!--<exclude>org.apache.avro:*:jar</exclude>-->
-      <!--</excludes>-->
-    <!--</dependencySet>-->
-  <!--</dependencySets>-->
   </fileSets>
 </assembly>

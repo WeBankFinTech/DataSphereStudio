@@ -1,33 +1,45 @@
 /*
- * Copyright 2019 WeBank
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  * Copyright 2019 WeBank
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  *  you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
+import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
-import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
-import com.webank.wedatasphere.dss.linkis.node.execution.execution.LinkisNodeExecution;
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.*;
 import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
-import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.utils.LinkisJobTypeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -35,6 +47,8 @@ import java.util.*;
  * Created by johnnwang on 2019/11/3.
  */
 public class AzkanbanBuilder extends Builder{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
     private Map<String, String> jobProps;
 
@@ -63,71 +77,13 @@ public class AzkanbanBuilder extends Builder{
     }
 
     @Override
-    protected Boolean isReadNode() {
-        return  StringUtils.isNotEmpty(jobProps.get("read.nodes"));
-    }
-
-    @Override
-    protected Boolean isShareNod() {
-        return  StringUtils.isNotEmpty(jobProps.get("share.num"));
-    }
-
-    @Override
-    protected Boolean isSignalSharedNode() {
-        return LinkisJobTypeUtils.isSignalNode(getJobType());
-    }
-
-    @Override
-    protected ReadJob createReadJob(boolean isLinkisType) {
-        if(isLinkisType){
-            AzkabanCommonLinkisReadJob readJob = new AzkabanCommonLinkisReadJob();
-            readJob.setJobProps(this.jobProps);
-            return readJob;
-        } else {
-            AzkabanAppJointLinkisReadJob readJob = new AzkabanAppJointLinkisReadJob();
-            readJob.setJobProps(this.jobProps);
-            return readJob;
-        }
-    }
-
-    @Override
-    protected SharedJob createSharedJob(boolean isLinkisType) {
-        if(isLinkisType){
-            AzkabanCommonLinkisSharedJob sharedJob = new AzkabanCommonLinkisSharedJob();
-            sharedJob.setJobProps(this.jobProps);
-            int shareNum = Integer.parseInt(this.jobProps.get(LinkisJobTypeConf.SHARED_NODE_TOKEN));
-            sharedJob.setSharedNum(shareNum);
-            return sharedJob;
-        } else {
-            AzkabanAppJointLinkisSharedJob sharedJob = new AzkabanAppJointLinkisSharedJob();
-            sharedJob.setJobProps(this.jobProps);
-            int shareNum = Integer.parseInt(this.jobProps.get(LinkisJobTypeConf.SHARED_NODE_TOKEN));
-            sharedJob.setSharedNum(shareNum);
-            return sharedJob;
-        }
-    }
-
-    @Override
-    protected SignalSharedJob createSignalSharedJob(boolean isLinkisType) {
-        if(isLinkisType){
-
-            return null;
-        } else {
-            AzkabanAppJointSignalSharedJob signalSharedJob = new AzkabanAppJointSignalSharedJob();
-            signalSharedJob.setSignalKeyCreator(jobSignalKeyCreator);
-            signalSharedJob.setJobProps(this.jobProps);
-            return signalSharedJob;
-        }
-    }
-
-    @Override
     protected LinkisJob creatLinkisJob(boolean isLinkisType) {
         if(isLinkisType){
             AzkabanCommonLinkisJob linkisJob = new AzkabanCommonLinkisJob();
             linkisJob.setJobProps(this.jobProps);
             return linkisJob;
         } else {
-            AzkabanAppJointLinkisJob linkisJob = new AzkabanAppJointLinkisJob();
+            AzkabanAppConnLinkisJob linkisJob = new AzkabanAppConnLinkisJob();
             linkisJob.setJobProps(this.jobProps);
             return linkisJob;
         }
@@ -137,8 +93,66 @@ public class AzkanbanBuilder extends Builder{
     protected void fillJobInfo(Job job) {
         job.setCode(jobProps.get(LinkisJobTypeConf.COMMAND));
         job.setParams(new HashMap<String, Object>());
-        job.setRuntimeParams(new HashMap<String, Object>());
+
+        Map<String, Object> runtimeMap = new HashMap<String, Object>();
+        if (null != job.getRuntimeParams()){
+            runtimeMap = job.getRuntimeParams();
+        }
+        //update by peaceWong add contextID to runtimeMap
+        if (jobProps.containsKey(LinkisJobExecutionConfiguration.FLOW_CONTEXTID)){
+            runtimeMap.put("contextID", jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID).replace("/", "\\"));
+        }
+        runtimeMap.put("nodeName", jobProps.get(LinkisJobTypeConf.JOB_ID));
+        //to put a workspace for linkis job
+        String workspace = "";
+        try {
+            workspace = getWorkspace(job.getUser(), job);
+        } catch (Exception e) {
+           LOGGER.error("Failed to get workspace", e);
+        }
+        runtimeMap.put("workspace", workspace);
+        job.setRuntimeParams(runtimeMap);
     }
+
+    private String getWorkspace(String user, Job job) throws Exception{
+        String linkisUrl = LinkisJobExecutionConfiguration.LINKIS_URL.getValue(job.getJobProps());
+        String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
+        String dssUrl = linkisUrl.endsWith("/") ? linkisUrl + "api/rest_j/v1/dss/framework/project/getWorkSpaceStr"
+                : linkisUrl + "/api/rest_j/v1/dss/framework/project/getWorkSpaceStr";
+        HttpGet httpGet = new HttpGet(dssUrl);
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("Token-User", user));
+        params.add(new BasicNameValuePair("Token-Code", token));
+        httpGet.addHeader("Token-User", user);
+        httpGet.addHeader("Token-Code", token);
+        CookieStore cookieStore = new BasicCookieStore();
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        HttpClientContext context;
+        String responseContent;
+        try {
+            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+            context = HttpClientContext.create();
+            response = httpClient.execute(httpGet, context);
+            HttpEntity entity = response.getEntity();
+            responseContent = EntityUtils.toString(entity,"utf-8");
+            Gson gson = new Gson();
+            Map resultMap = gson.fromJson(responseContent, Map.class);
+            Object obj = resultMap.get("data");
+            if (obj instanceof Map){
+                if (null != ((Map) obj).get("workspaceStr")){
+                    return ((Map) obj).get("workspaceStr").toString();
+                }else {
+                    return "";
+                }
+            }
+        } finally {
+            IOUtils.closeQuietly(response);
+            IOUtils.closeQuietly(httpClient);
+        }
+        return "";
+    }
+
 
     @Override
     protected void fillLinkisJobInfo(LinkisJob linkisJob) {

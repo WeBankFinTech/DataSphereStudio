@@ -16,58 +16,150 @@
  */
 
 // vue.config.js
-let CopyWebpackPlugin = require('copy-webpack-plugin')
-let FileManagerPlugin = require('filemanager-webpack-plugin');
-let MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-let path = require('path')
-let fs = require('fs');
+const path = require('path')
+const fs = require('fs')
+const FileManagerPlugin = require('filemanager-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
+const VirtualModulesPlugin = require('webpack-virtual-modules');
+const apps = require('./src/config.json')
 
 const getVersion = () => {
-  const pkgPath = path.join(__dirname, './package.json');
+  const pkgPath = path.join(__dirname, './package.json')
   let pkg = fs.readFileSync(pkgPath);
   pkg = JSON.parse(pkg);
   return pkg.version;
 }
 
-const host = "0.0.0.0";
-const port = "9001";
+// 指定module打包, 不指定则打包全部子应用
+// npm run serve --module=scriptis
+let modules = process.env.npm_config_module || ''
+if (modules) {
+  modules = modules.split(',')
+  Object.keys(apps).forEach(m => {
+    if (modules.indexOf(m) < 0) {
+      delete apps[m]
+    }
+  })
+} else {
+  modules = Object.keys(apps)
+}
+let requireComponent = []
+let requireComponentVue = []
+let appsRoutes = []
+let appsI18n = []
+let headers = []
+
+Object.entries(apps).forEach(item => {
+  if (item[1].module) {
+    requireComponent.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`)
+    requireComponentVue.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`)
+  }
+  // 获取个模块header
+  if (item[1].header) {
+    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`)
+  }
+  // 处理路由
+  if (item[1].routes) {
+    appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`)
+  }
+  // 处理国际化
+  if (item[1].i18n) {
+    appsI18n.push(`{
+      'zh-CN': require('@/${item[1].i18n["zh-CN"]}'),
+      'en': require('@/${item[1].i18n['en']}')
+    }`)
+  }
+})
+
+let buildDynamicModules = Object.values(apps)
+buildDynamicModules = JSON.stringify(buildDynamicModules)
+
+const virtualModules = new VirtualModulesPlugin({
+  'node_modules/dynamic-modules.js': `module.exports = {
+    apps: ${buildDynamicModules},
+    modules: ${JSON.stringify(modules)},
+    appsRoutes: {${appsRoutes.join(',')}},
+    appsI18n: [${appsI18n.join(',')}],
+    requireComponent: [${requireComponent.join(',')}],
+    requireComponentVue: [${requireComponentVue.join(',')}],
+    microModule: ${JSON.stringify(process.env.npm_config_micro_module) || false},
+    headers:{${headers.join(',')}}
+  };`
+});
+
+const plugins = [
+  virtualModules
+]
+
+// scriptis linkis 有使用编辑器组件, 需要Monaco Editor
+if (modules.indexOf('scriptis') > -1 || modules.indexOf('linkis') > -1) {
+  plugins.push(new MonacoWebpackPlugin())
+}
+
+/**
+ * resolve
+ * @param {*} dir
+ */
+function resolve(dir) {
+  return path.join(__dirname, dir)
+}
+
+if (process.env.NODE_ENV !== 'dev') {
+  plugins.push(new CspHtmlWebpackPlugin(
+    {
+      "base-uri": "'self'",
+      "object-src": "'none'",
+      "child-src": "'none'",
+      "script-src": ["'self'", "'unsafe-eval'"],
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "frame-src": "*",
+      "worker-src": "'self'",
+      "connect-src": [
+        "'self'",
+        "ws:",
+        "http://adm.webank.io"
+      ],
+      "img-src": [
+        "data:",
+        "'self'"
+      ]
+    },
+    {
+      enabled: true,
+      nonceEnabled: {
+        'style-src': false
+      }
+    }
+  ))
+}
 
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
-  devServer: {
-    port: 8080,
-    open: true,
-    disableHostCheck: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
-    proxy: {    //代理转发
-      '^/api/rest_j/v1': {
-        target: `http://${host}:${port}`,  //后端服务地址
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api/rest_j/v1': '/api/rest_j/v1'
-        }
-      },
-      '^/ws/api': {    //websocket
-        target: `ws://${host}:${port}`,
-        ws: true,
-        secure: false,
-      },
-    }
-    // after: require('./mock/mock-server.js')
-  },
   chainWebpack: (config) => {
-    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'sandbox') {
+    // set svg-sprite-loader
+    config.module
+      .rule('svg')
+      .exclude.add(resolve('src/components/svgIcon'))
+      .end()
+    config.module
+      .rule('icons')
+      .test(/\.svg$/)
+      .include.add(resolve('src/components/svgIcon'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: 'icon-[name]'
+      })
+      .end()
+    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'sandbox' || process.env.NODE_ENV === 'bdp') {
       config.plugin('compress').use(FileManagerPlugin, [{
         onEnd: {
           copy: [
-            { source: 'node_modules/monaco-editor/dev/vs', destination: `./dist/dist/static/vs` },
-            { source: './config.sh', destination: `./dist/conf` },
-            { source: './install.sh', destination: `./dist/bin` }
+            { source: './config.sh', destination: `./dist` },
+            { source: './install.sh', destination: `./dist` }
           ],
           // 先删除根目录下的zip包
           delete: [`./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip`],
@@ -82,25 +174,28 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        'vue$': 'vue/dist/vue.esm.js',
         '@': path.resolve(__dirname, './src'),
-        '@js': path.resolve(__dirname, './src/js'),
-        '@assets': path.resolve(__dirname, './src/assets')
+        '@component': path.resolve(__dirname, './src/components')
       }
     },
-    plugins: [
-      new CopyWebpackPlugin([{
-        from: 'node_modules/monaco-editor/dev/vs',
-        to: 'static/vs',
-      }]),
-      new MonacoWebpackPlugin({}),
-    ]
+    plugins
   },
   // 选项...
   pluginOptions: {
     mock: {
       entry: 'mock.js',
       power: false
+    }
+  },
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://x.x.x.x:8088',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '/api'
+        }
+      }
     }
   }
 }

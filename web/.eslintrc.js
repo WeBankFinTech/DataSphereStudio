@@ -20,7 +20,8 @@ module.exports = {
     env: {
         node: true
     },
-    'extends': [
+    extends: [
+        'eslint:recommended',
         'plugin:vue/essential'
     ],
     rules: {
@@ -46,6 +47,7 @@ module.exports = {
         ],
         'no-const-assign': 'warn',
         'no-this-before-super': 'warn',
+        "no-irregular-whitespace": 0,
         'no-undef': 2,
         'no-unreachable': 'warn',
         'no-unused-vars': 2,
@@ -82,10 +84,10 @@ module.exports = {
         'no-template-curly-in-string': 0,
         'no-useless-call': 0,
         "one-var": 0,
-        "camelcase": 0,
-        "no-unused-vars": 0
+        "camelcase": 0
     },
     parserOptions: {
-        parser: 'babel-eslint'
+        "parser": 'babel-eslint',
+        "sourceType": "module"
     }
 }

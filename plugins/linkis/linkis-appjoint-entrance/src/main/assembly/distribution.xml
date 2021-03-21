@@ -59,16 +59,16 @@
                 <exclude>aopalliance:aopalliance:jar</exclude>
                 <exclude>asm:asm:jar</exclude>
                 <exclude>cglib:cglib:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-autoscaling:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-core:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-ec2:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-route53:jar</exclude>
-                <exclude>com.amazonaws:aws-java-sdk-sts:jar</exclude>
-                <exclude>com.amazonaws:jmespath-java:jar</exclude>
+<!--                <exclude>com.amazonaws:aws-java-sdk-autoscaling:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-core:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-ec2:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-route53:jar</exclude>-->
+<!--                <exclude>com.amazonaws:aws-java-sdk-sts:jar</exclude>-->
+<!--                <exclude>com.amazonaws:jmespath-java:jar</exclude>-->
                 <exclude>com.fasterxml.jackson.core:jackson-annotations:jar</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-core:jar</exclude>
                 <exclude>com.fasterxml.jackson.core:jackson-databind:jar</exclude>
-                <exclude>com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar</exclude>
+<!--                <exclude>com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar</exclude>-->
                 <exclude>com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar</exclude>
                 <exclude>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar</exclude>
                 <exclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:jar</exclude>
@@ -84,7 +84,7 @@
                 <exclude>com.google.code.gson:gson:jar</exclude>
                 <exclude>com.google.guava:guava:jar</exclude>
                 <exclude>com.google.inject:guice:jar</exclude>
-                <exclude>com.google.protobuf:protobuf-java:jar</exclude>
+<!--                <exclude>com.google.protobuf:protobuf-java:jar</exclude>-->
                 <exclude>com.netflix.archaius:archaius-core:jar</exclude>
                 <exclude>com.netflix.eureka:eureka-client:jar</exclude>
                 <exclude>com.netflix.eureka:eureka-core:jar</exclude>
@@ -100,7 +100,6 @@
                 <exclude>com.netflix.ribbon:ribbon-loadbalancer:jar</exclude>
                 <exclude>com.netflix.ribbon:ribbon-transport:jar</exclude>
                 <exclude>com.netflix.servo:servo-core:jar</exclude>
-                <exclude>com.ning:async-http-client:jar</exclude>
                 <exclude>com.sun.jersey.contribs:jersey-apache-client4:jar</exclude>
                 <exclude>com.sun.jersey:jersey-client:jar</exclude>
                 <exclude>com.sun.jersey:jersey-core:jar</exclude>
@@ -112,15 +111,15 @@
                 <exclude>com.thoughtworks.xstream:xstream:jar</exclude>
                 <exclude>com.webank.wedatasphere.linkis:linkis-common:jar</exclude>
                 <exclude>com.webank.wedatasphere.linkis:linkis-module:jar</exclude>
-                <exclude>commons-beanutils:commons-beanutils:jar</exclude>
-                <exclude>commons-beanutils:commons-beanutils-core:jar</exclude>
-                <exclude>commons-cli:commons-cli:jar</exclude>
-                <exclude>commons-codec:commons-codec:jar</exclude>
-                <exclude>commons-collections:commons-collections:jar</exclude>
-                <exclude>commons-configuration:commons-configuration:jar</exclude>
-                <exclude>commons-daemon:commons-daemon:jar</exclude>
-                <exclude>commons-dbcp:commons-dbcp:jar</exclude>
-                <exclude>commons-digester:commons-digester:jar</exclude>
+<!--                <exclude>commons-beanutils:commons-beanutils:jar</exclude>-->
+<!--                <exclude>commons-beanutils:commons-beanutils-core:jar</exclude>-->
+<!--                <exclude>commons-cli:commons-cli:jar</exclude>-->
+<!--                <exclude>commons-codec:commons-codec:jar</exclude>-->
+<!--                <exclude>commons-collections:commons-collections:jar</exclude>-->
+<!--                <exclude>commons-configuration:commons-configuration:jar</exclude>-->
+<!--                <exclude>commons-daemon:commons-daemon:jar</exclude>-->
+<!--                <exclude>commons-dbcp:commons-dbcp:jar</exclude>-->
+<!--                <exclude>commons-digester:commons-digester:jar</exclude>-->
                 <exclude>commons-httpclient:commons-httpclient:jar</exclude>
                 <exclude>commons-io:commons-io:jar</exclude>
                 <exclude>commons-jxpath:commons-jxpath:jar</exclude>
@@ -155,11 +154,9 @@
                 <exclude>joda-time:joda-time:jar</exclude>
                 <exclude>log4j:log4j:jar</exclude>
                 <exclude>mysql:mysql-connector-java:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-core_2.11:jar</exclude>
-                <exclude>net.databinder.dispatch:dispatch-json4s-jackson_2.11:jar</exclude>
                 <exclude>org.antlr:antlr-runtime:jar</exclude>
                 <exclude>org.antlr:stringtemplate:jar</exclude>
-                <exclude>org.apache.commons:commons-compress:jar</exclude>
+<!--                <exclude>org.apache.commons:commons-compress:jar</exclude>-->
                 <exclude>org.apache.commons:commons-math:jar</exclude>
                 <exclude>org.apache.commons:commons-math3:jar</exclude>
                 <exclude>org.apache.curator:curator-client:jar</exclude>
@@ -169,13 +166,13 @@
                 <exclude>org.apache.directory.api:api-util:jar</exclude>
                 <exclude>org.apache.directory.server:apacheds-i18n:jar</exclude>
                 <exclude>org.apache.directory.server:apacheds-kerberos-codec:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-annotations:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-auth:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-common:jar</exclude>
-                <exclude>org.apache.hadoop:hadoop-hdfs:jar</exclude>
-                <exclude>org.apache.htrace:htrace-core:jar</exclude>
-                <exclude>org.apache.httpcomponents:httpclient:jar</exclude>
-                <exclude>org.apache.httpcomponents:httpcore:jar</exclude>
+<!--                <exclude>org.apache.hadoop:hadoop-annotations:jar</exclude>-->
+<!--                <exclude>org.apache.hadoop:hadoop-auth:jar</exclude>-->
+<!--                <exclude>org.apache.hadoop:hadoop-common:jar</exclude>-->
+<!--                <exclude>org.apache.hadoop:hadoop-hdfs:jar</exclude>-->
+<!--                <exclude>org.apache.htrace:htrace-core:jar</exclude>-->
+<!--                <exclude>org.apache.httpcomponents:httpclient:jar</exclude>-->
+<!--                <exclude>org.apache.httpcomponents:httpcore:jar</exclude>-->
                 <exclude>org.apache.logging.log4j:log4j-api:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-core:jar</exclude>
                 <exclude>org.apache.logging.log4j:log4j-jul:jar</exclude>
@@ -194,7 +191,6 @@
                 <exclude>org.eclipse.jetty:jetty-continuation:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-http:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-io:jar</exclude>
-                <exclude>org.eclipse.jetty:jetty-jndi:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-plus:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-security:jar</exclude>
                 <exclude>org.eclipse.jetty:jetty-server:jar</exclude>
@@ -243,7 +239,6 @@
                 <exclude>org.json4s:json4s-ast_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-core_2.11:jar</exclude>
                 <exclude>org.json4s:json4s-jackson_2.11:jar</exclude>
-                <exclude>org.jsoup:jsoup:jar</exclude>
                 <exclude>org.jvnet.mimepull:mimepull:jar</exclude>
                 <exclude>org.jvnet:tiger-types:jar</exclude>
                 <exclude>org.latencyutils:LatencyUtils:jar</exclude>
@@ -298,7 +293,7 @@
                 <exclude>org.springframework:spring-webmvc:jar</exclude>
                 <exclude>org.tukaani:xz:jar</exclude>
                 <exclude>org.yaml:snakeyaml:jar</exclude>
-                <exclude>software.amazon.ion:ion-java:jar</exclude>
+<!--                <exclude>software.amazon.ion:ion-java:jar</exclude>-->
                 <exclude>xerces:xercesImpl:jar</exclude>
                 <exclude>xmlenc:xmlenc:jar</exclude>
                 <exclude>xmlpull:xmlpull:jar</exclude>

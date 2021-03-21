@@ -1,23 +1,67 @@
-*.iml
 .idea
-.DS_Store
+.idea/*
 
 assembly/target
+assembly/dss-package/target
 
-datachecker-appjoint/target/
-dss-appjoint-auth/target/
-dss-appjoint-core/target/
-dss-appjoint-loader/target/
-dss-application/target/
-dss-azkaban-scheduler-appjoint/target/
-dss-common/target/
-dss-flow-execution-entrance/target/
-dss-linkis-node-execution/target/
-dss-scheduler-appjoint-core/target/
-dss-server/target/
-eventchecker-appjoint/target/
-plugins/azkaban/linkis-jobtype/target/
-plugins/linkis/linkis-appjoint-entrance/target/
+# dss-appconn
+dss-appconn/appconns/dss-datachecker-appconn/target
+dss-appconn/appconns/dss-eventchecker-appconn/target
+dss-appconn/appconns/dss-orchestrator-framework-appconn/target
+dss-appconn/appconns/dss-schedulis-appconn/target
+dss-appconn/appconns/dss-sendemail-appconn/esb-email-support/target
+dss-appconn/appconns/dss-sendemail-appconn/sendemail-appconn-core/target
+dss-appconn/appconns/dss-visualis-appconn/target
+dss-appconn/appconns/dss-workflow-appconn/target
+dss-appconn/dss-appconn-core/target
+dss-appconn/dss-appconn-loader/target
+dss-appconn/dss-schedule-appconn-core/target
+dss-appconn/linkis-appconn-engineplugin/target
 
-sendemail-appjoint/sendemail-core/target/
-visualis-appjoint/appjoint/target/
+# dss-apps
+dss-apps/dss-apiservice-server/target
+
+# dss-commons
+dss-commons/dss-common/target
+dss-commons/dss-contextservice/target
+
+# dss-framework
+dss-framework/dss-appconn-framework/target
+dss-framework/dss-framework-common/target
+dss-framework/dss-framework-orchestrator-server/target
+dss-framework/dss-framework-project-server/target
+dss-framework/dss-framework-workspace-server/target
+dss-framework/framework-plugins/dss-framework-orchestrator-publish/target
+dss-framework/framework-plugins/dss-framework-release-server/target
+
+# dss-orchestrator
+dss-orchestrator/dss-orchestrator-common/target
+dss-orchestrator/dss-orchestrator-core/target
+dss-orchestrator/dss-orchestrator-db/target
+dss-orchestrator/dss-orchestrator-loader/target
+dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target
+dss-orchestrator/orchestrators/dss-workflow/dss-linkis-node-execution/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-common/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target
+
+# dss-standars
+dss-standard/dss-standard-common/target
+dss-standard/sso-standard/origin-sso-integration-standard/target
+dss-standard/sso-standard/spring-origin-sso-integration-plugin/target
+dss-standard/sso-standard/sso-integration-standard/target
+dss-standard/development-standard/development-process-standard/target
+dss-standard/development-standard/development-process-standard-execution/target
+dss-standard/structure-standard/dss-project-plugin/target
+dss-standard/structure-standard/dss-role-plugin/target
+dss-standard/structure-standard/dss-structure-integration-standard
+dss-standard/structure-standard/spring-origin-dss-project-plugin/target
+
+
+# plugins
+plugins/azkaban/linkis-jobtype/target
+plugins/linkis/dss-gateway-support/target
+
+logs
+logs/*
+
+*.iml

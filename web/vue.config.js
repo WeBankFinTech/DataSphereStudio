@@ -29,17 +29,45 @@ const getVersion = () => {
   return pkg.version;
 }
 
+const host = "0.0.0.0";
+const port = "9001";
+
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  devServer: {
+    port: 8080,
+    open: true,
+    disableHostCheck: true,
+    overlay: {
+      warnings: false,
+      errors: true
+    },
+    proxy: {    //代理转发
+      '^/api/rest_j/v1': {
+        target: `http://${host}:${port}`,  //后端服务地址
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api/rest_j/v1': '/api/rest_j/v1'
+        }
+      },
+      '^/ws/api': {    //websocket
+        target: `ws://${host}:${port}`,
+        ws: true,
+        secure: false,
+      },
+    }
+    // after: require('./mock/mock-server.js')
+  },
   chainWebpack: (config) => {
     if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'sandbox') {
       config.plugin('compress').use(FileManagerPlugin, [{
         onEnd: {
           copy: [
             { source: 'node_modules/monaco-editor/dev/vs', destination: `./dist/dist/static/vs` },
-            { source: './config.sh', destination: `./dist` },
-            { source: './install.sh', destination: `./dist` }
+            { source: './config.sh', destination: `./dist/conf` },
+            { source: './install.sh', destination: `./dist/bin` }
           ],
           // 先删除根目录下的zip包
           delete: [`./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip`],

@@ -18,13 +18,13 @@
 package com.webank.wedatasphere.dss.appjoint.scheduler.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.entity.SchedulerProject;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 
 /**
  * Created by enjoyyin on 2019/9/16.
  */
 public interface ProjectParser {
-    SchedulerProject parseProject(DWSProject dwsProject);
+    SchedulerProject parseProject(DSSProject dssProject);
     void setFlowParsers(FlowParser[] flowParser);
     FlowParser[] getFlowParsers();
 

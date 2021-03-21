@@ -18,8 +18,8 @@
 package com.webank.wedatasphere.dss.server.crumb
 
 import com.webank.wedatasphere.dss.server.entity.CrumbType.CrumbType
-import com.webank.wedatasphere.dss.server.entity.{Crumb, CrumbType, DWSFlowTaxonomy, DWSProjectTaxonomy}
-import com.webank.wedatasphere.dss.server.service.impl.{DWSFlowServiceImpl, DWSFlowTaxonomyServiceImpl, DWSProjectServiceImpl, DWSProjectTaxonomyServiceImpl}
+import com.webank.wedatasphere.dss.server.entity.{Crumb, CrumbType, DSSFlowTaxonomy, DSSProjectTaxonomy}
+import com.webank.wedatasphere.dss.server.service.impl.{DSSFlowServiceImpl, DSSFlowTaxonomyServiceImpl, DSSProjectServiceImpl, DSSProjectTaxonomyServiceImpl}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -29,13 +29,13 @@ import scala.collection.mutable.ArrayBuffer
 @Component
 class CrumbFactory {
   @Autowired
-  private var projectService: DWSProjectServiceImpl = _
+  private var projectService: DSSProjectServiceImpl = _
   @Autowired
-  private var projectTaxonomyService:DWSProjectTaxonomyServiceImpl = _
+  private var projectTaxonomyService:DSSProjectTaxonomyServiceImpl = _
   @Autowired
-  private var flowService: DWSFlowServiceImpl = _
+  private var flowService: DSSFlowServiceImpl = _
   @Autowired
-  private var flowTaxonomyService:DWSFlowTaxonomyServiceImpl = _
+  private var flowTaxonomyService:DSSFlowTaxonomyServiceImpl = _
 
   def createCrumbs(crumbType: CrumbType, params: Array[String]): Array[Crumb] = {
     crumbType match {
@@ -104,7 +104,7 @@ class CrumbFactory {
 
   def createCrumbData(crumbType: CrumbType, params: java.util.Map[String, String],userName:String): Any = {
     crumbType match {
-      case CrumbType.All =>createAllData(userName)
+      case CrumbType.All =>createAllData(userName, params.get("workspaceId").toLong)
       case CrumbType.SortProject =>createSortProjectData(params.get("projectTaxonomyID").toLong,userName)
       case CrumbType.Project =>createProjectData(params.get("projectVersionID").toLong,params.get("isRootFlow").toBoolean)
       case CrumbType.SortFlow =>createSortFlowData(params.get("projectVersionID").toLong,params.get("flowTaxonomyID").toLong,params.get("isRootFlow").toBoolean)
@@ -112,19 +112,19 @@ class CrumbFactory {
     }
   }
 
-  private def createAllData(userName:String):java.util.List[DWSProjectTaxonomy] ={
-    projectTaxonomyService.listAllProjectTaxonomy(userName)
+  private def createAllData(userName:String, workspaceId: Long):java.util.List[DSSProjectTaxonomy] ={
+    projectTaxonomyService.listAllProjectTaxonomy(userName, workspaceId)
   }
 
-  private def createSortProjectData(projectTaxonomyID:Long,userName:String):java.util.List[DWSProjectTaxonomy] ={
+  private def createSortProjectData(projectTaxonomyID:Long,userName:String):java.util.List[DSSProjectTaxonomy] ={
     projectTaxonomyService.listProjectTaxonomy(projectTaxonomyID,userName)
   }
 
-  private def createProjectData(projectVersionID:Long,isRootFlow:Boolean):java.util.List[DWSFlowTaxonomy] = {
+  private def createProjectData(projectVersionID:Long,isRootFlow:Boolean):java.util.List[DSSFlowTaxonomy] = {
     flowTaxonomyService.listAllFlowTaxonomy(projectVersionID,isRootFlow)
   }
 
-  private def createSortFlowData(projectVersionID:Long,flowTaxonomyID:Long,isRootFlow:Boolean):java.util.List[DWSFlowTaxonomy] = {
+  private def createSortFlowData(projectVersionID:Long,flowTaxonomyID:Long,isRootFlow:Boolean):java.util.List[DSSFlowTaxonomy] = {
     flowTaxonomyService.listFlowTaxonomy(projectVersionID,flowTaxonomyID:Long,isRootFlow:Boolean)
   }
 }

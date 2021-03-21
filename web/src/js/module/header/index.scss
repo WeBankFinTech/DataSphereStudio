@@ -14,194 +14,231 @@
  * limitations under the License.
  *
  */
-
 @import '../../../assets/styles/variables.scss';
 
-.layout-header{
-    position: $fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    width: 100%;
+.layout-header {
+  position: $fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 20px;
+  background-color: #000;
+  color: $dark-color;
+  box-shadow: $shadow-down;
+  z-index: $zindex-affix;
+  user-select: none;
+  clear: both;
+
+  .layout-header-menu-icon {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
     height: 40px;
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      margin-top: 4px;
+    }
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  .logo {
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 20px;
+    color: $body-background;
+    margin-top: 2px;
+
+    .logo-title {
+      text-indent: -10000px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+    }
+
+    .logo-img {
+      height: 36px;
+    }
+  }
+
+  .menu {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 60px;
+
+    .menu-item {
+      position: $relative;
+      float: left;
+      padding: 0 20px;
+      font-size: $font-size-base;
+      text-align: center;
+      text-indent: 0;
+      border-right: none;
+      cursor: pointer;
+
+      &.selected,
+      &:hover {
+        color: $body-background;
+        background: $dark-bg-dark;
+      }
+
+      .menu-item-beat {
+        position: $absolute;
+        top: 0;
+        right: 0;
+      }
+    }
+  }
+
+  .icon-group {
+    float: right;
+    cursor: pointer;
+    text-align: center;
+    padding: 0 6px;
     line-height: 40px;
-    padding: 0 20px;
-    background-color: #000;
-    color: $dark-color;
-    box-shadow: $shadow-down;
-    z-index: $zindex-affix;
-    user-select: none;
-    clear: both;
-    .layout-header-menu-icon {
-        display: inline-block;
-        cursor: pointer;
-        margin-right: 10px;
-        height: 40px;
-        .icon {
-            width: 32px;
-            height: 32px;
-            margin-top: 4px;
-        }
-        &:hover {
-            color: $primary-color ;
-        }
-    }
-    .logo{
-        margin-left: 10px;
-        display: inline-block;
-        vertical-align: top;
-        font-size: 20px;
-        color: $body-background ;
-        margin-top: 2px;
-        .logo-title {
-            text-indent: -10000px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-        }
-        .logo-img {
-            height: 36px;
-        }
-    }
-    .menu{
-        display: inline-block;
-        vertical-align: top;
-        margin-left: 60px;
-        .menu-item{
-            position: $relative;
-            float: left;
-            padding: 0 20px;
-            font-size: $font-size-base;
-            text-align: center;
-            text-indent: 0;
-            border-right: none;
-            cursor: pointer;
-            &:hover, &.selected{
-                color: $body-background ;
-                background: $dark-bg-dark
-            }
-            .menu-item-beat {
-                position: $absolute;
-                top: 0;
-                right: 0;
-            }
-        }
-    }
-    .icon-group {
-        float: right;
-        cursor: pointer;
-        text-align: center;
-        padding: 0 6px;
-        line-height: 40px;
-        height: 40px;
-        font-size: 14px;
-        i {
-          font-size: 20px;
-          margin-right: 10px;
-          &:hover {
-            color: #fff;
-          }
-        }
-    }
-    .user{
-        float: right;
-        height: 40px;
-        cursor: pointer;
-        position: $relative;
-        span {
-            display: inline-block;
-            line-height: 40px;
-            font-size: $font-size-base;
-            padding: 0 7px 0 10px;
-        }
-        .user-icon {
-            padding-right: 10px;
-        }
-        .user-menu {
-            background: $menu-dark-active-bg;
-            width: 130px;
-            border: none;
-            position: $absolute;
-            top: 50px;
-            left: 50%;
-            margin-left: -75px;
-            border-radius: $border-radius-small;
-            .user-menu-arrow {
-                width: 0;
-                height: 0;
-                border: 8px solid $body-background;
-                border-color: transparent transparent $menu-dark-active-bg transparent;
-                border-top: 0;
-                list-style: none;
-                position: $absolute;
-                top: -8px;
-                left: 50%;
-                margin-left: -4px;
-            }
-            .user-menu-item {
-                list-style: none;
-                padding-left: 20px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                &:hover {
-                    color: $body-background;
-                    background: $dark-bg-dark;
-                    border-top: none;
-                    border-radius: $border-radius-small;
-                }
-                .user-menu-item-icon {
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-            }
-        }
-        &:hover, &.selected {
-            background: $menu-dark-active-bg;
-        }
-        .user-image{
-            border-radius: 50%;
-            width: 40px;
-            height: auto;
-        }
-    }
-    .proj-select {
-        margin-left: 25px;
-        vertical-align: middle;
+    height: 40px;
+    font-size: 14px;
+
+    i {
+      font-size: 20px;
+      margin-right: 10px;
+
+      &:hover {
         color: #fff;
-        margin-top: -2px;
-        display: inline-block;
+      }
     }
-    .project-dro {
-        vertical-align: top;
+  }
+
+  .user {
+    float: right;
+    height: 40px;
+    cursor: pointer;
+    position: $relative;
+
+    span {
+      display: inline-block;
+      line-height: 40px;
+      font-size: $font-size-base;
+      padding: 0 7px 0 10px;
     }
-    .proj-list {
-        height: 400px;
-        overflow-y: auto;
-        color: #333;
+
+    .user-icon {
+      padding-right: 10px;
     }
-    .proj-name {
-        padding:0 15px;
-        height: 30px;
-        line-height: 30px;
-        font-size: 14px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 2px;
-        color: #999;
-    }
-    .proj-item {
-        width: 200px;
+
+    .user-menu {
+      background: $menu-dark-active-bg;
+      width: 130px;
+      border: none;
+      position: $absolute;
+      top: 50px;
+      left: 50%;
+      margin-left: -75px;
+      border-radius: $border-radius-small;
+
+      .user-menu-arrow {
+        width: 0;
+        height: 0;
+        border: 8px solid $body-background;
+        border-color: transparent transparent $menu-dark-active-bg transparent;
+        border-top: 0;
+        list-style: none;
+        position: $absolute;
+        top: -8px;
+        left: 50%;
+        margin-left: -4px;
+      }
+
+      .user-menu-item {
+        list-style: none;
         padding-left: 20px;
-        height: 28px;
-        line-height: 28px;
-        cursor: pointer;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
         &:hover {
-            background-color: #eee;
+          color: $body-background;
+          background: $dark-bg-dark;
+          border-top: none;
+          border-radius: $border-radius-small;
         }
-        &.active {
-            color: $primary-color
+
+        .user-menu-item-icon {
+          font-size: 16px;
+          font-weight: bold;
         }
+      }
     }
+
+    &.selected,
+    &:hover {
+      background: $menu-dark-active-bg;
+    }
+
+    .user-image {
+      border-radius: 50%;
+      width: 40px;
+      height: auto;
+    }
+  }
+
+  .proj-select {
+    margin-left: 25px;
+    vertical-align: middle;
+    color: #fff;
+    margin-top: -2px;
+    display: inline-block;
+  }
+
+  .project-dro {
+    vertical-align: top;
+  }
+
+  .proj-list {
+    max-height: 400px;
+    overflow-y: auto;
+    color: #333;
+  }
+
+  .proj-name {
+    padding: 0 15px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 2px;
+    color: #999;
+  }
+
+  .proj-item {
+    width: 200px;
+    padding-left: 20px;
+    height: 28px;
+    line-height: 28px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
+
+    &.active {
+      color: $primary-color;
+    }
+  }
+
+  .workspace-title {
+    display: inline-flex;
+    width: 100px;
+    overflow: hidden;
+  }
 }

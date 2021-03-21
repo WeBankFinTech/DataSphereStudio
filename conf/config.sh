@@ -1,8 +1,13 @@
+#!/bin/sh
+
+shellDir=`dirname $0`
+workDir=`cd ${shellDir}/..;pwd`
+
 ### deploy user
 deployUser=hadoop
 
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/appcom/Install/DSS
+DSS_INSTALL_HOME=$workDir
 
 ### Specifies the user workspace, which is used to store the user's script files and log files.
 ### Generally local directory
@@ -66,10 +71,10 @@ VISUALIS_NGINX_PORT=8088
 
 #azkaban address for check
 AZKABAN_ADRESS_IP=127.0.0.1
-AZKABAN_ADRESS_PORT=8091
+AZKABAN_ADRESS_PORT=8081
 
 #qualitis.address for check
 QUALITIS_ADRESS_IP=127.0.0.1
 QUALITIS_ADRESS_PORT=8090
 
-DSS_VERSION=0.7.0
+DSS_VERSION=0.9.0

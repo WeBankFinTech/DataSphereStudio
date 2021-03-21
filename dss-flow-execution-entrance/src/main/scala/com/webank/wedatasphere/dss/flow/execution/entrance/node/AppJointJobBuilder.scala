@@ -26,13 +26,28 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.job._
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
+import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl
 import com.webank.wedatasphere.dss.linkis.node.execution.job._
+import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParamsParser
 import org.apache.commons.lang.StringUtils
 
 /**
-  * Created by peacewong on 2019/11/5.
-  */
+ * Created by johnnwang on 2019/11/5.
+ */
 object AppJointJobBuilder {
+
+  val signalKeyCreator = new FlowExecutionJobSignalKeyCreator
+
+  init()
+
+  def init(): Unit ={
+    val jobParamsParser = new JobParamsParser
+
+    jobParamsParser.setSignalKeyCreator(signalKeyCreator)
+
+    LinkisNodeExecutionImpl.getLinkisNodeExecution.asInstanceOf[LinkisNodeExecutionImpl].registerJobParser(jobParamsParser)
+  }
+
   def builder():FlowBuilder = new FlowBuilder
 
   class FlowBuilder extends Builder {
@@ -95,9 +110,10 @@ object AppJointJobBuilder {
 
     override protected def createSignalSharedJob(isLinkisType: Boolean): SignalSharedJob = {
       if(isLinkisType){
-       null
+        null
       } else {
         val signalJob = new FlowExecutionAppJointSignalSharedJob
+        signalJob.setSignalKeyCreator(signalKeyCreator)
         signalJob.setJobProps(this.jobProps)
         signalJob
       }
@@ -123,12 +139,12 @@ object AppJointJobBuilder {
     }
 
     override protected def fillLinkisJobInfo(linkisJob: LinkisJob): Unit = {
-      this.node.getDWSNode.getParams.get(FlowExecutionEntranceConfiguration.NODE_CONFIGURATION_KEY) match {
+      this.node.getDssNode.getParams.get(FlowExecutionEntranceConfiguration.NODE_CONFIGURATION_KEY) match {
         case configuration:util.Map[String, AnyRef] =>
           linkisJob.setConfiguration(configuration)
         case _ =>
       }
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP) match {
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP) match {
         case flowVar:util.Map[String, AnyRef] =>
           linkisJob.setVariables(flowVar)
         case _ =>
@@ -137,13 +153,13 @@ object AppJointJobBuilder {
     }
 
     override protected def fillCommonLinkisJobInfo(linkisAppjointJob: CommonLinkisJob): Unit = {
-      linkisAppjointJob.setJobResourceList(FlowExecutionUtils.resourcesAdaptation(this.node.getDWSNode.getResources))
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.PROJECT_RESOURCES) match {
+      linkisAppjointJob.setJobResourceList(FlowExecutionUtils.resourcesAdaptation(this.node.getDssNode.getResources))
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.PROJECT_RESOURCES) match {
         case projectResources:util.List[Resource] =>
           linkisAppjointJob.setProjectResourceList(FlowExecutionUtils.resourcesAdaptation(projectResources))
         case _ =>
       }
-      this.node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_RESOURCES) match {
+      this.node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.FLOW_RESOURCES) match {
         case flowResources:util.HashMap[String, util.List[BMLResource]] =>
           linkisAppjointJob.setFlowNameAndResources(flowResources)
         case _ =>

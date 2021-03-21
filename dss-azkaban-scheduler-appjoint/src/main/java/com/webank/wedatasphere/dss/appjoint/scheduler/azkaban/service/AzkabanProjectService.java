@@ -80,11 +80,11 @@ public final class AzkabanProjectService extends AppJointUrlImpl implements Sche
         params.add(new BasicNameValuePair("name", project.getName()));
         params.add(new BasicNameValuePair("description", project.getDescription()));
         HttpPost httpPost = new HttpPost(projectUrl);
-        httpPost.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
+        httpPost.addHeader(HTTP.CONTENT_ENCODING, HTTP.IDENTITY_CODING);
         CookieStore cookieStore = new BasicCookieStore();
         cookieStore.addCookie(session.getCookies()[0]);
-        HttpEntity entity = EntityBuilder.create().setContentEncoding("UTF-8").
-                setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
+        HttpEntity entity = EntityBuilder.create()
+                .setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
                 .setParameters(params).build();
         httpPost.setEntity(entity);
         CloseableHttpClient httpClient = null;

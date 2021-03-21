@@ -16,7 +16,7 @@
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.execution
-import java.util
+
 import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
@@ -31,13 +31,11 @@ import scala.collection.mutable.ArrayBuffer
 
 
 /**
-  * Created by peacewong on 2019/11/5.
-  */
+ * Created by johnnwang on 2019/11/5.
+ */
 @Service
 class DefaultFlowExecution extends FlowExecution with Logging {
 
-  private val executeService = Utils.newCachedThreadPool(FlowExecutionEntranceConfiguration.FLOW_EXECUTION_POOL_SIZE.getValue,
-    "DefaultFlowExecution",true)
 
   private val nodeRunnerQueue: LinkedBlockingQueue[NodeRunner] = new LinkedBlockingQueue[NodeRunner]()
 
@@ -63,7 +61,7 @@ class DefaultFlowExecution extends FlowExecution with Logging {
             // submit node runner
             runningNodes.add(runner)
           } else {
-            info(s"This node ${runner.getNode.getDWSNode.getName} Skipped in execution")
+            info(s"This node ${runner.getNode.getDssNode.getName} Skipped in execution")
             runner.fromScheduledTunToState(NodeExecutionState.Skipped)
           }
         }
@@ -74,6 +72,7 @@ class DefaultFlowExecution extends FlowExecution with Logging {
           if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue){
             scheduledThreadPool.scheduleAtFixedRate(new NodeExecutionStatusPoller(nodeRunnerQueue), 1,
               FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_SCHEDULER_TIME.getValue ,TimeUnit.SECONDS)
+            pollerCount = pollerCount + 1
           }
         }
       }

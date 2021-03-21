@@ -38,7 +38,7 @@
 import { isEmpty, cloneDeep } from 'lodash';
 import storage from '@/js/helper/storage';
 import directoryDialog from '@js/component/directoryDialog/index.vue';
-
+import { ext } from '@/js/service/nodeType';
 export default {
   components: {
     directoryDialog,
@@ -82,8 +82,8 @@ export default {
         this.setFileTree();
       });
       this.filterNode = (node) => {
-        const type = this.nodeData.type.slice(this.nodeData.type.lastIndexOf('.') + 1, this.nodeData.type.length);
-        const match = this.supportModes.find((item) => item.rule.test(node.label) && item.flowType === type);
+        const model = ext[this.nodeData.type];
+        const match = this.supportModes.find((item) => item.rule.test(node.label) && item.flowType === model);
         return !node.isLeaf || (node.isLeaf && match);
       };
     },

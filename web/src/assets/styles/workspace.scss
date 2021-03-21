@@ -1,0 +1,291 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+@import './variables.scss';
+
+.page-bgc {
+  background: rgb(245, 245, 245);
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  //竖轴方向
+
+  .page-bgc-header {
+    padding: 10px 25px 0;
+  }
+
+  .header-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 5px;
+    border-left: 3px solid $primary-color;
+  }
+
+  .header-info {
+    padding: 10px 0 10px 20px;
+
+    p {
+      line-height: 24px;
+    }
+  }
+
+}
+
+.app-icon {
+  font-size: 14px;
+  height: 30px;
+  line-height: 30px;
+  color: #39f;
+}
+
+.nodata-tips {
+  font-size: 12px;
+  margin: auto;
+  height: 70px;
+  line-height: 70px;
+  text-align: center;
+}
+
+.workspace-main {
+  padding: 10px 25px;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: start;
+  align-items: flex-start;
+
+  .item-header {
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 23px;
+    border-left: 2px solid $primary-color;
+
+  }
+
+  .left {
+    flex: 1;
+    min-height: 137px;
+    // box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: rgba(0,0,0,0);
+    padding: 0;
+  }
+
+  .right {
+    // flex: 1;
+    margin-left: 25px;
+    min-height: 137px;
+    width: 500px;
+    // box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: rgba(0,0,0,0);
+    padding: 0;
+  }
+
+  .setting-bt-wrap {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
+
+    &.ivu-btn-text {
+      outline: none;
+      border: none;
+      box-shadow: 0 0 0 2px transparent;
+    }
+  }
+
+  .app-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .app-item-add {
+      display: flex;
+      margin: 20px 10px 10px 25px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+
+      &:hover {
+        transition: color .2s linear,background-color .2s linear,border .2s linear,box-shadow .2s linear;
+        color: #39f;
+
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+        border-radius: 4px;
+      }
+    }
+
+    .shadow {
+      box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+      border-radius: 4px;
+    }
+
+    .app-item-wrap {
+      display: flex;
+      position: relative;
+      margin: 20px 10px 10px 25px;
+      padding: 10px 30px;
+      cursor: pointer;
+      border: 1px solid rgb(245, 245, 245);
+      border-radius: 3px;
+
+      .close-wrap {
+        position: absolute;
+        right: -5px;
+        top: -5px;
+        color: #39f;
+      }
+
+      &:hover {
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,.2);
+        border-radius: 4px;
+      }
+
+      .label {
+        margin-left: 10px;
+        // width: 110px;
+        // font-weight: 700;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 30px;
+        height: 30px;
+      }
+    }
+  }
+}
+
+.app-list-main {
+  padding: 0 25px 10px;
+  // bottom: 0;
+  flex: auto;
+
+  .app-list-tabs {
+    padding: 20px 20px 20px 22px;
+
+    border-radius: 6px;
+    height: 100%;
+    position: relative;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    background-color: #fff;
+
+    &:hover {
+      box-shadow: 0 2px 7px rgba(0,0,0,.15);
+      border-color: transparent;
+      position: relative;
+    }
+
+    .pane-wrap {
+      display: flex;
+      flex-wrap: wrap;
+
+      .pane-item {
+        float: left;
+        margin: 10px 100px 0 0;
+        width: 450px;
+      }
+
+      .app-entrance {
+        display: flex;
+
+        .app-title-wrap {
+          flex: 1;
+          font-size: 12px;
+
+          .app-title {
+            display: flex;
+            align-items: center;
+            margin-top: -10px;
+            margin-right: 50px;
+            flex-wrap: wrap;
+
+            .sub-margin {
+              margin-right: 10px;
+            }
+
+            .sub-title {
+              font-weight: 700;
+            }
+
+            .app-tag {
+              color: #07C1E0;
+              border: 1px solid transparent;
+              background: #07C1E0;
+            }
+
+          }
+
+        }
+
+        .app-status-wrap-active {
+          position: absolute;
+          right: 0;
+          top: 6px;
+          width: 70px;
+          font-size: 12px;
+
+          color: #0c6;
+
+          span {
+            color: #515a6e;
+          }
+        }
+
+        .app-status-wrap-disable {
+
+          position: absolute;
+          right: 0;
+          top: 6px;
+          width: 70px;
+          font-size: 12px;
+          color: #ccc;
+
+          span {
+            color: #515a6e;
+          }
+        }
+
+      }
+
+      .button-wrap {
+        display: flex;
+        margin-top: 20px;
+        // justify-content: center;
+
+        .entrace-btn {
+          margin-right: 10px;
+        }
+      }
+
+    }
+  }
+
+}
+
+.input-wrap {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 200px;
+}
+
+.radio-box .ivu-radio .ivu-radio-inner {
+  border: 1px solid #2d8cf0;
+}

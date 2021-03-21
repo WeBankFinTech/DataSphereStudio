@@ -30,11 +30,11 @@ export default {
         { rule: /\.(out)$/i, lang: 'hql', executable: true, application: 'pipeline', runType: 'pipeline', ext: '.out', scriptType: 'storage', abbr: 'stor', logo: 'fi-storage', isCanBeNew: true, label: 'Storage', isCanBeOpen: true },
         { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'scala', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: true, label: 'Scala', isCanBeOpen: true, flowType: 'scala' },
         { rule: /\.scala$/i, lang: 'java', executable: true, application: 'spark', runType: 'function.mdq', ext: '.scala', scriptType: 'scala', abbr: 'scala', logo: 'fi-scala', isCanBeNew: false, label: 'Scala', isCanBeOpen: true },
-        { rule: /\.jdbc$/i, lang: 'hql', executable: true, application: 'jdbc', runType: 'jdbc', ext: '.jdbc', scriptType: 'jdbc', abbr: 'jdbc', logo: 'fi-jdbc', isCanBeNew: true, label: 'JDBC', isCanBeOpen: true },
+        { rule: /\.jdbc$/i, lang: 'hql', executable: true, application: 'jdbc', runType: 'jdbc', ext: '.jdbc', scriptType: 'jdbc', abbr: 'jdbc', logo: 'fi-jdbc', isCanBeNew: true, label: 'JDBC', isCanBeOpen: true, flowType: 'jdbc' },
         { rule: /\.python$/i, lang: 'python', executable: true, application: 'python', runType: 'python', ext: '.python', scriptType: 'python', abbr: 'py', logo: 'fi-python', isCanBeNew: true, label: 'Python', isCanBeOpen: true, flowType: 'python' },
         { rule: /\.py$/i, lang: 'python', executable: true, application: 'spark', runType: 'python', ext: '.py', scriptType: 'pythonSpark', abbr: 'py', logo: 'fi-spark-python', isCanBeNew: true, label: 'PythonSpark', isCanBeOpen: true, flowType: 'pyspark' },
         { rule: /\.r$/i, lang: 'r', executable: true, application: 'spark', runType: 'r', ext: '.r', scriptType: 'r', abbr: 'r', logo: 'fi-r', isCanBeNew: true, label: 'R', isCanBeOpen: true },
-        { rule: /\.sh$/i, lang: 'sh', executable: true, application: 'shell', runType: 'shell', ext: '.sh', scriptType: 'shell', abbr: 'shell', logo: 'fi-r', isCanBeNew: false, label: 'Shell', isCanBeOpen: true, flowType: 'shell' },
+        { rule: /\.sh$/i, lang: 'sh', executable: true, application: 'shell', runType: 'shell', ext: '.sh', scriptType: 'shell', abbr: 'shell', logo: 'fi-r', isCanBeNew: true, label: 'Shell', isCanBeOpen: true, flowType: 'shell' },
         { rule: /\.qmlsql$/i, lang: 'hql', executable: false, application: 'spark', runType: 'sql', ext: '.qmlsql', scriptType: 'qmlsql', abbr: 'qmlsql', logo: 'fi-spark', isCanBeNew: false, label: 'QMLSQL', isCanBeOpen: true },
         { rule: /\.qmlpy$/i, lang: 'python', executable: false, application: 'spark', runType: 'python', ext: '.qmlpy', scriptType: 'qmlpy', abbr: 'qmlpy', logo: 'fi-python', isCanBeNew: false, label: 'QMLPy', isCanBeOpen: true },
         { rule: /\.txt$/i, lang: 'text', executable: false, application: null, runType: null, ext: '.txt', scriptType: 'txt', abbr: '', logo: 'fi-txt', isCanBeNew: false, isCanBeOpen: true },
@@ -142,7 +142,6 @@ export default {
         localStorage.removeItem('appJointProjectId')
         url = info.homepageUrl
       }
-      window.console.log(url, 'url')
       // 如果没有提示用户功能暂未开发
       if (Object.keys(info).length === 0) {
         this.$Message.warning(this.$t('message.constants.warning.comingSoon'));

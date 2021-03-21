@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.parser;
 
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.AbstractFlowParser;
 import com.webank.wedatasphere.dss.appjoint.scheduler.parser.NodeParser;
-import com.webank.wedatasphere.dss.common.entity.flow.DWSJSONFlow;
+import com.webank.wedatasphere.dss.common.entity.flow.DSSJSONFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +36,7 @@ public class FlowExecutionFlowParser extends AbstractFlowParser {
     }
 
     @Override
-    public Boolean ifFlowCanParse(DWSJSONFlow flow) {
+    public Boolean ifFlowCanParse(DSSJSONFlow flow) {
         return true;
     }
 

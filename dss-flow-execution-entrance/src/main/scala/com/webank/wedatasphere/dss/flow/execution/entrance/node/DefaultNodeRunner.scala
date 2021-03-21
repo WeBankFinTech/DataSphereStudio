@@ -27,11 +27,12 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.log.FlowExecutionLog
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeExecutionState.NodeExecutionState
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener
+import com.webank.wedatasphere.linkis.common.exception.ErrorException
 import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
 
 /**
-  * Created by peacewong on 2019/11/5.
-  */
+ * Created by johnnwang on 2019/11/5.
+ */
 class DefaultNodeRunner extends NodeRunner with Logging {
 
   private var node: SchedulerNode = _
@@ -47,6 +48,10 @@ class DefaultNodeRunner extends NodeRunner with Logging {
   private var executedInfo: String = _
 
   private var startTime: Long = _
+
+  private var nowTime:Long = _
+
+  private var lastGetStatusTime: Long = 0
 
   override def getNode: SchedulerNode = this.node
 
@@ -64,6 +69,15 @@ class DefaultNodeRunner extends NodeRunner with Logging {
   }
 
   override def isLinkisJobCompleted: Boolean = Utils.tryCatch{
+
+    val interval = System.currentTimeMillis() - lastGetStatusTime
+
+    if ( interval < FlowExecutionEntranceConfiguration.NODE_STATUS_INTERVAL.getValue){
+      return false
+    }
+
+    lastGetStatusTime = System.currentTimeMillis()
+
     if(NodeExecutionState.isCompleted(getStatus)) return true
     val toState = NodeExecutionState.withName(LinkisNodeExecutionImpl.getLinkisNodeExecution.getState(this.linkisJob))
     if (NodeExecutionState.isCompleted(toState)) {
@@ -75,9 +89,11 @@ class DefaultNodeRunner extends NodeRunner with Logging {
     } else {
       false
     }
-  }{ t =>
-    warn(s"Failed to get ${this.node.getName} linkis job states", t)
-    false
+  }{
+    case e:ErrorException => logger.warn(s"failed to get ${this.node.getName} state", e)
+      false
+    case t :Throwable => logger.error(s"failed to get ${this.node.getName} state", t)
+      true
   }
 
   override def setNodeRunnerListener(nodeRunnerListener: NodeRunnerListener): Unit = this.nodeRunnerListener = nodeRunnerListener
@@ -87,7 +103,7 @@ class DefaultNodeRunner extends NodeRunner with Logging {
   override def run(): Unit = {
     info(s"start to run node of ${node.getName}")
     try {
-      val jobProps = node.getDWSNode.getParams.remove(FlowExecutionEntranceConfiguration.PROPS_MAP) match {
+      val jobProps = node.getDssNode.getParams.remove(FlowExecutionEntranceConfiguration.PROPS_MAP) match {
         case propsMap: util.Map[String, String] => propsMap
         case _ => new util.HashMap[String, String]()
       }
@@ -102,7 +118,7 @@ class DefaultNodeRunner extends NodeRunner with Logging {
       }
 
       LinkisNodeExecutionImpl.getLinkisNodeExecution.runJob(this.linkisJob)
-      info(s"Finished to run node of ${node.getName}")
+      info(s"start to run node of ${node.getName}")
       /*LinkisNodeExecutionImpl.getLinkisNodeExecution.waitForComplete(this.linkisJob)
       val listener = LinkisNodeExecutionImpl.getLinkisNodeExecution.asInstanceOf[LinkisExecutionListener]
       val toState = LinkisNodeExecutionImpl.getLinkisNodeExecution.getState(this.linkisJob)
@@ -142,4 +158,7 @@ class DefaultNodeRunner extends NodeRunner with Logging {
 
   override def setStartTime(startTime: Long): Unit = this.startTime = startTime
 
+  override def getNowTime(): Long = this.nowTime
+
+  override def setNowTime(nowTime: Long): Unit = this.nowTime = nowTime
 }

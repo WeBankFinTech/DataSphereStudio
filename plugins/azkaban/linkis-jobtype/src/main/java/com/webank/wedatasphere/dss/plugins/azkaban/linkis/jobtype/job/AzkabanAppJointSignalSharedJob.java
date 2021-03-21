@@ -17,16 +17,29 @@
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
+import com.webank.wedatasphere.dss.linkis.node.execution.job.JobSignalKeyCreator;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.SignalSharedJob;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 
 import java.util.Map;
 
 /**
- * Created by peacewong on 2019/11/14.
+ * Created by johnnwang on 2019/11/14.
  */
-public class AzkabanAppJointSignalSharedJob extends AzkabanAppJointLinkisSharedJob implements SignalSharedJob {
+public class AzkabanAppJointSignalSharedJob extends AzkabanAppJointLinkisJob implements SignalSharedJob {
 
+
+    private JobSignalKeyCreator signalKeyCreator;
+
+    @Override
+    public JobSignalKeyCreator getSignalKeyCreator() {
+        return this.signalKeyCreator;
+    }
+
+    @Override
+    public void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator) {
+        this.signalKeyCreator = signalKeyCreator;
+    }
 
     @Override
     public String getMsgSaveKey() {

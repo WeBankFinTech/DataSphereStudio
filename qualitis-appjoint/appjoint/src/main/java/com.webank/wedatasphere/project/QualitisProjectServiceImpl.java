@@ -7,7 +7,7 @@ import com.webank.wedatasphere.dss.appjoint.exception.AppJointErrorException;
 import com.webank.wedatasphere.dss.appjoint.service.AppJointUrlImpl;
 import com.webank.wedatasphere.dss.appjoint.service.ProjectService;
 import com.webank.wedatasphere.dss.appjoint.service.session.Session;
-import com.webank.wedatasphere.dss.common.entity.project.DWSProject;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -60,10 +60,10 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
         try {
             QualitisAddProjectRequest qualitisAddProjectRequest = new QualitisAddProjectRequest();
 
-            DWSProject dwsProject = (DWSProject) project;
+            DSSProject dssProject = (DSSProject) project;
             qualitisAddProjectRequest.setProjectName(project.getName());
             qualitisAddProjectRequest.setDescription(project.getDescription());
-            qualitisAddProjectRequest.setUsername(dwsProject.getUserName());
+            qualitisAddProjectRequest.setUsername(dssProject.getUserName());
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisAddProjectRequest);
@@ -73,7 +73,7 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
             String responseStatus = (String) response.get("code");
             if (FAILURE_CODE.equals(responseStatus)) {
                 // Send request to auto create qualitis user
-                autoAddUser(restTemplate, dwsProject.getUserName());
+                autoAddUser(restTemplate, dssProject.getUserName());
 
                 // restart to create project
                 response = createProjectReal(restTemplate, entity);
@@ -142,9 +142,9 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
         try {
             QualitisDeleteProjectRequest qualitisDeleteProjectRequest = new QualitisDeleteProjectRequest();
 
-            DWSProject dwsProject = (DWSProject) project;
+            DSSProject dssProject = (DSSProject) project;
             qualitisDeleteProjectRequest.setProjectId(project.getId());
-            qualitisDeleteProjectRequest.setUsername(dwsProject.getUserName());
+            qualitisDeleteProjectRequest.setUsername(dssProject.getUserName());
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisDeleteProjectRequest);
@@ -183,11 +183,11 @@ public class QualitisProjectServiceImpl extends AppJointUrlImpl implements Proje
         try {
             QualitisUpdateProjectRequest qualitisUpdateProjectRequest = new QualitisUpdateProjectRequest();
 
-            DWSProject dwsProject = (DWSProject) project;
+            DSSProject dssProject = (DSSProject) project;
             qualitisUpdateProjectRequest.setProjectId(project.getId());
             qualitisUpdateProjectRequest.setProjectName(project.getName());
             qualitisUpdateProjectRequest.setDescription(project.getDescription());
-            qualitisUpdateProjectRequest.setUsername(dwsProject.getUserName());
+            qualitisUpdateProjectRequest.setUsername(dssProject.getUserName());
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Object> entity = generateEntity(qualitisUpdateProjectRequest);

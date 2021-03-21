@@ -24,6 +24,10 @@ public interface SignalSharedJob extends SharedJob {
 
     String PREFIX = "signal.";
 
+    JobSignalKeyCreator getSignalKeyCreator();
+
+    void setSignalKeyCreator(JobSignalKeyCreator signalKeyCreator);
+
     @Override
     default int getSharedNum() {
         return  -1;
@@ -31,7 +35,7 @@ public interface SignalSharedJob extends SharedJob {
 
     @Override
     default String getSharedKey() {
-        return PREFIX + getMsgSaveKey();
+        return PREFIX + getSignalKeyCreator().getSignalKeyBySignalSharedJob(this) + "." + getMsgSaveKey();
     }
 
     String getMsgSaveKey();

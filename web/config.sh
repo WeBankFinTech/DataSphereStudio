@@ -1,8 +1,8 @@
-#Configuring front-end ports
-dss_port="8088"
+#dss web port
+dss_web_port="8088"
 
-#URL of the backend linkis gateway
-linkis_url="http://localhost:20401"
+#dss web access linkis gateway adress
+linkis_gateway_url="http://localhost:9001"
 
-#dss ip address
-dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+#dss nginx ip
+dss_nginx_ip=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'|awk 'NR==1')

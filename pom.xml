@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2019 WeBank
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~  you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  ~
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -23,63 +24,107 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>0.9.0</version>
+    <version>1.0.0-RC1</version>
 
     <modules>
-        <module>dss-common</module>
-        <module>dss-appjoint-auth</module>
-        <module>dss-appjoint-core</module>
-        <module>dss-appjoint-loader</module>
-        <module>dss-application</module>
-        <module>dss-scheduler-appjoint-core</module>
-        <module>dss-linkis-node-execution</module>
-        <module>dss-flow-execution-entrance</module>
-        <module>dss-azkaban-scheduler-appjoint</module>
-        <module>dss-server</module>
-        <module>visualis-appjoint/appjoint</module>
-        <module>qualitis-appjoint/appjoint</module>
-        <module>eventchecker-appjoint</module>
-        <module>datachecker-appjoint</module>
-        <module>sendemail-appjoint/sendemail-core</module>
+        <module>dss-commons/dss-common</module>
+        <module>dss-commons/dss-contextservice</module>
+        <module>dss-orchestrator</module>
+        <module>dss-standard</module>
+        <module>dss-appconn</module>
+        <module>dss-framework</module>
+        <module>dss-apps/dss-apiservice-server</module>
         <module>plugins/azkaban/linkis-jobtype</module>
-        <module>plugins/linkis/linkis-appjoint-entrance</module>
+        <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
     </modules>
 
     <properties>
-        <dss.version>0.9.0</dss.version>
-        <linkis.version>0.9.4</linkis.version>
-        <scala.version>2.11.8</scala.version>
+        <dss.version>1.0.0-RC1</dss.version>
+        <linkis.version>1.0.0-RC1</linkis.version>
+        <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
+        <gson.version>2.8.5</gson.version>
+        <fasterxml.jackson.version>2.11.3</fasterxml.jackson.version>
+        <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
+        <math3.version>3.1.1</math3.version>
+        <httpclient.version>4.5.4</httpclient.version>
+        <httpmime.version>4.5.4</httpmime.version>
+        <beanutils.version>1.9.4</beanutils.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>5.2.12.RELEASE</spring.version>
+        <mybatis.spring.boot.version>2.1.2</mybatis.spring.boot.version>
+        <spring.boot.version>2.3.7.RELEASE</spring.boot.version>
+        <spring.cloud.version>2.2.6.RELEASE</spring.cloud.version>
+        <commons.math.version>3.1.1</commons.math.version>
+        <commons.lang3.version>3.8.1</commons.lang3.version>
+        <commons.lang.version>2.6</commons.lang.version>
+        <reflections.version>0.9.10</reflections.version>
+        <jersey-bean-validation.version>2.21</jersey-bean-validation.version>
+        <aspectj.version>1.9.5</aspectj.version>
+        <xstream.version>1.4.15</xstream.version>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scalap</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scalap</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.webank.wedatasphere.linkis</groupId>
+                <artifactId>linkis-common</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${commons.math.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>xstream</artifactId>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <version>${xstream.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -125,6 +170,7 @@
                     <configuration>
                         <source>${jdk.compile.version}</source>
                         <target>${jdk.compile.version}</target>
+                        <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -178,6 +224,16 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

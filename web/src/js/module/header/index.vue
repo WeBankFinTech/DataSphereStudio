@@ -4,9 +4,10 @@
       <div
         class="layout-header-menu-icon"
         @click="goHome"
-        @mouseleave="mouseleave"
-        @mouseover="mouseover">
-        <div style="margin-top:5px; display:inline-block;">
+      >
+        <div style="margin-top:5px; display:inline-block;"
+          @mouseleave="mouseleave"
+          @mouseover="mouseover">
           <svg t="1572957725118" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1115" width="20" height="20">
             <path d="M896 1024h-213.333333a128 128 0 0 1-128-128v-213.333333a128 128 0 0 1 128-128h213.333333a128 128 0 0 1 128 128v213.333333a128 128 0 0 1-128 128z m-213.333333-384a42.666667 42.666667 0 0 0-42.666667 42.666667v213.333333a42.666667 42.666667 0 0 0 42.666667 42.666667h213.333333a42.666667 42.666667 0 0 0 42.666667-42.666667v-213.333333a42.666667 42.666667 0 0 0-42.666667-42.666667z m-341.333334 384H128a128 128 0 0 1-128-128v-213.333333a128 128 0 0 1 128-128h213.333333a128 128 0 0 1 128 128v213.333333a128 128 0 0 1-128 128z m-213.333333-384a42.666667 42.666667 0 0 0-42.666667 42.666667v213.333333a42.666667 42.666667 0 0 0 42.666667 42.666667h213.333333a42.666667 42.666667 0 0 0 42.666667-42.666667v-213.333333a42.666667 42.666667 0 0 0-42.666667-42.666667z m768-170.666667h-213.333333a128 128 0 0 1-128-128V128a128 128 0 0 1 128-128h213.333333a128 128 0 0 1 128 128v213.333333a128 128 0 0 1-128 128z m-213.333333-384a42.666667 42.666667 0 0 0-42.666667 42.666667v213.333333a42.666667 42.666667 0 0 0 42.666667 42.666667h213.333333a42.666667 42.666667 0 0 0 42.666667-42.666667V128a42.666667 42.666667 0 0 0-42.666667-42.666667z m-341.333334 384H128a128 128 0 0 1-128-128V128a128 128 0 0 1 128-128h213.333333a128 128 0 0 1 128 128v213.333333a128 128 0 0 1-128 128zM128 85.333333a42.666667 42.666667 0 0 0-42.666667 42.666667v213.333333a42.666667 42.666667 0 0 0 42.666667 42.666667h213.333333a42.666667 42.666667 0 0 0 42.666667-42.666667V128a42.666667 42.666667 0 0 0-42.666667-42.666667z" p-id="1116" fill="#00FFFF">
             </path>
@@ -21,6 +22,7 @@
             src="../../../assets/images/dssLogo6.png" :alt="$t('message.newConst.logoName')">
         </div>
       </div>
+      <workspaceMenu v-if="isShowWorkspaceMenu()" :projectList="workspaces" :currentId="parseInt($route.query.workspaceId, 10)" :changeWorkSpace="changeWorkspace"></workspaceMenu>
       <span
         v-if="currentProject.id"
         class="proj-select"
@@ -39,7 +41,7 @@
         <DropdownMenu slot="list" class="proj-list">
           <div v-for="proj in projectList" :key="proj.id">
             <div class="proj-name">{{ proj.name }}</div>
-            <div v-for="p in proj.dwsProjectList"
+            <div v-for="p in proj.dssProjectList"
               @click="changeProj(proj,p)"
               :key="proj.id+p.id"
               :class="{'active':p.id == currentProject.id}"
@@ -49,6 +51,10 @@
           </div>
         </DropdownMenu>
       </Dropdown>
+      <ul class="menu">
+        <li v-if="this.$route.query && this.$route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.header.home")}}</li>
+        <li class="menu-item" @click="goConsole">{{$t("message.header.console")}}</li>
+      </ul>
       <div
         v-clickoutside="handleOutsideClick"
         :class="{'selected': isUserMenuShow}"
@@ -99,8 +105,10 @@ import { isEmpty } from 'lodash';
 import api from '@/js/service/api';
 import storage from '@/js/helper/storage';
 import userMenu from './userMenu.vue';
+import workspaceMenu from './workspaceMenu';
 import clickoutside from '@js/helper/clickoutside';
 import navMenu from '@/js/component/navMenu/index.vue'
+import weMenu from '@/js/component/menu/index.vue'
 export default {
   directives: {
     clickoutside,
@@ -108,6 +116,7 @@ export default {
   components: {
     userMenu,
     navMenu,
+    workspaceMenu,
   },
   data() {
     return {
@@ -116,6 +125,7 @@ export default {
       isNavMenuShow: false,
       currentProject: {},
       projectList: [],
+      workspaces: [],
       isSandbox: process.env.NODE_ENV === 'sandbox'
     };
   },
@@ -131,7 +141,6 @@ export default {
         '/home': 'Scriptis',
         '/console': 'Console',
         '/kanban': 'Visualis',
-        '/workflow': 'Workflow',
         '/process': 'Workflow'
       }
       let moudleName;
@@ -147,9 +156,13 @@ export default {
     '$route'(newValue) {
       this.projectID = newValue.query.projectID;
       this.getCurrentProject();
+      this.getWorkSpace();
     }
   },
   methods: {
+    isShowWorkspaceMenu(){
+      return (!this.currentProject.id && (this.$route.query && this.$route.query.workspaceId) && this.$route.path.indexOf('workflow')===-1 );
+    },
     init() {
       api.fetch('/dss/getBaseInfo', 'get').then((rst) => {
         if (!isEmpty(rst)) {
@@ -161,7 +174,15 @@ export default {
 
           this.$emit('set-init');
         }
+        this.getWorkSpace();
       });
+    },
+    getWorkSpace(){
+      api.fetch(`/dss/workspaces`, 'get').then(rst=>{
+        if (!isEmpty(rst)) {
+          this.workspaces = rst.workspaces;
+        }
+      })
     },
     goto(name) {
       this.$router.push({
@@ -188,7 +209,7 @@ export default {
       this.isNavMenuShow = false;
     },
     mouseover() {
-      this.isNavMenuShow = this.$route.path != '/project'
+      this.isNavMenuShow = (this.$route.path != '/project' && this.$route.path != '/newhome')
     },
     mouseleave() {
       this.isNavMenuShow = false
@@ -200,8 +221,8 @@ export default {
       let proj = {};
       if (projId) {
         this.projectList.forEach(item => {
-          if (item.dwsProjectList) {
-            item.dwsProjectList.forEach(p => {
+          if (item.dssProjectList) {
+            item.dssProjectList.forEach(p => {
               if(p.id == projId) {
                 proj = { ...p }
               }
@@ -247,6 +268,15 @@ export default {
       setTimeout(() => {
         newTab.location.href = url;
       }, 500);
+    },
+    goSpaceHome(){
+      this.$router.push({path: '/workspace',query: Object.assign({}, this.$route.query)});
+    },
+    goConsole(){
+      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+    },
+    changeWorkspace(data){
+      this.$router.push({query: Object.assign({}, this.$route.query, {workspaceId: data.id})});
     }
   },
 };

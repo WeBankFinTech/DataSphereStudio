@@ -1,8 +1,0 @@
-### for DSS-Server and Eventchecker APPJOINT
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_DB=xxx
-MYSQL_USER=xxx
-MYSQL_PASSWORD=xxx
-
-

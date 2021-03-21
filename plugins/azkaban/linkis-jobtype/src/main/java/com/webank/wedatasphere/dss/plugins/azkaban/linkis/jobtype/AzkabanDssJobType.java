@@ -1,25 +1,28 @@
 /*
- * Copyright 2019 WeBank
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  * Copyright 2019 WeBank
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  *  you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype;
 
 
+
 import azkaban.jobExecutor.AbstractJob;
 import azkaban.utils.Props;
+import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
@@ -27,14 +30,29 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job.JobBuilder;
-import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppjointLog;
-import org.apache.log4j.Logger;
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppConnLog;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
 
 /**
- * Created by peacewong on 2019/9/19.
+ * Created by johnnwang on 2019/9/19.
  */
 public class AzkabanDssJobType extends AbstractJob {
 
@@ -82,23 +100,47 @@ public class AzkabanDssJobType extends AbstractJob {
 
     }
 
+
     @Override
     public void run() throws Exception {
 
         info("Start to execute job");
         logJobProperties();
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
-        this.job.setLogObj(new AzkabanAppjointLog(this.log));
+        this.job.setLogObj(new AzkabanAppConnLog(this.log));
         if(JobTypeEnum.EmptyJob == ((LinkisJob)this.job).getJobType()){
             this.log.warn("This node is empty type");
             return;
         }
+       // info("runtimeMap is " + job.getRuntimeParams());
+        //job.getRuntimeParams().put("workspace", getWorkspace(job.getUser()));
+        info("runtimeMap is " + job.getRuntimeParams());
         LinkisNodeExecutionImpl.getLinkisNodeExecution().runJob(this.job);
-        LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
+
+        try {
+            LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
+        } catch (Exception e) {
+            this.log.warn("Failed to execute job", e);
+            String reason = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
+            this.log.error("Reason for failure: " + reason);
+            throw e;
+        }
+        try {
+            String endLog = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
+            this.log.info(endLog);
+        } catch (Throwable e){
+            this.log.info("Failed to get log", e);
+        }
 
         LinkisExecutionListener listener = (LinkisExecutionListener)LinkisNodeExecutionImpl.getLinkisNodeExecution();
         listener.onStatusChanged(null,  LinkisNodeExecutionImpl.getLinkisNodeExecution().getState(this.job),this.job);
-        int resultSize =  LinkisNodeExecutionImpl.getLinkisNodeExecution().getResultSize(this.job);
+        int resultSize =  0;
+        try{
+            resultSize = LinkisNodeExecutionImpl.getLinkisNodeExecution().getResultSize(this.job);
+        }catch(final Throwable t){
+            this.log.error("failed to get result size");
+            resultSize = -1;
+        }
         for(int i =0; i < resultSize; i++){
             this.log.info("The content of the " + (i + 1) + "th resultset is :"
                     +  LinkisNodeExecutionImpl.getLinkisNodeExecution().getResult(this.job, i, LinkisJobExecutionConfiguration.RESULT_PRINT_SIZE.getValue(this.jobPropsMap)));
@@ -109,7 +151,7 @@ public class AzkabanDssJobType extends AbstractJob {
 
     @Override
     public void cancel() throws Exception {
-        super.cancel();
+        //super.cancel();
         LinkisNodeExecutionImpl.getLinkisNodeExecution().cancel(this.job);
         isCanceled = true;
         warn("This job has been canceled");

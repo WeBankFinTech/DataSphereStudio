@@ -25,17 +25,17 @@
         id, `name`,`description`,`creator_id`,`create_time`,`update_time`,`project_id`
     </sql>
 
-    <select id="selectFlowTaxonomyByID" resultType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+    <select id="selectFlowTaxonomyByID" resultType="com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy">
         SELECT * FROM `dss_flow_taxonomy` WHERE id = #{id}
     </select>
 
-    <insert id="insertFlowTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+    <insert id="insertFlowTaxonomy" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy">
         INSERT INTO dss_flow_taxonomy (<include refid = "flow_taxonomy" />)
         VALUES
         (#{id},#{name},#{description},#{creatorID},#{createTime},#{updateTime},#{projectID})
     </insert>
 
-    <update id="updateFlowTaxonomy" parameterType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+    <update id="updateFlowTaxonomy" parameterType="com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy">
         UPDATE dss_flow_taxonomy
         <trim prefix="set" suffixOverrides=",">
             <if test="name != null">name=#{name},</if>
@@ -84,7 +84,7 @@
     </delete>
 
     <!--加了OR ft.project_id = -1-->
-    <select id="listFlowTaxonomyByProjectID" resultType="com.webank.wedatasphere.dss.server.entity.DWSFlowTaxonomy">
+    <select id="listFlowTaxonomyByProjectID" resultType="com.webank.wedatasphere.dss.server.entity.DSSFlowTaxonomy">
         SELECT
         *
         FROM

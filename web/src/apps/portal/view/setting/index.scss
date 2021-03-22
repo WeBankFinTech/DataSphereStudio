@@ -1,0 +1,14 @@
+@import '@/common/style/variables.scss';
+.page {
+    height: 100%;
+    display: flex;
+    position: relative;
+    .page-right {
+        position: absolute;
+        left: 300px;
+        top: 0;
+        margin-top: 20px;
+        margin-left: 20px;
+        right: 0;
+    }
+}

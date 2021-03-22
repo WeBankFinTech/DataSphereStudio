@@ -1,0 +1,103 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@import '@/common/style/variables.scss';
+.entry {
+    font-size: 16px;
+    height: 120px;
+    line-height: 120px;
+    background: #515a6e;
+    margin: 10px 30px 10px 10px;
+    color: #FFF;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+        font-weight: 600;
+        .icon-blod {
+            font-weight: 600;
+        }
+    }
+}
+.no-data-bgc {
+    font-size: $font-size-base;
+    position: absolute;
+    top: 0;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .no-data-img {
+        width: 200px;
+        margin-top: 150px;
+    }
+    .bg-text {
+        width: 60%;
+        text-align: left;
+        display: block;
+        line-height: 40px;
+        &.weight {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        &.indent {
+            text-indent: 2em;
+        }
+    }
+}
+.icon-blod {
+    margin-right: 2px;
+}
+.page-bgc {
+    background: $body-background;
+    min-width: 500px;
+    .project-header {
+        height: 32px;
+        .header-title {
+            font-size: $font-size-large  ;
+            font-weight: bold;
+            padding-left: 12px;
+            border-left: 3px solid $primary-color;
+            color: $text-title-color;
+        }
+        .header-tool {
+            float: right;
+            margin-right: 6%;
+            color: $primary-color;
+            cursor: pointer;
+            .sort-icon {
+                margin-right: 20px;
+                .icon {
+                    margin-left: 5px;
+                    color: $primary-color;
+                }
+            }
+            .search-input {
+                width: 200px;
+                margin-right: 30px;
+            }
+        }
+    }
+}
+.radio-box .ivu-radio .ivu-radio-inner{
+    border: 1px solid $primary-color;
+}
+.create-item {
+    text-align: center;
+    cursor: pointer;
+    line-height: 25px;
+}

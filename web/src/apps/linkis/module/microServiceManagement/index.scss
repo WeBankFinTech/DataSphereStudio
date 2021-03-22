@@ -1,0 +1,19 @@
+@import '@/common/style/variables.scss';
+.search-bar {
+  .search-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: $font-size-base;
+    .lable {
+      flex-basis: 120px;
+      text-align: center;
+    }
+  }
+  .search {
+    margin-right: 25px;
+  }
+}
+.table-content {
+  margin-top: 25px;
+}

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper">
+
+
+
+
+    <sql id="orchestrator_main">
+        id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type`
+    </sql>
+
+    <sql id="orchestrator_version">
+        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`
+    </sql>
+
+    <select id="getOrchestrator" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        SELECT * FROM `dss_orchestrator_info` WHERE id = #{id}
+    </select>
+
+    <select id="getOrchestratorByUUID" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        SELECT * FROM `dss_orchestrator_info` WHERE uuid = #{uuid}
+    </select>
+
+    <insert id="addOrchestrator" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        INSERT INTO dss_orchestrator_info (<include refid="orchestrator_main"/>)
+        VALUES
+        (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},#{uuid},#{secondaryType})
+    </insert>
+
+    <update id="updateOrchestrator" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        UPDATE dss_orchestrator_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">`name`=#{name},</if>
+            <if test="desc != null">`desc`=#{desc},</if>
+            <if test="appConnName != null">`appconn_name`=#{appConnName},</if>
+            <if test="uses != null">`uses`=#{uses},</if>
+            <if test="secondaryType != null">`secondary_type`=#{secondaryType}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+
+    <delete id="deleteOrchestrator">
+        DELETE
+        FROM
+        dss_orchestrator_info
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="addOrchestratorVersion" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        INSERT INTO dss_orchestrator_version_info (<include refid="orchestrator_version"/>)
+        VALUES
+        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content})
+    </insert>
+
+
+    <update id="updateOrchestratorVersion"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        UPDATE dss_orchestrator_version_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="source != null">`source` = #{source},</if>
+            <if test="appId != null">`app_id` = #{appId},</if>
+            <if test="content != null">`content`= #{content},</if>
+            <if test="comment != null">`comment` = #{comment},</if>
+            <if test="updateTime != null">`update_time` = #{updateTime},</if>
+            <if test="updater != null">`updater` = #{updater}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="getLatestOrchestratorVersionById"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT
+        *
+        FROM
+        `dss_orchestrator_version_info`
+        WHERE
+        orchestrator_id = #{orchestratorId}
+        ORDER BY
+        version DESC
+        LIMIT 1
+    </select>
+
+
+    <select id="getOrchestratorVersion" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT
+        *
+        FROM
+        `dss_orchestrator_version_info`
+        WHERE
+        id = #{versionId}
+    </select>
+
+    <delete id="deleteOrchestratorVersion">
+        DELETE
+        FROM
+        dss_orchestrator_version_info
+        WHERE id = #{versionId}
+    </delete>
+
+    <select id="getVersionByOrchestratorId"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT * FROM dss_orchestrator_version_info
+        WHERE orchestrator_id = #{orchestratorId}
+        ORDER BY version DESC
+    </select>
+
+
+
+    <resultMap id="orcInfo" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo">
+        <result column="id" property="orchestratorVersionId" jdbcType="BIGINT"/>
+        <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
+    </resultMap>
+
+
+    <select id="getOrcInfoByAppId" resultMap="orcInfo">
+        select `id`, `orchestrator_id` from dss_orchestrator_version_info where app_id = #{appId}
+    </select>
+
+
+    <resultMap id="orchestrator_detail" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorProdDetail">
+        <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
+        <result column="orchestrator_version_id" property="orchestratorVersionId" jdbcType="BIGINT"/>
+        <result column="name" property="orchestratorName" jdbcType="LONGVARCHAR"/>
+        <result column="latest_version" property="latestVersion" jdbcType="TIMESTAMP"/>
+        <result column="updater" property="releaseUser" jdbcType="TIMESTAMP"/>
+        <result column="updater" property="lastUpdater" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+
+    <select id = "getOrchestratorProdDetails" resultMap="orchestrator_detail">
+        select
+        `v`.`id` as `orchestrator_version_id`,
+        `v`.`orchestrator_id`,
+        max(`v`.`version`) as `latest_version`,
+        `v`.`updater`,
+        `i`.`name`
+        from dss_orchestrator_version_info as `v` join dss_orchestrator_info as `i`
+        on `v`.project_id = #{projectId} and `v`.`orchestrator_id` = `i`.`id`
+        group by `v`.`orchestrator_id`
+    </select>
+
+
+    <resultMap id="orchestrator_version_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        <result column="id" property="id" jdbcType="BIGINT"/>
+        <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
+        <result column="app_id" property="appId" jdbcType="BIGINT"/>
+        <result column="source" property="source" jdbcType="LONGVARCHAR"/>
+        <result column="version" property="version" jdbcType="LONGVARCHAR"/>
+        <result column="comment" property="comment" jdbcType="LONGVARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="updater" property="updater" jdbcType="LONGVARCHAR"/>
+        <result column="project_id" property="projectId" jdbcType="BIGINT"/>
+        <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+
+    <select id="getOrchestratorVersions" resultMap="orchestrator_version_info_result_map">
+        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` = #{orchestratorId}
+    </select>
+
+
+
+
+</mapper>

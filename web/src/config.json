@@ -1,0 +1,56 @@
+{
+    "workspace": {
+        "routes": "apps/workspace/router",
+        "module": "apps/workspace/module",
+        "i18n": {
+            "en": "apps/workspace/i18n/en.json",
+            "zh-CN": "apps/workspace/i18n/zh.json"
+        },
+        "header": ""
+    },
+    "scriptis": {
+        "routes": "apps/scriptis/router",
+        "module": "apps/scriptis/module",
+        "i18n": {
+            "en": "apps/scriptis/i18n/common/en.json",
+            "zh-CN": "apps/scriptis/i18n/common/zh.json"
+        },
+        "header": "apps/scriptis/module/header"
+    },
+    "workflows": {
+        "routes": "apps/workflows/router",
+        "module": "apps/workflows/module",
+        "i18n": {
+            "en": "apps/workflows/i18n/common/en.json",
+            "zh-CN": "apps/workflows/i18n/common/zh.json"
+        },
+        "header": "apps/workflows/module/header"
+    },
+    "linkis": {
+        "routes": "apps/linkis/router",
+        "module": "apps/linkis/module",
+        "i18n": {
+            "en": "apps/linkis/i18n/common/en.json",
+            "zh-CN": "apps/linkis/i18n/common/zh.json"
+        },
+        "header": "apps/linkis/module/header"
+    },
+    "apiServices": {
+        "routes": "apps/apiServices/router",
+        "module": "apps/apiServices/module",
+        "i18n": {
+            "en": "apps/apiServices/i18n/en.json",
+            "zh-CN": "apps/apiServices/i18n/zh.json"
+        },
+        "header": "apps/apiServices/module/header"
+    },
+    "portal": {
+        "routes": "apps/portal/router",
+        "module": "apps/portal/module",
+        "i18n": {
+            "en": "apps/portal/i18n/en.json",
+            "zh-CN": "apps/portal/i18n/zh.json"
+        },
+        "header": "apps/portal/module/header"
+    }
+}

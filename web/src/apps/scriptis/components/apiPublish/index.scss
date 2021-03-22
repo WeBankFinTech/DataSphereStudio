@@ -1,0 +1,16 @@
+@import "@/common/style/variables.scss";
+.api-module-title{
+  font-size: $font-size-base;
+  color: $title-color;
+}
+.verificationValue {
+  .ivu-input {
+    color: red!important;
+    border-color: red;
+  }
+}
+.api-module-content-title{
+  font-size: $font-size-small;
+  color: $title-color;
+  text-align: center;
+}

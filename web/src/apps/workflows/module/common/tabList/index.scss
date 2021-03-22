@@ -1,0 +1,95 @@
+@import '@/common/style/variables.scss';
+.workflowTabContainer {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    .tap-bar {
+        background: #fff;
+        margin-bottom: $padding-25;
+        .topTabList {
+            padding: 25px $padding-25 0px;
+            flex: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            .topLeft {
+                flex: 1;
+                min-width: 320px;
+                .ivu-breadcrumb {
+                    font-size: 21px;
+                    /deep/.ivu-breadcrumb-item-separator {
+                        color: rgba(0,0,0,0.65);
+                    }
+                }
+            }
+            .buttonChange {
+                flex: none;
+                .ivu-btn {
+                    font-size: 14px;
+                }
+                .button-group {
+                    margin-left: 15px;
+                }
+            }
+        }
+        .bottomTapList {
+            padding: 0px $padding-25;
+            border-bottom: $border-width-base $border-style-base $border-color-base;
+            margin-top: 12px;
+            flex: none;
+            display: flex;
+            align-items: center;
+            font-size: $font-size-large;
+            .bottomLeftText {
+                cursor: pointer;
+                flex: none;
+                font-size: $font-size-large;
+                padding: 0 15px;
+                margin-bottom: -1px;
+                line-height: 40px;
+                position: relative;
+                &::after {
+                    content: "";
+                    border-left: 1px solid #DEE4EC;
+                    width: 0;
+                    position: absolute;
+                    right: -15px;
+                    top: 12px;
+                    height: 16px;
+                    margin: 0 15px;
+                }
+            }
+            .active {
+                border-bottom: 2px solid $primary-color;
+            }
+            .bottomRightContainer {
+                flex: 1;
+                height: 40px;
+            }
+        }
+    }
+    .defaultSlot {
+        flex: 1;
+    }
+}
+
+.tab-item {
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    color: $title-color;
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 200px;
+    overflow: hidden;
+    margin-right: 2px;
+    &.active {
+        height: 40px;
+        color: $primary-color;
+        border-radius: 4px 4px 0 0;
+        border-bottom: 2px solid $primary-color;
+        line-height: 38px;
+    }
+}

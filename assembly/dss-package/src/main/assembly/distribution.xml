@@ -1,0 +1,224 @@
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<assembly>
+  <id>dist</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>dss-${dss.version}</baseDirectory>
+
+  <dependencySets>
+    <dependencySet>
+      <!-- Enable access to all projects in the current multimodule build! <useAllReactorProjects>true</useAllReactorProjects> -->
+      <!-- Now, select which projects to include in this module-set. -->
+      <outputDirectory>lib/dss-commons/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <unpack>false</unpack>
+      <useStrictFiltering>true</useStrictFiltering>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+    </dependencySet>
+  </dependencySets>
+
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/../../</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>README*</include>
+        <include>LICENSE*</include>
+        <include>NOTICE*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../conf
+      </directory>
+      <outputDirectory>conf</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../sbin
+      </directory>
+      <outputDirectory>sbin</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+
+    <!--dss-framework-project-server-->
+    <fileSet>
+      <directory>
+         ${basedir}/../../dss-framework/dss-framework-project-server/target/out/dss-framework-project-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-framework-orchestrator-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-framework/dss-framework-orchestrator-server/target/out/dss-framework-orchestrator-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-framework/dss-framework-orchestrator-server/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-apiservice-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-apps/dss-apiservice-server/target/out/dss-apiservice-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-apps/dss-apiservice-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-workflow-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target/out/dss-workflow-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-orchestrator/dss-workflow-server/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-flow-execution-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target/out/dss-flow-execution-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-orchestrator/dss-flow-execution-server/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-datachecker-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-datachecker-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-eventchecker-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-eventchecker-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-orchestrator-framework-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-orchestrator-framework-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-workflow-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-workflow-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-schedulis-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-schedulis-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-schedulis-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-visualis-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/linkis-appconn-engineplugin/target/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>*.zip</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../plugins/linkis/dss-gateway-support/target/
+      </directory>
+      <outputDirectory>lib/dss-plugins/linkis/dss-gateway/</outputDirectory>
+      <includes>
+        <include>*${dss.version}.jar</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../plugins/azkaban/linkis-jobtype/target/
+      </directory>
+      <outputDirectory>lib/dss-plugins/azkaban/linkis-jobtype/</outputDirectory>
+      <includes>
+        <include>*${dss.version}.zip</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>

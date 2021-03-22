@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.workflow.dao.InputRelationMapper">
+
+    <select id="selectInputRelation" resultType="com.webank.wedatasphere.dss.common.entity.InputRelation">
+        select * from dss_input_relation where `type` = #{type} and source_env = #{sourceEnv} and
+        source_id = #{sourceID} and target_env = #{targetEnv}
+    </select>
+
+    <insert id="insertInputRelation" parameterType="com.webank.wedatasphere.dss.common.entity.InputRelation">
+        insert into dss_input_relation values(#{inputRelation.id},
+        #{inputRelation.type},
+        #{inputRelation.sourceEnv},
+        #{inputRelation.sourceID},
+        #{inputRelation.targetEnv},
+        #{inputRelation.targetID})
+    </insert>
+
+    <delete id="removeInputRelation">
+        delete from dss_input_relation where type = #{type} and source_env = #{sourceEnv} and target_env = #{targetEnv}
+        and target_id = #{targetID}
+    </delete>
+
+</mapper>

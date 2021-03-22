@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.webank.wedatasphere.dss.framework.release.dao.ReleaseTaskMapper">
+
+    <resultMap id="taskInfo" type="com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="project_id" property="projectId" jdbcType="BIGINT"/>
+        <result column="orchestrator_version_id" property="orchestratorVersionId" jdbcType="BIGINT"/>
+        <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
+        <result column="release_user" property="releaseUser" jdbcType="LONGVARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="LONGVARCHAR"/>
+        <result column="error_msg" property="errorMsg" jdbcType="LONGVARCHAR"/>
+        <result column="status" property="status" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+
+
+    <sql id="release_task_main">
+        `id`, `project_id`, `orchestrator_version_id`, `orchestrator_id`,
+        `release_user`, `create_time`, `update_time`, `status`
+    </sql>
+
+
+    <insert id="insertReleaseTask" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask">
+        INSERT INTO dss_release_task (<include refid="release_task_main"/>)
+        VALUES
+        (#{id}, #{projectId}, #{orchestratorVersionId}, #{orchestratorId}, #{releaseUser}, #{createTime}, #{updateTime}, #{status})
+    </insert>
+
+
+
+    <!--更新releaseTask的状态和更新时间-->
+    <update id="updateReleaseTask" parameterType="com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask">
+        UPDATE dss_release_task
+        <trim prefix="set" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+
+
+    <select id = "getReleaseTask" resultMap="taskInfo" parameterType="java.lang.Long">
+        select * from dss_release_task where id = #{taskId}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,810 @@
+{
+    "message": {
+        "scripts": {
+            "emptyText": "暂无数据",
+            "publishing": "发布中",
+            "tagPlaceholder": "标签，按 enter 创建",
+            "script": "脚本",
+            "editor": "修改",
+            "ok": "确认",
+            "failedNotice": "验证项未通过，请检查后再试！",
+            "cancel": "取消",
+            "notSave": "只读状态不可保存！",
+            "saveSuccess": "保存成功！",
+            "saveErr": "保存失败！",
+            "createdTitle": "建表向导",
+            "saveToWidget": "保存widget到解决方案",
+            "contextMenu": {
+                "openToTab": "打开到侧边",
+                "copyPath": "复制路径",
+                "addCatalog": "新建目录",
+                "addScript": "新建脚本",
+                "importToHive": "导入至Hive",
+                "importToHdfs": "导入至HDFS",
+                "copyscript": "复制脚本",
+                "stickscript": "粘贴"
+            },
+            "warning": {
+                "getRootPath": "未请求到工作空间根目录，请刷新重试！",
+                "scriptChanged": "脚本已发生改变，请保存后再试！",
+                "empty": "脚本内容为空！"
+            },
+            "error": {
+                "fileExists": "该文件已经存在！"
+            },
+            "boyondQuota": {
+                "title": "警告",
+                "desc": "'您已打开20个脚本（超出最大限额），请关闭其他脚本再打开！'"
+            },
+            "createTable": {
+                "action": "操作",
+                "delete": "删除",
+                "baseAttr": "表基本属性",
+                "add": "新增",
+                "partitionAttr": "分区属性",
+                "selectResource": "请选择来源字段",
+                "next": "下一步",
+                "nameNotice": "仅支持中文、字母、数字和下划线",
+                "zm": "字母",
+                "daName": "数据库名",
+                "tableName": "表名",
+                "tablePlaceholder": "字母开头，支持字母、数字和下划线",
+                "tableOtherName": "表别名",
+                "aliasPlaceholder": "支持中文、字母、数字和下划线",
+                "use": "用途",
+                "emptyPlaceholder": "支持中文、字母、数字和下划线(可为空)",
+                "product": "所属产品",
+                "project": "所属项目",
+                "tableDesc": "表描述",
+                "selectDbName": "请选择库名",
+                "inputTableName": "请输入表名",
+                "inputOtherName": "请输入别名",
+                "letter": "大小写字母",
+                "moduleAttr": "表模型属性",
+                "partitionType": "分区类型",
+                "partition": "分区",
+                "unartition": "非分区",
+                "lifecycle": "生命周期",
+                "forever": "永久",
+                "day": "当天有效",
+                "week": "一周有效",
+                "moon": "一月有效",
+                "midYear": "半年有效",
+                "moduleRank": "模型层级",
+                "resource": "原始数据层",
+                "detailLevel": "明细数据层",
+                "sumData": "汇总数据层",
+                "appData": "应用数据层",
+                "actionType": "使用方式",
+                "noeWrite": "一次写多次读",
+                "ZSGC": "增删改查",
+                "FG": "多次覆盖写",
+                "OED": "一次写偶尔读",
+                "isUse": "外部是否使用",
+                "isDwsExeis": "是否需要在dws之外的系统上使用",
+                "selectPartitionType": "请选择分区类型",
+                "selectLife": "请选择生命周期",
+                "selectModuleLevel": "请选择模型层级",
+                "selectUseType": "请选择使用方式",
+                "selectIsUse": "请选择外部是否使用",
+                "canned": "该表已存在，请输入其他表名",
+                "type": "类型",
+                "selectType": "请选择类型",
+                "path": "路径",
+                "FGF": "分隔符",
+                "BMGS": "编码格式",
+                "XZBMGS": "请选择编码格式",
+                "XDF": "限定符",
+                "WXDF": "无限定符",
+                "HXWBT": "首行为表头",
+                "HQBZDSJ": "获取表字段数据",
+                "XZWJLJ": "请选择文件路径",
+                "GXMLDR": "共享目录导入",
+                "DR": "导入",
+                "DH": "逗号",
+                "FH": "分号",
+                "ZBF": "制表符",
+                "KG": "空格",
+                "SYH": "双引号",
+                "DYH": "单引号",
+                "GLWJ": "过滤文件夹",
+                "LYSX": "来源属性",
+                "MBZD": "目标表字段与源字段",
+                "XZK": "选择库",
+                "XZB": "选择表",
+                "SJSXLY": "数据属性来源",
+                "DRFS": "导入方式",
+                "XJ": "新建",
+                "FHSYB": "返回上一步",
+                "SCDDL": "生成DDL语句",
+                "JB": "建表",
+                "DDLYJ": "DDL语句",
+                "FZZT": "复制至粘贴板",
+                "DDLYFZ": "DDL语句已复制至粘贴板！",
+                "fieldsName": "字段名",
+                "isPrimary": "主键",
+                "fieldsType": "字段类型",
+                "length": "长度/设置",
+                "fieldsAlias": "字段别名",
+                "alias": "别名",
+                "sourceFields": "来源字段",
+                "rule": "字段规则",
+                "express": "字段表达式",
+                "comment": "描述",
+                "partitionValue": "分区值",
+                "partitionAlias": "分区别名",
+                "fieldsNameRequire": "字段名称不能为空",
+                "fieldsNameRule": "仅支持字母数字和下划线"
+            },
+            "tableDetails": {
+                "BZBSX": "表基本属性",
+                "BZDXX": "表字段信息",
+                "BTJXX": "表统计信息",
+                "DBN": "数据库名",
+                "TN": "表名",
+                "BBM": "表别名",
+                "FQM": "分区表",
+                "CJYH": "创建用户",
+                "CJSI": "创建时间",
+                "ZHFWSJ": "最后访问时间",
+                "BMS": "表描述",
+                "BMXSX": "表模型属性",
+                "SMZQ": "生命周期",
+                "MXCJ": "模型层级",
+                "SYFS": "使用方式",
+                "WBSFSY": "外部是否使用",
+                "BYYSX": "表应用属性",
+                "SXCP": "所属产品",
+                "SSXM": "所属项目",
+                "YT": "用途",
+                "SSZDMC": "搜索字段名称...",
+                "XH": "序号",
+                "ZDM": "字段名",
+                "ZDLX": "字段类型",
+                "BM": "别名",
+                "SFZJ": "是否主键",
+                "SFFQ": "是否分区",
+                "ZDGZ": "字段规则",
+                "MS": "描述",
+                "FQXX": "分区信息",
+                "DJFQCK": "请点击根分区查看分区大小",
+                "WFQSJ": "暂无表分区数据",
+                "BXX": "表信息",
+                "BZD": "字段数",
+                "BDX": "表大小",
+                "WJM": "文件数",
+                "FQS": "分区数",
+                "DX": "大小",
+                "FQDX": "分区大小：",
+                "WJS": "文件数：",
+                "YES": "对",
+                "GSHJX": "进行格式化成",
+                "ZJXYGE": "组件需要的格式"
+
+            },
+            "logView": {
+                "taskId": "任务ID：",
+                "search": "搜索",
+                "filter": "过滤",
+                "error": "错误",
+                "inputTaskId": "请输入有效的任务ID！"
+            },
+            "functionSetting": {
+                "HSM": "函数名称",
+                "HSLX": "函数类型",
+                "TY": "通用",
+                "ZDYHS": "自定义函数",
+                "B": "jar包",
+                "JBLU": "脚本路径",
+                "ZCGS": "注册格式",
+                "ZCHS": "注册函数",
+                "FHLX": "返回类型",
+                "CSLX": "参数类型",
+                "YLLX": "预览",
+                "SYGS": "使用格式",
+                "SRLX": "输入类型",
+                "HSMS": "函数描述",
+                "MRJZ": "默认加载",
+                "XZHS": "新增函数",
+                "LJCJ": "立即创建",
+                "QSRMC": "请输入名称",
+                "CDZ": "长度在1到100个字符",
+                "BXYZMKT": "必须以字母开头，且只支持字母、数字、下划线和中文",
+                "QZSXZYZLX": "请至少选择一种类型",
+                "QSRWZLJ": "请输入完整的路径",
+                "KHDBJZPP": "括号代表精准匹配",
+                "HZMZC": "后缀名只支持jar，且jar包名仅支持英文，数字，下划线！",
+                "ZCPYSCA": "后缀名只支持py、scala！",
+                "BHJZCYW": "包名仅支持英文",
+                "XHX": "下划线",
+                "SRZCHS": "请输入注册函数",
+                "SRFHLX": "请输入返回类型",
+                "SRCSLX": "请输入参数类型",
+                "XGHS": "修改函数",
+                "XG": "修改"
+            },
+            "functionShare": {
+                "ZZGX": "正在对{name}函数进行共享操作",
+                "HSLX": "函数类型",
+                "GXYH": "共享用户",
+                "SRGXYH": "请输入要共享的用户，以逗号分隔",
+                "XZGXHSLX": "请选择该共享函数的类型！",
+                "ZSXZYWGXYH": "请填入至少一位需要共享的用户！"
+            },
+            "uploadDialog": {
+                "SCJBWJ": "上传脚本文件",
+                "TWJDSQ": "将文件拖到此处，或点击上传",
+                "PATH": "路径：",
+                "QKLB": "清空列表",
+                "LIMIT2M": "上传脚本文件不得超过2MB！",
+                "LIMIT100M": "上传脚本文件不得超过100MB！",
+                "ZDSC": "此操作将中断文件上传，是否继续？",
+                "TS": "提示",
+                "ZJGB": "直接关闭",
+                "QX": "取消",
+                "QXBBSCCK": "取消关闭上传窗口",
+                "SCCG": "文件{name}上传成功！",
+                "WJDXCCXE": "文件大小超出限额",
+                "WJYCZ": "文件已存在，请选择其它文件或选择其它文件夹！",
+                "WJMBHF": "文件名称不合法，仅支持以字母、数字、中文、下划线且带后缀的命名！",
+                "SCZQK": "文件上传中，无法清空上传列表！"
+            },
+            "importToHive": {
+                "MC": "名称",
+                "ZDMC": "字段名称不能为空",
+                "JZCZM": "仅支持字母数字和下划线",
+                "QSRZDM": "请输入字段名",
+                "LX": "类型",
+                "GS": "格式",
+                "QXZGS": "请选择日期格式",
+                "CD": "长度",
+                "JD": "精度",
+                "XSW": "小数位数",
+                "SRZDZS": "请输入字段注释",
+                "DRWJ": "导入文件",
+                "BZONE": "步骤1",
+                "BZTOW": "步骤2",
+                "WJDR": "从文件导入数据",
+                "DRZMRB": "导入至默认表",
+                "LY": "来源",
+                "QXZLX": "请选择类型",
+                "LJ": "路径",
+                "GSH": "格式化",
+                "FGF": "分隔符",
+                "BMGS": "编码格式",
+                "QXZBMGS": "请选择编码格式",
+                "XDF": "限定符",
+                "WXDF": "无限定符",
+                "SHWBT": "首行为表头",
+                "SJK": "数据库名",
+                "QSRKM": "请输入库名",
+                "SJB": "数据表名",
+                "SRSJBM": "请输入数据表名",
+                "FQ": "分区",
+                "FX": "复写",
+                "XZFQ": "新增分区",
+                "SHEETB": "sheet表",
+                "ZG": "字段",
+                "XYB": "下一步",
+                "SYB": "上一步",
+                "TJ": "提交",
+                "LXWCHAR": "类型为char或者varchar的字段长度应为大于0的正整数",
+                "ZDJDSRYW": "类型为decimal的字段精度输入有误",
+                "ZDXSWYDY": "类型为decimal的字段小数位数应为大于0的正整数",
+                "ZDZSZCZW": "字段注释仅支持中文、大小写字母和下划线，长度不得超过100字符",
+                "SJKMBNWK": "数据库名不能为空",
+                "BMBNWK": "表名不能为空",
+                "BMJZCZMKT": "表名仅支持以字母开头，名称包含大小写字母和下划线，长度为0~100",
+                "FQMBNWK": "分区名不能为空",
+                "FQMZCSZ": "分区名只支持数字、字母和-",
+                "FQZBNWK": "分区值不能为空",
+                "FQZZZCSZ": "分区值只支持数字",
+                "GXMLDR": "共享目录导入",
+                "HDFSDR": "HDFS导入",
+                "DH": "逗号(,)",
+                "FH": "分号(;)",
+                "ZBF": "制表符(\\t)",
+                "KG": "空格",
+                "SYH": "双引号",
+                "DYH": "单引号",
+                "WJZZZXDR": "文件正在执行导入，请稍后再试",
+                "FQZCF": "分区值重复，请确认是否复写",
+                "TSWST": "提示：无法操作视图表， 请选择其它表导入",
+                "WFCZSTB": "无法操作视图表",
+                "QXZQTBDR": "请选择其它表导入",
+                "BMYCZDQSJK": "表名已存在当前数据库",
+                "ZBZCDJFQ": "暂不支持多级分区，请选择其它表",
+                "QQURFQ": "请确认分区",
+                "HQFQSB": "获取分区信息失败",
+                "ZQDRWJLJ": "请正确选择导入文件路径",
+                "QQRSJKMCXX": "请确认数据库名称填写信息",
+                "QQRSFCF": "请确认是否复写"
+            },
+            "hiveTableExport": {
+                "DCB": "导出表",
+                "SZDCCS": "步骤1：设置导出参数",
+                "SZDCLJ": "步骤2：设置导出路径",
+                "SJKM": "数据库名",
+                "QSRKM": "请输入库名",
+                "SJBM": "数据表名",
+                "ZDXX": "字段信息",
+                "FQXX": "分区信息",
+                "DCGS": "导出格式",
+                "FGF": "分隔符",
+                "BMGS": "编码格式",
+                "XZBMGS": "请选择编码格式",
+                "KZTH": "空值替换",
+                "SXWBT": "首行为表头",
+                "LX": "类型",
+                "QXZLX": "请选择类型",
+                "DCZ": "导出至",
+                "WJM": "文件名",
+                "TRDCWJMC": "请填入导出文件名称",
+                "FXMS": "复写模式",
+                "ZJ": "追加",
+                "FX": "复写",
+                "BM": "sheet表名",
+                "QSR": "请填入",
+                "XYB": "下一步",
+                "SYB": "上一步",
+                "TJ": "提交",
+                "WFCZST": "无法操作视图表，请选择其它表导出",
+                "ZBZCDBDC": "暂不支持多分区表导出，请选择其它表导出",
+                "GXML": "共享目录",
+                "DH": "逗号(,)",
+                "FH": "分号(;)",
+                "ZBF": "制表符(\\t)",
+                "KG": "空格",
+                "KZFC": "空字符串",
+                "XZSJK": "请选择数据库",
+                "XZB": "请选择表",
+                "XZFGF": "请选择分隔符",
+                "XZYGFQBDC": "请选择一个分区表导出",
+                "ZSXZYGZD": "请至少选择一个字段",
+                "XZDCGS": "请选择导出格式",
+                "XZXYJKZTHDZ": "请选择需要将空值替换的值",
+                "XZDCLJDLX": "请选择导出路径的类型",
+                "XZDCLJ": "请选择导出路径",
+                "DRDCDWJ": "请填入导出的文件名称",
+                "CDZ": "长度在3~100个字符",
+                "WJMZZCZW": "文件名只支持中文、字母、数字和下划线",
+                "CBDC": "此表导出中，请稍后再试或者选择其他表",
+                "QSHZSS": "请稍后再试或者选择其他表",
+                "XZFQ": "请选择分区",
+                "BDXCG": "表大小超过5GB，请使用其它方式导出或选择其它表"
+            },
+            "hiveTableDesc": {
+                "searchName": "搜索字段名称...",
+                "tableDetail": "表详情",
+                "noData": "暂无表分区数据",
+                "tableColumns": "表字段",
+                "columnsName": "字段名",
+                "columnsType": "字段类型",
+                "tablePartitions": "表分区",
+                "dbName": "数据库名",
+                "tableName": "数据表名",
+                "createUser": "创建用户",
+                "createTtime": "创建时间",
+                "lastTime": "最后访问时间",
+                "tableSize": "表大小",
+                "size": "大小"
+            },
+            "deleteType": {
+                "function": "函数",
+                "folder": "文件夹",
+                "file": "文件",
+                "common": "通用",
+                "catalog": "目录",
+                "script": "脚本文件",
+                "engine": "引擎",
+                "task": "任务",
+                "engineAndTask": "引擎和任务"
+            },
+            "constants": {
+                "add": "新建",
+                "cancel": "取消",
+                "confirm": "确认",
+                "changeLanguage": "切换语言",
+                "detail": "详情",
+                "description": "描述",
+                "delete": "删除",
+                "download": "下载",
+                "edit": "编辑",
+                "export": "导出",
+                "fail": "失败",
+                "noDataText": "暂无数据",
+                "node": "节点",
+                "refresh": "刷新",
+                "rename": "重命名",
+                "reset": "重置",
+                "remove": "移除",
+                "submit": "确定",
+                "search": "搜索",
+                "save": "保存",
+                "upload": "上传",
+                "update": "修改",
+                "warning": {
+                    "api": "接口请求中，请稍候！",
+                    "data": "数据请求中，请稍候！",
+                    "waiting": "请等待接口返回！",
+                    "biLoading": "正在和Visualis系统通讯，请稍候！",
+                    "comingSoon": "尚未开源，敬请期待！"
+                },
+                "success": {
+                    "delete": "删除成功！",
+                    "update": "修改成功！",
+                    "add": "新建成功！",
+                    "save": "保存成功",
+                    "stick": "粘贴成功",
+                    "prohibit": "禁止复制此类型"
+                },
+                "error": {
+                    "refresh": "刷新出错，请重试！",
+                    "fileExists": "该文件已经存在",
+                    "folderExists": "该文件夹已经存在",
+                    "functionExists": "该函数已经存在"
+                },
+                "logPanelList": {
+                    "fullScreen": "全屏",
+                    "releaseFullScreen": "取消全屏",
+                    "min": "最小化",
+                    "releaseMin": "取消最小化"
+                },
+                "time": {
+                    "second": "秒",
+                    "minute": "分钟",
+                    "hour": "小时",
+                    "day": "天"
+                }
+            },
+            "navList": {
+                "dataStudio": "数据开发",
+                "workSpace": "工作空间",
+                "database": "数据库",
+                "udfFunction": "UDF函数",
+                "methodFunction": "方法函数",
+                "hdfs": "HDFS"
+            },
+            "newDialog": {
+                "catalog": "目录",
+                "scriptName": "名称",
+                "catalogName": "名称",
+                "targetScriptPath": "创建路径",
+                "placeholder": "请输入脚本名称",
+                "required": "请输入目录名称",
+                "rules": {
+                    "scriptName": {
+                        "required": "请输入脚本名称",
+                        "lengthLimit": "长度在1到200个字符",
+                        "letterTypeLimit": "仅支持中文、大小写字母、数字和下划线"
+                    },
+                    "catalogName": {
+                        "required": "请输入目录名称",
+                        "lengthLimit": "长度在1到200个字符",
+                        "letterTypeLimit": "仅支持中文、大小写字母、数字和下划线"
+                    },
+                    "targetScriptPath": {
+                        "required": "请选择目标脚本路径"
+                    }
+                },
+                "nodeType": "节点类型",
+                "scriptType": "脚本类型",
+                "targetFolder": "目标文件夹"
+            },
+            "database": {
+                "contextMenu": {
+                    "db": {
+                        "copyName": "复制库名",
+                        "pasteName": "复制库名并粘贴至脚本",
+                        "listSort": "表按时间排序",
+                        "liststringSort": "表按首字符排序"
+                    },
+                    "tb": {
+                        "queryTable": "查询表",
+                        "deleteTable": "删除表",
+                        "viewTable": "查看表结构",
+                        "exportTable": "导出表",
+                        "copyName": "复制表名",
+                        "pasteName": "复制表名并粘贴至脚本",
+                        "copyAllColumns": "复制表全字段"
+                    },
+                    "field": {
+                        "copyColumnsName": "复制字段名",
+                        "pasteName": "复制库名并粘贴至脚本"
+                    }
+                },
+                "partitionsTitle": "分区大小",
+                "notPosition": "无法定位上一次操作，请使用右键刷新功能"
+            },
+            "fnSideBar": {
+                "contextMenu": {
+                    "isOwn": {
+                        "addFunction": "新增函数",
+                        "addFolder": "新增文件夹",
+                        "share": "共享"
+                    },
+                    "isLeaf": {
+                        "copyName": "复制函数名",
+                        "pasteName": "复制函数并粘贴至脚本"
+                    },
+                    "isOwnAndLeaf": {
+                        "updateToExpired": "修改为过期",
+                        "viewSharedUsers": "查看已共享的用户"
+                    }
+                },
+                "warning": {
+                    "folderNameExists": "存在同名的文件夹",
+                    "functionNameExists": "存在同名的函数",
+                    "functionShared": "该函数已被共享，请将函数设置为过期再删除！",
+                    "noEmpty": "请手动删除子文件夹或函数后再试！"
+                },
+                "success": {
+                    "load": "加载udf函数成功！",
+                    "cancelLoading": "已取消加载udf函数！",
+                    "addUdf": "新建udf函数成功！",
+                    "addFolder": "新建文件夹成功！",
+                    "shareFunction": "函数已共享成功",
+                    "updateShareUser": "修改共享用户成功！",
+                    "functionExpired": "函数已设置为过期，请到共享函数中查看！"
+                },
+                "confirm": {
+                    "title": "提示",
+                    "content": "<p>此操作将会对已共享的用户造成影响，是否继续？</p>"
+                }
+            },
+            "hdfs": {
+                "contextMenu": {
+                    "openToTab": "打开到侧边",
+                    "copyPath": "复制路径",
+                    "addCatalog": "新建目录",
+                    "importToHive": "导入至Hive",
+                    "exportToWorkSpace": "导出至工作空间"
+                },
+                "dialogTitle": {
+                    "exportToWorkSpace": "导出至工作空间"
+                },
+                "warning": {
+                    "noRootPath": "未请求到HDFS根目录，请刷新重试！"
+                }
+            },
+            "container": {
+                "title": {
+                    "editorName": "编辑器"
+                },
+                "closeDropDown": {
+                    "others": "关闭其他",
+                    "all": "关闭全部",
+                    "left": "关闭左边",
+                    "right": "关闭右边"
+                },
+                "closeHint": "关闭提示",
+                "footer": {
+                    "cancel": "取消",
+                    "close": "直接关闭",
+                    "save": "保存",
+                    "saveAs": "另存为"
+                },
+                "tips": "什么是Scriptis？\nScriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。\nScriptis？\n1. 选中工作空间的目录，创建文件夹；\n2. 右键某个文件夹 =>新建脚本；\n3. 选择脚本类型，如：SQL、Pyspark、HQL等；\n4. 书写脚本，点击执行，生成结果集。",
+                "warning": {
+                    "noDBInfo": "未获取到数据库表信息，脚本联想词功能可能存在异常！可刷新重试！",
+                    "noUDF": "未获取到UDF和方法函数信息，脚本联想词功能可能存在异常！可刷新重试！",
+                    "noSelectedScript": "未选中脚本，请选择一个脚本再试！"
+                },
+                "notice": {
+                    "developerWarning": {
+                        "title": "警告",
+                        "desc": "开发者警告：调用add接口必须传入id和filename！"
+                    },
+                    "unSupport": {
+                        "title": "警告",
+                        "desc": "很抱歉，系统暂不支持打开该格式文件！"
+                    }
+                },
+                "removeWork": {
+                    "normal": "该脚本已发生改变，是否保存？",
+                    "readOnly": "该只读脚本已发生改变，是否另存至工作空间？",
+                    "temporary": "该临时脚本已发生改变，是否另存为文件？"
+                }
+            },
+            "editorDetail": {
+                "navBar": {
+                    "undo": "撤销",
+                    "redo": "恢复",
+                    "play": "运行",
+                    "stop": "停止",
+                    "save": "保存",
+                    "config": "配置"
+                },
+                "warning": {
+                    "running": "脚本运行中，请稍候！",
+                    "invalidArgs": "请检查配置参数输入是否正确！",
+                    "emptyCode": "无法执行空代码！"
+                }
+            },
+            "history": {
+                "columns": {
+                    "taskID": {
+                        "title": "任务ID"
+                    },
+                    "runningTime": {
+                        "title": "执行时间"
+                    },
+                    "createDate": {
+                        "title": "启动时间"
+                    },
+                    "status": {
+                        "title": "状态",
+                        "status": {
+                            "succeed": "成功",
+                            "running": "运行",
+                            "timeout": "超时",
+                            "inited": "排队中",
+                            "scheduled": "资源申请中",
+                            "failed": "失败",
+                            "cancel": "取消"
+                        }
+                    },
+                    "data": {
+                        "title": "代码"
+                    },
+                    "failedReason": {
+                        "title": "关键信息"
+                    },
+                    "control": {
+                        "title": "操作",
+                        "view": "查看",
+                        "download": "日志下载"
+                    }
+                },
+                "success": {
+                    "open": "打开成功",
+                    "download": "下载成功，请到本地的download文件夹查看！"
+                }
+            },
+            "saveAs": {
+                "header": "另存为脚本",
+                "formItems": {
+                    "fileName": {
+                        "label": "文件名"
+                    },
+                    "selectedPath": {
+                        "label": "选择路径"
+                    }
+                },
+                "rules": {
+                    "fileName": {
+                        "required": "请输入文件名",
+                        "lengthLimit": "长度在1到200个字符",
+                        "letterTypeLimit": "仅支持中文、大小写字母、数字和下划线"
+                    },
+                    "selectedPath": {
+                        "required": "请选择一个目录"
+                    }
+                },
+                "warning": {
+                    "invalid": "请查看未通过验证项！"
+                },
+                "success": {
+                    "saveScript": "另存脚本成功，请手动刷新目录树！"
+                }
+            },
+            "tabs": {
+                "progress": "进度",
+                "result": "运行结果",
+                "log": "运行日志",
+                "history": "历史",
+                "diagnosis": "智能诊断"
+            },
+            "notice": {
+                "unsave": {
+                    "title": "提醒",
+                    "desc": "您的临时脚本已修改，请注意保存！"
+                },
+                "sendStart": {
+                    "title": "运行提示",
+                    "render": "开始执行脚本"
+                },
+                "querySuccess": {
+                    "title": "执行结果提示",
+                    "render": "脚本执行成功，共耗时"
+                },
+                "notice": {
+                    "title": "执行结果提示"
+                },
+                "kill": {
+                    "title": "运行提示",
+                    "desc": "已经停止执行脚本"
+                }
+            },
+            "confirmModal": {
+                "title": "另存为",
+                "content": "<p>该临时脚本已发生改变！</p><p>是否另存？</p>",
+                "okText": "另存为",
+                "cancelText": "取消"
+            },
+            "setting": {
+                "header": "配置",
+                "customVariable": {
+                    "title": "自定义参数"
+                },
+                "envVariable": {
+                    "title": "环境变量"
+                },
+                "runTimeArgs": {
+                    "settingTitle": "命令行参数",
+                    "placeholder": "请使用空格分开多个参数"
+                }
+            },
+            "apiPublish": {
+                "title": "发布为数据API",
+                "button": {
+                    "addApi": "新建数据API",
+                    "updateApi": "更新数据API"
+                },
+                "addApiModal": {
+                    "modalTitle": "数据服务API新增",
+                    "contentTitle": "基本信息补充",
+                    "paramConfirmTitle": "参数确认",
+                    "apiName": "API 名称",
+                    "apiPath": "API Path",
+                    "protocol": "协议",
+                    "requestType": "请求方式",
+                    "tag": "标签",
+                    "visible": "可见范围",
+                    "describe": "描述",
+                    "cancel": "取消",
+                    "nextStep": "下一步",
+                    "approvalName": "审批单名称",
+                    "applyUser": "申请用户",
+                    "proxyUser": "代理执行用户",
+                    "back": "上一步",
+                    "confirm": "确认",
+                    "comment": "备注"
+                },
+                "updateApiModal": {
+                    "modalTitle": "数据服务API更新",
+                    "apiVersionUpgrade": "生成新版本",
+                    "paramConfirm": "请确认参数"
+                },
+                "paramTable": {
+                    "paramName": "参数名称",
+                    "paramType": "参数类型",
+                    "require": {
+                        "title": "是否必填",
+                        "yes": "是",
+                        "no": "否",
+                        "hide": "隐藏"
+                    },
+                    "defaultValue": "默认值",
+                    "displayName": "展示名",
+                    "describe": "描述"
+                },
+                "rule": {
+                    "nameRule": "请填写API名称",
+                    "pathRule": "请填写API路径",
+                    "pathRegRule": "API路径不合法",
+                    "requestTypeRule": "请选择请求方式",
+                    "protocolRule": "请选择协议",
+                    "valueRule": "必须以字母开头，且只支持字母、数字、下划线！",
+                    "contentLengthLimit": "长度不能大于150",
+                    "contentLengthLimit50": "长度不能大于50",
+                    "contentLengthLimitTwo": "长度不能大于200",
+                    "pathRepeat": "API路径已存在",
+                    "nameRepeat": "API名称已存在",
+                    "chineseCheck": "只支持中文",
+                    "chineseName": "API中文名称"
+                },
+                "visible": {
+                    "workspace": "工作空间",
+                    "personal": "个人",
+                    "public": "公开",
+                    "grantView": "授权可见"
+                },
+                "notice": {
+                    "publishSuccess": "发布成功"
+                },
+                "tagPlaceholder": "标签，按 enter 创建"
+            }
+        }
+    }
+}

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.apiservice.core.dao.ApiServiceDao">
+    <resultMap id="apiServiceMap" type="ApiServiceVo">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="aliasName" column="alias_name"/>
+        <result property="path" column="path"/>
+        <result property="protocol" column="protocol"/>
+        <result property="method" column="method"/>
+        <result property="tag" column="tag"/>
+        <result property="scope" column="scope"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="runType" column="run_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="modifyTime" column="modify_time"/>
+        <result property="creator" column="creator"/>
+        <result property="modifier" column="modifier"/>
+        <result property="scriptPath" column="script_path"/>
+        <result property="workspaceId" column="workspaceID"/>
+        <result property="comment" column="api_comment"/>
+
+    </resultMap>
+
+    <sql id="fields">
+        `name`,`alias_name`, `path`,`protocol`,`method`,`tag`, `scope`,`description`,`status`,`type`,`run_type`,`create_time`,
+        `modify_time`,`creator`,`modifier`,`script_path`,`workspaceID`,`api_comment`
+    </sql>
+
+    <sql id="fields_query">
+        `id`, `alias_name`, `name`,`path`,`protocol`,`method`, `tag`, `scope`,`description`,`status`,`type`,`run_type`,`create_time`,
+        `modify_time`,`creator`,`modifier`,`script_path`,`workspaceID`,`api_comment`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ApiServiceVo">
+        <![CDATA[INSERT INTO `dss_apiservice_api`(]]>
+        <include refid="fields"/>
+        <![CDATA[) VALUES(#{name}, #{aliasName}, #{path}, #{protocol}, #{method}, #{tag}, #{scope}, #{description},
+        #{status}, #{type},#{runType}, now(), now(), #{creator}, #{modifier}, #{scriptPath},#{workspaceId},#{comment})]]>
+    </insert>
+
+    <update id="update" parameterType="ApiServiceVo">
+        <![CDATA[UPDATE `dss_apiservice_api`]]>
+        <set>
+            <if test="aliasName != null and aliasName != ''">
+                <![CDATA[ `alias_name` = #{aliasName}, ]]>
+            </if>
+            <if test="path != null and path != ''">
+                <![CDATA[ `path` = #{path}, ]]>
+            </if>
+            <if test="protocol != null and protocol != ''">
+                <![CDATA[ `protocol` = #{protocol}, ]]>
+            </if>
+
+            <if test="method != null and method != ''">
+                <![CDATA[ `method` = #{method}, ]]>
+            </if>
+
+            <if test="tag != null and tag != ''">
+                <![CDATA[ `tag` = #{tag}, ]]>
+            </if>
+
+            <if test="scope != null and scope != ''">
+                <![CDATA[ `scope` = #{scope}, ]]>
+            </if>
+
+            <if test="description != null and description != ''">
+                <![CDATA[ `description` = #{description}, ]]>
+            </if>
+
+            <if test="status != null and status != ''">
+                <![CDATA[ `status` = #{status}, ]]>
+            </if>
+
+            <if test="type != null and type != ''">
+                <![CDATA[ `type` = #{type}, ]]>
+            </if>
+            <if test="runType != null and runType != ''">
+                <![CDATA[ `run_type` = #{runType}, ]]>
+            </if>
+            <if test="modifier != null and modifier != ''">
+                <![CDATA[ `modifier` = #{modifier}, ]]>
+            </if>
+            <if test="scriptPath != null and scriptPath != ''">
+                <![CDATA[ `script_path` = #{scriptPath}, ]]>
+            </if>
+            <![CDATA[ `modify_time` = now() ]]>
+        </set>
+        <where>
+            `id` = #{id}
+        </where>
+    </update>
+
+
+
+    <update id="updateToTarget" parameterType="ApiServiceVo">
+        <![CDATA[UPDATE `dss_apiservice_api`]]>
+        <set>
+
+            <if test="type != null and type != ''">
+                <![CDATA[ `type` = #{type}, ]]>
+            </if>
+            <if test="runType != null and runType != ''">
+                <![CDATA[ `run_type` = #{runType}, ]]>
+            </if>
+            <if test="modifier != null and modifier != ''">
+                <![CDATA[ `modifier` = #{modifier}, ]]>
+            </if>
+            <if test="scriptPath != null and scriptPath != ''">
+                <![CDATA[ `script_path` = #{scriptPath}, ]]>
+            </if>
+            <if test="comment != null">
+                <![CDATA[ `api_comment` = #{comment}, ]]>
+            </if>
+            <![CDATA[ `modify_time` = now() ]]>
+        </set>
+        <where>
+            `id` = #{id}
+        </where>
+    </update>
+
+    <select id="query" resultMap="apiServiceMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ 1 = 1 ]]>
+            <if test="name != null and name != ''">
+                <![CDATA[AND `name` like concat('%', #{name}, '%')]]>
+            </if>
+
+            <if test="tag != null and tag != ''">
+                <![CDATA[AND `tag` like concat('%', #{tag}, '%')]]>
+            </if>
+
+            <if test="status != null">
+                <![CDATA[AND `status` = #{status} ]]>
+            </if>
+            <if test="creator != null and creator != ''">
+                <![CDATA[AND `creator` like concat('%', #{creator}, '%')]]>
+            </if>
+
+            <if test="workspaceId != null">
+                <![CDATA[AND `workspaceID` = #{workspaceId} ]]>
+            </if>
+        </where>
+    </select>
+
+
+
+    <select id="queryByWorkspaceId" resultMap="apiServiceMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ 1 = 1 ]]>
+
+
+            <if test="workspaceId != null">
+                <![CDATA[AND `workspaceID` = #{workspaceId} ]]>
+            </if>
+            <if test="userName != null and userName != ''">
+                <![CDATA[AND `creator` =#{userName}]]>
+            </if>
+
+        </where>
+    </select>
+
+    <select id="queryByScriptPath" resultMap="apiServiceMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ `script_path` = #{scriptPath} ]]>
+        </where>
+    </select>
+
+<!--    <select id="queryByScriptPathVersion" resultMap="apiServiceMap">-->
+<!--        <![CDATA[SELECT ]]>-->
+<!--        <include refid="fields_query"/>-->
+<!--        <![CDATA[ FROM `dss_apiservice_api` ]]>-->
+<!--        <where>-->
+<!--            <![CDATA[ `script_path` = #{scriptPath} ]]>-->
+<!--            and-->
+<!--            <![CDATA[ `version` = #{version} ]]>-->
+<!--        </where>-->
+<!--    </select>-->
+
+    <select id="queryByPath" resultMap="apiServiceMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ `path` = #{path} ]]>
+        </where>
+    </select>
+
+    <select id="queryCountByPath" resultType="java.lang.Integer">
+        <![CDATA[SELECT ]]>
+        count(1)
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ `script_path` != #{scriptPath} ]]>
+            and 
+            <![CDATA[ `path` = #{path} ]]>
+        </where>
+    </select>
+
+    <select id="queryCountByName" resultType="java.lang.Integer">
+        <![CDATA[SELECT ]]>
+        count(1)
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ `name` = #{name} ]]>
+        </where>
+    </select>
+    
+    <update id="enableApi">
+        <![CDATA[update `dss_apiservice_api` ]]>
+        <set>
+            <![CDATA[ `status` = 1 ]]>
+        </set>
+        <where>
+            <![CDATA[ `id` = #{id} ]]>
+        </where>
+    </update>
+
+    <update id="disableApi">
+        <![CDATA[update `dss_apiservice_api` ]]>
+        <set>
+            <![CDATA[ `status` = 0 ]]>
+        </set>
+        <where>
+            <![CDATA[ `id` = #{id} ]]>
+        </where>
+    </update>
+
+    <update id="deleteApi">
+        <![CDATA[update `dss_apiservice_api` ]]>
+        <set>
+            <![CDATA[ `status` = 2 ]]>
+        </set>
+        <where>
+            <![CDATA[ `id` = #{id} ]]>
+        </where>
+    </update>
+
+
+
+    <update id="updateApiServiceComment">
+        <![CDATA[update `dss_apiservice_api` ]]>
+        <set>
+            <![CDATA[ `api_comment` = #{comment} ]]>
+        </set>
+        <where>
+            <![CDATA[ `id` = #{id} ]]>
+        </where>
+    </update>
+
+    <select id="queryAllTags" resultType="java.lang.String">
+        select  distinct(tag)
+        from dss_apiservice_api A
+        right join  dss_apiservice_token_manager B
+        on A.id = B.api_id
+        <where>
+            <![CDATA[ (A.creator = #{userName} or B.user=#{userName}) AND `workspaceID` = #{workspaceId} ]]>
+        </where>
+    </select>
+
+
+    <select id="queryById" resultMap="apiServiceMap">
+        <![CDATA[SELECT ]]>
+        <include refid="fields_query"/>
+        <![CDATA[ FROM `dss_apiservice_api` ]]>
+        <where>
+            <![CDATA[ `id` = #{id} ]]>
+        </where>
+    </select>
+</mapper>

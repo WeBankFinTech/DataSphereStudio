@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper">
+
+    <cache flushInterval="120000"/>
+    <resultMap id="nodeGroup" type="com.webank.wedatasphere.dss.workflow.entity.NodeGroup">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="nameEn" column="name_en"/>
+        <result property="description" column="description"/>
+        <result property="order" column="order"/>
+        <collection property="nodes" ofType="com.webank.wedatasphere.dss.workflow.entity.NodeInfo">
+            <result property="id" column="n_id"/>
+            <result property="icon" column="icon"/>
+            <result property="nodeType" column="node_type"/>
+            <result property="appConnId" column="appconn_id"/>
+            <result property="submitToScheduler" column="submit_to_scheduler"/>
+            <result property="enableCopy" column="enable_copy"/>
+            <result property="shouldCreationBeforeNode" column="should_creation_before_node"/>
+            <result property="supportJump" column="support_jump"/>
+            <result property="jumpUrl" column="jump_url"/>
+            <result property="name" column="n_name"/>
+            <collection property="nodeUis" ofType="com.webank.wedatasphere.dss.workflow.entity.NodeUi">
+                <result property="id" column="u_id"/>
+                <result property="key" column="key"/>
+                <result property="description" column="u_description"/>
+                <result property="descriptionEn" column="u_description_en"/>
+                <result property="lableName" column="lable_name"/>
+                <result property="lableNameEn" column="lable_name_en"/>
+                <result property="uiType" column="ui_type"/>
+                <result property="required" column="required"/>
+                <result property="value" column="value"/>
+                <result property="defaultValue" column="default_value"/>
+                <result property="isHidden" column="is_hidden"/>
+                <result property="condition" column="condition"/>
+                <result property="isAdvanced" column="is_advanced"/>
+                <result property="order" column="u_order"/>
+                <result property="nodeMenuType" column="node_menu_type"/>
+                <result property="isBaseInfo" column="is_base_info"/>
+                <result property="position" column="position"/>
+                <collection property="nodeUiValidates" ofType="com.webank.wedatasphere.dss.workflow.entity.NodeUiValidate">
+                    <result property="id" column="uv_id"/>
+                    <result property="uiId" column="u_id"/>
+                    <result property="validateType" column="validate_type"/>
+                    <result property="validateRange" column="validate_range"/>
+                    <result property="errorMsg" column="error_msg"/>
+                    <result property="errorMsgEn" column="error_msg_en"/>
+                    <result property="trigger" column="trigger"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="listNodeGroups" resultMap="nodeGroup">
+        SELECT
+        ng.*, n.id AS 'n_id',
+        n.icon,
+        n.node_type,
+        n.appconn_id,
+        n.submit_to_scheduler,
+        n.enable_copy,
+        n.should_creation_before_node,
+        n.support_jump,
+        n.jump_url,
+        n.`name` AS 'n_name',
+        nu.id AS 'u_id',
+        nu.`key`,
+        nu.description AS 'u_description',
+        nu.description_en AS 'u_description_en',
+        nu.lable_name,
+        nu.lable_name_en,
+        nu.ui_type,
+        nu.required,
+        nu.`value`,
+        nu.default_value,
+        nu.is_hidden,
+        nu.`condition`,
+        nu.is_advanced,
+        nu.`order` AS 'u_order',
+        nu.node_menu_type,
+        nu.is_base_info,
+        nu.position,
+        nuv.id as 'uv_id',
+        nuv.validate_type,
+        nuv.validate_range,
+        nuv.error_msg,
+        nuv.error_msg_en,
+        nuv.trigger
+        FROM
+        dss_workflow_node_group ng,
+        dss_workflow_node_to_group ntg,
+        dss_workflow_node n,
+        dss_workflow_node_to_ui ntu,
+        dss_workflow_node_ui nu,
+        dss_workflow_node_ui_to_validate nutv,
+        dss_workflow_node_ui_validate nuv
+        WHERE
+        ng.id = ntg.group_id
+        AND ntg.node_id = n.id
+        AND n.id = ntu.workflow_node_id
+        AND ntu.ui_id = nu.id
+        AND ng.id
+        AND nu.id = nutv.ui_id
+        AND nutv.validate_id = nuv.id
+    </select>
+
+</mapper>

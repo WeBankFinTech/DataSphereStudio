@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.apiservice.core.dao.ApiServiceTokenManagerDao">
+    <resultMap id="tokenManagerMap" type = "com.webank.wedatasphere.dss.apiservice.core.vo.TokenManagerVo">
+        <result property="id" column="id"/>
+        <result property="apiId" column="api_id"/>
+        <result property="apiVersionId" column="api_version_id"/>
+        <result property="publisher" column="publisher"/>
+        <result property="user" column="user"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="duration" column="duration"/>
+        <result property="reason" column="reason"/>
+        <result property="ipWhitelist" column="ip_whitelist"/>
+        <result property="status" column="status"/>
+        <result property="caller" column="caller"/>
+        <result property="accessLimit" column="access_limit"/>
+        <result property="token" column="token"/>
+        <result property="applySource" column="apply_source"/>
+    </resultMap>
+
+    <sql id="fields">
+        `api_id`,`api_version_id`,`publisher`,`user`,`apply_time`,`duration`,
+        `reason`,`ip_whitelist`,`status`,`caller`,`access_limit`,`token`,`apply_source`
+    </sql>
+
+    <sql id="fields_query">
+        `id`, `api_version_id`,`api_id`,`publisher`,`user`,`apply_time`,`duration`,
+        `reason`,`ip_whitelist`,`status`,`caller`,`access_limit`,`token`,`apply_source`
+    </sql>
+
+    <sql id="fields_query_safe">
+        `id`, `api_version_id`,`api_id`,`publisher`,`user`,`apply_time`,`duration`,
+        `reason`,`ip_whitelist`,`status`,`caller`,`access_limit`,`apply_source`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.apiservice.core.vo.TokenManagerVo">
+        <![CDATA[INSERT INTO
+         `dss_apiservice_token_manager`(]]>
+        <include refid="fields"/>
+        <![CDATA[) VALUES
+            (#{apiId}, #{apiVersionId},#{publisher}, #{user}, #{applyTime},
+             #{duration}, #{reason}, #{ipWhitelist}, #{status},
+             #{caller}, #{accessLimit}, #{token}, #{applySource}
+        )]]>
+    </insert>
+
+    <!-- for bath insert token message -->
+    <insert id="insertList" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.List">
+        <![CDATA[INSERT INTO
+        `dss_apiservice_token_manager`(]]>
+        <include refid="fields"/>
+        <![CDATA[) VALUES]]>
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.apiId},#{item.apiVersionId}, #{item.publisher}, #{item.user}, #{item.applyTime},
+            #{item.duration}, #{item.reason}, #{item.ipWhitelist}, #{item.status},
+            #{item.caller}, #{item.accessLimit}, #{item.token}, #{item.applySource})
+        </foreach>
+    </insert>
+
+
+    <select id="query" parameterType="TokenQuery" resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query_safe"/>
+        <![CDATA[FROM
+               `dss_apiservice_token_manager`
+         ]]>
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <![CDATA[ `publisher` = #{creator} ]]>
+            <if test="apiId != null and apiId != ''">
+                <![CDATA[AND `api_id` = #{apiId}]]>
+            </if>
+
+            <if test="user != null and user != ''">
+                <![CDATA[AND `user` = #{user}]]>
+            </if>
+
+            <if test="status != null">
+                <![CDATA[AND `status` = #{status}]]>
+            </if>
+
+            <if test="startDate != null and endDate != null">
+                <![CDATA[AND `apply_time` >= #{startDate} AND `apply_time` <= #{endDate}
+            ]]>
+            </if>
+        </trim>
+    </select>
+
+    <!--
+        SELECT *
+        FROM `dss_apiservice_token_manager`
+        WHERE (`api_id`, `user`, `apply_time`) in
+            (select `api_id`, `user`, MAX(`apply_time`)
+            FROM `dss_apiservice_token_manager`
+            where `user` = 'a'
+            GROUP BY `api_id`, `user`);
+    -->
+    <select id="queryByApplyUser" parameterType="String" resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE (`api_id`, `user`, `apply_time`) IN
+            (SELECT `api_id`, `user`, MAX(`apply_time`)
+             FROM `dss_apiservice_token_manager`
+             WHERE `user` = #{userName}
+             GROUP BY `api_id`, `user`);
+        ]]>
+    </select>
+
+    <select id="queryByApplyUserAndServiceId"  resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE (`api_id`, `user`, `apply_time`) IN
+            (SELECT `api_id`, `user`, MAX(`apply_time`)
+             FROM `dss_apiservice_token_manager`
+             WHERE `user` = #{userName} and `api_id` = #{serviceId}
+             GROUP BY `api_id`, `user`);
+        ]]>
+    </select>
+
+
+    <select id="queryByApplyUserAndVersionId"  resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE  `user` =#{userName} and `api_version_id` =#{apiVersionId}
+        ]]>
+    </select>
+
+    <!--  query token avoid submit again -->
+    <!--    SELECT IFNULL((SELECT 1 FROM `dss_apiservice_token_manager` WHERE `token`=#{token} LIMIT 1), 0)-->
+    <select id="queryApprovalNo" resultType="int">
+        <![CDATA[SELECT IFNULL(
+            (SELECT 1
+             FROM `dss_apiservice_token_manager`]]>
+        <where>
+            <if test="approvalNo != null">
+                <![CDATA[AND `apply_source` = #{approvalNo}]]>
+            </if>
+        </where>
+        <![CDATA[LIMIT 1), 0)]]>
+    </select>
+
+    <select id="queryTokenById" parameterType="Long" resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <!--            id, api_id, user, apply_time, duration, reason, ip_whitelist, status, caller, access_limit, token, apply_source-->
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE
+            id = #{id}
+        ]]>
+    </select>
+
+    <select id="queryTokenByApiServiceId" parameterType="Long" resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <!--            id, api_id, user, apply_time, duration, reason, ip_whitelist, status, caller, access_limit, token, apply_source-->
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE
+            api_id = #{api_id}
+        ]]>
+    </select>
+
+    <select id="queryTokenByStatus" parameterType="Integer" resultMap="tokenManagerMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        <![CDATA[FROM
+            `dss_apiservice_token_manager`
+        WHERE
+            `status` = #{status}
+        ]]>
+    </select>
+
+
+    <update id="enableTokenStatus">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 1
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="disableTokenStatus">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 0
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="disableTokenStatusByVersionId">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 0
+        WHERE `api_version_id` = #{apiVersionId}
+    </update>
+
+
+    <update id="enableTokenStatusByVersionId">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 1
+        WHERE `api_version_id` = #{apiVersionId}
+    </update>
+
+
+
+
+    <update id="disableTokenStatusByApiId">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 0
+        WHERE `api_id` = #{apiId}
+    </update>
+
+
+    <update id="enableTokenStatusByApiId">
+        UPDATE `dss_apiservice_token_manager`
+        SET `status` = 1
+        WHERE `api_id` = #{apiId}
+    </update>
+
+    <delete id="deleteTokenById" parameterType="Long">
+        DELETE FROM
+        `dss_apiservice_token_manager`
+        WHERE
+        id = #{id}
+    </delete>
+
+</mapper>

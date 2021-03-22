@@ -1,0 +1,810 @@
+{
+    "message": {
+      "scripts": {
+        "emptyText": "No data yet",
+        "publishing": "Publishing",
+        "tagPlaceholder": "tag，click enter add",
+        "script": "Script",
+        "ok": "OK",
+        "editor": "Edit",
+        "failedNotice": "Invalid items found, please check and then retry!",
+        "cancel": "Cancel",
+        "notSave": "Cannot save on read-only status!",
+        "saveSuccess": "Successfully saved!",
+        "saveErr": "Save failed!",
+        "createdTitle": "Table creation guide",
+        "saveToWidget": "Save widget to solution",
+        "contextMenu": {
+          "openToTab": "Open as a tab",
+          "copyPath": "Copy path",
+          "addCatalog": "New directory",
+          "addScript": "New script",
+          "importToHive": "Import to Hive",
+          "importToHdfs": "Import to HDFS",
+          "copyscript": "Copy script",
+          "stickscript": "Stick script"
+        },
+        "warning": {
+          "getRootPath": "Failed to request Workspace root directory, please refresh to retry!",
+          "scriptChanged": "Script already updated, please save and retry!",
+          "empty": "Empty script content!"
+        },
+        "error": {
+            "fileExists": "Duplicated file!"
+        },
+        "boyondQuota": {
+          "title": "Warning",
+          "desc": "'You have open 20 scripts(over maximun limit), please close some other scripts!'"
+        },
+        "createTable": {
+          "action": "Action",
+          "delete": "Del",
+          "baseAttr": "Table basic attributes",
+          "add": "New",
+          "partitionAttr": "Partition attributes",
+          "selectResource": "Please choose the original field",
+          "next": "Next",
+          "nameNotice": "Only Chinese characters, alphanumeric characters and underscore are allowed",
+          "zm": "alphabetic characters",
+          "daName": "Database name",
+          "tableName": "Table name",
+          "tablePlaceholder": "Starts with alphabetic characters; Only alphanumeric characters and underscore are allowed",
+          "tableOtherName": "Table alias name",
+          "aliasPlaceholder": "Only Chinese characters, alphanumeric characters and underscore are allowed",
+          "use": "Usage",
+          "emptyPlaceholder": "Only Chinese characters, alphanumeric characters and underscore are allowed(Can be empty)",
+          "product": "Product",
+          "project": "Project",
+          "tableDesc": "Table description",
+          "selectDbName": "Please choose database name",
+          "inputTableName": "Please enter table name",
+          "inputOtherName": "Please enter alias name",
+          "letter": "Alphabetic characters",
+          "moduleAttr": "Table model attributes",
+          "partitionType": "Partition type",
+          "partition": "Partition",
+          "unartition": "Not Partition",
+          "lifecycle": "Lifecycle",
+          "forever": "Forever",
+          "day": "Valid for a day",
+          "week": "Valid for a week",
+          "moon": "Valid for a month",
+          "midYear": "Valid for half a year",
+          "moduleRank": "Model layer",
+          "resource": "Original data layer",
+          "detailLevel": "Detailed data layer",
+          "sumData": "Summarized data layer",
+          "appData": "Application data layer",
+          "actionType": "Usage method",
+          "noeWrite": "Write Once Read Many",
+          "ZSGC": "CRUD",
+          "FG": "Multi-overwrite",
+          "OED": "Write Once Read Occasionally",
+          "isUse": "Is used externally",
+          "isDwsExeis": "Need to be used in systems outside DsS",
+          "selectPartitionType": "Please choose partition type",
+          "selectLife": "Please choose lifecycle",
+          "selectModuleLevel": "Please choose model layer",
+          "selectUseType": "Please choose usage method",
+          "selectIsUse": "Please choose whether to be used externally",
+          "canned": "Duplicated table, please enter other table names",
+          "type": "Type",
+          "selectType": "Please choose type",
+          "path": "Path",
+          "FGF": "Separator",
+          "BMGS": "Encoding format",
+          "XZBMGS": "Please choose encoding format",
+          "XDF": "Limited qualifier",
+          "WXDF": "Unlimited qualifier",
+          "HXWBT": "Use the first line as table header",
+          "HQBZDSJ": "Request table column data",
+          "XZWJLJ": "Please choose file path",
+          "GXMLDR": "Import from shared directory",
+          "DR": "Import",
+          "DH": "Comma",
+          "FH": "Semicolon",
+          "ZBF": "Tab",
+          "KG": "Space",
+          "SYH": "Double quote",
+          "DYH": "Single quote(\"\")",
+          "GLWJ": "Filter directory",
+          "LYSX": "Source attribute",
+          "MBZD": "Target column and source column",
+          "XZK": "Choose database",
+          "XZB": "Choose table",
+          "SJSXLY": "Data attribute source",
+          "DRFS": "Import method",
+          "XJ": "New",
+          "FHSYB": "Back to Previous",
+          "SCDDL": "Generate DDL statement",
+          "JB": "Create table",
+          "DDLYJ": "DDL Statement",
+          "FZZT": "Copy to clipboard",
+          "DDLYFZ": "DDL statement has been copied to clipboard!",
+          "fieldsName": "Column name",
+          "isPrimary": "Primary key",
+          "fieldsType": "Column type",
+          "length": "Length/Settings",
+          "fieldsAlias": "Column alias name",
+          "alias": "Alias name",
+          "sourceFields": "Source column",
+          "rule": "Column rule",
+          "express": "Column expression",
+          "comment": "Comments",
+          "partitionValue": "Partition value",
+          "partitionAlias": "Partition alias",
+          "fieldsNameRequire": "Column name cannot be empty",
+          "fieldsNameRule": "Only alphanumeric characters and underscore are allowed"
+        },
+        "tableDetails": {
+          "BZBSX": "Table basic attributes",
+          "BZDXX": "Table column information",
+          "BTJXX": "Table statistical information",
+          "DBN": "Database name",
+          "TN": "Table namee",
+          "BBM": "Table alias name",
+          "FQM": "Partitioned table",
+          "CJYH": "Created By",
+          "CJSI": "Created At",
+          "ZHFWSJ": "Last Accessed At",
+          "BMS": "Table description",
+          "BMXSX": "Table model attributes",
+          "SMZQ": "Lifecycle",
+          "MXCJ": "Model layer",
+          "SYFS": "Usage mothod",
+          "WBSFSY": "Is used externally",
+          "BYYSX": "Table usage attributes",
+          "SXCP": "Product",
+          "SSXM": "Project",
+          "YT": "Usage",
+          "SSZDMC": "Search for column name...",
+          "XH": "Index",
+          "ZDM": "Column name",
+          "ZDLX": "Column type",
+          "BM": "Alias",
+          "SFZJ": "Is primary key",
+          "SFFQ": "Is partition",
+          "ZDGZ": "Column rules",
+          "MS": "Description",
+          "FQXX": "Partition information",
+          "DJFQCK": "Please click the root partition to view size information",
+          "WFQSJ": "No data of table partitions",
+          "BXX": "Table information",
+          "BZD": "Number of columns",
+          "BDX": "Table size",
+          "WJM": "Number of files",
+          "FQS": "Number of partitions",
+          "DX": "size",
+          "FQDX": "Partition size:",
+          "WJS": "Number of files:",
+          "YES": "Yes",
+          "GSHJX": "Formatted to",
+          "ZJXYGE": "The format required by the component"
+        },
+        "logView": {
+          "taskId": "Task ID：",
+          "search": "Search",
+          "filter": "Filter",
+          "error": "Error",
+          "inputTaskId": "Please enter a valid task ID!"
+        },
+        "functionSetting": {
+          "HSM": "Function name",
+          "HSLX": "Funtion type",
+          "TY": "Common",
+          "ZDYHS": "Self-defined funtions",
+          "B": "Package",
+          "JBLU": "Script path",
+          "ZCGS": "Register format",
+          "ZCHS": "Register function",
+          "FHLX": "Return type",
+          "CSLX": "Parameter type",
+          "YLLX": "Preview",
+          "SYGS": "Using format",
+          "SRLX": "Input type",
+          "HSMS": "Funtion description",
+          "MRJZ": "Loaded by default",
+          "XZHS": "New function",
+          "LJCJ": "Create",
+          "QSRMC": "Please enter the name",
+          "CDZ": "Length should be between 1 to 100 characters",
+          "BXYZMKT": "Must starts with alphabetic characters, followed by only alphanumeric, underscore and Chinese characters",
+          "QZSXZYZLX": "Please choose at least one type",
+          "QSRWZLJ": "Please enter the complete path",
+          "KHDBJZPP": "Brackets indicate precise matching",
+          "HZMZC": "Only jar is allowed as the suffix. Only alphanumeric characters and underscore is allowed for the name of jar package!",
+          "ZCPYSCA": "Only py and scala are allowed as the suffix!",
+          "BHJZCYW": "Only alphabetic characters are allowed as the package name",
+          "XHX": "Underscore",
+          "SRZCHS": "Please enter function registration",
+          "SRFHLX": "Please enter the return type",
+          "SRCSLX": "Please enter the parameter type",
+          "XGHS": "Update funtion",
+          "XG": "Update"
+        },
+        "functionShare": {
+          "ZZGX": "Sharing function {name} in progress",
+          "HSLX": "Funtion type",
+          "GXYH": "Shared users",
+          "SRGXYH": "Please enter the users to be shared, separated by comma",
+          "XZGXHSLX": "Please choose a type for this shared function!",
+          "ZSXZYWGXYH": "Please enter at least one user needed to be shared with!"
+        },
+        "uploadDialog": {
+          "SCJBWJ": "Upload script file",
+          "TWJDSQ": "Drag file here, or <em>click to upload</em> ",
+          "PATH": "Path:",
+          "QKLB": "Clear list",
+          "LIMIT2M": "Script file to upload cannot exceed 2MB!",
+          "LIMIT100M": "Script file to upload cannot exceed 100MB!",
+          "ZDSC": "This operation will interrupt file uploading, continue or not? ",
+          "TS": "Notice",
+          "ZJGB": "Close directly",
+          "QX": "Cancel",
+          "QXBBSCCK": "Close uploading window",
+          "SCCG": "Successfully uploaded file {name}!",
+          "WJDXCCXE": "File size exceeds limit",
+          "WJYCZ": "Duplicated file, please choose another file or directory!",
+          "WJMBHF": "Invalid file name, only alphanumeric characters, Chinese characters and underscore is allowed with suffix!",
+          "SCZQK": "Uploading file in progress, cannot clear upload list!"
+        },
+        "importToHive": {
+          "MC": "Name",
+          "ZDMC": "Column name cannot be empty",
+          "JZCZM": "Only alphanumeric characters and underscore are allowed",
+          "QSRZDM": "Please enter column name",
+          "LX": "Type",
+          "GS": "Format",
+          "QXZGS": "Please choose date format",
+          "CD": "Length",
+          "JD": "Accuracy",
+          "XSW": "Decimal scale",
+          "SRZDZS": "Please enter column comments",
+          "DRWJ": "Import file",
+          "BZONE": "Step 1",
+          "BZTOW": "Step 2",
+          "WJDR": "Import data from file",
+          "DRZMRB": "Import to the default table",
+          "LY": "Source",
+          "QXZLX": "Please choose type",
+          "LJ": "Path",
+          "GSH": "Format",
+          "FGF": "Separator",
+          "BMGS": "Encoding format",
+          "QXZBMGS": "Please choose encoding format",
+          "XDF": "Qualifier",
+          "WXDF": "No qualifier",
+          "SHWBT": "Treat the first line as header",
+          "SJK": "Database name",
+          "QSRKM": "Please enter database name",
+          "SJB": "Table name",
+          "SRSJBM": "Please enter table name",
+          "FQ": "Partition",
+          "FX": "Overwrite",
+          "XZFQ": "New partition",
+          "SHEETB": "sheet table",
+          "ZG": "Column",
+          "XYB": "Next step",
+          "SYB": "Previous step",
+          "TJ": "Submit",
+          "LXWCHAR": "Column with type char or varchar should have length as an integer greater than 0",
+          "ZDJDSRYW": "Column with type decimal has invalid accuracy",
+          "ZDXSWYDY": "Column with type decimal should have scale as an integer greater than 0",
+          "ZDZSZCZW": "Only Chinese characters, alphabetic characters and underscore are allowed in column comments, with length not greater than 100 characters",
+          "SJKMBNWK": "Database name cannot be empty",
+          "BMBNWK": "Table name cannot be empty",
+          "BMJZCZMKT": "Table names should start with alphabetic characters, followed by alphabetic characters and underscore, length between 0 to 100 characters",
+          "FQMBNWK": "Partition name cannot be empty",
+          "FQMZCSZ": "Only alphanumeric characters and - are allowed in partition names",
+          "FQZBNWK": "Partition value cannot be empty",
+          "FQZZZCSZ": "Only numbers are allowed as partition values",
+          "GXMLDR": "Import from shared directory",
+          "HDFSDR": "Import from HDFS",
+          "DH": "Comma(,)",
+          "FH": "Semicolon(;)",
+          "ZBF": "Tab(\\t)",
+          "KG": "Space",
+          "SYH": "Double quote",
+          "DYH": "Single quote",
+          "WJZZZXDR": "Importing file in progress, please retry later",
+          "FQZCF": "Duplicated partition values, please confirm whether to overwrite",
+          "TSWST": "Notice: Cannot handle view tables, please choose other tables to import",
+          "WFCZSTB": "Cannot handle view tables",
+          "QXZQTBDR": "Please choose other tables to import",
+          "BMYCZDQSJK": "Table name already exists in this database",
+          "ZBZCDJFQ": "Multi-level partitions are not supported yet, please choose other tables",
+          "QQURFQ": "Please confirm the partition",
+          "HQFQSB": "Failed to request partition information",
+          "ZQDRWJLJ": "Please choose the path correctly",
+          "QQRSJKMCXX": "Please confirm the database name",
+          "QQRSFCF": "Please confirm whether to overwrite"
+        },
+        "hiveTableExport": {
+          "DCB": "Export form table",
+          "SZDCCS": "Step 1: Set export parameters",
+          "SZDCLJ": "Step 2: Set export path",
+          "SJKM": "Database name",
+          "QSRKM": "Please enter the database name",
+          "SJBM": "Table name",
+          "ZDXX": "Column information",
+          "FQXX": "Partition information",
+          "DCGS": "Export format",
+          "FGF": "Separator",
+          "BMGS": "Encoding format",
+          "XZBMGS": "Please choose the encoding format",
+          "KZTH": "Null value place holder",
+          "SXWBT": "Treat the first line as header",
+          "LX": "Type",
+          "QXZLX": "Please choose the type",
+          "DCZ": "Export to",
+          "WJM": "File name",
+          "TRDCWJMC": "Please enter the name of the file to be exported",
+          "FXMS": "Overwrite mode",
+          "ZJ": "Append",
+          "FX": "Overwrite",
+          "BM": "sheet table name",
+          "QSR": "Please enter",
+          "XYB": "Next step",
+          "SYB": "Previous step",
+          "TJ": "Submit",
+          "WFCZST": "Cannot handle view tables, please choose other tables to export",
+          "ZBZCDBDC": "Tables with multiple partitions are not supported yet, please choose other tables to export",
+          "GXML": "Shared directory",
+          "DH": "Comma(,)",
+          "FH": "Semicolon(;)",
+          "ZBF": "Tab(\\t)",
+          "KG": "Space",
+          "KZFC": "Empty string",
+          "XZSJK": "Please choose database",
+          "XZB": "Please choose table",
+          "XZFGF": "Please choose separator",
+          "XZYGFQBDC": "Please choose a partitioned table to export",
+          "ZSXZYGZD": "Please choose at least one column",
+          "XZDCGS": "Please choose export format",
+          "XZXYJKZTHDZ": "Please choose the Null value place holder",
+          "XZDCLJDLX": "Please choose the type of export path",
+          "XZDCLJ": "Please choose export path",
+          "DRDCDWJ": "Please enter the name of the file to be exported",
+          "CDZ": "Length should be between 3 to 100 characters",
+          "WJMZZCZW": "Only Chinese characters, alphanumeric characters and underscore are allowed",
+          "CBDC": "Exporting table in progress, please hold on or try other tables",
+          "QSHZSS": "Please hold on or try other tables",
+          "XZFQ": "Please choose partition",
+          "BDXCG": "The size of this table is greater than 5GB, please choose other methods to export or choose other tables"
+        },
+        "hiveTableDesc": {
+          "searchName": "Search by column name...",
+          "tableDetail": "Table details",
+          "noData": "No data for table partition information yet",
+          "tableColumns": "Table columns",
+          "columnsName": "Column name",
+          "columnsType": "Column type",
+          "tablePartitions": "Table partitions表分区",
+          "dbName": "Database name",
+          "tableName": "Table name",
+          "createUser": "Created By",
+          "createTtime": "Created At",
+          "lastTime": "Last accessed",
+          "tableSize": "Table size",
+          "size": "Size"
+        },
+        "deleteType": {
+          "function": "Function",
+          "folder": "Directory",
+          "file": "File",
+          "common": "Common",
+          "catalog": "Directory",
+          "script": "Script file",
+          "engine": "Engine",
+          "task": "Task",
+          "engineAndTask": "Engine and task"
+        },
+        "constants": {
+          "add": "New",
+          "cancel": "Cancel",
+          "confirm": "Confirm",
+          "changeLanguage": "Switch language",
+          "detail": "Details",
+          "description": "Description",
+          "delete": "Delete",
+          "download": "Download",
+          "edit": "Edit",
+          "export": "Export",
+          "fail": "Fail",
+          "noDataText": "No data yet",
+          "node": "Node",
+          "refresh": "Refresh",
+          "rename": "Rename",
+          "reset": "Reset",
+          "remove": "Remove",
+          "submit": "Submit",
+          "search": "Search",
+          "save": "Save",
+          "upload": "Upload",
+          "update": "Update",
+          "warning": {
+            "api": "Requesting API, please hold on!",
+            "data": "Requesting data, please hold on!",
+            "waiting": "Please wait for API response!",
+            "biLoading": "Connecting with Visualis, please hold on!",
+            "comingSoon": "New version is being integrated, so stay tuned !",
+            "GJZ": "Open source co-construction is in progress, so stay tuned!"
+          },
+          "success": {
+            "delete": "Successfully deleted!",
+            "update": "Successfully updated!",
+            "add": "Successfully created!",
+            "save": "Successfully saved",
+            "stick": "Sticking success",
+            "prohibit": "Prohibit copying this type"
+          },
+          "error": {
+            "refresh": "Error on refreshing, please retry!",
+            "fileExists": "Duplicated file",
+            "folderExists": "Duplicated directory",
+            "functionExists": "Duplicated function"
+          },
+          "logPanelList": {
+            "fullScreen": "Full Screen",
+            "releaseFullScreen": "Restore",
+            "min": "Minimize",
+            "releaseMin": "Restore"
+          },
+          "time": {
+            "second": "Second",
+            "minute": "Minute",
+            "hour": "Hour",
+            "day": "Day"
+          }
+        },
+        "navList": {
+          "dataStudio": "Data development",
+          "workSpace": "Workspace",
+          "database": "Database",
+          "udfFunction": "UDF",
+          "methodFunction": "Method",
+          "hdfs": "HDFS"
+        },
+        "newDialog": {
+          "catalog": "Directory",
+          "scriptName": "Name",
+          "catalogName": "Name",
+          "targetScriptPath": "Creation target path",
+          "placeholder": "Please enter directory name",
+          "required": "Please enter directory name",
+          "rules": {
+            "scriptName": {
+              "required": "Please enter script name",
+              "lengthLimit": "Length should be between 1 to 200 characters",
+              "letterTypeLimit": "Only Chinese characters, alphanumeric characters and underscore are allowed"
+            },
+            "catalogName": {
+              "required": "Please enter directory name",
+              "lengthLimit": "Length should be between 1 to 200 characters",
+              "letterTypeLimit": " Only Chinese characters, alphanumeric characters and underscore are allowed"
+            },
+            "targetScriptPath": {
+              "required": "Please choose target script path"
+            }
+          },
+          "nodeType": "Node type",
+          "scriptType": "Script type",
+          "targetFolder": "Target directory"
+        },
+        "database": {
+          "contextMenu": {
+            "db": {
+              "copyName": "Copy database name",
+              "pasteName": "Copy database name & paste to script",
+              "listSort": "Sort by time",
+              "liststringSort": "Sort by first character"
+            },
+            "tb": {
+              "queryTable": "Query table",
+              "deleteTable": "Drop table",
+              "viewTable": "View table structure",
+              "exportTable": "Export table",
+              "copyName": "Copy table name",
+              "pasteName": "Copy table name & paste to script",
+              "copyAllColumns": "Copy all the columns of table"
+            },
+            "field": {
+              "copyColumnsName": "Copy column name",
+              "pasteName": "Copy column name & paste to script"
+            }
+          },
+          "partitionsTitle": "Partition size",
+          "notPosition": "Failed to locate last operation, please use refresh after right-click"
+        },
+        "fnSideBar": {
+          "contextMenu": {
+            "isOwn": {
+              "addFunction": "New function",
+              "addFolder": "New directory",
+              "share": "Share"
+            },
+            "isLeaf": {
+              "copyName": "Copy function name",
+              "pasteName": "Copy function name & paste to script"
+            },
+            "isOwnAndLeaf": {
+              "updateToExpired": "Set as expired",
+              "viewSharedUsers": "View shared users"
+            }
+          },
+          "warning": {
+            "folderNameExists": "Duplicated directory name",
+            "functionNameExists": "Duplicated function name",
+            "functionShared": "This function has been shared, please set it as expired before deletion!",
+            "noEmpty": "Please manually clear sub directories/functions and then retry!"
+          },
+          "success": {
+            "load": "Successfully loaded UDF!",
+            "cancelLoading": "Canceled loading UDF!",
+            "addUdf": "Successfully created UDF!",
+            "addFolder": "Successfully created new directory!",
+            "shareFunction": "Successfully shared function",
+            "updateShareUser": "Successfully updated shared users!",
+            "functionExpired": "Successfully set function as expired, please view it in Shared Functions!"
+          },
+          "confirm": {
+            "title": "Notice",
+            "content": "<p>This operation will affect all the shared users, continue or not?</p>"
+          }
+        },
+        "hdfs": {
+          "contextMenu": {
+            "openToTab": "Open as a tab",
+            "copyPath": "Copy path",
+            "addCatalog": "New directory",
+            "importToHive": "Export to Hive",
+            "exportToWorkSpace": "Export to Workspace"
+          },
+          "dialogTitle": {
+            "exportToWorkSpace": "Export to Workspace"
+          },
+          "warning": {
+            "noRootPath": "Failed to request HDFS root directory, please refresh to retry!"
+          }
+        },
+        "container": {
+          "title": {
+            "editorName": "Editor"
+          },
+          "closeDropDown": {
+            "others": "Close Others",
+            "all": "Close All",
+            "left": "Close Left",
+            "right": "Close Right"
+          },
+          "closeHint": "Close Hint",
+          "footer": {
+            "cancel": "Cancel",
+            "close": "Close",
+            "save": "Save",
+            "saveAs": "Save As"
+          },
+          "tips": "What is Scriptis？\nScriptis is a one-stop interactive data analysis & exploration tool built by WeDataSphere at Webank. Using Linkis as its kernel, Scriptis provides functionalities including multiple computation engines(Spark, Hive, TiSpark...), Hive database management, resource management(such as Yarn resource and server resource), application management and user resource management(such as UDF and variables). \nScriptis？\n1. Select a directory in workspace, and create a sub directory; \n2. Right-click a directory => Create script; \n3. Select script type, for example: SQL, Pyspark, HQL, etc... \n4. Edit script, click & run, wait for result sets.",
+          "warning": {
+            "noDBInfo": "Failed to request database/table information, word association in script may not be working well! Please refresh to retry!",
+            "noUDF": "Failed to request UDF and Method information, word association in script may not be working well! Please refresh to retry!",
+            "noSelectedScript": "No script selected, please select one first and retry!"
+          },
+          "notice": {
+            "developerWarning": {
+              "title": "Warning",
+              "desc": "Warning from developers: Requesing add API must pass id and filename as parameters!"
+            },
+            "unSupport": {
+              "title": "Warning",
+              "desc": "Sorry, the system does not support this file format!"
+            }
+          },
+          "removeWork": {
+            "normal": "This script has been updated, save or not?",
+            "readOnly": "This read-only script has been updated, save it as another file to workspace or not? ",
+            "temporary": "This temporary script has been updated, save it as another file or not?"
+          }
+        },
+        "editorDetail": {
+          "navBar": {
+            "undo": "Undo",
+            "redo": "Redo",
+            "play": "Run",
+            "stop": "Stop",
+            "save": "Save",
+            "config": "Configuration"
+          },
+          "warning": {
+            "running": "Script execution in progress, please hold on!",
+            "invalidArgs": "Please check the correctness of the input of configuration parameters!",
+            "emptyCode": "Cannot execute empty script!"
+          }
+        },
+        "history": {
+          "columns": {
+            "taskID": {
+              "title": "Task ID"
+            },
+            "runningTime": {
+              "title": "Execution Time"
+            },
+            "createDate": {
+              "title": "Executed At"
+            },
+            "status": {
+              "title": "Status",
+              "status": {
+                "succeed": "Succeeded",
+                "running": "Running",
+                "timeout": "Timeout",
+                "inited": "Waiting",
+                "scheduled": "Applying Resources",
+                "failed": "Failed",
+                "cancel": "Canceled"
+              }
+            },
+            "data": {
+              "title": "Code"
+            },
+            "failedReason": {
+              "title": "Key information"
+            },
+            "control": {
+              "title": "Handle",
+              "view": "View",
+              "download": "Download log"
+            }
+          },
+          "success": {
+            "open": "Successfully open",
+            "download": "Successfully downloaded, please check from local download directory!"
+          }
+        },
+        "saveAs": {
+          "header": "Save as script",
+          "formItems": {
+            "fileName": {
+              "label": "File name"
+            },
+            "selectedPath": {
+              "label": "Choose path"
+            }
+          },
+          "rules": {
+            "fileName": {
+              "required": "Please enter the file name",
+              "lengthLimit": "Length between 1 to 200 characters",
+              "letterTypeLimit": "Only Chinese characters, alphanumeric characters and underscore are allowed"
+            },
+            "selectedPath": {
+              "required": "Please choose a directory"
+            }
+          },
+          "warning": {
+            "invalid": "Please check the items failed to pass validations!"
+          },
+          "success": {
+            "saveScript": "Successfully saved as script, please refresh directory tree manually!"
+          }
+        },
+        "tabs": {
+          "progress": "Progress",
+          "result": "Execution Result",
+          "log": "Execution Log",
+          "history": "History",
+          "diagnosis": "Intelligent Diagnosis"
+        },
+        "notice": {
+          "unsave": {
+            "title": "Notice",
+            "desc": "Your temporary script has been updated, please mind to save!"
+          },
+          "sendStart": {
+            "title": "Execution Notice",
+            "render": "Start to execute the script"
+          },
+          "querySuccess": {
+            "title": "Execution result notice",
+            "render": "Successfully executed script, time elapsed:"
+          },
+          "notice": {
+            "title": "Execution Result Notice"
+          },
+          "kill": {
+            "title": "Execution Notice",
+            "desc": "Stopped executing this script"
+          }
+        },
+        "confirmModal": {
+          "title": "Save as",
+          "content": "<p>This temporary has been updated!</p><p>Save it or not?</p>",
+          "okText": "Save As",
+          "cancelText": "Cancel"
+        },
+        "setting": {
+          "header": "Settings",
+          "customVariable": {
+            "title": "Customized Variables"
+          },
+          "envVariable": {
+            "title": "Environment Variables"
+          },
+          "runTimeArgs": {
+            "settingTitle": "Command line Arguments",
+            "placeholder": "Please use space to separate multiple arguments"
+          }
+        },
+        "apiPublish": {
+          "title": "PublishAPI",
+          "button": {
+            "addApi": "API Add",
+            "updateApi": "API Update"
+          },
+          "addApiModal": {
+            "modalTitle": "Add API",
+            "contentTitle": "Base Info",
+            "paramConfirmTitle": "Params Confirm",
+            "apiName": "API Name",
+            "apiPath": "API Path",
+            "protocol": "Protocol",
+            "requestType": "Request Type",
+            "tag": "Tag",
+            "visible": "Visible",
+            "describe": "Describe",
+            "nextStep": "Next",
+            "back": "Back",
+            "cancel": "Cancel",
+            "approvalName": "Approval Name",
+            "applyUser": "Apply User",
+            "proxyUser": "Proxy User",
+            "confirm": "Confirm",
+            "comment": "Comment"
+          },
+          "updateApiModal": {
+            "modalTitle": "Update API",
+            "apiVersionUpgrade": "New Version",
+            "paramConfirm": "Please confirm param"
+          },
+          "paramTable": {
+            "paramName": "Param Name",
+            "paramType": "Param Type",
+            "require": {
+                "title": "Require",
+                "yes": "Yes",
+                "no": "No",
+                "hide": "Hide"
+            },
+            "defaultValue": "Default Value",
+            "displayName": "Display Name",
+            "describe": "Describe"
+          },
+          "rule": {
+            "nameRule": "Please input api name!",
+            "pathRule": "Please input api path!",
+            "pathRegRule": "Api path illegal!",
+            "requestTypeRule": "Please select request type!",
+            "protocolRule": "Please select protocol!",
+            "valueRule": "Started with alphabetic characters, only alphanumeric and underscore are allowed!",
+            "contentLengthLimit": "Length limit 155",
+            "contentLengthLimit50": "Length limit 50",
+            "contentLengthLimitTwo": "Length limit 200",
+            "pathRepeat": "Api path exists",
+            "nameRepeat": "Api name exists",
+            "chineseCheck": "Chainese only",
+            "chineseName": "Chinese name of API"
+          },
+          "visible": {
+            "workspace": "Workspace",
+            "personal": "Personal",
+            "public": "Public",
+            "grantView": "Grant View"
+          },
+          "notice": {
+            "publishSuccess": "Publish Success"
+          },
+          "tagPlaceholder": "tag，click enter add"
+        }
+      }
+    }
+  }

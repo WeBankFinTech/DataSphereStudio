@@ -1,0 +1,66 @@
+    @import '@/common/style/variables.scss';
+    .page {
+        background-color: #f7f7f7;
+        background: #fff;
+        .page-header {
+            padding: 10px 50px 0;
+        }
+        .header-info {
+            padding: 10px 0 10px 20px;
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+        .search-wrap {
+            display: flex;
+            margin-top: 15px;
+            .add-button {
+                height: 32px;
+            }
+            .search-input {
+                width: 300px;
+            }
+        }
+        .page-content {
+            margin: 20px 50px 0px;
+            .card-title {
+                display: flex;
+                justify-content: space-between;
+                .drop-bar {
+                    flex-basis: 65px;
+                }
+
+            }
+            .menu {
+                display: flex;
+                flex-wrap: wrap;
+                flex: 1;
+
+                .menu-item {
+                    padding: 0px 10px;
+                    margin-bottom: 10px;
+                    border-right: 1px solid $btn-disable-color;
+                    cursor: pointer;
+                    &:nth-last-child(1) {
+                        border-right: none;
+                    }
+                }
+                // &:hover {
+                //     color: $text-blue;
+                // }
+                .menuActive {
+                    color: $text-blue;
+                }
+            }
+            .show-type {
+                color: $text-blue;
+                // margin-right: 50px;
+            }
+            .card-content {
+                margin-top: 50px;
+                .cardItem {
+                    margin-right: 20px;
+                }
+            }
+        }
+    }

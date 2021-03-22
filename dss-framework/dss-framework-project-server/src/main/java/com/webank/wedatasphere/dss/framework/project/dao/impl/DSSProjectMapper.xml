@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper">
+    <sql id="project_main">
+        id,`name`,`source`, `workspace_id`,`description`,`org_id`,`visibility`,`is_transfer`,`initial_org_id`,
+        `username`,`create_time`,`create_by`,`product`,`application_area`,`business`
+        , `user_id`, `create_by_str`, `update_by_str`
+    </sql>
+
+    <insert id="addProject" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.framework.project.entity.po.DSSProjectPo">
+        INSERT INTO dss_project (<include refid="project_main"/>)
+        VALUES
+        (#{id},#{name},#{source}, #{workspaceId}, #{description},#{orgID},#{visibility},#{isTransfer},#{initialOrgID},
+        #{username},#{createTime},#{createBy},#{product},#{applicationArea},#{business},
+        #{userID},#{createByStr},#{updateByStr})
+    </insert>
+
+    <select id="getListByParam"
+            parameterType="com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest"
+            resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo">
+        SELECT * FROM (SELECT b.application_area applicationArea,b.id,b.business,b.create_by
+        createBy,b.description,b.name,
+        b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
+        b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
+        b.visible visible,
+        GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
+        FROM dss_project_user a
+        LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
+        WHERE b.workspace_id = #{workspaceId} AND a.priv >=1
+        <if test="id!=null">
+            AND b.id = #{id}
+        </if>
+        GROUP BY b.id ) c where c.pusername like concat('%',#{username},'%') order by updateTime desc
+    </select>
+
+    <select id="getProjectInfoById" resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo">
+        SELECT a.id,a.workspace_id workspaceId,a.name projectName,b.name workspaceName
+        FROM dss_project a LEFT JOIN dss_workspace b ON a.workspace_id = b.id
+        WHERE a.id = #{id} and a.name is not null and b.name is not null
+    </select>
+
+    <insert id = "saveProjectRelation" parameterType="java.util.List">
+        insert into dss_appconn_project_relation
+        (
+        `project_id`,
+        `appconn_instance_id`,
+        `appconn_instance_project_id`
+        )
+        values
+        <foreach collection="list" item="item" index= "index" separator =",">
+            (
+            #{item.dssProjectId},
+            #{item.appInstanceId},
+            #{item.appInstanceProjectId}
+            )
+        </foreach>
+    </insert>
+
+
+</mapper>

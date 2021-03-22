@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMapper">
+
+    <resultMap id="dss_workspace" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
+        <id property="createBy" column="create_by"/>
+        <id property="createTime" column="create_time"/>
+        <id property="lastUpdateTime" column="last_update_time"/>
+        <id property="lastUpdateUser" column="last_update_user"/>
+    </resultMap>
+
+    <resultMap id="dss_menu_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu">
+        <id property="upperMenuId" column="upper_menu_id"/>
+        <id property="active" column="is_active"/>
+        <id property="component" column="is_component"/>
+        <id property="frontName" column="front_name"/>
+        <id property="icon" column="icon"/>
+        <id property="applicationId" column="application_id"/>
+    </resultMap>
+
+    <resultMap id="dss_workspace_user_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser">
+        <id property="joinTime" column="join_time"/>
+        <id property="creator" column="created_by"/>
+        <id property="username" column="username"/>
+        <id property="workspaceId" column="workspace_id"/>
+    </resultMap>
+
+    <resultMap id="dss_workspace_menu_priv_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRolePriv">
+        <id property="updateTime" column="update_time"/>
+        <id property="updateBy" column="updateby"/>
+        <id property="id" column="user_id"/>
+        <id property="roleId" column="role_id"/>
+    </resultMap>
+
+    <sql id="dss_workspace_main">
+        id,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`
+    </sql>
+
+    <insert id="createWorkSpace" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
+        INSERT INTO dss_workspace(<include refid = "dss_workspace_main" />)
+        VALUES
+        (#{id},#{name},#{label},#{description},#{createBy},#{createTime},#{department},#{product},#{source},#{lastUpdateTime},#{lastUpdateUser})
+    </insert>
+
+    <sql id="dss_add_workspace_user">
+        id,`workspace_id`,`username`,`join_time`,`created_by`
+    </sql>
+
+    <select id="getWorkspaces" resultMap="dss_workspace">
+        SELECT * from dss_workspace where id in (select workspace_id from dss_workspace_user WHERE username = #{username})
+    </select>
+
+    <select id="getMenuId" resultType="java.lang.Integer">
+        SELECT menu_id from dss_menu_role WHERE role_id = #{roleId} and workspace_id = #{workspaceId} and priv >= 1
+    </select>
+
+    <select id="getSpaceMenu" resultMap="dss_menu_map">
+        SELECT * from dss_menu WHERE id = #{menuId}
+    </select>
+
+    <select id="getDSSWorkspaceMenuPriv" resultMap="dss_workspace_menu_priv_map">
+        SELECT * from dss_menu_role where workspace_id = #{workspaceId}
+    </select>
+
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.framework.appconn.dao.AppConnMapper">
+
+    <cache flushInterval="120000"/>
+
+    <resultMap id="AppConnBeanMap"  type="com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean">
+        <result property="id" column="id"/>
+        <result property="appConnName" column="appconn_name"/>
+        <result property="isUserNeedInit" column="is_user_need_init"/>
+        <result property="level" column="level"/>
+        <result property="ifIframe" column="if_iframe"/>
+        <result property="isExternal" column="is_external"/>
+        <result property="reference" column="reference"/>
+        <result property="className" column="class_name"/>
+        <result property="appConnClassPath" column="appconn_class_path"/>
+        <result property="resource" column="resource"/>
+    </resultMap>
+
+    <sql id="fields">
+        `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,
+        `reference`, `class_name`, `appconn_class_path`,`resource`
+    </sql>
+
+    <sql id="fields_query">
+        `id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,
+        `reference`, `class_name`, `appconn_class_path`, `resource`
+    </sql>
+
+    <select id="getAllAppConnBeans" resultMap="AppConnBeanMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        FROM `dss_appconn`
+    </select>
+
+    <select id="getAllAppConnsName" resultType="String">
+        SELECT `appconn_name`
+        FROM `dss_appconn`
+    </select>
+    
+    <select id="getAppConnBeanByName" resultMap="AppConnBeanMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        FROM `dss_appconn`
+        WHERE `appconn_name` = #{appConnName}
+    </select>
+
+    <select id="getAppConnBeanById" resultMap="AppConnBeanMap">
+        <![CDATA[SELECT]]>
+        <include refid="fields_query"/>
+        FROM `dss_appconn`
+        WHERE `id` = #{appConnId}
+    </select>
+
+    <select id="getAppConnNameByNodeType" resultType="String">
+        SELECT `appconn_name`
+        FROM `dss_appconn` left join `dss_workflow_node`
+        ON `dss_appconn`.`id` = `dss_workflow_node`.`appconn_id`
+        WHERE `dss_workflow_node`.`node_type` = #{nodeType}
+    </select>
+
+    <select id="getRedirectUrl" resultType="String">
+        SELECT `redirect_url`
+        FROM `dss_appconn_instance`
+        WHERE `dss_appconn_instance`.`id` = #{appInstanceId}
+    </select>
+</mapper>

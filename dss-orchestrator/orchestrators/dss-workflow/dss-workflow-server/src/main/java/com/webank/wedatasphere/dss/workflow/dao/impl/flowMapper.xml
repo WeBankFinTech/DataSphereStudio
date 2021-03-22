@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.workflow.dao.FlowMapper">
+
+    <sql id="flow_main">
+        id,`name`,`state`,`source`,`description`,`create_time`,`creator`,`is_root_flow`,`rank`,`project_id`,`has_saved`,`uses`,`bml_version`,`resource_id`,`linked_appconn_names`,`dss_labels`
+    </sql>
+
+    <select id="selectFlowByID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        SELECT * FROM `dss_workflow` WHERE id = #{id}
+    </select>
+
+
+    <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        INSERT INTO dss_workflow (<include refid = "flow_main" />)
+        VALUES
+        (#{id},#{name},#{state},#{source},#{description},#{createTime},#{creator},#{isRootFlow},#{rank},#{projectID},#{hasSaved},#{uses},#{bmlVersion},#{resourceId},#{linkedAppConnNames},#{dssLabels})
+    </insert>
+
+
+
+    <insert id="insertFlowRelation">
+        INSERT INTO dss_flow_relation (flow_id,parent_flow_id)
+        VALUES
+        (#{flowID},#{parentFlowID})
+    </insert>
+
+    <update id="updateFlowBaseInfo" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        UPDATE dss_workflow
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">name=#{name},</if>
+            <if test="description != null">description=#{description},</if>
+            <if test="hasSaved != null">has_saved=#{hasSaved},</if>
+            <if test="uses != null">uses=#{uses},</if>
+            <if test="linkedAppConnNames != null">linked_appconn_names=#{linkedAppConnNames},</if>
+        </trim>
+        WHERE id =#{id}
+    </update>
+
+    <select id="selectSubFlowIDByParentFlowID" resultType="java.lang.Long">
+        SELECT fr.flow_id FROM `dss_flow_relation` fr WHERE fr.parent_flow_id = #{parentFlowID}
+    </select>
+
+    <select id="listRootFlowIDsByProjectID" resultType="java.lang.Long">
+        SELECT fr.id FROM `dss_workflow` fr WHERE fr.project_id = #{projectID} and fr.is_root_flow = 1
+    </select>
+
+    <delete id="deleteFlowBaseInfo">
+        DELETE
+        FROM
+            dss_workflow
+        WHERE id = #{flowID}
+    </delete>
+
+    <delete id="deleteFlowRelation">
+        DELETE
+        FROM
+            dss_flow_relation
+        WHERE flow_id = #{flowID}
+    </delete>
+
+    <select id="selectParentFlowIDByFlowID" resultType="java.lang.Long">
+        SELECT
+            parent_flow_id
+        FROM
+            `dss_flow_relation`
+        WHERE
+            flow_id = #{flowID}
+    </select>
+
+    <select id="listFlowByProjectID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        SELECT
+        *
+        FROM
+        `dss_workflow`
+        WHERE
+        project_id = #{projectID}
+    </select>
+
+
+    <select id="getParentFlowID" resultType="java.lang.Long">
+        SELECT parent_flow_id  FROM  dss_flow_relation WHERE  flow_id = #{flowID}
+    </select>
+
+
+    <select id="selectSavedSubFlowIDByParentFlowID" resultType="java.lang.Long">
+        SELECT fr.flow_id FROM
+        `dss_flow_relation` fr,
+        `dss_workflow` fl
+        WHERE fr.parent_flow_id = #{parentFlowID} AND fr.flow_id = fl.id AND fl.has_saved = 1
+    </select>
+
+    <select id="listFlowRelation" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation">
+        select * from dss_flow_relation where
+        <foreach collection="flowIDs" item="flowID" index="i" separator="," open="flow_id in (" close=")">
+            #{flowID}
+        </foreach>
+    </select>
+
+    <update id="updateFlowInputInfo" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        UPDATE dss_workflow
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">name=#{name},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="description != null">description=#{description},</if>
+            <if test="createTime != null">create_time=#{createTime},</if>
+            <if test="creator != null">creator=#{creator},</if>
+            <if test="projectID != null">project_id=#{projectID},</if>
+            <if test="hasSaved != null">has_saved=#{hasSaved},</if>
+            <if test="uses != null">uses=#{uses},</if>
+            <if test="resourceId != null">resource_id=#{resourceId},</if>
+            <if test="bmlVersion != null">bml_version=#{bmlVersion},</if>
+            <if test="linkedAppConnNames != null">linked_appconn_names=#{linkedAppConnNames},</if>
+        </trim>
+        WHERE id =#{id}
+    </update>
+
+    <select id="selectFlowRelation" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation">
+        select * from dss_flow_relation where flow_id = #{flowID} and parent_flow_id = #{parentFlowID}
+    </select>
+
+</mapper>

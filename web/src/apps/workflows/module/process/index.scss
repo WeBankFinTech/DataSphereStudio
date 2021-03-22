@@ -1,0 +1,228 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+@import '@/common/style/variables.scss';
+.public_loading {
+    white-space: nowrap;
+    margin: 0 5px;
+    span {
+        font-size: $font-size-small;
+        padding: 0 5px;
+    }
+}
+
+.public-splin-load {
+    animation: ani-demo-spin 1s linear infinite;
+}
+
+@keyframes ani-demo-spin {
+    from { transform: rotate(0deg);}
+    50%  { transform: rotate(180deg);}
+    to   { transform: rotate(360deg);}
+}
+
+.process-module {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    .process-console {
+        position: absolute;
+        left: 250px;
+        bottom: 0px;
+        top: 50%;
+        z-index: 3;
+        width: 100%;
+    }
+    .flow-detail {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100%;
+        .detail-item {
+            padding: 0 10px;
+            color: #515a6e;
+            font-size: $font-size-base;
+        }
+    }
+}
+
+.process-module-param {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 360px;
+    height: 100%;
+    border: $border-width-base $border-style-base $border-color-base;
+    border-top: 0;
+    box-shadow: -6px 0 6px -6px $shadow-color;
+    z-index: 1008;
+    background: #fff;
+    overflow-y: auto;
+    .process-module-param-modal-header {
+        height: 36px;
+        line-height: 36px;
+        border-bottom: $border-width-base $border-style-base $border-color-base;
+        padding-left: 10px;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        h3 {
+            flex: 3;
+        }
+        .save-button {
+            flex: 2;
+            text-align: right;
+        }
+        .close-icon {
+            width: 20px;
+            height: 20px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 20px;
+            flex: 1;
+            cursor: pointer;
+            &:hover {
+                background-color: #ccc;
+            }
+        }
+    }
+    .process-module-param-modal-content {
+        position: absolute;
+        top: 40px;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        overflow: auto;
+        .node-parameter-bar {
+            padding: 10px 15px 10px 10px;
+            .ivu-form-item-error-tip {
+                text-overflow: -o-ellipsis-lastline;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                width: 100%;
+                height: 35px;
+            }
+        }
+        .node-module-param-modal-header {
+            padding-left: 10px;
+        }
+        .save-button {
+            text-align: center;
+            padding-bottom: 25px;
+        }
+    }
+}
+
+.process-module-title {
+    font-size: 14px;
+    color: $title-color;
+}
+
+.workflow-arguments {
+    .workflow-arguments-title-wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 30px;
+        padding-right: 7px;
+    }
+    .workflow-arguments-setting,
+    .time-arguments-setting {
+        padding: 10px 10px 2px;
+        ;
+        margin: 10px;
+        background: $menu-dark-subsidiary-color;
+        border-radius: $border-radius-small;
+        .time-set-title {
+            padding-bottom: 5px;
+        }
+        .margin-right {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.workflow-resource {
+    width: 100%;
+    height: 100%;
+    position: $relative;
+    padding: 16px;
+    .workflow-resource-list {
+        .workflow-resource-list-ul {
+            .workflow-resource-list-item {
+                height: 28px;
+                line-height: 28px;
+                padding: 0 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: $background-color-white;
+                border-radius: $border-radius-small;
+                margin: 4px 0;
+                &:hover {
+                    background: $background-color-select-hover;
+                }
+                .workflow-resource-list-name {
+                    max-width: calc(100% - 30px);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+    .workflow-resource-upload {
+        margin-top: 20px;
+    }
+}
+
+.we-editor.process-module-editor {
+    height: 300px;
+}
+
+.repetition-name .ivu-modal-body {
+    word-break: break-all;
+}
+
+.ivu-modal-confirm-body>div p {
+    word-break: break-all;
+}
+
+.node-selected {
+    background-color: rgba(0, 0, 0, .2) !important;
+}
+
+.ivu-select-dropdown {
+    max-width: 100%;
+    overflow: auto;
+}
+
+.schedulisIframe {
+    width: 100%;
+    height: 100%;
+}

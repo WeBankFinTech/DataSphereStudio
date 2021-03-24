@@ -17,9 +17,11 @@
 
 package com.webank.wedatasphere.dss.application.restful;
 
+import com.webank.wedatasphere.dss.application.conf.ApplicationConf;
 import com.webank.wedatasphere.dss.application.entity.Application;
 import com.webank.wedatasphere.dss.application.entity.DSSUser;
 import com.webank.wedatasphere.dss.application.entity.DSSUserVO;
+import com.webank.wedatasphere.dss.application.entity.WorkSpacePath;
 import com.webank.wedatasphere.dss.application.handler.ApplicationHandlerChain;
 import com.webank.wedatasphere.dss.application.service.ApplicationService;
 import com.webank.wedatasphere.dss.application.service.DSSApplicationUserService;
@@ -37,6 +39,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -70,7 +74,31 @@ public class ApplicationRestfulApi {
         }
         DSSUser dssUser = dataworkisUserService.getUserByName(username);
         DSSUserVO dataworkisUserVO = new DSSUserVO();
+        String superUserName = ApplicationConf.SUPER_USER_NAME;
+        if(username.equals(superUserName)){
+            dssUser.setIsSuperUser(true);
+        }else{
+            dssUser.setIsSuperUser(false);
+        }
+
         dataworkisUserVO.setBasic(dssUser);
         return Message.messageToResponse(Message.ok().data("applications",applicationList).data("userInfo",dataworkisUserVO));
+    }
+
+
+    @GET
+    @Path("paths")
+    public Response getWorkSpace(@Context HttpServletRequest req) throws Exception {
+        WorkSpacePath workSpacePath = new WorkSpacePath();
+        workSpacePath.setHdfsRootPath(ApplicationConf.HDFS_USER_ROOT_PATH);
+        workSpacePath.setResultRootPath(ApplicationConf.RESULT_SET_ROOT_PATH);
+        workSpacePath.setSchedulerPath(ApplicationConf.WDS_SCHEDULER_PATH);
+        workSpacePath.setWorkspaceRootPath(ApplicationConf.WORKSPACE_USER_ROOT_PATH);
+        workSpacePath.setUserPath(ApplicationConf.WDS_USER_PATH);
+        ArrayList<HashMap<String,Object>> responses = ApplicationUtils.convertToMap(workSpacePath);
+        return Message.messageToResponse(Message.ok().data("paths",responses)
+                .data("dssInstallDir", ApplicationConf.DSS_INSTALL_DIR)
+                .data("azkakanDir", ApplicationConf.AZKABAN_INSTALL_DIR));
+
     }
 }

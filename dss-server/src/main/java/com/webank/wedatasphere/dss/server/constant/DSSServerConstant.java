@@ -24,8 +24,10 @@ public class DSSServerConstant {
     public static final String DSS_PROJECT_SOURCE = "create by user";
     public static final String DSS_WORKSPACE_SOURCE = "create by user";
     public static final String PROJECT_VERSION_ID = "projectVersionID";
-    public static final String PUBLISH_FLOW_REPORT_FORMATE = "工作流名:%s,版本号:%s，工作流内容为空,请自行修改或者删除";
+    public static final String PUBLISH_FLOW_REPORT_FORMATE = "the workflow name is% s, the version number is% s, and the workflow content is empty. Please modify or delete it by yourself";
     public static final String EMVEDDEDFLOWID = "\"embeddedFlowId\":";
     public static final String VERSION_FORMAT = "%06d";
     public static final String VERSION_PREFIX = "v";
+    public static final String SUPER_USER_LOGIN_ERROR = "please login with super user";
+
 }

@@ -19,14 +19,12 @@
 import api from '@/js/service/api';
 export default {
   name: 'Menu',
+  props: {
+    isSuperUser: Boolean
+  },
   data() {
     return {
       menuList: [
-        // {
-        //     id: 'user-management',
-        //     name: '用户管理',
-        //     icon: 'ios-person-outline',
-        // },
         {
           id: 'FAQ',
           name: this.$t('message.navMune.FAQ'),
@@ -46,6 +44,23 @@ export default {
           icon: 'ios-log-out',
         }],
     };
+  },
+  watch: { 
+    isSuperUser: function(newVal){
+      if(newVal){
+        if(this.menuList[0].id !== 'user-management'){
+          this.menuList.unshift({
+            id: 'user-management',
+            name: this.$t('message.navMune.userManager'),
+            icon: 'ios-person-outline',
+          },)
+        }
+      }else {
+        if(this.menuList[0].id === 'user-management') {
+          this.menuList.shift();
+        }
+      }
+    }
   },
   methods: {
     handleClick(type) {
@@ -68,7 +83,8 @@ export default {
       }
     },
     openUserManagement() {
-      this.$Message.info(this.$t('message.userMenu.comingSoon'));
+      // this.$Message.info(this.$t('message.userMenu.comingSoon'));
+      this.$router.push('/userManager')
     },
     openFAQ() {
       const newTab = window.open('about:blank');

@@ -23,4 +23,5 @@ import com.webank.wedatasphere.dss.appjoint.service.SecurityService;
  * Created by enjoyyin on 2019/10/12.
  */
 public interface SchedulerSecurityService extends SecurityService {
+    void reloadToken();
 }

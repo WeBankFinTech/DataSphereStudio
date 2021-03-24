@@ -28,7 +28,7 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars$;
  */
 public class DSSWorkFlowConstant {
     public static final CommonVars<String> DSS_EXPORT_URL = CommonVars.apply("wds.dss.server.export.url", "/appcom/tmp/dss");
-    public static final CommonVars<String> DSS_EXPORT_ENV = CommonVars.apply("wds.dss.server.export.env", "PROD");
+    public static final CommonVars<String> DSS_EXPORT_ENV = CommonVars.apply("wds.dss.server.export.env", "DEV");
     public static final String DWS_PROJECT_FIRST_VERSION = "v000001";
     public static final String DWS_PROJECT_FIRST_VERSION_COMMENT = "first version";
     public static final String DWS_PROJECT_SOURCE = "create by user";

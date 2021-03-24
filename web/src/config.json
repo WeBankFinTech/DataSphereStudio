@@ -43,14 +43,5 @@
             "zh-CN": "apps/apiServices/i18n/zh.json"
         },
         "header": "apps/apiServices/module/header"
-    },
-    "portal": {
-        "routes": "apps/portal/router",
-        "module": "apps/portal/module",
-        "i18n": {
-            "en": "apps/portal/i18n/en.json",
-            "zh-CN": "apps/portal/i18n/zh.json"
-        },
-        "header": "apps/portal/module/header"
     }
 }

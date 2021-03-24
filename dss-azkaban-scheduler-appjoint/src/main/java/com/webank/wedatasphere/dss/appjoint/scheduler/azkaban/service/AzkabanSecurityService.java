@@ -49,15 +49,26 @@ public final class AzkabanSecurityService extends AppJointUrlImpl implements Sch
 
     static {
         Utils.defaultScheduler().scheduleAtFixedRate(()->{
-            LOGGER.info("开始读取用户token文件");
+            LOGGER.info("load azkaban-user.xml");
             Properties properties = new Properties();
             try {
                 properties.load(AzkabanSecurityService.class.getClassLoader().getResourceAsStream(AzkabanConstant.TOKEN_FILE_NAME));
                 userToken = properties;
             } catch (IOException e) {
-                LOGGER.error("读取文件失败:",e);
+                LOGGER.error("load error:",e);
             }
         },0,10, TimeUnit.MINUTES);
+    }
+
+    public void reloadToken(){
+        LOGGER.info("reload azkaban-user.xml");
+        Properties properties = new Properties();
+        try {
+            properties.load(AzkabanSecurityService.class.getClassLoader().getResourceAsStream(AzkabanConstant.TOKEN_FILE_NAME));
+            userToken = properties;
+        } catch (IOException e) {
+            LOGGER.error("reload error:",e);
+        }
     }
 
     @Override

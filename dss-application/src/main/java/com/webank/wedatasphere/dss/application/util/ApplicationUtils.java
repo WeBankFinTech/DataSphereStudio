@@ -17,12 +17,16 @@
 
 package com.webank.wedatasphere.dss.application.util;
 
+import com.webank.wedatasphere.dss.application.entity.WorkSpacePath;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by chaogefeng on 2019/11/20.
@@ -46,8 +50,36 @@ public class ApplicationUtils {
         return String.format(REDIRECT_FORMAT,redirectUrl,URLEndoder(url));
     }
 
-    public static void main(String[] args) throws DSSErrorException {
-        System.out.println(redirectUrlFormat("http://127.0..0.1:8090/qualitis/api/v1/redirect","http://127.0..0.1:8090/#/projects/list?id={projectId}&flow=true"));
+
+    public static ArrayList<HashMap<String, Object>> convertToMap(Object obj)
+            throws Exception {
+
+        ArrayList<HashMap<String, Object>> mapList = new ArrayList();
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (int i = 0, len = fields.length; i < len; i++) {
+            String varName = fields[i].getName();
+            boolean accessFlag = fields[i].isAccessible();
+            fields[i].setAccessible(true);
+            HashMap<String, Object> map = new HashMap<>();
+            Object o = fields[i].get(obj);
+            if (o != null){
+                map.put("key",varName);
+                map.put("value",o.toString());
+                mapList.add(map);
+            }
+
+            fields[i].setAccessible(accessFlag);
+        }
+
+        return mapList;
+    }
+
+    public static void main(String[] args) throws Exception {
+//        System.out.println(redirectUrlFormat("http://127.0..0.1:8090/qualitis/api/v1/redirect","http://127.0..0.1:8090/#/projects/list?id={projectId}&flow=true"));
+
+        WorkSpacePath workSpacePath = new WorkSpacePath();
+        workSpacePath.setWorkspaceRootPath("/");
+        System.out.println(convertToMap(workSpacePath));
     }
 
 }

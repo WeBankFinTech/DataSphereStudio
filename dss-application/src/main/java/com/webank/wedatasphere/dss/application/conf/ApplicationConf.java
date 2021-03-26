@@ -26,4 +26,27 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 public class ApplicationConf {
 
     public static final CommonVars<String> FAQ = CommonVars.apply("wds.linkis.application.dws.params","");
+
+    public static final String SUPER_USER_NAME = CommonVars.apply("wds.linkis.super.user.name","").getValue();
+    public static final String WORKSPACE_USER_ROOT_PATH = CommonVars.apply("wds.linkis.workspace.user.root.path","").getValue();
+    public static final String HDFS_USER_ROOT_PATH = CommonVars.apply("wds.linkis.hdfs.user.root.path","").getValue();
+    public static final String RESULT_SET_ROOT_PATH = CommonVars.apply("wds.linkis.result.set.root.path","").getValue();
+    public static final String WDS_SCHEDULER_PATH = CommonVars.apply("wds.linkis.scheduler.path","").getValue();
+    public static final String WDS_USER_PATH = CommonVars.apply("wds.linkis.user.path","hdfs:///user").getValue();
+    public static final String DSS_INSTALL_DIR = CommonVars.apply("wds.linkis.dss.install.dir","").getValue();
+    public static final String AZKABAN_INSTALL_DIR = CommonVars.apply("wds.linkis.azkaban.install.dir","").getValue();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

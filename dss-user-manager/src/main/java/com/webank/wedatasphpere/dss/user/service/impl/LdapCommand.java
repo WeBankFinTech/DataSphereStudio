@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * @program: luban-authorization
+ * @program: user-authorization
  * @description: 创建用户空间
  * @author: luxl@chinatelecom.cn
  * @create: 2020-08-13 13:39

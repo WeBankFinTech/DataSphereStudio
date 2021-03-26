@@ -1,6 +1,6 @@
 package com.webank;
 
-import com.webank.wedatasphpere.dss.user.service.impl.LubanAuthorizationClient;
+import com.webank.wedatasphpere.dss.user.service.impl.UserAuthorizationClient;
 import org.junit.Test;
 
 public class TestUnit {
@@ -8,7 +8,7 @@ public class TestUnit {
     @Test
     public void test() throws Exception {
 
-            LubanAuthorizationClient lubanAuthorizationClient = new LubanAuthorizationClient();
+        UserAuthorizationClient UserAuthorizationClient = new UserAuthorizationClient();
 
     }
 }

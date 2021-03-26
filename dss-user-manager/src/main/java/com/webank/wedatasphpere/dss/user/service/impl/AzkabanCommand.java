@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * @program: dss-appjoint-auth
  * @description: 开通azkaban账号
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2021-01-08 15:53
  **/
 

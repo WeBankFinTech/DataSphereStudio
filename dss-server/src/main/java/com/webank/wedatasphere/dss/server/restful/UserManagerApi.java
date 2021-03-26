@@ -22,9 +22,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * @program: luban-authorization
+ * @program: user-authorization
  * @description: 鲁班对外交互的接口  包括施工 注册用户
- * @author: luxl@chinatelecom.cn
  * @create: 2020-08-12 14:24
  **/
 

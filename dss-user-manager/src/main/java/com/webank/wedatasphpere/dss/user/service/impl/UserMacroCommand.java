@@ -35,9 +35,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @program: luban-authorization
+ * @program: user-authorization
  * @description: 开通命令实现
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-08-10 14:24
  **/
 public class UserMacroCommand implements MacroCommand {

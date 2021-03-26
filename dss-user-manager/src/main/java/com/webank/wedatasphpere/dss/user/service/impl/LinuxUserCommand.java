@@ -27,7 +27,7 @@ import java.util.ArrayList;
 /**
  * @program: user-authorization
  * @description: 创建用户空间
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-08-13 13:39
  **/
 

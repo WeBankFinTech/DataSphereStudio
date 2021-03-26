@@ -1,6 +1,7 @@
 *.iml
 .idea
 .DS_Store
+*.class
 
 assembly/target
 
@@ -21,3 +22,13 @@ plugins/linkis/linkis-appjoint-entrance/target/
 
 sendemail-appjoint/sendemail-core/target/
 visualis-appjoint/appjoint/target/
+
+dss-user-manager/target/
+logs
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+
+out
+gen

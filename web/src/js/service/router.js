@@ -102,6 +102,15 @@ const router = new VueRouter({
           component: () => import('../view/commonIframe/index.vue'),
         },
         {
+          name: 'USER MANAGER',
+          path: 'userManager',
+          component: () => import('../view/userManager/index.vue'),
+          meta: {
+            title: 'userManager',
+            publicPage: true,
+          },
+        },
+        {
           path: 'console',
           name: 'Console',
           meta: {

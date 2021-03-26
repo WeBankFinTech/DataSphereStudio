@@ -301,6 +301,24 @@
             <lineEnding>unix</lineEnding>
         </fileSet>
         <fileSet>
+            <directory>${project.parent.basedir}/dss-user-manager/src/main/resources/config</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>conf/config</outputDirectory>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
+            <directory>${project.parent.basedir}/dss-user-manager/src/main/resources/default</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>conf/default</outputDirectory>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/bin</directory>
             <includes>
                 <include>*</include>

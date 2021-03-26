@@ -26,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @program: luban-authorization
+ * @program: user-authorization
  * @description:
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-08-10 14:24
  **/
 public class UserAuthorizationClient {

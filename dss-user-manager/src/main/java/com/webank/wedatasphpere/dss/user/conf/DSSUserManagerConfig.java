@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 /**
  * @program: dss-appjoint-auth
  * @description: 用户模块配置文件
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-12-30 16:26
  **/
 

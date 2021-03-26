@@ -45,7 +45,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * @author litongtong
  * @date 2021/1/11
  */
 public class SchedulisCommand extends AbsCommand {

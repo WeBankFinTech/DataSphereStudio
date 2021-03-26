@@ -26,7 +26,7 @@ import com.webank.wedatasphpere.dss.user.service.Command;
 /**
  * @program: user-authorization
  * @description: 开通yarn权限的实现
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-08-10 14:24
  **/
 public class YarnCommand extends AbsCommand {

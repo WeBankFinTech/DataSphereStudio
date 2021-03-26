@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author anlexander
  * @date 2021/1/5
  */
 public class MetastoreCommand extends AbsCommand {

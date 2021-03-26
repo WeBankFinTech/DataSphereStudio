@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 /**
  * @program: dss-appjoint-auth
  * @description: 用户模块配置文件
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-12-30 16:26
  **/
 
@@ -53,7 +53,7 @@ public class DSSUserManagerConfig {
     public static final String KERBEROS_KDC_USER_PASSWORD = CommonVars.apply("wds.linkis.kerberos.kdc.user.password", "null").getValue().trim();
     public static final String KERBEROS_ENABLE_SWITCH = CommonVars.apply("wds.linkis.kerberos.enable.switch", "null").getValue().trim();
     public static final String DSS_DEPLOY_PATH = CommonVars.apply("wds.dss.deploy.path", "null").getValue().trim();
-    public static final String DSS_SCHEDULER_URL = CommonVars.apply("wds.dss.scheduler.url", "/luban/schedule/system").getValue().trim();
+    public static final String DSS_SCHEDULER_URL = CommonVars.apply("wds.dss.scheduler.url", "/schedule/system").getValue().trim();
 
 
 

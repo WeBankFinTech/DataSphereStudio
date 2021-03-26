@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * @program: user-manager
  * @description: 施工单数据结构
- * @author: luxl@chinatelecom.cn
+ *
  * @create: 2020-08-12 14:29
  **/
 public class AuthorizationBody {

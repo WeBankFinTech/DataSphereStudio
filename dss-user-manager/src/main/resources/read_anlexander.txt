@@ -1,7 +1,7 @@
 一键化开通账户
    服务目录结构：
        进入口调用：
-       入口调用：dss-user-manager\src\main\java\com\webank\wedatasphpere\dss\user\service\impl\LubanAuthorizationClient.java
+       入口调用：dss-user-manager\src\main\java\com\webank\wedatasphpere\dss\user\service\impl\UserAuthorizationClient.java
 
 #参考配置文件resource/config/properties.conf
 #metastore功能使用说明

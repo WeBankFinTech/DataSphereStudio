@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 /**
- * @author anlexander
  * @date 2021/1/5
  */
 public class KerberosCommand extends AbsCommand {

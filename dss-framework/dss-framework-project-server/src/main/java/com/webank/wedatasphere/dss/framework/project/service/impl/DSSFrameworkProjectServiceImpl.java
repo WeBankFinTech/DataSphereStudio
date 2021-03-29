@@ -97,7 +97,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         //todo 创建appconn的相关的工程 还没有调试通过
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, username, workspace);
-        if (null == projectMap || projectMap.size() == 0) {
+        if(null == projectMap){
             LOGGER.error("projectMap is null, it means some appConns create project failed");
             throw new DSSProjectErrorException(71000, "projectMap is null, create project in appconn failed");
         }
@@ -106,7 +106,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //4.保存dss_project_user 工程与用户关系
         projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest);
         //5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
-        projectService.saveProjectRelation(project, projectMap);
+        if (null != projectMap && projectMap.size() > 0) {
+            projectService.saveProjectRelation(project, projectMap);
+        }
         DSSProjectVo dssProjectVo = new DSSProjectVo();
         dssProjectVo.setDescription(project.getDescription());
         dssProjectVo.setId(project.getId());

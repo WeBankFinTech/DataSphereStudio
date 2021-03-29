@@ -67,6 +67,10 @@
                     <artifactId>linkis-common</artifactId>
                     <groupId>com.webank.wedatasphere.linkis</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>jetty-util</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

@@ -140,6 +140,15 @@ if (process.env.NODE_ENV !== 'dev') {
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  css: {
+    loaderOptions: {
+      less: {
+        lessOptions: {
+          javascriptEnabled: true,
+        }
+      },
+    },
+  },
   chainWebpack: (config) => {
     // set svg-sprite-loader
     config.module

@@ -1,33 +1,38 @@
 @import '@/common/style/variables.scss';
 
 .newHome_page {
-  background-color: #f7f7f7;
-  background: #fff;
+  background-color: #f4f7fb;
+  background: #f4f7fb;
   height: 100%;
   color: rgba(0,0,0,0.85);
   padding: 25px;
   display: flex;
   flex-direction: column;
+
   .newHome_header {
     flex: none;
+
     .newHome_info {
       h1 {
         font-size: 21px;
       }
+
       p {
         font-size: $font-size-base;
-        margin: 25px 0;
+        margin: 12px 0 24px;
         color: rgba(0,0,0,0.5);
       }
     }
   }
+
   .newHome_main {
     flex: 1;
     display: flex;
     align-items: flex-start;
     min-width: 900px;
     height: 700px;
-    background: #FFFFFF;
+    padding-bottom: 20px;
+
     .newHome_main_left {
       flex: 1;
       height: 100%;
@@ -38,11 +43,16 @@
       border: 1px solid #DEE4EC;
       border-radius: 2px;
       min-width: 640px;
+
+      // background: #f4f7fb;
+      background: #ffffff;
+
       .newHome_title_search {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
+
         .left_header {
           flex: none;
           font-size: $font-size-large;
@@ -51,15 +61,18 @@
           line-height: 1;
           border-left: 3px solid $primary-color;
         }
+
         .left_search {
           flex: none;
           display: flex;
           justify-content: space-between;
           align-items: center;
+
           .header-search {
             flex: 50%;
           }
         }
+
         .left_visual {
           margin-right: 15px;
           font-size: 14px;
@@ -67,20 +80,22 @@
           cursor: pointer;
         }
       }
+
       .newHome_list {
         .card-content {
           display: flex;
           justify-content: flex-start;
           flex-wrap: wrap;
         }
+
         .newHome_create {
           cursor: pointer;
-          width: 345px;
+          min-width: 320px;
           height: 116px;
           margin-bottom: 25px;
           box-sizing: border-box;
           border: 1px dashed #d9d9d9;
-          background:  #F8F9FC;
+          background: #F8F9FC;
           border-radius: 2px;
           padding: 10px;
           position: relative;
@@ -88,16 +103,19 @@
           align-items: center;
           justify-content: center;
           margin-right: 25px;
+
           &:hover {
             box-shadow: 0 2px 12px 0 $shadow-color;
             border-radius: $border-radius-small;
           }
+
           .newHome_create_content {
             flex: none;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-right: 1rem;
+
             .newHome_create_text {
               margin-left: 10px;
               cursor: pointer;
@@ -106,9 +124,10 @@
             }
           }
         }
-        .newHome_list_item{
+
+        .newHome_list_item {
           cursor: pointer;
-          width: 345px;
+          min-width: 320px;
           height: 116px;
           margin-bottom: 25px;
           box-sizing: border-box;
@@ -116,22 +135,30 @@
           border-radius: 2px;
           padding: 25px;
           position: relative;
-          background: url("../../assets/images/bgc-imag.svg")  center center no-repeat;
+          background: url("../../assets/images/bgc-imag.svg") center center no-repeat;
           background-size: 100%;
           margin-right: 25px;
+
+          :last-child {
+            margin-right: 0;
+          }
+
           &:hover {
             box-shadow: 0 2px 12px 0 $shadow-color;
             border-radius: $border-radius-small;
           }
+
           .management-button {
             position: absolute;
             top: 5px;
             right: 10px;
           }
+
           .item-header {
             display: flex;
             justify-content: flex-start;
             align-items: flex-start;
+
             .name {
               flex: 1;
               font-weight: 600;
@@ -168,6 +195,7 @@
             justify-content: flex-start;
             align-items: flex-start;
             width: 100%;
+
             .item {
               display: inline-block;
               font-size: 10px;
@@ -189,12 +217,14 @@
             bottom: 10px;
           }
         }
+
         .page {
           display: flex;
           justify-content: flex-end;
         }
       }
     }
+
     .newHome_main_right {
       flex: 0;
       margin-left: 25px;
@@ -206,11 +236,14 @@
       box-sizing: border-box;
       border: 1px solid #DEE4EC;
       border-radius: 2px;
+      background: #ffffff;
+
       .right_header {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
+
       .title {
         font-size: $font-size-large;
         color: rgba(0,0,0,0.85);
@@ -218,18 +251,21 @@
         line-height: 1;
         border-left: 3px solid $primary-color;
       }
+
       .video-title {
         padding: 5px 0;
         text-align: center;
         font-size: 12px;
       }
+
       .video-item {
         background: #f2f2f2;
         margin-bottom: 20px;
         cursor: pointer;
       }
+
       video {
-        pointer-events: none
+        pointer-events: none;
       }
     }
   }

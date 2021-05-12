@@ -18,6 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.release.service.impl;
 
+import com.webank.wedatasphere.dss.appconn.core.WorkflowAppConn;
 import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -73,21 +74,21 @@ public class PublishServiceImpl implements PublishService {
     @Qualifier("projectPublishRefFactory")
     private RefFactory<ProjectPublishToSchedulerRef> refFactory;
 
-
     private SchedulerAppConn schedulerAppConn;
+
+    private WorkflowAppConn workflowAppConn;
 
     private OrchestratorFrameworkAppConn orchestratorFrameworkAppConn;
 
-
-    private boolean supportProject = true;
-
     @PostConstruct
     public void init() {
-        schedulerAppConn = (SchedulerAppConn) appConnService.getAppConn(SchedulerAppConn.class);
-        if (schedulerAppConn == null) {
-            schedulerAppConn = (SchedulerAppConn) appConnService.getAppConn("schedulis");
-        }
-        orchestratorFrameworkAppConn = (OrchestratorFrameworkAppConn) appConnService.getAppConn("orchestrator-framework");
+        //        schedulerAppConn = (SchedulerAppConn) appConnService.getAppConn(SchedulerAppConn.class);
+        //        if (schedulerAppConn == null) {
+        schedulerAppConn = (SchedulerAppConn)appConnService.getAppConn("dolphinscheduler");
+        //        }
+        workflowAppConn = (WorkflowAppConn)appConnService.getAppConn("workflow");
+        orchestratorFrameworkAppConn = (OrchestratorFrameworkAppConn)appConnService.getAppConn(
+            "orchestrator-framework");
     }
 
     @Override
@@ -98,28 +99,28 @@ public class PublishServiceImpl implements PublishService {
             DSSExceptionUtils.dealErrorException(61123, "scheduler appconn is null", DSSErrorException.class);
         }
         LOGGER.info("{} begins to publish project {} orcInfos {} to scheduler {}", releaseUser,
-                projectInfo.getProjectName(), orchestratorReleaseInfos, schedulerAppConn.getAppDesc().getAppName());
-        //如果是支持工程级别的发布,那么就是走工程
+            projectInfo.getProjectName(), orchestratorReleaseInfos, schedulerAppConn.getAppDesc().getAppName());
+        //如果是支持工作流级别的发布,那么就是走工作流
         if (schedulerAppConn.supportFlowSchedule()) {
-            //todo 工作流级别的发布
+            publishWorkflow(releaseUser, projectInfo, orchestratorReleaseInfos, dssLabel, workspace, supportMultiEnv);
         } else {
             //工程级别的发布
             publishProject(releaseUser, projectInfo, orchestratorReleaseInfos, dssLabel, workspace, supportMultiEnv);
         }
     }
 
-    private void publishProject(String releaseUser, ProjectInfo projectInfo, List<OrchestratorReleaseInfo> orchestratorReleaseInfos,
-                                DSSLabel dssLabel, Workspace workspace, boolean supportMultiEnv) throws Exception {
-        if (orchestratorFrameworkAppConn == null) {
-            LOGGER.error("orchestrator appconn is null, can not do publish operation");
-            DSSExceptionUtils.dealErrorException(60032, "orchestrator appconn is null", DSSErrorException.class);
+    private void publishWorkflow(String releaseUser, ProjectInfo projectInfo,
+        List<OrchestratorReleaseInfo> orchestratorReleaseInfos, DSSLabel dssLabel, Workspace workspace,
+        boolean supportMultiEnv) throws Exception {
+        if (workflowAppConn == null) {
+            LOGGER.error("workflow appconn is null, can not do publish operation");
+            DSSExceptionUtils.dealErrorException(60032, "workflow appconn is null", DSSErrorException.class);
         }
-        DevelopmentIntegrationStandard developmentIntegrationStandard =
-                orchestratorFrameworkAppConn.getAppStandards().
-                        stream().
-                        filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).
-                        map(appStandard -> (DevelopmentIntegrationStandard) appStandard).
-                        findAny().orElse(null);
+        DevelopmentIntegrationStandard developmentIntegrationStandard = workflowAppConn.getAppStandards().
+            stream().
+            filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).
+            map(appStandard -> (DevelopmentIntegrationStandard)appStandard).
+            findAny().orElse(null);
         List<DSSLabel> dssLabels = Collections.singletonList(dssLabel);
         if (developmentIntegrationStandard == null) {
             LOGGER.error("development Standard is null will not go on");
@@ -127,37 +128,105 @@ public class PublishServiceImpl implements PublishService {
         } else {
             ProcessService processService = developmentIntegrationStandard.getProcessService(dssLabels);
             if (processService instanceof DevProcessService) {
-                DevProcessService devProcessService = (DevProcessService) processService;
-                RefPublishToSchedulerService refPublishToSchedulerService = devProcessService.getRefPublishToSchedulerService();
+                DevProcessService devProcessService = (DevProcessService)processService;
+                RefPublishToSchedulerService refPublishToSchedulerService
+                    = devProcessService.getRefPublishToSchedulerService();
                 RefScheduleOperation refScheduleOperation = refPublishToSchedulerService.createRefScheduleOperation();
                 PublishToSchedulerStage publishToSchedulerStage = refScheduleOperation.createPublishToSchedulerStage();
                 try {
-                    ProjectPublishToSchedulerRef ref =
-                            refFactory.newRef(ProjectPublishToSchedulerRef.class,
-                                    orchestratorFrameworkAppConn.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn.orchestrator.ref");
+                    ProjectPublishToSchedulerRef ref = refFactory.newRef(ProjectPublishToSchedulerRef.class,
+                        workflowAppConn.getClass().getClassLoader(),
+                        "com.webank.wedatasphere.dss.workflow.appconn.ref");
                     //ref.setLabels(dssLabels);
-                    List<Long> orchestratorIds = orchestratorReleaseInfos.stream().map(OrchestratorReleaseInfo::getOrchestratorId).collect(Collectors.toList());
+                    List<Long> orchestratorIds = orchestratorReleaseInfos.stream()
+                        .map(OrchestratorReleaseInfo::getOrchestratorId)
+                        .collect(Collectors.toList());
+                    ref.setOrcIds(orchestratorIds);
+                    List<Long> orcAppIds = orchestratorReleaseInfos.stream()
+                        .map(OrchestratorReleaseInfo::getOrchestratorVersionAppId)
+                        .collect(Collectors.toList());
+                    ref.setOrcAppIds(orcAppIds);
+                    Project project = toProject(projectInfo);
+                    ref.setProject(project);
+                    ref.setUserName(releaseUser);
+                    //ref.setPublishType(PublishType.FULL);
+                    ref.setWorkspace(workspace);
+                    if (supportMultiEnv) {
+                        ref.setLabels(dssLabels);
+                    } else {
+                        //如果不支持多环境的话，只需要在dev进行同步到scheudlis就好
+                        ref.setLabels(Collections.singletonList(new DSSLabel("DEV")));
+                    }
+                    publishToSchedulerStage.publishToScheduler(ref);
+                } catch (final Throwable t) {
+                    if (t instanceof ExternalOperationFailedException) {
+                        String errorInfo = t.getCause().getMessage();
+                        ExternalOperationFailedException warnException = (ExternalOperationFailedException)t;
+                        DSSExceptionUtils.dealErrorException(60018, "msg:" + errorInfo, t,
+                            ExternalOperationFailedException.class);
+                    } else {
+                        DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t,
+                            DSSErrorException.class);
+                    }
+                }
+            }
+        }
+    }
+
+    private void publishProject(String releaseUser, ProjectInfo projectInfo,
+        List<OrchestratorReleaseInfo> orchestratorReleaseInfos, DSSLabel dssLabel, Workspace workspace,
+        boolean supportMultiEnv) throws Exception {
+        if (orchestratorFrameworkAppConn == null) {
+            LOGGER.error("orchestrator appconn is null, can not do publish operation");
+            DSSExceptionUtils.dealErrorException(60032, "orchestrator appconn is null", DSSErrorException.class);
+        }
+        DevelopmentIntegrationStandard developmentIntegrationStandard = orchestratorFrameworkAppConn.getAppStandards().
+            stream().
+            filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).
+            map(appStandard -> (DevelopmentIntegrationStandard)appStandard).
+            findAny().orElse(null);
+        List<DSSLabel> dssLabels = Collections.singletonList(dssLabel);
+        if (developmentIntegrationStandard == null) {
+            LOGGER.error("development Standard is null will not go on");
+            DSSExceptionUtils.dealErrorException(60032, "development Standard is null", DSSErrorException.class);
+        } else {
+            ProcessService processService = developmentIntegrationStandard.getProcessService(dssLabels);
+            if (processService instanceof DevProcessService) {
+                DevProcessService devProcessService = (DevProcessService)processService;
+                RefPublishToSchedulerService refPublishToSchedulerService
+                    = devProcessService.getRefPublishToSchedulerService();
+                RefScheduleOperation refScheduleOperation = refPublishToSchedulerService.createRefScheduleOperation();
+                PublishToSchedulerStage publishToSchedulerStage = refScheduleOperation.createPublishToSchedulerStage();
+                try {
+                    ProjectPublishToSchedulerRef ref = refFactory.newRef(ProjectPublishToSchedulerRef.class,
+                        orchestratorFrameworkAppConn.getClass().getClassLoader(),
+                        "com.webank.wedatasphere.dss.appconn.orchestrator.ref");
+                    //ref.setLabels(dssLabels);
+                    List<Long> orchestratorIds = orchestratorReleaseInfos.stream()
+                        .map(OrchestratorReleaseInfo::getOrchestratorId)
+                        .collect(Collectors.toList());
                     ref.setOrcIds(orchestratorIds);
                     Project project = toProject(projectInfo);
                     ref.setProject(project);
                     ref.setUserName(releaseUser);
                     //ref.setPublishType(PublishType.FULL);
                     ref.setWorkspace(workspace);
-                    if (supportMultiEnv){
+                    if (supportMultiEnv) {
                         ref.setLabels(dssLabels);
-                    } else{
+                    } else {
                         //如果不支持多环境的话，只需要在dev进行同步到scheudlis就好
                         ref.setLabels(Collections.singletonList(new DSSLabel("DEV")));
                     }
                     publishToSchedulerStage.publishToScheduler(ref);
                 } catch (final Throwable t) {
-                    if(t instanceof ExternalOperationFailedException){
+                    if (t instanceof ExternalOperationFailedException) {
                         String errorInfo = t.getCause().getMessage();
                         ExternalOperationFailedException warnException = (ExternalOperationFailedException)t;
-                        DSSExceptionUtils.dealErrorException(60018, "msg:"+errorInfo, t,
-                                ExternalOperationFailedException.class);
-                    }else {
-                        DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t, DSSErrorException.class);
+                        DSSExceptionUtils.dealErrorException(60018, "msg:" + errorInfo, t,
+                            ExternalOperationFailedException.class);
+                    } else {
+                        DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t,
+                            DSSErrorException.class);
                     }
                 }
             }

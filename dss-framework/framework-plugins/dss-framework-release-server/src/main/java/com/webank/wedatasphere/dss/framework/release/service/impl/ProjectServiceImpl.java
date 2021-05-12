@@ -89,16 +89,19 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.getOrchestratorName(orchestratorId, orchestratorVersionId);
     }
 
-
     @Override
     public String getWorkspaceName(Long projectId) {
         return projectMapper.getWorkspaceName(projectId);
     }
 
-
     @Override
     public void updateProjectOrcInfo(Long projectId, Long orchestratorId, Long orchestratorVersionId) {
         projectMapper.updateProjectOrcInfo(projectId, orchestratorId, orchestratorVersionId);
+    }
+
+    @Override
+    public Long getAppIdByOrchestratorVersionId(Long orchestratorVersionId) {
+        return projectMapper.getAppIdByOrchestratorVersionId(orchestratorVersionId);
     }
 }
 

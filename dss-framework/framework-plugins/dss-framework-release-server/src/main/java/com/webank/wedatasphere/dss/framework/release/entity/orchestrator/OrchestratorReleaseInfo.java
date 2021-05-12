@@ -28,9 +28,9 @@ public class OrchestratorReleaseInfo {
 
     private Long orchestratorId;
 
+    private Long orchestratorVersionAppId;
+
     private String orchestratorVersion;
-
-
 
     public String getOrchestratorName() {
         return orchestratorName;
@@ -48,6 +48,14 @@ public class OrchestratorReleaseInfo {
         this.orchestratorId = orchestratorId;
     }
 
+    public Long getOrchestratorVersionAppId() {
+        return orchestratorVersionAppId;
+    }
+
+    public void setOrchestratorVersionAppId(Long orchestratorVersionAppId) {
+        this.orchestratorVersionAppId = orchestratorVersionAppId;
+    }
+
     public String getOrchestratorVersion() {
         return orchestratorVersion;
     }
@@ -56,10 +64,17 @@ public class OrchestratorReleaseInfo {
         this.orchestratorVersion = orchestratorVersion;
     }
 
-    public static OrchestratorReleaseInfo newInstance(Long orchestratorId, String orchestratorVersion){
+    public static OrchestratorReleaseInfo newInstance(Long orchestratorId, String orchestratorVersion) {
         OrchestratorReleaseInfo orchestratorReleaseInfo = new OrchestratorReleaseInfo();
         orchestratorReleaseInfo.setOrchestratorId(orchestratorId);
         orchestratorReleaseInfo.setOrchestratorVersion(orchestratorVersion);
+        return orchestratorReleaseInfo;
+    }
+
+    public static OrchestratorReleaseInfo newInstance(Long orchestratorId, Long orchestratorVersionAppId) {
+        OrchestratorReleaseInfo orchestratorReleaseInfo = new OrchestratorReleaseInfo();
+        orchestratorReleaseInfo.setOrchestratorId(orchestratorId);
+        orchestratorReleaseInfo.setOrchestratorVersionAppId(orchestratorVersionAppId);
         return orchestratorReleaseInfo;
     }
 

@@ -86,15 +86,18 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob{
 
             //1.进行同步到调度中心
             List<OrchestratorReleaseInfo> importOrcInfos = new ArrayList<>();
-            importOrcInfos.add(OrchestratorReleaseInfo.newInstance(orchestratorId, ""));
+            Long appId = this.getReleaseEnv()
+                .getProjectService()
+                .getAppIdByOrchestratorVersionId(orchestratorVersionId);
+            importOrcInfos.add(OrchestratorReleaseInfo.newInstance(orchestratorId, appId));
             nextLabel = new CommonDSSLabel("DEV");
-            this.releaseEnv.getPublishService().publish(releaseUser, projectInfo, importOrcInfos, nextLabel, workspace, supportMultiEnv());
-
+            this.releaseEnv.getPublishService()
+                .publish(releaseUser, projectInfo, importOrcInfos, nextLabel, workspace, supportMultiEnv());
 
             //2.进行导出,用于升级版本,目的是为了复用原来的代码
-            ExportResult exportResult = this.releaseEnv.getExportService().export(releaseUser,
-                    projectId, orchestratorId, orchestratorVersionId, projectInfo.getProjectName(), workspaceName, dssLabel, workspace);
-
+            ExportResult exportResult = this.releaseEnv.getExportService()
+                .export(releaseUser, projectId, orchestratorId, orchestratorVersionId, projectInfo.getProjectName(),
+                    workspaceName, dssLabel, workspace);
 
             //3.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             this.releaseEnv.getReleaseJobListener().onJobSucceed(this);

@@ -25,7 +25,6 @@ import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrche
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
 import com.webank.wedatasphere.dss.framework.release.job.OrchestratorPublishJob;
-import com.webank.wedatasphere.dss.framework.release.job.OrchestratorReleaseJob;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
@@ -63,6 +62,7 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
         String orchestratorName = releaseEnv.getProjectService().getOrchestratorName(orchestratorId, orchestratorVersionId);
 
         //2.插入数据到数据库
+        // TODO: 2021/4/27 判断当前版本是否正在发布或已发布成功
         ReleaseTask releaseTask = releaseEnv.getTaskService().addReleaseTask(releaseUser,
                 projectInfo.getProjectId(),
                 orchestratorId,

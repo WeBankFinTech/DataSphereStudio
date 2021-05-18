@@ -31,20 +31,36 @@
             </Tabs>
           </Workflow>
         </div>
-        <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
-          <process
-            v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
-            :key="item.tabId"
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :query="item.query"
-            @updateWorkflowList="updateWorkflowList"
-            @isChange="isChange(index, arguments)"
-          ></process>
-          <makeUp
-            v-else
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :key="item.name"
-            :currentVal="currentVal"></makeUp>
+        <template v-if="!dolphinschedulerMode">
+          <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
+            <process
+              v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
+              :key="item.tabId"
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :query="item.query"
+              @updateWorkflowList="updateWorkflowList"
+              @isChange="isChange(index, arguments)"
+              @showDolphinscheduler="showDS"
+            ></process>
+            <makeUp
+              v-else
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :key="item.name"
+              :currentVal="currentVal"></makeUp>
+          </template>
+        </template>
+
+        <template v-else>
+          <div class="scheduler-wrapper">
+            <div class="scheduler-menu">
+              <ul>
+                <li class="active">任务列表</li>
+                <li>实例列表</li>
+              </ul>
+            </div>
+            <div class="scheduler-list">
+            </div>
+          </div>
         </template>
       </template>
       <template v-else>
@@ -121,7 +137,9 @@ export default {
       selectDevprocess: [],
       DEVPROCESS,
       ORCHESTRATORMODES,
-      loading: false
+      loading: false,
+      dolphinschedulerMode: false,
+      list: []
     };
   },
   watch: {
@@ -449,6 +467,9 @@ export default {
     },
     publishSuccess(currentOrchetratorData) {
       this.tabList = this.tabList.filter((i) => i.tabId !== (String(currentOrchetratorData.orchestratorId) + currentOrchetratorData.orchestratorVersionId));
+    },
+    showDS() {
+      this.dolphinschedulerMode = true
     }
   }
 };
@@ -488,6 +509,31 @@ export default {
         font-size: $font-size-base;
         font-weight: 700;
       }
+    }
+  }
+  .scheduler-wrapper{
+    display: flex;
+    background-color: white;
+    margin-top: -25px;
+    min-height: calc(100% + 25px);
+    .scheduler-menu{
+      flex:1;
+      font-size: 18px;
+      li {
+        padding: 0 40px;
+        cursor: pointer;
+        line-height: 60px;
+        &:hover{
+          color: rgb(247, 152, 0);
+        }
+        &.active{
+          background-color: rgb(254, 249, 230);
+          color: rgb(247, 152, 0);
+        }
+      }
+    }
+    .scheduler-list{
+      flex:6;
     }
   }
 </style>

@@ -63,6 +63,7 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
+            @showDolphinscheduler="showDS"
           ></Process>
           <Ide
             v-if="item.type === 'IDE'"
@@ -539,6 +540,9 @@ export default {
           this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
         }
       }
+    },
+    showDS() {
+      this.$emit('showDolphinscheduler')
     }
   },
 };

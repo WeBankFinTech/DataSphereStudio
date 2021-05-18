@@ -29,7 +29,6 @@
         ]
     },
     "dependencies": {
-        "@webank/wa-sdk": "1.10.11",
         "axios": "0.19.2",
         "babel-polyfill": "6.26.0",
         "core-js": "2.6.11",

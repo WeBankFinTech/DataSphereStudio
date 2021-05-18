@@ -291,6 +291,7 @@
           "import": "Import",
           "run": "Run",
           "save": "Save",
+          "gotoScheduleCenter": "Visit ScheduleCenter",
           "seting": "Settings",
           "baseInfo": "Basice Information",
           "inputComment": "Please enter comment",

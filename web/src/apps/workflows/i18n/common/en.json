@@ -526,7 +526,38 @@
         "run": "run",
         "setTime": "timing",
         "offline": "offline",
-        "online": "online"
+        "online": "online",
+        "runTask": {
+          "title": "Please set the parameters before starting",
+          "processName": "Process Name",
+          "failureStrategy" : "Failure Strategy",
+          "continue": "Continue",
+          "end": "End",
+          "nodeExecution": "Node execution",
+          "backwardExecution": "Backward execution",
+          "forwardExecution": "Forward execution",
+          "executeOnlyTheCurrentNode": "Execute only the current node",
+          "notificationStrategy": "Notification strategy",
+          "processPriority": "Process priority",
+          "workerGroup": "Worker group",
+          "notificationGroup": "Notification group",
+          "alarmGroup": "Alarm group",
+          "complementData": "Complement Data",
+          "complementProcess?": "Whether it is a complement process?",
+          "modeOfExecution": "Mode of execution",
+          "serialExecution": "Serial execution",
+          "parallelExecution": "Parallel execution",
+          "scheduleDate": "Schedule date",
+          "startupParameter": "Startup parameter",
+          "cancel": "Cancel",
+          "start": "Start",
+          "none_1": "none",
+          "success_1": "success",
+          "failure_1": "failure",
+          "All_1": "All",
+          "receivers": "receivers",
+          "receiverCcs": "receiverCcs"
+        }
       }
     }
   }

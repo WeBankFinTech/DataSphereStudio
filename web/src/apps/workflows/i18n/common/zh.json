@@ -524,7 +524,38 @@
           "run": "运行",
           "setTime": "定时",
           "offline": "下线",
-          "online": "上线"
+          "online": "上线",
+          "runTask": {
+            "title": "启动前请先设置参数",
+            "processName": "工作流名称",
+            "failureStrategy" : "失败策略",
+            "continue": "继续",
+            "end": "结束",
+            "nodeExecution": "节点执行",
+            "backwardExecution": "向后执行",
+            "forwardExecution": "向前执行",
+            "executeOnlyTheCurrentNode": "仅执行当前节点",
+            "notificationStrategy": "通知策略",
+            "processPriority": "流程优先级",
+            "workerGroup": "Worker分组",
+            "notificationGroup": "通知组",
+            "alarmGroup": "告警组",
+            "complementData": "补数",
+            "complementProcess?": "是否补数?",
+            "modeOfExecution": "执行方式",
+            "serialExecution": "串行执行",
+            "parallelExecution": "并行执行",
+            "scheduleDate": "调度日期",
+            "startupParameter": "启动参数",
+            "cancel": "取消",
+            "start": "运行",
+            "none_1": "都不发",
+            "success_1": "成功发",
+            "failure_1": "失败发",
+            "All_1": "成功或失败都发",
+            "receivers": "收件人",
+            "receiverCcs": "抄送人"
+          }
         }
     }
 }

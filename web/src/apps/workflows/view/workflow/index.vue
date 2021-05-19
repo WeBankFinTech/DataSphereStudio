@@ -85,6 +85,16 @@
       v-if="loading"
       size="large"
       fix/>
+
+    <Modal
+      :title="$t('message.scheduler.runTask.title')"
+      v-model="showRunTaskModal"
+      width="860"
+      :mask-closable="false">
+      <i-run :startData= "startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
+      <div slot="footer" style="height: 30px;">
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -98,13 +108,15 @@ import ProjectForm from '@/components/projectForm/index.js'
 import api from '@/common/service/api';
 import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
+import iRun from './run'
 export default {
   components: {
     Workflow: Workflow.component,
     process: Process.component,
     WorkflowTabList,
     makeUp: MakeUp.component,
-    ProjectForm
+    ProjectForm,
+    iRun
   },
   data() {
     return {
@@ -142,6 +154,7 @@ export default {
       ORCHESTRATORMODES,
       loading: false,
       dolphinschedulerMode: false,
+      showRunTaskModal: false,
       list: [
         {
           id: 1
@@ -230,7 +243,8 @@ export default {
             ]);
           }
         }
-      ]
+      ],
+      startData: {}
     };
   },
   watch: {
@@ -563,10 +577,8 @@ export default {
       this.dolphinschedulerMode = true
     },
     run(index) {
-      this.$Modal.info({
-        title: '运行',
-        content: `姓名：${this.list[index].name}<br>年龄：${this.list[index].age}<br>地址：${this.list[index].address}`
-      })
+      console.log(this.list[index])
+      this.showRunTaskModal = true
     },
     setTime() {
 
@@ -576,6 +588,12 @@ export default {
     },
     offline() {
       this.isOnline = false
+    },
+    runTask() {
+      this.showRunTaskModal = false
+    },
+    closeRun() {
+      this.showRunTaskModal = false
     }
   }
 };

@@ -521,6 +521,12 @@
         "exportFail": "Export fail",
         "importSuccess": "import succeeded. Please close the opened choreography to open refresh again.",
         "importFail": "Import failed"
+      },
+      "scheduler": {
+        "run": "run",
+        "setTime": "timing",
+        "offline": "offline",
+        "online": "online"
       }
     }
   }

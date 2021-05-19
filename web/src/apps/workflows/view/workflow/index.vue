@@ -59,6 +59,9 @@
               </ul>
             </div>
             <div class="scheduler-list">
+              <template>
+                <Table border :columns="columns" :data="list"></Table>
+              </template>
             </div>
           </div>
         </template>
@@ -139,7 +142,95 @@ export default {
       ORCHESTRATORMODES,
       loading: false,
       dolphinschedulerMode: false,
-      list: []
+      list: [
+        {
+          id: 1
+        }
+      ],
+      isOnline: false,
+      columns: [
+        {
+          title: '编号',
+          key: 'id'
+        },
+        {
+          title: '工作流名称',
+          key: 'name'
+        },
+        {
+          title: '状态',
+          key: 'status'
+        },
+        {
+          title: '创建时间',
+          key: 'createTime'
+        },
+        {
+          title: '更新时间',
+          key: 'updateTime'
+        },
+        {
+          title: '描述',
+          key: 'describe'
+        },
+        {
+          title: '修改用户',
+          key: 'updateUserInfo'
+        },
+        {
+          title: '定时状态',
+          key: 'timingStatus'
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.run(params.index)
+                  }
+                }
+              },  this.$t('message.scheduler.run')),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.setTime(params.index)
+                  }
+                }
+              }, this.$t('message.scheduler.setTime')),
+              h('Button', {
+                props: {
+                  type: 'warning',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.isOnline ? this.offline(params.index) : this.online(params.index)
+                  }
+                }
+              }, this.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'))
+            ]);
+          }
+        }
+      ]
     };
   },
   watch: {
@@ -470,6 +561,21 @@ export default {
     },
     showDS() {
       this.dolphinschedulerMode = true
+    },
+    run(index) {
+      this.$Modal.info({
+        title: '运行',
+        content: `姓名：${this.list[index].name}<br>年龄：${this.list[index].age}<br>地址：${this.list[index].address}`
+      })
+    },
+    setTime() {
+
+    },
+    online() {
+      this.isOnline = true
+    },
+    offline() {
+      this.isOnline = false
     }
   }
 };

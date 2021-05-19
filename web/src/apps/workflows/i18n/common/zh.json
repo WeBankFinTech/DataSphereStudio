@@ -519,6 +519,12 @@
             "exportFail": "导出失败",
             "importSuccess": "导入成功，请关闭已打开编排以便再次打开刷新。",
             "importFail": "导入失败"
+        },
+        "scheduler": {
+          "run": "运行",
+          "setTime": "定时",
+          "offline": "下线",
+          "online": "上线"
         }
     }
 }

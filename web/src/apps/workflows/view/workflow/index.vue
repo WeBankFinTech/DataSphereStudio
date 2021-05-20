@@ -87,11 +87,20 @@
       fix/>
 
     <Modal
-      :title="$t('message.scheduler.runTask.title')"
+      :title="$t('message.scheduler.runTask.startTitle')"
       v-model="showRunTaskModal"
       width="860"
       :mask-closable="false">
       <i-run :startData= "startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
+      <div slot="footer" style="height: 30px;">
+      </div>
+    </Modal>
+    <Modal
+      :title="$t('message.scheduler.runTask.timingTitle')"
+      v-model="showTimingTaskModal"
+      width="860"
+      :mask-closable="false">
+      <i-timing :timingData="timingData" @onUpdateTiming="setTiming" @closeTiming="closeTiming"></i-timing>
       <div slot="footer" style="height: 30px;">
       </div>
     </Modal>
@@ -109,6 +118,7 @@ import api from '@/common/service/api';
 import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
 import iRun from './run'
+import iTiming from './timing'
 export default {
   components: {
     Workflow: Workflow.component,
@@ -116,7 +126,8 @@ export default {
     WorkflowTabList,
     makeUp: MakeUp.component,
     ProjectForm,
-    iRun
+    iRun,
+    iTiming
   },
   data() {
     return {
@@ -155,6 +166,7 @@ export default {
       loading: false,
       dolphinschedulerMode: false,
       showRunTaskModal: false,
+      showTimingTaskModal: false,
       list: [
         {
           id: 1
@@ -244,7 +256,11 @@ export default {
           }
         }
       ],
-      startData: {}
+      startData: {},
+      timingData: {
+        item: {},
+        type: ''
+      }
     };
   },
   watch: {
@@ -580,8 +596,9 @@ export default {
       console.log(this.list[index])
       this.showRunTaskModal = true
     },
-    setTime() {
-
+    setTime(index) {
+      console.log(this.list[index])
+      this.showTimingTaskModal = true
     },
     online() {
       this.isOnline = true
@@ -594,6 +611,12 @@ export default {
     },
     closeRun() {
       this.showRunTaskModal = false
+    },
+    setTiming() {
+      this.showTimingTaskModal = false
+    },
+    closeTiming() {
+      this.showTimingTaskModal = false
     }
   }
 };

@@ -528,7 +528,8 @@
         "offline": "offline",
         "online": "online",
         "runTask": {
-          "title": "Please set the parameters before starting",
+          "startTitle": "Please set the parameters before starting",
+          "timingTitle": "Set parameters before timing",
           "processName": "Process Name",
           "failureStrategy" : "Failure Strategy",
           "continue": "Continue",
@@ -556,7 +557,16 @@
           "failure_1": "failure",
           "All_1": "All",
           "receivers": "receivers",
-          "receiverCcs": "receiverCcs"
+          "receiverCcs": "receiverCcs",
+          "startDate": "startDate",
+          "endDate": "endDate",
+          "StartAndStopTime": "Start and stop time",
+          "Timing": "Timing",
+          "ExecuteTime": "Execute time",
+          "Timezone": "Timezone",
+          "fiveTimes": "Next five execution times",
+          "create": "Create",
+          "edit": "Edit"
         }
       }
     }

@@ -527,6 +527,7 @@
         "setTime": "timing",
         "offline": "offline",
         "online": "online",
+        "rerun": "rerun",
         "runTask": {
           "startTitle": "Please set the parameters before starting",
           "timingTitle": "Set parameters before timing",

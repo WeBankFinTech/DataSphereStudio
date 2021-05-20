@@ -54,13 +54,18 @@
           <div class="scheduler-wrapper">
             <div class="scheduler-menu">
               <ul>
-                <li class="active">任务列表</li>
-                <li>实例列表</li>
+                <li :class="active == 1? 'active' : ''" @click="activeList(1)">任务列表</li>
+                <li :class="active == 2? 'active' : ''" @click="activeList(2)">实例列表</li>
               </ul>
             </div>
-            <div class="scheduler-list">
+            <div class="scheduler-list" v-if="active == 1">
               <template>
                 <Table border :columns="columns" :data="list"></Table>
+              </template>
+            </div>
+            <div class="scheduler-list" v-if="active == 2">
+              <template>
+                <Table border :columns="columns2" :data="list2"></Table>
               </template>
             </div>
           </div>
@@ -172,6 +177,12 @@ export default {
           id: 1
         }
       ],
+      list2: [
+        {
+          id: 1,
+          name: 'test'
+        }
+      ],
       isOnline: false,
       columns: [
         {
@@ -256,11 +267,86 @@ export default {
           }
         }
       ],
+      columns2: [
+        {
+          title: '编号',
+          key: 'id'
+        },
+        {
+          title: '工作流名称',
+          key: 'name'
+        },
+        {
+          title: '状态',
+          key: 'status'
+        },
+        {
+          title: '运行类型',
+          key: 'executeType'
+        },
+        {
+          title: '调度时间',
+          key: 'scheduleTime'
+        },
+        {
+          title: '开始时间',
+          key: 'startTime'
+        },
+        {
+          title: '结束时间',
+          key: 'endTime'
+        },
+        {
+          title: '运行时长s',
+          key: 'duration'
+        },
+        {
+          title: '运行次数',
+          key: 'times'
+        },
+        {
+          title: '容错标识',
+          key: 'faultTolerant'
+        },
+        {
+          title: '执行用户',
+          key: 'operateUser'
+        },
+        {
+          title: 'host',
+          key: 'host'
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'info',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.rerun(params.index)
+                  }
+                }
+              },  this.$t('message.scheduler.rerun'))
+            ]);
+          }
+        }
+      ],
       startData: {},
       timingData: {
         item: {},
         type: ''
-      }
+      },
+      active: 1
     };
   },
   watch: {
@@ -617,6 +703,12 @@ export default {
     },
     closeTiming() {
       this.showTimingTaskModal = false
+    },
+    activeList(type) {
+      this.active = type
+    },
+    rerun(index) {
+      console.log(this.list[index])
     }
   }
 };

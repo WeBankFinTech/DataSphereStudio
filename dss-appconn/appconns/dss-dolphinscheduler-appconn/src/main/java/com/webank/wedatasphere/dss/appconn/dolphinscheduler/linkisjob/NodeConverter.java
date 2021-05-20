@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob;
 
 import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerSchedulerNode;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +59,7 @@ public class NodeConverter {
     }
 
     private DolphinSchedulerTask baseConversion(DolphinSchedulerSchedulerNode schedulerNode) {
-        DSSNodeDefault dssNode = (DSSNodeDefault)schedulerNode.getDSSNode();
+        DSSNodeDefault dssNode = (DSSNodeDefault) schedulerNode.getDSSNode();
 
         DolphinSchedulerTask task = new DolphinSchedulerTask();
         task.setId(schedulerNode.getId());
@@ -71,81 +73,23 @@ public class NodeConverter {
         DolphinSchedulerTaskParam params = new DolphinSchedulerTaskParam();
         Resource resource = dssNode.getResources().get(0);
         // 从资源中获取脚本内容
-        Map<String, Object> query = bmlHelper.query(schedulerNode.getUser(), resource.getResourceId(),
-            resource.getVersion());
-        InputStream inputStream = (InputStream)query.get("stream");
+        Map<String, Object> query = bmlHelper.query(schedulerNode.getUser(), resource.getResourceId(), resource.getVersion());
+        InputStream inputStream = (InputStream) query.get("stream");
         try {
             String script = IOUtils.toString(inputStream);
-            params.setRawScript(script);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("linkisType", schedulerNode.getNodeType());
+            map.put("proxyUser", schedulerNode.getDSSNode().getUserProxy());
+            map.put(Constant.JOB_COMMAND, new Gson().toJson(dssNode.getJobContent()));
+            map.put("params", new Gson().toJson(dssNode.getParams()));
+            map.put("resources", new Gson().toJson(dssNode.getResources()));
+            String rawScript = "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar '" + new Gson().toJson(map) + "'";
+            params.setRawScript(rawScript);
         } catch (IOException e) {
             logger.error("获取节点{}脚本内容出错", e, dssNode.getName());
         }
         task.setParams(params);
 
         return task;
-    }
-
-    //    private String convertJobtoString(LinkisJob job) {
-    //        HashMap<String, String> map = new HashMap<>();
-    //        map.put(Constant.JOB_TYPE, job.getType());
-    //        map.put(Constant.LINKIS_TYPE, job.getLinkistype());
-    //        map.put(Constant.ZAKABAN_DEPENDENCIES_KEY, job.getDependencies());
-    //        map.put(SchedulerAppConnConstant.PROXY_USER, job.getProxyUser());
-    //        map.put(Constant.JOB_COMMAND, job.getCommand());
-    //        map.putAll(job.getConf());
-    //        StringBuilder stringBuilder = new StringBuilder();
-    //        map.forEach((k, v) -> {
-    //            if (v != null) {
-    //                stringBuilder.append(k).append("=").append(v).append("\n");
-    //            }
-    //        });
-    //        return stringBuilder.toString();
-    //}
-
-    private void convertHead(DolphinSchedulerSchedulerNode schedulerNode, LinkisJob job) {
-        job.setType("linkis");
-        //        job.setLinkistype(schedulerNode.getNodeType());
-    }
-
-    private void convertDependencies(DolphinSchedulerSchedulerNode schedulerNode, LinkisJob job) {
-        List<String> dependencys = schedulerNode.getDSSNode().getDependencys();
-        if (dependencys != null && !dependencys.isEmpty()) {
-            StringBuilder dependencies = new StringBuilder();
-            dependencys.forEach(d -> dependencies.append(d + ","));
-            job.setDependencies(dependencies.substring(0, dependencies.length() - 1));
-        }
-    }
-
-    private void convertProxyUser(DolphinSchedulerSchedulerNode schedulerNode, LinkisJob job) {
-        String userProxy = schedulerNode.getDSSNode().getUserProxy();
-        if (!StringUtils.isEmpty(userProxy)) {
-            job.setProxyUser(userProxy);
-        }
-    }
-
-    private void convertConfiguration(DolphinSchedulerSchedulerNode schedulerNode, LinkisJob job) {
-        Map<String, Object> params = schedulerNode.getDSSNode().getParams();
-        if (params != null && !params.isEmpty()) {
-            Object configuration = params.get("configuration");
-            String confprefix = "node.conf.";
-            ((Map<String, Map<String, Object>>)configuration).forEach((k, v) -> {
-                if (null != v) {
-                    v.forEach((k2, v2) -> {
-                        if (null != v2) {
-                            job.getConf().put(confprefix + k + "." + k2, v2.toString());
-                        }
-                    });
-                }
-            });
-        }
-
-    }
-
-    private void convertJobCommand(DolphinSchedulerSchedulerNode schedulerNode, LinkisJob job) {
-        Map<String, Object> jobContent = schedulerNode.getDSSNode().getJobContent();
-        if (jobContent != null) {
-            jobContent.remove("jobParams");
-            job.setCommand(new Gson().toJson(jobContent));
-        }
     }
 }

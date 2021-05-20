@@ -525,6 +525,7 @@
           "setTime": "定时",
           "offline": "下线",
           "online": "上线",
+          "rerun": "重跑",
           "runTask": {
             "startTitle": "启动前请先设置参数",
             "timingTitle": "定时前请先设置参数",

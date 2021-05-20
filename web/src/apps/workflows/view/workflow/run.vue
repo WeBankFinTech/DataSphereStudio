@@ -12,7 +12,7 @@
       </div>
       <div class="cont">
         <template>
-          <Radio-group v-model="failureStrategy" style="margin-top: 7px;" size="small">
+          <Radio-group v-model="failureStrategy" style="margin-top: 7px;">
             <Radio :label="'CONTINUE'">{{$t('message.scheduler.runTask.continue')}}</Radio>
             <Radio :label="'END'">{{$t('message.scheduler.runTask.end')}}</Radio>
           </Radio-group>
@@ -26,7 +26,7 @@
       </div>
       <div class="cont" style="padding-top: 6px;">
         <template>
-          <Radio-group v-model="taskDependType" size="small">
+          <Radio-group v-model="taskDependType">
             <Radio :label="'TASK_POST'">{{$t('message.scheduler.runTask.backwardExecution')}}</Radio>
             <Radio :label="'TASK_PRE'">{{$t('message.scheduler.runTask.forwardExecution')}}</Radio>
             <Radio :label="'TASK_ONLY'">{{$t('message.scheduler.runTask.executeOnlyTheCurrentNode')}}</Radio>
@@ -40,7 +40,7 @@
       </div>
       <div class="cont">
         <template>
-          <Select style="width: 200px;" v-model="warningType" size="small">
+          <Select style="width: 200px;" v-model="warningType">
             <Option
               v-for="city in warningTypeList"
               :key="city.id"
@@ -84,10 +84,9 @@
           <Select
             style="width: 200px;"
             clearable
-            size="small"
             v-model="warningGroupId"
             :disabled="!notifyGroupList.length">
-            <Input slot="trigger" slot-scope="{ selectedModel }" readonly size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+            <Input slot="trigger" slot-scope="{ selectedModel }" readonly :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
               <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
               <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
             </Input>
@@ -103,12 +102,36 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        <span>{{$t('message.scheduler.runTask.receivers')}}</span>
+      </div>
+      <div class="cont" style="width: 688px;">
+        <div style="padding-top: 6px;">
+          <template>
+            <Input v-model="receivers" />
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
+        <span>{{$t('message.scheduler.runTask.receiverCcs')}}</span>
+      </div>
+      <div class="cont" style="width: 688px;">
+        <div style="padding-top: 6px;">
+          <template>
+            <Input v-model="receiverCcs" />
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('message.scheduler.runTask.complementData')}}
       </div>
       <div class="cont">
         <div style="padding-top: 6px;">
           <template>
-            <Checkbox v-model="execType" size="small">{{$t('message.scheduler.runTask.complementProcess?')}}</Checkbox>
+            <Checkbox v-model="execType">{{$t('message.scheduler.runTask.complementProcess?')}}</Checkbox>
           </template>
         </div>
       </div>
@@ -136,45 +159,20 @@
             <Date-picker
               style="width: 360px"
               v-model="scheduleTime"
-              size="small"
               @change="_datepicker"
               type="datetimerange"
               range-separator="-"
-              :start-placeholder="$t('startDate')"
-              :end-placeholder="$t('endDate')"
+              :start-placeholder="$t('message.scheduler.runTask.startDate')"
+              :end-placeholder="$t('message.scheduler.runTask.endDate')"
               value-format="yyyy-MM-dd HH:mm:ss">
             </Date-picker>
           </template>
         </div>
       </div>
     </template>
-    <div class="clearfix list">
-      <div class="text">
-        <span>{{$t('message.scheduler.runTask.receivers')}}</span>
-      </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
-          <template>
-            <Input v-model="receivers" />
-          </template>
-        </div>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
-        <span>{{$t('message.scheduler.runTask.receiverCcs')}}</span>
-      </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
-          <template>
-            <Input v-model="receiverCcs" />
-          </template>
-        </div>
-      </div>
-    </div>
     <div class="submit">
-      <i-button type="text" size="small" @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </i-button>
-      <i-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('message.scheduler.runTask.start')}} </i-button>
+      <i-button type="text" @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </i-button>
+      <i-button type="primary" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('message.scheduler.runTask.start')}} </i-button>
     </div>
   </div>
 </template>
@@ -339,11 +337,11 @@ export default {
     }
   },
   mounted () {
-    this._getNotifyGroupList().then(() => {
+    /*this._getNotifyGroupList().then(() => {
       this.$nextTick(() => {
         this.warningGroupId = ''
       })
-    })
+    })*/
     this.workflowName = this.startData.name
   },
   computed: {},

@@ -2,12 +2,12 @@
   <div class="v-crontab">
     <div class="v-crontab-model">
       <div class="clearfix v-crontab-tab">
-        <a href="javascript:" :class="tabVal === 'second' ?' active' :''" @click="onTab('second')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('秒')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'minute' ?' active' :''" @click="onTab('minute')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('分')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'hour' ?' active' :''" @click="onTab('hour')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('时')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'day' ?' active' :''" @click="onTab('day')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('天')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'month' ?' active' :''" @click="onTab('month')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('月')}}</span></a>
-        <a href="javascript:" :class="tabVal === 'year' ?' active' :''" @click="onTab('year')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t('年')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'second' ?' active' :''" @click="onTab('second')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('秒')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'minute' ?' active' :''" @click="onTab('minute')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('分')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'hour' ?' active' :''" @click="onTab('hour')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('时')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'day' ?' active' :''" @click="onTab('day')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('天')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'month' ?' active' :''" @click="onTab('month')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('月')}}</span></a>
+        <a href="javascript:" :class="tabVal === 'year' ?' active' :''" @click="onTab('year')"><em class="ivu-icon ivu-icon-calendar"></em><span>{{$t2('年')}}</span></a>
       </div>
       <div class="v-crontab-content">
         <template v-if="tabVal === 'second'">

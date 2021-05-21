@@ -528,6 +528,7 @@
         "offline": "offline",
         "online": "online",
         "rerun": "rerun",
+        "Unpublished": "Unpublished",
         "runTask": {
           "startTitle": "Please set the parameters before starting",
           "timingTitle": "Set parameters before timing",

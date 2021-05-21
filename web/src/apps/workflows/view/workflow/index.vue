@@ -61,6 +61,18 @@
             <div class="scheduler-list" v-if="active == 1">
               <template>
                 <Table border :columns="columns" :data="list"></Table>
+                <Page
+                  v-if="list.length > 0"
+                  class="page-bar fr"
+                  :total="pagination.total"
+                  show-sizer
+                  show-total
+                  :current="pagination.current"
+                  :page-size="pagination.size"
+                  :page-size-opts="pagination.opts"
+                  @on-change="pageChange"
+                  @on-page-size-change="pageSizeChange"
+                ></Page>
               </template>
             </div>
             <div class="scheduler-list" v-if="active == 2">
@@ -124,6 +136,7 @@ import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
 import iRun from './run'
 import iTiming from './timing'
+import dayjs from 'dayjs'
 export default {
   components: {
     Workflow: Workflow.component,
@@ -183,7 +196,6 @@ export default {
           name: 'test'
         }
       ],
-      isOnline: false,
       columns: [
         {
           title: '编号',
@@ -195,7 +207,7 @@ export default {
         },
         {
           title: '状态',
-          key: 'status'
+          key: 'releaseStateDesc'
         },
         {
           title: '创建时间',
@@ -207,15 +219,15 @@ export default {
         },
         {
           title: '描述',
-          key: 'describe'
+          key: 'description'
         },
         {
           title: '修改用户',
-          key: 'updateUserInfo'
+          key: 'modifyBy'
         },
         {
           title: '定时状态',
-          key: 'timingStatus'
+          key: 'scheduleReleaseStateDesc'
         },
         {
           title: '操作',
@@ -227,7 +239,8 @@ export default {
               h('Button', {
                 props: {
                   type: 'success',
-                  size: 'small'
+                  size: 'small',
+                  disabled: !params.row.isOnline
                 },
                 style: {
                   marginRight: '5px'
@@ -241,7 +254,8 @@ export default {
               h('Button', {
                 props: {
                   type: 'info',
-                  size: 'small'
+                  size: 'small',
+                  disabled: !params.row.isOnline
                 },
                 style: {
                   marginRight: '5px'
@@ -259,10 +273,10 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.isOnline ? this.offline(params.index) : this.online(params.index)
+                    params.row.isOnline ? this.offline(params.index) : this.online(params.index)
                   }
                 }
-              }, this.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'))
+              }, params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'))
             ]);
           }
         }
@@ -278,7 +292,7 @@ export default {
         },
         {
           title: '状态',
-          key: 'status'
+          key: 'releaseState'
         },
         {
           title: '运行类型',
@@ -346,8 +360,19 @@ export default {
         item: {},
         type: ''
       },
-      active: 1
-    };
+      active: 1,
+      publishStatus: {
+        'NOT_RELEASE': this.$t('message.scheduler.Unpublished'),
+        'ONLINE': this.$t('message.scheduler.online'),
+        'OFFLINE': this.$t('message.scheduler.offline')
+      },
+      pagination: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      }
+    }
   },
   watch: {
     currentVal(val, oldVal) {
@@ -677,6 +702,23 @@ export default {
     },
     showDS() {
       this.dolphinschedulerMode = true
+      this.getListData()
+    },
+    getListData() {
+      api.fetch(`dolphinscheduler/projects/-project/process/list-paging`, {
+        pageSize: this.pagination.size,
+        pageNo: this.pagination.current
+      }, 'get').then((res) => {
+        res.totalList.forEach(item => {
+          item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
+          item.scheduleReleaseStateDesc = item.scheduleReleaseState? this.publishStatus[item.scheduleReleaseState] : '-'
+          item.isOnline = item.releaseState === 'ONLINE'
+          item.createTime = this.formatDate(item.createTime)
+          item.updateTime = this.formatDate(item.updateTime)
+        })
+        this.list = res.totalList
+        this.pagination.total = res.total
+      })
     },
     run(index) {
       console.log(this.list[index])
@@ -686,11 +728,11 @@ export default {
       console.log(this.list[index])
       this.showTimingTaskModal = true
     },
-    online() {
-      this.isOnline = true
+    online(index) {
+      this.list[index].isOnline = true
     },
-    offline() {
-      this.isOnline = false
+    offline(index) {
+      this.list[index].isOnline = false
     },
     runTask() {
       this.showRunTaskModal = false
@@ -709,6 +751,29 @@ export default {
     },
     rerun(index) {
       console.log(this.list[index])
+    },
+    formatISODate (date) {
+      let [datetime, timezone] = date.split('+')
+      if (!timezone || timezone.indexOf(':') >= 0) return date
+      let hourOfTz = timezone.substring(0, 2) || '00'
+      let secondOfTz = timezone.substring(2, 4) || '00'
+      return `${datetime}+${hourOfTz}:${secondOfTz}`
+    },
+    formatDate(value, fmt) {
+      fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
+      if (value === null) {
+        return '-'
+      } else {
+        return dayjs(this.formatISODate(value)).format(fmt)
+      }
+    },
+    pageChange(page) {
+      this.pagination.current = page
+      this.getListData()
+    },
+    pageSizeChange(size) {
+      this.pagination.size = size
+      this.getListData()
     }
   }
 };
@@ -773,6 +838,12 @@ export default {
     }
     .scheduler-list{
       flex:6;
+    }
+    .fr{
+      float: right;
+    }
+    .page-bar {
+      margin-top: 20px;
     }
   }
 </style>

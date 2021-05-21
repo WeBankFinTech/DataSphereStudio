@@ -58,6 +58,13 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
+
+  // 增加token
+  if (/dolphinscheduler/.test(config.url)) {
+    config.headers['token'] = 'c1f1e5c8c4b5bcdfd5fead493e7b2b41'
+    config.url = `http://${window.location.host}/` + config.url
+  }
+
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -162,12 +169,24 @@ const success = function(response) {
     let code = res.codePath;
     let message = res.messagePath;
     let result = res.resultPath;
-    if (code != api.constructionOfResponse.successCode) {
-      if (api.error[code]) {
-        api.error[code](response);
-        throw new Error('');
-      } else {
-        throw new Error(message || '后台接口异常，请联系开发处理！');
+    // 兼容 dolphin 返回数据结构
+    if (data.msg) {
+      if (data.code != api.constructionOfResponse.successCode) {
+        if (api.error[data.code]) {
+          api.error[data.code](response);
+          throw new Error('');
+        } else {
+          throw new Error(message || '后台接口异常，请联系开发处理！');
+        }
+      }
+    } else {
+      if (code != api.constructionOfResponse.successCode) {
+        if (api.error[code]) {
+          api.error[code](response);
+          throw new Error('');
+        } else {
+          throw new Error(message || '后台接口异常，请联系开发处理！');
+        }
       }
     }
     if (result) {

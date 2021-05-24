@@ -23,6 +23,7 @@ import axios from 'axios';
 import router from '@/router';
 import { Message } from 'iview';
 import cache from './apiCache';
+import qs from './querystring'
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -63,6 +64,17 @@ instance.interceptors.request.use((config) => {
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = 'c1f1e5c8c4b5bcdfd5fead493e7b2b41'
     config.url = `http://${window.location.host}/` + config.url
+    // fallback application/json to application/x-www-form-urlencoded
+    if (config.useForm) {
+      let formData = new FormData()
+      Object.keys(config.data).forEach(key => {
+        formData.append(key, config.data[key])
+      })
+      config.data = formData
+    }
+    if (config.useFormQuery) {
+      config.url = config.url + '?' + qs(config.data)
+    }
   }
 
   let flag = cutReq(config);
@@ -201,7 +213,6 @@ const success = function(response) {
         console.log(response.data, '潜在性能问题大数据量', len)
       }
     }
-
     return result || {};
   }
 };

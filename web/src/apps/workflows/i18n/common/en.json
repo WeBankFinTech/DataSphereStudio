@@ -568,7 +568,8 @@
           "Timezone": "Timezone",
           "fiveTimes": "Next five execution times",
           "create": "Create",
-          "edit": "Edit"
+          "edit": "Edit",
+          "inputEmail": "Please enter Email, separate by comma"
         }
       }
     }

@@ -33,4 +33,10 @@ public class Constant {
     public final static String FLOW_PROPERTIES_KEY_AIRFLOW_START_TIME = "dag.start.time";
     public final static String FLOW_PROPERTIES_KEY_AIRFLOW_END_TIME = "dag.end.time";
     public final static String FLOW_PROPERTIES_KEY_AIRFLOW_SCHEDULE_INTERVAL = "dag.schedule.interval";
+
+    /**
+     * dolphin scheduler result code.
+     */
+    public final static int DS_RESULT_CODE_SUCCESS = 0;
+    public final static int DS_RESULT_CODE_PROJECT_ALREADY_EXISTS = 10019;
 }

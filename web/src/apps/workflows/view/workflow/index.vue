@@ -108,7 +108,7 @@
       v-model="showRunTaskModal"
       width="860"
       :mask-closable="false">
-      <i-run :startData= "startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
+      <i-run :startData="startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
       <div slot="footer" style="height: 30px;">
       </div>
     </Modal>
@@ -158,6 +158,7 @@ export default {
       lastVal: null,
       current: null,
       modeOfKey: '',
+      projectName: this.$route.query.projectName,//'-project',
       modeName: "工作流开发",
       tabName: '',
       topTabList: undefined,
@@ -704,10 +705,10 @@ export default {
       this.dolphinschedulerMode = true
       this.getListData()
     },
-    getListData() {
-      api.fetch(`dolphinscheduler/projects/-project/process/list-paging`, {
+    getListData(page=1) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
         pageSize: this.pagination.size,
-        pageNo: this.pagination.current
+        pageNo: page
       }, 'get').then((res) => {
         res.totalList.forEach(item => {
           item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
@@ -720,19 +721,50 @@ export default {
         this.pagination.total = res.total
       })
     },
+    checkStart(index, cb){
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-check`, {
+        processDefinitionId: this.list[index].id
+      }, {useForm: true}).then(() => {
+        cb && cb()
+      })
+    },
+    getReceiver(processDefinitionId){
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/get-receiver-cc`, {
+        processDefinitionId: processDefinitionId
+      }, 'get').then((res) => {
+        this.startData.receivers = res.receivers
+        this.startData.receiversCc = res.receiversCc
+      })
+    },
     run(index) {
-      console.log(this.list[index])
-      this.showRunTaskModal = true
+      this.checkStart(index, ()=>{
+        this.startData = this.list[index]
+        this.showRunTaskModal = true
+        this.getReceiver(this.list[index].id)
+      })
     },
     setTime(index) {
       console.log(this.list[index])
       this.showTimingTaskModal = true
     },
     online(index) {
-      this.list[index].isOnline = true
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
+        processId: this.list[index].id,
+        releaseState: 1
+      }, {useForm: true}).then(() => {
+        this.getListData()
+        this.list[index].isOnline = true
+      })
     },
     offline(index) {
-      this.list[index].isOnline = false
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
+        processId: this.list[index].id,
+        releaseState: 0
+      }, {useForm: true}).then(() => {
+        this.getListData()
+        this.list[index].isOnline = false
+      })
+
     },
     runTask() {
       this.showRunTaskModal = false
@@ -769,7 +801,7 @@ export default {
     },
     pageChange(page) {
       this.pagination.current = page
-      this.getListData()
+      this.getListData(page)
     },
     pageSizeChange(size) {
       this.pagination.size = size

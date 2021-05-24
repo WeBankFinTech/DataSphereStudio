@@ -45,7 +45,7 @@ public class LinkisDolphinSchedulerProjectPublishHook extends AbstractProjectPub
 
         // TODO: 2021/4/29 检查工程是否存在
         // 2.处理资源
-        //        writeProjectResourcesToLocal(publishProject);
+        // writeProjectResourcesToLocal(publishProject);
         //3.调用flowPublishHooks
         super.prePublish(project);
     }
@@ -116,55 +116,6 @@ public class LinkisDolphinSchedulerProjectPublishHook extends AbstractProjectPub
         allSchedulerFlows.forEach(flow -> flow.getSchedulerNodes().forEach(node -> nodeNames.add(node.getName())));
         return nodeNames;
     }
-
-    //    private String sendFlowScheduleParams(String projectName, String flowName, String cronExpression, SchedulerAppJoint schedulerAppJoint, Session session) throws AppJointErrorException {
-    //        String scheduleId = null;
-    //        List<NameValuePair> params = new ArrayList<>();
-    //        if(cronExpression!= null) {
-    //            params.add(new BasicNameValuePair("ajax", "scheduleCronFlow"));
-    //            params.add(new BasicNameValuePair("projectName", projectName));
-    //            params.add(new BasicNameValuePair("flow", flowName));
-    //            params.add(new BasicNameValuePair("cronExpression", cronExpression));
-    //            AzkabanProjectService projectService = (AzkabanProjectService) schedulerAppJoint.getProjectService();
-    //            String baseUrl = projectService.getAzkabanBaseUrl();
-    //            String scheduleUrl = baseUrl + "/schedule";
-    //            HttpPost httpPost = new HttpPost(scheduleUrl);
-    //            /*httpPost.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");*/
-    //            CookieStore cookieStore = new BasicCookieStore();
-    //            cookieStore.addCookie(session.getCookies()[0]);
-    //            HttpEntity entity = EntityBuilder.create().
-    //                    setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
-    //                    .setParameters(params).build();
-    //            httpPost.setEntity(entity);
-    //            CloseableHttpClient httpClient = null;
-    //            CloseableHttpResponse response = null;
-    //            try {
-    //                httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-    //                response = httpClient.execute(httpPost);
-    //                HttpEntity ent = response.getEntity();
-    //                String entStr = IOUtils.toString(ent.getContent(), "utf-8");
-    //                LOGGER.info("设置工程调度 {}, azkaban 返回的信息是 {}", projectName + "-" + flowName, entStr);
-    //                String message = AzkabanUtils.handleAzkabanEntity(entStr);
-    //                if (!"success".equals(message)) {
-    //                    throw new AppJointErrorException(90077, "设置调度失败, 原因:" + message);
-    //                } else {
-    //                    int  id = (int)Double.parseDouble(AzkabanUtils.getValueFromEntity(entStr, "scheduleId"));
-    //                    scheduleId = Integer.toString(id);
-    //                    LOGGER.info("设置调度成功，工作流名为：{}, 调度ID:{} ", flowName, scheduleId);
-    //                }
-    //            } catch (Exception e) {
-    //                LOGGER.error("设置调度失败:", e);
-    //                throw new AppJointErrorException(90009, e.getMessage(), e);
-    //            } finally {
-    //                IOUtils.closeQuietly(response);
-    //                IOUtils.closeQuietly(httpClient);
-    //            }
-    //        }else{
-    //            LOGGER.info("设置工作流调度参数时间参数为空！");
-    //        }
-    //        return scheduleId;
-    //
-    //    }
 
     //    private void sendFlowScheduleAlarmParams(String scheduleId, String flowName, String slaEmails, String alarmLevel, SchedulerAppJoint schedulerAppJoint, Session session) throws AppJointErrorException {
     //

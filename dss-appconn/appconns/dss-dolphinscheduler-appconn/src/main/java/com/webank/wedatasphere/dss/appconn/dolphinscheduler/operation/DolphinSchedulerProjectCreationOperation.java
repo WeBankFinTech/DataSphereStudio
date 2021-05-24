@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
@@ -31,6 +32,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Dolphin scheduler project creation operation.
+ *
+ * @author yuxin.yuan
+ * @date 2021/05/18
+ */
 public class DolphinSchedulerProjectCreationOperation implements ProjectCreationOperation, DolphinSchedulerConf {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectCreationOperation.class);
@@ -60,9 +67,8 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
 
     @Override
     public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
-        // 在Dolphin Scheduler创建工程的时候
-        String dsProjectName = ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(),
-            requestRef.getName());
+        // Dolphin Scheduler项目名
+        String dsProjectName = ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
         logger.info("begin to create project in Dolphin Scheduler, project is {}", dsProjectName);
 
         List<NameValuePair> params = new ArrayList<>();
@@ -82,19 +88,27 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), "utf-8");
 
-            String code = DolphinAppConnUtils.getValueFromEntity(entString, "code");
-            if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode() && Integer.valueOf(code)
-                .equals(0)) {
-                logger.info("Dolphin Scheduler新建工程 {} 成功, 返回的信息是 {}", dsProjectName,
-                    DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
+            if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()) {
+                String codeString = DolphinAppConnUtils.getValueFromEntity(entString, "code");
+                int code = Integer.valueOf(codeString);
+
+                if (Constant.DS_RESULT_CODE_SUCCESS == code) {
+                    logger.info("Dolphin Scheduler新建项目 {} 成功, 返回的信息是 {}", dsProjectName,
+                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
+                } else if (Constant.DS_RESULT_CODE_PROJECT_ALREADY_EXISTS == code) {
+                    logger.info("Dolphin Scheduler项目 {} 已经存在, 返回的信息是 {}", dsProjectName,
+                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
+                } else {
+                    throw new ExternalOperationFailedException(90001, "新建工程失败, 原因:" + entString);
+                }
             } else {
-                throw new ExternalOperationFailedException(90008,
-                    "新建工程失败, 原因:" + IOUtils.toString(entity.getContent(), "utf-8"));
+                throw new ExternalOperationFailedException(90001, "新建工程失败, 原因:" + entString);
             }
+
             // 未返回project id
             responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
         } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(60051, "failed to create project in Dolphin Scheduler", t,
+            SchedulisExceptionUtils.dealErrorException(90002, "failed to create project in Dolphin Scheduler", t,
                 ExternalOperationFailedException.class);
         } finally {
             IOUtils.closeQuietly(httpResponse);

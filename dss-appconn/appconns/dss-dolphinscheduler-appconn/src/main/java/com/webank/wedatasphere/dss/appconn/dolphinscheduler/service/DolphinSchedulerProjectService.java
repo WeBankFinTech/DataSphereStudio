@@ -17,13 +17,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The type Dolphin scheduler project service.
+ *
+ * @author yuxin.yuan
+ * @date 2021/05/18
+ */
 public class DolphinSchedulerProjectService implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectService.class);
 
-    private AppInstance appInstance;
-
     private AppDesc appDesc;
+
+    private AppInstance appInstance;
 
     private StructureIntegrationStandard structureIntegrationStandard;
 
@@ -38,8 +44,7 @@ public class DolphinSchedulerProjectService implements ProjectService {
     }
 
     private void init() {
-        operationMap.put(DolphinSchedulerProjectCreationOperation.class,
-            new DolphinSchedulerProjectCreationOperation(this));
+        operationMap.put(DolphinSchedulerProjectCreationOperation.class, new DolphinSchedulerProjectCreationOperation(this));
         //        operationMap.put(SchedulisProjectUpdateOperation.class, new SchedulisProjectUpdateOperation(this));
         //        operationMap.put(SchedulisProjectDeletionOperation.class, new SchedulisProjectDeletionOperation(this));
     }
@@ -47,13 +52,10 @@ public class DolphinSchedulerProjectService implements ProjectService {
     @Override
     public ProjectCreationOperation createProjectCreationOperation() {
         if (operationMap.containsKey(DolphinSchedulerProjectCreationOperation.class)) {
-            return (DolphinSchedulerProjectCreationOperation)operationMap.get(
-                DolphinSchedulerProjectCreationOperation.class);
+            return (DolphinSchedulerProjectCreationOperation)operationMap.get(DolphinSchedulerProjectCreationOperation.class);
         } else {
-            operationMap.put(DolphinSchedulerProjectCreationOperation.class,
-                new DolphinSchedulerProjectCreationOperation(this));
-            return (DolphinSchedulerProjectCreationOperation)operationMap.get(
-                DolphinSchedulerProjectCreationOperation.class);
+            operationMap.put(DolphinSchedulerProjectCreationOperation.class, new DolphinSchedulerProjectCreationOperation(this));
+            return (DolphinSchedulerProjectCreationOperation)operationMap.get(DolphinSchedulerProjectCreationOperation.class);
         }
     }
 

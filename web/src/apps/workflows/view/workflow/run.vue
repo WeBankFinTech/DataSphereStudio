@@ -17,7 +17,6 @@
             <Radio :label="'END'">{{$t('message.scheduler.runTask.end')}}</Radio>
           </Radio-group>
         </template>
-
       </div>
     </div>
     <div class="clearfix list" v-if="sourceType === 'contextmenu'" style="margin-top: -8px;">
@@ -58,7 +57,10 @@
       <div class="cont">
         <template>
           <Select v-model="processInstancePriority">
-            <Option v-for="item in priorityList" :value="item.code" :key="item.code">{{item.code}}</Option>
+            <SvgIcon class="icon" :icon-class="getSvgIcon()" slot="prefix"/>
+            <Option v-for="item in priorityList" :value="item.code" :key="item.code">
+              <SvgIcon class="icon" :icon-class="item.unicode" :color="item.color"/>{{item.code}}
+            </Option>
           </Select>
         </template>
       </div>
@@ -107,7 +109,7 @@
       <div class="cont" style="width: 688px;">
         <div style="padding-top: 6px;">
           <template>
-            <Input v-model="receivers" />
+            <Input v-model="receivers" :placeholder="$t('message.scheduler.runTask.inputEmail')"/>
           </template>
         </div>
       </div>
@@ -119,7 +121,7 @@
       <div class="cont" style="width: 688px;">
         <div style="padding-top: 6px;">
           <template>
-            <Input v-model="receiverCcs" />
+            <Input v-model="receiversCc" :placeholder="$t('message.scheduler.runTask.inputEmail')"/>
           </template>
         </div>
       </div>
@@ -179,6 +181,7 @@
 <script>
 import dayjs from 'dayjs'
 import api from '@/common/service/api'
+import _ from 'lodash'
 
 export default {
   name: 'start-process',
@@ -218,32 +221,32 @@ export default {
       workerGroup: 'default',
       workerGroupsList: [],
       // Global custom parameters
-      receiverCcs: '',
+      receiversCc: '',
       receivers: '',
       priorityList: [
         {
           code: 'HIGHEST',
-          unicode: 'el-icon-top',
+          unicode: 'high:highest',
           color: '#ff0000'
         },
         {
           code: 'HIGH',
-          unicode: 'el-icon-top',
+          unicode: 'high:highest',
           color: '#ff0000'
         },
         {
           code: 'MEDIUM',
-          unicode: 'el-icon-top',
+          unicode: 'medium',
           color: '#EA7D24'
         },
         {
           code: 'LOW',
-          unicode: 'el-icon-bottom',
+          unicode: 'low:lowest',
           color: '#2A8734'
         },
         {
           code: 'LOWEST',
-          unicode: 'el-icon-bottom',
+          unicode: 'low:lowest',
           color: '#2A8734'
         }
       ]
@@ -275,74 +278,102 @@ export default {
         taskDependType: this.taskDependType,
         runMode: this.runMode,
         processInstancePriority: this.processInstancePriority,
-        workerGroup: this.workerGroup
+        workerGroup: this.workerGroup,
+        receivers: this.receivers,
+        receiversCc: this.receiversCc
       }
       // Executed from the specified node
       if (this.sourceType === 'contextmenu') {
         param.taskDependType = this.taskDependType
       }
 
-      /*this.api.fetch(`dag/processStart`, param, 'post').then((res) => {
-        this.$message.success(res.msg)
+      this.api.fetch(`dolphinscheduler/projects/${this.$route.query.projectName}/executors/start-process-instance`, param, {useFormQuery: true}).then(() => {
+        this.$Message.success('操作成功')
         this.$emit('onUpdateStart')
-
         setTimeout(() => {
           this.spinnerLoading = false
           this.close()
         }, 500)
       }).catch(e => {
-        this.$message.error(e.msg || '')
+        console.log(e)
         this.spinnerLoading = false
-      })*/
+      })
     },
     _getNotifyGroupList () {
-      /*return new Promise((resolve, reject) => {
-        this.api.fetch('dag/getNotifyGroupList', 'get').then(res => {
-          this.notifyGroupList = res
+      return new Promise((resolve) => {
+        this.api.fetch('dolphinscheduler/alert-group/list', 'get').then(res => {
+          let notifyGroupListS = _.map(res, v => {
+            return {
+              id: v.id,
+              code: v.groupName,
+              disabled: false
+            }
+          })
+          this.notifyGroupList = _.cloneDeep(notifyGroupListS)
           resolve()
         })
-      })*/
-    },
-    _getGlobalParams () {
-      /*this.api.fetch(`dag/getProcessDetails/${this.startData.id}`, 'get').then(res => {})*/
+      })
     },
     ok () {
       this._start()
     },
     close () {
       this.$emit('closeStart')
+    },
+    getAllWorkers(cb) {
+      api.fetch(`dolphinscheduler/worker-group/all-groups`, 'get').then((res) => {
+        let list = res
+        if (list.length > 0) {
+          list = list.map(item => {
+            return {
+              id: item,
+              name: item
+            }
+          })
+        } else {
+          list.unshift({
+            id: 'default',
+            name: 'default'
+          })
+        }
+        cb(list)
+      })
+    },
+    getSvgIcon() {
+      for (let i = 0;i < this.priorityList.length; i++) {
+        if (this.priorityList[i].code === this.processInstancePriority) {
+          return this.priorityList[i].unicode
+        }
+      }
     }
   },
   watch: {
     execType (a) {
       this.scheduleTime = a ? [dayjs().format('YYYY-MM-DD 00:00:00'), dayjs().format('YYYY-MM-DD 00:00:00')] : ''
+    },
+    startData () {
+      this.workflowName = this.startData.name
+      this.warningGroupId = ''
+      this.workerGroup = this.workerGroupsList.length ? this.workerGroupsList[0].id : 'default',
+      this.receivers = this.startData.receivers
+      this.receiversCc = this.startData.receiversCc
     }
   },
   created () {
     this.warningType = this.warningTypeList[0].id
-    this.workflowName = this.startData.name
-    this._getGlobalParams()
-    let stateWorkerGroupsList = []
-    if (stateWorkerGroupsList.length) {
-      this.workerGroup = stateWorkerGroupsList[0].id
-    } else {
-      /*this.api.fetch('security/getWorkerGroupsAll', 'get').then(res => {
-        this.workerGroupsList = res
-        this.$nextTick(() => {
-          if (res.length > 0) {
-            this.workerGroup = res[0].id
-          }
-        })
-      })*/
-    }
   },
   mounted () {
-    /*this._getNotifyGroupList().then(() => {
+    this.getAllWorkers((list) => {
+      if (list.length) {
+        this.workerGroup = list[0].id
+        this.workerGroupsList = list
+      }
+    })
+    this._getNotifyGroupList().then(() => {
       this.$nextTick(() => {
         this.warningGroupId = ''
       })
-    })*/
-    this.workflowName = this.startData.name
+    })
   },
   computed: {},
   components: {}

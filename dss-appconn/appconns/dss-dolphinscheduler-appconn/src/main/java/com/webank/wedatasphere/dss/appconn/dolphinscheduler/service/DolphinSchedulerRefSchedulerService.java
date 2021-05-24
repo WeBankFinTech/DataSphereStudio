@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.service;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerWorkflowUploadOperation;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.publish.RefSchedulerService;
+import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.ProjectPublishToSchedulerRef;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.ProjectUploadToSchedulerRef;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.PublishToSchedulerRef;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.UploadToScheduleOperation;
@@ -10,6 +11,12 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 
 import java.util.List;
 
+/**
+ * The type Dolphin scheduler ref scheduler service.
+ *
+ * @author yuxin.yuan
+ * @date 2021/05/21
+ */
 public class DolphinSchedulerRefSchedulerService implements RefSchedulerService {
 
     private AppDesc appDesc;
@@ -29,10 +36,15 @@ public class DolphinSchedulerRefSchedulerService implements RefSchedulerService 
     @Override
     public UploadToScheduleOperation<ProjectUploadToSchedulerRef> createRefUploadToScheduleOperation(
         PublishToSchedulerRef requestRef) {
-        DolphinSchedulerWorkflowUploadOperation dolphinSchedulerProjectUploadOperation
+        DolphinSchedulerWorkflowUploadOperation dolphinSchedulerWorkflowUploadOperation
             = new DolphinSchedulerWorkflowUploadOperation(this.appDesc);
-        dolphinSchedulerProjectUploadOperation.setDssLabels(requestRef.getLabels());
-        return dolphinSchedulerProjectUploadOperation;
+        dolphinSchedulerWorkflowUploadOperation.setDssLabels(requestRef.getLabels());
+        if (requestRef instanceof ProjectPublishToSchedulerRef) {
+            ProjectPublishToSchedulerRef projectPublishToSchedulerRef = (ProjectPublishToSchedulerRef)requestRef;
+            dolphinSchedulerWorkflowUploadOperation.setProcessDefinitionId(
+                projectPublishToSchedulerRef.getSchedulerWorkflowId());
+        }
+        return dolphinSchedulerWorkflowUploadOperation;
     }
 
     @Override
@@ -54,4 +66,5 @@ public class DolphinSchedulerRefSchedulerService implements RefSchedulerService 
     public List<DSSLabel> getDSSLabels() {
         return this.dssLabels;
     }
+
 }

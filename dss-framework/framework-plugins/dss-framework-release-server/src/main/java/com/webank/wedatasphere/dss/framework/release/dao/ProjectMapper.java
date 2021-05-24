@@ -48,4 +48,7 @@ public interface ProjectMapper {
 
     @Select("select app_id from dss_orchestrator_version_info where id = #{orchestratorVersionId}")
     Long getAppIdByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
+
+    @Select("select version from dss_orchestrator_version_info where id = #{orchestratorVersionId}")
+    String getVersionByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
 }

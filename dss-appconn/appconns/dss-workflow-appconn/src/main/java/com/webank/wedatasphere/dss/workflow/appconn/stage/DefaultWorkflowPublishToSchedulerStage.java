@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.standard.app.development.stage.GetRefStage;
 import com.webank.wedatasphere.dss.standard.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.workflow.appconn.constant.WorkflowAppConnConstant;
 import com.webank.wedatasphere.dss.workflow.appconn.ref.DefaultProjectUploadToSchedulerRef;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.linkis.DataWorkCloudApplication;
@@ -65,9 +66,8 @@ public class DefaultWorkflowPublishToSchedulerStage extends AbstractPublishToSch
 
     @Override
     public ResponseRef publishToScheduler(PublishToSchedulerRef ref) throws ExternalOperationFailedException {
-
-        // SchedulerAppConn appConn = (SchedulerAppConn) appConnService.getAppConn(WorkflowAppConnConstant.DSS_SCHEDULE_APPCONN_NAME.getValue());
-        SchedulerAppConn appConn = (SchedulerAppConn)appConnService.getAppConn("dolphinscheduler");
+        SchedulerAppConn appConn = (SchedulerAppConn)appConnService.getAppConn(
+            WorkflowAppConnConstant.DSS_SCHEDULE_APPCONN_NAME.getValue());
         if (null != appConn) {
             SchedulerStructureStandard schedulerStructureStandard
                 = (SchedulerStructureStandard)appConn.getAppStandards()
@@ -77,40 +77,38 @@ public class DefaultWorkflowPublishToSchedulerStage extends AbstractPublishToSch
                 .orElse(null);
 
             if (null != schedulerStructureStandard) {
-                RefSchedulerService refSchedulerService = schedulerStructureStandard.getSchedulerService();
-                refSchedulerService.setAppDesc(appConn.getAppDesc());
-                refSchedulerService.setDSSLabels(ref.getLabels());
-                if (null != refSchedulerService) {
+                if (ref instanceof ProjectPublishToSchedulerRef) {
+                    ProjectPublishToSchedulerRef projectPublishToSchedulerRef = (ProjectPublishToSchedulerRef)ref;
+
+                    RefSchedulerService refSchedulerService = schedulerStructureStandard.getSchedulerService();
+                    refSchedulerService.setAppDesc(appConn.getAppDesc());
+                    refSchedulerService.setDSSLabels(projectPublishToSchedulerRef.getLabels());
                     UploadToScheduleOperation uploadToScheduleOperation
-                        = refSchedulerService.createRefUploadToScheduleOperation(ref);
+                        = refSchedulerService.createRefUploadToScheduleOperation(projectPublishToSchedulerRef);
 
-                    //构建ScheduleProject
-                    if (ref instanceof ProjectPublishToSchedulerRef) {
-                        ProjectPublishToSchedulerRef projectPublishToSchedulerRef = (ProjectPublishToSchedulerRef)ref;
-                        DSSProject dssProject = (DSSProject)projectPublishToSchedulerRef.getProject();
-                        GetRefStage getRefStage = this.createGetRefStage();
-                        List<DSSFlow> dssFlowList = new ArrayList<>();
-                        for (Long rootFlowId : projectPublishToSchedulerRef.getOrcAppIds()) {
-                            DSSFlow dssFlow = getRefStage.getDssFlowById(projectPublishToSchedulerRef.getUserName(),
-                                rootFlowId, projectPublishToSchedulerRef.getLabels());
-                            dssFlowList.add(dssFlow);
-                        }
-
-                        ProjectUploadToSchedulerRef projectUploadToSchedulerRef
-                            = new DefaultProjectUploadToSchedulerRef();
-                        projectUploadToSchedulerRef.setDSSProject(dssProject);
-                        projectUploadToSchedulerRef.setDSSFlowList(dssFlowList);
-                        projectUploadToSchedulerRef.setWorkspace(projectPublishToSchedulerRef.getWorkspace());
-                        projectUploadToSchedulerRef.setUserName(projectPublishToSchedulerRef.getUserName());
-                        return uploadToScheduleOperation.publish(projectUploadToSchedulerRef);
+                    DSSProject dssProject = (DSSProject)projectPublishToSchedulerRef.getProject();
+                    GetRefStage getRefStage = this.createGetRefStage();
+                    List<DSSFlow> dssFlowList = new ArrayList<>();
+                    for (Long rootFlowId : projectPublishToSchedulerRef.getOrcAppIds()) {
+                        DSSFlow dssFlow = getRefStage.getDssFlowById(projectPublishToSchedulerRef.getUserName(),
+                            rootFlowId, projectPublishToSchedulerRef.getLabels());
+                        dssFlowList.add(dssFlow);
                     }
-                } else {
-                    LOGGER.error("scheduler Structure standard is null can not continue");
-                    DSSExceptionUtils.dealErrorException(60059, "scheduler Structure standard is null can not continue", ExternalOperationFailedException.class);
-                }
-            }
 
+                    ProjectUploadToSchedulerRef projectUploadToSchedulerRef = new DefaultProjectUploadToSchedulerRef();
+                    projectUploadToSchedulerRef.setDSSProject(dssProject);
+                    projectUploadToSchedulerRef.setDSSFlowList(dssFlowList);
+                    projectUploadToSchedulerRef.setWorkspace(projectPublishToSchedulerRef.getWorkspace());
+                    projectUploadToSchedulerRef.setUserName(projectPublishToSchedulerRef.getUserName());
+                    return uploadToScheduleOperation.publish(projectUploadToSchedulerRef);
+                }
+            } else {
+                LOGGER.error("scheduler Structure standard is null can not continue");
+                DSSExceptionUtils.dealErrorException(60059, "scheduler Structure standard is null can not continue",
+                    ExternalOperationFailedException.class);
+            }
         }
+
         return null;
     }
 

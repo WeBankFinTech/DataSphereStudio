@@ -41,6 +41,7 @@ public class DefaultWorkflowOrchestratorPublishRequestRef implements Orchestrato
     private String userName;
     private Workspace workspace;
     private List<DSSLabel> dssLabels;
+    private Long schedulerWorkflowId;
 
     @Override
     public void setOrcIds(List<Long> orcIds) {
@@ -93,6 +94,16 @@ public class DefaultWorkflowOrchestratorPublishRequestRef implements Orchestrato
     }
 
     @Override
+    public Long getSchedulerWorkflowId() {
+        return schedulerWorkflowId;
+    }
+
+    @Override
+    public void setSchedulerWorkflowId(Long schedulerWorkflowId) {
+        this.schedulerWorkflowId = schedulerWorkflowId;
+    }
+
+    @Override
     public String getUserName() {
         return userName;
     }
@@ -131,4 +142,5 @@ public class DefaultWorkflowOrchestratorPublishRequestRef implements Orchestrato
     public String toString() {
         return null;
     }
+
 }

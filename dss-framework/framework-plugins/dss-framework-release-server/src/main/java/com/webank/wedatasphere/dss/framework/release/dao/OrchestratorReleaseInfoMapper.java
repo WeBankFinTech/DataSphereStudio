@@ -16,11 +16,23 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
+package com.webank.wedatasphere.dss.framework.release.dao;
+
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * created by cooperyang on 2021/1/15
- * Description:
+ * The interface Orchestrator release info mapper.
+ *
+ * @author yuxin.yuan
+ * @date 2021 /05/20
  */
-public class SchedulisGetRequestOperation {
+@Mapper
+public interface OrchestratorReleaseInfoMapper {
+
+    void insert(OrchestratorReleaseInfo orchestratorReleaseInfo);
+
+    OrchestratorReleaseInfo getByOrchestratorId(Long orchestratorId);
+
+    void update(OrchestratorReleaseInfo orchestratorReleaseInfo);
 }

@@ -8,33 +8,29 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 /**
- * The type Dolphin scheduler post request operation.
+ * The type Dolphin scheduler get request operation.
  *
  * @author yuxin.yuan
- * @date 2021/05/19
+ * @date 2021/05/20
  */
-public class DolphinSchedulerPostRequestOperation
-    implements SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> {
-
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerPostRequestOperation.class);
+public class DolphinSchedulerGetRequestOperation
+    implements SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> {
 
     private DolphinSchedulerSecurityService dolphinSchedulerSecurityService;
 
     private CloseableHttpClient httpClient;
 
-    public DolphinSchedulerPostRequestOperation(String baseUrl) {
+    public DolphinSchedulerGetRequestOperation(String baseUrl) {
         super();
         this.dolphinSchedulerSecurityService = DolphinSchedulerSecurityService.getInstance(baseUrl);
     }
 
     @Override
-    public CloseableHttpResponse requestWithSSO(SSOUrlBuilderOperation urlBuilder, DolphinSchedulerHttpPost req)
+    public CloseableHttpResponse requestWithSSO(SSOUrlBuilderOperation urlBuilder, DolphinSchedulerHttpGet req)
         throws AppStandardErrorException {
         try {
             ArrayList<Header> headers = new ArrayList<>();
@@ -48,7 +44,7 @@ public class DolphinSchedulerPostRequestOperation
     }
 
     @Override
-    public CloseableHttpResponse requestWithSSO(String url, DolphinSchedulerHttpPost req)
+    public CloseableHttpResponse requestWithSSO(String url, DolphinSchedulerHttpGet req)
         throws AppStandardErrorException {
         return null;
     }

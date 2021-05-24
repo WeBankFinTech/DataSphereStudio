@@ -89,7 +89,7 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob{
             Long appId = this.getReleaseEnv()
                 .getProjectService()
                 .getAppIdByOrchestratorVersionId(orchestratorVersionId);
-            importOrcInfos.add(OrchestratorReleaseInfo.newInstance(orchestratorId, appId));
+            importOrcInfos.add(OrchestratorReleaseInfo.newInstance(orchestratorId, orchestratorVersionId, appId));
             nextLabel = new CommonDSSLabel("DEV");
             this.releaseEnv.getPublishService()
                 .publish(releaseUser, projectInfo, importOrcInfos, nextLabel, workspace, supportMultiEnv());

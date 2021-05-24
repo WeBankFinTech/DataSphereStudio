@@ -24,10 +24,12 @@ import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
+import com.webank.wedatasphere.dss.framework.release.dao.OrchestratorReleaseInfoMapper;
 import com.webank.wedatasphere.dss.framework.release.dao.ProjectMapper;
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.service.PublishService;
+import com.webank.wedatasphere.dss.framework.release.utils.ReleaseConf;
 import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorFrameworkAppConn;
 import com.webank.wedatasphere.dss.standard.app.development.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.development.process.DevProcessService;
@@ -41,6 +43,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.common.entity.project.Project;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +54,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -71,6 +76,9 @@ public class PublishServiceImpl implements PublishService {
     private ProjectMapper projectMapper;
 
     @Autowired
+    private OrchestratorReleaseInfoMapper orchestratorReleaseInfoMapper;
+
+    @Autowired
     @Qualifier("projectPublishRefFactory")
     private RefFactory<ProjectPublishToSchedulerRef> refFactory;
 
@@ -82,10 +90,8 @@ public class PublishServiceImpl implements PublishService {
 
     @PostConstruct
     public void init() {
-        //        schedulerAppConn = (SchedulerAppConn) appConnService.getAppConn(SchedulerAppConn.class);
-        //        if (schedulerAppConn == null) {
-        schedulerAppConn = (SchedulerAppConn)appConnService.getAppConn("dolphinscheduler");
-        //        }
+        schedulerAppConn = (SchedulerAppConn)appConnService.getAppConn(
+            ReleaseConf.DSS_SCHEDULE_APPCONN_NAME.getValue());
         workflowAppConn = (WorkflowAppConn)appConnService.getAppConn("workflow");
         orchestratorFrameworkAppConn = (OrchestratorFrameworkAppConn)appConnService.getAppConn(
             "orchestrator-framework");
@@ -137,7 +143,6 @@ public class PublishServiceImpl implements PublishService {
                     ProjectPublishToSchedulerRef ref = refFactory.newRef(ProjectPublishToSchedulerRef.class,
                         workflowAppConn.getClass().getClassLoader(),
                         "com.webank.wedatasphere.dss.workflow.appconn.ref");
-                    //ref.setLabels(dssLabels);
                     List<Long> orchestratorIds = orchestratorReleaseInfos.stream()
                         .map(OrchestratorReleaseInfo::getOrchestratorId)
                         .collect(Collectors.toList());
@@ -154,10 +159,33 @@ public class PublishServiceImpl implements PublishService {
                     if (supportMultiEnv) {
                         ref.setLabels(dssLabels);
                     } else {
-                        //如果不支持多环境的话，只需要在dev进行同步到scheudlis就好
+                        //如果不支持多环境的话，只需要在dev进行同步到dolphin scheduler就好
                         ref.setLabels(Collections.singletonList(new DSSLabel("DEV")));
                     }
-                    publishToSchedulerStage.publishToScheduler(ref);
+                    // 目前只考虑工作流发布，一次只发布一个编排
+                    OrchestratorReleaseInfo releaseInfo = orchestratorReleaseInfos.get(0);
+                    // 如果发布过，记录调度系统中对应的工作流id
+                    OrchestratorReleaseInfo latestOrchestratorReleaseInfo
+                        = orchestratorReleaseInfoMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
+                    if (latestOrchestratorReleaseInfo != null) {
+                        ref.setSchedulerWorkflowId(latestOrchestratorReleaseInfo.getSchedulerWorkflowId());
+                    }
+
+                    ResponseRef responseRef = publishToSchedulerStage.publishToScheduler(ref);
+                    Long schedulerWorkflowId = Long.valueOf(responseRef.getResponseBody());
+
+                    String orchestratorVersion = projectMapper.getVersionByOrchestratorVersionId(
+                        releaseInfo.getOrchestratorVersionId());
+                    if (Objects.isNull(latestOrchestratorReleaseInfo)) { // 未发布过，插入记录
+                        releaseInfo.setOrchestratorVersion(orchestratorVersion);
+                        releaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
+                        orchestratorReleaseInfoMapper.insert(releaseInfo);
+                    } else {
+                        latestOrchestratorReleaseInfo.setOrchestratorVersionId(releaseInfo.getOrchestratorVersionId());
+                        latestOrchestratorReleaseInfo.setOrchestratorVersion(orchestratorVersion);
+                        latestOrchestratorReleaseInfo.setUpdateTime(new Date());
+                        orchestratorReleaseInfoMapper.update(latestOrchestratorReleaseInfo);
+                    }
                 } catch (final Throwable t) {
                     if (t instanceof ExternalOperationFailedException) {
                         String errorInfo = t.getCause().getMessage();

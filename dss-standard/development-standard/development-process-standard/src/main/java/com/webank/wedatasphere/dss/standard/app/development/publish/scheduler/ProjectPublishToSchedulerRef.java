@@ -50,4 +50,8 @@ public  interface ProjectPublishToSchedulerRef extends PublishToSchedulerRef {
 
     void setPublishType(PublishType publishType);
 
+    Long getSchedulerWorkflowId();
+
+    void setSchedulerWorkflowId(Long schedulerWorkflowId);
+
 }

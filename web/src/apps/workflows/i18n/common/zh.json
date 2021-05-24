@@ -566,7 +566,8 @@
             "Timezone": "时区",
             "fiveTimes": "接下来五次执行时间",
             "create": "创建",
-            "edit": "编辑"
+            "edit": "编辑",
+            "inputEmail": "请输入邮箱,以逗号分割"
           }
         }
     }

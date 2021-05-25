@@ -728,23 +728,31 @@ export default {
         cb && cb()
       })
     },
-    getReceiver(processDefinitionId){
+    getReceiver(processDefinitionId, cb){
       api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/get-receiver-cc`, {
         processDefinitionId: processDefinitionId
       }, 'get').then((res) => {
-        this.startData.receivers = res.receivers
-        this.startData.receiversCc = res.receiversCc
+        cb && cb(res)
+
       })
     },
     run(index) {
       this.checkStart(index, ()=>{
         this.startData = this.list[index]
         this.showRunTaskModal = true
-        this.getReceiver(this.list[index].id)
+        this.getReceiver(this.list[index].id, (res) => {
+          this.startData.receivers = res.receivers
+          this.startData.receiversCc = res.receiversCc
+        })
       })
     },
     setTime(index) {
-      console.log(this.list[index])
+      this.timingData.item = this.list[index]
+      this.timingData.type = 'timing'
+      this.getReceiver(this.list[index].id, (res) => {
+        this.timingData.item.receivers = res.receivers
+        this.timingData.item.receiversCc = res.receiversCc
+      })
       this.showTimingTaskModal = true
     },
     online(index) {

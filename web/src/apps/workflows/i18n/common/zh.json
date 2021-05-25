@@ -567,7 +567,13 @@
             "fiveTimes": "接下来五次执行时间",
             "create": "创建",
             "edit": "编辑",
-            "inputEmail": "请输入邮箱,以逗号分割"
+            "inputEmail": "请输入邮箱,以逗号分割",
+            "selectTime": "请选择时间",
+            "startNotSameAsEnd":"开始时间和结束时间不能相同",
+            "enterCrontab":"请输入crontab",
+            "success": "成功",
+            "PleaseGoOnline":"不要忘记上线",
+            "noData":"该时间段无数据"
           }
         }
     }

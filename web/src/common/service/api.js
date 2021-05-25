@@ -64,7 +64,6 @@ instance.interceptors.request.use((config) => {
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = 'c1f1e5c8c4b5bcdfd5fead493e7b2b41'
     config.url = `http://${window.location.host}/` + config.url
-    // fallback application/json to application/x-www-form-urlencoded
     if (config.useForm) {
       let formData = new FormData()
       Object.keys(config.data).forEach(key => {
@@ -72,8 +71,10 @@ instance.interceptors.request.use((config) => {
       })
       config.data = formData
     }
+    // fallback application/json to application/x-www-form-urlencoded
     if (config.useFormQuery) {
-      config.url = config.url + '?' + qs(config.data)
+      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      config.data = qs(config.data)
     }
   }
 

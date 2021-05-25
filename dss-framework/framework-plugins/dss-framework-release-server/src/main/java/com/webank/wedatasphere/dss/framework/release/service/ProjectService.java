@@ -45,4 +45,6 @@ public interface ProjectService {
     void updateProjectOrcInfo(Long projectId, Long orchestratorId, Long orchestratorVersionId);
 
     Long getAppIdByOrchestratorVersionId(Long orchestratorVersionId);
+
+    Boolean updateCommentInOrchestratorInfo(String comment, Long orchestratorId);
 }

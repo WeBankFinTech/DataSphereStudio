@@ -33,17 +33,17 @@ import java.util.List;
  * created by cooperyang on 2021/2/23
  * Description: orchestrator的发布，由开发中心直接发布到schedulis等调度系统
  */
-public final class OrchestratorPublishJob extends AbstractReleaseJob{
-
+public final class OrchestratorPublishJob extends AbstractReleaseJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorPublishJob.class);
-
 
     private Long orchestratorId;
 
     private Long orchestratorVersionId;
 
     private String orchestratorName;
+
+    private String comment;
 
     public Long getOrchestratorId() {
         return orchestratorId;
@@ -53,6 +53,14 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob{
         this.orchestratorId = orchestratorId;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public void setReleaseTask(ReleaseTask releaseTask) {
         super.setReleaseTask(releaseTask);
@@ -60,7 +68,6 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob{
         this.orchestratorVersionId = releaseTask.getOrchestratorVersionId();
         this.orchestratorName = releaseTask.getOrchestratorName();
     }
-
 
     @Override
     boolean supportMultiEnv() {
@@ -93,13 +100,15 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob{
             nextLabel = new CommonDSSLabel("DEV");
             this.releaseEnv.getPublishService()
                 .publish(releaseUser, projectInfo, importOrcInfos, nextLabel, workspace, supportMultiEnv());
+            //2. 更新发布orchestrator时的描述信息
+            this.releaseEnv.getProjectService().updateCommentInOrchestratorInfo(comment, orchestratorId);
 
-            //2.进行导出,用于升级版本,目的是为了复用原来的代码
+            //3.进行导出,用于升级版本,目的是为了复用原来的代码
             ExportResult exportResult = this.releaseEnv.getExportService()
                 .export(releaseUser, projectId, orchestratorId, orchestratorVersionId, projectInfo.getProjectName(),
                     workspaceName, dssLabel, workspace);
 
-            //3.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
+            //4.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             this.releaseEnv.getReleaseJobListener().onJobSucceed(this);
         }catch(final Throwable t){
             LOGGER.error("export for orchestrator {} failed", orchestratorId, t);

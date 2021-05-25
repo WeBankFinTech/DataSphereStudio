@@ -196,6 +196,7 @@ export default {
   data () {
     return {
       api,
+      projectName: '-' + this.$route.query.projectName,
       processDefinitionId: 0,
       failureStrategy: 'CONTINUE',
       availableTimezoneIDList: moment.tz.names(),
@@ -323,11 +324,11 @@ export default {
 
         // edit
         if (this.timingData.item.crontab) {
-          api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/update`
+          api = `dolphinscheduler/projects/${this.projectName}/schedule/update`
           searchParams.id = this.timingData.item.id
           msg = `${this.$t('message.scheduler.runTask.edit')}${this.$t('message.scheduler.runTask.success')},${this.$t('message.scheduler.runTask.PleaseGoOnline')}`
         } else {
-          api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/create`
+          api = `dolphinscheduler/projects/${this.projectName}/schedule/create`
           searchParams.processDefinitionId = this.timingData.item.id
           msg = `${this.$t('message.scheduler.runTask.create')}${this.$t('message.scheduler.runTask.success')}`
         }
@@ -341,7 +342,7 @@ export default {
 
     _preview () {
       if (this._verification()) {
-        let api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/preview`
+        let api = `dolphinscheduler/projects/${this.projectName}/schedule/preview`
         let searchParams = {
           schedule: JSON.stringify({
             startTime: this.scheduleTime[0],

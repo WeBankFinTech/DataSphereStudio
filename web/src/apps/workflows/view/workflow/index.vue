@@ -78,6 +78,18 @@
             <div class="scheduler-list" v-if="active == 2">
               <template>
                 <Table border :columns="columns2" :data="list2"></Table>
+                <Page
+                  v-if="list2.length > 0"
+                  class="page-bar fr"
+                  :total="pagination2.total"
+                  show-sizer
+                  show-total
+                  :current="pagination2.current"
+                  :page-size="pagination2.size"
+                  :page-size-opts="pagination2.opts"
+                  @on-change="pageChange2"
+                  @on-page-size-change="pageSizeChange2"
+                ></Page>
               </template>
             </div>
           </div>
@@ -158,7 +170,7 @@ export default {
       lastVal: null,
       current: null,
       modeOfKey: '',
-      projectName: this.$route.query.projectName,//'-project',
+      projectName: '-' + this.$route.query.projectName,
       modeName: "工作流开发",
       tabName: '',
       topTabList: undefined,
@@ -289,15 +301,24 @@ export default {
         },
         {
           title: '工作流名称',
-          key: 'name'
+          key: 'name',
+          render: (h, params) => {
+            return h('div', [
+              h('a', {
+                props: {
+                  href: '#'
+                }
+              }, params.row.name)
+            ]);
+          }
         },
         {
           title: '状态',
-          key: 'releaseState'
+          key: 'state'
         },
         {
           title: '运行类型',
-          key: 'executeType'
+          key: 'commandType'
         },
         {
           title: '调度时间',
@@ -317,15 +338,15 @@ export default {
         },
         {
           title: '运行次数',
-          key: 'times'
+          key: 'runTimes'
         },
         {
           title: '容错标识',
-          key: 'faultTolerant'
+          key: 'recovery'
         },
         {
           title: '执行用户',
-          key: 'operateUser'
+          key: 'executorName'
         },
         {
           title: 'host',
@@ -368,6 +389,12 @@ export default {
         'OFFLINE': this.$t('message.scheduler.offline')
       },
       pagination: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
+      pagination2: {
         size: 10,
         opts: [5, 10, 30, 45, 60],
         current: 1,
@@ -721,6 +748,20 @@ export default {
         this.pagination.total = res.total
       })
     },
+    getInstanceListData(page=1) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
+        pageSize: this.pagination2.size,
+        pageNo: page
+      }, 'get').then((res) => {
+        res.totalList.forEach(item => {
+          item.scheduleTime = this.formatDate(item.scheduleTime)
+          item.startTime = this.formatDate(item.startTime)
+          item.endTime = this.formatDate(item.endTime)
+        })
+        this.list2 = res.totalList
+        this.pagination2.total = res.total
+      })
+    },
     checkStart(index, cb){
       api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-check`, {
         processDefinitionId: this.list[index].id
@@ -788,6 +829,7 @@ export default {
     },
     activeList(type) {
       this.active = type
+      this.active === 1? this.getListData() : this.getInstanceListData()
     },
     rerun(index) {
       console.log(this.list[index])
@@ -814,6 +856,14 @@ export default {
     pageSizeChange(size) {
       this.pagination.size = size
       this.getListData()
+    },
+    pageChange2(page) {
+      this.pagination2.current = page
+      this.getInstanceListData(page)
+    },
+    pageSizeChange2(size) {
+      this.pagination2.size = size
+      this.getInstanceListData()
     }
   }
 };

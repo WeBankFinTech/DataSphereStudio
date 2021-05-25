@@ -188,6 +188,7 @@ export default {
   data () {
     return {
       api,
+      projectName: '-' + this.$route.query.projectName,
       processDefinitionId: 0,
       failureStrategy: 'CONTINUE',
       warningTypeList: [
@@ -291,7 +292,7 @@ export default {
         param.taskDependType = this.taskDependType
       }
 
-      this.api.fetch(`dolphinscheduler/projects/${this.$route.query.projectName}/executors/start-process-instance`, param, {useFormQuery: true}).then(() => {
+      this.api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-process-instance`, param, {useFormQuery: true}).then(() => {
         this.$Message.success('操作成功')
         this.$emit('onUpdateStart')
         setTimeout(() => {

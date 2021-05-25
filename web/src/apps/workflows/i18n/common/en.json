@@ -569,7 +569,13 @@
           "fiveTimes": "Next five execution times",
           "create": "Create",
           "edit": "Edit",
-          "inputEmail": "Please enter Email, separate by comma"
+          "inputEmail": "Please enter Email, separate by comma",
+          "selectTime": "Please select time",
+          "startNotSameAsEnd":"The start time must not be the same as the end",
+          "enterCrontab":"Please enter crontab",
+          "success": "Success",
+          "PleaseGoOnline":"Please go online",
+          "noData":"There is no data for this period of time"
         }
       }
     }

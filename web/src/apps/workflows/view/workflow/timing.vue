@@ -9,12 +9,12 @@
           <Date-picker
             style="width: 360px"
             v-model="scheduleTime"
-            @change="_datepicker"
+            @on-change="_datepicker"
             type="datetimerange"
             range-separator="-"
             :start-placeholder="$t('message.scheduler.runTask.startDate')"
             :end-placeholder="$t('message.scheduler.runTask.endDate')"
-            value-format="yyyy-MM-dd HH:mm:ss">
+            format="yyyy-MM-dd HH:mm:ss">
           </Date-picker>
         </template>
       </div>
@@ -44,7 +44,7 @@
         </template>
       </div>
     </div>
-    <div class="clearfix list">
+    <div class="clearfix list" v-show="false">
       <div class="text">
         {{$t('message.scheduler.runTask.Timezone')}}
       </div>
@@ -61,7 +61,7 @@
         </template>
       </div>
     </div>
-    <div class="clearfix list">
+    <div class="clearfix list" v-if="previewTimes.length" style="height: 90px">
       <div style = "padding-left: 150px;">{{$t('message.scheduler.runTask.fiveTimes')}}</div>
       <ul style = "padding-left: 150px;">
         <li v-for="(time,i) in previewTimes" :key='i'>{{time}}</li>
@@ -107,7 +107,10 @@
       <div class="cont">
         <template>
           <Select v-model="processInstancePriority">
-            <Option v-for="item in priorityList" :value="item.code" :key="item.code">{{item.code}}</Option>
+            <SvgIcon class="icon" :icon-class="getSvgIcon()" slot="prefix"/>
+            <Option v-for="item in priorityList" :value="item.code" :key="item.code">
+              <SvgIcon class="icon" :icon-class="item.unicode" :color="item.color"/>{{item.code}}
+            </Option>
           </Select>
         </template>
       </div>
@@ -168,7 +171,7 @@
       <div class="cont" style="width: 688px;">
         <div style="padding-top: 6px;">
           <template>
-            <Input v-model="receiverCcs" />
+            <Input v-model="receiversCc" />
           </template>
         </div>
       </div>
@@ -209,7 +212,7 @@ export default {
       workerGroup: '',
       previewTimes: [],
       // Global custom parameters
-      receiverCcs: '',
+      receiversCc: '',
       receivers: '',
       workerGroupsList: [],
       warningTypeList: [
@@ -233,27 +236,27 @@ export default {
       priorityList: [
         {
           code: 'HIGHEST',
-          unicode: 'el-icon-top',
+          unicode: 'high:highest',
           color: '#ff0000'
         },
         {
           code: 'HIGH',
-          unicode: 'el-icon-top',
+          unicode: 'high:highest',
           color: '#ff0000'
         },
         {
           code: 'MEDIUM',
-          unicode: 'el-icon-top',
+          unicode: 'medium',
           color: '#EA7D24'
         },
         {
           code: 'LOW',
-          unicode: 'el-icon-bottom',
+          unicode: 'low:lowest',
           color: '#2A8734'
         },
         {
           code: 'LOWEST',
-          unicode: 'el-icon-bottom',
+          unicode: 'low:lowest',
           color: '#2A8734'
         }
       ]
@@ -283,17 +286,17 @@ export default {
     },
     _verification () {
       if (!this.scheduleTime) {
-        this.$message.warning(this.$t('Please select time'))
+        this.$Message.warning(this.$t('message.scheduler.runTask.selectTime'))
         return false
       }
 
       if (this.scheduleTime[0] === this.scheduleTime[1]) {
-        this.$message.warning(this.$t('The start time must not be the same as the end'))
+        this.$Message.warning(this.$t('message.scheduler.runTask.startNotSameAsEnd'))
         return false
       }
 
       if (!this.crontab) {
-        this.$message.warning(this.$t('Please enter crontab'))
+        this.$Message.warning(this.$t('message.scheduler.runTask.enterCrontab'))
         return false
       }
       return true
@@ -312,33 +315,33 @@ export default {
           warningType: this.warningType,
           processInstancePriority: this.processInstancePriority,
           warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
-          workerGroup: this.workerGroup
+          workerGroup: this.workerGroup,
+          receivers: this.receivers,
+          receiversCc: this.receiversCc
         }
         let msg = ''
 
         // edit
         if (this.timingData.item.crontab) {
-          api = 'dag/updateSchedule'
+          api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/update`
           searchParams.id = this.timingData.item.id
-          msg = `${this.$t('Edit')}${this.$t('Success')},${this.$t('Please go online')}`
+          msg = `${this.$t('message.scheduler.runTask.edit')}${this.$t('message.scheduler.runTask.success')},${this.$t('message.scheduler.runTask.PleaseGoOnline')}`
         } else {
-          api = 'dag/createSchedule'
+          api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/create`
           searchParams.processDefinitionId = this.timingData.item.id
-          msg = `${this.$t('Create')}${this.$t('Success')}`
+          msg = `${this.$t('message.scheduler.runTask.create')}${this.$t('message.scheduler.runTask.success')}`
         }
 
-        /*this.api.fetch(api, searchParams, 'post').then(res => {
-          this.$message.success(msg)
+        this.api.fetch(api, searchParams, {useFormQuery: true}).then(res => {
+          this.$Message.success(msg)
           this.$emit('onUpdateTiming')
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })*/
+        })
       }
     },
 
     _preview () {
       if (this._verification()) {
-        let api = 'dag/previewSchedule'
+        let api = `dolphinscheduler/projects/${this.$route.query.projectName}/schedule/preview`
         let searchParams = {
           schedule: JSON.stringify({
             startTime: this.scheduleTime[0],
@@ -347,27 +350,56 @@ export default {
           })
         }
 
-        /*this.api.fetch(api, searchParams, 'post').then(res => {
+        this.api.fetch(api, searchParams, {useFormQuery: true}).then(res => {
           if (res.length) {
             this.previewTimes = res
           } else {
-            this.$message.warning(`${this.$t('There is no data for this period of time')}`)
+            this.$Message.warning(`${this.$t('message.scheduler.runTask.noData')}`)
           }
-        })*/
+        })
       }
     },
 
     _getNotifyGroupList () {
-      /*return new Promise((resolve, reject) => {
-        this.api.fetch('dag/getNotifyGroupList', 'get').then(res => {
-          this.notifyGroupList = res
-          if (this.notifyGroupList.length) {
-            resolve()
-          } else {
-            reject(new Error(0))
-          }
+      return new Promise((resolve) => {
+        this.api.fetch('dolphinscheduler/alert-group/list', 'get').then(res => {
+          let notifyGroupListS = _.map(res, v => {
+            return {
+              id: v.id,
+              code: v.groupName,
+              disabled: false
+            }
+          })
+          this.notifyGroupList = _.cloneDeep(notifyGroupListS)
+          resolve()
         })
-      })*/
+      })
+    },
+    getAllWorkers(cb) {
+      api.fetch(`dolphinscheduler/worker-group/all-groups`, 'get').then((res) => {
+        let list = res
+        if (list.length > 0) {
+          list = list.map(item => {
+            return {
+              id: item,
+              name: item
+            }
+          })
+        } else {
+          list.unshift({
+            id: 'default',
+            name: 'default'
+          })
+        }
+        cb(list)
+      })
+    },
+    getSvgIcon() {
+      for (let i = 0;i < this.priorityList.length; i++) {
+        if (this.priorityList[i].code === this.processInstancePriority) {
+          return this.priorityList[i].unicode
+        }
+      }
     },
     ok () {
       this._timing()
@@ -377,73 +409,65 @@ export default {
     },
     preview () {
       this._preview()
+    },
+    init () {
+      let item = this.timingData.item
+      // Determine whether to echo
+      if (item.crontab) {
+        this.crontab = item.crontab
+        this.scheduleTime = [this.formatDate(item.startTime), this.formatDate(item.endTime)]
+        this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
+        this.failureStrategy = item.failureStrategy
+        this.warningType = item.warningType
+        this.processInstancePriority = item.processInstancePriority
+      }
+      if (item.workerGroup !== undefined) {
+        this.workerGroup = item.workerGroup
+      }
+      this.receivers = item.receivers
+      this.receiversCc = item.receiversCc
+      this.warningGroupId = item.warningGroupId ? item.warningGroupId : ''
+      if (this.timingData.type === 'timing') {
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        if (month < 10) {
+          month = '0' + month
+        }
+        if (day < 10) {
+          day = '0' + day
+        }
+        let startDate = year + '-' + month + '-' + day + ' ' + '00:00:00'
+        let endDate = (year + 100) + '-' + month + '-' + day + ' ' + '00:00:00'
+        let times = []
+        times[0] = startDate
+        times[1] = endDate
+        this.crontab = '0 0 * * * ? *'
+        this.scheduleTime = times
+      }
     }
   },
   watch: {
+    'timingData.item' () {
+      this.init()
+    }
   },
   created () {
-    if (this.timingData.item.workerGroup === undefined) {
-      let stateWorkerGroupsList = []
-      if (stateWorkerGroupsList.length) {
-        this.workerGroup = stateWorkerGroupsList[0].id
-      } else {
-        /*this.api.fetch('security/getWorkerGroupsAll', 'get').then(res => {
-         this.workerGroupsList = res
-         this.$nextTick(() => {
-         if (res.length > 0) {
-         this.workerGroup = res[0].id
-         }
-         })
-         })*/
-      }
-    } else {
-      this.workerGroup = this.timingData.item.workerGroup
-    }
-    if (this.timingData.item.crontab) {
-      this.crontab = this.timingData.item.crontab
-    }
-    if (this.timingData.type === 'timing') {
-      let date = new Date()
-      let year = date.getFullYear()
-      let month = date.getMonth() + 1
-      let day = date.getDate()
-      if (month < 10) {
-        month = '0' + month
-      }
-      if (day < 10) {
-        day = '0' + day
-      }
-      let startDate = year + '-' + month + '-' + day + ' ' + '00:00:00'
-      let endDate = (year + 100) + '-' + month + '-' + day + ' ' + '00:00:00'
-      let times = []
-      times[0] = startDate
-      times[1] = endDate
-      this.crontab = '0 0 * * * ? *'
-      this.scheduleTime = times
-    }
+    this.init()
   },
   mounted () {
-    let item = this.timingData.item
-    // Determine whether to echo
-    if (this.timingData.item.crontab) {
-      this.crontab = item.crontab
-      this.scheduleTime = [this.formatDate(item.startTime), this.formatDate(item.endTime)]
-      this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
-      this.failureStrategy = item.failureStrategy
-      this.warningType = item.warningType
-      this.processInstancePriority = item.processInstancePriority
-      /*this._getNotifyGroupList().then(() => {
+    this.getAllWorkers((list) => {
+      if (list.length) {
+        this.workerGroup = list[0].id
+        this.workerGroupsList = list
+      }
+      this._getNotifyGroupList().then(() => {
         this.$nextTick(() => {
-          this.warningGroupId = item.warningGroupId
+          this.init()
         })
-      }).catch(() => { this.warningGroupId = '' })*/
-    } else {
-      /*this._getNotifyGroupList().then(() => {
-        this.$nextTick(() => {
-          this.warningGroupId = ''
-        })
-      }).catch(() => { this.warningGroupId = '' })*/
-    }
+      })
+    })
   },
   components: { vCrontab }
 }

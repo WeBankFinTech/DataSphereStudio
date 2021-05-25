@@ -4,8 +4,8 @@
       <div slot="header" @click.stop="createWorkspace">
         <div class="newHome_create">
           <div class="newHome_create_content">
-            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="fi-addproject" color="#2d8cf0"/>
-            <p class="newHome_create_text" style="color:#2d8cf0">
+            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="fi-addproject"/>
+            <p class="newHome_create_text" >
               {{ $t('message.workspace.createWorkspace') }}
             </p>
           </div>
@@ -143,6 +143,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    
     .newHome_create_text {
       margin-left: 10px;
       cursor: pointer;

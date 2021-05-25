@@ -4,12 +4,12 @@
       <div
         class="layout-header-menu-icon"
       >
-        <div style="display:inline-block;"
+        <!-- <div style="display:inline-block;"
           v-show="isNavShowMenu"
           @mouseleave="mouseleave"
           @click="mouseover">
           <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF"/>
-        </div>
+        </div> -->
         <div class="logo">
           <img
             @click.stop="goHome"

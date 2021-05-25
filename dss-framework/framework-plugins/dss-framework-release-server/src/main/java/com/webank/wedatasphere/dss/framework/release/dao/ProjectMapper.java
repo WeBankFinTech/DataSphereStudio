@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * created by cooperyang on 2020/12/11
@@ -46,9 +47,13 @@ public interface ProjectMapper {
     void updateProjectOrcInfo(@Param("projectId") Long projectId, @Param("orchestratorId") Long orchestratorId,
         @Param("orchestratorVersionId") Long orchestratorVersionId);
 
-    @Select("select app_id from dss_orchestrator_version_info where id = #{orchestratorVersionId}")
+    @Select("SELECT app_id FROM dss_orchestrator_version_info WHERE id = #{orchestratorVersionId}")
     Long getAppIdByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
 
-    @Select("select version from dss_orchestrator_version_info where id = #{orchestratorVersionId}")
+    @Select("SELECT version FROM dss_orchestrator_version_info WHERE id = #{orchestratorVersionId}")
     String getVersionByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
+
+    @Update("UPDATE dss_orchestrator_info SET comment = #{comment} WHERE id =  #{orchestratorId}")
+    Boolean updateCommentInOrchestratorInfo(@Param("comment") String comment,
+        @Param("orchestratorId") Long orchestratorId);
 }

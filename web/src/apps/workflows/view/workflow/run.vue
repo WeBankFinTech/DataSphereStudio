@@ -161,12 +161,12 @@
             <Date-picker
               style="width: 360px"
               v-model="scheduleTime"
-              @change="_datepicker"
+              @on-change="_datepicker"
               type="datetimerange"
               range-separator="-"
               :start-placeholder="$t('message.scheduler.runTask.startDate')"
               :end-placeholder="$t('message.scheduler.runTask.endDate')"
-              value-format="yyyy-MM-dd HH:mm:ss">
+              format="yyyy-MM-dd HH:mm:ss">
             </Date-picker>
           </template>
         </div>
@@ -267,6 +267,10 @@ export default {
     },
     _start () {
       this.spinnerLoading = true
+      // 兼容首次默认值为时间格式的问题
+      if (this.scheduleTime.length && typeof this.scheduleTime[0] === 'object') {
+        this.scheduleTime = [dayjs(this.scheduleTime[0]).format('YYYY-MM-DD 00:00:00'), dayjs(this.scheduleTime[1]).format('YYYY-MM-DD 00:00:00')]
+      }
       let param = {
         processDefinitionId: this.startData.id,
         scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',

@@ -207,7 +207,10 @@ const template = (string, ...args) => {
   })
 }
 
+const name = 'crontab-util'
+
 export {
+  name,
   selectList,
   isStr,
   isWeek,

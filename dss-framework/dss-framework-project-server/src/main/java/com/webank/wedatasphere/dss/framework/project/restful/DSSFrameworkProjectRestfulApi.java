@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProject
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
@@ -46,7 +47,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -71,6 +77,8 @@ public class DSSFrameworkProjectRestfulApi {
     private DSSProjectService projectService;
     @Autowired
     private AppConnService appConnService;
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
 
     /**
      * 获取所有工程或者单个工程
@@ -111,8 +119,12 @@ public class DSSFrameworkProjectRestfulApi {
     public Response createProject(@Context HttpServletRequest request, @Valid ProjectCreateRequest projectCreateRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        String workspaceName = dssWorkspaceService.getWorkspaceName(
+            String.valueOf(projectCreateRequest.getWorkspaceId()));
+        projectCreateRequest.setWorkspaceName(workspaceName);
         try {
-            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
+            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username,
+                workspace);
             if (dssProjectVo != null) {
                 return Message.messageToResponse(Message.ok("创建工程成功").data("project", dssProjectVo));
             } else {

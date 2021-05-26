@@ -19,6 +19,7 @@ import { findLocale } from './config'
 import { template } from './util'
 
 export default {
+  name: '$t2',
   methods: {
     $t2 (str, data) {
       return template(findLocale(window.localeCrontab).locale[str], data)

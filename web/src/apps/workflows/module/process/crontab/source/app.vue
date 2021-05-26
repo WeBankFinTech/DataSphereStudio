@@ -48,7 +48,7 @@ import mMonth from './_times/month'
 import mYear from './_times/year'
 
 export default {
-  name: 'app',
+  name: 'crontab',
   data () {
     return {
       tabVal: 'second',

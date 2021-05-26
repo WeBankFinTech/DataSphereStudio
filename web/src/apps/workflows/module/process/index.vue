@@ -84,14 +84,77 @@
             @save="saveNode"
           ></commonIframe>
           <div
-            v-if="item.type === 'DiaoDu'"
+            v-if="item.type === 'DS'"
             v-show="index===active"
             :key="item.title"
             style="width:100%; height:100%"
-          ></div>
+          >
+            <template>
+              <div class="scheduler-wrapper">
+                <div class="scheduler-menu">
+                  <ul>
+                    <li :class="activeDS == 1? 'active' : ''" @click="activeList(1)">任务列表</li>
+                    <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">实例列表</li>
+                  </ul>
+                </div>
+                <div class="scheduler-list" v-if="activeDS == 1">
+                  <template>
+                    <Table border :columns="columns" :data="list"></Table>
+                    <Page
+                      v-if="list.length > 0"
+                      class="page-bar fr"
+                      :total="pagination.total"
+                      show-sizer
+                      show-total
+                      :current="pagination.current"
+                      :page-size="pagination.size"
+                      :page-size-opts="pagination.opts"
+                      @on-change="pageChange"
+                      @on-page-size-change="pageSizeChange"
+                    ></Page>
+                  </template>
+                </div>
+                <div class="scheduler-list" v-if="activeDS == 2">
+                  <template>
+                    <Table border :columns="columns2" :data="list2"></Table>
+                    <Page
+                      v-if="list2.length > 0"
+                      class="page-bar fr"
+                      :total="pagination2.total"
+                      show-sizer
+                      show-total
+                      :current="pagination2.current"
+                      :page-size="pagination2.size"
+                      :page-size-opts="pagination2.opts"
+                      @on-change="pageChange2"
+                      @on-page-size-change="pageSizeChange2"
+                    ></Page>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
         </template>
       </div>
     </div>
+    <Modal
+      :title="$t('message.scheduler.runTask.startTitle')"
+      v-model="showRunTaskModal"
+      width="860"
+      :mask-closable="false">
+      <i-run :startData="startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
+      <div slot="footer" style="height: 30px;">
+      </div>
+    </Modal>
+    <Modal
+      :title="$t('message.scheduler.runTask.timingTitle')"
+      v-model="showTimingTaskModal"
+      width="860"
+      :mask-closable="false">
+      <i-timing :timingData="timingData" @onUpdateTiming="setTiming" @closeTiming="closeTiming"></i-timing>
+      <div slot="footer" style="height: 30px;">
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -102,11 +165,16 @@ import Process from "./module.vue";
 import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
+import iRun from './run'
+import iTiming from './timing'
+import dayjs from 'dayjs'
 export default {
   components: {
     Process,
     Ide: Ide.component,
-    commonIframe: commonModule.component.iframe
+    commonIframe: commonModule.component.iframe,
+    iRun,
+    iTiming
   },
   props: {
     query: {
@@ -135,7 +203,214 @@ export default {
       setTime: 40,
       showTip: true,
       openFiles: {},
-      nodeImg: NODEICON
+      nodeImg: NODEICON,
+
+      projectName: '-' + this.$route.query.projectName,
+      activeDS: 1,
+      showRunTaskModal: false,
+      showTimingTaskModal: false,
+      list: [
+        {
+          id: 1
+        }
+      ],
+      list2: [
+        {
+          id: 1,
+          name: 'test'
+        }
+      ],
+      columns: [
+        {
+          title: '编号',
+          key: 'id'
+        },
+        {
+          title: '工作流名称',
+          key: 'name'
+        },
+        {
+          title: '状态',
+          key: 'releaseStateDesc'
+        },
+        {
+          title: '创建时间',
+          key: 'createTime'
+        },
+        {
+          title: '更新时间',
+          key: 'updateTime'
+        },
+        {
+          title: '描述',
+          key: 'description'
+        },
+        {
+          title: '修改用户',
+          key: 'modifyBy'
+        },
+        {
+          title: '定时状态',
+          key: 'scheduleReleaseStateDesc'
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  size: 'small',
+                  disabled: !params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.run(params.index)
+                  }
+                }
+              },  this.$t('message.scheduler.run')),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  size: 'small',
+                  disabled: !params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.openTiming(params.index)
+                  }
+                }
+              }, this.$t('message.scheduler.setTime')),
+              h('Button', {
+                props: {
+                  type: 'warning',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    params.row.isOnline ? this.offline(params.index) : this.online(params.index)
+                  }
+                }
+              }, params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'))
+            ]);
+          }
+        }
+      ],
+      columns2: [
+        {
+          title: '编号',
+          key: 'id'
+        },
+        {
+          title: '工作流名称',
+          key: 'name',
+          render: (h, params) => {
+            return h('div', [
+              h('a', {
+                props: {
+                  href: '#'
+                }
+              }, params.row.name)
+            ]);
+          }
+        },
+        {
+          title: '状态',
+          key: 'state'
+        },
+        {
+          title: '运行类型',
+          key: 'commandType'
+        },
+        {
+          title: '调度时间',
+          key: 'scheduleTime'
+        },
+        {
+          title: '开始时间',
+          key: 'startTime'
+        },
+        {
+          title: '结束时间',
+          key: 'endTime'
+        },
+        {
+          title: '运行时长s',
+          key: 'duration'
+        },
+        {
+          title: '运行次数',
+          key: 'runTimes'
+        },
+        {
+          title: '容错标识',
+          key: 'recovery'
+        },
+        {
+          title: '执行用户',
+          key: 'executorName'
+        },
+        {
+          title: 'host',
+          key: 'host'
+        },
+        {
+          title: '操作',
+          key: 'action',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'info',
+                  size: 'small',
+                  disabled: params.row.disabled
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.rerun(params.index)
+                  }
+                }
+              },  this.$t('message.scheduler.rerun'))
+            ]);
+          }
+        }
+      ],
+      startData: {},
+      timingData: {
+        item: {},
+        type: ''
+      },
+      publishStatus: {
+        'NOT_RELEASE': this.$t('message.scheduler.Unpublished'),
+        'ONLINE': this.$t('message.scheduler.online'),
+        'OFFLINE': this.$t('message.scheduler.offline')
+      },
+      pagination: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
+      pagination2: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      }
     };
   },
   mounted() {
@@ -542,9 +817,221 @@ export default {
       }
     },
     showDS() {
-      this.$emit('showDolphinscheduler')
+      let tab = {
+        title: this.query.name + '-调度',
+        type: "DS",
+        close: true,
+        data: this.query,
+        node: {
+          isChange: false,
+          type: "workflow.subflow"
+        },
+        key: this.query.appId,
+        isHover: false
+      }
+      for (let i = 0;i < this.tabs.length; i++) {
+        let cur = this.tabs[i]
+        // 已经打开
+        if (cur.key === this.query.appId) {
+          return  this.choose(i)
+        }
+      }
+      this.tabs.push(tab)
+      this.choose(this.tabs.length - 1)
+      this.getListData()
+    },
+    getListData(page=1) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
+        pageSize: this.pagination.size,
+        pageNo: page,
+        searchVal: this.query.name
+      }, 'get').then((res) => {
+        res.totalList.forEach(item => {
+          item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
+          item.scheduleReleaseStateDesc = item.scheduleReleaseState? this.publishStatus[item.scheduleReleaseState] : '-'
+          item.isOnline = item.releaseState === 'ONLINE'
+          item.createTime = this.formatDate(item.createTime)
+          item.updateTime = this.formatDate(item.updateTime)
+          item.disabled = false
+        })
+        this.list = res.totalList
+        this.pagination.total = res.total
+      })
+    },
+    getInstanceListData(page=1) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
+        pageSize: this.pagination2.size,
+        pageNo: page,
+        searchVal: this.query.name
+      }, 'get').then((res) => {
+        res.totalList.forEach(item => {
+          item.scheduleTime = this.formatDate(item.scheduleTime)
+          item.startTime = this.formatDate(item.startTime)
+          item.endTime = this.formatDate(item.endTime)
+          item.disabled = false
+        })
+        this.list2 = res.totalList
+        this.pagination2.total = res.total
+      })
+    },
+    checkStart(index, cb){
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-check`, {
+        processDefinitionId: this.list[index].id
+      }, {useForm: true}).then(() => {
+        cb && cb()
+      })
+    },
+    getReceiver(processDefinitionId, cb){
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/get-receiver-cc`, {
+        processDefinitionId: processDefinitionId
+      }, 'get').then((res) => {
+        cb && cb(res)
+
+      })
+    },
+    run(index) {
+      this.checkStart(index, ()=>{
+        this.startData = this.list[index]
+        this.showRunTaskModal = true
+        this.getReceiver(this.list[index].id, (res) => {
+          this.startData.receivers = res.receivers
+          this.startData.receiversCc = res.receiversCc
+        })
+      })
+    },
+    openTiming(index) {
+      this.timingData.item = this.list[index]
+      this.timingData.type = 'timing'
+      this.getReceiver(this.list[index].id, (res) => {
+        this.timingData.item.receivers = res.receivers
+        this.timingData.item.receiversCc = res.receiversCc
+      })
+      this.showTimingTaskModal = true
+    },
+    online(index) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
+        processId: this.list[index].id,
+        releaseState: 1
+      }, {useForm: true}).then(() => {
+        this.getListData()
+        this.list[index].isOnline = true
+      })
+    },
+    offline(index) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
+        processId: this.list[index].id,
+        releaseState: 0
+      }, {useForm: true}).then(() => {
+        this.getListData()
+        this.list[index].isOnline = false
+      })
+
+    },
+    runTask() {
+      this.showRunTaskModal = false
+    },
+    closeRun() {
+      this.showRunTaskModal = false
+    },
+    setTiming() {
+      this.showTimingTaskModal = false
+    },
+    closeTiming() {
+      this.showTimingTaskModal = false
+    },
+    activeList(type) {
+      this.activeDS = type
+      this.activeDS === 1? this.getListData() : this.getInstanceListData()
+    },
+    rerun(index) {
+      let item = this.list2[index]
+      this._countDownFn({
+        id: item.id,
+        executeType: 'REPEAT_RUNNING',
+        index: index,
+        buttonType: 'run'
+      })
+    },
+    _countDownFn (param) {
+      this.buttonType = param.buttonType
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/execute`, {
+        processInstanceId: param.id,
+        executeType: param.executeType
+      }, {useFormQuery: true}).then(() => {
+        this.list2[param.index].disabled = true
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        setTimeout(() => {
+          this.list2[param.index].disabled = false
+          this.getInstanceListData()
+        }, 5000)
+      }).catch(() => {
+        this.getInstanceListData()
+      })
+    },
+    formatISODate (date) {
+      let [datetime, timezone] = date.split('+')
+      if (!timezone || timezone.indexOf(':') >= 0) return date
+      let hourOfTz = timezone.substring(0, 2) || '00'
+      let secondOfTz = timezone.substring(2, 4) || '00'
+      return `${datetime}+${hourOfTz}:${secondOfTz}`
+    },
+    formatDate(value, fmt) {
+      fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
+      if (value === null) {
+        return '-'
+      } else {
+        return dayjs(this.formatISODate(value)).format(fmt)
+      }
+    },
+    pageChange(page) {
+      this.pagination.current = page
+      this.getListData(page)
+    },
+    pageSizeChange(size) {
+      this.pagination.size = size
+      this.getListData()
+    },
+    pageChange2(page) {
+      this.pagination2.current = page
+      this.getInstanceListData(page)
+    },
+    pageSizeChange2(size) {
+      this.pagination2.size = size
+      this.getInstanceListData()
     }
   },
 };
 </script>
 <style lang="scss" src="@/apps/workflows/assets/styles/process.scss"></style>
+<style lang="scss" scoped>
+  .scheduler-wrapper{
+    display: flex;
+    background-color: white;
+    min-height: 100%;
+  .scheduler-menu{
+    flex:1;
+    font-size: 18px;
+  li {
+    padding: 0 40px;
+    cursor: pointer;
+    line-height: 60px;
+  &:hover{
+     color: rgb(247, 152, 0);
+   }
+  &.active{
+     background-color: rgb(254, 249, 230);
+     color: rgb(247, 152, 0);
+   }
+  }
+  }
+  .scheduler-list{
+    flex:6;
+  }
+  .fr{
+    float: right;
+  }
+  .page-bar {
+    margin-top: 20px;
+  }
+  }
+</style>

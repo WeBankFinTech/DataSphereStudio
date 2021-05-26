@@ -293,7 +293,7 @@ export default {
       }
 
       this.api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-process-instance`, param, {useFormQuery: true}).then(() => {
-        this.$Message.success('操作成功')
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.$emit('onUpdateStart')
         setTimeout(() => {
           this.spinnerLoading = false

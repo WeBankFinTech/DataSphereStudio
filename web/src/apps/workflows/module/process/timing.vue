@@ -188,7 +188,7 @@
 /*eslint-disable */
 import moment from 'moment-timezone'
 import api from '@/common/service/api'
-import { vCrontab } from './crontab/index'
+import vCrontab from './crontab/index'
 import dayjs from 'dayjs'
 
 export default {

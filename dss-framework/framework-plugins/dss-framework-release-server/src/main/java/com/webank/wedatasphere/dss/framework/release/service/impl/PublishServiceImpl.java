@@ -151,7 +151,8 @@ public class PublishServiceImpl implements PublishService {
                         .map(OrchestratorReleaseInfo::getOrchestratorVersionAppId)
                         .collect(Collectors.toList());
                     ref.setOrcAppIds(orcAppIds);
-                    Project project = toProject(projectInfo);
+                    DSSProject project = toProject(projectInfo);
+                    project.setWorkspaceName(workspace.getWorkspaceName());
                     ref.setProject(project);
                     ref.setUserName(releaseUser);
                     //ref.setPublishType(PublishType.FULL);
@@ -186,16 +187,12 @@ public class PublishServiceImpl implements PublishService {
                         latestOrchestratorReleaseInfo.setUpdateTime(new Date());
                         orchestratorReleaseInfoMapper.update(latestOrchestratorReleaseInfo);
                     }
+                } catch (ExternalOperationFailedException e) {
+                    String errorInfo = e.getDesc();
+                    DSSExceptionUtils.dealErrorException(60018, errorInfo, e, ExternalOperationFailedException.class);
                 } catch (final Throwable t) {
-                    if (t instanceof ExternalOperationFailedException) {
-                        String errorInfo = t.getCause().getMessage();
-                        ExternalOperationFailedException warnException = (ExternalOperationFailedException)t;
-                        DSSExceptionUtils.dealErrorException(60018, "msg:" + errorInfo, t,
-                            ExternalOperationFailedException.class);
-                    } else {
-                        DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t,
-                            DSSErrorException.class);
-                    }
+                    DSSExceptionUtils.dealErrorException(61121, "Failed to publish workflow", t,
+                        DSSErrorException.class);
                 }
             }
         }
@@ -261,7 +258,7 @@ public class PublishServiceImpl implements PublishService {
         }
     }
 
-    private Project toProject(ProjectInfo projectInfo) {
+    private DSSProject toProject(ProjectInfo projectInfo) {
         DSSProject dssProject = new DSSProject();
         dssProject.setName(projectInfo.getProjectName());
         dssProject.setCreateBy(projectInfo.getCreateBy());

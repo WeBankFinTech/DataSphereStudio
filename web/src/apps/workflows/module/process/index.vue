@@ -133,6 +133,11 @@
                     ></Page>
                   </template>
                 </div>
+                <div :class="getPanelClass()">
+                  <SvgIcon @click="changePanel" style="font-size: 60px;left: -26px;top: 45%;position: absolute;cursor: pointer;" v-if="showDag != '0'" :icon-class="showDag === 1? 'panel-full': 'panel-full'"/>
+                  <div class="content"></div>
+                  <div class="close-panel" @click="showDag = 0">x</div>
+                </div>
               </div>
             </template>
           </div>
@@ -349,6 +354,11 @@ export default {
               h('a', {
                 props: {
                   href: '#'
+                },
+                on: {
+                  click: () => {
+                    this.openDag(params.index)
+                  }
                 }
               }, params.row.name)
             ])
@@ -592,7 +602,8 @@ export default {
           desc: this.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
           color: '#5102ce'
         }
-      }
+      },
+      showDag: 0
     }
   },
   mounted() {
@@ -1112,7 +1123,6 @@ export default {
         this.getListData()
         this.list[index].isOnline = false
       })
-
     },
     runTask() {
       this.showRunTaskModal = false
@@ -1129,6 +1139,27 @@ export default {
     activeList(type) {
       this.activeDS = type
       this.activeDS === 1? this.getListData() : this.getInstanceListData()
+    },
+    openDag(index) {
+      this.list2[index]
+      this.showDag = 1
+    },
+    getPanelClass() {
+      switch (this.showDag) {
+        case 0:
+          return 'left-panel'
+        case 1:
+          return 'left-panel partial-panel'
+        case 2:
+          return 'left-panel full-panel'
+      }
+    },
+    changePanel() {
+      if (this.showDag === 1) {
+        this.showDag = 2
+      } else if (this.showDag === 2) {
+        this.showDag = 1
+      }
     },
     rerun(index) {
       let item = this.list2[index]
@@ -1224,6 +1255,36 @@ export default {
     padding: 23px 26px;
     .scheduler-table {
       width: calc(100vw - 250px - 60px);
+    }
+  }
+  .left-panel{
+    height: 80vh;
+    width: calc(100vw - 250px - 65px - 250px);
+    background: #FFFFFF;
+    position: absolute;
+    left: 100vw;
+    z-index: 999;
+    padding: 23px 26px;
+    &.partial-panel {
+      left: calc(250px + 250px + 60px);
+      transition: all 1s;
+    }
+    .content{
+      border: 1px solid #DEE4EC;
+      width: 100%;
+      height: 100%;
+    }
+    &.full-panel {
+      left: 0;
+      width: 100vw;
+      transition: all 1s;
+    }
+    .close-panel{
+      position: absolute;
+      right: 26px;
+      top: -5px;
+      font-size: 16px;
+      cursor: pointer;
     }
   }
   .fr{

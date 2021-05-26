@@ -99,8 +99,9 @@
                 </div>
                 <div class="scheduler-list" v-if="activeDS == 1">
                   <template>
-                    <Table border :columns="columns" :data="list"></Table>
+                    <Table class="scheduler-table" :columns="columns" :data="list"></Table>
                     <Page
+                      size="small"
                       v-if="list.length > 0"
                       class="page-bar fr"
                       :total="pagination.total"
@@ -116,8 +117,9 @@
                 </div>
                 <div class="scheduler-list" v-if="activeDS == 2">
                   <template>
-                    <Table border :columns="columns2" :data="list2"></Table>
+                    <Table class="scheduler-table" :columns="columns2" :data="list2"></Table>
                     <Page
+                      size="small"
                       v-if="list2.length > 0"
                       class="page-bar fr"
                       :total="pagination2.total"
@@ -168,6 +170,7 @@ import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
 import iRun from './run'
 import iTiming from './timing'
 import dayjs from 'dayjs'
+import _ from 'lodash'
 export default {
   components: {
     Process,
@@ -222,40 +225,49 @@ export default {
       ],
       columns: [
         {
-          title: '编号',
+          title: this.$t('message.scheduler.header.id'),
+          width: 100,
           key: 'id'
         },
         {
-          title: '工作流名称',
+          title: this.$t('message.scheduler.header.ProcessName'),
+          width: 200,
           key: 'name'
         },
         {
-          title: '状态',
+          title: this.$t('message.scheduler.header.State'),
+          width: 100,
           key: 'releaseStateDesc'
         },
         {
-          title: '创建时间',
+          title: this.$t('message.scheduler.header.CreateTime'),
+          width: 100,
           key: 'createTime'
         },
         {
-          title: '更新时间',
+          title: this.$t('message.scheduler.header.UpdateTime'),
+          width: 100,
           key: 'updateTime'
         },
         {
-          title: '描述',
+          title: this.$t('message.scheduler.header.Description'),
+          width: 100,
           key: 'description'
         },
         {
-          title: '修改用户',
+          title: this.$t('message.scheduler.header.ModifyBy'),
+          width: 100,
           key: 'modifyBy'
         },
         {
-          title: '定时状态',
+          title: this.$t('message.scheduler.header.TimingState'),
+          width: 100,
           key: 'scheduleReleaseStateDesc'
         },
         {
-          title: '操作',
+          title: this.$t('message.scheduler.header.Operation'),
           key: 'action',
+          fixed: 'right',
           width: 250,
           align: 'center',
           render: (h, params) => {
@@ -263,55 +275,74 @@ export default {
               h('Button', {
                 props: {
                   type: 'success',
+                  shape: "circle",
+                  icon: "md-arrow-dropright",
                   size: 'small',
                   disabled: !params.row.isOnline
                 },
                 style: {
                   marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.run')
                 },
                 on: {
                   click: () => {
                     this.run(params.index)
                   }
                 }
-              },  this.$t('message.scheduler.run')),
+              }),
               h('Button', {
                 props: {
                   type: 'info',
+                  shape: "circle",
+                  icon: "md-alarm",
                   size: 'small',
                   disabled: !params.row.isOnline
                 },
                 style: {
                   marginRight: '5px'
                 },
+                attrs: {
+                  title: this.$t('message.scheduler.setTime')
+                },
                 on: {
                   click: () => {
                     this.openTiming(params.index)
                   }
                 }
-              }, this.$t('message.scheduler.setTime')),
+              }),
               h('Button', {
                 props: {
-                  type: 'warning',
+                  type: params.row.isOnline ? 'error' : 'warning',
+                  shape: "circle",
+                  icon: "md-power",
                   size: 'small'
+                },
+                attrs: {
+                  title: params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'),
+                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;' : ''
                 },
                 on: {
                   click: () => {
                     params.row.isOnline ? this.offline(params.index) : this.online(params.index)
                   }
                 }
-              }, params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'))
+              })
             ]);
           }
         }
       ],
+
       columns2: [
         {
-          title: '编号',
+          title: this.$t('message.scheduler.header.id'),
+          width: 100,
           key: 'id'
         },
         {
-          title: '工作流名称',
+          title: this.$t('message.scheduler.header.ProcessName'),
+          width: 200,
           key: 'name',
           render: (h, params) => {
             return h('div', [
@@ -320,61 +351,89 @@ export default {
                   href: '#'
                 }
               }, params.row.name)
-            ]);
+            ])
           }
         },
         {
-          title: '状态',
-          key: 'state'
+          title: this.$t('message.scheduler.header.State'),
+          key: 'stateDesc',
+          width: 100,
+          render: (h, params) => {
+            return h('div', [
+              h('Icon', {
+                props: {
+                  type: 'ios-radio-button-on',
+                  color: params.row.stateColor,
+                  size: 10
+                }
+              }),
+              h('strong', params.row.stateDesc)
+            ])
+          }
         },
         {
-          title: '运行类型',
-          key: 'commandType'
+          title: this.$t('message.scheduler.header.RunType'),
+          width: 100,
+          key: 'commandTypeDesc'
         },
         {
-          title: '调度时间',
+          title: this.$t('message.scheduler.header.SchedulingTime'),
+          width: 100,
           key: 'scheduleTime'
         },
         {
-          title: '开始时间',
+          title: this.$t('message.scheduler.header.StartTime'),
+          width: 100,
           key: 'startTime'
         },
         {
-          title: '结束时间',
+          title: this.$t('message.scheduler.header.EndTime'),
+          width: 100,
           key: 'endTime'
         },
         {
-          title: '运行时长s',
+          title: this.$t('message.scheduler.header.Duration') + 's',
+          width: 100,
           key: 'duration'
         },
         {
-          title: '运行次数',
+          title: this.$t('message.scheduler.header.RunTimes'),
+          width: 100,
           key: 'runTimes'
         },
         {
-          title: '容错标识',
+          title: this.$t('message.scheduler.header.FaultTolerantSign'),
+          width: 100,
           key: 'recovery'
         },
         {
-          title: '执行用户',
+          title: this.$t('message.scheduler.header.Executor'),
+          width: 150,
           key: 'executorName'
         },
         {
           title: 'host',
+          width: 150,
           key: 'host'
         },
         {
-          title: '操作',
+          title: this.$t('message.scheduler.header.Operation'),
           key: 'action',
-          width: 250,
+          width: 200,
+          fixed: 'right',
           align: 'center',
           render: (h, params) => {
             return  h('div', [
               h('Button', {
                 props: {
                   type: 'info',
+                  shape: "circle",
+                  icon: "md-refresh",
                   size: 'small',
                   disabled: params.row.disabled
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.rerun')
                 },
                 style: {
                   marginRight: '5px'
@@ -384,7 +443,7 @@ export default {
                     this.rerun(params.index)
                   }
                 }
-              },  this.$t('message.scheduler.rerun'))
+              })
             ]);
           }
         }
@@ -393,11 +452,6 @@ export default {
       timingData: {
         item: {},
         type: ''
-      },
-      publishStatus: {
-        'NOT_RELEASE': this.$t('message.scheduler.Unpublished'),
-        'ONLINE': this.$t('message.scheduler.online'),
-        'OFFLINE': this.$t('message.scheduler.offline')
       },
       pagination: {
         size: 10,
@@ -410,8 +464,136 @@ export default {
         opts: [5, 10, 30, 45, 60],
         current: 1,
         total: 0
+      },
+      publishStatus: {
+        'NOT_RELEASE': this.$t('message.scheduler.Unpublished'),
+        'ONLINE': this.$t('message.scheduler.online'),
+        'OFFLINE': this.$t('message.scheduler.offline')
+      },
+      runningType: [
+        {
+          desc: this.$t('message.scheduler.START_PROCESS'),
+          code: 'START_PROCESS'
+        },
+        {
+          desc: this.$t('message.scheduler.START_CURRENT_TASK_PROCESS'),
+          code: 'START_CURRENT_TASK_PROCESS'
+        },
+        {
+          desc: this.$t('message.scheduler.RECOVER_TOLERANCE_FAULT_PROCESS'),
+          code: 'RECOVER_TOLERANCE_FAULT_PROCESS'
+        },
+        {
+          desc: this.$t('message.scheduler.RECOVER_SUSPENDED_PROCESS'),
+          code: 'RECOVER_SUSPENDED_PROCESS'
+        },
+        {
+          desc: this.$t('message.scheduler.START_FAILURE_TASK_PROCESS'),
+          code: 'START_FAILURE_TASK_PROCESS'
+        },
+        {
+          desc: this.$t('message.scheduler.COMPLEMENT_DATA'),
+          code: 'COMPLEMENT_DATA'
+        },
+        {
+          desc: this.$t('message.scheduler.SCHEDULER'),
+          code: 'SCHEDULER'
+        },
+        {
+          desc: this.$t('message.scheduler.rerun'),
+          code: 'REPEAT_RUNNING'
+        },
+        {
+          desc: this.$t('message.scheduler.PAUSE'),
+          code: 'PAUSE'
+        },
+        {
+          desc: this.$t('message.scheduler.STOP'),
+          code: 'STOP'
+        },
+        {
+          desc: this.$t('message.scheduler.RECOVER_WAITTING_THREAD'),
+          code: 'RECOVER_WAITTING_THREAD'
+        }
+      ],
+      tasksState: {
+        SUBMITTED_SUCCESS: {
+          id: 0,
+          desc: this.$t('message.scheduler.tasksState.SUBMITTED_SUCCESS'),
+          color: '#A9A9A9'
+        },
+        'RUNNING_EXECUTION': {
+          id: 1,
+          desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
+          color: '#0097e0'
+        },
+        'RUNNING_EXEUTION': {
+          id: 1,
+          desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
+          color: '#0097e0'
+        },
+        READY_PAUSE: {
+          id: 2,
+          desc: this.$t('message.scheduler.tasksState.READY_PAUSE'),
+          color: '#07b1a3'
+        },
+        PAUSE: {
+          id: 3,
+          desc: this.$t('message.scheduler.tasksState.PAUSE'),
+          color: '#057c72'
+        },
+        READY_STOP: {
+          id: 4,
+          desc: this.$t('message.scheduler.tasksState.READY_STOP'),
+          color: '#FE0402'
+        },
+        STOP: {
+          id: 5,
+          desc: this.$t('message.scheduler.tasksState.STOP'),
+          color: '#e90101'
+        },
+        FAILURE: {
+          id: 6,
+          desc: this.$t('message.scheduler.tasksState.FAILURE'),
+          color: '#000000'
+        },
+        SUCCESS: {
+          id: 7,
+          desc: this.$t('message.scheduler.tasksState.SUCCESS'),
+          color: '#33cc00'
+        },
+        NEED_FAULT_TOLERANCE: {
+          id: 8,
+          desc: this.$t('message.scheduler.tasksState.NEED_FAULT_TOLERANCE'),
+          color: '#FF8C00'
+        },
+        KILL: {
+          id: 9,
+          desc: this.$t('message.scheduler.tasksState.Kill'),
+          color: '#a70202'
+        },
+        WAITTING_THREAD: {
+          id: 10,
+          desc: this.$t('message.scheduler.tasksState.WAITTING_THREAD'),
+          color: '#912eed'
+        },
+        WAITTING_DEPEND: {
+          id: 11,
+          desc: this.$t('message.scheduler.tasksState.WAITTING_DEPEND'),
+          color: '#5101be'
+        },
+        DELAY_EXECUTION: {
+          id: 12,
+          desc: this.$t('message.scheduler.tasksState.DELAY_EXECUTION'),
+          color: '#5102ce'
+        },
+        FORCED_SUCCESS: {
+          id: 13,
+          desc: this.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
+          color: '#5102ce'
+        }
       }
-    };
+    }
   },
   mounted() {
     this.getCache().then(tabs => {
@@ -868,6 +1050,11 @@ export default {
           item.scheduleTime = this.formatDate(item.scheduleTime)
           item.startTime = this.formatDate(item.startTime)
           item.endTime = this.formatDate(item.endTime)
+          item.duration = this.filterNull(item.duration)
+          item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
+          console.log(item.state, this.tasksState['RUNNING_EXEUTION'])
+          item.stateDesc = this.tasksState[item.state].desc
+          item.stateColor = this.tasksState[item.state].color
           item.disabled = false
         })
         this.list2 = res.totalList
@@ -983,6 +1170,13 @@ export default {
         return dayjs(this.formatISODate(value)).format(fmt)
       }
     },
+    filterNull(value) {
+      if (value === null || value === '') {
+        return '-'
+      } else {
+        return value
+      }
+    },
     pageChange(page) {
       this.pagination.current = page
       this.getListData(page)
@@ -1004,28 +1198,33 @@ export default {
 </script>
 <style lang="scss" src="@/apps/workflows/assets/styles/process.scss"></style>
 <style lang="scss" scoped>
-  .scheduler-wrapper{
-    display: flex;
-    background-color: white;
-    min-height: 100%;
+.scheduler-wrapper{
+  background-color: white;
+  min-height: 100%;
   .scheduler-menu{
-    flex:1;
-    font-size: 18px;
-  li {
+    float: left;
+    width: 250px;
+    font-size: 14px;
+    li {
     padding: 0 40px;
     cursor: pointer;
-    line-height: 60px;
-  &:hover{
-     color: rgb(247, 152, 0);
-   }
-  &.active{
-     background-color: rgb(254, 249, 230);
-     color: rgb(247, 152, 0);
-   }
-  }
+    line-height: 40px;
+    &:hover{
+       color: #2E92F7;
+     }
+    &.active{
+       background-color: #ECF4FF;
+       color: #2E92F7;
+       border-right: 3px solid  #2E92F7
+     }
+    }
   }
   .scheduler-list{
-    flex:6;
+    float: left;
+    padding: 23px 26px;
+    .scheduler-table {
+      width: calc(100vw - 250px - 60px);
+    }
   }
   .fr{
     float: right;
@@ -1033,5 +1232,5 @@ export default {
   .page-bar {
     margin-top: 20px;
   }
-  }
+}
 </style>

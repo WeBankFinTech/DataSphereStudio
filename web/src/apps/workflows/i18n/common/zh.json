@@ -527,6 +527,16 @@
           "online": "上线",
           "rerun": "重跑",
           "Unpublished": "未发布",
+          "START_PROCESS": "启动工作流",
+          "START_CURRENT_TASK_PROCESS": "从当前节点开始执行",
+          "RECOVER_TOLERANCE_FAULT_PROCESS": "恢复被容错的工作流",
+          "RECOVER_SUSPENDED_PROCESS": "恢复运行流程",
+          "START_FAILURE_TASK_PROCESS": "从失败节点开始执行",
+          "COMPLEMENT_DATA": "补数",
+          "SCHEDULER": "调度执行",
+          "RECOVER_WAITTING_THREAD": "恢复等待线程",
+          "PAUSE": "暂停",
+          "STOP": "停止",
           "runTask": {
             "startTitle": "启动前请先设置参数",
             "timingTitle": "定时前请先设置参数",
@@ -574,6 +584,41 @@
             "success": "成功",
             "PleaseGoOnline":"不要忘记上线",
             "noData":"该时间段无数据"
+          },
+          "tasksState":{
+            "SUBMITTED_SUCCESS": "提交成功",
+            "RUNNING_EXECUTION": "正在执行",
+            "READY_PAUSE": "准备暂停",
+            "PAUSE": "暂停",
+            "READY_STOP": "准备停止",
+            "STOP": "停止",
+            "FAILURE": "失败",
+            "SUCCESS": "成功",
+            "NEED_FAULT_TOLERANCE": "需要容错",
+            "KILL": "Kill",
+            "WAITTING_THREAD": "等待线程",
+            "WAITTING_DEPEND": "等待依赖",
+            "DELAY_EXECUTION": "延时执行",
+            "FORCED_SUCCESS": "强制成功"
+          },
+          "header": {
+            "id": "编号",
+            "ProcessName": "工作流名称",
+            "State": "状态",
+            "RunType": "运行类型",
+            "SchedulingTime": "调度时间",
+            "StartTime": "开始时间",
+            "EndTime": "结束时间",
+            "Duration": "运行时长",
+            "RunTimes": "运行次数",
+            "FaultTolerantSign": "容错标识",
+            "Executor": "执行用户",
+            "Operation": "操作",
+            "CreateTime": "创建时间",
+            "UpdateTime": "更新时间",
+            "Description": "描述",
+            "ModifyBy": "修改用户",
+            "TimingState": "定时状态"
           }
         }
     }

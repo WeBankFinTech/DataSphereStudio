@@ -15,6 +15,7 @@
  *
  */
 
+/*eslint-disable */
 import qs from 'qs';
 import md5 from 'md5';
 import * as domUtil from './dom';
@@ -22,6 +23,7 @@ import * as objectUtil from './object';
 import * as typeUtil from './type';
 import * as convertUtil from './convert';
 import * as currentModules from './currentModules'
+import filters from './filters'
 
 
 let util = {

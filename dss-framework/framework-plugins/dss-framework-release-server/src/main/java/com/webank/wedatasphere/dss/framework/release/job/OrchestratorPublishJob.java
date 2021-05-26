@@ -22,7 +22,9 @@ import com.webank.wedatasphere.dss.framework.release.entity.export.ExportResult;
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,8 +100,12 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob {
                 .getAppIdByOrchestratorVersionId(orchestratorVersionId);
             importOrcInfos.add(OrchestratorReleaseInfo.newInstance(orchestratorId, orchestratorVersionId, appId));
             nextLabel = new CommonDSSLabel("DEV");
+            // 临时解决获取空间名称
+            Workspace publishWorkspace = new Workspace();
+            publishWorkspace.setWorkspaceName(workspaceName);
             this.releaseEnv.getPublishService()
-                .publish(releaseUser, projectInfo, importOrcInfos, nextLabel, workspace, supportMultiEnv());
+                .publish(releaseUser, projectInfo, importOrcInfos, nextLabel, publishWorkspace, supportMultiEnv());
+
             //2. 更新发布orchestrator时的描述信息
             this.releaseEnv.getProjectService().updateCommentInOrchestratorInfo(comment, orchestratorId);
 
@@ -110,9 +116,12 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob {
 
             //4.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             this.releaseEnv.getReleaseJobListener().onJobSucceed(this);
-        }catch(final Throwable t){
-            LOGGER.error("export for orchestrator {} failed", orchestratorId, t);
-            this.releaseEnv.getReleaseJobListener().onJobFailed(this, "export failed" + t.getMessage());
+        } catch (final ExternalOperationFailedException e) {
+            LOGGER.error("publish orchestrator {} failed", orchestratorId, e);
+            this.releaseEnv.getReleaseJobListener().onJobFailed(this, "发布失败：" + e.getDesc());
+        } catch (final Throwable t) {
+            LOGGER.error("publish orchestrator {} failed", orchestratorId, t);
+            this.releaseEnv.getReleaseJobListener().onJobFailed(this, "发布失败：" + t.getMessage());
         }
     }
 }

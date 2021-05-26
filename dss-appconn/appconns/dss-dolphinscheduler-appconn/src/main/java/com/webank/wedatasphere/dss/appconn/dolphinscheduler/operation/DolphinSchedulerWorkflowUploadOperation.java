@@ -17,11 +17,13 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConn
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.SchedulisExceptionUtils;
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerFlow;
+import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerProject;
 import com.webank.wedatasphere.dss.appconn.schedule.core.hooks.ProjectPublishHook;
 import com.webank.wedatasphere.dss.appconn.schedule.core.parser.ProjectParser;
 import com.webank.wedatasphere.dss.appconn.schedule.core.tuning.ProjectTuning;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.ProjectUploadToSchedulerRef;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.UploadToScheduleOperation;
@@ -33,6 +35,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
@@ -147,6 +150,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         ProjectTuning projectTuning = getProjectTuning();
         ProjectPublishHook[] projectPublishHooks = getProjectPublishHooks();
         SchedulerProject schedulerProject = projectParser.parseProject(dssProject, dssFlowList);
+        checkSchedulerProject(schedulerProject);
         projectTuning.tuningSchedulerProject(schedulerProject);
         Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.prePublish(schedulerProject)));
         // 未发布过，则执行发布
@@ -159,6 +163,20 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         // 成功发布后，获取Dolphin Scheduler中工作流定义id
         Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.postPublish(schedulerProject)));
         return processDefinitionId.intValue();
+    }
+
+    private void checkSchedulerProject(SchedulerProject schedulerProject) throws ExternalOperationFailedException {
+        DolphinSchedulerProject dolphinSchedulerProject = (DolphinSchedulerProject)schedulerProject;
+        List<SchedulerFlow> schedulerFlows = dolphinSchedulerProject.getSchedulerFlows();
+        for (SchedulerFlow flow : schedulerFlows) {
+            List<SchedulerNode> schedulerNodes = flow.getSchedulerNodes();
+            for (SchedulerNode node : schedulerNodes) {
+                DSSNode dssNode = node.getDSSNode();
+                if (CollectionUtils.isEmpty(dssNode.getResources())) {
+                    throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
+                }
+            }
+        }
     }
 
     private void publish(SchedulerProject schedulerProject) throws ExternalOperationFailedException {

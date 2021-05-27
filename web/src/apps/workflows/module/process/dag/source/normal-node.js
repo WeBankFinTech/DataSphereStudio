@@ -5,13 +5,11 @@ import './normal-node.scss';
 
 class NormalNode extends Node {
   constructor(opts) {
-    console.log(opts)
     super(opts);
     this.options = opts;
   }
 
   draw = (opts) => {
-    console.log(opts)
     let container = $('<div class="relation-node"></div>')
       .css('top', opts.top)
       .css('left', opts.left)

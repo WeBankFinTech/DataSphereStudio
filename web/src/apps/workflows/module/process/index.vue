@@ -133,10 +133,13 @@
                     ></Page>
                   </template>
                 </div>
-                <div :class="getPanelClass()">
-                  <SvgIcon @click="changePanel" style="font-size: 60px;left: -26px;top: 45%;position: absolute;cursor: pointer;" v-if="showDag != '0'" :icon-class="showDag === 1? 'panel-full': 'panel-full'"/>
-                  <div class="content"></div>
-                  <div class="close-panel" @click="showDag = 0">x</div>
+                <div :class="getPanelClass()" v-if="activeDS == 2">
+                  <SvgIcon @click="changePanel(true)" style="font-size: 40px;left: -12px;top: 45%;position: absolute;cursor: pointer;" v-if="showDag === 1" icon-class="panel-full"/>
+                  <SvgIcon @click="changePanel(false)" style="font-size: 40px;left: -12px;top: 37%;position: absolute;cursor: pointer;" v-if="showDag === 1" icon-class="panel-close"/>
+                  <SvgIcon @click="changePanel(false)" style="font-size: 80px;left: -32px;top: 35%;position: absolute;cursor: pointer;" v-if="showDag === 2" icon-class="panel-partial"/>
+                  <div class="dag-page">
+                    <Dag v-if="showDag"></Dag>
+                  </div>
                 </div>
               </div>
             </template>
@@ -176,13 +179,16 @@ import iRun from './run'
 import iTiming from './timing'
 import dayjs from 'dayjs'
 import _ from 'lodash'
+import Dag from './dag'
+console.log(Dag)
 export default {
   components: {
     Process,
     Ide: Ide.component,
     commonIframe: commonModule.component.iframe,
     iRun,
-    iTiming
+    iTiming,
+    Dag
   },
   props: {
     query: {
@@ -579,7 +585,7 @@ export default {
         },
         KILL: {
           id: 9,
-          desc: this.$t('message.scheduler.tasksState.Kill'),
+          desc: this.$t('message.scheduler.tasksState.KILL'),
           color: '#a70202'
         },
         WAITTING_THREAD: {
@@ -1011,7 +1017,7 @@ export default {
     },
     showDS() {
       let tab = {
-        title: this.query.name + '-调度',
+        title: this.query.name + '-' + this.$t("message.workflow.process.schedule"),
         type: "DS",
         close: true,
         data: this.query,
@@ -1154,12 +1160,8 @@ export default {
           return 'left-panel full-panel'
       }
     },
-    changePanel() {
-      if (this.showDag === 1) {
-        this.showDag = 2
-      } else if (this.showDag === 2) {
-        this.showDag = 1
-      }
+    changePanel(expand) {
+      this.showDag = expand ? ++this.showDag : --this.showDag
     },
     rerun(index) {
       let item = this.list2[index]
@@ -1265,18 +1267,19 @@ export default {
     left: 100vw;
     z-index: 999;
     padding: 23px 26px;
+    transition: all 1s;
     &.partial-panel {
       left: calc(250px + 250px + 60px);
       transition: all 1s;
     }
-    .content{
+    .dag-page{
       border: 1px solid #DEE4EC;
       width: 100%;
       height: 100%;
     }
     &.full-panel {
-      left: 0;
-      width: 100vw;
+      left: 270px;
+      width: calc(100vw - 270px);
       transition: all 1s;
     }
     .close-panel{

@@ -138,7 +138,7 @@
                   <SvgIcon @click="changePanel(false)" style="font-size: 40px;left: -12px;top: 37%;position: absolute;cursor: pointer;" v-if="showDag === 1" icon-class="panel-close"/>
                   <SvgIcon @click="changePanel(false)" style="font-size: 80px;left: -32px;top: 35%;position: absolute;cursor: pointer;" v-if="showDag === 2" icon-class="panel-partial"/>
                   <div class="dag-page">
-                    <Dag v-if="showDag"></Dag>
+                    <Dag :dagData="dagData" :processId="dagProcessId" v-if="showDag"></Dag>
                   </div>
                 </div>
               </div>
@@ -180,6 +180,8 @@ import iTiming from './timing'
 import dayjs from 'dayjs'
 import _ from 'lodash'
 import Dag from './dag'
+import {ds2butterfly} from './convertor'
+
 console.log(Dag)
 export default {
   components: {
@@ -609,7 +611,12 @@ export default {
           color: '#5102ce'
         }
       },
-      showDag: 0
+      showDag: 0,
+      dagData: {
+        nodes: [],
+        edges: []
+      },
+      dagProcessId: ''
     }
   },
   mounted() {
@@ -1069,7 +1076,6 @@ export default {
           item.endTime = this.formatDate(item.endTime)
           item.duration = this.filterNull(item.duration)
           item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
-          console.log(item.state, this.tasksState['RUNNING_EXEUTION'])
           item.stateDesc = this.tasksState[item.state].desc
           item.stateColor = this.tasksState[item.state].color
           item.disabled = false
@@ -1147,8 +1153,19 @@ export default {
       this.activeDS === 1? this.getListData() : this.getInstanceListData()
     },
     openDag(index) {
-      this.list2[index]
-      this.showDag = 1
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/select-by-id`, {
+        processInstanceId: this.list2[index].id,
+      }, 'get').then((data) => {
+        // process instance
+        let processInstanceJson = JSON.parse(data.processInstanceJson)
+        let tasks = processInstanceJson.tasks
+        let connects = JSON.parse(data.connects)
+        let locations = JSON.parse(data.locations)
+        this.dagData = ds2butterfly(tasks, connects, locations)
+        this.dagProcessId = this.list2[index].id
+        this.showDag = 1
+      }).catch(() => {
+      })
     },
     getPanelClass() {
       switch (this.showDag) {

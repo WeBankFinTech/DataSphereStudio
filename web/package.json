@@ -32,7 +32,6 @@
         "axios": "^0.21.1",
         "babel-polyfill": "6.26.0",
         "butterfly-dag": "^4.0.6",
-        "butterfly-vue": "^1.0.1",
         "core-js": "2.6.11",
         "dayjs": "^1.10.4",
         "dexie": "2.0.4",

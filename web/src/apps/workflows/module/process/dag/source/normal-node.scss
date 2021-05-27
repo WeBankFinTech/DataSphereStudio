@@ -4,10 +4,12 @@
     width: 140px;
     height: 36px;
     padding: 0;
-    border:1px solid #2d8cf0;
+    box-shadow:0 2px 3px 0 rgba(0,112,204,0.06);
+    border-radius:100px;
+    border:1px solid #D9D9D9;
     cursor: pointer;
     &:hover {
-      border: 1px solid #00BFFF;
+      border:1px solid #F66902;
       .datac-icon {
         line-height: 52px;
       }
@@ -32,6 +34,6 @@
     text-align: center;
   }
   .nodeBackground-color{
-    background-color: #FFF;
+    background-color:rgba(255, 255, 255, 0.8);
   }
 }

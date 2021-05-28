@@ -39,13 +39,11 @@ export default {
         this.dagData.nodes.forEach(node=> {
           node.Class = NNode
         })
-        console.log(this.dagData)
         this.canvas.draw(this.dagData)
       } else {
         this.dagData.nodes.forEach(node=> {
           node.Class = NNode
         })
-        console.log(this.dagData)
         this.canvas.redraw(this.dagData)
       }
     },

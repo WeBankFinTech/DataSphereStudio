@@ -214,7 +214,7 @@ const success = function(response) {
         console.log(response.data, '潜在性能问题大数据量', len)
       }
     }
-    return result || {};
+    return result
   }
 };
 

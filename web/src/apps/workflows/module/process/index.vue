@@ -165,6 +165,7 @@
       <div slot="footer" style="height: 30px;">
       </div>
     </Modal>
+    <m-log v-if="showLog" :key="logId" :item="logData" :source="source" :logId="logId" @ok="showLog=false" @close="showLog=false"></m-log>
   </div>
 </template>
 <script>
@@ -181,8 +182,9 @@ import dayjs from 'dayjs'
 import _ from 'lodash'
 import Dag from './dag'
 import {ds2butterfly} from './convertor'
+import mLog from './log/log'
+import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 
-console.log(Dag)
 export default {
   components: {
     Process,
@@ -190,12 +192,18 @@ export default {
     commonIframe: commonModule.component.iframe,
     iRun,
     iTiming,
-    Dag
+    Dag,
+    mLog
   },
   props: {
     query: {
       type: Object,
       default: () => {}
+    }
+  },
+  computed: {
+    projectName() {
+      return `${this.workspaceName}-${this.$route.query.projectName}`
     }
   },
   data() {
@@ -220,8 +228,7 @@ export default {
       showTip: true,
       openFiles: {},
       nodeImg: NODEICON,
-
-      projectName: '-' + this.$route.query.projectName,
+      workspaceName: '',
       activeDS: 1,
       showRunTaskModal: false,
       showTimingTaskModal: false,
@@ -616,7 +623,12 @@ export default {
         nodes: [],
         edges: []
       },
-      dagProcessId: ''
+      dagProcessId: '',
+      timer: '', //用来轮询工作节点状态的计时器,
+      logData: {},
+      showLog: false,
+      logId: null,
+      source: 'list'
     }
   },
   mounted() {
@@ -627,8 +639,44 @@ export default {
     });
     this.updateProjectCacheByActive();
     this.changeTitle(false);
+    GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+      this.workspaceName = data.workspace.name;
+    })
+    util.Hub.$on('dagLog', data => {
+      this.getTaskInstanceList(data, (id) => {
+        if (!id) {
+          this.logId = null
+          this.logData = {}
+          this.showLog = false
+          this.$Message.info(this.$t('message.scheduler.noLog'))
+        } else {
+          this.logId = id
+          this.logData = data
+          this.showLog = true
+        }
+      })
+    })
   },
   methods: {
+    getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
+      if (!this.dagProcessId) return
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
+        processInstanceId: this.dagProcessId,
+        pageSize,
+        pageNo,
+        name: data.label
+      }, 'get').then((res) => {
+        let list = res.totalList
+        let thisTimeList = list.filter(item => item.flag === 'YES')
+        for (let i = 0; i < thisTimeList.length; i++) {
+          if (thisTimeList[i].name === data.label) {
+            return cb && cb(thisTimeList[i].id)
+          }
+        }
+        return cb && cb()
+      }).catch(() => {
+      })
+    },
     // 判断是否有意编辑权限
     // 没有权限的和历史的都不可编辑
     checkEditable(item) {
@@ -1153,6 +1201,8 @@ export default {
       this.activeDS === 1? this.getListData() : this.getInstanceListData()
     },
     openDag(index) {
+      if (this.timer)
+        clearInterval(this.timer)
       api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/select-by-id`, {
         processInstanceId: this.list2[index].id,
       }, 'get').then((data) => {
@@ -1161,9 +1211,30 @@ export default {
         let tasks = processInstanceJson.tasks
         let connects = JSON.parse(data.connects)
         let locations = JSON.parse(data.locations)
-        this.dagData = ds2butterfly(tasks, connects, locations)
         this.dagProcessId = this.list2[index].id
-        this.showDag = 1
+        this.pollTask(this.list2[index].id, taskList => {
+          this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+          this.showDag = 1
+        })
+        this.timer = setInterval(() => {
+          this.pollTask(this.list2[index].id, taskList => {
+            this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+          })
+        }, 1000*30)
+      }).catch(() => {
+      })
+    },
+    pollTask(processInstanceId, cb) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/task-list-by-process-id`, {
+        processInstanceId: processInstanceId,
+      }, 'get').then((data) => {
+        // process instance
+        let taskList = data.taskList
+        taskList.forEach(task => {
+          task.stateObj = this.tasksState[task.state]
+          task.taskObj = JSON.parse(task.taskJson)
+        })
+        cb && cb(taskList)
       }).catch(() => {
       })
     },
@@ -1179,6 +1250,11 @@ export default {
     },
     changePanel(expand) {
       this.showDag = expand ? ++this.showDag : --this.showDag
+      // 关闭dag图 清除计时器
+      if (!this.showDag && this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
     },
     rerun(index) {
       let item = this.list2[index]
@@ -1282,7 +1358,7 @@ export default {
     background: #FFFFFF;
     position: absolute;
     left: 100vw;
-    z-index: 999;
+    z-index: 99;
     padding: 23px 26px;
     transition: all 1s;
     &.partial-panel {

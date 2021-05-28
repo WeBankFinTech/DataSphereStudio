@@ -190,13 +190,14 @@ import moment from 'moment-timezone'
 import api from '@/common/service/api'
 import vCrontab from './crontab/index'
 import dayjs from 'dayjs'
+import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 
 export default {
   name: 'timing-process',
   data () {
     return {
       api,
-      projectName: '-' + this.$route.query.projectName,
+      workspaceName: '',
       processDefinitionId: 0,
       failureStrategy: 'CONTINUE',
       availableTimezoneIDList: moment.tz.names(),
@@ -469,8 +470,16 @@ export default {
         })
       })
     })
+    GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+      this.workspaceName = data.workspace.name;
+    })
   },
-  components: { vCrontab }
+  components: { vCrontab },
+  computed: {
+    projectName() {
+      return `${this.workspaceName}-${this.$route.query.projectName}`
+    }
+  }
 }
 </script>
 

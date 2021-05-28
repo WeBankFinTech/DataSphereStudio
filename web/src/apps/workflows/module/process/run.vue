@@ -182,13 +182,14 @@
 import dayjs from 'dayjs'
 import api from '@/common/service/api'
 import _ from 'lodash'
+import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 
 export default {
   name: 'start-process',
   data () {
     return {
       api,
-      projectName: '-' + this.$route.query.projectName,
+      workspaceName: '',
       processDefinitionId: 0,
       failureStrategy: 'CONTINUE',
       warningTypeList: [
@@ -379,8 +380,15 @@ export default {
         this.warningGroupId = ''
       })
     })
+    GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+      this.workspaceName = data.workspace.name;
+    })
   },
-  computed: {},
+  computed: {
+    projectName() {
+      return `${this.workspaceName}-${this.$route.query.projectName}`
+    }
+  },
   components: {}
 }
 </script>

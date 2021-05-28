@@ -1,4 +1,4 @@
-export function ds2butterfly(tasks, connects, locations) {
+export function ds2butterfly(tasks, connects, locations, taskList) {
   let nodes = [],
     edges = []
   tasks.forEach(task => {
@@ -10,6 +10,7 @@ export function ds2butterfly(tasks, connects, locations) {
       node_type: task.type,
       node_params: task.params,
       node_preTasks: task.preTasks,
+      state: '',
       endpoints: [
         {
           id: 'point1-' + task.id,
@@ -37,6 +38,15 @@ export function ds2butterfly(tasks, connects, locations) {
       arrowOffset: 0
     })
   })
+  if (taskList && taskList.length) {
+    taskList.forEach(item => {
+      nodes.forEach(node => {
+        if (node.id === item.taskObj.id && item.stateObj) {
+          node.state = item.stateObj
+        }
+      })
+    })
+  }
   return {
     nodes,
     edges

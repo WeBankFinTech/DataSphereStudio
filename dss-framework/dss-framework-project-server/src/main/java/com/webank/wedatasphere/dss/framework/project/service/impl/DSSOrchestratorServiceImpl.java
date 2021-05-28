@@ -146,10 +146,12 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         if (!orchestratorModifRequest.getOrchestratorName().equals(list.get(0).getOrchestratorName())) {
             isExistSameName(orchestratorModifRequest.getWorkspaceId(), orchestratorModifRequest.getProjectId(), orchestratorModifRequest.getOrchestratorName());
         }
+        long id = orchestratorModifRequest.getId();
+        String name = orchestratorModifRequest.getOrchestratorName();
         DSSOrchestrator orchestrator = new DSSOrchestrator();
-        orchestrator.setId(orchestratorModifRequest.getId());
+        orchestrator.setId(id);
         //编排模式-名称
-        orchestrator.setOrchestratorName(orchestratorModifRequest.getOrchestratorName());
+        orchestrator.setOrchestratorName(name);
         //编排模式
         orchestrator.setOrchestratorMode(orchestratorModifRequest.getOrchestratorMode());
         //编排模式-方式
@@ -162,6 +164,8 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         orchestrator.setUpdateUser(username);
         //编排模式-更新时间
         orchestrator.setUpdateTime(new Date());
+
+        dssProjectMapper.updateDssWorkflowName(id,name);
         this.updateById(orchestrator);
     }
 

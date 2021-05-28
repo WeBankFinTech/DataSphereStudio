@@ -66,4 +66,7 @@ public interface DSSProjectMapper extends BaseMapper<DSSProject> {
 
     @Update("update dss_project set `visible` = 0 where `id` = #{projectId}")
     void deleteProject(@Param("projectId")Long projectId);
+
+    void updateDssWorkflowName(@Param("id") Long id, @Param("name") String name);
+
 }

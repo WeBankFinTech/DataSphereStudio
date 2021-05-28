@@ -29,5 +29,9 @@ public interface ProjectConf {
     CommonVars<String> SUPPORT_ABILITY = CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");
     CommonVars<String> SERVICE_NAME = CommonVars.apply("wds.dss.framework.project.service.name", "dss-framework-project-server");
 
+    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
+    CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "http://192.168.10.223:12345/dolphinscheduler");
+
+
 
 }

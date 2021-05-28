@@ -19,6 +19,7 @@
 package com.webank.wedatasphere.dss.framework.project.restful;
 
 import com.google.gson.*;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.utils.DateUtil;
 import com.webank.wedatasphere.dss.framework.project.utils.HttpClientUtil;
 import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
@@ -59,9 +60,10 @@ public class DSSFrameworkDSTokenRestfulApi {
             String userId = SecurityFilter.getLoginUsername(req);
 
             try{
+                String dsUrl = ProjectConf.DS_URL.getValue();
                 Map<String, Object> headerMap = new HashMap();
-                headerMap.put("token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
-                String userExistsRes = HttpClientUtil.executeGetByHeader("http://192.168.10.223:12345/dolphinscheduler/users/verify-user-name?userName=" + userId, headerMap);
+                headerMap.put("token", ProjectConf.DS_ADMIN_TOKEN.getValue());
+                String userExistsRes = HttpClientUtil.executeGetByHeader(dsUrl+"/users/verify-user-name?userName=" + userId, headerMap);
 
                 JsonObject userExistJSON =  new JsonParser().parse(userExistsRes).getAsJsonObject();
                 String userExistCode = userExistJSON.getAsJsonObject().get("code").getAsString();
@@ -74,10 +76,10 @@ public class DSSFrameworkDSTokenRestfulApi {
                     userRequestParas.add(new BasicNameValuePair("tenantId", "1"));
                     userRequestParas.add(new BasicNameValuePair("email", "xx@qq.com"));
                     userRequestParas.add(new BasicNameValuePair("queue", "default"));
-                    HttpClientUtil.postForm("http://192.168.10.223:12345/dolphinscheduler/users/create", 30000, headerMap, userRequestParas, "UTF-8");
+                    HttpClientUtil.postForm(dsUrl+"/users/create", 30000, headerMap, userRequestParas, "UTF-8");
                 }
 
-                String userListRes = HttpClientUtil.executeGetByHeader("http://192.168.10.223:12345/dolphinscheduler/users/list-paging?pageNo=1&pageSize=10&searchVal=" + userId, headerMap);
+                String userListRes = HttpClientUtil.executeGetByHeader(dsUrl+"/users/list-paging?pageNo=1&pageSize=10&searchVal=" + userId, headerMap);
                 String  id = "";
                 JsonArray userListJSON = new JsonParser().parse(userListRes).getAsJsonObject().get("data").getAsJsonObject().getAsJsonArray("totalList");
 
@@ -94,7 +96,7 @@ public class DSSFrameworkDSTokenRestfulApi {
                 List<NameValuePair> tokenGenerateRequestParas = new ArrayList<NameValuePair>();
                 tokenGenerateRequestParas.add(new BasicNameValuePair("userId", id));
                 tokenGenerateRequestParas.add(new BasicNameValuePair("expireTime", expireTime));
-                String tokenGenerateRes = HttpClientUtil.postForm("http://192.168.10.223:12345//dolphinscheduler/access-token/generate", 30000, headerMap, tokenGenerateRequestParas, "UTF-8");
+                String tokenGenerateRes = HttpClientUtil.postForm(dsUrl+"/access-token/generate", 30000, headerMap, tokenGenerateRequestParas, "UTF-8");
                 JsonObject tokenGenerateJSON =  new JsonParser().parse(tokenGenerateRes).getAsJsonObject();
                 String token = tokenGenerateJSON.get("data").getAsString();
 
@@ -102,12 +104,12 @@ public class DSSFrameworkDSTokenRestfulApi {
                 tokenCreateRequestParas.add(new BasicNameValuePair("userId", id));
                 tokenCreateRequestParas.add(new BasicNameValuePair("expireTime", expireTime));
                 tokenCreateRequestParas.add(new BasicNameValuePair("token", token));
-                HttpClientUtil.postForm("http://192.168.10.223:12345//dolphinscheduler/access-token/create",30000,headerMap,tokenCreateRequestParas,"UTF-8");
+                HttpClientUtil.postForm(dsUrl+"/access-token/create",30000,headerMap,tokenCreateRequestParas,"UTF-8");
 
                 return Message.messageToResponse(Message.ok().data("token", token));
 
             }catch (Exception exceptin){
-                return RestfulUtils.dealError("创建工程失败:" + exceptin.getMessage());
+                return RestfulUtils.dealError("获取token失败:" + exceptin.getMessage());
             }
     }
 }

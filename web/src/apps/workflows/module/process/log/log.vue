@@ -207,7 +207,7 @@ export default {
   created () {
     // Source is a task instance
     if (this.source === 'list') {
-      this.$Message.info(this.$t('message.scheduler.logLoading'))
+      //this.$Message.info(this.$t('message.scheduler.logLoading'))
       this._ckLog()
     }
   },

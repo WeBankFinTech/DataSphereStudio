@@ -1,4 +1,4 @@
-export function ds2butterfly(tasks, connects, locations, taskList) {
+export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
   let nodes = [],
     edges = []
   tasks.forEach(task => {
@@ -11,31 +11,92 @@ export function ds2butterfly(tasks, connects, locations, taskList) {
       node_params: task.params,
       node_preTasks: task.preTasks,
       state: '',
-      endpoints: [
+      endpoints: isNode ? [] : [
         {
-          id: 'point1-' + task.id,
+          id: 'top-' + task.id,
           orientation: [0, -1],
           pos: [0.5, 0]
         },
         {
-          id: 'point2-' + task.id,
+          id: 'bottom-' + task.id,
           orientation: [0, 1],
           pos: [0.5, 0]
+        },
+        {
+          id: 'left-' + task.id,
+          orientation: [-1, 0],
+          pos: [0, 0.5]
+        },
+        {
+          id: 'right-' + task.id,
+          orientation: [1, 0],
+          pos: [0, 0.5]
         }
       ]
     })
   })
   connects.forEach(connect => {
+    let preId = connect.endPointSourceId,
+      curId = connect.endPointTargetId,
+      curNode, preNode, prePoint, curPoint
+    if (!isNode) {
+      nodes.forEach(node => {
+        if (node.id === preId) {
+          preNode = node
+        } else if (node.id === curId) {
+          curNode = node
+        }
+      })
+      if (!preNode || !curNode) return
+      if (preNode.left < curNode.left) {
+        if (preNode.top < curNode.top) {
+          if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
+            prePoint = 'right-' + preId
+            curPoint = 'left-' + curId
+          } else {
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
+          }
+        } else {
+          if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
+            prePoint = 'right-' + preId
+            curPoint = 'left-' + curId
+          } else {
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
+          }
+        }
+      } else {
+        if (preNode.top < curNode.top) {
+          if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
+            prePoint = 'left-' + preId
+            curPoint = 'right-' + curId
+          } else {
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
+          }
+        } else {
+          if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
+            prePoint = 'left-' + preId
+            curPoint = 'right-' + curId
+          } else {
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
+          }
+        }
+      }
+    }
     edges.push({
-      type: 'endpoint',//默认
+      type: isNode ? 'node' : 'endpoint',//默认
       shapeType: 'AdvancedBezier', //默认
-      sourceNode: connect.endPointSourceId, //连接源节点id
-      source: 'point2-' + connect.endPointSourceId,     //连接源锚点id
-      targetNode: connect.endPointTargetId, //连接目标节点id
-      target: 'point1-' + connect.endPointTargetId,      //连接目标锚点id
+      sourceNode: isNode ? '' : preId, //连接源节点id
+      source: isNode ? preId : prePoint,     //连接源锚点id
+      targetNode: isNode ? '' : curId, //连接目标节点id
+      target: isNode ? curId : curPoint,      //连接目标锚点id
       arrow: true,
       arrowPosition: 1,
-      arrowOffset: 0
+      arrowOffset: 0,
+      orientationLimit: ['Left', 'Right', 'Top', 'Bottom']
     })
   })
   if (taskList && taskList.length) {

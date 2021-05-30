@@ -1,0 +1,44 @@
+.v-crontab-form-model {
+  width: 525px;
+  .list-box {
+    //padding: 6px 0;
+    height: 40px;
+    .ans-radio-wrapper {
+      height: auto !important;
+    }
+    .ans-radio-group-item {
+      .text {
+        color: #888;
+      }
+    }
+    .ans-radio-wrapper-checked {
+      .text {
+        color: #0097e0;
+      }
+    }
+    .ans-select {
+      .tag-container {
+        .tag-wrapper {
+          line-height: 10px;
+          margin-left: 6px;
+          .tag-text {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+  .ivu-select{
+    width: 300px;
+  }
+  .input-number-model{
+    margin-left: 5px;
+    width: 100px;
+    button {
+      padding: 0 5px;
+    }
+    input {
+      height: 22px;
+    }
+  }
+}

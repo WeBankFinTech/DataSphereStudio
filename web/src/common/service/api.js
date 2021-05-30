@@ -24,6 +24,7 @@ import router from '@/router';
 import { Message } from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
+import storage from "@/common/helper/storage"
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -62,7 +63,7 @@ instance.interceptors.request.use((config) => {
 
   // 增加token
   if (/dolphinscheduler/.test(config.url)) {
-    config.headers['token'] = 'c1f1e5c8c4b5bcdfd5fead493e7b2b41'
+    config.headers['token'] = api.getToken()
     config.url = `http://${window.location.host}/` + config.url
     if (config.useForm) {
       let formData = new FormData()
@@ -327,5 +328,9 @@ api.setError = function(option) {
 api.setResponse = function(constructionOfResponse) {
   this.constructionOfResponse = constructionOfResponse;
 };
+
+api.getToken = function() {
+  return storage.get("token", "local");
+}
 
 export default api;

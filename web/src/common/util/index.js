@@ -7,6 +7,8 @@ import * as typeUtil from './type';
 import * as convertUtil from './convert';
 import * as currentModules from './currentModules'
 import filters from './filters'
+import api from "@/common/service/api"
+import storage from "@/common/helper/storage"
 
 import Vue from 'vue'
 const Hub = new Vue()
@@ -80,7 +82,17 @@ let util = {
     }
     return key;
   },
-  Hub
+  Hub,
+  checkToken(cb) {
+    if (!api.getToken()) {
+      api.fetch('/dss/framework/project/ds/token', 'get').then((res) => {
+        storage.set('token', res.token, 'local')
+        cb && cb()
+      })
+    } else {
+      cb && cb()
+    }
+  }
 };
 objectUtil.merge(util, domUtil, objectUtil, typeUtil, convertUtil, currentModules);
 

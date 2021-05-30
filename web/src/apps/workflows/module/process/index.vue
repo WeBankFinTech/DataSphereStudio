@@ -1071,65 +1071,71 @@ export default {
       }
     },
     showDS() {
-      let tab = {
-        title: this.query.name + '-' + this.$t("message.workflow.process.schedule"),
-        type: "DS",
-        close: true,
-        data: this.query,
-        node: {
-          isChange: false,
-          type: "workflow.subflow"
-        },
-        key: this.query.appId,
-        isHover: false
-      }
-      for (let i = 0;i < this.tabs.length; i++) {
-        let cur = this.tabs[i]
-        // 已经打开
-        if (cur.key === this.query.appId) {
-          return  this.choose(i)
+      util.checkToken(() => {
+        let tab = {
+          title: this.query.name + '-' + this.$t("message.workflow.process.schedule"),
+          type: "DS",
+          close: true,
+          data: this.query,
+          node: {
+            isChange: false,
+            type: "workflow.subflow"
+          },
+          key: this.query.appId,
+          isHover: false
         }
-      }
-      this.tabs.push(tab)
-      this.choose(this.tabs.length - 1)
-      this.getListData()
+        for (let i = 0;i < this.tabs.length; i++) {
+          let cur = this.tabs[i]
+          // 已经打开
+          if (cur.key === this.query.appId) {
+            return  this.choose(i)
+          }
+        }
+        this.tabs.push(tab)
+        this.choose(this.tabs.length - 1)
+        this.getListData()
+      })
     },
     getListData(page=1) {
-      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
-        pageSize: this.pagination.size,
-        pageNo: page,
-        searchVal: this.query.name
-      }, 'get').then((res) => {
-        res.totalList.forEach(item => {
-          item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
-          item.scheduleReleaseStateDesc = item.scheduleReleaseState? this.publishStatus[item.scheduleReleaseState] : '-'
-          item.isOnline = item.releaseState === 'ONLINE'
-          item.createTime = this.formatDate(item.createTime)
-          item.updateTime = this.formatDate(item.updateTime)
-          item.disabled = false
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
+          pageSize: this.pagination.size,
+          pageNo: page,
+          searchVal: this.query.name
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
+            item.scheduleReleaseStateDesc = item.scheduleReleaseState? this.publishStatus[item.scheduleReleaseState] : '-'
+            item.isOnline = item.releaseState === 'ONLINE'
+            item.createTime = this.formatDate(item.createTime)
+            item.updateTime = this.formatDate(item.updateTime)
+            item.disabled = false
+          })
+          this.list = res.totalList
+          this.pagination.total = res.total
         })
-        this.list = res.totalList
-        this.pagination.total = res.total
       })
     },
     getInstanceListData(page=1) {
-      api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
-        pageSize: this.pagination2.size,
-        pageNo: page,
-        searchVal: this.query.name
-      }, 'get').then((res) => {
-        res.totalList.forEach(item => {
-          item.scheduleTime = this.formatDate(item.scheduleTime)
-          item.startTime = this.formatDate(item.startTime)
-          item.endTime = this.formatDate(item.endTime)
-          item.duration = this.filterNull(item.duration)
-          item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
-          item.stateDesc = this.tasksState[item.state].desc
-          item.stateColor = this.tasksState[item.state].color
-          item.disabled = false
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
+          pageSize: this.pagination2.size,
+          pageNo: page,
+          searchVal: this.query.name
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.scheduleTime = this.formatDate(item.scheduleTime)
+            item.startTime = this.formatDate(item.startTime)
+            item.endTime = this.formatDate(item.endTime)
+            item.duration = this.filterNull(item.duration)
+            item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
+            item.stateDesc = this.tasksState[item.state].desc
+            item.stateColor = this.tasksState[item.state].color
+            item.disabled = false
+          })
+          this.list2 = res.totalList
+          this.pagination2.total = res.total
         })
-        this.list2 = res.totalList
-        this.pagination2.total = res.total
       })
     },
     checkStart(index, cb){

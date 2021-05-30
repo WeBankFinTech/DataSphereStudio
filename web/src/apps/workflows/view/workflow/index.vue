@@ -31,20 +31,22 @@
             </Tabs>
           </Workflow>
         </div>
-        <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
-          <process
-            v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
-            :key="item.tabId"
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :query="item.query"
-            @updateWorkflowList="updateWorkflowList"
-            @isChange="isChange(index, arguments)"
-          ></process>
-          <makeUp
-            v-else
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :key="item.name"
-            :currentVal="currentVal"></makeUp>
+        <template>
+          <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
+            <process
+              v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
+              :key="item.tabId"
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :query="item.query"
+              @updateWorkflowList="updateWorkflowList"
+              @isChange="isChange(index, arguments)"
+            ></process>
+            <makeUp
+              v-else
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :key="item.name"
+              :currentVal="currentVal"></makeUp>
+          </template>
         </template>
       </template>
       <template v-else>
@@ -79,6 +81,7 @@ import ProjectForm from '@/components/projectForm/index.js'
 import api from '@/common/service/api';
 import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
+
 export default {
   components: {
     Workflow: Workflow.component,
@@ -122,7 +125,7 @@ export default {
       DEVPROCESS,
       ORCHESTRATORMODES,
       loading: false
-    };
+    }
   },
   watch: {
     currentVal(val, oldVal) {

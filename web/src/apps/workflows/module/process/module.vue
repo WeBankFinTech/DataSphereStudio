@@ -80,6 +80,7 @@
           v-if="type==='flow'"
           :title="$t('message.workflow.process.publish')"
           class="button"
+          :disabled="publishChangeCount<1"
           @click="workflowPublishIsShow">
           <template v-if="!isFlowPubulish">
             <SvgIcon class="icon" icon-class="publish" color="#666"/>
@@ -399,6 +400,8 @@ import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
+import { getPublishStatus } from '@/apps/workflows/service/api.js';
+
 export default {
   components: {
     vueProcess,
@@ -498,6 +501,7 @@ export default {
       },
       // 是否有改变
       jsonChange: false,
+      publishChangeCount: 0,
       loading: false,
       repetitionNameShow: false,
       repeatTitles: [],
@@ -539,7 +543,8 @@ export default {
       exporTChangeVersion: false,
       changeNum: 0,
       consoleParams: [],
-      appId: null
+      appId: null,
+      newOrchestratorVersionId: this.orchestratorVersionId
     };
   },
   computed: {
@@ -630,9 +635,14 @@ export default {
   },
   created() {
     this.viewOptions.shapeView = !this.myReadonly;
+    // if(this.isCurrentOrchestrator()){
+    //   const taskId = this.getTaskId();
+    //   this.checkPublishStatus(taskId, 5000);
+    // }
   },
   watch: {
     jsonChange(val) {
+      this.publishChangeCount += 1;
       this.$emit('isChange', val);
     },
     workflowExecutorCache() {
@@ -842,7 +852,6 @@ export default {
       // 创建工作流之后就有值
       this.contextID = json.contextID;
       // 保存节点才有的值
-      window.console.log(json,'json')
       if (json && json.nodes) {
         this.originalData = this.json = JSON.parse(JSON.stringify(json));
         this.resources = json.resources;
@@ -2130,8 +2139,14 @@ export default {
         })
       })
     },
-    workflowPublishIsShow() {
+    workflowPublishIsShow(event) {
       // 已经在发布不能再点击
+      if(this.publishChangeCount < 1) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.$Message.warning(this.$t('message.workflow.warning.unChange'))
+        return;
+      }
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
       this.pubulishShow = true;
       this.pubulishFlowComment = ''
@@ -2143,7 +2158,7 @@ export default {
       // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
-        orchestratorVersionId: this.orchestratorVersionId,
+        orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
 
         // workflowId: Number(this.flowId),
@@ -2157,11 +2172,29 @@ export default {
         // 发布之后需要轮询结果
         let queryTime = 0;
         this.checkResult(res.releaseTaskId, queryTime, 'publish');
-
+        this.setTaskId(res.releaseTaskId);
       }).catch(() => {
         this.pubulishShow = false;
         this.$Message.error(this.$t('message.workflow.projectDetail.publishFailed'));
       })
+    },
+    checkPublishStatus(taskId, delay){
+      this.isFlowPubulish = true;
+      const check = ()=>{
+        getPublishStatus(taskId, this.getCurrentDsslabels()).then(res=>{
+          if(res.status === 'init' || res.status === 'running'){
+            this.checkPublishStatus(taskId)
+          }else {
+            this.isFlowPubulish = false;
+            clearTimeout(time);
+          }
+        }).catch(()=>{
+          clearTimeout(time);
+          this.isFlowPubulish = false;
+        })
+      };
+      check();
+      let time = setTimeout(check, delay);
     },
     // 发布和导出共用查询接口
     checkResult(id, timeoutValue, type = 'publish') {
@@ -2170,8 +2203,8 @@ export default {
         typeName = this.$t('message.workflow.process.publish')
       }
       const timer = setTimeout(() => {
-        timeoutValue += 8000;
-        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getPublishStatus`, { releaseTaskId: +id, dssLabel: this.getCurrentDsslabels() }, 'get').then((res) => {
+        timeoutValue += 2000;
+        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);
@@ -2195,6 +2228,7 @@ export default {
                 });
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
+              this.publishChangeCount = 0;
               // this.getBaseInfo();
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
               // this.$emit('publishSuccess', this.getBaseInfo);
@@ -2218,7 +2252,7 @@ export default {
             this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
           }
         });
-      }, 8000);
+      }, 2000);
     },
     // 发布成功，更新appId
     publishSuccess(cb) {
@@ -2233,6 +2267,7 @@ export default {
         this.loading = false;
         if (openOrchestrator) {
           this.appId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.appId;
+          this.newOrchestratorVersionId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
           if(cb) {
             cb();
           }
@@ -2306,6 +2341,23 @@ export default {
     getCurrentWorkspaceName() {
       const workspaceData = storage.get("currentWorkspace");
       return workspaceData ? workspaceData.name : ''
+    },
+    getTaskKey(){
+      const username = this.getUserName();
+      const key = `${username}-workflow-${this.orchestratorId}-taskId`;
+      return key
+    },
+    isCurrentOrchestrator(){
+      const username = this.getUserName();
+      return this.getTaskKey().replace(this.orchestratorId, '') ===  `${username}-workflow--taskId`;
+    },
+    setTaskId(taskId) {
+      const key = this.getTaskKey();
+      storage.set(key, taskId);
+    },
+    getTaskId(){
+      const key = this.getTaskKey();
+      return storage.get(key);
     }
   },
 };

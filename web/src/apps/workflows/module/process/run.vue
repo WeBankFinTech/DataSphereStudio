@@ -39,7 +39,7 @@
       </div>
       <div class="cont">
         <template>
-          <Select style="width: 200px;" v-model="warningType">
+          <Select style="width: 350px;" v-model="warningType">
             <Option
               v-for="city in warningTypeList"
               :key="city.id"
@@ -84,7 +84,6 @@
       <div class="cont">
         <template>
           <Select
-            style="width: 200px;"
             clearable
             v-model="warningGroupId"
             :disabled="!notifyGroupList.length">
@@ -106,7 +105,7 @@
       <div class="text">
         <span>{{$t('message.scheduler.runTask.receivers')}}</span>
       </div>
-      <div class="cont" style="width: 688px;">
+      <div class="cont">
         <div style="padding-top: 6px;">
           <template>
             <Input v-model="receivers" :placeholder="$t('message.scheduler.runTask.inputEmail')"/>
@@ -118,7 +117,7 @@
       <div class="text">
         <span>{{$t('message.scheduler.runTask.receiverCcs')}}</span>
       </div>
-      <div class="cont" style="width: 688px;">
+      <div class="cont">
         <div style="padding-top: 6px;">
           <template>
             <Input v-model="receiversCc" :placeholder="$t('message.scheduler.runTask.inputEmail')"/>
@@ -159,7 +158,7 @@
         <div class="cont">
           <template>
             <Date-picker
-              style="width: 360px"
+              style="width: 350px"
               v-model="scheduleTime"
               @on-change="_datepicker"
               type="datetimerange"
@@ -173,7 +172,7 @@
       </div>
     </template>
     <div class="submit">
-      <i-button type="text" @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </i-button>
+      <i-button @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </i-button>
       <i-button type="primary" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('message.scheduler.runTask.start')}} </i-button>
     </div>
   </div>
@@ -417,7 +416,7 @@ export default {
     margin-bottom: 14px;
     height: 32px;
   .text {
-    width: 140px;
+    width: 100px;
     float: left;
     text-align: right;
     line-height: 32px;
@@ -440,6 +439,9 @@ export default {
     position: absolute;
     margin-top: 20px;
     right: 0;
+    button{
+      margin-left: 8px;
+    }
   }
   }
 </style>

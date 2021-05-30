@@ -9,20 +9,20 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="WkintervalWeek">
+            <Radio style="display: inline-block" label="WkintervalWeek">
               <span class="text">{{$t2('每隔')}}</span>
               <m-input-number :min="0" :max="7" :props-value="parseInt(WkintervalWeekPerformVal)" @on-number="onWkintervalWeekPerform"></m-input-number>
               <span class="text" style="margin-left: 65px;">{{$t2('天执行 从')}}</span>
-              <i-select :placeholder="$t2('请选择具体小时数')" style="width: 200px" size="small" v-model="WkintervalWeekStartVal">
-                <i-option
-                  v-for="item in selectWeekList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
-              <span class="text" style="margin-left: 65px;">{{$t2('开始')}}</span>
             </Radio>
+            <i-select style="display: inline-block;width:200px;" :placeholder="$t2('请选择具体小时数')" size="small" v-model="WkintervalWeekStartVal">
+              <i-option
+                v-for="item in selectWeekList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
+            <span class="text" style="margin-left: 5px;">{{$t2('开始')}}</span>
           </div>
           <div class="list-box">
             <Radio label="intervalDay" size="small">
@@ -34,31 +34,31 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="WkspecificWeek" size="small">
+            <Radio style="display: inline-block" label="WkspecificWeek" size="small">
               <!--<span class="text">（周）</span>-->
               <span class="text">{{$t2('具体星期几(可多选)')}}</span>
-              <i-select multiple size="small" :placeholder="$t2('请选择具体周几')" v-model="WkspecificWeekVal">
-                <i-option
-                  v-for="item in selectSpecificWeekList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" multiple size="small" :placeholder="$t2('请选择具体周几')" v-model="WkspecificWeekVal">
+              <i-option
+                v-for="item in selectSpecificWeekList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
-            <Radio label="specificDay" size="small">
+            <Radio style="display: inline-block" label="specificDay" size="small">
               <span class="text">{{$t2('具体天数(可多选)')}}</span>
-              <i-select multiple size="small" :placeholder="$t2('请选择具体天数')" v-model="WkspecificDayVal">
-                <i-option
-                  v-for="item in selectSpecificDayList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" multiple size="small" :placeholder="$t2('请选择具体天数')" v-model="WkspecificDayVal">
+              <i-option
+                v-for="item in selectSpecificDayList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
             <Radio label="monthLastDays" size="small">
@@ -71,17 +71,17 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="monthLastWeeks" size="small">
+            <Radio style="display: inline-block" label="monthLastWeeks" size="small">
               <span class="text">{{$t2('在这个月的最后一个')}}</span>
-              <i-select size="small" :placeholder="$t2('请选择具体周几')" v-model="monthLastWeeksVal">
-                <i-option
-                  v-for="item in monthLastWeeksList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" size="small" :placeholder="$t2('请选择具体周几')" v-model="monthLastWeeksVal">
+              <i-option
+                v-for="item in monthLastWeeksList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
             <Radio label="monthTailBefore" size="small">
@@ -97,19 +97,18 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="WkmonthNumWeeks" size="small">
-              <!--<span class="text">（周）</span>-->
+            <Radio style="display: inline-block" label="WkmonthNumWeeks" size="small">
               <span class="text">{{$t2('在这个月的第')}}</span>
               <m-input-number :min="0" :max="31" :props-value="parseInt(WkmonthNumWeeksDayVal)" @on-number="onWkmonthNumWeeksDay"></m-input-number>
-              <i-select :placeholder="$t2('请选择具体周几')" size="small" style="width: 200px; margin-left: 65px;"  v-model="WkmonthNumWeeksWeekVal">
-                <i-option
-                  v-for="item in WkmonthNumWeeksWeekList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block;width: 200px; margin-left: 65px;" :placeholder="$t2('请选择具体周几')" size="small" v-model="WkmonthNumWeeksWeekVal">
+              <i-option
+                v-for="item in WkmonthNumWeeksWeekList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
         </Radio-group>
       </template>

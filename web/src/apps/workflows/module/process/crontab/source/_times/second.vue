@@ -11,24 +11,24 @@
           <div class="list-box">
             <Radio label="intervalSecond">
               <span class="text">{{$t2('每隔')}}</span>
-              <m-input-number :min="0" :max="59" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
+              <m-input-number style="margin-left: 5px" :min="0" :max="59" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
               <span class="text" style="margin-left: 65px;">{{$t2('秒执行 从')}}</span>
               <m-input-number :min="0" :max="59" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
               <span class="text" style="margin-left: 65px;">{{$t2('秒开始')}}</span>
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="specificSecond">
+            <Radio style="display: inline-block" label="specificSecond">
               <span class="text">{{$t2('具体秒数(可多选)')}}</span>
-              <i-select multiple size="small" :placeholder="$t2('请选择具体秒数')" v-model="specificSecondsVal" @change="onSpecificSeconds">
-                <i-option
-                  v-for="item in selectSecondList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <Select style="display: inline-block" size="small" multiple :placeholder="$t2('请选择具体秒数')" v-model="specificSecondsVal">
+              <Option
+                v-for="item in selectSecondList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </Option>
+            </Select>
           </div>
           <div class="list-box">
             <Radio label="cycleSecond">
@@ -80,8 +80,6 @@ export default {
   methods: {
     // Interval execution time（1）
     onIntervalPerform (val) {
-      console.log(val)
-      console.log('++')
       this.intervalPerformVal = val
       if (this.radioSecond === 'intervalSecond') {
         this.secondValue = `${this.intervalStartVal}/${this.intervalPerformVal}`

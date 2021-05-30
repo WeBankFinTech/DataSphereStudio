@@ -25,7 +25,6 @@ import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrche
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
 import com.webank.wedatasphere.dss.framework.release.job.OrchestratorPublishJob;
-import com.webank.wedatasphere.dss.framework.release.job.OrchestratorReleaseJob;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
@@ -57,25 +56,30 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
         Long orchestratorId = releaseOrchestratorRequest.getOrchestratorId();
         Long orchestratorVersionId = releaseOrchestratorRequest.getOrchestratorVersionId();
         String dssLabel = releaseOrchestratorRequest.getDssLabel();
-        LOGGER.info("received a release orchestrator request releaseUser is {}, orchestratorId is {}", releaseUser, orchestratorId);
-        //1.通过orchestratorVersionId获取到project的信息
-        ProjectInfo projectInfo = releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
-        String orchestratorName = releaseEnv.getProjectService().getOrchestratorName(orchestratorId, orchestratorVersionId);
+        LOGGER.info("received a release orchestrator request releaseUser is {}, orchestratorId is {}", releaseUser,
+            orchestratorId);
 
-        //2.插入数据到数据库
-        ReleaseTask releaseTask = releaseEnv.getTaskService().addReleaseTask(releaseUser,
-                projectInfo.getProjectId(),
-                orchestratorId,
-                orchestratorVersionId, orchestratorName);
+        // 1.通过orchestratorId获取到project的信息
+        ProjectInfo projectInfo = releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
+        String orchestratorName = releaseEnv.getProjectService()
+            .getOrchestratorName(orchestratorId, orchestratorVersionId);
+
+        // 2.插入数据到数据库
+        // TODO: 2021/4/27 判断当前版本是否正在发布或已发布成功
+        ReleaseTask releaseTask = releaseEnv.getTaskService()
+            .addReleaseTask(releaseUser, projectInfo.getProjectId(), orchestratorId, orchestratorVersionId,
+                orchestratorName);
         //3.生成任务,然后放入到线程池中
         OrchestratorPublishJob job = new OrchestratorPublishJob();
         job.setReleaseTask(releaseTask);
         job.setReleaseEnv(releaseEnv);
         job.setWorkspace(workspace);
         job.setDssLabel(new CommonDSSLabel(dssLabel));
+        job.setComment(releaseOrchestratorRequest.getComment());
         releaseContext.submitReleaseJob(job);
         //返回具体的jobId
-        LOGGER.info("finished to get release job id for releaseUser {} orchestratorId {}, jobId is {}", releaseUser, orchestratorId, job.getJobId());
+        LOGGER.info("finished to get release job id for releaseUser {} orchestratorId {}, jobId is {}", releaseUser,
+            orchestratorId, job.getJobId());
         return releaseTask.getId();
     }
 

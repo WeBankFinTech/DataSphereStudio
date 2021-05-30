@@ -191,6 +191,7 @@ import api from '@/common/service/api'
 import vCrontab from './crontab/index'
 import dayjs from 'dayjs'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
+import util from "@/common/util"
 
 export default {
   name: 'timing-process',
@@ -364,36 +365,40 @@ export default {
 
     _getNotifyGroupList () {
       return new Promise((resolve) => {
-        this.api.fetch('dolphinscheduler/alert-group/list', 'get').then(res => {
-          let notifyGroupListS = _.map(res, v => {
-            return {
-              id: v.id,
-              code: v.groupName,
-              disabled: false
-            }
+        util.checkToken(() => {
+          this.api.fetch('dolphinscheduler/alert-group/list', 'get').then(res => {
+            let notifyGroupListS = _.map(res, v => {
+              return {
+                id: v.id,
+                code: v.groupName,
+                disabled: false
+              }
+            })
+            this.notifyGroupList = _.cloneDeep(notifyGroupListS)
+            resolve()
           })
-          this.notifyGroupList = _.cloneDeep(notifyGroupListS)
-          resolve()
         })
       })
     },
     getAllWorkers(cb) {
-      api.fetch(`dolphinscheduler/worker-group/all-groups`, 'get').then((res) => {
-        let list = res
-        if (list.length > 0) {
-          list = list.map(item => {
-            return {
-              id: item,
-              name: item
-            }
-          })
-        } else {
-          list.unshift({
-            id: 'default',
-            name: 'default'
-          })
-        }
-        cb(list)
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/worker-group/all-groups`, 'get').then((res) => {
+          let list = res
+          if (list.length > 0) {
+            list = list.map(item => {
+              return {
+                id: item,
+                name: item
+              }
+            })
+          } else {
+            list.unshift({
+              id: 'default',
+              name: 'default'
+            })
+          }
+          cb(list)
+        })
       })
     },
     getSvgIcon() {

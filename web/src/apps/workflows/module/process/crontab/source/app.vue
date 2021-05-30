@@ -139,19 +139,19 @@ export default {
 <style lang="scss">
   @import "index";
   .v-crontab {
-    width: 780px;
+    width: 550px;
     border:1px solid #e4e7ed;
     background: #fff;
     border-radius: 4px;
     .v-crontab-model {
       .v-crontab-tab {
         background: #f5f7fa;
-        height: 42px;
+        height: 32px;
         border-bottom: 1px solid #e4e7ed;
         a {
-          width: 86px;
-          height: 42px;
-          line-height: 42px;
+          width: 60px;
+          height: 32px;
+          line-height: 32px;
           text-align: center;
           float: left;
           border-right: 1px solid #e4e7ed;
@@ -170,7 +170,7 @@ export default {
           &.active {
             background: #fff;
             position: relative;
-            height: 43px;
+            height: 32px;
           }
         }
       }

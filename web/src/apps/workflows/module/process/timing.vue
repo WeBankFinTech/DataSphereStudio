@@ -7,7 +7,7 @@
       <div class="cont">
         <template>
           <Date-picker
-            style="width: 360px"
+            style="width: 350px"
             v-model="scheduleTime"
             @on-change="_datepicker"
             type="datetimerange"
@@ -24,14 +24,14 @@
       <div class="text">
         {{$t('message.scheduler.runTask.Timing')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="width: 250px">
         <template>
           <Poptip
             placement="bottom-start"
             trigger="click">
             <template>
               <Input
-                style="width: 360px;"
+                style="width: 250px;"
                 type="text"
                 readonly
                 :value="crontab">
@@ -88,7 +88,6 @@
       <div class="cont">
         <template>
           <Select
-            style="width: 200px;"
             v-model="warningType">
             <Option
               v-for="city in warningTypeList"
@@ -134,11 +133,10 @@
       <div class="cont">
         <template>
           <Select
-            style="width: 200px;"
             clearable
             v-model="warningGroupId"
             :disabled="!notifyGroupList.length">
-            <Input slot="trigger" slot-scope="{ selectedModel }" readonly :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+            <Input slot="trigger" slot-scope="{ selectedModel }" readonly :value="selectedModel ? selectedModel.label : ''"  @on-click-icon.stop="warningGroupId = ''">
               <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
               <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
             </Input>
@@ -156,8 +154,8 @@
       <div class="text">
         <span>{{$t('message.scheduler.runTask.receivers')}}</span>
       </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
+      <div class="cont">
+        <div>
           <template>
             <Input v-model="receivers" />
           </template>
@@ -168,8 +166,8 @@
       <div class="text">
         <span>{{$t('message.scheduler.runTask.receiverCcs')}}</span>
       </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
+      <div class="cont">
+        <div>
           <template>
             <Input v-model="receiversCc" />
           </template>
@@ -178,7 +176,7 @@
     </div>
     <div class="submit">
       <template>
-        <Button type="text" @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </Button>
+        <Button @click="close()"> {{$t('message.scheduler.runTask.cancel')}} </Button>
         <Button type="primary" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (timingData.item.crontab ? $t('message.scheduler.runTask.edit') : $t('message.scheduler.runTask.create'))}} </Button>
       </template>
     </div>
@@ -515,7 +513,7 @@ export default {
       margin-bottom: 14px;
       height: 32px;
       >.text {
-        width: 140px;
+        width: 100px;
         float: left;
         text-align: right;
         line-height: 32px;
@@ -534,6 +532,9 @@ export default {
       position: absolute;
       margin-top: 20px;
       right: 0;
+      button{
+        margin-left: 8px;
+      }
     }
   }
   .v-crontab-form-model {

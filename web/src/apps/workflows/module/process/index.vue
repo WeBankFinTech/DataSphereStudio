@@ -150,7 +150,7 @@
     <Modal
       :title="$t('message.scheduler.runTask.startTitle')"
       v-model="showRunTaskModal"
-      width="860"
+      width="550"
       :mask-closable="false">
       <i-run :startData="startData" @onUpdateStart="runTask" @closeStart="closeRun"></i-run>
       <div slot="footer" style="height: 30px;">
@@ -159,7 +159,7 @@
     <Modal
       :title="$t('message.scheduler.runTask.timingTitle')"
       v-model="showTimingTaskModal"
-      width="860"
+      width="550"
       :mask-closable="false">
       <i-timing :timingData="timingData" @onUpdateTiming="setTiming" @closeTiming="closeTiming"></i-timing>
       <div slot="footer" style="height: 30px;">

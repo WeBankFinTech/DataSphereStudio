@@ -18,17 +18,17 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="specificYear">
+            <Radio style="display: inline-block" label="specificYear">
               <span class="text">{{$t2('具体年数(可多选)')}}</span>
-              <i-select multiple :placeholder="$t2('请选择具体年数')" size="small" v-model="specificYearVal" @change="onspecificYears">
-                <i-option
-                  v-for="item in selectYearList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" multiple :placeholder="$t2('请选择具体年数')" size="small" v-model="specificYearVal" @change="onspecificYears">
+              <i-option
+                v-for="item in selectYearList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
             <Radio label="cycleYear">

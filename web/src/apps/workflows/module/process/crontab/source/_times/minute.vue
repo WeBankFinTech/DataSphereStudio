@@ -18,17 +18,17 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="specificMinute" size="small">
+            <Radio style="display: inline-block" label="specificMinute" size="small">
               <span class="text">{{$t2('具体分钟数(可多选)')}}</span>
-              <i-select multiple :placeholder="$t2('请选择具体分钟数')" size="small" v-model="specificMinutesVal" @change="onspecificMinutes">
-                <i-option
-                  v-for="item in selectMinuteList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" multiple :placeholder="$t2('请选择具体分钟数')" size="small" v-model="specificMinutesVal" @change="onspecificMinutes">
+              <i-option
+                v-for="item in selectMinuteList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
             <Radio label="cycleMinute" size="small">

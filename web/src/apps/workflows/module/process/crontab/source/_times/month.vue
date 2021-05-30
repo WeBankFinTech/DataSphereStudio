@@ -18,17 +18,17 @@
             </Radio>
           </div>
           <div class="list-box">
-            <Radio label="specificlMonth">
+            <Radio style="display: inline-block" label="specificlMonth">
               <span class="text">{{$t2('具体月数(可多选)')}}</span>
-              <i-select multiple :placeholder="$t2('请选择具体月数')" size="small" v-model="specificMonthVal" @change="onspecificlMonths">
-                <i-option
-                  v-for="item in selectMonthList"
-                  :key="item.value"
-                  :value="item.value"
-                  :label="item.label">
-                </i-option>
-              </i-select>
             </Radio>
+            <i-select style="display: inline-block" multiple :placeholder="$t2('请选择具体月数')" size="small" v-model="specificMonthVal" @change="onspecificlMonths">
+              <i-option
+                v-for="item in selectMonthList"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label">
+              </i-option>
+            </i-select>
           </div>
           <div class="list-box">
             <Radio label="cycleMonth" size="small">

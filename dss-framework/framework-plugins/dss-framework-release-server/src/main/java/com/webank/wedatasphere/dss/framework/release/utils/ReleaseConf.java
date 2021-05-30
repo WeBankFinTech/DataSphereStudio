@@ -26,9 +26,10 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars;
  */
 public class ReleaseConf {
 
+    public static final CommonVars<String> DSS_SCHEDULE_APPCONN_NAME = CommonVars.apply(
+        "wds.dss.schedule.module.appconn.name", "dolphinscheduler");
 
-    public static final CommonVars<String> ORCHESTRATOR_APPCONN_NAME =
-            CommonVars.apply("wds.dss.framework.release.orc.name", "orchestrator-framework");
-
+    public static final CommonVars<String> ORCHESTRATOR_APPCONN_NAME = CommonVars.apply(
+        "wds.dss.framework.release.orc.name", "orchestrator-framework");
 
 }

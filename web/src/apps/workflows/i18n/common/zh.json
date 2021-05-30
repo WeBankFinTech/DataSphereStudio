@@ -149,7 +149,8 @@
                 "data": "数据请求中，请稍候！",
                 "waiting": "请等待接口返回！",
                 "biLoading": "正在和Visualis系统通讯，请稍候！",
-                "comingSoon": "尚未开源，敬请期待！"
+                "comingSoon": "尚未开放，敬请期待！",
+                "unChange": "工作流无变化，不需要发布"
             },
             "projectDetail": {
                 "WDGZL": "我的工作流",

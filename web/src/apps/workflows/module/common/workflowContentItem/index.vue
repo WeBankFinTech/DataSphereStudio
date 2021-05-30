@@ -64,7 +64,8 @@
   </div>
 </template>
 <script>
-import mixin from '@/common/service/mixin';
+import mixin from '@/common/service/mixin'
+import util from "@/common/util"
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -141,6 +142,7 @@ export default {
       this.$emit("modify", classifyId, project);
     },
     goto(item, subItem) {
+      util.checkToken(()=>{}, true)
       // 被锁住时候不能跳转
       if(subItem.flowEditLockExist) return this.$Message.warning(this.$t("message.workflow.workflowItem.lockTip"))
       // 在发布中不允许跳转

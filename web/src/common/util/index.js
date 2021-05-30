@@ -83,8 +83,8 @@ let util = {
     return key;
   },
   Hub,
-  checkToken(cb) {
-    if (!api.getToken()) {
+  checkToken(cb, forceUpdate) {
+    if (forceUpdate || !api.getToken()) {
       api.fetch('/dss/framework/project/ds/token', 'get').then((res) => {
         storage.set('token', res.token, 'local')
         cb && cb()

@@ -172,6 +172,10 @@ const success = function(response) {
   }
   let data;
   if (response) {
+    if (response.status === 401) {
+      router.push('/newhome');
+      throw new Error('token失效，请重新进入之前页面!');
+    }
     if (util.isString(response.data)) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {

@@ -150,7 +150,8 @@
         "waiting": "Please wait for API response!",
         "biLoading": "Connecting with Visualis, please hold on!",
         "comingSoon": "New version is being integrated, so stay tuned !",
-        "GJZ": "Open source co-construction is in progress, so stay tuned!"
+        "GJZ": "Open source co-construction is in progress, so stay tuned!",
+        "unChange": "Not change, do not need to publish"
       },
       "projectDetail": {
         "WDGZL": "My personal workflow",

@@ -191,9 +191,17 @@ module.exports = {
     proxy: {
       '/api': {
         target: 'http://192.168.10.201:8088',
+        // target: 'http://192.168.10.180:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'
+        }
+      },
+      '/dolphinscheduler': {
+        target: 'http://192.168.10.223:12345',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/dolphinscheduler': '/dolphinscheduler'
         }
       }
     }

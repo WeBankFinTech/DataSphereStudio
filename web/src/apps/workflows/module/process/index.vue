@@ -561,7 +561,7 @@ export default {
             return  h('div', [
               h('Button', {
                 props: {
-                  type: 'success',
+                  type: 'info',
                   shape: "circle",
                   icon: "md-create",
                   size: 'small',
@@ -601,7 +601,7 @@ export default {
               }),
               h('Button', {
                 props: {
-                  type: 'info',
+                  type: 'error',
                   shape: "circle",
                   icon: "md-pint",
                   size: 'small',

@@ -20,6 +20,8 @@ package com.webank.wedatasphere.dss.framework.release.service.impl;
 
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseContext;
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseEnv;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
@@ -43,7 +45,6 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PublishToSchedulerServiceImpl.class);
 
-
     @Autowired
     private ReleaseEnv releaseEnv;
 
@@ -65,7 +66,6 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
             .getOrchestratorName(orchestratorId, orchestratorVersionId);
 
         // 2.插入数据到数据库
-        // TODO: 2021/4/27 判断当前版本是否正在发布或已发布成功
         ReleaseTask releaseTask = releaseEnv.getTaskService()
             .addReleaseTask(releaseUser, projectInfo.getProjectId(), orchestratorId, orchestratorVersionId,
                 orchestratorName);
@@ -86,9 +86,28 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
     @Override
     public PublishStatus getStatus(String username, Long releaseTaskId) {
         Tuple2<String, String> statusTuple = releaseContext.getReleaseJobStatus(releaseTaskId);
-        if(LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("user {} get status of {} is {}, {}", username, releaseTaskId, statusTuple._1, statusTuple._2);
         }
         return new PublishStatus(statusTuple._1, statusTuple._2, releaseTaskId);
+    }
+
+    @Override
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws Exception {
+        OrchestratorReleaseInfo orchestratorReleaseInfo = this.releaseEnv.getOrchestratorReleaseInfoService()
+            .getByOrchestratorId(orchestratorId);
+        WorkflowStatus status = new WorkflowStatus();
+        if (orchestratorReleaseInfo == null) {
+            status.setPublished(false);
+            return status;
+        }
+
+        status.setPublished(true);
+        ProjectInfo projectInfo = this.releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
+        String workspaceName = this.releaseEnv.getProjectService().getWorkspaceName(projectInfo.getProjectId());
+        String workflowStatus = this.releaseEnv.getPublishService()
+            .getSchedulerWorkflowStatus(workspaceName, projectInfo.getProjectName(), orchestratorId, username);
+        status.setReleaseState(workflowStatus);
+        return status;
     }
 }

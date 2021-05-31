@@ -1568,11 +1568,12 @@ export default {
 <style lang="scss" scoped>
 .scheduler-wrapper{
   background-color: white;
-  min-height: 100%;
+  min-height: 80vh;
   .scheduler-menu{
     float: left;
     width: 250px;
     font-size: 14px;
+    min-height: 80vh;
     li {
     padding: 0 40px;
     cursor: pointer;
@@ -1591,7 +1592,7 @@ export default {
     float: left;
     padding: 23px 26px;
     .scheduler-table {
-      width: calc(100vw - 250px - 60px);
+      width: calc(100vw - 250px - 70px);
     }
   }
   .left-panel{

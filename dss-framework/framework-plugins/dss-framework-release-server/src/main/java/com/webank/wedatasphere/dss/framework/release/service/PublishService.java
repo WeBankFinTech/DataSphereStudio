@@ -18,9 +18,9 @@
 
 package com.webank.wedatasphere.dss.framework.release.service;
 
+import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
@@ -40,5 +40,6 @@ public interface PublishService {
 
     void publish(String releaseUser, ProjectInfo projectInfo, Long orchestratorId, DSSLabel dssLabel, Workspace workspace) throws Exception;
 
-
+    String getSchedulerWorkflowStatus(String workspaceName, String projectName, Long workflowId, String username)
+        throws Exception;
 }

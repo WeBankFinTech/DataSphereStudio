@@ -19,6 +19,7 @@
 package com.webank.wedatasphere.dss.framework.release.restful;
 
 import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
@@ -35,7 +36,12 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -75,16 +81,32 @@ public class FrameworkPublishRestful {
     @GET
     @Path("/getPublishStatus")
     public Response getPublishStatus(@Context HttpServletRequest request,
-                                     @NotNull(message = "查询的发布id不能为空") @QueryParam("releaseTaskId") Long releaseTaskId){
+        @NotNull(message = "查询的发布id不能为空") @QueryParam("releaseTaskId") Long releaseTaskId) {
         String username = SecurityFilter.getLoginUsername(request);
-        try{
+        try {
             PublishStatus publishStatus = publishToSchedulerService.getStatus(username, releaseTaskId);
-            return RestfulUtils.dealOk("获取发布进度成功", new Pair<>("status", publishStatus.getStatus()), new Pair<>("errorMsg", publishStatus.getErrorMsg()));
-        }catch(final Throwable t){
+            return RestfulUtils.dealOk("获取发布进度成功", new Pair<>("status", publishStatus.getStatus()),
+                new Pair<>("errorMsg", publishStatus.getErrorMsg()));
+        } catch (final Throwable t) {
             LOGGER.error("Failed to get publish status for user {} , releaseTaskId {}", username, releaseTaskId, t);
             return RestfulUtils.dealError("获取任务进度失败");
         }
     }
 
+    @GET
+    @Path("/getSchedulerWorkflowStatus")
+    public Response getSchedulerWorkflowStatus(@Context HttpServletRequest request,
+        @NotNull(message = "查询的空间id不能为空") @QueryParam("workspaceId") Long workspaceId,
+        @NotNull(message = "查询的编排id不能为空") @QueryParam("orchestratorId") Long orchestratorId) {
+        String username = SecurityFilter.getLoginUsername(request);
+        try {
+            WorkflowStatus status = publishToSchedulerService.getSchedulerWorkflowStatus(username, orchestratorId);
+            return RestfulUtils.dealOk("获取发布工作流状态", new Pair<>("published", status.getPublished()),
+                new Pair<>("releaseStatus", status.getReleaseState()));
+        } catch (final Throwable t) {
+            LOGGER.error("Failed to get workflow status for user {} , OrchestratorId {}", username, orchestratorId, t);
+            return RestfulUtils.dealError("获取工作流发布状态失败");
+        }
+    }
 
 }

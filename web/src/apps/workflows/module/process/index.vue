@@ -93,7 +93,7 @@
               <div class="scheduler-wrapper">
                 <div class="scheduler-menu">
                   <ul>
-                    <li :class="activeDS == 1? 'active' : ''" @click="activeList(1)">任务列表</li>
+                    <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">任务列表</li>
                     <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">实例列表</li>
                   </ul>
                 </div>
@@ -130,6 +130,24 @@
                       :page-size-opts="pagination2.opts"
                       @on-change="pageChange2"
                       @on-page-size-change="pageSizeChange2"
+                    ></Page>
+                  </template>
+                </div>
+                <div class="scheduler-list" v-if="activeDS == 3">
+                  <template>
+                    <Table class="scheduler-table" :columns="columns3" :data="list3"></Table>
+                    <Page
+                      size="small"
+                      v-if="list3.length > 0"
+                      class="page-bar fr"
+                      :total="pagination3.total"
+                      show-sizer
+                      show-total
+                      :current="pagination3.current"
+                      :page-size="pagination3.size"
+                      :page-size-opts="pagination3.opts"
+                      @on-change="pageChange3"
+                      @on-page-size-change="pageSizeChange3"
                     ></Page>
                   </template>
                 </div>
@@ -232,17 +250,9 @@ export default {
       activeDS: 1,
       showRunTaskModal: false,
       showTimingTaskModal: false,
-      list: [
-        {
-          id: 1
-        }
-      ],
-      list2: [
-        {
-          id: 1,
-          name: 'test'
-        }
-      ],
+      list: [],
+      list2: [],
+      list3: [],
       columns: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -339,13 +349,36 @@ export default {
                   icon: "md-power",
                   size: 'small'
                 },
+                style: {
+                  marginRight: '5px'
+                },
                 attrs: {
                   title: params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'),
-                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;' : ''
+                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;margin-right: 5px;' : 'margin-right: 5px;'
                 },
                 on: {
                   click: () => {
                     params.row.isOnline ? this.offline(params.index) : this.online(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-calendar",
+                  size: 'small',
+                  disabled: !params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.setTime')
+                },
+                on: {
+                  click: () => {
+                    this.queryTimingList(params.index)
                   }
                 }
               })
@@ -353,7 +386,6 @@ export default {
           }
         }
       ],
-
       columns2: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -473,6 +505,124 @@ export default {
           }
         }
       ],
+      columns3: [
+        {
+          title: this.$t('message.scheduler.header.id'),
+          width: 100,
+          key: 'id'
+        },
+        {
+          title: this.$t('message.scheduler.header.ProcessName'),
+          width: 200,
+          key: 'processDefinitionName'
+        },
+        {
+          title: this.$t('message.scheduler.header.StartTime'),
+          width: 100,
+          key: 'startTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.EndTime'),
+          width: 100,
+          key: 'endTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.crontab'),
+          width: 150,
+          key: 'crontab'
+        },
+        {
+          title: this.$t('message.scheduler.header.failureStrategy'),
+          width: 100,
+          key: 'failureStrategy'
+        },
+        {
+          title: this.$t('message.scheduler.header.State'),
+          width: 100,
+          key: 'releaseStateDesc'
+        },
+        {
+          title: this.$t('message.scheduler.header.CreateTime'),
+          width: 100,
+          key: 'createTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.UpdateTime'),
+          width: 100,
+          key: 'updateTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.Operation'),
+          key: 'action',
+          fixed: 'right',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  shape: "circle",
+                  icon: "md-create",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.runTask.edit')
+                },
+                on: {
+                  click: () => {
+                    this.openTiming(params.row, true)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: params.row.isOnline ? 'error' : 'warning',
+                  shape: "circle",
+                  icon: "md-power",
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'),
+                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;margin-right: 5px;' : 'margin-right: 5px;'
+                },
+                on: {
+                  click: () => {
+                    params.row.isOnline ? this.timingOffline(params.row.id) : this.timingOnline(params.row.id)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-pint",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.delete')
+                },
+                on: {
+                  click: () => {
+                    this.deleteScheduler(params.index)
+                  }
+                }
+              })
+            ]);
+          }
+        }
+      ],
       startData: {},
       timingData: {
         item: {},
@@ -485,6 +635,12 @@ export default {
         total: 0
       },
       pagination2: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
+      pagination3: {
         size: 10,
         opts: [5, 10, 30, 45, 60],
         current: 1,
@@ -628,7 +784,8 @@ export default {
       logData: {},
       showLog: false,
       logId: null,
-      source: 'list'
+      source: 'list',
+      schedulerId: '' //用来查定时管理的id
     }
   },
   mounted() {
@@ -1138,6 +1295,28 @@ export default {
         })
       })
     },
+    getSchedulerData(page=1){
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/list-paging`, {
+          pageSize: this.pagination3.size,
+          pageNo: page,
+          searchVal: this.query.name,
+          processDefinitionId: this.schedulerId
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.startTime = this.formatDate(item.startTime)
+            item.endTime = this.formatDate(item.endTime)
+            item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
+            item.isOnline = item.releaseState === 'ONLINE'
+            item.createTime = this.formatDate(item.createTime)
+            item.updateTime = this.formatDate(item.updateTime)
+            item.disabled = false
+          })
+          this.list3 = res.totalList
+          this.pagination3.total = res.total
+        })
+      })
+    },
     checkStart(index, cb){
       api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-check`, {
         processDefinitionId: this.list[index].id
@@ -1163,14 +1342,26 @@ export default {
         })
       })
     },
-    openTiming(index) {
-      this.timingData.item = this.list[index]
-      this.timingData.type = 'timing'
-      this.getReceiver(this.list[index].id, (res) => {
+    openTiming(index, isEdit) {
+      let id
+      if (isEdit) {
+        this.timingData.item = index
+        this.timingData.type = ''
+        id = index.processDefinitionId
+      } else {
+        this.timingData.item = this.list[index]
+        this.timingData.type = 'timing'
+        id = this.list[index].id
+      }
+      this.getReceiver(id, (res) => {
         this.timingData.item.receivers = res.receivers
         this.timingData.item.receiversCc = res.receiversCc
       })
       this.showTimingTaskModal = true
+    },
+    queryTimingList(index) {
+      this.schedulerId = this.list[index].id
+      this.activeList(3)
     },
     online(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
@@ -1190,6 +1381,20 @@ export default {
         this.list[index].isOnline = false
       })
     },
+    timingOnline(id) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/online`, {
+        id: id
+      }, {useForm: true}).then(() => {
+        this.getSchedulerData()
+      })
+    },
+    timingOffline(id) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/offline`, {
+        id: id
+      }, {useForm: true}).then(() => {
+        this.getSchedulerData()
+      })
+    },
     runTask() {
       this.showRunTaskModal = false
     },
@@ -1204,7 +1409,13 @@ export default {
     },
     activeList(type) {
       this.activeDS = type
-      this.activeDS === 1? this.getListData() : this.getInstanceListData()
+      if (this.activeDS === 1) {
+        this.getListData()
+      } else if (this.activeDS === 2) {
+        this.getInstanceListData()
+      } else if (this.activeDS === 3) {
+        this.getSchedulerData()
+      }
     },
     openDag(index) {
       if (this.timer)
@@ -1271,6 +1482,23 @@ export default {
         buttonType: 'run'
       })
     },
+    deleteScheduler(index) {
+      let item = this.list3[index]
+      this.$Modal.confirm({
+        title: this.$t('message.scheduler.setTime'),
+        content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
+        okText: this.$t('message.scheduler.ok'),
+        cancelText: this.$t('message.scheduler.cancel'),
+        onOk: () => {
+          api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/delete`, {
+            scheduleId: item.id,
+          }, 'get').then(() => {
+            this.activeList(2)
+          })
+        },
+        onCancel: () => {}
+      })
+    },
     _countDownFn (param) {
       this.buttonType = param.buttonType
       api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/execute`, {
@@ -1324,6 +1552,14 @@ export default {
     pageSizeChange2(size) {
       this.pagination2.size = size
       this.getInstanceListData()
+    },
+    pageChange3(page) {
+      this.pagination3.current = page
+      this.getSchedulerData(page)
+    },
+    pageSizeChange3(size) {
+      this.pagination3.size = size
+      this.getSchedulerData()
     }
   },
 };

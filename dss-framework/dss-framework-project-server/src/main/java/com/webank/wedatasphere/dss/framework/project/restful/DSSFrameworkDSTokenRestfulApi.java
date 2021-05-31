@@ -105,11 +105,11 @@ public class DSSFrameworkDSTokenRestfulApi {
                 tokenCreateRequestParas.add(new BasicNameValuePair("expireTime", expireTime));
                 tokenCreateRequestParas.add(new BasicNameValuePair("token", token));
                 HttpClientUtil.postForm(dsUrl+"/access-token/create",30000,headerMap,tokenCreateRequestParas,"UTF-8");
+                long expireTimeStamp = DateUtil.strToTimeStamp(expireTime,DateUtil.FORMAT_LONG)-30000;
+                return Message.messageToResponse(Message.ok().data("token", token).data("expire_time",expireTimeStamp));
 
-                return Message.messageToResponse(Message.ok().data("token", token));
-
-            }catch (Exception exceptin){
-                return RestfulUtils.dealError("获取token失败:" + exceptin.getMessage());
+            }catch (Exception exception){
+                return RestfulUtils.dealError("获取token失败:" + exception.getMessage());
             }
     }
 }

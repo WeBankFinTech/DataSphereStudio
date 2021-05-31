@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.framework.release.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.core.WorkflowAppConn;
 import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
+import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -32,6 +33,7 @@ import com.webank.wedatasphere.dss.framework.release.service.PublishService;
 import com.webank.wedatasphere.dss.framework.release.utils.ReleaseConf;
 import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorFrameworkAppConn;
 import com.webank.wedatasphere.dss.standard.app.development.DevelopmentIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.process.DevProcessService;
 import com.webank.wedatasphere.dss.standard.app.development.process.ProcessService;
 import com.webank.wedatasphere.dss.standard.app.development.process.ProdProcessService;
@@ -39,7 +41,9 @@ import com.webank.wedatasphere.dss.standard.app.development.publish.RefPublishTo
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.ProjectPublishToSchedulerRef;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.PublishToSchedulerStage;
 import com.webank.wedatasphere.dss.standard.app.development.publish.scheduler.RefScheduleOperation;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.common.entity.project.Project;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
@@ -98,8 +102,9 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public void publish(String releaseUser, ProjectInfo projectInfo, List<OrchestratorReleaseInfo> orchestratorReleaseInfos,
-                        DSSLabel dssLabel, Workspace workspace, boolean supportMultiEnv) throws Exception {
+    public void publish(String releaseUser, ProjectInfo projectInfo,
+        List<OrchestratorReleaseInfo> orchestratorReleaseInfos, DSSLabel dssLabel, Workspace workspace,
+        boolean supportMultiEnv) throws Exception {
         if (schedulerAppConn == null) {
             LOGGER.error("scheduler appconn is null, can not publish to scheduler system");
             DSSExceptionUtils.dealErrorException(61123, "scheduler appconn is null", DSSErrorException.class);
@@ -113,6 +118,46 @@ public class PublishServiceImpl implements PublishService {
             //工程级别的发布
             publishProject(releaseUser, projectInfo, orchestratorReleaseInfos, dssLabel, workspace, supportMultiEnv);
         }
+    }
+
+    @Override
+    public String getSchedulerWorkflowStatus(String workspaceName, String projectName, Long workflowId, String username)
+        throws Exception {
+        if (schedulerAppConn == null) {
+            LOGGER.error("scheduler appconn is null, can not get scheduler workflow status");
+            DSSExceptionUtils.dealErrorException(61123, "scheduler appconn is null", DSSErrorException.class);
+        }
+
+        SchedulerStructureStandard schedulerStructureStandard
+            = (SchedulerStructureStandard)schedulerAppConn.getAppStandards()
+            .stream()
+            .filter(appStandard -> appStandard instanceof SchedulerStructureStandard)
+            .findAny()
+            .orElse(null);
+        if (schedulerStructureStandard == null) {
+            LOGGER.error("scheduler Structure Standard is null, can not continue");
+            DSSExceptionUtils.dealErrorException(60059, "scheduler Structure Standard is null, can not continue",
+                ExternalOperationFailedException.class);
+        }
+
+        ProjectService schedulerProjectService = schedulerStructureStandard.getProjectService();
+        schedulerProjectService.setAppDesc(schedulerStructureStandard.getAppDesc());
+        RefQueryOperation operation = (RefQueryOperation)schedulerProjectService.createOperation(
+            RefQueryOperation.class);
+        if (operation == null) {
+            LOGGER.error("scheduler query Operation is null, can not continue");
+            DSSExceptionUtils.dealErrorException(61124, "scheduler query Operation is null, can not continue",
+                ExternalOperationFailedException.class);
+        }
+
+        CommonRequestRef requestRef = new CommonRequestRef();
+        requestRef.setWorkspaceName(workspaceName);
+        requestRef.setProjectName(projectName);
+        requestRef.setParameter("processId", workflowId);
+        requestRef.setParameter("username", username);
+        ResponseRef responseRef = operation.query(requestRef);
+
+        return responseRef.getResponseBody();
     }
 
     private void publishWorkflow(String releaseUser, ProjectInfo projectInfo,
@@ -268,45 +313,43 @@ public class PublishServiceImpl implements PublishService {
         return dssProject;
     }
 
-
-    private void publishOrchestrator(String releaseUser, ProjectInfo projectInfo, List<OrchestratorReleaseInfo> orchestratorReleaseInfos) {
+    private void publishOrchestrator(String releaseUser, ProjectInfo projectInfo,
+        List<OrchestratorReleaseInfo> orchestratorReleaseInfos) {
 
     }
-
 
     @Override
     public void publish(Long projectId, Map<Long, Long> orchestratorInfoMap, DSSLabel dssLabel) {
 
     }
 
-
     @Override
     public void publish(String releaseUser, ProjectInfo projectInfo, Long orchestratorId, DSSLabel dssLabel,
-                        Workspace workspace) throws Exception {
-        if (null == schedulerAppConn){
+        Workspace workspace) throws Exception {
+        if (null == schedulerAppConn) {
             LOGGER.error("scheduler AppConn is null");
             throw new DSSErrorException(70023, "schedulerAppConn is null");
         }
-        if (schedulerAppConn.supportFlowSchedule()){
+        if (schedulerAppConn.supportFlowSchedule()) {
             //如果支持工作流级别的发布,不需要进行工作流级别的打包
             //todo 先不实现，先做工程级别的
-        } else{
+        } else {
             //工程级别的发布
             publishProject(releaseUser, projectInfo, orchestratorId, dssLabel, workspace);
         }
     }
 
-    private void publishProject(String releaseUser, ProjectInfo projectInfo, Long orchestratorId, DSSLabel dssLabel, Workspace workspace) throws Exception {
+    private void publishProject(String releaseUser, ProjectInfo projectInfo, Long orchestratorId, DSSLabel dssLabel,
+        Workspace workspace) throws Exception {
         if (orchestratorFrameworkAppConn == null) {
             LOGGER.error("orchestrator appconn is null, can not do publish operation");
             DSSExceptionUtils.dealErrorException(60032, "orchestrator appconn is null", DSSErrorException.class);
         }
-        DevelopmentIntegrationStandard developmentIntegrationStandard =
-                orchestratorFrameworkAppConn.getAppStandards().
-                        stream().
-                        filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).
-                        map(appStandard -> (DevelopmentIntegrationStandard) appStandard).
-                        findAny().orElse(null);
+        DevelopmentIntegrationStandard developmentIntegrationStandard = orchestratorFrameworkAppConn.getAppStandards().
+            stream().
+            filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).
+            map(appStandard -> (DevelopmentIntegrationStandard)appStandard).
+            findAny().orElse(null);
         List<DSSLabel> dssLabels = Collections.singletonList(dssLabel);
         if (developmentIntegrationStandard == null) {
             LOGGER.error("development Standard is null will not go on");
@@ -314,14 +357,15 @@ public class PublishServiceImpl implements PublishService {
         } else {
             ProcessService processService = developmentIntegrationStandard.getProcessService(dssLabels);
             if (processService instanceof ProdProcessService) {
-                ProdProcessService prodProcessService = (ProdProcessService) processService;
-                RefPublishToSchedulerService refPublishToSchedulerService = prodProcessService.getRefPublishToSchedulerService();
+                ProdProcessService prodProcessService = (ProdProcessService)processService;
+                RefPublishToSchedulerService refPublishToSchedulerService
+                    = prodProcessService.getRefPublishToSchedulerService();
                 RefScheduleOperation refScheduleOperation = refPublishToSchedulerService.createRefScheduleOperation();
                 PublishToSchedulerStage publishToSchedulerStage = refScheduleOperation.createPublishToSchedulerStage();
                 try {
-                    ProjectPublishToSchedulerRef ref =
-                            refFactory.newRef(ProjectPublishToSchedulerRef.class,
-                                    orchestratorFrameworkAppConn.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn.orchestrator.ref");
+                    ProjectPublishToSchedulerRef ref = refFactory.newRef(ProjectPublishToSchedulerRef.class,
+                        orchestratorFrameworkAppConn.getClass().getClassLoader(),
+                        "com.webank.wedatasphere.dss.appconn.orchestrator.ref");
                     ref.setLabels(dssLabels);
                     ref.setOrcIds(Arrays.asList(orchestratorId));
                     Project project = toProject(projectInfo);
@@ -331,7 +375,8 @@ public class PublishServiceImpl implements PublishService {
                     ref.setWorkspace(workspace);
                     publishToSchedulerStage.publishToScheduler(ref);
                 } catch (final Throwable t) {
-                    DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t, DSSErrorException.class);
+                    DSSExceptionUtils.dealErrorException(61121, "Failed to create Ref for publish", t,
+                        DSSErrorException.class);
                 }
             }
         }

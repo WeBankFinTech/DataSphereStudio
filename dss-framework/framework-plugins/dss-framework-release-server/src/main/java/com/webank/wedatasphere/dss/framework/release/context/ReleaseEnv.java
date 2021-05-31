@@ -19,7 +19,12 @@
 package com.webank.wedatasphere.dss.framework.release.context;
 
 import com.webank.wedatasphere.dss.framework.release.job.listener.ReleaseJobListener;
-import com.webank.wedatasphere.dss.framework.release.service.*;
+import com.webank.wedatasphere.dss.framework.release.service.ExportService;
+import com.webank.wedatasphere.dss.framework.release.service.ImportService;
+import com.webank.wedatasphere.dss.framework.release.service.OrchestratorReleaseInfoService;
+import com.webank.wedatasphere.dss.framework.release.service.ProjectService;
+import com.webank.wedatasphere.dss.framework.release.service.PublishService;
+import com.webank.wedatasphere.dss.framework.release.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -47,6 +52,9 @@ public class ReleaseEnv {
     private TaskService taskService;
 
     @Autowired
+    private OrchestratorReleaseInfoService orchestratorReleaseInfoService;
+
+    @Autowired
     @Qualifier("releaseJobListener")
     private ReleaseJobListener releaseJobListener;
 
@@ -70,7 +78,11 @@ public class ReleaseEnv {
         return taskService;
     }
 
-    public ReleaseJobListener getReleaseJobListener(){
+    public OrchestratorReleaseInfoService getOrchestratorReleaseInfoService() {
+        return orchestratorReleaseInfoService;
+    }
+
+    public ReleaseJobListener getReleaseJobListener() {
         return releaseJobListener;
     }
 

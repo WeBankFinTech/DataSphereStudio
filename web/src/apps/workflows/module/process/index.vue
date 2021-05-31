@@ -1493,7 +1493,7 @@ export default {
           api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/delete`, {
             scheduleId: item.id,
           }, 'get').then(() => {
-            this.activeList(2)
+            this.activeList(1)
           })
         },
         onCancel: () => {}

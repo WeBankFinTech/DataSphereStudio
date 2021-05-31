@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.service;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProcessDefinitionQueryOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
@@ -44,7 +46,9 @@ public class DolphinSchedulerProjectService implements ProjectService {
     }
 
     private void init() {
-        operationMap.put(DolphinSchedulerProjectCreationOperation.class, new DolphinSchedulerProjectCreationOperation(this));
+        operationMap.put(DolphinSchedulerProjectCreationOperation.class,
+            new DolphinSchedulerProjectCreationOperation(this));
+        operationMap.put(RefQueryOperation.class, new DolphinSchedulerProcessDefinitionQueryOperation(this.appDesc));
         //        operationMap.put(SchedulisProjectUpdateOperation.class, new SchedulisProjectUpdateOperation(this));
         //        operationMap.put(SchedulisProjectDeletionOperation.class, new SchedulisProjectDeletionOperation(this));
     }

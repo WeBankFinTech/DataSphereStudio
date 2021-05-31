@@ -24,7 +24,7 @@ import router from '@/router';
 import { Message } from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
-import storage from "@/common/helper/storage"
+import storage from "./storage"
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -172,7 +172,7 @@ const success = function(response) {
   }
   let data;
   if (response) {
-    if (response.status === 401) {
+    if (response.status === 401 && !(response.data && response.data.status === -1)) {
       router.push('/newhome');
       throw new Error('token失效，请重新进入之前页面!');
     }
@@ -334,7 +334,7 @@ api.setResponse = function(constructionOfResponse) {
 };
 
 api.getToken = function() {
-  return storage.get("token", "local");
+  return storage.get("token", true);
 }
 
 export default api;

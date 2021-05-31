@@ -554,6 +554,8 @@
       "close": "Close",
       "cancel": "Cancel",
       "ok": "OK",
+      "recovery": "Recovery Failed",
+      "recoverySuspend": "Recovery Suspend",
       "runTask": {
         "startTitle": "Please set the parameters before starting",
         "timingTitle": "Set parameters before timing",

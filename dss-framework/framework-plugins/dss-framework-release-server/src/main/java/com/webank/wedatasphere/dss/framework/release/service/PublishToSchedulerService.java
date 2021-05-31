@@ -18,6 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.release.service;
 
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -28,8 +29,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
  */
 public interface PublishToSchedulerService {
 
-
     Long publish(String releaseUser, ReleaseOrchestratorRequest releaseOrchestratorRequest, Workspace workspace);
 
     PublishStatus getStatus(String username, Long releaseTaskId);
+
+    WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws Exception;
 }

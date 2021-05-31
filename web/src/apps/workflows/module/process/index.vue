@@ -487,7 +487,7 @@ export default {
                   shape: "circle",
                   icon: "md-refresh",
                   size: 'small',
-                  disabled: params.row.disabled
+                  disabled: params.row.disabled || (params.row.state !== 'SUCCESS' && params.row.state !== 'PAUSE' && params.row.state !== 'FAILURE' && params.row.state !== 'STOP')
                 },
                 attrs: {
                   title: this.$t('message.scheduler.rerun')
@@ -498,6 +498,46 @@ export default {
                 on: {
                   click: () => {
                     this.rerun(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'success',
+                  shape: "circle",
+                  icon: "md-backspace",
+                  size: 'small',
+                  disabled: params.row.disabled || params.row.state !== 'FAILURE'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.recovery')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.recovery(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: params.row.state === 'STOP' ? "md-play" : "md-close",
+                  size: 'small',
+                  disabled: params.row.disabled || (params.row.state !== 'RUNNING_EXECUTION' && params.row.state !== 'RUNNING_EXEUTION' && params.row.state !== 'STOP')
+                },
+                attrs: {
+                  title: params.row.state === 'STOP' ? this.$t('message.scheduler.recoverySuspend') : this.$t('message.scheduler.STOP')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this._stop(params.index)
                   }
                 }
               })
@@ -1482,6 +1522,31 @@ export default {
         buttonType: 'run'
       })
     },
+    recovery(index) {
+      let item = this.list2[index]
+      this._countDownFn({
+        id: item.id,
+        executeType: 'START_FAILURE_TASK_PROCESS',
+        index: index,
+        buttonType: 'store'
+      })
+    },
+    _stop(index) {
+      let item = this.list2[index]
+      if (item.state === 'STOP') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          id: item.id,
+          executeType: 'STOP'
+        })
+      }
+    },
     deleteScheduler(index) {
       let item = this.list3[index]
       this.$Modal.confirm({
@@ -1497,6 +1562,17 @@ export default {
           })
         },
         onCancel: () => {}
+      })
+    },
+    _upExecutorsState(param) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/execute`, {
+        processInstanceId: param.id,
+        executeType: param.executeType
+      }, {useFormQuery: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.getInstanceListData()
+      }).catch(() => {
+        this.getInstanceListData()
       })
     },
     _countDownFn (param) {

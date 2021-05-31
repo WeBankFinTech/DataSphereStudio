@@ -552,6 +552,8 @@
           "close": "关闭",
           "cancel": "取消",
           "ok": "确定",
+          "recovery": "恢复失败",
+          "recoverySuspend": "恢复运行",
           "runTask": {
             "startTitle": "启动前请先设置参数",
             "timingTitle": "定时前请先设置参数",

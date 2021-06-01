@@ -179,7 +179,15 @@ const success = function(response) {
     if (util.isString(response.data)) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {
-      data = response.data;
+      // 兼容ds blob流下载
+      if (response.status === 200 && !response.data.data) {
+        data = {}
+        data.data = response
+        data.msg = 'success'
+        data.code = api.constructionOfResponse.successCode
+      } else {
+        data = response.data
+      }
     } else {
       throw new Error('后台接口异常，请联系开发处理！');
     }

@@ -556,6 +556,7 @@
           "recovery": "恢复失败",
           "recoverySuspend": "恢复运行",
           "copy": "复制工作流",
+          "export": "导出",
           "runTask": {
             "startTitle": "启动前请先设置参数",
             "timingTitle": "定时前请先设置参数",

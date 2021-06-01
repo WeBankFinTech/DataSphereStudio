@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
 
 public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQueryOperation {
 
@@ -45,10 +46,13 @@ public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQuery
     private String queryProcessDefinitionReleaseStateById(String projectName, Long processId, String userName)
         throws ExternalOperationFailedException {
         String queryUrl = StringUtils.replace(this.queryProcessDefinitionByIdUrl, "${projectName}", projectName);
-        DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(queryUrl, userName);
 
         CloseableHttpResponse httpResponse = null;
         try {
+            URIBuilder uriBuilder = new URIBuilder(queryUrl);
+            uriBuilder.addParameter("processId", String.valueOf(processId));
+            DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(uriBuilder.build(), userName);
+
             httpResponse = this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), "utf-8");

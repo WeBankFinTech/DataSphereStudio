@@ -106,7 +106,8 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
         ProjectInfo projectInfo = this.releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
         String workspaceName = this.releaseEnv.getProjectService().getWorkspaceName(projectInfo.getProjectId());
         String workflowStatus = this.releaseEnv.getPublishService()
-            .getSchedulerWorkflowStatus(workspaceName, projectInfo.getProjectName(), orchestratorId, username);
+            .getSchedulerWorkflowStatus(workspaceName, projectInfo.getProjectName(),
+                orchestratorReleaseInfo.getSchedulerWorkflowId(), username);
         status.setReleaseState(workflowStatus);
         return status;
     }

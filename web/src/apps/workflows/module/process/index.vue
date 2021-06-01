@@ -421,6 +421,25 @@ export default {
                     this._deleteWorkflow(params.index)
                   }
                 }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-cloud-download",
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.export')
+                },
+                on: {
+                  click: () => {
+                    this.exportDefinition(params.index)
+                  }
+                }
               })
             ]);
           }
@@ -1483,6 +1502,36 @@ export default {
           })
         },
         onCancel: () => {}
+      })
+    },
+    exportDefinition (index) {
+      const downloadBlob = (data, fileNameS = 'json') => {
+        if (!data) {
+          return
+        }
+        const blob = new Blob([data])
+        const fileName = `${fileNameS}.json`
+        if ('download' in document.createElement('a')) { // 不是IE浏览器
+          const url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link) // 下载完成移除元素
+          window.URL.revokeObjectURL(url) // 释放掉blob对象
+        } else { // IE 10+
+          window.navigator.msSaveBlob(blob, fileName)
+        }
+      }
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/export`, {
+        processDefinitionIds: this.list[index].id,
+      }, {
+        method: 'get',
+        responseType: 'blob'
+      }).then((res) => {
+        downloadBlob(res.data, this.list[index].name)
       })
     },
     queryTimingList(index) {

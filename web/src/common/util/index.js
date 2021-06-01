@@ -8,7 +8,7 @@ import * as convertUtil from './convert';
 import * as currentModules from './currentModules'
 import filters from './filters'
 import api from "@/common/service/api"
-import storage from "@/common/helper/storage"
+import storage from "@/common/service/storage"
 
 import Vue from 'vue'
 const Hub = new Vue()
@@ -86,7 +86,7 @@ let util = {
   checkToken(cb, forceUpdate) {
     if (forceUpdate || !api.getToken()) {
       api.fetch('/dss/framework/project/ds/token', 'get').then((res) => {
-        storage.set('token', res.token, 'local')
+        storage.set('token', res.token, res.expire_time)
         cb && cb()
       })
     } else {

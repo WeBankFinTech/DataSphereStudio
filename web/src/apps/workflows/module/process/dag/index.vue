@@ -33,7 +33,7 @@ export default {
         this.canvas = new Canvas({
           root: $('.dag-page')[0],
           zoomable: false,         //可缩放(可传)
-          moveable: false,         //可平移(可传)
+          moveable: true,         //可平移(可传)
           draggable: false,        //节点可拖动(可传)
         })
         this.dagData.nodes.forEach(node=> {

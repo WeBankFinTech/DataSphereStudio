@@ -6,7 +6,7 @@
         "serve": "vue-cli-service serve",
         "serve-workflows": "npm run serve --module=scriptis,workflows --micro_module=workflows",
         "serve-apiServices": "npm run serve --module=apiServices,workspace --micro_module=apiServices",
-        "build": "vue-cli-service build",
+        "build": "node --max_old_space_size=4096 node_modules/.bin/vue-cli-service build",
         "build-sandbox": "vue-cli-service build --mode sandbox",
         "build-workflows": "npm run build --module=scriptis,workflows --micro_module=workflows",
         "build-apiServices": "npm run build --module=apiServices,workspace --micro_module=apiServices",

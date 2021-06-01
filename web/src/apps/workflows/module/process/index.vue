@@ -497,7 +497,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.rerun(params.index)
+                    this._rerun(params.index)
                   }
                 }
               }),
@@ -517,7 +517,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.recovery(params.index)
+                    this._recovery(params.index)
                   }
                 }
               }),
@@ -538,6 +538,26 @@ export default {
                 on: {
                   click: () => {
                     this._stop(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'warning',
+                  shape: "circle",
+                  icon: params.row.state === 'PAUSE' ? "md-play" : "md-puase",
+                  size: 'small',
+                  disabled: params.row.disabled || (params.row.state !== 'RUNNING_EXECUTION' && params.row.state !== 'RUNNING_EXEUTION' && params.row.state !== 'PAUSE')
+                },
+                attrs: {
+                  title: params.row.state === 'PAUSE' ? this.$t('message.scheduler.recoverySuspend') : this.$t('message.scheduler.PAUSE')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this._suspend(params.index)
                   }
                 }
               })
@@ -1513,7 +1533,7 @@ export default {
         this.timer = null
       }
     },
-    rerun(index) {
+    _rerun(index) {
       let item = this.list2[index]
       this._countDownFn({
         id: item.id,
@@ -1522,7 +1542,7 @@ export default {
         buttonType: 'run'
       })
     },
-    recovery(index) {
+    _recovery(index) {
       let item = this.list2[index]
       this._countDownFn({
         id: item.id,
@@ -1544,6 +1564,22 @@ export default {
         this._upExecutorsState({
           id: item.id,
           executeType: 'STOP'
+        })
+      }
+    },
+    _suspend(index) {
+      let item = this.list2[index]
+      if (item.state === 'PAUSE') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          id: item.id,
+          executeType: 'PAUSE'
         })
       }
     },

@@ -2,14 +2,14 @@
 
 export const prefix = '';
 
-export function set(key, value){
+export function set(key, value, expire_time){
   if(!(window.localStorage && window.localStorage.setItem)){
     return false;
   }
   try {
     window.localStorage.setItem(prefix + key, JSON.stringify({
       v: value,
-      t: +new Date()
+      t: expire_time || +new Date()
     }));
     return true;
   }catch(e){
@@ -18,14 +18,14 @@ export function set(key, value){
   }
 }
 
-export function get(key, validTime){
+export function get(key, checkValid){
   if(!(window.localStorage && window.localStorage.getItem)){
     return null;
   }
   try {
     let data = (JSON.parse(window.localStorage.getItem(prefix + key) || '{}')),
       t = data.t;
-    if(validTime && (+new Date() > t + validTime)){
+    if(checkValid && (+new Date() > t)){
       window.localStorage.removeItem(prefix + key);
       return null;
     }

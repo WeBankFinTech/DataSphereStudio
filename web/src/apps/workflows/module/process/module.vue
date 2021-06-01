@@ -400,7 +400,7 @@ import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
-import { getPublishStatus } from '@/apps/workflows/service/api.js';
+import { getPublishStatus, getSchedulingStatus } from '@/apps/workflows/service/api.js';
 
 export default {
   components: {
@@ -544,7 +544,11 @@ export default {
       changeNum: 0,
       consoleParams: [],
       appId: null,
-      newOrchestratorVersionId: this.orchestratorVersionId
+      newOrchestratorVersionId: this.orchestratorVersionId,
+      schedulingStatus: {
+        published: false,
+        releaseStatus: ''
+      }
     };
   },
   computed: {
@@ -639,6 +643,11 @@ export default {
     //   const taskId = this.getTaskId();
     //   this.checkPublishStatus(taskId, 5000);
     // }
+    getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+      this.schedulingStatus = data;
+    }).catch(() => {
+
+    })
   },
   watch: {
     jsonChange(val) {
@@ -2139,12 +2148,17 @@ export default {
         })
       })
     },
+    
     workflowPublishIsShow(event) {
       // 已经在发布不能再点击
       if(this.publishChangeCount < 1) {
         event.preventDefault();
         event.stopPropagation();
-        this.$Message.warning(this.$t('message.workflow.warning.unChange'))
+        this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        return;
+      }
+      if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+        this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
         return;
       }
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))

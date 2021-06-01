@@ -118,7 +118,7 @@
           <span>调度历史</span>
         </div> -->
         <div class="devider"></div>
-        <div class="button" @click.stop="linkToDispatch">
+        <div v-if="schedulingStatus.published" class="button" @click.stop="linkToDispatch">
           <SvgIcon class="icon" icon-class="ds-center" color="#666"/>
           <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
         </div>
@@ -643,11 +643,7 @@ export default {
     //   const taskId = this.getTaskId();
     //   this.checkPublishStatus(taskId, 5000);
     // }
-    getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
-      this.schedulingStatus = data;
-    }).catch(() => {
-
-    })
+    this.refreshSchedulingStatus();
   },
   watch: {
     jsonChange(val) {
@@ -695,6 +691,13 @@ export default {
     }
   },
   methods: {
+    refreshSchedulingStatus(){
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+      }).catch(() => {
+
+      })
+    },
     // 保存node参数修改
     saveNodeParameter() {
       this.$refs.nodeParameter.save();
@@ -2220,6 +2223,7 @@ export default {
         timeoutValue += 2000;
         getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
+            this.refreshSchedulingStatus();
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);
               this.checkResult(id, timeoutValue, type);

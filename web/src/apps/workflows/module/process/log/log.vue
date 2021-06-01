@@ -144,7 +144,7 @@ export default {
      * Download log
      */
     _downloadLog () {
-      downloadFile('log/download-log', {
+      downloadFile('/dolphinscheduler/log/download-log', {
         taskInstanceId: this.stateId || this.logId
       })
     },

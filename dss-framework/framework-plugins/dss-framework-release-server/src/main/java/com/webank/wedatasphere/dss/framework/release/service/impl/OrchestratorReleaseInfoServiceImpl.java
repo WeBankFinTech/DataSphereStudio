@@ -4,7 +4,9 @@ import com.webank.wedatasphere.dss.framework.release.dao.OrchestratorReleaseInfo
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.framework.release.service.OrchestratorReleaseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class OrchestratorReleaseInfoServiceImpl implements OrchestratorReleaseInfoService {
 
     @Autowired

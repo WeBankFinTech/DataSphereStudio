@@ -1,28 +1,35 @@
 /**
  * download file
  */
-import $ from 'jquery'
+import api from '@/common/service/api';
 
-const downloadFile = ($url, $obj) => {
-  const param = {
-    url: `/dolphinscheduler/${$url}`,
-    obj: $obj
+const downloadFile = ($url, $obj, $fileName) => {
+  const downloadBlob = (data, fileNameS = 'json') => {
+    if (!data) {
+      return
+    }
+    const blob = new Blob([data])
+    const fileName = `${fileNameS}`
+    if ('download' in document.createElement('a')) { // 不是IE浏览器
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.setAttribute('download', fileName)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) // 下载完成移除元素
+      window.URL.revokeObjectURL(url) // 释放掉blob对象
+    } else { // IE 10+
+      window.navigator.msSaveBlob(blob, fileName)
+    }
   }
-
-  if (!param.url) {
-    this.$Message.warning(this.$t('message.scheduler.noUrl'))
-    return
-  }
-
-  const generatorInput = function (obj) {
-    let result = ''
-    const keyArr = Object.keys(obj)
-    keyArr.forEach(function (key) {
-      result += "<input type='hidden' name = '" + key + "' value='" + obj[key] + "'>"
-    })
-    return result
-  }
-  $(`<form action="${param.url}" method="get">${generatorInput(param.obj)}</form>`).appendTo('body').submit().remove()
+  api.fetch($url, $obj, {
+    method: 'get',
+    responseType: 'blob'
+  }).then((res) => {
+    downloadBlob(res.data, $fileName || `${Date.now()}.log`)
+  })
 }
 
 export { downloadFile }

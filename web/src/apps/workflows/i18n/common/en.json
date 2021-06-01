@@ -530,6 +530,8 @@
       "offline": "offline",
       "online": "online",
       "rerun": "rerun",
+      "delete": "Delete",
+      "DELETE": "Delete",
       "Unpublished": "Unpublished",
       "START_PROCESS": "Start Process",
       "START_CURRENT_TASK_PROCESS": "Execute from the current node",
@@ -552,6 +554,12 @@
       "fullScreen": "Enter full screen",
       "cancelScreen": "Cancel full screen",
       "close": "Close",
+      "cancel": "Cancel",
+      "ok": "OK",
+      "recovery": "Recovery Failed",
+      "recoverySuspend": "Recovery Suspend",
+      "copy": "Copy Workflow",
+      "export": "Export",
       "runTask": {
         "startTitle": "Please set the parameters before starting",
         "timingTitle": "Set parameters before timing",
@@ -633,7 +641,9 @@
         "UpdateTime": "Update Time",
         "Description": "Description",
         "ModifyBy": "Modify User",
-        "TimingState": "Timing state"
+        "TimingState": "Timing state",
+        "crontab": "crontab",
+        "failureStrategy": "Failure Strategy"
       }
     }
   }

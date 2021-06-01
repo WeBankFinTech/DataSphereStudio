@@ -101,11 +101,12 @@ public class FrameworkPublishRestful {
         String username = SecurityFilter.getLoginUsername(request);
         try {
             WorkflowStatus status = publishToSchedulerService.getSchedulerWorkflowStatus(username, orchestratorId);
-            return RestfulUtils.dealOk("获取发布工作流状态", new Pair<>("published", status.getPublished()),
+            return RestfulUtils.dealOk("获取调度工作流状态", new Pair<>("published", status.getPublished()),
                 new Pair<>("releaseStatus", status.getReleaseState()));
         } catch (final Throwable t) {
-            LOGGER.error("Failed to get workflow status for user {} , OrchestratorId {}", username, orchestratorId, t);
-            return RestfulUtils.dealError("获取工作流发布状态失败");
+            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
+                orchestratorId, t);
+            return RestfulUtils.dealError("获取工作流调度状态失败");
         }
     }
 

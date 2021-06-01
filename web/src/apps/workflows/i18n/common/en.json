@@ -530,6 +530,7 @@
       "online": "online",
       "rerun": "rerun",
       "delete": "Delete",
+      "DELETE": "Delete",
       "Unpublished": "Unpublished",
       "START_PROCESS": "Start Process",
       "START_CURRENT_TASK_PROCESS": "Execute from the current node",
@@ -556,6 +557,7 @@
       "ok": "OK",
       "recovery": "Recovery Failed",
       "recoverySuspend": "Recovery Suspend",
+      "copy": "Copy Workflow",
       "runTask": {
         "startTitle": "Please set the parameters before starting",
         "timingTitle": "Set parameters before timing",

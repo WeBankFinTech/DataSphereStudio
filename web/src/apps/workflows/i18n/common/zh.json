@@ -528,6 +528,7 @@
           "online": "上线",
           "rerun": "重跑",
           "delete": "确定删除吗",
+          "DELETE": "删除",
           "Unpublished": "未发布",
           "START_PROCESS": "启动工作流",
           "START_CURRENT_TASK_PROCESS": "从当前节点开始执行",
@@ -554,6 +555,7 @@
           "ok": "确定",
           "recovery": "恢复失败",
           "recoverySuspend": "恢复运行",
+          "copy": "复制工作流",
           "runTask": {
             "startTitle": "启动前请先设置参数",
             "timingTitle": "定时前请先设置参数",

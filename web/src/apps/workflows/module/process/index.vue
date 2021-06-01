@@ -366,6 +366,26 @@ export default {
                 props: {
                   type: 'info',
                   shape: "circle",
+                  icon: "md-copy",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.copy')
+                },
+                on: {
+                  click: () => {
+                    this._copy(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
                   icon: "md-calendar",
                   size: 'small',
                   disabled: !params.row.isOnline
@@ -379,6 +399,26 @@ export default {
                 on: {
                   click: () => {
                     this.queryTimingList(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: "md-pint",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.DELETE')
+                },
+                on: {
+                  click: () => {
+                    this._deleteWorkflow(params.index)
                   }
                 }
               })
@@ -545,7 +585,7 @@ export default {
                 props: {
                   type: 'warning',
                   shape: "circle",
-                  icon: params.row.state === 'PAUSE' ? "md-play" : "md-puase",
+                  icon: params.row.state === 'PAUSE' ? "md-play" : "md-pause",
                   size: 'small',
                   disabled: params.row.disabled || (params.row.state !== 'RUNNING_EXECUTION' && params.row.state !== 'RUNNING_EXEUTION' && params.row.state !== 'PAUSE')
                 },
@@ -671,7 +711,7 @@ export default {
                   marginRight: '5px'
                 },
                 attrs: {
-                  title: this.$t('message.scheduler.delete')
+                  title: this.$t('message.scheduler.DELETE')
                 },
                 on: {
                   click: () => {
@@ -1419,6 +1459,32 @@ export default {
       })
       this.showTimingTaskModal = true
     },
+    _copy(index) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/copy`, {
+        processId: this.list[index].id
+      }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.getListData()
+      })
+    },
+    _deleteWorkflow(index) {
+      let item = this.list[index]
+      this.$Modal.confirm({
+        title: this.$t('message.scheduler.DELETE'),
+        content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
+        okText: this.$t('message.scheduler.ok'),
+        cancelText: this.$t('message.scheduler.cancel'),
+        onOk: () => {
+          api.fetch(`dolphinscheduler/projects/${this.projectName}/process/delete`, {
+            processDefinitionId: item.id,
+          }, 'get').then(() => {
+            this.$Message.success(this.$t('message.scheduler.runTask.success'))
+            this.getListData()
+          })
+        },
+        onCancel: () => {}
+      })
+    },
     queryTimingList(index) {
       this.schedulerId = this.list[index].id
       this.activeList(3)
@@ -1428,6 +1494,7 @@ export default {
         processId: this.list[index].id,
         releaseState: 1
       }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = true
       })
@@ -1437,6 +1504,7 @@ export default {
         processId: this.list[index].id,
         releaseState: 0
       }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = false
       })
@@ -1586,7 +1654,7 @@ export default {
     deleteScheduler(index) {
       let item = this.list3[index]
       this.$Modal.confirm({
-        title: this.$t('message.scheduler.setTime'),
+        title: this.$t('message.scheduler.DELETE'),
         content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
         okText: this.$t('message.scheduler.ok'),
         cancelText: this.$t('message.scheduler.cancel'),
@@ -1594,6 +1662,7 @@ export default {
           api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/delete`, {
             scheduleId: item.id,
           }, 'get').then(() => {
+            this.$Message.success(this.$t('message.scheduler.runTask.success'))
             this.activeList(1)
           })
         },

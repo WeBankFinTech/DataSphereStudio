@@ -93,7 +93,7 @@
               <div class="scheduler-wrapper">
                 <div class="scheduler-menu">
                   <ul>
-                    <li :class="activeDS == 1? 'active' : ''" @click="activeList(1)">任务列表</li>
+                    <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">任务列表</li>
                     <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">实例列表</li>
                   </ul>
                 </div>
@@ -130,6 +130,24 @@
                       :page-size-opts="pagination2.opts"
                       @on-change="pageChange2"
                       @on-page-size-change="pageSizeChange2"
+                    ></Page>
+                  </template>
+                </div>
+                <div class="scheduler-list" v-if="activeDS == 3">
+                  <template>
+                    <Table class="scheduler-table" :columns="columns3" :data="list3"></Table>
+                    <Page
+                      size="small"
+                      v-if="list3.length > 0"
+                      class="page-bar fr"
+                      :total="pagination3.total"
+                      show-sizer
+                      show-total
+                      :current="pagination3.current"
+                      :page-size="pagination3.size"
+                      :page-size-opts="pagination3.opts"
+                      @on-change="pageChange3"
+                      @on-page-size-change="pageSizeChange3"
                     ></Page>
                   </template>
                 </div>
@@ -232,17 +250,9 @@ export default {
       activeDS: 1,
       showRunTaskModal: false,
       showTimingTaskModal: false,
-      list: [
-        {
-          id: 1
-        }
-      ],
-      list2: [
-        {
-          id: 1,
-          name: 'test'
-        }
-      ],
+      list: [],
+      list2: [],
+      list3: [],
       columns: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -339,13 +349,95 @@ export default {
                   icon: "md-power",
                   size: 'small'
                 },
+                style: {
+                  marginRight: '5px'
+                },
                 attrs: {
                   title: params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'),
-                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;' : ''
+                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;margin-right: 5px;' : 'margin-right: 5px;'
                 },
                 on: {
                   click: () => {
                     params.row.isOnline ? this.offline(params.index) : this.online(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-copy",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.copy')
+                },
+                on: {
+                  click: () => {
+                    this._copy(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-calendar",
+                  size: 'small',
+                  disabled: !params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.setTime')
+                },
+                on: {
+                  click: () => {
+                    this.queryTimingList(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: "md-pint",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.DELETE')
+                },
+                on: {
+                  click: () => {
+                    this._deleteWorkflow(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-cloud-download",
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.export')
+                },
+                on: {
+                  click: () => {
+                    this.exportDefinition(params.index)
                   }
                 }
               })
@@ -353,7 +445,6 @@ export default {
           }
         }
       ],
-
       columns2: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -455,7 +546,7 @@ export default {
                   shape: "circle",
                   icon: "md-refresh",
                   size: 'small',
-                  disabled: params.row.disabled
+                  disabled: params.row.disabled || (params.row.state !== 'SUCCESS' && params.row.state !== 'PAUSE' && params.row.state !== 'FAILURE' && params.row.state !== 'STOP')
                 },
                 attrs: {
                   title: this.$t('message.scheduler.rerun')
@@ -465,7 +556,185 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.rerun(params.index)
+                    this._rerun(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'success',
+                  shape: "circle",
+                  icon: "md-backspace",
+                  size: 'small',
+                  disabled: params.row.disabled || params.row.state !== 'FAILURE'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.recovery')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this._recovery(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: params.row.state === 'STOP' ? "md-play" : "md-close",
+                  size: 'small',
+                  disabled: params.row.disabled || (params.row.state !== 'RUNNING_EXECUTION' && params.row.state !== 'RUNNING_EXEUTION' && params.row.state !== 'STOP')
+                },
+                attrs: {
+                  title: params.row.state === 'STOP' ? this.$t('message.scheduler.recoverySuspend') : this.$t('message.scheduler.STOP')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this._stop(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'warning',
+                  shape: "circle",
+                  icon: params.row.state === 'PAUSE' ? "md-play" : "md-pause",
+                  size: 'small',
+                  disabled: params.row.disabled || (params.row.state !== 'RUNNING_EXECUTION' && params.row.state !== 'RUNNING_EXEUTION' && params.row.state !== 'PAUSE')
+                },
+                attrs: {
+                  title: params.row.state === 'PAUSE' ? this.$t('message.scheduler.recoverySuspend') : this.$t('message.scheduler.PAUSE')
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this._suspend(params.index)
+                  }
+                }
+              })
+            ]);
+          }
+        }
+      ],
+      columns3: [
+        {
+          title: this.$t('message.scheduler.header.id'),
+          width: 100,
+          key: 'id'
+        },
+        {
+          title: this.$t('message.scheduler.header.ProcessName'),
+          width: 200,
+          key: 'processDefinitionName'
+        },
+        {
+          title: this.$t('message.scheduler.header.StartTime'),
+          width: 100,
+          key: 'startTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.EndTime'),
+          width: 100,
+          key: 'endTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.crontab'),
+          width: 150,
+          key: 'crontab'
+        },
+        {
+          title: this.$t('message.scheduler.header.failureStrategy'),
+          width: 100,
+          key: 'failureStrategy'
+        },
+        {
+          title: this.$t('message.scheduler.header.State'),
+          width: 100,
+          key: 'releaseStateDesc'
+        },
+        {
+          title: this.$t('message.scheduler.header.CreateTime'),
+          width: 100,
+          key: 'createTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.UpdateTime'),
+          width: 100,
+          key: 'updateTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.Operation'),
+          key: 'action',
+          fixed: 'right',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-create",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.runTask.edit')
+                },
+                on: {
+                  click: () => {
+                    this.openTiming(params.row, true)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: params.row.isOnline ? 'error' : 'warning',
+                  shape: "circle",
+                  icon: "md-power",
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: params.row.isOnline ? this.$t('message.scheduler.offline') : this.$t('message.scheduler.online'),
+                  style: params.row.isOnline ? 'transform: rotate(180deg);line-height: 25px;margin-right: 5px;' : 'margin-right: 5px;'
+                },
+                on: {
+                  click: () => {
+                    params.row.isOnline ? this.timingOffline(params.row.id) : this.timingOnline(params.row.id)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: "md-pint",
+                  size: 'small',
+                  disabled: params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.DELETE')
+                },
+                on: {
+                  click: () => {
+                    this.deleteScheduler(params.index)
                   }
                 }
               })
@@ -485,6 +754,12 @@ export default {
         total: 0
       },
       pagination2: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
+      pagination3: {
         size: 10,
         opts: [5, 10, 30, 45, 60],
         current: 1,
@@ -628,7 +903,8 @@ export default {
       logData: {},
       showLog: false,
       logId: null,
-      source: 'list'
+      source: 'list',
+      schedulerId: '' //用来查定时管理的id
     }
   },
   mounted() {
@@ -1138,6 +1414,28 @@ export default {
         })
       })
     },
+    getSchedulerData(page=1){
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/list-paging`, {
+          pageSize: this.pagination3.size,
+          pageNo: page,
+          searchVal: this.query.name,
+          processDefinitionId: this.schedulerId
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.startTime = this.formatDate(item.startTime)
+            item.endTime = this.formatDate(item.endTime)
+            item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
+            item.isOnline = item.releaseState === 'ONLINE'
+            item.createTime = this.formatDate(item.createTime)
+            item.updateTime = this.formatDate(item.updateTime)
+            item.disabled = false
+          })
+          this.list3 = res.totalList
+          this.pagination3.total = res.total
+        })
+      })
+    },
     checkStart(index, cb){
       api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/start-check`, {
         processDefinitionId: this.list[index].id
@@ -1163,20 +1461,89 @@ export default {
         })
       })
     },
-    openTiming(index) {
-      this.timingData.item = this.list[index]
-      this.timingData.type = 'timing'
-      this.getReceiver(this.list[index].id, (res) => {
+    openTiming(index, isEdit) {
+      let id
+      if (isEdit) {
+        this.timingData.item = index
+        this.timingData.type = ''
+        id = index.processDefinitionId
+      } else {
+        this.timingData.item = this.list[index]
+        this.timingData.type = 'timing'
+        id = this.list[index].id
+      }
+      this.getReceiver(id, (res) => {
         this.timingData.item.receivers = res.receivers
         this.timingData.item.receiversCc = res.receiversCc
       })
       this.showTimingTaskModal = true
+    },
+    _copy(index) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/copy`, {
+        processId: this.list[index].id
+      }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.getListData()
+      })
+    },
+    _deleteWorkflow(index) {
+      let item = this.list[index]
+      this.$Modal.confirm({
+        title: this.$t('message.scheduler.DELETE'),
+        content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
+        okText: this.$t('message.scheduler.ok'),
+        cancelText: this.$t('message.scheduler.cancel'),
+        onOk: () => {
+          api.fetch(`dolphinscheduler/projects/${this.projectName}/process/delete`, {
+            processDefinitionId: item.id,
+          }, 'get').then(() => {
+            this.$Message.success(this.$t('message.scheduler.runTask.success'))
+            this.getListData()
+          })
+        },
+        onCancel: () => {}
+      })
+    },
+    exportDefinition (index) {
+      const downloadBlob = (data, fileNameS = 'json') => {
+        if (!data) {
+          return
+        }
+        const blob = new Blob([data])
+        const fileName = `${fileNameS}.json`
+        if ('download' in document.createElement('a')) { // 不是IE浏览器
+          const url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link) // 下载完成移除元素
+          window.URL.revokeObjectURL(url) // 释放掉blob对象
+        } else { // IE 10+
+          window.navigator.msSaveBlob(blob, fileName)
+        }
+      }
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/process/export`, {
+        processDefinitionIds: this.list[index].id,
+      }, {
+        method: 'get',
+        responseType: 'blob'
+      }).then((res) => {
+        downloadBlob(res.data, this.list[index].name)
+      })
+    },
+    queryTimingList(index) {
+      this.schedulerId = this.list[index].id
+      this.activeList(3)
     },
     online(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
         processId: this.list[index].id,
         releaseState: 1
       }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = true
       })
@@ -1186,8 +1553,23 @@ export default {
         processId: this.list[index].id,
         releaseState: 0
       }, {useForm: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = false
+      })
+    },
+    timingOnline(id) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/online`, {
+        id: id
+      }, {useForm: true}).then(() => {
+        this.getSchedulerData()
+      })
+    },
+    timingOffline(id) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/offline`, {
+        id: id
+      }, {useForm: true}).then(() => {
+        this.getSchedulerData()
       })
     },
     runTask() {
@@ -1204,7 +1586,13 @@ export default {
     },
     activeList(type) {
       this.activeDS = type
-      this.activeDS === 1? this.getListData() : this.getInstanceListData()
+      if (this.activeDS === 1) {
+        this.getListData()
+      } else if (this.activeDS === 2) {
+        this.getInstanceListData()
+      } else if (this.activeDS === 3) {
+        this.getSchedulerData()
+      }
     },
     openDag(index) {
       if (this.timer)
@@ -1262,13 +1650,83 @@ export default {
         this.timer = null
       }
     },
-    rerun(index) {
+    _rerun(index) {
       let item = this.list2[index]
       this._countDownFn({
         id: item.id,
         executeType: 'REPEAT_RUNNING',
         index: index,
         buttonType: 'run'
+      })
+    },
+    _recovery(index) {
+      let item = this.list2[index]
+      this._countDownFn({
+        id: item.id,
+        executeType: 'START_FAILURE_TASK_PROCESS',
+        index: index,
+        buttonType: 'store'
+      })
+    },
+    _stop(index) {
+      let item = this.list2[index]
+      if (item.state === 'STOP') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          id: item.id,
+          executeType: 'STOP'
+        })
+      }
+    },
+    _suspend(index) {
+      let item = this.list2[index]
+      if (item.state === 'PAUSE') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          id: item.id,
+          executeType: 'PAUSE'
+        })
+      }
+    },
+    deleteScheduler(index) {
+      let item = this.list3[index]
+      this.$Modal.confirm({
+        title: this.$t('message.scheduler.DELETE'),
+        content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
+        okText: this.$t('message.scheduler.ok'),
+        cancelText: this.$t('message.scheduler.cancel'),
+        onOk: () => {
+          api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/delete`, {
+            scheduleId: item.id,
+          }, 'get').then(() => {
+            this.$Message.success(this.$t('message.scheduler.runTask.success'))
+            this.activeList(1)
+          })
+        },
+        onCancel: () => {}
+      })
+    },
+    _upExecutorsState(param) {
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/executors/execute`, {
+        processInstanceId: param.id,
+        executeType: param.executeType
+      }, {useFormQuery: true}).then(() => {
+        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.getInstanceListData()
+      }).catch(() => {
+        this.getInstanceListData()
       })
     },
     _countDownFn (param) {
@@ -1324,6 +1782,14 @@ export default {
     pageSizeChange2(size) {
       this.pagination2.size = size
       this.getInstanceListData()
+    },
+    pageChange3(page) {
+      this.pagination3.current = page
+      this.getSchedulerData(page)
+    },
+    pageSizeChange3(size) {
+      this.pagination3.size = size
+      this.getSchedulerData()
     }
   },
 };
@@ -1332,11 +1798,12 @@ export default {
 <style lang="scss" scoped>
 .scheduler-wrapper{
   background-color: white;
-  min-height: 100%;
+  min-height: 80vh;
   .scheduler-menu{
     float: left;
     width: 250px;
     font-size: 14px;
+    min-height: 80vh;
     li {
     padding: 0 40px;
     cursor: pointer;
@@ -1355,7 +1822,7 @@ export default {
     float: left;
     padding: 23px 26px;
     .scheduler-table {
-      width: calc(100vw - 250px - 60px);
+      width: calc(100vw - 250px - 70px);
     }
   }
   .left-panel{

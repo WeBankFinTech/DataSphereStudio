@@ -18,6 +18,22 @@
 
 package com.webank.wedatasphere.dss.framework.release.service.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import com.webank.wedatasphere.dss.appconn.core.WorkflowAppConn;
 import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
@@ -49,20 +65,6 @@ import com.webank.wedatasphere.dss.standard.common.entity.project.Project;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * created by cooperyang on 2020/12/14
@@ -229,6 +231,7 @@ public class PublishServiceImpl implements PublishService {
                     } else {
                         latestOrchestratorReleaseInfo.setOrchestratorVersionId(releaseInfo.getOrchestratorVersionId());
                         latestOrchestratorReleaseInfo.setOrchestratorVersion(orchestratorVersion);
+                        latestOrchestratorReleaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
                         latestOrchestratorReleaseInfo.setUpdateTime(new Date());
                         orchestratorReleaseInfoMapper.update(latestOrchestratorReleaseInfo);
                     }

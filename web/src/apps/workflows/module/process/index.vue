@@ -152,9 +152,9 @@
                   </template>
                 </div>
                 <div :class="getPanelClass()" v-if="activeDS == 2">
-                  <SvgIcon @click="changePanel(true)" style="font-size: 40px;left: -12px;top: 45%;position: absolute;cursor: pointer;" v-if="showDag === 1" icon-class="panel-full"/>
-                  <SvgIcon @click="changePanel(false)" style="font-size: 40px;left: -12px;top: 37%;position: absolute;cursor: pointer;" v-if="showDag === 1" icon-class="panel-close"/>
-                  <SvgIcon @click="changePanel(false)" style="font-size: 80px;left: -32px;top: 35%;position: absolute;cursor: pointer;" v-if="showDag === 2" icon-class="panel-partial"/>
+                  <SvgIcon @click="changePanel(true)" style="font-size: 40px;left: -12px;top: 45%;position: absolute;cursor: pointer;z-index: 5;" v-if="showDag === 1" icon-class="panel-full"/>
+                  <SvgIcon @click="changePanel(false)" style="font-size: 40px;left: -12px;top: 37%;position: absolute;cursor: pointer;z-index: 5;" v-if="showDag === 1" icon-class="panel-close"/>
+                  <SvgIcon @click="changePanel(false)" style="font-size: 80px;left: -32px;top: 35%;position: absolute;cursor: pointer;z-index: 5;" v-if="showDag === 2" icon-class="panel-partial"/>
                   <div class="dag-page">
                     <Dag :dagData="dagData" :processId="dagProcessId" v-if="showDag"></Dag>
                   </div>
@@ -281,7 +281,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.Description'),
-          width: 100,
+          width: 200,
           key: 'description'
         },
         {
@@ -358,7 +358,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    params.row.isOnline ? this.offline(params.index) : this.online(params.index)
+                    params.row.isOnline ? this._offline(params.index) : this._online(params.index)
                   }
                 }
               }),
@@ -411,7 +411,8 @@ export default {
                   disabled: params.row.isOnline
                 },
                 style: {
-                  marginRight: '5px'
+                  marginRight: '5px',
+                  display: 'none'
                 },
                 attrs: {
                   title: this.$t('message.scheduler.DELETE')
@@ -430,7 +431,8 @@ export default {
                   size: 'small'
                 },
                 style: {
-                  marginRight: '5px'
+                  marginRight: '5px',
+                  display: 'none'
                 },
                 attrs: {
                   title: this.$t('message.scheduler.export')
@@ -478,12 +480,14 @@ export default {
             return h('div', [
               h('Icon', {
                 props: {
-                  type: 'ios-radio-button-on',
+                  custom: "iconfont " + params.row.stateIcon,
                   color: params.row.stateColor,
-                  size: 10
+                  size: 15
+                },
+                attrs: {
+                  title: params.row.stateDesc
                 }
-              }),
-              h('strong', params.row.stateDesc)
+              })
             ])
           }
         },
@@ -617,6 +621,26 @@ export default {
                 on: {
                   click: () => {
                     this._suspend(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  shape: "circle",
+                  icon: "md-pint",
+                  size: 'small',
+                  disabled: params.row.state !== 'SUCCESS' && params.row.state !== 'FAILURE' && params.row.state !== 'STOP' && params.row.state !== 'PAUSE'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.DELETE')
+                },
+                on: {
+                  click: () => {
+                    this._deleteInstance(params.index)
                   }
                 }
               })
@@ -820,76 +844,91 @@ export default {
         SUBMITTED_SUCCESS: {
           id: 0,
           desc: this.$t('message.scheduler.tasksState.SUBMITTED_SUCCESS'),
+          icon: 'icon-submitted-success',
           color: '#A9A9A9'
         },
         'RUNNING_EXECUTION': {
           id: 1,
           desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
+          icon: 'icon-running-execution',
           color: '#0097e0'
         },
         'RUNNING_EXEUTION': {
           id: 1,
           desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
+          icon: 'icon-running-execution',
           color: '#0097e0'
         },
         READY_PAUSE: {
           id: 2,
           desc: this.$t('message.scheduler.tasksState.READY_PAUSE'),
+          icon: 'icon-ready-pause',
           color: '#07b1a3'
         },
         PAUSE: {
           id: 3,
           desc: this.$t('message.scheduler.tasksState.PAUSE'),
+          icon: 'icon-pause',
           color: '#057c72'
         },
         READY_STOP: {
           id: 4,
           desc: this.$t('message.scheduler.tasksState.READY_STOP'),
+          icon: 'icon-ready-stop',
           color: '#FE0402'
         },
         STOP: {
           id: 5,
           desc: this.$t('message.scheduler.tasksState.STOP'),
+          icon: 'icon-stop',
           color: '#e90101'
         },
         FAILURE: {
           id: 6,
           desc: this.$t('message.scheduler.tasksState.FAILURE'),
+          icon: 'icon-failure',
           color: '#000000'
         },
         SUCCESS: {
           id: 7,
           desc: this.$t('message.scheduler.tasksState.SUCCESS'),
+          icon: 'icon-success',
           color: '#33cc00'
         },
         NEED_FAULT_TOLERANCE: {
           id: 8,
           desc: this.$t('message.scheduler.tasksState.NEED_FAULT_TOLERANCE'),
+          icon: 'icon-need-fault-tolerance',
           color: '#FF8C00'
         },
         KILL: {
           id: 9,
           desc: this.$t('message.scheduler.tasksState.KILL'),
+          icon: 'icon-kill',
           color: '#a70202'
         },
         WAITTING_THREAD: {
           id: 10,
           desc: this.$t('message.scheduler.tasksState.WAITTING_THREAD'),
+          icon: 'icon-waitting-thread',
           color: '#912eed'
         },
         WAITTING_DEPEND: {
           id: 11,
           desc: this.$t('message.scheduler.tasksState.WAITTING_DEPEND'),
+          icon: 'icon-watting-depend',
           color: '#5101be'
         },
         DELAY_EXECUTION: {
           id: 12,
           desc: this.$t('message.scheduler.tasksState.DELAY_EXECUTION'),
+          icon: 'icon-delay-execution',
           color: '#5102ce'
         },
         FORCED_SUCCESS: {
           id: 13,
           desc: this.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
+          icon: 'icon-forced-success',
           color: '#5102ce'
         }
       },
@@ -1407,6 +1446,7 @@ export default {
             item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
             item.stateDesc = this.tasksState[item.state].desc
             item.stateColor = this.tasksState[item.state].color
+            item.stateIcon = this.tasksState[item.state].icon
             item.disabled = false
           })
           this.list2 = res.totalList
@@ -1484,6 +1524,9 @@ export default {
       }, {useForm: true}).then(() => {
         this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
+        util.Hub.$emit('DS-operation', {
+          type: 'copy'
+        })
       })
     },
     _deleteWorkflow(index) {
@@ -1499,6 +1542,24 @@ export default {
           }, 'get').then(() => {
             this.$Message.success(this.$t('message.scheduler.runTask.success'))
             this.getListData()
+          })
+        },
+        onCancel: () => {}
+      })
+    },
+    _deleteInstance(index) {
+      let item = this.list2[index]
+      this.$Modal.confirm({
+        title: this.$t('message.scheduler.DELETE'),
+        content: `<p>${this.$t('message.scheduler.delete')}?</p>`,
+        okText: this.$t('message.scheduler.ok'),
+        cancelText: this.$t('message.scheduler.cancel'),
+        onOk: () => {
+          api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/delete`, {
+            processInstanceId: item.id,
+          }, 'get').then(() => {
+            this.$Message.success(this.$t('message.scheduler.runTask.success'))
+            this.getInstanceListData()
           })
         },
         onCancel: () => {}
@@ -1538,7 +1599,7 @@ export default {
       this.schedulerId = this.list[index].id
       this.activeList(3)
     },
-    online(index) {
+    _online(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
         processId: this.list[index].id,
         releaseState: 1
@@ -1546,9 +1607,12 @@ export default {
         this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = true
+        util.Hub.$emit('DS-operation', {
+          type: 'online'
+        })
       })
     },
-    offline(index) {
+    _offline(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/release`, {
         processId: this.list[index].id,
         releaseState: 0
@@ -1556,6 +1620,9 @@ export default {
         this.$Message.success(this.$t('message.scheduler.runTask.success'))
         this.getListData()
         this.list[index].isOnline = false
+        util.Hub.$emit('DS-operation', {
+          type: 'offline'
+        })
       })
     },
     timingOnline(id) {
@@ -1804,6 +1871,8 @@ export default {
     width: 250px;
     font-size: 14px;
     min-height: 80vh;
+    margin-top: 16px;
+    border-right: 1px solid #DEE4EC;
     li {
     padding: 0 40px;
     cursor: pointer;
@@ -1823,6 +1892,8 @@ export default {
     padding: 23px 26px;
     .scheduler-table {
       width: calc(100vw - 250px - 70px);
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
     }
   }
   .left-panel{
@@ -1832,7 +1903,7 @@ export default {
     position: absolute;
     left: 100vw;
     z-index: 99;
-    padding: 23px 26px;
+    padding: 23px 26px 23px 0;
     transition: all 1s;
     &.partial-panel {
       left: calc(250px + 250px + 60px);

@@ -17,7 +17,10 @@
  */
 package com.webank.wedatasphere.dss.framework.project.utils;
 
+import com.github.pagehelper.Constant;
+
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -364,5 +367,11 @@ public class DateUtil {
         cal.add(Calendar.HOUR, hours);
         return  df.format(cal.getTime());
     }
+
+    public static Long strToTimeStamp(String date,String format) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+         return sdf.parse(date).getTime();
+    }
+
 
 }

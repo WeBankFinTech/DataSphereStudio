@@ -22,10 +22,10 @@ class NormalNode extends Node {
     let icon = '<i></i>',
       state = '<span></span>'
     if (opts.options.node_type === 'SHELL') {
-      icon = '<i style="color:rgb(121, 113, 246);margin-right: 12px;" class="ivu-icon ivu-icon-md-code-working"></i>'
+      icon = '<i style="color:rgb(100, 100, 100);margin-right: 10px;font-size: 13px;position: relative;top: 1px;" class="iconfont icon-shell"></i>'
     }
     if (opts.options.state) {
-      state = `<i title='${opts.options.state.desc}' style='color:${opts.options.state.color};margin-left: 8px' class='iconfont ${opts.options.state.icon}'></i>`
+      state = `<i title='${opts.options.state.desc}' style='color:${opts.options.state.color};margin-left: 8px;font-size: 13px;' class='iconfont ${opts.options.state.icon}'></i>`
     }
     let logoContainer = $(`<div class="logo-container">${icon}<span>${opts.options.label}</span>${state}</div>`);
     logoContainer.addClass(opts.options.className);

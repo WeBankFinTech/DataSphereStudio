@@ -80,7 +80,7 @@
           v-if="type==='flow'"
           :title="$t('message.workflow.process.publish')"
           class="button"
-          :disabled="publishChangeCount<1"
+          :disabled="publishChangeCount<1 && schedulingStatus.published"
           @click="workflowPublishIsShow">
           <template v-if="!isFlowPubulish">
             <SvgIcon class="icon" icon-class="publish" color="#666"/>
@@ -2154,7 +2154,7 @@ export default {
     
     workflowPublishIsShow(event) {
       // 已经在发布不能再点击
-      if(this.publishChangeCount < 1) {
+      if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
         event.preventDefault();
         event.stopPropagation();
         this.$Message.warning(this.$t('message.workflow.warning.unChange'));

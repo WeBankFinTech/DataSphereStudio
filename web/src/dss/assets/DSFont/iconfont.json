@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "21990365",
+      "name": "shell",
+      "font_class": "shell",
+      "unicode": "e671",
+      "unicode_decimal": 58993
+    },
+    {
       "icon_id": "21974034",
       "name": "icon-kill",
       "font_class": "kill",

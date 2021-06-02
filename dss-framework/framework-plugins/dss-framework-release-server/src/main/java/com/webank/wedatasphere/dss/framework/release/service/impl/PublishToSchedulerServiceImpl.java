@@ -18,6 +18,11 @@
 
 package com.webank.wedatasphere.dss.framework.release.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseContext;
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseEnv;
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
@@ -30,10 +35,7 @@ import com.webank.wedatasphere.dss.framework.release.job.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 import scala.Tuple2;
 
 /**
@@ -102,12 +104,16 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
             return status;
         }
 
-        status.setPublished(true);
         ProjectInfo projectInfo = this.releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
         String workspaceName = this.releaseEnv.getProjectService().getWorkspaceName(projectInfo.getProjectId());
         String workflowStatus = this.releaseEnv.getPublishService()
             .getSchedulerWorkflowStatus(workspaceName, projectInfo.getProjectName(),
                 orchestratorReleaseInfo.getSchedulerWorkflowId(), username);
+        if (workflowStatus == null) {
+            status.setPublished(false);
+            return status;
+        }
+        status.setPublished(true);
         status.setReleaseState(workflowStatus);
         return status;
     }

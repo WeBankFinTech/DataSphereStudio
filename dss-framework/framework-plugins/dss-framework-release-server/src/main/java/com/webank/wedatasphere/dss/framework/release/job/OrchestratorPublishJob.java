@@ -18,18 +18,19 @@
 
 package com.webank.wedatasphere.dss.framework.release.job;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.webank.wedatasphere.dss.framework.release.entity.export.ExportResult;
 import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 /**
  * created by cooperyang on 2021/2/23
@@ -116,7 +117,7 @@ public final class OrchestratorPublishJob extends AbstractReleaseJob {
 
             //4.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             this.releaseEnv.getReleaseJobListener().onJobSucceed(this);
-        } catch (final ExternalOperationFailedException e) {
+        } catch (final ErrorException e) {
             LOGGER.error("publish orchestrator {} failed", orchestratorId, e);
             this.releaseEnv.getReleaseJobListener().onJobFailed(this, "发布失败：" + e.getDesc());
         } catch (final Throwable t) {

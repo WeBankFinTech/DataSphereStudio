@@ -12,7 +12,7 @@
             <Radio style="display: inline-block" label="WkintervalWeek">
               <span class="text">{{$t2('每隔')}}</span>
               <m-input-number :min="0" :max="7" :props-value="parseInt(WkintervalWeekPerformVal)" @on-number="onWkintervalWeekPerform"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('天执行 从')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('天执行 从')}}</span>
             </Radio>
             <i-select style="display: inline-block;width:200px;" :placeholder="$t2('请选择具体小时数')" size="small" v-model="WkintervalWeekStartVal">
               <i-option
@@ -28,9 +28,9 @@
             <Radio label="intervalDay" size="small">
               <span class="text">{{$t2('每隔')}}</span>
               <m-input-number :min="0" :max="31" :props-value="parseInt(intervalDayPerformVal)" @on-number="onIntervalDayPerform"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('天执行 从')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('天执行 从')}}</span>
               <m-input-number :min="1" :max="31" :props-value="parseInt(intervalDayStartVal)" @on-number="onIntervalDayStart"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('天开始')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('天开始')}}</span>
             </Radio>
           </div>
           <div class="list-box">
@@ -86,14 +86,14 @@
           <div class="list-box">
             <Radio label="monthTailBefore" size="small">
               <m-input-number :min="0" :max="31" :props-value="parseInt(monthTailBeforeVal)" @on-number="onMonthTailBefore"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('在本月底前')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('在本月底前')}}</span>
             </Radio>
           </div>
           <div class="list-box">
             <Radio label="recentlyWorkingDaysMonth" size="small">
               <span class="text">{{$t2('最近的工作日（周一至周五）至本月')}}</span>
               <m-input-number :min="0" :max="31" :props-value="parseInt(recentlyWorkingDaysMonthVal)" @on-number="onRecentlyWorkingDaysMonth"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('日')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('日')}}</span>
             </Radio>
           </div>
           <div class="list-box">
@@ -101,7 +101,7 @@
               <span class="text">{{$t2('在这个月的第')}}</span>
               <m-input-number :min="0" :max="31" :props-value="parseInt(WkmonthNumWeeksDayVal)" @on-number="onWkmonthNumWeeksDay"></m-input-number>
             </Radio>
-            <i-select style="display: inline-block;width: 200px; margin-left: 65px;" :placeholder="$t2('请选择具体周几')" size="small" v-model="WkmonthNumWeeksWeekVal">
+            <i-select style="display: inline-block;width: 200px; margin-left: 46px;" :placeholder="$t2('请选择具体周几')" size="small" v-model="WkmonthNumWeeksWeekVal">
               <i-option
                 v-for="item in WkmonthNumWeeksWeekList"
                 :key="item.value"

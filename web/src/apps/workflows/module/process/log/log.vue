@@ -13,16 +13,16 @@
             <span>{{$t('message.scheduler.viewLog')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.downloadLog')">
-                <Icon type="md-cloud-download" size="20"></Icon>
+                <Icon custom="iconfont icon-download" size="20"></Icon>
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.refreshLog')">
-                <Icon type="md-refresh" size="20"></Icon>
+                <Icon custom="iconfont icon-refresh" size="20"></Icon>
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.fullScreen')">
-                <Icon type="ios-expand" size="20"></Icon>
+                <Icon custom="iconfont icon-full-screen" size="20"></Icon>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.cancelScreen')">
-                <Icon type="md-expand" size="20"></Icon>
+                <Icon custom="iconfont icon-cancel-full-screen" size="20"></Icon>
               </a>
             </div>
           </div>
@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="operation">
-            <Button type="primary" size="small" round @click="close"> {{$t('message.scheduler.close')}} </Button>
+            <Button size="small" round @click="close"> {{$t('message.scheduler.close')}} </Button>
           </div>
         </div>
       </div>
@@ -251,20 +251,21 @@ export default {
       .title {
         height: 50px;
         border-bottom: 1px solid #dcdedc;
+        background-color: #FAFAFA;
         span {
           font-size: 16px;
           color: #333;
           padding-left: 20px;
           display: inline-block;
-          padding-top: 16px;
+          padding-top: 14px;
         }
         .full-screen {
           position: absolute;
           right: 20px;
-          top: 12px;
+          top: 17px;
           a{
             color: #0097e0;
-            margin-left: 10px;
+            margin-left: 15px;
             em {
               font-size: 17px;
               font-weight: 400;

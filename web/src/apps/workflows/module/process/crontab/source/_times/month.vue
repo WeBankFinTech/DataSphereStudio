@@ -12,9 +12,9 @@
             <Radio label="intervalMonth" size="small">
               <span class="text">{{$t2('每隔')}}</span>
               <m-input-number :min="0" :max="12" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('月执行 从')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('月执行 从')}}</span>
               <m-input-number :min="0" :max="12" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('月开始')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('月开始')}}</span>
             </Radio>
           </div>
           <div class="list-box">
@@ -34,9 +34,9 @@
             <Radio label="cycleMonth" size="small">
               <span class="text">{{$t2('周期从')}}</span>
               <m-input-number :min="0" :max="12" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('到')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('到')}}</span>
               <m-input-number :min="0" :max="12" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-              <span class="text" style="margin-left: 65px;">{{$t2('月')}}</span>
+              <span class="text" style="margin-left: 46px;">{{$t2('月')}}</span>
             </Radio>
           </div>
         </Radio-group>

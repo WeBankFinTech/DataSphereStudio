@@ -94,7 +94,7 @@
 
 ### c. 安装包准备
 
-**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。**
+**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/releases))，直接解压即可，以下步骤可忽略。**
 
 下列步骤为用户自行编译或者去各个组件release页面下载安装包：
 1. 下载安装包
@@ -252,7 +252,7 @@
 
 ### c. 安装包准备
 
-**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/issues/90))，直接解压即可，以下步骤可忽略。**
+**如果您想使用DSS & Linkis全家桶一键部署安装包(1.3GB)([点我进入下载页面](https://github.com/WeBankFinTech/DataSphereStudio/releases))，直接解压即可，以下步骤可忽略。**
 
 下列步骤为用户自行编译或者去各个组件release页面下载安装包：
 1. 下载安装包
@@ -437,47 +437,6 @@ _yum java mysql unzip expect telnet tar sed dos2unix nginx_
 
 2. 如果用户想启动和停止**单个微服务**，则可进入该微服务安装目录下执行sh bin/start-微服务名称.sh或sh bin/stop-微服务名称.sh
 
-## 五、云资源
-## 云资源
-
-**我们提供了DSS + Linkis + Qualitis + Visualis + Azkaban【全家桶一键部署安装包】，由于安装包过大（1.3GB），Github下载缓慢，请通过以下方式获取**：
-
-**Baidu cloud:**
-
-- 百度云链接：https://pan.baidu.com/s/1hmxuJtyY72D5X_dZoQIE5g 
-
-- Password: p82h 
-
-**Tencent Cloud:**
-
-- 腾讯云链接：https://share.weiyun.com/5vpLr9t
-
-- Password: upqgib
-
-**DSS&Linkis 一键部署脚本**
-
-- URL：https://share.weiyun.com/5Qvl07X
-
-**以下为Linkis安装包资源：**
-
-- 腾讯云链接：https://share.weiyun.com/5Gjz0zU
-
--  密码：9vctqg 
-
-- 百度云链：
-https://pan.baidu.com/s/1uuogWgLE9r8EcGROkRNeKg 
-
-- 密码：pwbz 
-
-**以下为DSS安装包资源：**
-
-- 腾讯云链接：https://share.weiyun.com/5n2GD0h
-
-- 密码：p8f4ug
-
-- 百度云链接：https://pan.baidu.com/s/18H8P75Y-cSEsW-doVRyAJQ 
-
-- 密码：pnnj
 
 **附Qualitis及Azkaban单机版安装包资源：**
 

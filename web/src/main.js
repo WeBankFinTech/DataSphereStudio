@@ -33,6 +33,9 @@ import 'iview/dist/styles/iview.css'
 import './components/svgIcon/index.js'
 import './dss/module/index.js'
 
+import LubanMenu from 'vue-luban-menu'
+Vue.use(LubanMenu)
+
 
 // moduleMixin
 if (apps.requireComponent) {

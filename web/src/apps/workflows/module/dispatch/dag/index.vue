@@ -3,7 +3,8 @@
 </template>
 
 <script>
-import $ from 'jquery'
+/*eslint-disable */
+
 import {Canvas} from 'butterfly-dag'
 import 'butterfly-dag/dist/index.css'
 

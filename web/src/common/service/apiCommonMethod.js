@@ -51,6 +51,15 @@ const GetWorkspaceBaseInfo = (params) =>  api.fetch(`${API_PATH.WORKSPACE_PATH}g
 // 获取工程的应用领域
 const GetAreaMap = () =>  api.fetch(`${API_PATH.PROJECT_PATH}listApplicationAreas`, "get")
 
+// 获取常用功能列表
+const GetFavorites = (workspaceId) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, workspaceId, 'get')
+
+// 添加常用应用
+const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, data, 'post')
+
+// 删除收藏菜单
+const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, {}, 'delete')
+
 export {
   GetDicSecondList,
   GetAreaMap,
@@ -63,5 +72,8 @@ export {
   CheckWorkspaceNameExist,
   GetDicList,
   GetWorkspaceList,
-  GetWorkspaceBaseInfo
+  GetWorkspaceBaseInfo,
+  GetFavorites,
+  AddFavorite,
+  RemoveFavorite
 }

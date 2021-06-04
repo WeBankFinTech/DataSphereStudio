@@ -44,7 +44,6 @@
 import _ from 'lodash'
 import api from '@/common/service/api'
 import { downloadFile } from './download'
-import $ from 'jquery'
 
 /**
  * Calculate text size

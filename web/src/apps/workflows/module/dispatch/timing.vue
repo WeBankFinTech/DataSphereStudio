@@ -187,9 +187,9 @@
 import moment from 'moment-timezone'
 import api from '@/common/service/api'
 import vCrontab from './crontab/index'
-import dayjs from 'dayjs'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
-import util from "@/common/util"
+import util from '@/common/util'
+import { formatDate } from './convertor'
 
 export default {
   name: 'timing-process',
@@ -267,21 +267,6 @@ export default {
     timingData: Object
   },
   methods: {
-    formatISODate (date) {
-      let [datetime, timezone] = date.split('+')
-      if (!timezone || timezone.indexOf(':') >= 0) return date
-      let hourOfTz = timezone.substring(0, 2) || '00'
-      let secondOfTz = timezone.substring(2, 4) || '00'
-      return `${datetime}+${hourOfTz}:${secondOfTz}`
-    },
-    formatDate(value, fmt) {
-      fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
-      if (value === null) {
-        return '-'
-      } else {
-        return dayjs(this.formatISODate(value)).format(fmt)
-      }
-    },
     _datepicker (val) {
       this.scheduleTime = val
     },
@@ -420,7 +405,7 @@ export default {
       // Determine whether to echo
       if (item.crontab) {
         this.crontab = item.crontab
-        this.scheduleTime = [this.formatDate(item.startTime), this.formatDate(item.endTime)]
+        this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
         this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType

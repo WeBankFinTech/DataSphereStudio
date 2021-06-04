@@ -1,5 +1,7 @@
-import $ from 'jquery'
+/*eslint-disable */
+
 import {Node} from 'butterfly-dag'
+import {tasksType} from '../../config'
 
 import './normal-node.scss'
 import util from '@/common/util'
@@ -21,8 +23,10 @@ class NormalNode extends Node {
       })
     let icon = '<i></i>',
       state = '<span></span>'
-    if (opts.options.node_type === 'SHELL') {
-      icon = '<i style="color:rgb(100, 100, 100);margin-right: 10px;font-size: 13px;position: relative;top: 1px;" class="iconfont icon-shell"></i>'
+    if (opts.options.node_type) {
+      let color = tasksType[opts.options.node_type].color,
+        iconfont = tasksType[opts.options.node_type].icon
+      icon = `<i style='color:${color};margin-right: 10px;font-size: 13px;position: relative;top: 1px;' class="iconfont ${iconfont}"></i>`
     }
     if (opts.options.state) {
       state = `<i title='${opts.options.state.desc}' style='color:${opts.options.state.color};margin-left: 8px;font-size: 13px;' class='iconfont ${opts.options.state.icon}'></i>`

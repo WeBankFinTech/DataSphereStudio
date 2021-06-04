@@ -523,8 +523,12 @@
             "importFail": "导入失败"
         },
         "scheduler": {
+            "dashboard": "运维大屏",
+            "processDefinition": "工作流定义",
+            "processInstance": "工作流实例",
             "run": "运行",
             "setTime": "定时",
+            "setTimeManage": "定时管理",
             "offline": "下线",
             "online": "上线",
             "rerun": "重跑",
@@ -545,7 +549,9 @@
             "noMoreLogs": "没有更多日志",
             "updateSuccess": "日志更新成功",
             "noLog": "暂无日志",
+            "noData": "暂无数据",
             "logLoading": "日志加载中...",
+            "Loading": "加载中...",
             "viewLog": "查看日志",
             "downloadLog": "下载日志",
             "refreshLog": "刷新日志",
@@ -558,6 +564,8 @@
             "recoverySuspend": "恢复运行",
             "copy": "复制工作流",
             "export": "导出",
+            "Gantt": "甘特图",
+            "taskStatus": "状态任务",
             "runTask": {
                 "startTitle": "启动前请先设置参数",
                 "timingTitle": "定时前请先设置参数",

@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
   let nodes = [],
     edges = []
@@ -111,5 +113,29 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
   return {
     nodes,
     edges
+  }
+}
+
+function formatISODate (date) {
+  let [datetime, timezone] = date.split('+')
+  if (!timezone || timezone.indexOf(':') >= 0) return date
+  let hourOfTz = timezone.substring(0, 2) || '00'
+  let secondOfTz = timezone.substring(2, 4) || '00'
+  return `${datetime}+${hourOfTz}:${secondOfTz}`
+}
+export function formatDate(value, fmt) {
+  fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
+  if (value === null) {
+    return '-'
+  } else {
+    return dayjs(formatISODate(value)).format(fmt)
+  }
+}
+
+export function filterNull(value) {
+  if (value === null || value === '') {
+    return '-'
+  } else {
+    return value
   }
 }

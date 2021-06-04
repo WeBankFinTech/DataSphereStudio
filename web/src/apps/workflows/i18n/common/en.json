@@ -525,8 +525,12 @@
       "importFail": "Import failed"
     },
     "scheduler": {
+      "dashboard": "Operation Dashboard",
+      "processDefinition": "Process Definition",
+      "processInstance": "Process Instance",
       "run": "run",
       "setTime": "timing",
+      "setTimeManage": "Cron Manage",
       "offline": "offline",
       "online": "online",
       "rerun": "rerun",
@@ -547,7 +551,9 @@
       "noMoreLogs": "No more logs",
       "updateSuccess": "Update log success",
       "noLog": "No log",
+      "noData": "No Data",
       "logLoading": "Loading Log...",
+      "Loading": "Loading...",
       "viewLog": "View log",
       "downloadLog": "Download Log",
       "refreshLog": "Refresh Log",
@@ -560,6 +566,8 @@
       "recoverySuspend": "Recovery Suspend",
       "copy": "Copy Workflow",
       "export": "Export",
+      "Gantt": "Gantt",
+      "taskStatus": "Task Status",
       "runTask": {
         "startTitle": "Please set the parameters before starting",
         "timingTitle": "Set parameters before timing",

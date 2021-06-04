@@ -4,12 +4,26 @@
       <div class="scheduler-wrapper">
         <div class="scheduler-menu">
           <ul>
-            <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">任务列表</li>
-            <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">实例列表</li>
+            <li :class="activeDS == 4? 'active' : ''" @click="activeList(4)">{{$t('message.scheduler.dashboard')}}</li>
+            <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
+            <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
           </ul>
+        </div>
+        <div class="scheduler-list" v-if="activeDS == 4">
+          <template>
+            <div class="scheduler-list-title">
+              <span>{{$t('message.scheduler.dashboard')}}</span>
+            </div>
+          </template>
         </div>
         <div class="scheduler-list" v-if="activeDS == 1">
           <template>
+            <div class="scheduler-list-title">
+              <span>{{$t('message.scheduler.processDefinition')}}</span>
+              <Input v-model="searchVal" style="width: auto;float: right">
+                <Icon type="ios-search" slot="suffix" @click="activeList(1)" style="cursor: pointer;"/>
+              </Input>
+            </div>
             <Table class="scheduler-table" :columns="columns" :data="list"></Table>
             <Page
               size="small"
@@ -27,7 +41,13 @@
           </template>
         </div>
         <div class="scheduler-list" v-if="activeDS == 2">
-          <template>
+          <template v-if="!showGantt">
+            <div class="scheduler-list-title">
+              <span>{{$t('message.scheduler.processInstance')}}</span>
+              <Input v-model="searchVal" style="width: auto;float: right">
+                <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
+              </Input>
+            </div>
             <Table class="scheduler-table" :columns="columns2" :data="list2"></Table>
             <Page
               size="small"
@@ -43,9 +63,11 @@
               @on-page-size-change="pageSizeChange2"
             ></Page>
           </template>
+          <gantt :instanceId="instanceId" v-else></gantt>
         </div>
         <div class="scheduler-list" v-if="activeDS == 3">
           <template>
+            <div class="scheduler-list-title">{{$t('message.scheduler.setTimeManage')}}</div>
             <Table class="scheduler-table" :columns="columns3" :data="list3"></Table>
             <Page
               size="small"
@@ -98,12 +120,14 @@ import api from "@/common/service/api";
 import util from "@/common/util";
 import iRun from './run'
 import iTiming from './timing'
-import dayjs from 'dayjs'
 import _ from 'lodash'
 import Dag from './dag'
-import {ds2butterfly} from './convertor'
+import {ds2butterfly, formatDate, filterNull} from './convertor'
 import mLog from './log/log'
+import gantt from './gantt'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
+import { tasksState, publishStatus, runningType } from './config'
+
 
 export default {
   name: 'dispatch',
@@ -111,12 +135,28 @@ export default {
     iRun,
     iTiming,
     Dag,
-    mLog
+    mLog,
+    gantt
   },
   props: {
     query: {
       type: Object,
       default: () => {}
+    },
+    tabName: {
+      type: String,
+      default: ''
+    },
+    activeTab: {
+      default: 1
+    }
+  },
+  watch: {
+    tabName() {
+      this.searchVal = this.tabName
+    },
+    activeTab() {
+      this.activeDS = this.activeTab
     }
   },
   computed: {
@@ -126,8 +166,9 @@ export default {
   },
   data() {
     return {
+      searchVal: this.tabName, //搜索名字
       workspaceName: '',
-      activeDS: 1,
+      activeDS: this.activeTab,
       showRunTaskModal: false,
       showTimingTaskModal: false,
       list: [],
@@ -171,7 +212,6 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.TimingState'),
-          width: 100,
           key: 'scheduleReleaseStateDesc'
         },
         {
@@ -275,7 +315,7 @@ export default {
                   marginRight: '5px'
                 },
                 attrs: {
-                  title: this.$t('message.scheduler.setTime')
+                  title: this.$t('message.scheduler.setTimeManage')
                 },
                 on: {
                   click: () => {
@@ -420,7 +460,7 @@ export default {
         {
           title: this.$t('message.scheduler.header.Operation'),
           key: 'action',
-          width: 200,
+          width: 250,
           fixed: 'right',
           align: 'center',
           render: (h, params) => {
@@ -522,6 +562,25 @@ export default {
                 on: {
                   click: () => {
                     this._deleteInstance(params.index)
+                  }
+                }
+              }),
+              h('Button', {
+                props: {
+                  type: 'info',
+                  shape: "circle",
+                  icon: "md-list-box",
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.Gantt')
+                },
+                on: {
+                  click: () => {
+                    this._gantt(params.row)
                   }
                 }
               })
@@ -670,149 +729,9 @@ export default {
         current: 1,
         total: 0
       },
-      publishStatus: {
-        'NOT_RELEASE': this.$t('message.scheduler.Unpublished'),
-        'ONLINE': this.$t('message.scheduler.online'),
-        'OFFLINE': this.$t('message.scheduler.offline')
-      },
-      runningType: [
-        {
-          desc: this.$t('message.scheduler.START_PROCESS'),
-          code: 'START_PROCESS'
-        },
-        {
-          desc: this.$t('message.scheduler.START_CURRENT_TASK_PROCESS'),
-          code: 'START_CURRENT_TASK_PROCESS'
-        },
-        {
-          desc: this.$t('message.scheduler.RECOVER_TOLERANCE_FAULT_PROCESS'),
-          code: 'RECOVER_TOLERANCE_FAULT_PROCESS'
-        },
-        {
-          desc: this.$t('message.scheduler.RECOVER_SUSPENDED_PROCESS'),
-          code: 'RECOVER_SUSPENDED_PROCESS'
-        },
-        {
-          desc: this.$t('message.scheduler.START_FAILURE_TASK_PROCESS'),
-          code: 'START_FAILURE_TASK_PROCESS'
-        },
-        {
-          desc: this.$t('message.scheduler.COMPLEMENT_DATA'),
-          code: 'COMPLEMENT_DATA'
-        },
-        {
-          desc: this.$t('message.scheduler.SCHEDULER'),
-          code: 'SCHEDULER'
-        },
-        {
-          desc: this.$t('message.scheduler.rerun'),
-          code: 'REPEAT_RUNNING'
-        },
-        {
-          desc: this.$t('message.scheduler.PAUSE'),
-          code: 'PAUSE'
-        },
-        {
-          desc: this.$t('message.scheduler.STOP'),
-          code: 'STOP'
-        },
-        {
-          desc: this.$t('message.scheduler.RECOVER_WAITTING_THREAD'),
-          code: 'RECOVER_WAITTING_THREAD'
-        }
-      ],
-      tasksState: {
-        SUBMITTED_SUCCESS: {
-          id: 0,
-          desc: this.$t('message.scheduler.tasksState.SUBMITTED_SUCCESS'),
-          icon: 'icon-submitted-success',
-          color: '#A9A9A9'
-        },
-        'RUNNING_EXECUTION': {
-          id: 1,
-          desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
-          icon: 'icon-running-execution',
-          color: '#0097e0'
-        },
-        'RUNNING_EXEUTION': {
-          id: 1,
-          desc: this.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
-          icon: 'icon-running-execution',
-          color: '#0097e0'
-        },
-        READY_PAUSE: {
-          id: 2,
-          desc: this.$t('message.scheduler.tasksState.READY_PAUSE'),
-          icon: 'icon-ready-pause',
-          color: '#07b1a3'
-        },
-        PAUSE: {
-          id: 3,
-          desc: this.$t('message.scheduler.tasksState.PAUSE'),
-          icon: 'icon-pause',
-          color: '#057c72'
-        },
-        READY_STOP: {
-          id: 4,
-          desc: this.$t('message.scheduler.tasksState.READY_STOP'),
-          icon: 'icon-ready-stop',
-          color: '#FE0402'
-        },
-        STOP: {
-          id: 5,
-          desc: this.$t('message.scheduler.tasksState.STOP'),
-          icon: 'icon-stop',
-          color: '#e90101'
-        },
-        FAILURE: {
-          id: 6,
-          desc: this.$t('message.scheduler.tasksState.FAILURE'),
-          icon: 'icon-failure',
-          color: '#000000'
-        },
-        SUCCESS: {
-          id: 7,
-          desc: this.$t('message.scheduler.tasksState.SUCCESS'),
-          icon: 'icon-success',
-          color: '#33cc00'
-        },
-        NEED_FAULT_TOLERANCE: {
-          id: 8,
-          desc: this.$t('message.scheduler.tasksState.NEED_FAULT_TOLERANCE'),
-          icon: 'icon-need-fault-tolerance',
-          color: '#FF8C00'
-        },
-        KILL: {
-          id: 9,
-          desc: this.$t('message.scheduler.tasksState.KILL'),
-          icon: 'icon-kill',
-          color: '#a70202'
-        },
-        WAITTING_THREAD: {
-          id: 10,
-          desc: this.$t('message.scheduler.tasksState.WAITTING_THREAD'),
-          icon: 'icon-waitting-thread',
-          color: '#912eed'
-        },
-        WAITTING_DEPEND: {
-          id: 11,
-          desc: this.$t('message.scheduler.tasksState.WAITTING_DEPEND'),
-          icon: 'icon-watting-depend',
-          color: '#5101be'
-        },
-        DELAY_EXECUTION: {
-          id: 12,
-          desc: this.$t('message.scheduler.tasksState.DELAY_EXECUTION'),
-          icon: 'icon-delay-execution',
-          color: '#5102ce'
-        },
-        FORCED_SUCCESS: {
-          id: 13,
-          desc: this.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
-          icon: 'icon-forced-success',
-          color: '#5102ce'
-        }
-      },
+      publishStatus,
+      runningType,
+      tasksState,
       showDag: 0,
       dagData: {
         nodes: [],
@@ -824,7 +743,9 @@ export default {
       showLog: false,
       logId: null,
       source: 'list',
-      schedulerId: '' //用来查定时管理的id
+      schedulerId: '', //用来查定时管理的id
+      instanceId: '', //甘特图的实例id
+      showGantt: false
     }
   },
   mounted() {
@@ -872,14 +793,14 @@ export default {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
           pageSize: this.pagination.size,
           pageNo: page,
-          searchVal: this.query.name
+          searchVal: this.searchVal
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
             item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
             item.scheduleReleaseStateDesc = item.scheduleReleaseState? this.publishStatus[item.scheduleReleaseState] : '-'
             item.isOnline = item.releaseState === 'ONLINE'
-            item.createTime = this.formatDate(item.createTime)
-            item.updateTime = this.formatDate(item.updateTime)
+            item.createTime = formatDate(item.createTime)
+            item.updateTime = formatDate(item.updateTime)
             item.disabled = false
           })
           this.list = res.totalList
@@ -892,13 +813,13 @@ export default {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
           pageSize: this.pagination2.size,
           pageNo: page,
-          searchVal: this.query.name
+          searchVal: this.searchVal
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
-            item.scheduleTime = this.formatDate(item.scheduleTime)
-            item.startTime = this.formatDate(item.startTime)
-            item.endTime = this.formatDate(item.endTime)
-            item.duration = this.filterNull(item.duration)
+            item.scheduleTime = formatDate(item.scheduleTime)
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
+            item.duration = filterNull(item.duration)
             item.commandTypeDesc = _.filter(this.runningType, v => v.code === item.commandType)[0].desc
             item.stateDesc = this.tasksState[item.state].desc
             item.stateColor = this.tasksState[item.state].color
@@ -915,16 +836,15 @@ export default {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/schedule/list-paging`, {
           pageSize: this.pagination3.size,
           pageNo: page,
-          searchVal: this.query.name,
           processDefinitionId: this.schedulerId
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
-            item.startTime = this.formatDate(item.startTime)
-            item.endTime = this.formatDate(item.endTime)
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
             item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
             item.isOnline = item.releaseState === 'ONLINE'
-            item.createTime = this.formatDate(item.createTime)
-            item.updateTime = this.formatDate(item.updateTime)
+            item.createTime = formatDate(item.createTime)
+            item.updateTime = formatDate(item.updateTime)
             item.disabled = false
           })
           this.list3 = res.totalList
@@ -1112,9 +1032,12 @@ export default {
       if (this.activeDS === 1) {
         this.getListData()
       } else if (this.activeDS === 2) {
+        this.showGantt = false
         this.getInstanceListData()
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
+      } else if (this.activeDS === 4) {
+        console.log('运维大屏')
       }
     },
     openDag(index) {
@@ -1268,28 +1191,6 @@ export default {
         this.getInstanceListData()
       })
     },
-    formatISODate (date) {
-      let [datetime, timezone] = date.split('+')
-      if (!timezone || timezone.indexOf(':') >= 0) return date
-      let hourOfTz = timezone.substring(0, 2) || '00'
-      let secondOfTz = timezone.substring(2, 4) || '00'
-      return `${datetime}+${hourOfTz}:${secondOfTz}`
-    },
-    formatDate(value, fmt) {
-      fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
-      if (value === null) {
-        return '-'
-      } else {
-        return dayjs(this.formatISODate(value)).format(fmt)
-      }
-    },
-    filterNull(value) {
-      if (value === null || value === '') {
-        return '-'
-      } else {
-        return value
-      }
-    },
     pageChange(page) {
       this.pagination.current = page
       this.getListData(page)
@@ -1313,20 +1214,32 @@ export default {
     pageSizeChange3(size) {
       this.pagination3.size = size
       this.getSchedulerData()
+    },
+    _gantt (item) {
+      this.instanceId = item.id
+      this.showGantt = true
     }
   }
 };
 </script>
+<style lang="scss">
+  a {
+    color: #2d8cf0;
+    &:hover {
+      color: #57a3f3;
+    }
+  }
+</style>
 <style lang="scss" scoped>
 .scheduler-wrapper{
   background-color: white;
   min-height: 80vh;
+  padding-top: 16px;
   .scheduler-menu{
     float: left;
     width: 250px;
     font-size: 14px;
-    min-height: 80vh;
-    margin-top: 16px;
+    min-height: calc(80vh - 16px);
     border-right: 1px solid #DEE4EC;
     li {
     padding: 0 40px;
@@ -1344,7 +1257,14 @@ export default {
   }
   .scheduler-list{
     float: left;
-    padding: 23px 26px;
+    padding: 10px 26px;
+    .scheduler-list-title {
+      padding-bottom: 17px;
+      font-size: 16px;
+      color: rgba(0,0,0,0.65);
+      line-height: 22px;
+      font-weight: bolder;
+    }
     .scheduler-table {
       width: calc(100vw - 250px - 70px);
       border-top-left-radius: 4px;

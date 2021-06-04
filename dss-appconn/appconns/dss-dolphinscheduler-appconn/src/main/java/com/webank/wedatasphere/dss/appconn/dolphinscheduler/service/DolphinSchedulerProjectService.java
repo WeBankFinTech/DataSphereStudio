@@ -1,7 +1,11 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.service;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProcessDefinitionQueryOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
@@ -13,11 +17,6 @@ import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The type Dolphin scheduler project service.
@@ -26,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2021/05/18
  */
 public class DolphinSchedulerProjectService implements ProjectService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectService.class);
 
     private AppDesc appDesc;
 
@@ -49,8 +46,9 @@ public class DolphinSchedulerProjectService implements ProjectService {
         operationMap.put(DolphinSchedulerProjectCreationOperation.class,
             new DolphinSchedulerProjectCreationOperation(this));
         operationMap.put(RefQueryOperation.class, new DolphinSchedulerProcessDefinitionQueryOperation(this.appDesc));
+        operationMap.put(DolphinSchedulerProjectDeletionOperation.class,
+            new DolphinSchedulerProjectDeletionOperation(this));
         //        operationMap.put(SchedulisProjectUpdateOperation.class, new SchedulisProjectUpdateOperation(this));
-        //        operationMap.put(SchedulisProjectDeletionOperation.class, new SchedulisProjectDeletionOperation(this));
     }
 
     @Override
@@ -76,13 +74,15 @@ public class DolphinSchedulerProjectService implements ProjectService {
 
     @Override
     public ProjectDeletionOperation createProjectDeletionOperation() {
-        //        if (operationMap.containsKey(SchedulisProjectDeletionOperation.class)) {
-        //            return (SchedulisProjectDeletionOperation)operationMap.get(SchedulisProjectDeletionOperation.class);
-        //        } else {
-        //            operationMap.put(SchedulisProjectDeletionOperation.class, new SchedulisProjectDeletionOperation(this));
-        //            return (SchedulisProjectDeletionOperation)operationMap.get(SchedulisProjectDeletionOperation.class);
-        //        }
-        return null;
+        if (operationMap.containsKey(DolphinSchedulerProjectDeletionOperation.class)) {
+            return (DolphinSchedulerProjectDeletionOperation)operationMap
+                .get(DolphinSchedulerProjectDeletionOperation.class);
+        } else {
+            operationMap.put(DolphinSchedulerProjectDeletionOperation.class,
+                new DolphinSchedulerProjectDeletionOperation(this));
+            return (DolphinSchedulerProjectDeletionOperation)operationMap
+                .get(DolphinSchedulerProjectDeletionOperation.class);
+        }
     }
 
     @Override

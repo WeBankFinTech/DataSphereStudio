@@ -27,4 +27,8 @@ public class WorkflowStatus {
     public void setReleaseState(String releaseState) {
         this.releaseState = releaseState;
     }
+
+    public boolean isOnline(String releaseState) {
+        return "ONLINE".equalsIgnoreCase(releaseState);
+    }
 }

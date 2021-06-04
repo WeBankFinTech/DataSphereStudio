@@ -357,7 +357,7 @@ export default {
         scalaTypeR: [
           {
             type: 'string',
-            required: true,
+            required: false,
             message: this.$t('message.functionSetting.SRCSLX'),
             trigger: 'blur',
           },
@@ -403,11 +403,19 @@ export default {
           trim(this.setting.pyPara).toLowerCase()
         })`;
       } else if (this.fnType === 2) {
-        return `sqlContext.udf.register[${this.firstUpperCase(
-          this.setting.scalaTypeL
-        )},${this.firstUpperCase(this.setting.scalaTypeR)}]("${
-          this.setting.name
-        }",${trim(this.setting.scalapara)})`;
+        if (this.setting.scalaTypeR) {
+          return `sqlContext.udf.register[${this.firstUpperCase(
+            this.setting.scalaTypeL
+          )},${this.firstUpperCase(this.setting.scalaTypeR)}]("${
+            this.setting.name
+          }",${trim(this.setting.scalapara)})`;
+        } else {
+          return `sqlContext.udf.register[${this.firstUpperCase(
+            this.setting.scalaTypeL
+          )}]("${
+            this.setting.name
+          }",${trim(this.setting.scalapara)})`;
+        }
       }
       return null;
     },
@@ -415,17 +423,16 @@ export default {
     useFormat() {
       let type = trim(this.setting.useFormatParaL) || '';
       let input = trim(this.setting.useFormatParaR) || '';
-      if (this.setting.useFormatParaL) {
-        if (this.fnType === 1 || this.fnType === 3) {
-          type = trim(this.setting.useFormatParaL).toLowerCase();
-        } else if (this.fnType === 2) {
-          type = this.firstUpperCase(this.setting.scalaTypeL);
-          input = this.firstUpperCase(this.setting.scalaTypeR);
-        } else if (this.fnType === 4) {
-          type = this.firstUpperCase(this.setting.useFormatParaL);
-          input = this.firstUpperCase(this.setting.useFormatParaR);
-        }
+      if ((this.fnType === 1 || this.fnType === 3) && this.setting.useFormatParaL) {
+        type = trim(this.setting.useFormatParaL).toLowerCase();
+      } else if (this.fnType === 2 && this.setting.scalaTypeL) {
+        type = this.firstUpperCase(this.setting.scalaTypeL);
+        input = this.firstUpperCase(this.setting.scalaTypeR);
+      } else if (this.fnType === 4 && this.setting.useFormatParaL) {
+        type = this.firstUpperCase(this.setting.useFormatParaL);
+        input = this.firstUpperCase(this.setting.useFormatParaR);
       }
+
       return trim(`${type} ${this.setting.name}(${input})`);
     },
   },
@@ -518,7 +525,7 @@ export default {
       } else if (this.node.udfType === 1) {
         this.setting.pyPara = conver(',', ')', 'indexOf', 'lastIndexOf');
       } else {
-        const type = rf.slice(rf.indexOf('['), rf.indexOf(']'));
+        const type = rf.slice(rf.indexOf('['), rf.lastIndexOf(']'));
         // 如果存在多个逗号，就只用使用格式来截取，否则会出现多个类型填入input异常的问题
         if (type.indexOf(',') !== type.lastIndexOf(',')) {
           this.setting.scalaTypeL = '';

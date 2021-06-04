@@ -22,6 +22,7 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
+const webpack = require('webpack')
 const apps = require('./src/config.json')
 
 const getVersion = () => {
@@ -89,7 +90,8 @@ const virtualModules = new VirtualModulesPlugin({
 });
 
 const plugins = [
-  virtualModules
+  virtualModules,
+  new webpack.ProvidePlugin({jQuery:"jquery/dist/jquery.min.js",$:"jquery/dist/jquery.min.js" })
 ]
 
 // scriptis linkis 有使用编辑器组件, 需要Monaco Editor

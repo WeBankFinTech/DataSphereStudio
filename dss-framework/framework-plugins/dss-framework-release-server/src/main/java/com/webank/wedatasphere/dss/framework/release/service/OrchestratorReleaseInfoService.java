@@ -5,4 +5,8 @@ import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.Orchest
 public interface OrchestratorReleaseInfoService {
 
     OrchestratorReleaseInfo getByOrchestratorId(Long orchestratorId);
+
+    int removeById(Long id);
+
+    int removeByOrchestratorId(Long orchestratorId);
 }

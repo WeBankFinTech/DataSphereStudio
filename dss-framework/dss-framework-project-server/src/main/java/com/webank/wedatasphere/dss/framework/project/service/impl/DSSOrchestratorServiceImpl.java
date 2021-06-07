@@ -18,14 +18,34 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
+import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSOrchestratorMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.*;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
@@ -35,21 +55,21 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
+import com.webank.wedatasphere.dss.framework.release.service.OrchestratorReleaseInfoService;
+import com.webank.wedatasphere.dss.framework.release.utils.ReleaseConf;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchetratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorCreateResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.rpc.Sender;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 /**
  * DSS编排模式信息表 服务实现类
@@ -60,12 +80,18 @@ import java.util.*;
 @Service
 public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMapper, DSSOrchestrator> implements DSSOrchestratorService {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorServiceImpl.class);
 
     public static final String MODE_SPLIT = ",";
+
+    private static final String PROD_ORC_NAME =
+        CommonVars.apply("wds.dss.orchestrator.prod.name", "dss-framework-orchestrator-server-prod").getValue();
+
+    private final Sender prodOrcSender = Sender.getSender(PROD_ORC_NAME);
+
     @Autowired
     private DSSOrchestratorMapper orchestratorMapper;
+
     @Autowired
     private DSSProjectUserService projectUserService;
 
@@ -75,12 +101,19 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
     @Autowired
     private DSSProjectMapper dssProjectMapper;
 
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
 
-    private static final String PROD_ORC_NAME =
-            CommonVars.apply("wds.dss.orchestrator.prod.name", "dss-framework-orchestrator-server-prod").getValue();
+    @Autowired
+    private OrchestratorReleaseInfoService orchestratorReleaseInfoService;
 
+    private SchedulerAppConn schedulerAppConn;
 
-    private final Sender prodOrcSender = Sender.getSender(PROD_ORC_NAME);
+    @PostConstruct
+    public void init() {
+        schedulerAppConn =
+            (SchedulerAppConn)appConnService.getAppConn(ReleaseConf.DSS_SCHEDULE_APPCONN_NAME.getValue());
+    }
 
     /**
      * 保存编排模式
@@ -247,6 +280,58 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         return responseOrchetratorVersion.getOrchestratorVersions();
     }
 
+    @Override
+    @Transactional
+    public void deleteOrchestrator(String username, DSSOrchestrator dssOrchestrator, Boolean deleteSchedulerWorkflow)
+        throws ErrorException {
+        // 删除调度系统的工作流
+        if (deleteSchedulerWorkflow) {
+            if (schedulerAppConn == null) {
+                LOGGER.error("scheduler appconn is null, can not delete scheduler workflow");
+                throw new DSSErrorException(61123, "scheduler appconn is null");
+            }
 
+            SchedulerStructureStandard schedulerStructureStandard =
+                (SchedulerStructureStandard)schedulerAppConn.getAppStandards().stream()
+                    .filter(appStandard -> appStandard instanceof SchedulerStructureStandard).findAny().orElse(null);
+            if (schedulerStructureStandard == null) {
+                LOGGER.error("scheduler structure standard is null, can not continue");
+                DSSExceptionUtils.dealErrorException(60059, "scheduler Structure Standard is null, can not continue",
+                    ExternalOperationFailedException.class);
+            }
+
+            ProjectService schedulerProjectService = schedulerStructureStandard.getProjectService();
+            schedulerProjectService.setAppDesc(schedulerStructureStandard.getAppDesc());
+            ProjectDeletionOperation operation = schedulerProjectService.createProjectDeletionOperation();
+            if (operation == null) {
+                LOGGER.error("scheduler delete operation is null, can not continue");
+                DSSExceptionUtils.dealErrorException(61124, "scheduler delete operation is null, can not continue",
+                    ExternalOperationFailedException.class);
+            }
+
+            String workspaceName =
+                dssWorkspaceService.getWorkspaceName(String.valueOf(dssOrchestrator.getWorkspaceId()));
+            String projectName = dssProjectMapper.getProjectNameById(dssOrchestrator.getProjectId());
+            // 删除调度系统工作流，则发布信息一定存在
+            OrchestratorReleaseInfo orchestratorReleaseInfo =
+                orchestratorReleaseInfoService.getByOrchestratorId(dssOrchestrator.getOrchestratorId());
+
+            ProjectRequestRefImpl requestRef = new ProjectRequestRefImpl();
+            requestRef.setWorkspaceName(workspaceName);
+            requestRef.setName(projectName);
+            requestRef.setType("Orchestrator");
+            requestRef.setId(orchestratorReleaseInfo.getSchedulerWorkflowId());
+            requestRef.setCreateBy(username);
+            operation.deleteProject(requestRef);
+
+            // 删除DSS工作流发布信息
+            orchestratorReleaseInfoService.removeById(orchestratorReleaseInfo.getId());
+        }
+
+        // 删除项目-编排信息
+        this.removeById(dssOrchestrator.getId());
+
+        // TODO: 2021/6/4 删除编排信息dss_orchestrator_info、版本信息dss_orchestrator_info_version、版本信息对应的工作流信息dss_workflow
+    }
 
 }

@@ -11,8 +11,8 @@
           <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF"/>
         </div> -->
 
-        <!--luban-nav-menu-->
         <vue-luban-menu
+          v-if="isNavShowMenu"
           :apps="menuList" 
           :favorites="favorites" 
           @menu-click="handleMenuClick"

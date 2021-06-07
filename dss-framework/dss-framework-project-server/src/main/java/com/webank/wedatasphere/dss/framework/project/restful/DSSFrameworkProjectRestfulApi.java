@@ -18,6 +18,29 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
@@ -32,6 +55,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProcessNode;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -39,27 +63,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * created by cooperyang on 2020/9/22
@@ -79,6 +82,8 @@ public class DSSFrameworkProjectRestfulApi {
     private AppConnService appConnService;
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
+    @Autowired
+    private DSSProjectUserService projectUserService;
 
     /**
      * 获取所有工程或者单个工程
@@ -167,12 +172,16 @@ public class DSSFrameworkProjectRestfulApi {
     @Path("deleteProject")
     public Response deleteProject(@Context HttpServletRequest request, @Valid ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
-        try{
+
+        try {
+            // 使用工程的权限关系来限定 校验当前登录用户是否含有修改权限
+            projectUserService.isEditProjectAuth(projectDeleteRequest.getId(), username);
+
             projectService.deleteProject(username,projectDeleteRequest);
             return RestfulUtils.dealOk("删除工程成功");
-        }catch(final Throwable t){
-            LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);
-            return RestfulUtils.dealError("删除工程失败");
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete project {} for user {}", projectDeleteRequest, username, e);
+            return RestfulUtils.dealError("删除工程失败" + e.getMessage());
         }
     }
 

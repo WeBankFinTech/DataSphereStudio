@@ -535,9 +535,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public Long deleteFavorite(String username, Long favouritesId) {
-        workspaceMapper.deleteFavorite(favouritesId);
-        return favouritesId;
+    public Long deleteFavorite(String username, Long applicationId, Long workspaceId) {
+        workspaceMapper.deleteFavorite(username, applicationId, workspaceId);
+        return applicationId;
     }
 
     private boolean isAdminUser(Long workspaceId, String username) {

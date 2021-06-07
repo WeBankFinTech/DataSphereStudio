@@ -85,7 +85,7 @@ public interface DSSWorkspaceService {
 
     Long addFavorite(String username, Long workspaceId, Long menuApplicationId);
 
-    Long deleteFavorite(String username, Long favouritesId);
+    Long deleteFavorite(String username, Long applicationId, Long workspaceId);
 
 
 }

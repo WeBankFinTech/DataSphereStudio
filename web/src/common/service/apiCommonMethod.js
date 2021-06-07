@@ -58,7 +58,7 @@ const GetFavorites = (workspaceId) => api.fetch(`${API_PATH.WORKSPACE_PATH}works
 const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, data, 'post')
 
 // 删除收藏菜单
-const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, {}, 'delete')
+const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, data, 'post')
 
 export {
   GetDicSecondList,

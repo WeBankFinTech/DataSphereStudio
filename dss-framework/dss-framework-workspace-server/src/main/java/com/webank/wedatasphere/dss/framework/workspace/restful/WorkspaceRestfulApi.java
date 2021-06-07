@@ -166,11 +166,20 @@ public class WorkspaceRestfulApi {
         return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
     }
 
-    @DELETE
-    @Path("/workspaces/{workspaceId}/favorites/{favouritesId}")
-    public Response deleteFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, @PathParam("favouritesId") Long favouritesId) {
+    @POST
+    @Path("/workspaces/{workspaceId}/favorites/{applicationId}")
+    public Response deleteFavorite(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, @PathParam("applicationId") Long applicationId) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.deleteFavorite(username, favouritesId);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId);
+        return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
+    }
+
+
+    @GET
+    @Path("/workspaces/{workspaceId}/favorites/{applicationId}")
+    public Response deleteFavorite1(@Context HttpServletRequest req, @PathParam("workspaceId") Long workspaceId, @PathParam("applicationId") Long applicationId) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId);
         return Message.messageToResponse(Message.ok().data("favoriteId", favoriteId));
     }
 

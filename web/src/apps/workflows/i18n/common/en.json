@@ -525,6 +525,12 @@
       "importFail": "Import failed"
     },
     "scheduler": {
+      "selectState": "Select State",
+      "taskStatusStatistics": "Task status statistics",
+      "processStatusStatistics": "Process Status Statistics",
+      "processDefinitionStatistics": "Process Definition Statistics",
+      "projectHome": "Project Home",
+      "home": "Home",
       "dashboard": "Operation Dashboard",
       "processDefinition": "Process Definition",
       "processInstance": "Process Instance",
@@ -635,6 +641,7 @@
       "header": {
         "id": "#",
         "ProcessName": "Process Name",
+        "Number": "Number",
         "State": "State",
         "RunType": "Run Type",
         "SchedulingTime": "Scheduling Time",

@@ -283,10 +283,10 @@
 
 ### d. 修改配置
 
-将conf目录下的config.sh.stand.template，修改为config.sh
+将conf目录下的config.sh.standard.template，修改为config.sh
 
 ```shell
-    cp conf/config.sh.stand.template conf/config.sh
+    cp conf/config.sh.standard.template conf/config.sh
 ```
 
 您可以按需修改相关配置参数：

@@ -523,6 +523,12 @@
             "importFail": "导入失败"
         },
         "scheduler": {
+            "selectState": "选择状态",
+            "taskStatusStatistics": "任务状态统计",
+            "processStatusStatistics": "流程状态统计",
+            "processDefinitionStatistics": "流程定义统计",
+            "projectHome": "项目首页",
+            "home": "首页",
             "dashboard": "运维大屏",
             "processDefinition": "工作流定义",
             "processInstance": "工作流实例",
@@ -633,6 +639,7 @@
             "header": {
                 "id": "编号",
                 "ProcessName": "工作流名称",
+                "Number": "数量",
                 "State": "状态",
                 "RunType": "运行类型",
                 "SchedulingTime": "调度时间",

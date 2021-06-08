@@ -38,6 +38,7 @@
         "dayjs": "^1.10.4",
         "dexie": "2.0.4",
         "dt-sql-parser": "1.2.1",
+        "echarts": "^4.1.0",
         "eslint": "6.8.0",
         "eslint-plugin-vue": "6.2.2",
         "highlight.js": "9.18.3",

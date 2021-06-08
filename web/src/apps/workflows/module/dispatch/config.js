@@ -99,84 +99,98 @@ const tasksStateList = [
     id: 0,
     desc: i18n.$t('message.scheduler.tasksState.SUBMITTED_SUCCESS'),
     icon: 'icon-submitted-success',
+    code: 'SUBMITTED_SUCCESS',
     color: '#A9A9A9'
   },
   {
     id: 1,
     desc: i18n.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
     icon: 'icon-running-execution',
+    code: 'RUNNING_EXEUTION',
     color: '#0097e0'
   },
   {
     id: 2,
     desc: i18n.$t('message.scheduler.tasksState.READY_PAUSE'),
     icon: 'icon-ready-pause',
+    code: 'READY_PAUSE',
     color: '#07b1a3'
   },
   {
     id: 3,
     desc: i18n.$t('message.scheduler.tasksState.PAUSE'),
     icon: 'icon-pause',
+    code: 'PAUSE',
     color: '#057c72'
   },
   {
     id: 4,
     desc: i18n.$t('message.scheduler.tasksState.READY_STOP'),
     icon: 'icon-ready-stop',
+    code: 'READY_STOP',
     color: '#FE0402'
   },
   {
     id: 5,
     desc: i18n.$t('message.scheduler.tasksState.STOP'),
     icon: 'icon-stop',
+    code: 'STOP',
     color: '#e90101'
   },
   {
     id: 6,
     desc: i18n.$t('message.scheduler.tasksState.FAILURE'),
     icon: 'icon-failure',
+    code: 'FAILURE',
     color: '#000000'
   },
   {
     id: 7,
     desc: i18n.$t('message.scheduler.tasksState.SUCCESS'),
     icon: 'icon-success',
+    code: 'SUCCESS',
     color: '#33cc00'
   },
   {
     id: 8,
     desc: i18n.$t('message.scheduler.tasksState.NEED_FAULT_TOLERANCE'),
     icon: 'icon-need-fault-tolerance',
+    code: 'NEED_FAULT_TOLERANCE',
     color: '#FF8C00'
   },
   {
     id: 9,
     desc: i18n.$t('message.scheduler.tasksState.KILL'),
     icon: 'icon-kill',
+    code: 'KILL',
     color: '#a70202'
   },
   {
     id: 10,
     desc: i18n.$t('message.scheduler.tasksState.WAITTING_THREAD'),
     icon: 'icon-waitting-thread',
+    code: 'WAITTING_THREAD',
     color: '#912eed'
   },
   {
     id: 11,
     desc: i18n.$t('message.scheduler.tasksState.WAITTING_DEPEND'),
     icon: 'icon-watting-depend',
+    code: 'WAITTING_DEPEND',
     color: '#5101be'
   },
   {
     id: 12,
     desc: i18n.$t('message.scheduler.tasksState.DELAY_EXECUTION'),
     icon: 'icon-delay-execution',
+    code: 'DELAY_EXECUTION',
     color: '#5102ce'
   },
   {
     id: 13,
     desc: i18n.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
     icon: 'icon-forced-success',
+    code: 'FORCED_SUCCESS',
     color: '#5102ce'
   }
 ]

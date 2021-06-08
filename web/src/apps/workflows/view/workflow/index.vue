@@ -49,6 +49,9 @@
           </template>
         </template>
       </template>
+      <template v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
+        <DS :activeTab="4" class="scheduler-center"></DS>
+      </template>
       <template v-else>
       <!-- 其他应用流程 -->
       </template>
@@ -78,9 +81,10 @@ import storage from '@/common/helper/storage';
 import WorkflowTabList from '@/apps/workflows/module/common/tabList/index.vue';
 import MakeUp from '@/apps/workflows/module/makeUp'
 import ProjectForm from '@/components/projectForm/index.js'
-import api from '@/common/service/api';
-import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
-import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
+import api from '@/common/service/api'
+import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js'
+import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js'
+import DS from '@/apps/workflows/module/dispatch'
 
 export default {
   components: {
@@ -88,7 +92,8 @@ export default {
     process: Process.component,
     WorkflowTabList,
     makeUp: MakeUp.component,
-    ProjectForm
+    ProjectForm,
+    DS
   },
   data() {
     return {

@@ -11,9 +11,10 @@
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
           <template>
-            <div class="scheduler-list-title">
-              <span>{{$t('message.scheduler.dashboard')}}</span>
-            </div>
+            <!--<div class="scheduler-list-title">-->
+            <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
+            <!--</div>-->
+            <dashboard @goToList="goToList"></dashboard>
           </template>
         </div>
         <div class="scheduler-list" v-if="activeDS == 1">
@@ -47,6 +48,26 @@
               <Input v-model="searchVal" style="width: auto;float: right">
                 <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
               </Input>
+              <template>
+                <Date-picker
+                  style="width: 350px;float: right;margin-right: 10px;"
+                  v-model="dateTime"
+                  type="datetimerange"
+                  @on-ok="_datepicker"
+                  range-separator="-"
+                  :start-placeholder="$t('message.scheduler.runTask.startDate')"
+                  :end-placeholder="$t('message.scheduler.runTask.endDate')"
+                  format="yyyy-MM-dd HH:mm:ss">
+                </Date-picker>
+                <Select v-model="instanceStateType"
+                  @on-change="_changeInstanceState"
+                  :placeholder="$t('message.scheduler.selectState')"
+                  style="width: 150px;float: right;margin-right: 10px;"
+                >
+                  <Option value="" key="-">-</Option>
+                  <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
+                </Select>
+              </template>
             </div>
             <Table class="scheduler-table" :columns="columns2" :data="list2"></Table>
             <Page
@@ -116,8 +137,8 @@
   </div>
 </template>
 <script>
-import api from "@/common/service/api";
-import util from "@/common/util";
+import api from "@/common/service/api"
+import util from "@/common/util"
 import iRun from './run'
 import iTiming from './timing'
 import _ from 'lodash'
@@ -126,7 +147,9 @@ import {ds2butterfly, formatDate, filterNull} from './convertor'
 import mLog from './log/log'
 import gantt from './gantt'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
-import { tasksState, publishStatus, runningType } from './config'
+import { tasksState, publishStatus, runningType, tasksStateList } from './config'
+import dashboard from './dashboard/index'
+import moment from 'moment'
 
 
 export default {
@@ -136,7 +159,8 @@ export default {
     iTiming,
     Dag,
     mLog,
-    gantt
+    gantt,
+    dashboard
   },
   props: {
     query: {
@@ -166,7 +190,10 @@ export default {
   },
   data() {
     return {
+      userId: '', //列表入参,用户id
       searchVal: this.tabName, //搜索名字
+      dateTime: [], //实例列表搜索时间
+      instanceStateType: '',//实例列表搜索状态
       workspaceName: '',
       activeDS: this.activeTab,
       showRunTaskModal: false,
@@ -732,6 +759,7 @@ export default {
       publishStatus,
       runningType,
       tasksState,
+      tasksStateList,
       showDag: 0,
       dagData: {
         nodes: [],
@@ -751,7 +779,9 @@ export default {
   mounted() {
     GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
       this.workspaceName = data.workspace.name
-      this.getListData()
+      if (this.activeDS === 1) {
+        this.getListData()
+      }
     })
     util.Hub.$on('dagLog', data => {
       this.getTaskInstanceList(data, (id) => {
@@ -788,12 +818,13 @@ export default {
       }).catch(() => {
       })
     },
-    getListData(page=1) {
+    getListData(page=1, data) {
       util.checkToken(() => {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/process/list-paging`, {
           pageSize: this.pagination.size,
           pageNo: page,
-          searchVal: this.searchVal
+          searchVal: this.searchVal,
+          ...data
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
             item.releaseStateDesc = item.releaseState? this.publishStatus[item.releaseState] : ''
@@ -808,12 +839,13 @@ export default {
         })
       })
     },
-    getInstanceListData(page=1) {
+    getInstanceListData(page=1, data) {
       util.checkToken(() => {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/list-paging`, {
           pageSize: this.pagination2.size,
           pageNo: page,
-          searchVal: this.searchVal
+          searchVal: this.searchVal,
+          ...data
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
             item.scheduleTime = formatDate(item.scheduleTime)
@@ -1027,13 +1059,19 @@ export default {
     closeTiming() {
       this.showTimingTaskModal = false
     },
-    activeList(type) {
+    activeList(type, data) {
       this.activeDS = type
       if (this.activeDS === 1) {
-        this.getListData()
+        this.getListData(1, data)
       } else if (this.activeDS === 2) {
         this.showGantt = false
-        this.getInstanceListData()
+        if (data) {
+          data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
+          data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
+          this.dateTime = [data.startDate, data.endDate]
+          this.instanceStateType = data.stateType
+        }
+        this.getInstanceListData(1, data)
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
@@ -1218,6 +1256,20 @@ export default {
     _gantt (item) {
       this.instanceId = item.id
       this.showGantt = true
+    },
+    goToList(active, data){
+      this.searchVal = ''
+      this.activeList(active, data)
+    },
+    _datepicker() {
+      let searchDate = this.dateTime.length > 1 ? {
+        startDate: this.dateTime[0],
+        endDate: this.dateTime[1]
+      } : {}
+      this.activeList(2, searchDate)
+    },
+    _changeInstanceState() {
+      this.activeList(2, {stateType: this.instanceStateType})
     }
   }
 };
@@ -1231,16 +1283,30 @@ export default {
   }
 </style>
 <style lang="scss" scoped>
+.scheduler-center{
+  position: relative;
+  overflow: hidden;
+  .scheduler-wrapper{
+    padding-top: 0;
+    .scheduler-menu{
+      min-height: 80vh;
+    }
+    .scheduler-list{
+      min-height: 80vh;
+    }
+  }
+}
 .scheduler-wrapper{
   background-color: white;
   min-height: 80vh;
   padding-top: 16px;
+  float: left;
+  width: 100%;
   .scheduler-menu{
     float: left;
     width: 250px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
-    border-right: 1px solid #DEE4EC;
     li {
     padding: 0 40px;
     cursor: pointer;
@@ -1257,7 +1323,9 @@ export default {
   }
   .scheduler-list{
     float: left;
-    padding: 10px 26px;
+    padding: 10px 25px;
+    border-left: 1px solid #DEE4EC;
+    min-height: calc(80vh - 16px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;

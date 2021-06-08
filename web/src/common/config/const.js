@@ -1,6 +1,7 @@
 const DEVPROCESS = {
   DEVELOPMENTCENTER: 'dev',// 开发中心
-  PRODUCTCENTER: 'prod'// 生产中心
+  PRODUCTCENTER: 'prod',// 生产中心
+  OPERATIONCENTER: 'scheduler'//运维中心
 }
 
 const ORCHESTRATORMODES = {

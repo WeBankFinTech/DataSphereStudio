@@ -8,5 +8,6 @@ dist/
 
 package-lock.json
 wedatasphere-*.zip
+luban-*.zip
 ./cn.json
 .env.*

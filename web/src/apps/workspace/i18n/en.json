@@ -12,11 +12,11 @@
       "production": "Production",
       "knowledgeBase": "Knowledge Base",
       "enterKnowledgeBase": "Enter Knowledge Base",
-      "infoHeader": "Welcome to the DataSphere Studio !",
+      "infoHeader": "Welcome to the 鲁班 !",
       "workspaceHeader": "Welcome to the {name} workspace !",
       "workspaceHeaderDesc": "The operation of big data platform carries all the operation applications of big data platform, including operation daily report, operation data collection and processing, etc.",
-      "infoBodyFirstRow": "DataSphere Studio is a one-stop portal focusing on data application development & management . Developed with Linkis computational middleware, DataSphere Studio is designed to efficiently integrate various other data application systems, making the development of data application easier and simpler.",
-      "infoBodySecondRow": "Developed with Linkis computational middleware, DataSphere Studio is designed to efficiently integrate various other data application systems, making the development of data application easier and simpler.",
+      "infoBodyFirstRow": "鲁班 is a one-stop portal focusing on data application development & management . Developed with Linkis computational middleware, 鲁班 is designed to efficiently integrate various other data application systems, making the development of data application easier and simpler.",
+      "infoBodySecondRow": "Developed with Linkis computational middleware, 鲁班 is designed to efficiently integrate various other data application systems, making the development of data application easier and simpler.",
       "createWorkspace": "Create Workspace",
       "searchWorkspace": "Search Workspace",
       "workspaceList": "Workspace List",
@@ -88,7 +88,7 @@
       "DSSSHOP": "DSS app store",
       "QuickAccess": "Quick access",
       "AppStore": {
-        "title":"App store",
+        "title": "App store",
         "demoCase": "Demo case",
         "comingSoon": "Coming soon"
       }

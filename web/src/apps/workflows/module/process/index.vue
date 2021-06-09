@@ -63,6 +63,7 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
+            @showDolphinscheduler="showDS"
           ></Process>
           <Ide
             v-if="item.type === 'IDE'"
@@ -83,11 +84,12 @@
             @save="saveNode"
           ></commonIframe>
           <div
-            v-if="item.type === 'DiaoDu'"
+            v-if="item.type === 'DS'"
             v-show="index===active"
             :key="item.title"
-            style="width:100%; height:100%"
-          ></div>
+          >
+            <DS :query="query" :tab-name="query.name"></DS>
+          </div>
         </template>
       </div>
     </div>
@@ -101,11 +103,15 @@ import Process from "./module.vue";
 import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
+
+import DS from '@/apps/workflows/module/dispatch'
+
 export default {
   components: {
     Process,
     Ide: Ide.component,
-    commonIframe: commonModule.component.iframe
+    commonIframe: commonModule.component.iframe,
+    DS
   },
   props: {
     query: {
@@ -113,6 +119,7 @@ export default {
       default: () => {}
     }
   },
+  computed: {},
   data() {
     return {
       tabs: [
@@ -135,7 +142,7 @@ export default {
       showTip: true,
       openFiles: {},
       nodeImg: NODEICON
-    };
+    }
   },
   mounted() {
     this.getCache().then(tabs => {
@@ -147,6 +154,25 @@ export default {
     this.changeTitle(false);
   },
   methods: {
+    getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
+      if (!this.dagProcessId) return
+      api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
+        processInstanceId: this.dagProcessId,
+        pageSize,
+        pageNo,
+        name: data.label
+      }, 'get').then((res) => {
+        let list = res.totalList
+        let thisTimeList = list.filter(item => item.flag === 'YES')
+        for (let i = 0; i < thisTimeList.length; i++) {
+          if (thisTimeList[i].name === data.label) {
+            return cb && cb(thisTimeList[i].id)
+          }
+        }
+        return cb && cb()
+      }).catch(() => {
+      })
+    },
     // 判断是否有意编辑权限
     // 没有权限的和历史的都不可编辑
     checkEditable(item) {
@@ -539,8 +565,33 @@ export default {
           this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
         }
       }
+    },
+    showDS() {
+      util.checkToken(() => {
+        let tab = {
+          title: this.query.name + '-' + this.$t("message.workflow.process.schedule"),
+          type: "DS",
+          close: true,
+          data: this.query,
+          node: {
+            isChange: false,
+            type: "workflow.subflow"
+          },
+          key: this.query.appId,
+          isHover: false
+        }
+        for (let i = 0;i < this.tabs.length; i++) {
+          let cur = this.tabs[i]
+          // 已经打开
+          if (cur.key === this.query.appId) {
+            return  this.choose(i)
+          }
+        }
+        this.tabs.push(tab)
+        this.choose(this.tabs.length - 1)
+      })
     }
-  },
+  }
 };
 </script>
 <style lang="scss" src="@/apps/workflows/assets/styles/process.scss"></style>

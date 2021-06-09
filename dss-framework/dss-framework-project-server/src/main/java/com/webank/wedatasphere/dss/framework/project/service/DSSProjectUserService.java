@@ -19,8 +19,8 @@
 package com.webank.wedatasphere.dss.framework.project.service;
 
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 
@@ -42,7 +42,7 @@ public interface DSSProjectUserService {
      * @param username
      * @return
      */
-    public List<DSSProjectUser> getEditProjectList(Long projectId,String username);
+    public List<DSSProjectUser> getProjectUserPriv(Long projectId, String username);
 
     /**
      * 保存工程与用户关系

@@ -4,7 +4,7 @@ export const subAppRoutes = {
   component: () => import('./view/layout.vue'),
   redirect: '/workflow',
   meta: {
-    title: 'DataSphere Studio',
+    title: '鲁班',
     publicPage: true, // 权限公开
   },
   children: []
@@ -25,7 +25,7 @@ export default [
     path: 'process',
     name: 'Process',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true,
     },
     component: () =>

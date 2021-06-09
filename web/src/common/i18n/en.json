@@ -23,7 +23,7 @@
       "cancel": "Cancel",
       "delete": "Delete",
       "failedNotice": "Invalid items found, please check and then retry!",
-      "logoName": "DataSphere Studio",
+      "logoName": "鲁班",
       "home": "Home",
       "management": "Console",
       "feedback": "Feedback",
@@ -251,7 +251,7 @@
         "comingSoon": "Planning in progress, please stay tuned!"
       },
       "login": {
-        "loginTitle": "Welcome to DataSphere Studio！",
+        "loginTitle": "Welcome to 鲁班！",
         "userName": "Please enter your phone",
         "remenber": "Remember me",
         "login": "Login",

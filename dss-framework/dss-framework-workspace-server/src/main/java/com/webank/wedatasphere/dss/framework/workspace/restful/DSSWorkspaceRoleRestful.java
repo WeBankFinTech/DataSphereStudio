@@ -40,7 +40,12 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -153,6 +158,7 @@ public class DSSWorkspaceRoleRestful {
                                      @Context HttpServletResponse response,
                                      @QueryParam(WORKSPACE_ID_STR) Integer workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
+
         //如果workspaceId为null的话,那么就找到这个用户工作空间
         if (workspaceId == null || workspaceId <= 0){
             workspaceId = dssWorkspaceRoleService.getWorkspaceIdByUser(username);
@@ -176,41 +182,23 @@ public class DSSWorkspaceRoleRestful {
             LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);
             return Message.messageToResponse(Message.error("can not get roles information"));
         }
-        //判断如果是没有权限的，那么就直接干掉
-        if (roles.contains("apiUser")){
-            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, "apiUser", "apiService");
-            if(priv <= 0) {
-                roles.remove("apiUser");
-            }
-        }
+
         Message retMessage = Message.ok();
         //工作空间中，加上用户在顶部的菜单
+        // todo: 对接工作空间权限管理的配置
         if (roles.contains("analyser")){
             retMessage.data("topName", "Scriptis");
             retMessage.data("topUrl", "/home");
         } else if (roles.contains("developer")){
             retMessage.data("topName", "工作流开发");
             retMessage.data("topUrl", "/project");
-        }else if(roles.contains("apiUser") && roles.size() == 1){
+        }else if(roles.contains("apiUser")){
             retMessage.data("topName","数据服务");
             retMessage.data("topUrl", "/apiservices");
         }else{
             retMessage.data("topName", "Scriptis");
             retMessage.data("topUrl", "/home");
         }
-        //如果其他的角色也是有这个api权限的，那么就加上这个apiUser
-        boolean flag = false;
-        for (String role : roles){
-            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, role, "apiService");
-            if (priv >= 1) {
-                flag = true;
-                break;
-            }
-        }
-        if(flag && !roles.contains("apiUser")){
-            roles.add("apiUser");
-        }
-        //roles.add("apiUser");
         return Message.messageToResponse(retMessage.data("roles", roles).data("workspaceId", workspaceId));
     }
 

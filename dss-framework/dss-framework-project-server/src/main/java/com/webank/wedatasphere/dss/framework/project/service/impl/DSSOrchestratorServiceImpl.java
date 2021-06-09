@@ -23,9 +23,11 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSOrchestratorMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.*;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
@@ -33,6 +35,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.Orchestrator
 import com.webank.wedatasphere.dss.framework.project.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -49,7 +52,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DSS编排模式信息表 服务实现类
@@ -68,6 +74,8 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
     private DSSOrchestratorMapper orchestratorMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
+    @Autowired
+    private DSSProjectService dssProjectService;
 
     @Autowired
     private AppConnService appConnService;
@@ -189,6 +197,9 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
         queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
+        if (orchestratorRequest.getOrchestratorId() != null) {
+            queryWrapper.eq("orchestrator_id", orchestratorRequest.getOrchestratorId());
+        }
         if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
             queryWrapper.eq("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
         }
@@ -196,14 +207,23 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         List<OrchestratorBaseInfo> retList = new ArrayList<OrchestratorBaseInfo>(list.size());
         if (!CollectionUtils.isEmpty(list)) {
             //获取工程的权限等级
-            List<DSSProjectUser> projectUserList = projectUserService.getEditProjectList(orchestratorRequest.getProjectId(), username);
-            Integer priv = CollectionUtils.isEmpty(projectUserList) ? null : projectUserList.stream().mapToInt(DSSProjectUser::getPriv).max().getAsInt(); //获取最大权限
+            List<DSSProjectUser> projectUserList = projectUserService.getProjectUserPriv(orchestratorRequest.getProjectId(), username);
+            List<Integer> editPriv = projectUserList.stream()
+                    .map(DSSProjectUser::getPriv)
+                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                    .collect(Collectors.toList());
+            List<Integer> releasePriv = projectUserList.stream()
+                    .map(DSSProjectUser::getPriv)
+                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_RELEASE.getRank())
+                    .collect(Collectors.toList());
+
             OrchestratorBaseInfo orchestratorBaseInfo = null;
             for (DSSOrchestrator orchestrator : list) {
                 orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(orchestrator, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(ProjectStringUtils.convertList(orchestrator.getOrchestratorWay()));
-                orchestratorBaseInfo.setPriv(priv);
+                orchestratorBaseInfo.setEditable(!editPriv.isEmpty());
+                orchestratorBaseInfo.setReleasable(!releasePriv.isEmpty());
                 retList.add(orchestratorBaseInfo);
             }
         }

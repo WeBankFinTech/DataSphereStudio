@@ -18,11 +18,11 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import java.util.*;
+import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
-import com.webank.wedatasphere.dss.framework.project.entity.*;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.OrchestratorBaseI
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorCreateResponseRef;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 /**
  * <p>
@@ -77,5 +78,18 @@ public interface DSSOrchestratorService extends IService<DSSOrchestrator> {
 
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId, String dssLabel);
 
-
+    /**
+     * 删除编排模式.
+     *
+     *
+     * @param username
+     * @param dssOrchestrator
+     *            the dss orchestrator
+     * @param deleteSchedulerWorkflow
+     *            if delete scheduler workflow
+     * @throws ErrorException
+     *             the error exception
+     */
+    public void deleteOrchestrator(String username, DSSOrchestrator dssOrchestrator, Boolean deleteSchedulerWorkflow)
+        throws ErrorException;
 }

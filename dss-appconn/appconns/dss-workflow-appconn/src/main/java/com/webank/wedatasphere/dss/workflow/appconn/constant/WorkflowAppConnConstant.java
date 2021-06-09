@@ -30,5 +30,6 @@ public class WorkflowAppConnConstant {
     public static final CommonVars<String> DSS_WORKFLOW_APPLICATION_NAME_PROD =
             CommonVars.apply("wds.dss.workflow.application.name.prod", "dss-workflow-server-prod");
 
-    public static final CommonVars<String> DSS_SCHEDULE_APPCONN_NAME = CommonVars.apply("wds.dss.schedule.module.appconn.name", "schedulis");
+    public static final CommonVars<String> DSS_SCHEDULE_APPCONN_NAME = CommonVars.apply(
+        "wds.dss.schedule.module.appconn.name", "dolphinscheduler");
 }

@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * created by cooperyang on 2020/12/11
@@ -30,27 +31,29 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface ProjectMapper {
 
-
-
-    ProjectInfo getProjectInfoById(@Param("projectId")Long projectId);
-
-
+    ProjectInfo getProjectInfoById(@Param("projectId") Long projectId);
 
     @Select("Select project_id from dss_project_orchestrator where orchestrator_id = #{orchestratorId}")
     Long getProjectIdByOrcId(@Param("orchestratorId") Long orchestratorId);
 
-
     @Select("select orchestrator_name from dss_project_orchestrator where orchestrator_id = #{orchestratorId}")
     String getOrchestratorName(@Param("orchestratorId") Long orchestratorId,
-                               @Param("orchestratorVersionId") Long orchestratorVersionId);
+        @Param("orchestratorVersionId") Long orchestratorVersionId);
 
-
-
-
-    @Select("select w.`name` from dss_workspace w join dss_project p on w.`id` = p.`workspace_id` and p.id = #{projectId}")
+    @Select(
+        "select w.`name` from dss_workspace w join dss_project p on w.`id` = p.`workspace_id` and p.id = #{projectId}")
     String getWorkspaceName(@Param("projectId") Long projectId);
 
-
     void updateProjectOrcInfo(@Param("projectId") Long projectId, @Param("orchestratorId") Long orchestratorId,
-                              @Param("orchestratorVersionId") Long orchestratorVersionId);
+        @Param("orchestratorVersionId") Long orchestratorVersionId);
+
+    @Select("SELECT app_id FROM dss_orchestrator_version_info WHERE id = #{orchestratorVersionId}")
+    Long getAppIdByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
+
+    @Select("SELECT version FROM dss_orchestrator_version_info WHERE id = #{orchestratorVersionId}")
+    String getVersionByOrchestratorVersionId(@Param("orchestratorVersionId") Long orchestratorVersionId);
+
+    @Update("UPDATE dss_orchestrator_info SET comment = #{comment} WHERE id =  #{orchestratorId}")
+    Boolean updateCommentInOrchestratorInfo(@Param("comment") String comment,
+        @Param("orchestratorId") Long orchestratorId);
 }

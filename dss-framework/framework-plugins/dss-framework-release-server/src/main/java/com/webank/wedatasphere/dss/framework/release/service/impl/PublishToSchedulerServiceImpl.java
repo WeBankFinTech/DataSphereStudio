@@ -18,21 +18,24 @@
 
 package com.webank.wedatasphere.dss.framework.release.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseContext;
 import com.webank.wedatasphere.dss.framework.release.context.ReleaseEnv;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
 import com.webank.wedatasphere.dss.framework.release.job.OrchestratorPublishJob;
-import com.webank.wedatasphere.dss.framework.release.job.OrchestratorReleaseJob;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 import scala.Tuple2;
 
 /**
@@ -43,7 +46,6 @@ import scala.Tuple2;
 public class PublishToSchedulerServiceImpl implements PublishToSchedulerService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PublishToSchedulerServiceImpl.class);
-
 
     @Autowired
     private ReleaseEnv releaseEnv;
@@ -57,34 +59,62 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
         Long orchestratorId = releaseOrchestratorRequest.getOrchestratorId();
         Long orchestratorVersionId = releaseOrchestratorRequest.getOrchestratorVersionId();
         String dssLabel = releaseOrchestratorRequest.getDssLabel();
-        LOGGER.info("received a release orchestrator request releaseUser is {}, orchestratorId is {}", releaseUser, orchestratorId);
-        //1.通过orchestratorVersionId获取到project的信息
-        ProjectInfo projectInfo = releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
-        String orchestratorName = releaseEnv.getProjectService().getOrchestratorName(orchestratorId, orchestratorVersionId);
+        LOGGER.info("received a release orchestrator request releaseUser is {}, orchestratorId is {}", releaseUser,
+            orchestratorId);
 
-        //2.插入数据到数据库
-        ReleaseTask releaseTask = releaseEnv.getTaskService().addReleaseTask(releaseUser,
-                projectInfo.getProjectId(),
-                orchestratorId,
-                orchestratorVersionId, orchestratorName);
+        // 1.通过orchestratorId获取到project的信息
+        ProjectInfo projectInfo = releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
+        String orchestratorName = releaseEnv.getProjectService()
+            .getOrchestratorName(orchestratorId, orchestratorVersionId);
+
+        // 2.插入数据到数据库
+        ReleaseTask releaseTask = releaseEnv.getTaskService()
+            .addReleaseTask(releaseUser, projectInfo.getProjectId(), orchestratorId, orchestratorVersionId,
+                orchestratorName);
         //3.生成任务,然后放入到线程池中
         OrchestratorPublishJob job = new OrchestratorPublishJob();
         job.setReleaseTask(releaseTask);
         job.setReleaseEnv(releaseEnv);
         job.setWorkspace(workspace);
         job.setDssLabel(new CommonDSSLabel(dssLabel));
+        job.setComment(releaseOrchestratorRequest.getComment());
         releaseContext.submitReleaseJob(job);
         //返回具体的jobId
-        LOGGER.info("finished to get release job id for releaseUser {} orchestratorId {}, jobId is {}", releaseUser, orchestratorId, job.getJobId());
+        LOGGER.info("finished to get release job id for releaseUser {} orchestratorId {}, jobId is {}", releaseUser,
+            orchestratorId, job.getJobId());
         return releaseTask.getId();
     }
 
     @Override
     public PublishStatus getStatus(String username, Long releaseTaskId) {
         Tuple2<String, String> statusTuple = releaseContext.getReleaseJobStatus(releaseTaskId);
-        if(LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("user {} get status of {} is {}, {}", username, releaseTaskId, statusTuple._1, statusTuple._2);
         }
         return new PublishStatus(statusTuple._1, statusTuple._2, releaseTaskId);
+    }
+
+    @Override
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws Exception {
+        OrchestratorReleaseInfo orchestratorReleaseInfo = this.releaseEnv.getOrchestratorReleaseInfoService()
+            .getByOrchestratorId(orchestratorId);
+        WorkflowStatus status = new WorkflowStatus();
+        if (orchestratorReleaseInfo == null) {
+            status.setPublished(false);
+            return status;
+        }
+
+        ProjectInfo projectInfo = this.releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
+        String workspaceName = this.releaseEnv.getProjectService().getWorkspaceName(projectInfo.getProjectId());
+        String workflowStatus = this.releaseEnv.getPublishService()
+            .getSchedulerWorkflowStatus(workspaceName, projectInfo.getProjectName(),
+                orchestratorReleaseInfo.getSchedulerWorkflowId(), username);
+        if (workflowStatus == null) {
+            status.setPublished(false);
+            return status;
+        }
+        status.setPublished(true);
+        status.setReleaseState(workflowStatus);
+        return status;
     }
 }

@@ -28,7 +28,7 @@ import java.util.List;
  * created by cooperyang on 2020/11/18
  * Description:
  */
-public  interface ProjectPublishToSchedulerRef extends PublishToSchedulerRef {
+public interface ProjectPublishToSchedulerRef extends PublishToSchedulerRef {
 
     void setOrcIds(List<Long> orcIds);
 
@@ -38,7 +38,7 @@ public  interface ProjectPublishToSchedulerRef extends PublishToSchedulerRef {
 
     List<Long> getOrcAppIds();
 
-    Project  getProject();
+    Project getProject();
 
     void setProject(Project project);
 
@@ -49,5 +49,12 @@ public  interface ProjectPublishToSchedulerRef extends PublishToSchedulerRef {
     PublishType getPublishType();
 
     void setPublishType(PublishType publishType);
+
+    default Long getSchedulerWorkflowId() {
+        return null;
+    }
+
+    default void setSchedulerWorkflowId(Long schedulerWorkflowId) {
+    }
 
 }

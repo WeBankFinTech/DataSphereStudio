@@ -14,6 +14,7 @@
         :label="$t('message.orchestratorModes.orchestratorName')"
         prop="orchestratorName">
         <Input
+          :disabled="isPublished"
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>
@@ -82,7 +83,8 @@
   </Modal>
 </template>
 <script>
-import tag from '@component/tag/index.vue'
+import tag from '@component/tag/index.vue';
+import { getSchedulingStatus } from '@/apps/workflows/service/api.js';
 const FORMITEMTYPE = {
   RADIO: 'radio',
   SELECT: 'select',
@@ -122,6 +124,7 @@ export default {
     return {
       ProjectShow: false,
       originBusiness: '',
+      isPublished: false,
       FORMITEMTYPE
     };
   },
@@ -161,8 +164,11 @@ export default {
     }
   },
   watch: {
-    addProjectShow(val) {
+    async addProjectShow(val) {
       this.ProjectShow = val;
+      if(this.actionType != 'add' && val) {
+        await this.asyncGetSchedulingStatus()
+      }
     },
     ProjectShow(val) {
       if (val) {
@@ -172,6 +178,11 @@ export default {
     },
   },
   methods: {
+    asyncGetSchedulingStatus(){
+      return getSchedulingStatus(this.workflowDataCurrent.workspaceId, this.workflowDataCurrent.orchestratorId).then(data=>{
+        this.isPublished = data.published;
+      });
+    },
     // 处理编排模式值类型不同方法,最终只存数组
     modeValueTypeChange(workflowDataCurrent) {
       let currentData = JSON.parse(JSON.stringify(workflowDataCurrent));

@@ -31,21 +31,26 @@
             </Tabs>
           </Workflow>
         </div>
-        <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
-          <process
-            v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
-            :key="item.tabId"
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :query="item.query"
-            @updateWorkflowList="updateWorkflowList"
-            @isChange="isChange(index, arguments)"
-          ></process>
-          <makeUp
-            v-else
-            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-            :key="item.name"
-            :currentVal="currentVal"></makeUp>
+        <template>
+          <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
+            <process
+              v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
+              :key="item.tabId"
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :query="item.query"
+              @updateWorkflowList="updateWorkflowList"
+              @isChange="isChange(index, arguments)"
+            ></process>
+            <makeUp
+              v-else
+              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+              :key="item.name"
+              :currentVal="currentVal"></makeUp>
+          </template>
         </template>
+      </template>
+      <template v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
+        <DS :activeTab="4" class="scheduler-center"></DS>
       </template>
       <template v-else>
       <!-- 其他应用流程 -->
@@ -76,16 +81,19 @@ import storage from '@/common/helper/storage';
 import WorkflowTabList from '@/apps/workflows/module/common/tabList/index.vue';
 import MakeUp from '@/apps/workflows/module/makeUp'
 import ProjectForm from '@/components/projectForm/index.js'
-import api from '@/common/service/api';
-import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
-import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
+import api from '@/common/service/api'
+import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js'
+import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js'
+import DS from '@/apps/workflows/module/dispatch'
+
 export default {
   components: {
     Workflow: Workflow.component,
     process: Process.component,
     WorkflowTabList,
     makeUp: MakeUp.component,
-    ProjectForm
+    ProjectForm,
+    DS
   },
   data() {
     return {
@@ -122,7 +130,7 @@ export default {
       DEVPROCESS,
       ORCHESTRATORMODES,
       loading: false
-    };
+    }
   },
   watch: {
     currentVal(val, oldVal) {

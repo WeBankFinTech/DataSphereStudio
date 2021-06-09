@@ -2,14 +2,17 @@ package com.webank.wedatasphere.dss.framework.admin.restful;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.PageDomain;
+import com.webank.wedatasphere.dss.framework.admin.common.domain.ResponseEnum;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.TableDataInfo;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.SqlUtil;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.TableSupport;
-import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lvjw
@@ -39,10 +42,11 @@ public class BaseController {
     protected TableDataInfo getDataTable(List<?> list)
     {
         TableDataInfo rspData = new TableDataInfo();
-        rspData.setCode(HttpStatus.OK.value());
-        rspData.setRows(list);
+        rspData.setStatus(ResponseEnum.SUCCESS.getStatus());
+        HashMap<String, Object> data = (HashMap<String, Object>) Message.ok().data("total" , new PageInfo(list).getTotal()).data("userList" , list).getData();
+        rspData.setData(data);
         rspData.setMsg("查询成功");
-        rspData.setTotal(new PageInfo(list).getTotal());
+
         return rspData;
     }
 

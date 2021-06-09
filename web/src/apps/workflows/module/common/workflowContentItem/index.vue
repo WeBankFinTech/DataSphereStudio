@@ -64,7 +64,7 @@
   </div>
 </template>
 <script>
-import mixin from '@/common/service/mixin';
+import mixin from '@/common/service/mixin'
 export default {
   name: "WorkflowContentItem",
   props: {

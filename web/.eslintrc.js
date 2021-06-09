@@ -50,7 +50,7 @@ module.exports = {
         "no-irregular-whitespace": 0,
         'no-undef': 2,
         'no-unreachable': 'warn',
-        'no-unused-vars': 2,
+        'no-unused-vars': ['error', { "args": "none" }],
         'constructor-super': 'warn',
         'valid-typeof': 'warn',
         'one-var': 'warn',
@@ -65,11 +65,6 @@ module.exports = {
             'invalid-first-character-of-tag-name': false
         }],
         'no-tabs': 0,
-        'vue/html-indent': [2, 2, {
-            'attribute': 1,
-            'closeBracket': 0,
-            'alignAttributesVertically': false
-        }],
         'vue/require-default-prop': 0,
         'vue/component-name-in-template-casing': 0,
         'vue/html-closing-bracket-spacing': 0,

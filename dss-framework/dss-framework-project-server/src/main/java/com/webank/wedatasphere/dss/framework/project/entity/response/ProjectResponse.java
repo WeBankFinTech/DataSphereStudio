@@ -43,6 +43,8 @@ public class ProjectResponse implements Serializable {
     private String source;
     //产品
     private String product;
+    // 是否可编辑
+    private Boolean editable;
     private Boolean isArchive;
     //工程创建时间
     private Date createTime;
@@ -202,6 +204,14 @@ public class ProjectResponse implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
     @Override
     public String toString() {
         return "ResponseProjectVo{" +
@@ -214,6 +224,7 @@ public class ProjectResponse implements Serializable {
                 ", source='" + source + '\'' +
                 ", product='" + product + '\'' +
                 ", isArchive=" + isArchive +
+                ", editable=" + editable +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", releaseUsers=" + releaseUsers +

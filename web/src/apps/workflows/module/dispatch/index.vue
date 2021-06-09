@@ -12,7 +12,7 @@
         <div class="scheduler-list" v-if="activeDS == 4">
           <template>
             <!--<div class="scheduler-list-title">-->
-            <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
+              <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
             <!--</div>-->
             <dashboard @goToList="goToList"></dashboard>
           </template>
@@ -150,7 +150,6 @@ import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 import { tasksState, publishStatus, runningType, tasksStateList } from './config'
 import dashboard from './dashboard/index'
 import moment from 'moment'
-
 
 export default {
   name: 'dispatch',
@@ -815,7 +814,7 @@ export default {
           }
         }
         return cb && cb()
-      }).catch(() => {
+      }).catch(e => {
       })
     },
     getListData(page=1, data) {

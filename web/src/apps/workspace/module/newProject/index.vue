@@ -111,6 +111,7 @@ import pinyin from 'pinyin';
 import WorkflowForm from '@/apps/workflows/module/workflow/module/workflowForm.vue';
 import projectContentItem from './module/projectItem.vue';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
+import {setVirtualRoles} from '@/common/config/permissions.js';
 export default {
   components: {
     projectContentItem,
@@ -207,9 +208,14 @@ export default {
         return false;
       }
     },
+    getUserName() {
+      return storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
+    },
     getclassListData() {
       this.loading = true;
       return api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {workspaceId: +this.$route.query.workspaceId}, 'post').then((res) => {
+        
+        res.projects.map(item=>{return setVirtualRoles(item, this.getUserName())});
         this.dataList[0].dwsProjectList = res.projects;
         this.cacheData = this.dataList;
         this.dataList.forEach(item => {

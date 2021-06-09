@@ -2,22 +2,16 @@ package com.webank.wedatasphere.dss.framework.admin.restful;
 
 
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
-import com.webank.wedatasphere.dss.framework.admin.common.exception.Assert;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
-import com.webank.wedatasphere.dss.framework.admin.common.domain.ResponseEnum;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
-import com.webank.wedatasphere.dss.framework.admin.pojo.entity.TreeSelect;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -73,7 +67,7 @@ public class DssAdminDeptController {
     @GetMapping("/treeselect")
     public Message treeselect(DssAdminDept dept) {
         List<DssAdminDept> depts = dssAdminDeptService.selectDeptList(dept);
-        return Message.ok().data("" , dssAdminDeptService.buildDeptTreeSelect(depts)).message("树形部门获取成功");
+        return Message.ok().data("deptTree" , dssAdminDeptService.buildDeptTreeSelect(depts)).message("树形部门获取成功");
     }
 
 
@@ -84,7 +78,7 @@ public class DssAdminDeptController {
     }
 
     @ApiOperation("修改部门")
-    @PutMapping
+    @PostMapping("/edit")
     public Message edit(@Validated @RequestBody DssAdminDept dept) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dept))) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
@@ -103,7 +97,7 @@ public class DssAdminDeptController {
      * 删除部门
      */
     @ApiOperation("删除部门")
-    @DeleteMapping("/{deptId}")
+    @PostMapping("/{deptId}")
     public Message remove(@PathVariable Long deptId) {
         if (dssAdminDeptService.hasChildById(deptId)) {
             return Message.error().message("存在下级部门,不允许删除");

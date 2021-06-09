@@ -72,6 +72,14 @@
         SELECT menu_id from dss_menu_role WHERE role_id = #{roleId} and workspace_id = #{workspaceId} and priv >= 1
     </select>
 
+    <select id="getUserMenuApplicationId" resultType="java.lang.Long">
+        SELECT dm.menu_application_id
+        FROM dss_workspace_user_role dwur
+        LEFT JOIN dss_menu_role dmr ON dwur.role_id = dmr.role_id
+        LEFT JOIN dss_menu dm ON dmr.menu_id = dm.id
+        WHERE dwur.workspace_id=#{workspaceId} AND dwur.username=#{username} AND dmr.workspace_id=#{workspaceId}
+    </select>
+
     <select id="getSpaceMenu" resultMap="dss_menu_map">
         SELECT * from dss_menu WHERE id = #{menuId}
     </select>

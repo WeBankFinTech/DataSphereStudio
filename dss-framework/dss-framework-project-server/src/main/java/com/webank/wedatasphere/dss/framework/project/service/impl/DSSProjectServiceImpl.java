@@ -23,8 +23,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
@@ -160,29 +162,36 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             projectResponseList.add(projectResponse);
-            /**
-             * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-             * 从而得到：查看权限用户、编辑权限用户、发布权限用户
-             */
-            String pusername = projectVo.getPusername();
-            if (StringUtils.isEmpty(pusername)) {
-                continue;
-            }
-            Map<String, List<String>> userPricMap = new HashMap<>();
-            String[] tempstrArr = pusername.split(MODE_SPLIT);
 
-            for (String s : tempstrArr) {
-                String[] strArr = s.split(KEY_SPLIT);
-                String key = strArr[0] + KEY_SPLIT + strArr[1];
-                userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
-                userPricMap.get(key).add(strArr[2]);
+            String pusername = projectVo.getPusername();
+            String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
+                    + KEY_SPLIT + projectRequest.getUsername();
+
+            // 用户是否具有编辑权限
+            if (!StringUtils.isEmpty(pusername) && pusername.contains(editPriv)) {
+                projectResponse.setEditable(true);
+                Map<String, List<String>> userPricMap = new HashMap<>();
+                String[] tempstrArr = pusername.split(MODE_SPLIT);
+
+                /**
+                 * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+                 * 从而得到：查看权限用户、编辑权限用户、发布权限用户
+                 */
+                for (String s : tempstrArr) {
+                    String[] strArr = s.split(KEY_SPLIT);
+                    String key = strArr[0] + KEY_SPLIT + strArr[1];
+                    userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                    userPricMap.get(key).add(strArr[2]);
+                }
+                List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+                List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
+                List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
+                projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
+                projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+            } else {
+                projectResponse.setEditable(false);
             }
-            List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
-            List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
-            List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
-            projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
-            projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
-            projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
         }
         return projectResponseList;
     }
@@ -219,9 +228,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Override
     public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) {
         LOGGER.warn("user {} begins to delete project {}", username, projectDeleteRequest);
-        //1.check权限
-        //2.进行屏蔽
-        //todo 进行真实的删除
         projectMapper.deleteProject(projectDeleteRequest.getId());
         LOGGER.warn("user {} deleted project {}", username, projectDeleteRequest);
     }
@@ -230,5 +236,18 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     public List<String> getProjectAbilities(String username) {
         LOGGER.info("{} begins to get project ability", username);
         return Arrays.asList(SUPPORT_ABILITY.trim().split(","));
+    }
+
+    @Override
+    public boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException  {
+        //校验当前登录用户是否含有删除权限，默认创建用户可以删除工程
+        QueryWrapper<DSSProject> queryWrapper = new QueryWrapper<DSSProject>();
+        queryWrapper.eq("id", projectId);
+        queryWrapper.eq("create_by", username);
+        long count = projectMapper.selectCount(queryWrapper);
+        if (count == 0) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
+        }
+        return true;
     }
 }

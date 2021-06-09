@@ -48,13 +48,14 @@ import java.util.stream.Collectors;
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
     @Autowired
-    private DSSProjectUserMapper  projectUserMapper;
+    private DSSProjectUserMapper projectUserMapper;
     @Autowired
     @Qualifier("projectServerBMLService")
     private BMLService bmlService;
 
     /**
      * 是否有修改工程权限
+     *
      * @param projectId
      * @param username
      * @return
@@ -63,107 +64,89 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     public boolean isEditProjectAuth(Long projectId, String username) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<DSSProjectUser>();
-        queryWrapper.eq("project_id",projectId);
-        queryWrapper.eq("username",username);
-        queryWrapper.ge("priv",ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
+        queryWrapper.eq("project_id", projectId);
+        queryWrapper.eq("username", username);
+        queryWrapper.ge("priv", ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
         long count = projectUserMapper.selectCount(queryWrapper);
-        if(count == 0){
-            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(),ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
+        if (count == 0) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
         }
         return true;
     }
+
     /**
      * 根据用户名和工程id获取工程权限
+     *
      * @param projectId
      * @param username
      * @return
      */
     @Override
-    public List<DSSProjectUser> getEditProjectList(Long projectId, String username){
+    public List<DSSProjectUser> getProjectUserPriv(Long projectId, String username) {
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<DSSProjectUser>();
-        queryWrapper.eq("project_id",projectId);
-        queryWrapper.eq("username",username);
+        queryWrapper.eq("project_id", projectId);
+        queryWrapper.eq("username", username);
         return projectUserMapper.selectList(queryWrapper);
     }
 
     /**
      * 保存工程与用户关系
+     *
      * @param projectID
      * @param request
      */
     @Override
-    public void saveProjectUser(Long projectID,String username, ProjectCreateRequest request){
-        //將创建人默认为发布权限
-        List<String> releaseUsers = request.getReleaseUsers();
-        if(releaseUsers==null){
-            if(!request.getEditUsers().contains(username)){
-                request.getEditUsers().add(username);
-            }
-            releaseUsers = new ArrayList<>();
-        }else{
-            if(!releaseUsers.contains(username)){
-                releaseUsers.add(username);
-            }
+    public void saveProjectUser(Long projectID, String username, ProjectCreateRequest request) {
+        // 创建用户默认赋予编辑权限
+        if (!request.getEditUsers().contains(username)) {
+            request.getEditUsers().add(username);
         }
         //批量保存
-        saveBatch(request.getWorkspaceId(),projectID,releaseUsers,request.getEditUsers(),request.getAccessUsers());
-
-        //获取所有编辑权限的用户
-        List<String> sumEditUsers = ProjectUserUtils.getEditUserList(releaseUsers, request.getEditUsers());
+        saveBatch(request.getWorkspaceId(), projectID, request.getReleaseUsers(), request.getEditUsers(), request.getAccessUsers());
         //去bml建一个工程
-        bmlService.createBmlProject(username, request.getName(), sumEditUsers, request.getAccessUsers());
+        bmlService.createBmlProject(username, request.getName(), request.getEditUsers(), request.getAccessUsers());
     }
 
     /**
      * 修改工程与用户关系
+     *
      * @param dbProject
      * @param modifyRequest
      */
     @Override
     public void modifyProjectUser(DSSProject dbProject, ProjectModifyRequest modifyRequest) {
+        // TODO: 新增代替删除
         projectUserMapper.deleteAllPriv(dbProject.getId());
-        //將创建人默认为发布权限
-        List<String> releaseUsers = modifyRequest.getReleaseUsers();
-        String username = dbProject.getUsername();
-        if(releaseUsers==null){
-            if(!modifyRequest.getEditUsers().contains(username)){
-                modifyRequest.getEditUsers().add(username);
-            }
-            releaseUsers = new ArrayList<>();
-        }else{
-            if(!releaseUsers.contains(username)){
-                releaseUsers.add(username);
-            }
+
+        if (!modifyRequest.getEditUsers().contains(dbProject.getUsername())) {
+            modifyRequest.getEditUsers().add(dbProject.getUsername());
         }
         //批量保存
-        saveBatch(modifyRequest.getWorkspaceId(),dbProject.getId(),releaseUsers,modifyRequest.getEditUsers(),modifyRequest.getAccessUsers());
-
-        //获取所有编辑权限的用户
-        List<String> sumEditUsers = ProjectUserUtils.getEditUserList(releaseUsers, modifyRequest.getEditUsers());
+        saveBatch(modifyRequest.getWorkspaceId(), dbProject.getId(), modifyRequest.getReleaseUsers(), modifyRequest.getEditUsers(), modifyRequest.getAccessUsers());
         //更新底层的权限
-        bmlService.updateProjectPriv(dbProject.getName(), username, sumEditUsers, modifyRequest.getAccessUsers());
+        bmlService.updateProjectPriv(dbProject.getName(), dbProject.getUsername(), modifyRequest.getEditUsers(), modifyRequest.getAccessUsers());
     }
 
     @Override
     public List<DSSProjectUser> getListByParam(Long workspaceId, String username) {
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("workspace_id",workspaceId);
-        queryWrapper.eq("username",username);
-        queryWrapper.ge("priv",ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+        queryWrapper.eq("workspace_id", workspaceId);
+        queryWrapper.eq("username", username);
+        queryWrapper.ge("priv", ProjectUserPrivEnum.PRIV_ACCESS.getRank());
         List<DSSProjectUser> dssProjectUserList = projectUserMapper.selectList(queryWrapper);
         return dssProjectUserList;
     }
 
     //批量保存
-    public void saveBatch(Long workspaceId,Long projectID,List<String> releaseUsers,List<String> editUsers,List<String> accessUsers){
+    public void saveBatch(Long workspaceId, Long projectID, List<String> releaseUsers, List<String> editUsers, List<String> accessUsers) {
         List<String> realReleaseUsers = releaseUsers.stream().distinct().collect(Collectors.toList());
         List<String> realEditUsers = editUsers.stream().distinct().collect(Collectors.toList());
         List<String> realAccessUsers = accessUsers.stream().distinct().collect(Collectors.toList());
         List<DSSProjectUser> addList = new ArrayList<>();
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realReleaseUsers,ProjectUserPrivEnum.PRIV_RELEASE.getRank()));
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realEditUsers, ProjectUserPrivEnum.PRIV_EDIT.getRank()));
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realAccessUsers,ProjectUserPrivEnum.PRIV_ACCESS.getRank()));
-        if(CollectionUtils.isEmpty(addList)){
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realReleaseUsers, ProjectUserPrivEnum.PRIV_RELEASE.getRank()));
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realEditUsers, ProjectUserPrivEnum.PRIV_EDIT.getRank()));
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realAccessUsers, ProjectUserPrivEnum.PRIV_ACCESS.getRank()));
+        if (CollectionUtils.isEmpty(addList)) {
             return;
         }
         //分批插入

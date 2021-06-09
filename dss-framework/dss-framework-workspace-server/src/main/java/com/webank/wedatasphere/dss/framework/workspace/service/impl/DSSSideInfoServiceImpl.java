@@ -19,11 +19,11 @@
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.Sidebar;
 import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarContentVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarVO;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarContentMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
@@ -35,7 +35,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +55,10 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
     private SidebarMapper sidebarMapper;
     @Autowired
     private SidebarContentMapper sidebarContentMapper;
+    @Autowired
+    private DSSWorkspaceRoleMapper workspaceRoleMapper;
 
+    private static final String ADMIN = "admin";
 
     @Override
     public List<SidebarVO> getSidebarVOList(String username, Integer workspaceId,boolean isEnglish) {
@@ -71,15 +78,19 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
         sidebarQueryContentWrapper.in("sidebar_id", sideBarIds);
         sidebarQueryContentWrapper.orderByAsc("order_num");
         List<SidebarContent> sidebarContentList = sidebarContentMapper.selectList(sidebarQueryContentWrapper);
-
+        Boolean isAdmin = workspaceRoleMapper.getAllRoles(username, workspaceId).contains(ADMIN);
         //封装返回数据
-        return getSidebarVOS(retList, sidebarList, sidebarContentList,isEnglish);
+        return getSidebarVOS(retList, sidebarList, sidebarContentList,isEnglish, isAdmin);
     }
 
     //封装返回数据
-    private List<SidebarVO> getSidebarVOS(List<SidebarVO> retList, List<Sidebar> sidebarList, List<SidebarContent> sidebarContentList,boolean isEnglish) {
+    private List<SidebarVO> getSidebarVOS(List<SidebarVO> retList, List<Sidebar> sidebarList,
+                                          List<SidebarContent> sidebarContentList,boolean isEnglish, boolean isAdmin) {
         Map<Integer,List<SidebarContent>> contentMap = new HashMap<>();
         for(SidebarContent sidebarContent : sidebarContentList){
+            if (!isAdmin && ADMIN.equals(sidebarContent.getRemark())) {
+                continue;
+            }
             Integer sidebarId = sidebarContent.getSidebarId();
             if(contentMap.get(sidebarId)==null){
                 contentMap.put(sidebarId,new ArrayList<>());

@@ -21,7 +21,13 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -101,4 +107,8 @@ public interface DSSWorkspaceUserMapper {
             @Result(property = "workspaceId", column = "workspace_id")
     })
     List<DSSWorkspaceUser> getWorkspaceUsersByRole(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
+
+    List<String> getWorkspaceEditUsers(int workspaceId);
+
+    List<String> getWorkspaceReleaseUsers(int workspaceId);
 }

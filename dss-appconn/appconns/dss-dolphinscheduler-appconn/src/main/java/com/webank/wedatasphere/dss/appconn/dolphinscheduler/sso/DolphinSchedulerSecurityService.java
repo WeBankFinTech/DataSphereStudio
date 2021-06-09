@@ -1,56 +1,69 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
 
-import com.webank.wedatasphere.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerTokenOperation;
+import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public final class DolphinSchedulerSecurityService {
+/**
+ * The type Dolphin scheduler security service.
+ *
+ * @author yuxin.yuan
+ * @date 2021/06/08
+ */
+public final class DolphinSchedulerSecurityService implements RefQueryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerSecurityService.class);
 
-    private static Properties userToken;
-
     private static DolphinSchedulerSecurityService instance;
 
-    private DolphinSchedulerSecurityService() {
+    private String baseUrl;
+
+    private DolphinSchedulerSecurityService(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public static DolphinSchedulerSecurityService getInstance(String baseUrl) {
         if (null == instance) {
             synchronized (DolphinSchedulerSecurityService.class) {
                 if (null == instance) {
-                    instance = new DolphinSchedulerSecurityService();
+                    instance = new DolphinSchedulerSecurityService(baseUrl);
                 }
             }
         }
         return instance;
     }
 
-    static {
-        Utils.defaultScheduler().scheduleAtFixedRate(() -> {
-            logger.info("开始读取用户token文件");
-            Properties properties = new Properties();
-            try {
-                properties.load(
-                    DolphinSchedulerSecurityService.class.getClassLoader().getResourceAsStream("token.properties"));
-                userToken = properties;
-            } catch (IOException e) {
-                logger.error("读取文件失败:", e);
-            }
-        }, 0, 10, TimeUnit.MINUTES);
-    }
+    public String getUserToken(String user) throws ExternalOperationFailedException {
+        CommonRequestRef requestRef = new CommonRequestRef();
+        requestRef.setParameter("userName", user);
 
-    public String getUserToken(String user) {
-        //直接从配置文件中读取，有需求可以自己实现
-        Object token = userToken.get(user);
+        ResponseRef responseRef = getRefQueryOperation().query(requestRef);
+        String token = (String)responseRef.getValue("token");
         if (token == null) {
             return "";
         }
-        return token.toString();
+        return token;
     }
 
+    @Override
+    public RefQueryOperation getRefQueryOperation() {
+        return DolphinSchedulerTokenOperation.getInstance(baseUrl);
+    }
+
+    @Override
+    public DevelopmentService getDevelopmentService() {
+        return null;
+    }
+
+    @Override
+    public void setDevelopmentService(DevelopmentService developmentService) {
+
+    }
 }

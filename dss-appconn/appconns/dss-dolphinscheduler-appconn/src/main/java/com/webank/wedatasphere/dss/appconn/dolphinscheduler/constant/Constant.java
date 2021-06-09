@@ -39,4 +39,5 @@ public class Constant {
      */
     public final static int DS_RESULT_CODE_SUCCESS = 0;
     public final static int DS_RESULT_CODE_PROJECT_ALREADY_EXISTS = 10019;
+    public final static String DS_ADMIN_USERNAME = "admin";
 }

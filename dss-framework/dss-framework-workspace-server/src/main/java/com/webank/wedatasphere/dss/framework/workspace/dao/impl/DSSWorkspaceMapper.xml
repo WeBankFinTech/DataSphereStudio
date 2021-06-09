@@ -51,13 +51,13 @@
     </resultMap>
 
     <sql id="dss_workspace_main">
-        id,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`
+       id,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`
     </sql>
 
     <insert id="createWorkSpace" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
         INSERT INTO dss_workspace(<include refid = "dss_workspace_main" />)
         VALUES
-        (#{id},#{name},#{label},#{description},#{createBy},#{createTime},#{department},#{product},#{source},#{lastUpdateTime},#{lastUpdateUser})
+        (#{id},#{name},#{label},#{description},#{createBy},#{createTime},#{department},#{product},#{source},#{lastUpdateTime},#{lastUpdateUser},#{workspaceType})
     </insert>
 
     <sql id="dss_add_workspace_user">

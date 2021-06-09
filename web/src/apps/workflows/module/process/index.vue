@@ -50,6 +50,7 @@
             :version="item.data.version"
             :product="query.product"
             :readonly="!checkEditable(query)"
+            :publish="query.releasable"
             :isLatest="query.isLatest === 'true'"
             :tabs="tabs"
             :open-files="openFiles"
@@ -151,11 +152,16 @@ export default {
     // 没有权限的和历史的都不可编辑
     checkEditable(item) {
       // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
-      if ([2,3].includes(item.priv) && this.query.readonly !== 'true') {
+      if (item.editable && this.query.readonly !== 'true') {
         return true
       } else {
         return false
       }
+      // if ([2,3].includes(item.priv) && this.query.readonly !== 'true') {
+      //   return true
+      // } else {
+      //   return false
+      // }
     },
     gotoAction(back = -1) {
       if (back) {

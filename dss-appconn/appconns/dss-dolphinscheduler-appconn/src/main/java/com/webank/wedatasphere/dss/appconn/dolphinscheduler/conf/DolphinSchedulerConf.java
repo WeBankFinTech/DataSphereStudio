@@ -26,4 +26,6 @@ public interface DolphinSchedulerConf {
 
     CommonVars<String> APP_NAME = CommonVars.apply("wds.dss.appconn.dolphinscheduler.app.name", "dolphinscheduler");
 
+    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
+
 }

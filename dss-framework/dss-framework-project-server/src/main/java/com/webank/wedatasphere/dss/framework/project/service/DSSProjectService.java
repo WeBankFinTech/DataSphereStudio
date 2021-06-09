@@ -84,4 +84,6 @@ public interface DSSProjectService  extends IService<DSSProject> {
     void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest);
 
     List<String> getProjectAbilities(String username);
+
+    boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
 }

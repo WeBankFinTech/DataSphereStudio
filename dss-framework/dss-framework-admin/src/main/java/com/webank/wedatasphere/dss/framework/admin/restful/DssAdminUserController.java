@@ -12,11 +12,9 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -51,7 +49,7 @@ public class DssAdminUserController extends BaseController {
     }
 
     @ApiOperation("添加用户")
-    @PostMapping
+    @PostMapping("/add")
     public Message add(@Validated @RequestBody DssUser user) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
             return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -73,7 +71,7 @@ public class DssAdminUserController extends BaseController {
         return Message.ok().data("users" , dssAdminUserService.selectUserById(userId));
     }
     @ApiOperation("编辑用户")
-    @PutMapping
+    @PostMapping("/edit")
     public Message edit(@Validated @RequestBody DssUser user) {
        if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {

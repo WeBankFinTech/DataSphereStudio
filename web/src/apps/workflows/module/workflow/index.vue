@@ -23,7 +23,7 @@
                 <Icon :size="20" type="ios-add"></Icon>
                 {{$t('message.orchestratorModes.createOrchestrator')}}
               </Button>
-              <Button class="button-text" style="margin-left: 20px" type="primary" @click="orchestratorImport">
+              <Button class="button-text" style="margin-left: 20px" type="primary" @click="orchestratorImport" v-if="checkEditable">
                 {{$t('message.orchestratorModes.importOrchestrator')}}
               </Button>
             </div>
@@ -372,7 +372,8 @@ export default {
         id: node.id,
         name: node.title,
         version: '',
-        priv: node.priv
+        priv: node.priv,
+        editable: node.editable
       })
     },
     // 点击工程跳转到工作流编辑
@@ -384,7 +385,8 @@ export default {
         name: subItem.orchestratorName,
         version: String(subItem.orchestratorVersionId),
         orchestratorMode: subItem.orchestratorMode,
-        priv: subItem.priv // 权限字段
+        priv: subItem.priv, // 权限字段
+        editable: subItem.editable
       })
     },
     // 查看版本详情

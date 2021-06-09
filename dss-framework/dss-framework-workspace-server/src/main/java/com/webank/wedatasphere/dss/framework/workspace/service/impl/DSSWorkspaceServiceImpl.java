@@ -20,11 +20,39 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRolePriv;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceComponentPrivVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceMenuPrivVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SecondaryWorkspaceMenuVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
-import com.webank.wedatasphere.dss.framework.workspace.dao.*;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSComponentRoleMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceHomepageMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceInfoMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMenuMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.WorkspaceMapper;
 import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceDuplicateNameException;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
@@ -41,7 +69,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 /**
@@ -283,6 +319,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
             map.get(menuId).add(dssWorkspaceMenuPriv);
         }
+        // 得到(menuId, dssWorkspaceMenuRolePrivs)
         map.forEach((k,v) ->{
             DSSWorkspaceMenuPrivVO vo = new DSSWorkspaceMenuPrivVO();
             vo.setId(k);
@@ -494,7 +531,31 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         for (OnestopMenuVo menuVo : menuVos) {
             Long menuId = menuVo.getId();
             List<OnestopMenuAppInstanceVo> menuAppInstanceVos = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstancesEn(menuId);
+
             for (OnestopMenuAppInstanceVo menuAppInstanceVo : menuAppInstanceVos) {
+                Map<String, String> nameAndUrl = new HashMap<>();
+                if ("visualis".equals(menuAppInstanceVo.getName())){
+                    nameAndUrl.put("进入开发中心", menuAppInstanceVo.getAccessButtonUrl());
+                    nameAndUrl.put("进入生产中心", menuAppInstanceVo.getAccessButtonUrl());
+                }else{
+                    nameAndUrl.put(menuAppInstanceVo.getAccessButton(), menuAppInstanceVo.getAccessButtonUrl());
+                }
+                menuAppInstanceVo.setNameAndUrls(nameAndUrl);
+            }
+            menuVo.setAppInstances(menuAppInstanceVos);
+        }
+        return menuVos;
+    }
+
+    private List<OnestopMenuVo> getMenuAppInstances(List<OnestopMenuVo> menuVos, List<Long> userMenuApplicationId,
+                                                    boolean isChinese) {
+        for (OnestopMenuVo menuVo : menuVos) {
+            Long menuId = menuVo.getId();
+            List<OnestopMenuAppInstanceVo> menuAppInstanceVos = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstancesEn(menuId);
+
+            for (OnestopMenuAppInstanceVo menuAppInstanceVo : menuAppInstanceVos) {
+                // 如果该工作空间中用户拥有该组件权限，则该组件的accessable属性为true；否则为false
+                menuAppInstanceVo.setAccessable(userMenuApplicationId.contains(menuAppInstanceVo.getId()));
                 Map<String, String> nameAndUrl = new HashMap<>();
                 if ("visualis".equals(menuAppInstanceVo.getName())){
                     nameAndUrl.put("进入开发中心", menuAppInstanceVo.getAccessButtonUrl());
@@ -512,7 +573,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<OnestopMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese) {
         List<OnestopMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
-        return getMenuAppInstances(applicationMenuVos, isChinese);
+        List<Long> userMenuApplicationId = dssWorkspaceMapper.getUserMenuApplicationId(username, workspaceId);
+        return getMenuAppInstances(applicationMenuVos, userMenuApplicationId, isChinese);
     }
 
     @Override

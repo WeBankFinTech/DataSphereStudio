@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
@@ -67,7 +68,7 @@ public class DSSWorkspaceUserRestful {
 
     @GET
     @Path("getWorkspaceUsers")
-    public Response getWorkspaceUsers(@Context HttpServletRequest request, @QueryParam(WORKSPACE_ID_STR) String workspaceId,
+    public Response getWorkspaceUsers(@Context HttpServletRequest request, @QueryParam("workspaceId") String workspaceId,
                                       @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize,
                                       @QueryParam("department") String department, @QueryParam("username") String username,
                                       @QueryParam("roleName") String roleName){
@@ -91,13 +92,13 @@ public class DSSWorkspaceUserRestful {
             return Message.messageToResponse(Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0)));
         }else{
             List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUserVO> workspaceUsers =
+            List<DSSWorkspaceUser01> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
-            PageInfo<DSSWorkspaceUserVO> pageInfo = new PageInfo<>(workspaceUsers);
-            List<DSSWorkspaceUserVO> list = pageInfo.getList();
+            PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
+            List<DSSWorkspaceUser01> list = pageInfo.getList();
             long total = pageInfo.getTotal();
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.messageToResponse(Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0)));
+            return Message.messageToResponse(Message.ok().data("workspaceUsers", list).data("total", totals.get(0)));
         }
     }
 
@@ -113,7 +114,8 @@ public class DSSWorkspaceUserRestful {
     @Path("addWorkspaceUser")
     public Response addWorkspaceUser(@Context HttpServletRequest request, JsonNode jsonNode){
         //todo 工作空间添加用户
-        String creator = SecurityFilter.getLoginUsername(request);
+//        String creator = SecurityFilter.getLoginUsername(request);
+        String creator = "demo";
         List<Integer> roles = new ArrayList<>();
         if (jsonNode.get("roles").isArray()){
             for (JsonNode role : jsonNode.get("roles")){
@@ -121,8 +123,9 @@ public class DSSWorkspaceUserRestful {
             }
         }
         int workspaceId = jsonNode.get("workspaceId").getIntValue();
-        String userName = jsonNode.get("username").getTextValue();
-        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator);
+        String userName = jsonNode.get("userName").getTextValue();
+        String userId = String.valueOf(jsonNode.get("userId").getBigIntegerValue());
+        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator,userId);
         return Message.messageToResponse(Message.ok());
     }
 

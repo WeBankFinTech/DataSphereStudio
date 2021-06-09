@@ -156,6 +156,8 @@ public class DSSFrameworkProjectRestfulApi {
     public Response deleteProject(@Context HttpServletRequest request, @Valid ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         try{
+            // 检查是否具有删除项目权限
+            projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
             projectService.deleteProject(username,projectDeleteRequest);
             return RestfulUtils.dealOk("删除工程成功");
         }catch(final Throwable t){

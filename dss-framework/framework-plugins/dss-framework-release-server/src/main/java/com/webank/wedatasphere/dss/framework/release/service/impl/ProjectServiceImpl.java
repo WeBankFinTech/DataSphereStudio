@@ -43,7 +43,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectMapper projectMapper;
 
-
     @Override
     public ProjectInfo getProjectInfoByOrcVersionId(Long orchestratorVersionId) {
         return null;
@@ -51,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     /**
      * 封装工程信息,最后以json的形式进行返回
+     *
      * @return 封装之后的json
      */
     @Override
@@ -89,16 +89,24 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.getOrchestratorName(orchestratorId, orchestratorVersionId);
     }
 
-
     @Override
     public String getWorkspaceName(Long projectId) {
         return projectMapper.getWorkspaceName(projectId);
     }
 
-
     @Override
     public void updateProjectOrcInfo(Long projectId, Long orchestratorId, Long orchestratorVersionId) {
         projectMapper.updateProjectOrcInfo(projectId, orchestratorId, orchestratorVersionId);
+    }
+
+    @Override
+    public Long getAppIdByOrchestratorVersionId(Long orchestratorVersionId) {
+        return projectMapper.getAppIdByOrchestratorVersionId(orchestratorVersionId);
+    }
+
+    @Override
+    public Boolean updateCommentInOrchestratorInfo(String comment, Long orchestratorId) {
+        return projectMapper.updateCommentInOrchestratorInfo(comment, orchestratorId);
     }
 }
 

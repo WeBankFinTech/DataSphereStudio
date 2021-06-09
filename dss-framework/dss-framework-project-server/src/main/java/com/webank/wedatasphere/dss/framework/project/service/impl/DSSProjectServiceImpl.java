@@ -167,8 +167,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
                     + KEY_SPLIT + projectRequest.getUsername();
 
-            // 用户是否具有编辑权限
-            if (!StringUtils.isEmpty(pusername) && pusername.contains(editPriv)) {
+            // 用户是否具有编辑权限  编辑权限和创建者都有
+            if (!StringUtils.isEmpty(pusername) &&
+                    (pusername.contains(editPriv) || projectRequest.getUsername() == projectVo.getCreateBy())) {
                 projectResponse.setEditable(true);
                 Map<String, List<String>> userPricMap = new HashMap<>();
                 String[] tempstrArr = pusername.split(MODE_SPLIT);

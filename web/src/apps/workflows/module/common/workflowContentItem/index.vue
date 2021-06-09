@@ -131,11 +131,12 @@ export default {
   methods: {
     checkEditable(item) {
       // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
-      if ([2, 3].includes(item.priv)) {
-        return true
-      } else {
-        return false
-      }
+      return item.editable;  //后端新增字段
+      // if ([2, 3].includes(item.priv)) {
+      //   return true
+      // } else {
+      //   return false
+      // }
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

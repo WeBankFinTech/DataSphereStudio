@@ -41,6 +41,10 @@ public class DSSOrchestratorInfo {
 
     private String uses;
 
+    private Boolean editable;
+
+    private Boolean releasable;
+
     private String appConnName;
 
     private Long projectId;
@@ -128,6 +132,22 @@ public class DSSOrchestratorInfo {
 
     public void setAppConnName(String appConnName) {
         this.appConnName = appConnName;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public Boolean getReleasable() {
+        return releasable;
+    }
+
+    public void setReleasable(Boolean releasable) {
+        this.releasable = releasable;
     }
 
     public Long getId() {

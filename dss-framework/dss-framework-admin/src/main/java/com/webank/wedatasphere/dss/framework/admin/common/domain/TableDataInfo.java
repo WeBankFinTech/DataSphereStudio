@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
 
 public class TableDataInfo implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,12 +14,12 @@ public class TableDataInfo implements Serializable {
     /**
      * 列表数据
      */
-    private List<?> rows;
+    private HashMap<String,Object > data;
 
     /**
      * 消息状态码
      */
-    private int code;
+    private int status;
 
     /**
      * 消息内容
@@ -35,11 +35,11 @@ public class TableDataInfo implements Serializable {
     /**
      * 分页
      *
-     * @param list  列表数据
+     * @param data  列表数据
      * @param total 总记录数
      */
-    public TableDataInfo(List<?> list, int total) {
-        this.rows = list;
+    public TableDataInfo(HashMap<String,Object > data, int total) {
+        this.data = data;
         this.total = total;
     }
 
@@ -51,20 +51,20 @@ public class TableDataInfo implements Serializable {
         this.total = total;
     }
 
-    public List<?> getRows() {
-        return rows;
+    public HashMap<String,Object > getData() {
+        return data;
     }
 
-    public void setRows(List<?> rows) {
-        this.rows = rows;
+    public void setData(HashMap<String,Object > data) {
+        this.data = data;
     }
 
-    public int getCode() {
-        return code;
+    public int getStatus() {
+        return status;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getMsg() {

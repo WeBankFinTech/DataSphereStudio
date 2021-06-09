@@ -22,6 +22,7 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const webpack = require('webpack')
 const apps = require('./src/config.json')
 
@@ -180,7 +181,24 @@ module.exports = {
         '@component': path.resolve(__dirname, './src/components')
       }
     },
-    plugins
+    plugins,
+    optimization:{
+      minimizer:[
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            // output: {
+            //   comments: false
+            // },
+            compress: {
+              warnings: false,
+              drop_debugger: true, // 去掉debugger
+              drop_console: true,  // 去掉console
+              pure_funcs: ['console.log']// 移除console
+            }
+          }
+        })
+      ]
+    }
   },
   // 选项...
   pluginOptions: {

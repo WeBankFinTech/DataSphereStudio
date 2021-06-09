@@ -74,7 +74,7 @@ public class DSSWorkspaceRestful {
         String description = node.get("description").getTextValue();
         String stringTags = node.get("tags").getTextValue();
         String productName = node.get("productName").getTextValue();
-        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName);
+        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName,"");
         return Message.messageToResponse(Message.ok().data("workspaceId", workspaceId).data("workspaceName",workSpaceName));
     }
 

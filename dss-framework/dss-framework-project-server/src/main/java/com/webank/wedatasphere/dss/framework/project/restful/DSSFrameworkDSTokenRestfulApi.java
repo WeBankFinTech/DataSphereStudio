@@ -1,42 +1,49 @@
-/*
- *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *
- */
+
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import com.google.gson.*;
-import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
-import com.webank.wedatasphere.dss.framework.project.utils.DateUtil;
-import com.webank.wedatasphere.dss.framework.project.utils.HttpClientUtil;
-import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
+import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
+import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.utils.DateUtil;
+import com.webank.wedatasphere.dss.framework.project.utils.HttpClientUtil;
+import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
+import com.webank.wedatasphere.dss.framework.release.utils.ReleaseConf;
+import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 
 /**
  * @author allenlliu
@@ -49,10 +56,57 @@ import java.util.*;
 @Produces(MediaType.APPLICATION_JSON)
 @Component
 public class DSSFrameworkDSTokenRestfulApi {
-    private static final Logger LOG = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
+    private static final Logger logger = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
+
+    @Autowired
+    private AppConnService appConnService;
+
+    private SchedulerAppConn schedulerAppConn;
+
+    @PostConstruct
+    public void init() {
+        schedulerAppConn =
+            (SchedulerAppConn)appConnService.getAppConn(ReleaseConf.DSS_SCHEDULE_APPCONN_NAME.getValue());
+    }
 
     @GET
     @Path("/ds/token")
+    public Response dsApiServiceTokenCreate(@Context HttpServletRequest req) {
+        String userName = SecurityFilter.getLoginUsername(req);
+
+        if (schedulerAppConn == null) {
+            logger.error("scheduler appconn is null, can not get scheduler api access token");
+            return RestfulUtils.dealError("scheduler appconn is null");
+        }
+
+        SchedulerStructureStandard schedulerStructureStandard =
+            (SchedulerStructureStandard)schedulerAppConn.getAppStandards().stream()
+                .filter(appStandard -> appStandard instanceof SchedulerStructureStandard).findAny().orElse(null);
+        if (schedulerStructureStandard == null) {
+            logger.error("scheduler structure standard is null, can not continue");
+            return RestfulUtils.dealError("scheduler Structure Standard is null");
+        }
+
+        RefQueryService tokenQueryService = schedulerStructureStandard.getQueryService();
+        RefQueryOperation tokenRefQueryOperation = tokenQueryService.getRefQueryOperation();
+        if (tokenRefQueryOperation == null) {
+            logger.error("scheduler token query operation is null, can not continue");
+            return RestfulUtils.dealError("scheduler token query operation is null");
+        }
+
+        CommonRequestRef requestRef = new CommonRequestRef();
+        requestRef.setParameter("userName", userName);
+        try {
+            ResponseRef responseRef = tokenRefQueryOperation.query(requestRef);
+            return Message.messageToResponse(Message.ok().data("token", responseRef.getValue("token"))
+                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time"))));
+        } catch (ExternalOperationFailedException e) {
+            return RestfulUtils.dealError("获取token失败:" + e.getMessage());
+        }
+    }
+
+    @GET
+    @Path("/ds/token1")
     public Response apiServiceTokenQuery(
                                          @Context HttpServletRequest req) {
 

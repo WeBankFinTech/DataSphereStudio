@@ -21,6 +21,7 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -69,4 +70,7 @@ public interface WorkspaceMapper {
     void addFavorite(DSSFavorite dssFavorite);
 
     void deleteFavorite(Long favouritesId);
+
+    String getDepartName(@Param("id") Long id);
+    List<DSSWorkspaceUser01> getWorkspaceUsers(@Param("id") Long id);
 }

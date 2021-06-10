@@ -20,7 +20,6 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 /**
  * created by cooperyang on 2020/10/16
@@ -29,7 +28,7 @@ import java.util.List;
 @XmlRootElement
 public class OrchestratorRequest {
 
-    private Long id;
+    private Long orchestratorId;
 
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
@@ -44,12 +43,12 @@ public class OrchestratorRequest {
     private String orchestratorMode;
 
 
-    public Long getId() {
-        return id;
+    public Long getOrchestratorId() {
+        return orchestratorId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.orchestratorId = orchestratorId;
     }
 
     public Long getWorkspaceId() {
@@ -79,7 +78,7 @@ public class OrchestratorRequest {
     @Override
     public String toString() {
         return "OrchestratorRequest{" +
-                "id=" + id +
+                "orchestratorId=" + orchestratorId +
                 ", workspaceId=" + workspaceId +
                 ", projectId=" + projectId +
                 ", orchestratorMode='" + orchestratorMode + '\'' +

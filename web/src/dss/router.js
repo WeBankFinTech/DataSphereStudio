@@ -4,14 +4,14 @@ export const subAppRoutes = {
   component: () => import('./view/layout.vue'),
   redirect: '/newHome',
   meta: {
-    title: 'DataSphere Studio',
+    title: '鲁班',
     publicPage: true, // 权限公开
   },
   children: [{
     path: 'commonIframe',
     name: 'commonIframe',
     meta: {
-      title: 'DSS Component',
+      title: '鲁班组件',
       publicPage: true,
     },
     component: () =>
@@ -86,7 +86,7 @@ export default [
   {
     path: '*',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true,
     },
     component: () =>

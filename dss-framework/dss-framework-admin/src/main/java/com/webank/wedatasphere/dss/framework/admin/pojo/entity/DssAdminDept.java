@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.webank.wedatasphere.dss.framework.admin.common.domain.BaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+//import io.swagger.annotations.ApiModel;
+//import io.swagger.annotations.ApiModelProperty;
+//import lombok.Data;
+//import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -23,9 +23,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author Lvjw
  * @since 2021-06-01
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
-@ApiModel(value="DssAdminDept对象", description="部门表")
+//@Data
+//@EqualsAndHashCode(callSuper = false)
+//@ApiModel(value="DssAdminDept对象", description="部门表")
 public class DssAdminDept extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

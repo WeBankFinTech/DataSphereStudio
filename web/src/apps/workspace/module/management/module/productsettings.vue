@@ -11,6 +11,7 @@
         <!-- <label>{{$t('message.workspaceManagemnet.productsetting.admin')}}<span>enjoyyin</span></label> -->
         <label>{{$t('message.workspaceManagemnet.productsetting.status')}}<span>{{ $t('message.workspace.normal') }}</span></label>
         <label>{{$t('message.workspaceManagemnet.productsetting.desc')}}<span>{{ workspaceData.description}}</span></label>
+        <label>{{$t('message.workspaceManagemnet.productsetting.workspaceType')}}<span>{{workspaceData.workspaceType === 'department' ? $t('message.workspace.departmentOrientation') : $t('message.workspace.projectOrientation')}}</span></label>
       </div>
     </div>
     <!-- <div style="padding: 10px 0;">
@@ -119,7 +120,7 @@ export default {
   methods: {
     filterDepartment(id) {
       const a = this.departments.find((item) => id === String(item.id));
-      return a ? a.name : '';
+      return a ? a.deptName : '';
     },
     dateFormatter(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
@@ -129,7 +130,7 @@ export default {
         this.workspaceData = data.workspace;
       });
       GetDepartments().then((res) => {
-        this.departments = res.departments;
+        this.departments = res.deptList;
       });
     },
     change (status, flag) {

@@ -70,6 +70,21 @@
             :key="index"/>
         </Select>
       </FormItem>
+      <FormItem
+        :label="$t('message.workflow.projectDetail.viewPermissions')"
+        prop="releaseUsers">
+        <Select
+          v-model="projectDataCurrent.releaseUsers"
+          multiple
+          filterable
+          :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')">
+          <Option
+            v-for="(item, index) in releaseUsers"
+            :label="item"
+            :value="item"
+            :key="index"/>
+        </Select>
+      </FormItem>
       <FormItem :label="$t('message.workflow.projectDetail.devProcess')" prop="devProcessList">
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
           <Checkbox v-for="item in devProcess" :label="item.dicValue" :key="item.dicKey">
@@ -158,6 +173,7 @@ export default {
       originBusiness: '',
       editUsersMap: [],
       accessUsersMap: [],
+      releaseUsers: [],
       devProcess: [
         {
           id: 1,
@@ -217,7 +233,9 @@ export default {
   },
   mounted() {
     GetWorkspaceUserList({workspaceId: +this.$route.query.workspaceId}).then((res) => {
-      this.accessUsersMap = this.editUsersMap = res.users;
+      this.accessUsersMap = res.users.accessUsers;
+      this.editUsersMap = res.users.editUsers;
+      this.releaseUsers = res.users.releaseUsers;
     })
     this.getData();
   },

@@ -29,7 +29,7 @@ import java.io.Serializable;
  * created by cooperyang on 2020/3/22
  * Description:
  */
-//@TableName(value = "dss_user")
+@TableName(value = "dss_user")
 public class DSSUser implements Serializable {
 
     private static final long serialVersionUID = -5404077122214161197L;

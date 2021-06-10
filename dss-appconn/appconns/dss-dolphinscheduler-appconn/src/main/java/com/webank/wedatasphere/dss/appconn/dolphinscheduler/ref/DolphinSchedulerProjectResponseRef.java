@@ -22,6 +22,10 @@ public class DolphinSchedulerProjectResponseRef extends AbstractResponseRef impl
         super("", 0);
     }
 
+    public DolphinSchedulerProjectResponseRef(String responseBody) {
+        super(responseBody, 0);
+    }
+
     public DolphinSchedulerProjectResponseRef(String responseBody, int status, String errorMsg) {
         super(responseBody, status);
         this.errorMsg = errorMsg;

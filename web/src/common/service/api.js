@@ -24,7 +24,7 @@ import router from '@/router';
 import { Message } from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
-import storage from "@/common/helper/storage"
+import storage from "./storage"
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -172,14 +172,22 @@ const success = function(response) {
   }
   let data;
   if (response) {
-    if (response.status === 401) {
+    if (response.status === 401 && !(response.data && response.data.status === -1)) {
       router.push('/newhome');
       throw new Error('token失效，请重新进入之前页面!');
     }
     if (util.isString(response.data)) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {
-      data = response.data;
+      // 兼容ds blob流下载
+      if (response.status === 200 && !response.data.data) {
+        data = {}
+        data.data = response
+        data.msg = 'success'
+        data.code = api.constructionOfResponse.successCode
+      } else {
+        data = response.data
+      }
     } else {
       throw new Error('后台接口异常，请联系开发处理！');
     }
@@ -334,7 +342,7 @@ api.setResponse = function(constructionOfResponse) {
 };
 
 api.getToken = function() {
-  return storage.get("token", "local");
+  return storage.get("token", true);
 }
 
 export default api;

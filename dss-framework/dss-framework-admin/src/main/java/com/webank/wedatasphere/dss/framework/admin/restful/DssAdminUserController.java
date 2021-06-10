@@ -31,55 +31,55 @@ import java.util.List;
  * @since 2021-06-01
  */
 //@Api(tags = "用户管理")
-@RestController
-@RequestMapping("/dss/framework/admin/user")
+//@RestController
+//@RequestMapping("/dss/framework/admin/user")
 public class DssAdminUserController extends BaseController {
-    @Resource
-    private DssAdminUserService dssAdminUserService;
-
-//    @ApiOperation("用户查询")
-    @GetMapping("/list")
-    public TableDataInfo list( DssAdminUser user) {
-        startPage();
-        List<DssAdminUser> userList = dssAdminUserService.selectUserList(user);
-        return getDataTable(userList);
-    }
-
-//    @ApiOperation("添加用户")
-    @PostMapping("/add")
-    public Message add(@Validated @RequestBody DssAdminUser user) {
-        if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
-            return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
-                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
-            return Message.error().message("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail())
-                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
-            return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return Message.ok().data("rows" , dssAdminUserService.insertUser(user)).message("新增成功");
-
-    }
-//    @ApiOperation("根据id查询详细信息")
-    @GetMapping(value = {"/{id}"})
-    public Message getInfo(@PathVariable(value = "id" , required = false) Long userId) {
-        return Message.ok().data("users" , dssAdminUserService.selectUserById(userId));
-    }
-//    @ApiOperation("编辑用户")
-    @PostMapping("/edit")
-    public Message edit(@Validated @RequestBody DssAdminUser user) {
-       if (StringUtils.isNotEmpty(user.getPhonenumber())
-                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
-            return Message.error().message("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        } else if (StringUtils.isNotEmpty(user.getEmail())
-                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
-            return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return Message.ok().data("修改用户成功" , dssAdminUserService.updateUser(user));
-    }
+//    @Resource
+//    private DssAdminUserService dssAdminUserService;
+//
+////    @ApiOperation("用户查询")
+//    @GetMapping("/list")
+//    public TableDataInfo list( DssAdminUser user) {
+//        startPage();
+//        List<DssAdminUser> userList = dssAdminUserService.selectUserList(user);
+//        return getDataTable(userList);
+//    }
+//
+////    @ApiOperation("添加用户")
+//    @PostMapping("/add")
+//    public Message add(@Validated @RequestBody DssAdminUser user) {
+//        if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
+//            return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+//        } else if (StringUtils.isNotEmpty(user.getPhonenumber())
+//                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
+//            return Message.error().message("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        } else if (StringUtils.isNotEmpty(user.getEmail())
+//                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
+//            return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+//        }
+//
+//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+//        return Message.ok().data("rows" , dssAdminUserService.insertUser(user)).message("新增成功");
+//
+//    }
+////    @ApiOperation("根据id查询详细信息")
+//    @GetMapping(value = {"/{id}"})
+//    public Message getInfo(@PathVariable(value = "id" , required = false) Long userId) {
+//        return Message.ok().data("users" , dssAdminUserService.selectUserById(userId));
+//    }
+////    @ApiOperation("编辑用户")
+//    @PostMapping("/edit")
+//    public Message edit(@Validated @RequestBody DssAdminUser user) {
+//       if (StringUtils.isNotEmpty(user.getPhonenumber())
+//                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
+//            return Message.error().message("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+//        } else if (StringUtils.isNotEmpty(user.getEmail())
+//                && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
+//            return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+//        }
+//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+//        return Message.ok().data("修改用户成功" , dssAdminUserService.updateUser(user));
+//    }
 
 }
 

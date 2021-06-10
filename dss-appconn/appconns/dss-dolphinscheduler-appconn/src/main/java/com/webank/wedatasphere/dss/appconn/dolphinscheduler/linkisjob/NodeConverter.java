@@ -65,31 +65,34 @@ public class NodeConverter {
         task.setId(schedulerNode.getId());
         task.setName(schedulerNode.getName());
         task.setPreTasks(schedulerNode.getDSSNode().getDependencys());
-        // TODO: 2021/4/29 先固定为Shell，后续改进
         task.setType("SHELL");
-        // TODO: 2021/4/29 获取描述信息
         // task.setDescription(dssNode.getDesc());
 
-        DolphinSchedulerTaskParam params = new DolphinSchedulerTaskParam();
-        Resource resource = dssNode.getResources().get(0);
-        // 从资源中获取脚本内容
-        Map<String, Object> query = bmlHelper.query(schedulerNode.getUser(), resource.getResourceId(), resource.getVersion());
-        InputStream inputStream = (InputStream) query.get("stream");
+        DolphinSchedulerTaskParam taskParams = new DolphinSchedulerTaskParam();
+
         try {
-            String script = IOUtils.toString(inputStream);
             HashMap<String, String> map = new HashMap<>();
-            map.put("linkisType", schedulerNode.getNodeType());
-            map.put("proxyUser", schedulerNode.getDSSNode().getUserProxy());
+            map.put(Constant.JOB_TYPE, "linkis");
+            map.put(Constant.LINKIS_TYPE, schedulerNode.getNodeType());
+            map.put(Constant.PROXY_USER, schedulerNode.getDSSNode().getUserProxy());
             map.put(Constant.JOB_COMMAND, new Gson().toJson(dssNode.getJobContent()));
             map.put("params", new Gson().toJson(dssNode.getParams()));
             map.put("resources", new Gson().toJson(dssNode.getResources()));
-            String rawScript = "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar '" + new Gson().toJson(map) + "'";
-            params.setRawScript(rawScript);
-        } catch (IOException e) {
-            logger.error("获取节点{}脚本内容出错", e, dssNode.getName());
-        }
-        task.setParams(params);
+            Map<String, Object> nodeParams = dssNode.getParams();
+            if (nodeParams != null && !nodeParams.isEmpty()) {
+                Object configuration = nodeParams.get("configuration");
+                String confprefix = "node.conf.";
+                ((Map<String, Map<String, Object>>) configuration).forEach((k, v) -> v.forEach((k2, v2) -> map.put(confprefix + k + "." + k2, v2.toString())));
+            }
 
+            //TODO 改为参数配置路径
+            String dolphinScript = "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar " + new Gson().toJson(map);
+            taskParams.setRawScript(dolphinScript);
+        } catch (Exception e) {
+            logger.error("任务转换失败", e);
+        }
+
+        task.setParams(taskParams);
         return task;
     }
 }

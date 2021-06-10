@@ -24,7 +24,11 @@
       "newWorkspace": "新建工作空间",
       "editorWorkspace": "编辑工作空间",
       "workName": "工作空间名",
-      "department": "归属部门",
+      "department": "所属部门",
+      "workspaceType": "工作空间类型",
+      "selectWorkspaceType": "请选择工作空间类型",
+      "projectOrientation": "项目导向",
+      "departmentOrientation": "部门导向",
       "selectDepartment": "请选择部门",
       "label": "标签",
       "addLabel": "添加标签",
@@ -170,7 +174,8 @@
         "department": "部门：",
         "admin": "管理员：",
         "status": "状态：",
-        "desc": "描述："
+        "desc": "描述：",
+        "workspaceType": "工作空间类型："
       }
     },
     "Project": {

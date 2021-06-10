@@ -357,6 +357,7 @@ export default {
     // 切换工作空间
     changeWorkspace(workspace) {
       if (workspace.id === this.currentWorkspace.id) return;
+      storage.set("curWorkspace", workspace, "local")
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
       if (["/process"].includes(this.$route.path)) {
         this.$router.replace({ path: "/workspace" });

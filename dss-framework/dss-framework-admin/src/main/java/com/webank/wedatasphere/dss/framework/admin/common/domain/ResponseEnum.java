@@ -1,12 +1,12 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+//import lombok.AllArgsConstructor;
+//import lombok.Getter;
+//import lombok.ToString;
 
-@Getter
-@ToString
-@AllArgsConstructor
+//@Getter
+//@ToString
+//@AllArgsConstructor
 public enum ResponseEnum {
     /*
         case -1 => 401
@@ -23,7 +23,37 @@ public enum ResponseEnum {
     AUTH_FAILED(3, "auth failed"),
     WARNING(4,"warning");
 
+    ResponseEnum(Integer status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseEnum{" +
+                "status=" + status +
+                ", message='" + message + '\'' +
+                '}';
+    }
 
     private Integer status;
     private String  message;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+
 }

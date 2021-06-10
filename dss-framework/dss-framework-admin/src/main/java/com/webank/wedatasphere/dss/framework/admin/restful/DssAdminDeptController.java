@@ -37,25 +37,25 @@ import java.util.List;
 //@RestController
 ////@Api(tags = "部门管理")
 //@RequestMapping("/dss/framework/admin/dept")
-
-@Component
-@Path("/dss/framework/admin/dept")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class DssAdminDeptController {
-    @Resource
-    private DssAdminDeptService dssAdminDeptService;
-
-
-//    @ApiOperation("部门查询")
-//    @GetMapping("/list")
-    @GET
-    @Path("/list")
-    public Message listAll(DssAdminDept dept) {
-        List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
-        return Message.ok().data("deptList" , list).message("成功");
-    }
 //
+//@Component
+//@Path("/dss/framework/admin/dept")
+//@Produces(MediaType.APPLICATION_JSON)
+//@Consumes(MediaType.APPLICATION_JSON)
+public class DssAdminDeptController {
+//    @Resource
+//    private DssAdminDeptService dssAdminDeptService;
+//
+//
+////    @ApiOperation("部门查询")
+////    @GetMapping("/list")
+//    @GET
+//    @Path("/list")
+//    public Message listAll(DssAdminDept dept) {
+//        List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
+//        return Message.ok().data("deptList" , list).message("成功");
+//    }
+////
 ////    @ApiOperation("新增部门")
 //    @PostMapping
 //    public Message add(@RequestBody DssAdminDept dssAdminDept) {

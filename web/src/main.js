@@ -33,6 +33,10 @@ import 'iview/dist/styles/iview.css'
 import './components/svgIcon/index.js'
 import './dss/module/index.js'
 
+import LubanMenu from 'vue-luban-menu'
+Vue.use(LubanMenu)
+
+
 // moduleMixin
 if (apps.requireComponent) {
   apps.requireComponent.forEach(item=>{
@@ -50,6 +54,7 @@ Vue.use(component)
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value)
 })
+
 
 Vue.config.productionTip = false
 Vue.prototype.$Message.config({

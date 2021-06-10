@@ -22,6 +22,8 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const webpack = require('webpack')
 const apps = require('./src/config.json')
 
 const getVersion = () => {
@@ -89,7 +91,8 @@ const virtualModules = new VirtualModulesPlugin({
 });
 
 const plugins = [
-  virtualModules
+  virtualModules,
+  new webpack.ProvidePlugin({jQuery: "jquery/dist/jquery.min.js",$: "jquery/dist/jquery.min.js" })
 ]
 
 // scriptis linkis 有使用编辑器组件, 需要Monaco Editor
@@ -162,10 +165,10 @@ module.exports = {
             { source: './install.sh', destination: `./dist` }
           ],
           // 先删除根目录下的zip包
-          delete: [`./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip`],
+          delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
           // 将dist文件夹下的文件进行打包
           archive: [
-            { source: './dist', destination: `./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip` },
+            { source: './dist', destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip` },
           ]
         },
       }])
@@ -178,7 +181,24 @@ module.exports = {
         '@component': path.resolve(__dirname, './src/components')
       }
     },
-    plugins
+    plugins,
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            // output: {
+            //   comments: false
+            // },
+            compress: {
+              warnings: false,
+              drop_debugger: true, // 去掉debugger
+              drop_console: true,  // 去掉console
+              pure_funcs: ['console.log']// 移除console
+            }
+          }
+        })
+      ]
+    }
   },
   // 选项...
   pluginOptions: {
@@ -191,9 +211,17 @@ module.exports = {
     proxy: {
       '/api': {
         target: 'http://192.168.10.201:8088',
+        // target: 'http://192.168.10.180:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'
+        }
+      },
+      '/dolphinscheduler': {
+        target: 'http://192.168.10.223:12345',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/dolphinscheduler': '/dolphinscheduler'
         }
       }
     }

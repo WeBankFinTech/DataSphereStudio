@@ -19,6 +19,7 @@
 package com.webank.wedatasphere.dss.appconn.schedule.core.standard;
 
 import com.webank.wedatasphere.dss.standard.app.development.publish.RefSchedulerService;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 
 /**
@@ -27,4 +28,8 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationSt
  */
 public interface SchedulerStructureStandard extends StructureIntegrationStandard {
     RefSchedulerService getSchedulerService();
+
+    default RefQueryService getQueryService() {
+        return null;
+    }
 }

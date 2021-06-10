@@ -3,7 +3,7 @@ export const apiServicesRoutes = [
     path: 'newhome',
     name: 'Newhome',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true,
     },
     component: () => import('./view/home/index.vue'),
@@ -22,7 +22,7 @@ export const apiServicesRoutes = [
     name: 'workspaceManagement',
     redirect: '/workspaceManagement/productsettings',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true,
     },
     component: () => import('./view/management/index.vue'),
@@ -30,7 +30,7 @@ export const apiServicesRoutes = [
       path: 'productsettings',
       name: 'productsettings',
       meta: {
-        title: 'DataSphere Studio',
+        title: '鲁班',
         publicPage: true
       },
       component: () =>
@@ -40,7 +40,7 @@ export const apiServicesRoutes = [
       path: 'usertable',
       name: 'usertable',
       meta: {
-        title: 'DataSphere Studio',
+        title: '鲁班',
         publicPage: true
       },
       component: () =>
@@ -50,7 +50,7 @@ export const apiServicesRoutes = [
       path: 'jurisdiction',
       name: 'jurisdiction',
       meta: {
-        title: 'DataSphere Studio',
+        title: '鲁班',
         publicPage: true
       },
       component: () =>

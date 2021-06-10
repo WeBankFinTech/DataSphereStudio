@@ -132,6 +132,7 @@ import WorkspaceForm from './module/workspaceForm.vue';
 import WorkspaceTable from './module/workspaceTable.vue';
 import { GetBaseInfo, GetWorkspaceList } from '@/common/service/apiCommonMethod.js';
 import util from '@/common/util';
+import storage from "@/common/helper/storage"
 
 export default {
   components: {
@@ -148,7 +149,8 @@ export default {
         name: '',
         description: '',
         label: '',
-        department: ''
+        department: '',
+        workspace_type: ''
       },
       workspaceShow: false,
       cacheData: [],
@@ -221,6 +223,7 @@ export default {
         description: '',
         label: '',
         department: '',
+        workspace_type: ''
       }
     },
     editor(workspace) {
@@ -238,6 +241,7 @@ export default {
       }
     },
     gotoWorkspace(workspace) {
+      storage.set("curWorkspace", workspace, "local")
       const workspaceId = workspace.workspaceId || workspace.id;
       const currentModules = util.currentModules();
       if (currentModules.microModule === 'apiServices') {

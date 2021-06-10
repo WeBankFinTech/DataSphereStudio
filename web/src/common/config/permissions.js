@@ -95,20 +95,19 @@ const canPublish = (permission)=>{
 
 const setVirtualRoles = (item, username)=>{
   let virtualRoles = DEFAULT_NOT;
-  if(item.releaseUsers.some(e => e === username)){
+  if(item.releaseUsers&&item.releaseUsers.some(e => e === username)){
     virtualRoles = addPremission(virtualRoles, '----x');
   }
-  if(item.editUsers.some(e => e === username)) {
+  if(item.editUsers&&item.editUsers.some(e => e === username)) {
     virtualRoles = addPremission(virtualRoles, '-w---');
   }
-  if(item.accessUsers.some(e => e === username)) {
+  if(item.accessUsers&&item.accessUsers.some(e => e === username)) {
     virtualRoles = addPremission(virtualRoles, 'r----');
   }
   if(item.createBy === username) {
     virtualRoles = addPremission(virtualRoles, 'rwdc-');
   }
   item.virtualRoles = virtualRoles
-  //   console.log('=====>', canCreate.bind(item))
   item.canCreate = ()=> canCreate(item) ;
   item.canDelete = ()=> canDelete(item);
   item.canPublish = ()=> canPublish(item);

@@ -214,9 +214,11 @@ export default {
     getclassListData() {
       this.loading = true;
       return api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {workspaceId: +this.$route.query.workspaceId}, 'post').then((res) => {
-        
-        res.projects.map(item=>{return setVirtualRoles(item, this.getUserName())});
+        res.projects.map((item, index)=>{
+          setVirtualRoles(item, this.getUserName())
+        });
         this.dataList[0].dwsProjectList = res.projects;
+        
         this.cacheData = this.dataList;
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t('message.workflow.projectDetail.updteTime');

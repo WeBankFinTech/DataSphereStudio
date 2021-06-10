@@ -18,8 +18,10 @@
 
 package com.webank.wedatasphere.dss.framework.release.dao;
 
-import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.OrchestratorReleaseInfo;
 
 /**
  * The interface Orchestrator release info mapper.
@@ -35,4 +37,10 @@ public interface OrchestratorReleaseInfoMapper {
     OrchestratorReleaseInfo getByOrchestratorId(Long orchestratorId);
 
     void update(OrchestratorReleaseInfo orchestratorReleaseInfo);
+
+    @Delete("DELETE FROM dss_orchestrator_release_info WHERE id = #{id}")
+    int removeById(Long id);
+
+    @Delete("DELETE FROM dss_orchestrator_release_info WHERE orchestrator_id = #{orchestratorId}")
+    int removeByOrchestratorId(Long orchestratorId);
 }

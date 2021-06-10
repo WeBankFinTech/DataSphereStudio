@@ -11,7 +11,7 @@ export const subAppRoutes = {
     path: 'commonIframe',
     name: 'commonIframe',
     meta: {
-      title: 'DSS Component',
+      title: '鲁班组件',
       publicPage: true,
     },
     component: () =>

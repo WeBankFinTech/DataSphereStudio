@@ -6,7 +6,7 @@
         "serve": "vue-cli-service serve",
         "serve-workflows": "npm run serve --module=scriptis,workflows --micro_module=workflows",
         "serve-apiServices": "npm run serve --module=apiServices,workspace --micro_module=apiServices",
-        "build": "vue-cli-service build",
+        "build": "node --max_old_space_size=4096 node_modules/.bin/vue-cli-service build",
         "build-sandbox": "vue-cli-service build --mode sandbox",
         "build-workflows": "npm run build --module=scriptis,workflows --micro_module=workflows",
         "build-apiServices": "npm run build --module=apiServices,workspace --micro_module=apiServices",
@@ -31,11 +31,14 @@
     "dependencies": {
         "axios": "^0.21.1",
         "babel-polyfill": "6.26.0",
+        "bootstrap": "^3.3.7",
         "butterfly-dag": "^4.0.6",
         "core-js": "2.6.11",
+        "d3": "^3.5.17",
         "dayjs": "^1.10.4",
         "dexie": "2.0.4",
         "dt-sql-parser": "1.2.1",
+        "echarts": "^4.1.0",
         "eslint": "6.8.0",
         "eslint-plugin-vue": "6.2.2",
         "highlight.js": "9.18.3",
@@ -54,6 +57,7 @@
         "svgo": "1.3.0",
         "vue": "2.6.12",
         "vue-i18n": "8.22.1",
+        "vue-luban-menu": "^1.3.0",
         "vue-router": "3.4.8",
         "vuedraggable": "2.24.3",
         "vuescroll": "4.16.1",
@@ -80,8 +84,10 @@
         "patch-package": "6.2.2",
         "sass-loader": "7.3.1",
         "svg-sprite-loader": "5.0.0",
+        "uglifyjs-webpack-plugin": "^2.2.0",
         "vue-cli-plugin-mockjs": "0.1.3",
         "vue-template-compiler": "2.6.12",
+        "webpack": "^4.41.3",
         "webpack-virtual-modules": "0.3.2"
     }
 }

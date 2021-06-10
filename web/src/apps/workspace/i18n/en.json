@@ -25,6 +25,10 @@
       "editorWorkspace": "Edit Workspace",
       "workName": "Name",
       "department": "Department",
+      "workspaceType": "Workspace Type",
+      "selectWorkspaceType": "Please Select Workspace Type",
+      "projectOrientation": "Project Orientation",
+      "departmentOrientation": "Department Orientation",
       "selectDepartment": "Please Select Department",
       "label": "Label",
       "addLabel": "Add Label",
@@ -170,7 +174,8 @@
         "department": "Department：",
         "admin": "Adminstrators：",
         "status": "Status：",
-        "desc": "Description："
+        "desc": "Description：",
+        "workspaceType": "Workspace Type："
       }
     },
     "Project": {

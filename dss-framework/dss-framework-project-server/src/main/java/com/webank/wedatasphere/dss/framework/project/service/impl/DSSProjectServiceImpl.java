@@ -18,6 +18,22 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,29 +45,23 @@ import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
-import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 /**
  * @author v_wbzwchen
@@ -67,6 +77,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
+    @Autowired
+    private DSSOrchestratorService orchestratorService;
+    @Autowired
+    private DSSProjectUserMapper projectUserMapper;
 
     @Autowired
     private AppConnService appConnService;
@@ -227,9 +241,19 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) {
+    @Transactional
+    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) throws ErrorException {
         LOGGER.warn("user {} begins to delete project {}", username, projectDeleteRequest);
-        projectMapper.deleteProject(projectDeleteRequest.getId());
+
+        Long projectId = projectDeleteRequest.getId();
+        if (projectMapper.hasOrchestrator(projectId) != null) {
+            throw new DSSProjectErrorException(90041, "该工程项下存在工作流，请先删除对应工作流");
+        }
+
+        // 删除项目信息
+        projectMapper.deleteProjectInfo(projectDeleteRequest.getId());
+        // 删除项目角色信息
+        projectUserMapper.deleteAllPriv(projectDeleteRequest.getId());
         LOGGER.warn("user {} deleted project {}", username, projectDeleteRequest);
     }
 

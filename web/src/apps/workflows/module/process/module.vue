@@ -46,14 +46,6 @@
               <span>{{$t('message.workflow.process.resource')}}</span>
             </div>
             <div class="devider" />
-            <!-- <div
-          :title="$t('message.workflow.process.import')"
-          class="button"
-          @click="showImportJsonView">
-          <SvgIcon class="icon" icon-class="fi-download" color="#666"/>
-          <span>{{$t('message.workflow.process.import')}}</span>
-        </div>
-        <div class="devider" />-->
             <div
               v-if="!workflowIsExecutor"
               :title="$t('message.workflow.process.run')"
@@ -79,6 +71,9 @@
               <span>{{$t('message.workflow.process.save')}}</span>
             </div>
             <div v-if="type==='flow'" class="devider" />
+        </div>
+          <!-- 预留运维发布的区别-->
+        <div v-if="publish">
             <div
               v-if="type==='flow'"
               :title="$t('message.workflow.process.publish')"
@@ -93,44 +88,16 @@
                 <span>{{$t('message.workflow.publishing')}}</span>
               </Spin>
             </div>
-            <!-- <div v-if="type==='flow'" class="devider"></div>
-        <div
-          v-if="type==='flow'"
-          :title="$t('message.workflow.process.publish')"
-          class="button"
-          @click="exportWorkflow">
-          <svg class="icon" width="200px" height="185.84px" viewBox="0 0 1102 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path fill="#333333" d="M894.424615 970.121846l-305.624615-137.924923c-22.606769-10.24-32.531692-35.603692-20.952615-56.477538 5.513846-10.24 14.887385-17.801846 26.466461-21.425231a49.703385 49.703385 0 0 1 35.288616 2.048l250.486153 113.427692 107.52-682.929231-486.557538 538.466462v250.407385c0 23.394462-20.401231 42.220308-45.686154 42.220307-25.442462 0-45.843692-18.825846-45.843692-42.220307V711.601231c0-2.048 0-4.647385 0.551384-6.616616a40.566154 40.566154 0 0 1 10.476308-22.44923l458.436923-507.352616-735.389538 351.625846 173.292307 82.944c22.606769 11.264 31.980308 36.706462 20.401231 58.052923a43.559385 43.559385 0 0 1-25.442461 20.873847 46.788923 46.788923 0 0 1-34.185847-2.048L26.781538 566.035692a48.049231 48.049231 0 0 1-21.504-20.873846 40.644923 40.644923 0 0 1-3.308307-32.059077 43.874462 43.874462 0 0 1 22.055384-24.969846L1033.924923 4.726154a42.062769 42.062769 0 0 1 22.055385-4.568616c22.685538-0.472615 41.984 14.257231 45.843692 34.658462a36.627692 36.627692 0 0 1-1.102769 20.322462l-139.579077 882.451692c-2.756923 18.904615-19.298462 33.083077-39.148308 36.155077a47.419077 47.419077 0 0 1-27.569231-3.544616z" /></svg>
-          <span>导出</span>
-        </div> -->
             <div class="devider"></div>
-            <!-- <div class="button" @click="goScheduleCenter">
-          <SvgIcon class="icon" icon-class="icon-shengchanzhongxin" color="#666"/>
-          <span>
-            {{$t('message.workflow.goScheduleCenter')}}
-          </span>
-        </div> -->
-            <!-- <div class="devider"></div>
-        <div ref="dispatchButton" class="button" @click.stop="dispatchSetShow">
-          <SvgIcon class="icon" icon-class="dispatch" color="#666"/>
-          <span>调度配置</span>
-        </div> -->
-            <!-- <div v-if="!showDispatchHistoryButton" class="devider"></div>
-        <div v-if="!showDispatchHistoryButton" class="button" @click="dispatchHistoryShow">
-          <SvgIcon class="icon" icon-class="history" color="#666"/>
-          <span>调度历史</span>
-        </div> -->
-          </div>
-
-          <!-- 预留运维发布的区别-->
-          <div v-if="publish">
-            <div class="devider"></div>
-            预留发布权限
-          </div>
+            <div 
+              v-if="schedulingStatus.published" 
+              class="button" 
+              @click.stop="linkToDispatch">
+              <SvgIcon class="icon" icon-class="ds-center" color="#666"/>
+              <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
+            </div>
         </div>
-        
-
-        
-        
+      </div>
       </template>
       <!-- 生产中心保留执行和地图模式 -->
       <template v-if="myReadonly">
@@ -409,6 +376,8 @@ import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
+import { getPublishStatus, getSchedulingStatus } from '@/apps/workflows/service/api.js';
+
 export default {
   components: {
     vueProcess,
@@ -512,6 +481,7 @@ export default {
       },
       // 是否有改变
       jsonChange: false,
+      publishChangeCount: 0,
       loading: false,
       repetitionNameShow: false,
       repeatTitles: [],
@@ -553,7 +523,12 @@ export default {
       exporTChangeVersion: false,
       changeNum: 0,
       consoleParams: [],
-      appId: null
+      appId: null,
+      newOrchestratorVersionId: this.orchestratorVersionId,
+      schedulingStatus: {
+        published: false,
+        releaseStatus: ''
+      }
     };
   },
   computed: {
@@ -644,9 +619,15 @@ export default {
   },
   created() {
     this.viewOptions.shapeView = !this.myReadonly;
+    // if(this.isCurrentOrchestrator()){
+    //   const taskId = this.getTaskId();
+    //   this.checkPublishStatus(taskId, 5000);
+    // }
+    this.refreshSchedulingStatus();
   },
   watch: {
     jsonChange(val) {
+      this.publishChangeCount += 1;
       this.$emit('isChange', val);
     },
     workflowExecutorCache() {
@@ -690,6 +671,13 @@ export default {
     }
   },
   methods: {
+    refreshSchedulingStatus(){
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+      }).catch(() => {
+
+      })
+    },
     // 保存node参数修改
     saveNodeParameter() {
       this.$refs.nodeParameter.save();
@@ -807,6 +795,12 @@ export default {
       this.showDispatchHistoryModel = true;
 
     },
+
+    // 跳转内嵌ds
+    linkToDispatch() {
+      this.$emit('showDolphinscheduler')
+    },
+
     // 显示调度配置弹框
     dispatchSetShow() {
       if (this.workflowIsExecutor) return;
@@ -850,7 +844,6 @@ export default {
       // 创建工作流之后就有值
       this.contextID = json.contextID;
       // 保存节点才有的值
-      window.console.log(json,'json')
       if (json && json.nodes) {
         this.originalData = this.json = JSON.parse(JSON.stringify(json));
         this.resources = json.resources;
@@ -2138,8 +2131,19 @@ export default {
         })
       })
     },
-    workflowPublishIsShow() {
+    
+    workflowPublishIsShow(event) {
       // 已经在发布不能再点击
+      if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        return;
+      }
+      if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+        this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
+        return;
+      }
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
       this.pubulishShow = true;
       this.pubulishFlowComment = ''
@@ -2151,7 +2155,7 @@ export default {
       // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
-        orchestratorVersionId: this.orchestratorVersionId,
+        orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
 
         // workflowId: Number(this.flowId),
@@ -2165,11 +2169,29 @@ export default {
         // 发布之后需要轮询结果
         let queryTime = 0;
         this.checkResult(res.releaseTaskId, queryTime, 'publish');
-
+        this.setTaskId(res.releaseTaskId);
       }).catch(() => {
         this.pubulishShow = false;
         this.$Message.error(this.$t('message.workflow.projectDetail.publishFailed'));
       })
+    },
+    checkPublishStatus(taskId, delay){
+      this.isFlowPubulish = true;
+      const check = ()=>{
+        getPublishStatus(taskId, this.getCurrentDsslabels()).then(res=>{
+          if(res.status === 'init' || res.status === 'running'){
+            this.checkPublishStatus(taskId)
+          }else {
+            this.isFlowPubulish = false;
+            clearTimeout(time);
+          }
+        }).catch(()=>{
+          clearTimeout(time);
+          this.isFlowPubulish = false;
+        })
+      };
+      check();
+      let time = setTimeout(check, delay);
     },
     // 发布和导出共用查询接口
     checkResult(id, timeoutValue, type = 'publish') {
@@ -2178,9 +2200,10 @@ export default {
         typeName = this.$t('message.workflow.process.publish')
       }
       const timer = setTimeout(() => {
-        timeoutValue += 8000;
-        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getPublishStatus`, { releaseTaskId: +id, dssLabel: this.getCurrentDsslabels() }, 'get').then((res) => {
+        timeoutValue += 2000;
+        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
+            this.refreshSchedulingStatus();
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);
               this.checkResult(id, timeoutValue, type);
@@ -2203,6 +2226,7 @@ export default {
                 });
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
+              this.publishChangeCount = 0;
               // this.getBaseInfo();
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
               // this.$emit('publishSuccess', this.getBaseInfo);
@@ -2226,7 +2250,7 @@ export default {
             this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
           }
         });
-      }, 8000);
+      }, 2000);
     },
     // 发布成功，更新appId
     publishSuccess(cb) {
@@ -2241,6 +2265,7 @@ export default {
         this.loading = false;
         if (openOrchestrator) {
           this.appId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.appId;
+          this.newOrchestratorVersionId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
           if(cb) {
             cb();
           }
@@ -2314,6 +2339,23 @@ export default {
     getCurrentWorkspaceName() {
       const workspaceData = storage.get("currentWorkspace");
       return workspaceData ? workspaceData.name : ''
+    },
+    getTaskKey(){
+      const username = this.getUserName();
+      const key = `${username}-workflow-${this.orchestratorId}-taskId`;
+      return key
+    },
+    isCurrentOrchestrator(){
+      const username = this.getUserName();
+      return this.getTaskKey().replace(this.orchestratorId, '') ===  `${username}-workflow--taskId`;
+    },
+    setTaskId(taskId) {
+      const key = this.getTaskKey();
+      storage.set(key, taskId);
+    },
+    getTaskId(){
+      const key = this.getTaskKey();
+      return storage.get(key);
     }
   },
 };

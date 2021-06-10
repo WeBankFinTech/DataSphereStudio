@@ -126,6 +126,14 @@ public class DSSNodeDefault implements DSSNode {
         this.title = name;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     @Override
     public void addDependency(String nodeName) {
         dependencys.add(nodeName);

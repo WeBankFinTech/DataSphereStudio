@@ -68,5 +68,5 @@ public interface WorkspaceMapper {
 
     void addFavorite(DSSFavorite dssFavorite);
 
-    void deleteFavorite(Long favouritesId);
+    void deleteFavorite(@Param("username") String username,@Param("applicationId") Long applicationId, @Param("workspaceId") Long workspaceId);
 }

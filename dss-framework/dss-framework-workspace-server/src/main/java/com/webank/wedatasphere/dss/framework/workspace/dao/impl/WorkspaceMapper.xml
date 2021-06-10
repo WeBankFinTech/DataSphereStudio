@@ -59,12 +59,11 @@
 	    last_update_time,
 	    last_update_user,
     CASE
-+
 
 		workspace_type
 		WHEN 'department' THEN
 		'部门导向'
-		WHEN  THEN
+		WHEN 'project' THEN
 		'项目导向' ELSE ''
 	END AS workspace_type
     FROM

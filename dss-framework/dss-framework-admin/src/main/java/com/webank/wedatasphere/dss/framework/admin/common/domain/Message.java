@@ -1,11 +1,43 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
-import lombok.Data;
+//import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
-@Data
+//@Data
 public class Message {
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Map<String, Object> getData() {
+        return data;
+    }
+
+    public void setData(Map<String, Object> data) {
+        this.data = data;
+    }
+
     private String method;
     private Integer status;
     private String  message;

@@ -2,8 +2,8 @@ package com.webank.wedatasphere.dss.framework.admin.service.impl;
 
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
-import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssUser;
-import com.webank.wedatasphere.dss.framework.admin.mapper.DssUserMapper;
+import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
+import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
  * @since 2021-06-01
  */
 @Service
-public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser> implements DssAdminUserService {
+public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdminUser> implements DssAdminUserService {
 
     @Resource
     DssUserMapper dssUserMapper;
@@ -49,10 +49,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser>
      * @return
      */
     @Override
-    public String checkPhoneUnique(DssUser user)
+    public String checkPhoneUnique(DssAdminUser user)
     {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
-        DssUser info = dssUserMapper.checkPhoneUnique(user.getPhonenumber());
+        DssAdminUser info = dssUserMapper.checkPhoneUnique(user.getPhonenumber());
         if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
@@ -67,10 +67,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser>
      * @return
      */
     @Override
-    public String checkEmailUnique(DssUser user)
+    public String checkEmailUnique(DssAdminUser user)
     {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
-        DssUser info = dssUserMapper.checkEmailUnique(user.getEmail());
+        DssAdminUser info = dssUserMapper.checkEmailUnique(user.getEmail());
         if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
@@ -85,13 +85,13 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser>
      */
     @Override
     @Transactional
-    public int insertUser(DssUser user) {
+    public int insertUser(DssAdminUser user) {
         int rows = dssUserMapper.insertUser(user);
         return rows;
     }
 
     @Override
-    public List<DssUser> selectUserList(DssUser user) {
+    public List<DssAdminUser> selectUserList(DssAdminUser user) {
         return dssUserMapper.selectUserList(user);
     }
 
@@ -102,7 +102,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser>
      * @return 用户对象信息
      */
     @Override
-    public DssUser selectUserById(Long userId)
+    public DssAdminUser selectUserById(Long userId)
     {
         return dssUserMapper.selectUserById(userId);
     }
@@ -111,7 +111,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssUser>
 
     @Override
 //    @Transactional
-    public int updateUser(DssUser user)
+    public int updateUser(DssAdminUser user)
     {
         Long userId = user.getId();
 

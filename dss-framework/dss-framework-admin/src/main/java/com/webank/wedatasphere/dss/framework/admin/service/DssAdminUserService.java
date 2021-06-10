@@ -1,10 +1,9 @@
 package com.webank.wedatasphere.dss.framework.admin.service;
 
-import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssUser;
+import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -14,19 +13,19 @@ import java.util.Map;
  * @author Lvjw
  * @since 2021-06-01
  */
-public interface DssAdminUserService extends IService<DssUser> {
+public interface DssAdminUserService extends IService<DssAdminUser> {
 
     String checkUserNameUnique(String username);
 
-    String checkPhoneUnique(DssUser user);
+    String checkPhoneUnique(DssAdminUser user);
 
-    String checkEmailUnique(DssUser user);
+    String checkEmailUnique(DssAdminUser user);
 
-    int insertUser(DssUser user);
+    int insertUser(DssAdminUser user);
 
-    List<DssUser> selectUserList(DssUser user);
+    List<DssAdminUser> selectUserList(DssAdminUser user);
 
-    DssUser selectUserById(Long userId);
+    DssAdminUser selectUserById(Long userId);
 
-    int updateUser(DssUser user);
+    int updateUser(DssAdminUser user);
 }

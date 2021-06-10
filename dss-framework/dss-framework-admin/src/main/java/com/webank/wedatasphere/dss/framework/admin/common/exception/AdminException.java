@@ -2,12 +2,29 @@ package com.webank.wedatasphere.dss.framework.admin.common.exception;
 
 
 import com.webank.wedatasphere.dss.framework.admin.common.domain.ResponseEnum;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+//import lombok.Data;
+//import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
+//@Data
+//@NoArgsConstructor
 public class AdminException extends RuntimeException {
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     /**
      * 错误码

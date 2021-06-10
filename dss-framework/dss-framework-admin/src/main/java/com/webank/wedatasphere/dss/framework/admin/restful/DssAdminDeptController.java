@@ -6,8 +6,8 @@ import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,21 +29,21 @@ import java.util.List;
  * @since 2021-06-01
  */
 @RestController
-@Api(tags = "部门管理")
+//@Api(tags = "部门管理")
 @RequestMapping("/dss/framework/admin/dept")
 public class DssAdminDeptController {
     @Resource
     private DssAdminDeptService dssAdminDeptService;
 
 
-    @ApiOperation("部门查询")
+//    @ApiOperation("部门查询")
     @GetMapping("/list")
     Message listAll(DssAdminDept dept) {
         List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
         return Message.ok().data("deptList" , list).message("成功");
     }
 
-    @ApiOperation("新增部门")
+//    @ApiOperation("新增部门")
     @PostMapping
     public Message add(@RequestBody DssAdminDept dssAdminDept) {
 
@@ -63,7 +63,7 @@ public class DssAdminDeptController {
     /**
      * 获取部门下拉树列表
      */
-    @ApiOperation("获取部门下拉树列表")
+//    @ApiOperation("获取部门下拉树列表")
     @GetMapping("/treeselect")
     public Message treeselect(DssAdminDept dept) {
         List<DssAdminDept> depts = dssAdminDeptService.selectDeptList(dept);
@@ -71,13 +71,13 @@ public class DssAdminDeptController {
     }
 
 
-    @ApiOperation("根据部门编号获取详细信息")
+//    @ApiOperation("根据部门编号获取详细信息")
     @GetMapping(value = "/{deptId}")
     public Message getInfo(@PathVariable Long deptId) {
         return Message.ok().data("deptInfo" , dssAdminDeptService.selectDeptById(deptId));
     }
 
-    @ApiOperation("修改部门")
+//    @ApiOperation("修改部门")
     @PostMapping("/edit")
     public Message edit(@Validated @RequestBody DssAdminDept dept) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dept))) {
@@ -96,7 +96,7 @@ public class DssAdminDeptController {
     /**
      * 删除部门
      */
-    @ApiOperation("删除部门")
+//    @ApiOperation("删除部门")
     @PostMapping("/{deptId}")
     public Message remove(@PathVariable Long deptId) {
         if (dssAdminDeptService.hasChildById(deptId)) {

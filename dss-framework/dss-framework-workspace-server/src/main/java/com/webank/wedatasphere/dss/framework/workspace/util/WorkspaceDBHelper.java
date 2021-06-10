@@ -150,34 +150,90 @@ public class WorkspaceDBHelper {
         Date date = new Date(System.currentTimeMillis());
         //管理员的权限,全部可以见
        // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,1,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,1,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 2,1,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 3,1,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,1,1, date, username));
-        //运维用户，只可以看见生产中心
-       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,2,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,2,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,1,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,1,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,1,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,1,1, date, username));
+        //运维用户
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,2,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,2,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 3,2,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,2,0, date, username));
-        //开发用户，只可以看见开发中心
-       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,3,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,2,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,2,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,2,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,2,1, date, username));
+        //开发用户
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,3,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 2,3,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 3,3,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,3,0, date, username));
-        //分析用户，只可以看见分析中心
-     //   list.add(new DSSWorkspaceMenuRole(workspaceId, 1,4,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,3,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,3,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,3,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,3,0, date, username));
+
+        //分析用户
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,4,1, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 2,4,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,4,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,4,0, date, username));
-        //运营用户，只可以看见核心指标
-       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,5,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,4,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,4,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,4,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,4,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,4,0, date, username));
+
+        //运营用户
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,5,0, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 2,5,0, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 3,5,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,5,0, date, username));
-        //领导，默认全部可见
-       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,6,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,6,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,5,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,5,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,5,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,5,0, date, username));
+
+        //数据服务
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,6,0, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 3,6,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,6,0, date, username));
+
+        //访客
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 1,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 4,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 5,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 6,7,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 7,7,0, date, username));
+//        //运维用户，只可以看见生产中心
+//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,2,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,2,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,2,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,2,0, date, username));
+//        //开发用户，只可以看见开发中心
+//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,3,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,3,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,3,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,3,0, date, username));
+//        //分析用户，只可以看见分析中心
+//     //   list.add(new DSSWorkspaceMenuRole(workspaceId, 1,4,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,4,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,4,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,4,0, date, username));
+//        //运营用户，只可以看见核心指标
+//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,5,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,5,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,5,0, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,5,0, date, username));
+//        //领导，默认全部可见
+//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,6,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,6,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,6,1, date, username));
+//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,6,0, date, username));
         return list;
     }
 

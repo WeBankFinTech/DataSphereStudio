@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -36,7 +37,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -105,17 +111,18 @@ public class DSSWorkspaceUserRestful {
     @GET
     @Path("getAllWorkspaceUsers")
     public Response getAllWorkspaceUsers(@Context HttpServletRequest request, @QueryParam(WORKSPACE_ID_STR) int workspaceId ){
-        String username = SecurityFilter.getLoginUsername(request);
-        List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
-        return Message.messageToResponse(Message.ok().data("users", users));
+        DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
+        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
+        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+        return Message.messageToResponse(Message.ok().data("users", dssWorkspaceUsersVo));
     }
 
     @POST
     @Path("addWorkspaceUser")
     public Response addWorkspaceUser(@Context HttpServletRequest request, JsonNode jsonNode){
         //todo 工作空间添加用户
-//        String creator = SecurityFilter.getLoginUsername(request);
-        String creator = "demo";
+        String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = new ArrayList<>();
         if (jsonNode.get("roles").isArray()){
             for (JsonNode role : jsonNode.get("roles")){

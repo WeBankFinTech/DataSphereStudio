@@ -19,6 +19,19 @@
           :disabled="actionType === 'modify'" />
       </FormItem>
       <FormItem
+        :label="$t('message.workspace.workspaceType')"
+        prop="workspace_type">
+        <RadioGroup v-model="projectDataCurrent.workspace_type">
+          <Radio label="project" :disabled="actionType === 'modify'">
+            <span>{{$t('message.workspace.projectOrientation')}}</span>
+          </Radio>
+          <Radio label="department" :disabled="actionType === 'modify'">
+            <span>{{$t('message.workspace.departmentOrientation')}}</span>
+          </Radio>
+        </RadioGroup>
+      </FormItem>
+      <FormItem
+        v-if="projectDataCurrent.workspace_type === 'department'"
         :label="$t('message.workspace.department')"
         prop="department">
         <Select
@@ -26,7 +39,7 @@
           :placeholder="$t('message.workspace.selectDepartment')">
           <Option
             v-for="(item, index) in departments"
-            :label="item.name"
+            :label="item.deptName"
             :value="String(item.id)"
             :key="index"/>
         </Select>
@@ -106,12 +119,15 @@ export default {
         department: [
           { required: true, message: this.$t('message.workspace.selectDepartment'), trigger: 'change' },
         ],
+        workspace_type: [
+          { required: true, message: this.$t('message.workspace.selectWorkspaceType'), trigger: 'change' },
+        ]
       }
     }
   },
   mounted() {
     GetDepartments().then((res) => {
-      this.departments = res.departments;
+      this.departments = res.deptList;
     });
   },
   watch: {

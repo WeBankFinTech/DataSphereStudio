@@ -3,7 +3,7 @@ const routes = [
     path: '/apiservices',
     name: 'Apiservices',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true
     },
     component: () => import('./view/apiServices/index.vue')
@@ -12,7 +12,7 @@ const routes = [
     path: '/servicesMangement',
     name: 'ServicesMangement',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true
     },
     component: () => import('./view/servicesMangement/index.vue')
@@ -21,7 +21,7 @@ const routes = [
     path: '/servicesExecute',
     name: 'ServicesExecute',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true
     },
     component: () => import('./view/servicesExecute/index.vue')

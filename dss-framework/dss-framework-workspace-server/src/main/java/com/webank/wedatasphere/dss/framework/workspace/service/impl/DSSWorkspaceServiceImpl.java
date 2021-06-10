@@ -220,28 +220,27 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
+    public List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                       String roleName, int pageNow, int pageSize, List<Long> total) {
         int roleId = -1;
         if (StringUtils.isNotEmpty(roleName)){
             roleId = workspaceDBHelper.getRoleIdByName(roleName);
         }
         PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser01> workspaceUsers = new ArrayList<>();
+        List<DSSWorkspaceUser> workspaceUsers = new ArrayList<>();
         try{
-            workspaceUsers = workspaceMapper.getWorkspaceUsers(Long.valueOf(workspaceId));
+            workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, department,username, roleId);
         }finally {
             PageHelper.clearPage();
         }
-        PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
+        PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());
         List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-//        for (DSSWorkspaceUser workspaceUser : workspaceUsers) {
-//            List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), workspaceUser.getUsername());
-//            dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
-//        }
-//        return dssWorkspaceUserVOs;
-        return workspaceUsers;
+        for (DSSWorkspaceUser workspaceUser : workspaceUsers) {
+            List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), workspaceUser.getUsername());
+            dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
+        }
+        return dssWorkspaceUserVOs;
     }
 
 

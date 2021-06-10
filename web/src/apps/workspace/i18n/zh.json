@@ -84,8 +84,8 @@
       "project": "工程",
       "feedback": "反馈",
       "workspaceTitle": "工作空间——",
-      "DSSDEV": "DSS应用开发",
-      "DSSSHOP": "DSS应用商店",
+      "DSSDEV": "应用开发",
+      "DSSSHOP": "应用商店",
       "QuickAccess": "快捷入口",
       "AppStore": {
         "title": "组件商店",

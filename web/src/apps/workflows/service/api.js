@@ -11,8 +11,8 @@ const getPublishStatus = (releaseTaskId, dssLabel)=>{
   return api.fetch(`${API_PATH.PUBLISH_PATH}getPublishStatus`, {releaseTaskId,  dssLabel}, 'get');
 }
 
-const getSchedulingStatus = ()=>{
-  return api.fetch(`${API_PATH.PUBLISH_PATH}getPublishStatus`);
+const getSchedulingStatus = (workspaceId, orchestratorId)=>{
+  return api.fetch(`${API_PATH.PUBLISH_PATH}getSchedulerWorkflowStatus`, {orchestratorId, workspaceId}, 'get');
 }
 
 

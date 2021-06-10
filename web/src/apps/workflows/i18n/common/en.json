@@ -151,7 +151,8 @@
         "biLoading": "Connecting with Visualis, please hold on!",
         "comingSoon": "New version is being integrated, so stay tuned !",
         "GJZ": "Open source co-construction is in progress, so stay tuned!",
-        "unChange": "Not change, do not need to publish"
+        "unChange": "Not change, do not need to publish",
+        "publishOnlineTips": "The workflow is running online. Please take the workflow offline first if you want to update the publication"
       },
       "projectDetail": {
         "WDGZL": "My personal workflow",
@@ -524,11 +525,23 @@
       "importFail": "Import failed"
     },
     "scheduler": {
+      "selectState": "Select State",
+      "taskStatusStatistics": "Task status statistics",
+      "processStatusStatistics": "Process Status Statistics",
+      "processDefinitionStatistics": "Process Definition Statistics",
+      "projectHome": "Project Home",
+      "home": "Home",
+      "dashboard": "Operation Dashboard",
+      "processDefinition": "Process Definition",
+      "processInstance": "Process Instance",
       "run": "run",
       "setTime": "timing",
+      "setTimeManage": "Cron Manage",
       "offline": "offline",
       "online": "online",
       "rerun": "rerun",
+      "delete": "Delete",
+      "DELETE": "Delete",
       "Unpublished": "Unpublished",
       "START_PROCESS": "Start Process",
       "START_CURRENT_TASK_PROCESS": "Execute from the current node",
@@ -544,13 +557,23 @@
       "noMoreLogs": "No more logs",
       "updateSuccess": "Update log success",
       "noLog": "No log",
+      "noData": "No Data",
       "logLoading": "Loading Log...",
+      "Loading": "Loading...",
       "viewLog": "View log",
       "downloadLog": "Download Log",
       "refreshLog": "Refresh Log",
       "fullScreen": "Enter full screen",
       "cancelScreen": "Cancel full screen",
       "close": "Close",
+      "cancel": "Cancel",
+      "ok": "OK",
+      "recovery": "Recovery Failed",
+      "recoverySuspend": "Recovery Suspend",
+      "copy": "Copy Workflow",
+      "export": "Export",
+      "Gantt": "Gantt",
+      "taskStatus": "Task Status",
       "runTask": {
         "startTitle": "Please set the parameters before starting",
         "timingTitle": "Set parameters before timing",
@@ -618,6 +641,7 @@
       "header": {
         "id": "#",
         "ProcessName": "Process Name",
+        "Number": "Number",
         "State": "State",
         "RunType": "Run Type",
         "SchedulingTime": "Scheduling Time",
@@ -632,7 +656,9 @@
         "UpdateTime": "Update Time",
         "Description": "Description",
         "ModifyBy": "Modify User",
-        "TimingState": "Timing state"
+        "TimingState": "Timing state",
+        "crontab": "crontab",
+        "failureStrategy": "Failure Strategy"
       }
     }
   }

@@ -10,6 +10,19 @@
           @click="mouseover">
           <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF"/>
         </div> -->
+
+        <vue-luban-menu
+          v-if="isNavShowMenu"
+          :apps="menuList" 
+          :favorites="favorites" 
+          @menu-click="handleMenuClick"
+          @favorite-remove="removeFavorite" 
+          @favorite-add="addFavorite">
+          <div class="luban-menu-trigger">
+            <img src="../../assets/images/luban-menu-trigger.png">
+          </div>
+        </vue-luban-menu>
+
         <div class="logo">
           <img
             @click.stop="goHome"
@@ -107,7 +120,10 @@ import clickoutside from "@/common/helper/clickoutside";
 import navMenu from "./navMenu/index.vue";
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
-import { GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo} from '@/common/service/apiCommonMethod.js';
+import { 
+  GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo,
+  GetFavorites, AddFavorite, RemoveFavorite
+} from '@/common/service/apiCommonMethod.js';
 export default {
   directives: {
     clickoutside
@@ -131,7 +147,9 @@ export default {
       isSandbox: process.env.NODE_ENV === "sandbox",
       workspaceList: [],
       currentWorkspace: {},
-      menuList: []
+      menuList: [],
+      // luban-nav-menu
+      favorites: [],
     };
   },
   mixins: [mixin],
@@ -142,6 +160,7 @@ export default {
         this.init();
         this.getApplications();
         this.getWorkspaces();
+        this.getWorkspaceFavorites();
       }
     }).catch(err => {
       console.error(err)
@@ -187,6 +206,7 @@ export default {
           if(res) {
             this.getApplications();
             this.getWorkspaces();
+            this.getWorkspaceFavorites();
           }
         }).catch(err => {
           console.error(err)
@@ -231,7 +251,6 @@ export default {
           this.menuList = data.applications || [];
         })
       }
-
     },
     getWorkspaces() {
       GetWorkspaceList({}, 'get').then((res) => {
@@ -239,6 +258,30 @@ export default {
         this.getCurrentWorkspace();
       }).catch(() => {
       })
+    },
+    getWorkspaceFavorites() {
+      if(this.$route.query.workspaceId) {
+        GetFavorites(this.$route.query.workspaceId).then(data=>{
+          this.favorites = data.favorites || [];
+        })
+      }
+    },
+    addFavorite(app) {
+      if(this.$route.query.workspaceId) {
+        AddFavorite(this.$route.query.workspaceId, { menuApplicationId: app.id }).then(data=>{
+          this.favorites = this.favorites.concat({...app, id: data.favoriteId, menuApplicationId: app.id })
+        })
+      }
+    },
+    removeFavorite(app) {
+      if(this.$route.query.workspaceId) {
+        RemoveFavorite({ workspaceId: this.$route.query.workspaceId, applicationId: app.menuApplicationId }).then(()=>{
+          this.favorites = this.favorites.filter(i => i.menuApplicationId !== app.menuApplicationId);
+        })
+      }
+    },
+    handleMenuClick(item) {
+      this.gotoCommonIframe(item.name, {workspaceId: this.$route.query.workspaceId})
     },
     init() {
       GetBaseInfo().then(rst => {

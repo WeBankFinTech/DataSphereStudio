@@ -2,7 +2,7 @@
   <div>
     <slot></slot>
     <Row class="content-item">
-      <i-col
+      <i-col v-if="checkCreate()"
         class="project-item project-header"
         :xs="12"
         :sm="8"
@@ -30,10 +30,10 @@
                 <SvgIcon style="font-size: 16px;" color="#5580eb" icon-class="base"/>
                 {{subitem.name}}
               </span>
-              <div v-if="checkEditable(subitem, getUserName())" class="menu-bar">
+              <div v-if="subitem.canWrite()" class="menu-bar">
                 <Button size="small" @click.stop>管理</Button>
                 <ul class="menu-list">
-                  <li class="list-item" @click.stop="deleteProject(subitem)">删除</li>
+                  <li class="list-item" v-if="subitem.canDelete()" @click.stop="deleteProject(subitem)">删除</li>
                   <li class="list-item" @click.stop="modify(currentData.id, subitem)">配置</li>
                   <!-- <li class="list-item" @click.stop="publish(currentData.id, subitem)">发布</li> -->
                 </ul>
@@ -76,6 +76,8 @@
 </template>
 <script>
 import mixin from '@/common/service/mixin';
+import storage from '@/common/helper/storage';
+import {canCreate} from '@/common/config/permissions.js';
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -155,13 +157,12 @@ export default {
     selectAction(name) {
       console.log(name, 'name')
     },
-    checkEditable(item, name) {
-      // 先判断是否可编辑
-      if (item.editUsers && item.editUsers.length > 0) {
-        return item.editUsers.some(e => e === name);
-      } else {
-        return false;
+    checkCreate(){
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (canCreate(workspaceRoles)) {
+        return true;
       }
+      return false;
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

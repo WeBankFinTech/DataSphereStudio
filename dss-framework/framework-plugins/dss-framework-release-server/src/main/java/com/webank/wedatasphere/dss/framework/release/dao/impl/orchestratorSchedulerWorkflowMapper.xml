@@ -56,6 +56,7 @@
         <trim prefix="set" suffixOverrides=",">
             <if test="orchestratorVersionId != null">orchestrator_version_id = #{orchestratorVersionId},</if>
             <if test="orchestratorVersion != null">orchestrator_version = #{orchestratorVersion},</if>
+            <if test="schedulerWorkflowId != null">scheduler_workflow_id = #{schedulerWorkflowId},</if>
             <if test="updateTime != null">update_time = #{updateTime}</if>
         </trim>
         WHERE id = #{id}

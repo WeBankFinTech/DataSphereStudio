@@ -1,23 +1,26 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerRefSchedulerService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerRefSchedulerService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerRoleService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.ScheduleFlowService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.SchedulerInfoService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.ServiceBuilder;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerSecurityService;
 import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
 import com.webank.wedatasphere.dss.standard.app.development.publish.RefSchedulerService;
+import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.role.RoleService;
 import com.webank.wedatasphere.dss.standard.app.structure.status.AppStatusService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * The type Dolphin scheduler structure standard.
@@ -29,7 +32,7 @@ public class DolphinSchedulerStructureStandard implements SchedulerStructureStan
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerStructureStandard.class);
 
-    private volatile static DolphinSchedulerStructureStandard instance;
+    private static volatile DolphinSchedulerStructureStandard instance;
 
     private AppConn appConn;
 
@@ -124,4 +127,9 @@ public class DolphinSchedulerStructureStandard implements SchedulerStructureStan
         return ScheduleFlowService.getInstance(this.getAppDesc());
     }
 
+    @Override
+    public RefQueryService getQueryService() {
+        AppDesc appDesc = appConn.getAppDesc();
+        return DolphinSchedulerSecurityService.getInstance(appDesc.getAppInstances().get(0).getBaseUrl());
+    }
 }

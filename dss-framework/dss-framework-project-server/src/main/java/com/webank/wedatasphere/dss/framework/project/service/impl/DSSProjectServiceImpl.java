@@ -18,38 +18,50 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
-import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
-import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
-import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
-import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
-import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
-import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
+import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
+import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
+import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
+import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 /**
  * @author v_wbzwchen
@@ -65,6 +77,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
+    @Autowired
+    private DSSOrchestratorService orchestratorService;
+    @Autowired
+    private DSSProjectUserMapper projectUserMapper;
 
     @Autowired
     private AppConnService appConnService;
@@ -160,29 +176,37 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             projectResponseList.add(projectResponse);
-            /**
-             * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-             * 从而得到：查看权限用户、编辑权限用户、发布权限用户
-             */
-            String pusername = projectVo.getPusername();
-            if (StringUtils.isEmpty(pusername)) {
-                continue;
-            }
-            Map<String, List<String>> userPricMap = new HashMap<>();
-            String[] tempstrArr = pusername.split(MODE_SPLIT);
 
-            for (String s : tempstrArr) {
-                String[] strArr = s.split(KEY_SPLIT);
-                String key = strArr[0] + KEY_SPLIT + strArr[1];
-                userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
-                userPricMap.get(key).add(strArr[2]);
+            String pusername = projectVo.getPusername();
+            String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
+                    + KEY_SPLIT + projectRequest.getUsername();
+
+            // 用户是否具有编辑权限  编辑权限和创建者都有
+            if (!StringUtils.isEmpty(pusername) &&
+                    (pusername.contains(editPriv) || projectRequest.getUsername() == projectVo.getCreateBy())) {
+                projectResponse.setEditable(true);
+                Map<String, List<String>> userPricMap = new HashMap<>();
+                String[] tempstrArr = pusername.split(MODE_SPLIT);
+
+                /**
+                 * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+                 * 从而得到：查看权限用户、编辑权限用户、发布权限用户
+                 */
+                for (String s : tempstrArr) {
+                    String[] strArr = s.split(KEY_SPLIT);
+                    String key = strArr[0] + KEY_SPLIT + strArr[1];
+                    userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                    userPricMap.get(key).add(strArr[2]);
+                }
+                List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+                List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
+                List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
+                projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
+                projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+            } else {
+                projectResponse.setEditable(false);
             }
-            List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
-            List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
-            List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
-            projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
-            projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
-            projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
         }
         return projectResponseList;
     }
@@ -217,12 +241,19 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) {
+    @Transactional
+    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) throws ErrorException {
         LOGGER.warn("user {} begins to delete project {}", username, projectDeleteRequest);
-        //1.check权限
-        //2.进行屏蔽
-        //todo 进行真实的删除
-        projectMapper.deleteProject(projectDeleteRequest.getId());
+
+        Long projectId = projectDeleteRequest.getId();
+        if (projectMapper.hasOrchestrator(projectId) != null) {
+            throw new DSSProjectErrorException(90041, "该工程项下存在工作流，请先删除对应工作流");
+        }
+
+        // 删除项目信息
+        projectMapper.deleteProjectInfo(projectDeleteRequest.getId());
+        // 删除项目角色信息
+        projectUserMapper.deleteAllPriv(projectDeleteRequest.getId());
         LOGGER.warn("user {} deleted project {}", username, projectDeleteRequest);
     }
 
@@ -230,5 +261,18 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     public List<String> getProjectAbilities(String username) {
         LOGGER.info("{} begins to get project ability", username);
         return Arrays.asList(SUPPORT_ABILITY.trim().split(","));
+    }
+
+    @Override
+    public boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException  {
+        //校验当前登录用户是否含有删除权限，默认创建用户可以删除工程
+        QueryWrapper<DSSProject> queryWrapper = new QueryWrapper<DSSProject>();
+        queryWrapper.eq("id", projectId);
+        queryWrapper.eq("create_by", username);
+        long count = projectMapper.selectCount(queryWrapper);
+        if (count == 0) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
+        }
+        return true;
     }
 }

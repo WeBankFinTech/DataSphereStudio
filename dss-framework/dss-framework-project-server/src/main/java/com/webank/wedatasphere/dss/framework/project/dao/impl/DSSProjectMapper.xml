@@ -76,15 +76,16 @@
     </insert>
 
 <update id="updateDssWorkflowName">
-    UPDATE dss_workflow
-    SET NAME = #{name}
-    WHERE
-	   id = (
+
+   UPDATE dss_workflow
+   SET NAME = #{name}
+   WHERE
+	id in (
 	SELECT
 		t2.app_id
 	FROM
-		( SELECT orchestrator_version_id FROM dss_project_orchestrator WHERE id = #{id} ) t1
-		JOIN dss_orchestrator_version_info t2 ON t1.orchestrator_version_id = t2.id
+		( SELECT orchestrator_id FROM dss_project_orchestrator WHERE id = #{id} ) t1
+		JOIN dss_orchestrator_version_info t2 ON t1.orchestrator_id = t2.orchestrator_id
 	)
 
  </update>

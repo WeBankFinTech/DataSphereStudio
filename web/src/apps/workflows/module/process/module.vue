@@ -24,104 +24,80 @@
       @ctx-menu-console="openConsole"
       @link-delete="linkDelete"
       @link-add="linkAdd">
-      <template v-if="!myReadonly">
-        <div
-          class="button"
-          :title="$t('message.workflow.process.params')"
-          ref="paramButton"
-          @click.stop="showParamView">
-          <SvgIcon class="icon" icon-class="params" color="#666"/>
-          <span>{{$t('message.workflow.process.params')}}</span>
+      <template >
+        <!-- 这里需要做控制，只读和发布的区别-->
+        <div>
+          <div v-if="!myReadonly">
+            <div
+              class="button"
+              :title="$t('message.workflow.process.params')"
+              ref="paramButton"
+              @click.stop="showParamView">
+              <SvgIcon class="icon" icon-class="params" color="#666"/>
+              <span>{{$t('message.workflow.process.params')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              class="button"
+              ref="resourceButton"
+              :title="$t('message.workflow.process.resource')"
+              @click.stop="showResourceView">
+              <SvgIcon class="icon" icon-class="fi-export" color="#666"/>
+              <span>{{$t('message.workflow.process.resource')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              v-if="!workflowIsExecutor"
+              :title="$t('message.workflow.process.run')"
+              class="button"
+              @click="clickswitch">
+              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+              <span>{{$t('message.workflow.process.run')}}</span>
+            </div>
+            <div
+              v-if="workflowIsExecutor"
+              :title="$t('message.workflow.process.stop')"
+              class="button"
+              @click="clickswitch">
+              <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
+              <span>{{$t('message.workflow.process.stop')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              :title="$t('message.workflow.process.save')"
+              class="button"
+              @click="handleSave">
+              <SvgIcon class="icon" icon-class="save-2" color="#666"/>
+              <span>{{$t('message.workflow.process.save')}}</span>
+            </div>
+            <div v-if="type==='flow'" class="devider" />
         </div>
-        <div class="devider" />
-        <div
-          class="button"
-          ref="resourceButton"
-          :title="$t('message.workflow.process.resource')"
-          @click.stop="showResourceView">
-          <SvgIcon class="icon" icon-class="fi-export" color="#666"/>
-          <span>{{$t('message.workflow.process.resource')}}</span>
+          <!-- 预留运维发布的区别-->
+        <div v-if="publish">
+            <div
+              v-if="type==='flow'"
+              :title="$t('message.workflow.process.publish')"
+              class="button"
+              @click="workflowPublishIsShow">
+              <template v-if="!isFlowPubulish">
+                <SvgIcon class="icon" icon-class="publish" color="#666"/>
+                <span>{{$t('message.workflow.process.publish')}}</span>
+              </template>
+              <Spin v-else class="public_loading">
+                <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
+                <span>{{$t('message.workflow.publishing')}}</span>
+              </Spin>
+            </div>
+            <div class="devider"></div>
+            <div 
+              v-if="schedulingStatus.published" 
+              class="button" 
+              @click.stop="linkToDispatch">
+              <SvgIcon class="icon" icon-class="ds-center" color="#666"/>
+              <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
+            </div>
         </div>
-        <div class="devider" />
-        <!-- <div
-          :title="$t('message.workflow.process.import')"
-          class="button"
-          @click="showImportJsonView">
-          <SvgIcon class="icon" icon-class="fi-download" color="#666"/>
-          <span>{{$t('message.workflow.process.import')}}</span>
-        </div>
-        <div class="devider" />-->
-        <div
-          v-if="!workflowIsExecutor"
-          :title="$t('message.workflow.process.run')"
-          class="button"
-          @click="clickswitch">
-          <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-          <span>{{$t('message.workflow.process.run')}}</span>
-        </div>
-        <div
-          v-if="workflowIsExecutor"
-          :title="$t('message.workflow.process.stop')"
-          class="button"
-          @click="clickswitch">
-          <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
-          <span>{{$t('message.workflow.process.stop')}}</span>
-        </div>
-        <div class="devider" />
-        <div
-          :title="$t('message.workflow.process.save')"
-          class="button"
-          @click="handleSave">
-          <SvgIcon class="icon" icon-class="save-2" color="#666"/>
-          <span>{{$t('message.workflow.process.save')}}</span>
-        </div>
-        <div v-if="type==='flow'" class="devider" />
-        <div
-          v-if="type==='flow'"
-          :title="$t('message.workflow.process.publish')"
-          class="button"
-          :disabled="publishChangeCount<1"
-          @click="workflowPublishIsShow">
-          <template v-if="!isFlowPubulish">
-            <SvgIcon class="icon" icon-class="publish" color="#666"/>
-            <span>{{$t('message.workflow.process.publish')}}</span>
-          </template>
-          <Spin v-else class="public_loading">
-            <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
-            <span>{{$t('message.workflow.publishing')}}</span>
-          </Spin>
-        </div>
-        <!-- <div v-if="type==='flow'" class="devider"></div>
-        <div
-          v-if="type==='flow'"
-          :title="$t('message.workflow.process.publish')"
-          class="button"
-          @click="exportWorkflow">
-          <svg class="icon" width="200px" height="185.84px" viewBox="0 0 1102 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path fill="#333333" d="M894.424615 970.121846l-305.624615-137.924923c-22.606769-10.24-32.531692-35.603692-20.952615-56.477538 5.513846-10.24 14.887385-17.801846 26.466461-21.425231a49.703385 49.703385 0 0 1 35.288616 2.048l250.486153 113.427692 107.52-682.929231-486.557538 538.466462v250.407385c0 23.394462-20.401231 42.220308-45.686154 42.220307-25.442462 0-45.843692-18.825846-45.843692-42.220307V711.601231c0-2.048 0-4.647385 0.551384-6.616616a40.566154 40.566154 0 0 1 10.476308-22.44923l458.436923-507.352616-735.389538 351.625846 173.292307 82.944c22.606769 11.264 31.980308 36.706462 20.401231 58.052923a43.559385 43.559385 0 0 1-25.442461 20.873847 46.788923 46.788923 0 0 1-34.185847-2.048L26.781538 566.035692a48.049231 48.049231 0 0 1-21.504-20.873846 40.644923 40.644923 0 0 1-3.308307-32.059077 43.874462 43.874462 0 0 1 22.055384-24.969846L1033.924923 4.726154a42.062769 42.062769 0 0 1 22.055385-4.568616c22.685538-0.472615 41.984 14.257231 45.843692 34.658462a36.627692 36.627692 0 0 1-1.102769 20.322462l-139.579077 882.451692c-2.756923 18.904615-19.298462 33.083077-39.148308 36.155077a47.419077 47.419077 0 0 1-27.569231-3.544616z" /></svg>
-          <span>导出</span>
-        </div> -->
-        <!--<div class="devider"></div>-->
-        <!-- <div class="button" @click="goScheduleCenter">
-          <SvgIcon class="icon" icon-class="icon-shengchanzhongxin" color="#666"/>
-          <span>
-            {{$t('message.workflow.goScheduleCenter')}}
-          </span>
-        </div> -->
-        <!--<div class="devider"></div>-->
-        <!--<div ref="dispatchButton" class="button" @click.stop="dispatchSetShow">-->
-        <!--<SvgIcon class="icon" icon-class="dispatch" color="#666"/>-->
-        <!--<span>调度配置</span>-->
-        <!--</div>-->
-        <!-- <div v-if="!showDispatchHistoryButton" class="devider"></div>
-        <div v-if="!showDispatchHistoryButton" class="button" @click="dispatchHistoryShow">
-          <SvgIcon class="icon" icon-class="history" color="#666"/>
-          <span>调度历史</span>
-        </div> -->
-        <div class="devider"></div>
-        <div class="button" @click.stop="linkToDispatch">
-          <SvgIcon class="icon" icon-class="ds-center" color="#666"/>
-          <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
-        </div>
+      </div>
       </template>
       <!-- 生产中心保留执行和地图模式 -->
       <template v-if="myReadonly">
@@ -400,7 +376,7 @@ import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
-import { getPublishStatus } from '@/apps/workflows/service/api.js';
+import { getPublishStatus, getSchedulingStatus } from '@/apps/workflows/service/api.js';
 
 export default {
   components: {
@@ -432,6 +408,10 @@ export default {
     readonly: {
       type: [String, Boolean],
       default: false,
+    },
+    publish: {
+      type: Boolean,
+      default: false
     },
     product: {
       type: [Boolean],
@@ -544,7 +524,11 @@ export default {
       changeNum: 0,
       consoleParams: [],
       appId: null,
-      newOrchestratorVersionId: this.orchestratorVersionId
+      newOrchestratorVersionId: this.orchestratorVersionId,
+      schedulingStatus: {
+        published: false,
+        releaseStatus: ''
+      }
     };
   },
   computed: {
@@ -639,6 +623,7 @@ export default {
     //   const taskId = this.getTaskId();
     //   this.checkPublishStatus(taskId, 5000);
     // }
+    this.refreshSchedulingStatus();
   },
   watch: {
     jsonChange(val) {
@@ -686,6 +671,13 @@ export default {
     }
   },
   methods: {
+    refreshSchedulingStatus(){
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+      }).catch(() => {
+
+      })
+    },
     // 保存node参数修改
     saveNodeParameter() {
       this.$refs.nodeParameter.save();
@@ -2139,12 +2131,17 @@ export default {
         })
       })
     },
+    
     workflowPublishIsShow(event) {
       // 已经在发布不能再点击
-      if(this.publishChangeCount < 1) {
+      if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
         event.preventDefault();
         event.stopPropagation();
-        this.$Message.warning(this.$t('message.workflow.warning.unChange'))
+        this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        return;
+      }
+      if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+        this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
         return;
       }
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
@@ -2206,6 +2203,7 @@ export default {
         timeoutValue += 2000;
         getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
+            this.refreshSchedulingStatus();
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);
               this.checkResult(id, timeoutValue, type);

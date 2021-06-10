@@ -8,12 +8,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.BaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+//import io.swagger.annotations.ApiModel;
+//import io.swagger.annotations.ApiModelProperty;
+//import lombok.Data;
+//import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -25,14 +26,20 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author Lvjw
  * @since 2021-06-01
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "DssAdminUser对象" , description = "用户信息表")
-public class DssUser extends BaseEntity {
+//@Data
+//@EqualsAndHashCode(callSuper = false)
+//@ApiModel(value = "DssAdminUser对象" , description = "用户信息表")
+
+@TableName(value = "dss_user")
+
+
+public class DssAdminUser extends BaseEntity {
     private static final long serialVersionUID = 1L;
     /**
      * user_id
      */
+    @TableId(type = IdType.AUTO)
+
     private Long id;
 
     /**

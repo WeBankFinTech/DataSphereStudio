@@ -44,6 +44,16 @@
             <artifactId>azkaban-common</artifactId>
             <version>${azkaban.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>opendj-core</artifactId>
+                    <groupId>org.forgerock.opendj</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>opendj-grizzly</artifactId>
+                    <groupId>org.forgerock.opendj</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

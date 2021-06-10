@@ -60,14 +60,14 @@
         <FormItem :label="$t('message.workspaceManagemnet.user')" prop="name">
           <Row>
             <Col span="12" style="width: 196px" size="small">
-            <Select
-              v-model="useradd.name"
-              filterable
-              remote
-              :remote-method="remoteMethod1"
-              :loading="loading1">
-              <Option v-for="(option, index) in options" :value="option.value" :key="index">{{option.label}}</Option>
-            </Select>
+              <Select
+                v-model="useradd.id"
+                filterable
+                remote
+                :remote-method="remoteMethod1"
+                :loading="loading1">
+                <Option v-for="(option, index) in options" :value="option.id" :key="index">{{option.userName}}</Option>
+              </Select>
             </Col>
           </Row>
         </FormItem>
@@ -180,24 +180,22 @@ export default {
   },
   mounted() {
     this.username()
-    this.init();
+    this.init()
+    this.deptId = storage.get("curWorkspace", 'local').department
   },
   methods: {
     remoteMethod1(query) {
       if (query !== "") {
         this.loading1 = true;
-        setTimeout(() => {
+        api.fetch(`${this.$API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/user/list`,{
+          deptId: this.deptId,
+          userName: query,
+          pageSize: 1000,
+          pageNum: 1
+        },'get').then((res)=>{
           this.loading1 = false;
-          const list = this.usernamelist.map(item => {
-            return {
-              value: item,
-              label: item
-            };
-          });
-          this.options = list.filter(
-            item => item.label.toLowerCase().indexOf(query.toLowerCase()) > -1
-          );
-        }, 200);
+          this.options = res.rows
+        })
       } else {
         this.options = [];
       }
@@ -310,7 +308,7 @@ export default {
     },
     creater() {
       this.useradd = {
-        name: "",
+        id: "",
         role: []
       }
       this.creatershow = true;
@@ -331,11 +329,20 @@ export default {
       this.options = [];
     },
     createuser(){
-      let name = this.useradd.name
+      let id = this.useradd.id
+      let userName
+      for (let i = 0; i < this.options.length; i++) {
+        let option = this.options[i]
+        if (option.id === id) {
+          userName = option.userName
+          break
+        }
+      }
       const params = {
         roles: this.useradd.role,
         workspaceId: this.workspaceId,
-        username: name,
+        userId: id,
+        userName: userName
       }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}addWorkspaceUser`, params).then(() => {
         this.init()

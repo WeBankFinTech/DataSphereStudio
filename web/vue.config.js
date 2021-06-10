@@ -222,8 +222,9 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://192.168.10.201:8088',
-        // target: 'http://192.168.10.180:8088',
+        //target: 'http://192.168.10.201:8088',
+        target: 'http://192.168.9.119:9202', //tangHan
+        //target: 'http://192.168.10.180:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'

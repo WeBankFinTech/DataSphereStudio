@@ -92,3 +92,22 @@
     margin: 0 10px 0 25px;
     display: inline-block;
 }
+
+.luban-menu-trigger {
+    display: block;
+    margin-left: -20px;
+    width: 54px;
+    height: 54px;
+    line-height: 54px;
+    background: #061528;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+      background: #2E92F7;
+    }
+    img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+}

@@ -171,7 +171,19 @@ module.exports = {
             { source: './dist', destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip` },
           ]
         },
-      }])
+      }]).use(new UglifyJsPlugin({
+        uglifyOptions: {
+          // output: {
+          //   comments: false
+          // },
+          warnings: false,
+          compress: {
+            drop_debugger: true, // 去掉debugger
+            drop_console: true,  // 去掉console
+            pure_funcs: ['console.log']// 移除console
+          }
+        }
+      }))
     }
   },
   configureWebpack: {
@@ -182,23 +194,23 @@ module.exports = {
       }
     },
     plugins,
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            // output: {
-            //   comments: false
-            // },
-            compress: {
-              warnings: false,
-              drop_debugger: true, // 去掉debugger
-              drop_console: true,  // 去掉console
-              pure_funcs: ['console.log']// 移除console
-            }
-          }
-        })
-      ]
-    }
+    // optimization: {
+    //   minimizer: [
+    //     new UglifyJsPlugin({
+    //       uglifyOptions: {
+    //         // output: {
+    //         //   comments: false
+    //         // },
+    //         warnings: false,
+    //         compress: {
+    //           drop_debugger: true, // 去掉debugger
+    //           drop_console: true,  // 去掉console
+    //           pure_funcs: ['console.log']// 移除console
+    //         }
+    //       }
+    //     })
+    //   ]
+    // }
   },
   // 选项...
   pluginOptions: {

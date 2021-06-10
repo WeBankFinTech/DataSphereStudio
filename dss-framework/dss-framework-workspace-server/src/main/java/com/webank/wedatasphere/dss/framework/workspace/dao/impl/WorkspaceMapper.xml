@@ -190,6 +190,8 @@
         FROM
             dss_onestop_user_favorites
         WHERE
-            id = #{favouritesId}
+            menu_application_id = #{applicationId}
+            AND username = #{username}
+            AND workspace_id = #{workspaceId}
     </delete>
 </mapper>

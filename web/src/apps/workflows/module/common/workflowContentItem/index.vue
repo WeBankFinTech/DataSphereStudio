@@ -65,7 +65,6 @@
 </template>
 <script>
 import mixin from '@/common/service/mixin'
-import util from "@/common/util"
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -132,17 +131,17 @@ export default {
   methods: {
     checkEditable(item) {
       // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
-      if ([2, 3].includes(item.priv)) {
-        return true
-      } else {
-        return false
-      }
+      return item.editable;  //后端新增字段
+      // if ([2, 3].includes(item.priv)) {
+      //   return true
+      // } else {
+      //   return false
+      // }
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);
     },
     goto(item, subItem) {
-      util.checkToken(()=>{}, true)
       // 被锁住时候不能跳转
       if(subItem.flowEditLockExist) return this.$Message.warning(this.$t("message.workflow.workflowItem.lockTip"))
       // 在发布中不允许跳转

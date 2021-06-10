@@ -92,4 +92,14 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
         return  tempWorkspaceIds;
     }
+
+    @Override
+    public List<String> getWorkspaceEditUsers(int workspaceId) {
+        return dssWorkspaceUserMapper.getWorkspaceEditUsers(workspaceId);
+    }
+
+    @Override
+    public List<String> getWorkspaceReleaseUsers(int workspaceId) {
+        return dssWorkspaceUserMapper.getWorkspaceReleaseUsers(workspaceId);
+    }
 }

@@ -4,7 +4,7 @@ import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants
 import com.webank.wedatasphere.dss.framework.admin.common.exception.AdminException;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
-import com.webank.wedatasphere.dss.framework.admin.mapper.DssAdminDeptMapper;
+import com.webank.wedatasphere.dss.framework.admin.xml.DssAdminDeptMapper;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.TreeSelect;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

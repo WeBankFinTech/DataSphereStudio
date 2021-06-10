@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.framework.admin.mapper;
+package com.webank.wedatasphere.dss.framework.admin.xml;
 
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

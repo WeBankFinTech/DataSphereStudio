@@ -1,0 +1,116 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\sihaiyang\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js install
+
+PATH: 
+  C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\bin;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files (x86)\NetSarang\Xshell 7\;C:\Program Files\nodejs\;C:\Users\sihaiyang\AppData\Local\Programs\Python\Python38\Scripts\;C:\Users\sihaiyang\AppData\Local\Programs\Python\Python38\;C:\Users\sihaiyang\anaconda3;C:\Users\sihaiyang\anaconda3\Library\mingw-w64\bin;C:\Users\sihaiyang\anaconda3\Library\usr\bin;C:\Users\sihaiyang\anaconda3\Library\bin;C:\Users\sihaiyang\anaconda3\Scripts;C:\Users\sihaiyang\AppData\Local\Programs\Python\Python38\Scripts\;C:\Users\sihaiyang\AppData\Local\Programs\Python\Python38\;C:\Users\sihaiyang\AppData\Local\Microsoft\WindowsApps;C:\Users\sihaiyang\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\sihaiyang\AppData\Local\Programs\Fiddler;C:\Users\sihaiyang\AppData\Roaming\npm;C:\Program Files\JetBrains\PyCharm Professional Edition with Anaconda plugin 2020.1\bin;;C:\Users\sihaiyang\AppData\Local\Microsoft\WindowsApps;
+
+Yarn version: 
+  1.22.10
+
+Node version: 
+  14.16.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.npm.taobao.org/@webank%2fwa-sdk: Not found
+      at Request.params.callback [as _callback] (C:\Users\sihaiyang\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66988:18)
+      at Request.self.callback (C:\Users\sihaiyang\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140662:22)
+      at Request.emit (events.js:315:20)
+      at Request.<anonymous> (C:\Users\sihaiyang\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141634:10)
+      at Request.emit (events.js:315:20)
+      at IncomingMessage.<anonymous> (C:\Users\sihaiyang\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141556:12)
+      at Object.onceWrapper (events.js:421:28)
+      at IncomingMessage.emit (events.js:327:22)
+      at endReadableNT (internal/streams/readable.js:1327:12)
+      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+
+npm manifest: 
+  {
+      "name": "dataspherestudio",
+      "version": "1.0.0",
+      "private": true,
+      "scripts": {
+          "serve": "vue-cli-service serve",
+          "serve-workflows": "npm run serve --module=scriptis,workflows --micro_module=workflows",
+          "serve-apiServices": "npm run serve --module=apiServices,workspace --micro_module=apiServices",
+          "build": "vue-cli-service build",
+          "build-sandbox": "vue-cli-service build --mode sandbox",
+          "build-workflows": "npm run build --module=scriptis,workflows --micro_module=workflows",
+          "build-apiServices": "npm run build --module=apiServices,workspace --micro_module=apiServices",
+          "release": "node ./scripts/release.js",
+          "lint": "vue-cli-service lint --no-fix",
+          "fix": "eslint --ext .js,.vue src --fix",
+          "precommit": "lint-staged",
+          "postinstall": "patch-package"
+      },
+      "husky": {
+          "hooks": {
+              "postcommit": "git update-index --again",
+              "pre-commit": "lint-staged"
+          }
+      },
+      "lint-staged": {
+          "src/**/*.{js,vue}": [
+              "vue-cli-service lint --no-fix",
+              "git add"
+          ]
+      },
+      "dependencies": {
+          "@webank/wa-sdk": "1.10.11",
+          "axios": "0.19.2",
+          "babel-polyfill": "6.26.0",
+          "core-js": "2.6.11",
+          "dexie": "2.0.4",
+          "dt-sql-parser": "1.2.1",
+          "eslint": "6.8.0",
+          "eslint-plugin-vue": "6.2.2",
+          "highlight.js": "9.18.3",
+          "iview": "3.5.4",
+          "lodash": "4.17.20",
+          "md5": "2.3.0",
+          "mitt": "1.2.0",
+          "moment": "2.29.1",
+          "monaco-editor": "0.19.3",
+          "pinyin": "2.9.1",
+          "qs": "6.9.4",
+          "reconnecting-websocket": "4.4.0",
+          "sql-formatter": "2.3.3",
+          "svgo": "1.3.0",
+          "vue": "2.6.12",
+          "vue-i18n": "8.22.1",
+          "vue-router": "3.4.8",
+          "vuedraggable": "2.24.3",
+          "vuescroll": "4.16.1",
+          "worker-loader": "2.0.0"
+      },
+      "devDependencies": {
+          "@kazupon/vue-i18n-loader": "0.4.1",
+          "@vue/cli-plugin-babel": "3.12.1",
+          "@vue/cli-plugin-eslint": "3.12.1",
+          "@vue/cli-service": "3.12.1",
+          "@vue/eslint-config-standard": "4.0.0",
+          "archiver": "3.1.1",
+          "babel-eslint": "10.1.0",
+          "copy-webpack-plugin": "4.6.0",
+          "csp-html-webpack-plugin": "4.0.0",
+          "filemanager-webpack-plugin": "2.0.5",
+          "husky": "1.3.1",
+          "lint-staged": "8.2.1",
+          "monaco-editor-webpack-plugin": "1.8.2",
+          "node-sass": "4.14.1",
+          "patch-package": "6.2.2",
+          "sass-loader": "7.3.1",
+          "svg-sprite-loader": "5.0.0",
+          "vue-cli-plugin-mockjs": "0.1.3",
+          "vue-template-compiler": "2.6.12",
+          "webpack-virtual-modules": "0.3.2"
+      }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

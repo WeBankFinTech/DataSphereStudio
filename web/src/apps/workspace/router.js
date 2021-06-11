@@ -56,7 +56,16 @@ export const apiServicesRoutes = [
       component: () =>
         import('./module/management/module/jurisdiction.vue'),
     }]
-  }
+  },
+  {
+    path: 'permissions',
+    name: 'Permissions',
+    meta: {
+      title: 'DataSphere Studio',
+      publicPage: true,
+    },
+    component: () => import('./view/permissions/index.vue'),
+  },
 ];
 
 const routes = apiServicesRoutes.concat([{

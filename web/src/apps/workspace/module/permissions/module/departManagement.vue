@@ -8,7 +8,7 @@
         >
           <Input
             type="text"
-            v-model="queries.departName"
+            v-model="queries.deptName"
             :placeholder="$t('message.permissions.departPlaceholder')"
             style="width: 272px"
           >
@@ -218,7 +218,13 @@ import {
   ModifyDepartment,
   DeleteDepartment
 } from "@/common/service/permissions";
-import { ID_CHAIN, addIdChain, expandAll, getParentDepartName, removeEmptyChildren } from "../util";
+import {
+  ID_CHAIN,
+  addIdChain,
+  expandAll,
+  getParentDepartName,
+  removeEmptyChildren
+} from "../util";
 
 //构建表格所需的树形结构
 function assembleTree(level, datas, result) {
@@ -245,7 +251,7 @@ export default {
   data() {
     return {
       queries: {
-        departName: ""
+        deptName: ""
       },
       idChain: ID_CHAIN,
       columns: [
@@ -277,7 +283,8 @@ export default {
         {
           title: this.$t("message.permissions.operation"),
           key: "operation",
-          slot: "operation"
+          slot: "operation",
+          fixed: "right"
         }
       ],
       departmentList: [],
@@ -311,30 +318,29 @@ export default {
     this.getDepartmentList();
   },
   methods: {
-    getDepartmentList() {
+    getDepartmentList(query = "") {
       this.loading = true;
-      GetDepartmentList({})
+      GetDepartmentList(query)
         .then(data => {
           const depts = (data && data.deptList) || [];
-          if (depts.length > 0) {
-            const departs = [];
-            let MAX_LEVEL = 0;
-            depts.map(item => {
-              const dept = { ...item };
-              const level = dept.ancestors.split(",").length - 1;
-              dept.level = level;
-              MAX_LEVEL = level > MAX_LEVEL ? level : MAX_LEVEL;
-              departs.push(dept);
-            });
-            let result = {};
-            assembleTree(MAX_LEVEL, departs, result);
-            console.log(result);
-            const departmentList = result.data;
-            departmentList.forEach(item => addIdChain(item, "id"));
-            this.departmentListOrigin = [...departmentList];
-            this.departmentList = expandAll(departmentList);
-            this.loading = false;
-          }
+
+          const departs = [];
+          let MAX_LEVEL = 0;
+          depts.map(item => {
+            const dept = { ...item };
+            const level = dept.ancestors.split(",").length - 1;
+            dept.level = level;
+            MAX_LEVEL = level > MAX_LEVEL ? level : MAX_LEVEL;
+            departs.push(dept);
+          });
+          let result = {};
+          assembleTree(MAX_LEVEL, departs, result);
+          console.log(result);
+          const departmentList = result.data;
+          departmentList.forEach(item => addIdChain(item, "id"));
+          this.departmentListOrigin = [...departmentList];
+          this.departmentList = expandAll(departmentList);
+          this.loading = false;
         })
         .catch(e => {
           console.log(e);
@@ -343,16 +349,19 @@ export default {
     },
     handleReset() {
       this.queries = {
-        departName: ""
+        deptName: ""
       };
-      this.departmentList = expandAll(this.departmentListOrigin);
+      this.getDepartmentList();
     },
     handleQuery() {
-      console.log('qeuery');
+      console.log("qeuery");
+      const deptName = this.queries.deptName;
+      const query = deptName ? encodeURI(`?deptName=${deptName}`) : "";
+      this.getDepartmentList(query);
     },
     handleAdd() {
       GetDepartmentTree({}).then(data => {
-        const tree = data && data.deptTree || [];
+        const tree = (data && data.deptTree) || [];
         removeEmptyChildren(tree);
         this.editingData = "";
         this.departTree = tree;
@@ -361,7 +370,7 @@ export default {
             ? this.$t("message.permissions.addDepartment")
             : this.$t("message.permissions.addCompany");
         this.modalVisible = true;
-        this.departForm.parentId = tree[0] && tree[0].id || "";
+        this.departForm.parentId = (tree[0] && tree[0].id) || "";
       });
     },
     handleFold(rowData, index) {
@@ -478,11 +487,6 @@ export default {
             })
             .catch(() => {
               this.confirmLoading = false;
-              this.$Message.error(
-                isAdd
-                  ? this.$t("message.permissions.addDeptFailed")
-                  : this.$t("message.permissions.updateDeptFailed")
-              );
             });
         }
       });

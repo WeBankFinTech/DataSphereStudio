@@ -324,7 +324,8 @@ export default {
         {
           title: this.$t("message.permissions.operation"),
           key: "operation",
-          slot: "operation"
+          slot: "operation",
+          fixed: "right"
         }
       ],
       userList: [],

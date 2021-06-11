@@ -12,7 +12,15 @@ import storage from "@/common/service/storage"
 
 import Vue from 'vue'
 const Hub = new Vue()
-
+function deleteEmptyChildren(cur) {
+  if (cur.children && !cur.children.length) {
+    delete cur.children
+  } else if (cur.children && cur.children.length) {
+    for (let i = 0; i < cur.children.length; i++) {
+      deleteEmptyChildren(cur.children[i])
+    }
+  }
+}
 let util = {
   executeCopy(textValue) {
     const input = document.createElement('textarea');
@@ -92,7 +100,8 @@ let util = {
     } else {
       cb && cb()
     }
-  }
+  },
+  deleteEmptyChildren
 };
 objectUtil.merge(util, domUtil, objectUtil, typeUtil, convertUtil, currentModules);
 

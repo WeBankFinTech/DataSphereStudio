@@ -11,15 +11,10 @@ import com.webank.wedatasphere.dss.framework.admin.restful.BaseController;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -73,7 +68,7 @@ public class DssFrameworkAdminUserController extends BaseController {
     //    @GetMapping(value = {"/{id}"})
     @GET
     @Path("/{id}")
-    public Message getInfo(@PathVariable(value = "id", required = false) Long userId) {
+    public Message getInfo(@PathParam("id") Long userId) {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
     }
 

@@ -196,7 +196,7 @@ const success = function(response) {
     let message = res.messagePath;
     let result = res.resultPath;
     // 兼容 dolphin 返回数据结构
-    if (data.msg) {
+    if (data.msg && !data.msg.includes('成功')) {
       if (data.code != api.constructionOfResponse.successCode) {
         if (api.error[data.code]) {
           api.error[data.code](response);

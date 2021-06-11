@@ -1,0 +1,61 @@
+@import '@/common/style/variables.scss';
+
+$permissions-Backgroud: #F4F7FB;
+$per-border-color:#DEE4EC;
+.permission-wrap{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .header, .footer{
+    background-color: $permissions-Backgroud;
+    width: 100%;
+    height: 24px;
+
+    box-sizing: border-box;
+  }
+  .header{
+    border-bottom: 1px solid $per-border-color;
+  }
+  .footer{
+    border-top: 1px solid $per-border-color;
+  }
+  .main{
+    flex:1;
+    background-color: #fff;
+    display: flex;
+    .slider{
+      padding-top:20px;
+      width: 250px;
+      height: 100%;
+      background-color: $permissions-Backgroud;
+      box-sizing: border-box;
+      border-right: 1px solid $per-border-color;
+      .menuItem{
+        height: 40px;
+        width: 100%;
+        padding-left: 24px;
+        line-height: 40px;
+        font-size: 14px;
+        font-family: PingFangSC-Regular;
+        color: rgba(0,0,0,0.65);
+        cursor: pointer;
+        &:hover{
+          color: #2E92F7; 
+        }
+      }
+      .menuChoosed{
+        color: #2E92F7;
+        border-right: 2px solid #2E92F7;
+        background: #ECF4FF;
+        font-family: PingFangSC-Medium;
+        
+      }
+    }
+    .content{
+      flex:1;
+    }
+  }
+}
+
+

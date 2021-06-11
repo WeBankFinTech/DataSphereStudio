@@ -243,6 +243,17 @@
         justify-content: space-between;
         align-items: center;
       }
+      .permissions_entry{
+        cursor: pointer;
+        text-align: center;
+        padding: 10px 0;
+        & img{
+          width: 80px;
+        }
+        & div{
+          margin-top: 5px;
+        }
+      }
 
       .title {
         font-size: $font-size-large;

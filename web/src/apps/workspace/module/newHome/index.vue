@@ -92,6 +92,10 @@
           <h3 class="title">{{$t('message.workspace.KSRM')}}</h3>
           <Button type="text" @click="changeVideos">{{$t('message.workspace.HYP')}}</Button>
         </div>
+        <div class="permissions_entry" @click="gotoPermissions()">
+          <img src="../../assets/images/u111.svg"/>
+          <div>{{$t('message.workspace.permissions')}}</div>
+        </div>
         <div class="admin-box-video">
           <div v-for="(item, index) in videos" :key="index" class="video-item" @click="play(item)">
             <video width="100%" height="100" controls>
@@ -295,6 +299,9 @@ export default {
     // 跳转管理页
     gotoManagement(id) {
       this.$router.push({ path: '/workspaceManagement/productsettings', query: { workspaceId: id}});
+    },
+    gotoPermissions(){
+      this.$router.push({ path: '/permissions'});
     }
   }
 }

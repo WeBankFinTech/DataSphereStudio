@@ -4,7 +4,7 @@ const API_PATHG_PERMISSIONS = "/dss/framework/admin/";
 const API_PATHG_PERMISSIONS_USER = "/dss/framework/admin/user";
 
 // 获取部门列表
-const GetDepartmentList = (params) => api.fetch(`${API_PATHG_PERMISSIONS}dept/list`, params, 'get');
+const GetDepartmentList = (query) => api.fetch(`${API_PATHG_PERMISSIONS}dept/list${query}`, {}, 'get');
 
 // 获取部门树形列表
 const GetDepartmentTree = (params) => api.fetch(`${API_PATHG_PERMISSIONS}dept/treeselect`, params, 'get');

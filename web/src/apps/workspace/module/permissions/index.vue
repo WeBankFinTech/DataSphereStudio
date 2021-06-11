@@ -1,6 +1,10 @@
 <template>
   <div class="permission-wrap">
-    <div class="header"></div>
+    <div class="page-bgc-header">
+      <div class="header-info">
+        {{ $t("message.workspace.permissions") }}
+      </div>
+    </div>
     <div class="main">
       <div class="slider">
         <div
@@ -13,7 +17,7 @@
         </div>
       </div>
       <div class="content">
-          <component v-bind:is="choosedComponent"></component>
+        <component v-bind:is="choosedComponent"></component>
       </div>
     </div>
     <div class="footer"></div>

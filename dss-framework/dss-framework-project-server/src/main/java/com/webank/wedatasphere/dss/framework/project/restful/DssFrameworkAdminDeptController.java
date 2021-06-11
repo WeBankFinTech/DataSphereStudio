@@ -8,18 +8,12 @@ import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-
-import javax.ws.rs.POST;
 
 
 /**
@@ -80,7 +74,7 @@ public class DssFrameworkAdminDeptController {
     //    @GetMapping(value = "/{deptId}")
     @GET
     @Path("/{deptId}")
-    public Message getInfo(@PathVariable Long deptId) {
+    public Message getInfo(@PathParam("deptId") Long deptId) {
         return Message.ok().data("deptInfo", dssAdminDeptService.selectDeptById(deptId));
     }
 
@@ -105,7 +99,7 @@ public class DssFrameworkAdminDeptController {
      */
     @POST
     @Path("/{deptId}")
-    public Message remove(@PathVariable Long deptId) {
+    public Message remove(@PathParam("deptId") Long deptId) {
         if (dssAdminDeptService.hasChildById(deptId)) {
             return Message.error().message("存在下级部门,不允许删除");
         }

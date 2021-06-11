@@ -85,11 +85,11 @@ public class WorkspaceRestfulApi {
     @POST
     @Path("/workspaces")
     public Response addWorkspace(@Context HttpServletRequest req, JsonNode json) throws ErrorException {
-//        String userName = SecurityFilter.getLoginUsername(req);
-//        if (!dssWorkspaceService.checkAdmin(userName)){
-//            return Message.messageToResponse(Message.error("您好，您不是管理员,没有权限建立工作空间"));
-//        }
-        String userName = "demo";
+        String userName = SecurityFilter.getLoginUsername(req);
+        if (!dssWorkspaceService.checkAdmin(userName)){
+            return Message.messageToResponse(Message.error("您好，您不是管理员,没有权限建立工作空间"));
+        }
+//        String userName = "demo";
         String name = json.get("name").getTextValue();
         if (dssWorkspaceService.existWorkspaceName(name)) {
             return Message.messageToResponse(Message.error("工作空间名重复"));

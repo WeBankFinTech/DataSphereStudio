@@ -15,8 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -40,7 +48,16 @@ public class DssFrameworkAdminUserController extends BaseController {
     //    @GetMapping("/list")
     @GET
     @Path("/list")
-    public TableDataInfo list(DssAdminUser user) {
+//    public TableDataInfo list(DssAdminUser user) {
+    public TableDataInfo list(@QueryParam("userName") String userName, @QueryParam("deptId") Long deptId, @QueryParam("phonenumber") String phonenumber, @QueryParam("beginTime") String beginTime, @QueryParam("endTime") String endTime) {
+        DssAdminUser user = new DssAdminUser();
+        user.setUserName(userName);
+        user.setDeptId(deptId);
+        user.setPhonenumber(phonenumber);
+        Map<String, Object> params = new HashMap<>();
+        params.put("beginTime", beginTime);
+        params.put("endTime", endTime);
+        user.setParams(params);
         startPage();
         List<DssAdminUser> userList = dssAdminUserService.selectUserList(user);
         return getDataTable(userList);
@@ -65,7 +82,7 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     }
 
-    //    @GetMapping(value = {"/{id}"})
+    //    @GetMapping(value = {"/{id}"})@PathParam("id")
     @GET
     @Path("/{id}")
     public Message getInfo(@PathParam("id") Long userId) {

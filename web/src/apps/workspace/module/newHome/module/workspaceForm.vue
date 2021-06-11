@@ -34,15 +34,20 @@
         v-if="projectDataCurrent.workspace_type === 'department'"
         :label="$t('message.workspace.department')"
         prop="department">
-        <Select
+        <treeselect
           v-model="projectDataCurrent.department"
-          :placeholder="$t('message.workspace.selectDepartment')">
-          <Option
-            v-for="(item, index) in departments"
-            :label="item.deptName"
-            :value="String(item.id)"
-            :key="index"/>
-        </Select>
+          :placeholder="$t('message.workspace.selectDepartment')"
+          searchable
+          :options="treeDepartments" />
+        <!--<Select-->
+          <!--v-model="projectDataCurrent.department"-->
+          <!--:placeholder="$t('message.workspace.selectDepartment')">-->
+          <!--<Option-->
+            <!--v-for="(item, index) in departments"-->
+            <!--:label="item.deptName"-->
+            <!--:value="String(item.id)"-->
+            <!--:key="index"/>-->
+        <!--</Select>-->
       </FormItem>
       <FormItem
         :label="$t('message.workspace.label')"
@@ -76,10 +81,16 @@
 </template>
 <script>
 import tag from '@/components/tag/index.vue';
-import { GetDepartments, CheckWorkspaceNameExist } from '@/common/service/apiCommonMethod.js';
+import { GetDepartments, CheckWorkspaceNameExist, GetTreeDepartments } from '@/common/service/apiCommonMethod.js'
+// import the component
+import Treeselect from '@riophae/vue-treeselect'
+// import the styles
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import util from '@/common/util';
 export default {
   components: {
     'we-tag': tag,
+    Treeselect
   },
   props: {
     projectData: {
@@ -99,10 +110,13 @@ export default {
     return {
       ProjectShow: false,
       departments: [],
+      treeDepartments: []
     };
   },
   computed: {
     projectDataCurrent() {
+      if (!this.projectData.department)
+        this.projectData.department = null
       return this.projectData;
     },
     formValid() {
@@ -116,9 +130,6 @@ export default {
         description: [
           { required: true, message: this.$t('message.workspace.pleaseInputWorkspaceDesc'), trigger: 'blur' },
         ],
-        department: [
-          { required: true, message: this.$t('message.workspace.selectDepartment'), trigger: 'change' },
-        ],
         workspace_type: [
           { required: true, message: this.$t('message.workspace.selectWorkspaceType'), trigger: 'change' },
         ]
@@ -128,7 +139,12 @@ export default {
   mounted() {
     GetDepartments().then((res) => {
       this.departments = res.deptList;
-    });
+    })
+    GetTreeDepartments().then(res => {
+      let list = res.deptTree
+      list && list.length === 1 ? util.deleteEmptyChildren(list[0]) : ''
+      this.treeDepartments = list[0] ? list[0].children : list
+    })
   },
   watch: {
     addProjectShow(val) {
@@ -151,6 +167,9 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
+          if (this.projectDataCurrent.workspace_type === 'department' && !this.projectDataCurrent.department) {
+            return this.$Message.error(this.$t('message.workspace.selectDepartment'));
+          }
           this.$emit('confirm', this.projectDataCurrent);
           this.ProjectShow = false;
         } else {

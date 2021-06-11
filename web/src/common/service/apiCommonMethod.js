@@ -36,6 +36,9 @@ const GetWorkspaceApplications = (params) => api.fetch(`${API_PATH.WORKSPACE_PAT
 // 获取工作空间归属部门数据
 const GetDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/dept/list`, 'get')
 
+// 获取工作空间树形归属部门数据
+const GetTreeDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/dept/treeselect`, 'get')
+
 // 判断工作空间是否重复
 const CheckWorkspaceNameExist = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/exists`, params, 'get')
 
@@ -69,8 +72,12 @@ export {
   GetWorkspaceData,
   GetWorkspaceApplications,
   GetDepartments,
+  GetTreeDepartments,
   CheckWorkspaceNameExist,
   GetDicList,
   GetWorkspaceList,
-  GetWorkspaceBaseInfo
+  GetWorkspaceBaseInfo,
+  GetFavorites,
+  AddFavorite,
+  RemoveFavorite
 }

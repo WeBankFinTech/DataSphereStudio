@@ -115,10 +115,9 @@ export default {
   },
   computed: {
     projectDataCurrent() {
-      let data = this.projectData
-      if (data.department)
-        data.department = null
-      return data;
+      if (!this.projectData.department)
+        this.projectData.department = null
+      return this.projectData;
     },
     formValid() {
       return {

@@ -11,6 +11,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -38,7 +43,11 @@ public class DssFrameworkAdminDeptController {
 
     @GET
     @Path("/list")
-    public Message listAll(DssAdminDept dept) {
+    public Message listAll(@QueryParam("parentId") Long parentId, @QueryParam("deptName") String deptName) {
+
+        DssAdminDept dept=new DssAdminDept();
+        dept.setParentId(parentId);
+        dept.setDeptName(deptName);
         List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
         return Message.ok().data("deptList", list).message("成功");
     }

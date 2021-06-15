@@ -155,9 +155,6 @@ export default {
         role: [{ required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' }]
       },
       addrule: {
-        name: [
-          { required: true, message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: "blur" },
-        ],
         role: [
           { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' },
         ]
@@ -320,8 +317,12 @@ export default {
     Ok(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          if(name === 'addUser')  this.createuser()
-          if(name === 'editUser') this.editrole()
+          if(name === 'addUser') {
+            this.useradd.id ? this.createuser() : this.$Message.error(this.$t("message.workspaceManagemnet.addruleMsg"));
+          }
+          if(name === 'editUser') {
+            this.editrole()
+          }
         } else {
           this.$Message.warning(this.$t("message.workspaceManagemnet.failedNotice"));
         }

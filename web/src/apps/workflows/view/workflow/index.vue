@@ -123,6 +123,7 @@ export default {
         accessUsers: [],
         devProcessList: [],
         orchestratorModeList: [],
+        releaseUsers: [],
       },
       selectOrchestratorList: [],
       devProcessBase: [],

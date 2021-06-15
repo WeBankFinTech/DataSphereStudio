@@ -137,7 +137,8 @@ export default {
         product: '',
         editUsers: [],
         accessUsers: [],
-        devProcessList: []
+        devProcessList: [],
+        releaseUsers: [],
       },
       dataList: [
         {
@@ -335,7 +336,9 @@ export default {
         applicationArea: '',
         product: '',
         editUsers: [],
-        accessUsers: []
+        accessUsers: [],
+        devProcessList: [],
+        releaseUsers: [],
       };
     },
     // 修改工程

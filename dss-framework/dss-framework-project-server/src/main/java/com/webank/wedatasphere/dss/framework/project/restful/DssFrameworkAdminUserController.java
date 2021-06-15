@@ -9,6 +9,11 @@ import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.restful.BaseController;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.service.LdapService;
+import com.webank.wedatasphere.dss.framework.project.utils.LdapUtils;
+import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +49,8 @@ import java.util.Map;
 public class DssFrameworkAdminUserController extends BaseController {
     @Resource
     private DssAdminUserService dssAdminUserService;
+    @Autowired
+    private LdapService ldapService;
 
     //    @GetMapping("/list")
     @GET
@@ -67,6 +74,8 @@ public class DssFrameworkAdminUserController extends BaseController {
     @POST
     @Path("/add")
     public Message add(@Validated @RequestBody DssAdminUser user) {
+        try{
+
         if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
             return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         } else if (StringUtils.isNotEmpty(user.getPhonenumber())
@@ -77,8 +86,15 @@ public class DssFrameworkAdminUserController extends BaseController {
             return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
 
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return Message.ok().data("rows", dssAdminUserService.insertUser(user)).message("新增成功");
+        String pwd = user.getPassword();
+        user.setPassword(SecurityUtils.encryptPassword(pwd));
+        int rows = dssAdminUserService.insertUser(user);
+        String userName = user.getUserName();
+        ldapService.addUser(ProjectConf.LDAP_ADMIN_NAME.getValue(),ProjectConf.LDAP_ADMIN_PASS.getValue(),ProjectConf.LDAP_URL.getValue(),ProjectConf.LDAP_BASE_DN.getValue(),userName,pwd);
+        return Message.ok().data("rows", rows).message("新增成功");
+        }catch (Exception exception){
+           return Message.error().data("rows",0).message(exception.getMessage());
+    }
 
     }
 

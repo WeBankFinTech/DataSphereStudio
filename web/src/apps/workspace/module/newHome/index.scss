@@ -1,10 +1,10 @@
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 
 .newHome_page {
   background-color: #f4f7fb;
   background: #f4f7fb;
   height: 100%;
-  color: rgba(0,0,0,0.85);
+  color: rgba(0, 0, 0, 0.85);
   padding: 25px;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
       p {
         font-size: $font-size-base;
         margin: 12px 0 24px;
-        color: rgba(0,0,0,0.5);
+        color: rgba(0, 0, 0, 0.5);
       }
     }
   }
@@ -40,7 +40,7 @@
       overflow-y: auto;
       padding: 25px;
       box-sizing: border-box;
-      border: 1px solid #DEE4EC;
+      border: 1px solid #dee4ec;
       border-radius: 2px;
       min-width: 640px;
 
@@ -95,7 +95,7 @@
           margin-bottom: 25px;
           box-sizing: border-box;
           border: 1px dashed #d9d9d9;
-          background: #F8F9FC;
+          background: #f8f9fc;
           border-radius: 2px;
           padding: 10px;
           position: relative;
@@ -131,11 +131,12 @@
           height: 116px;
           margin-bottom: 25px;
           box-sizing: border-box;
-          border: 1px solid #DEE4EC;
+          border: 1px solid #dee4ec;
           border-radius: 2px;
           padding: 25px;
           position: relative;
-          background: url("../../assets/images/bgc-imag.svg") center center no-repeat;
+          background: url("../../assets/images/bgc-imag.svg") center center
+            no-repeat;
           background-size: 100%;
           margin-right: 25px;
 
@@ -182,7 +183,7 @@
             word-break: break-all;
             font-family: PingFangSC-Regular;
             font-size: 14px;
-            color: rgba(0,0,0,0.45);
+            color: rgba(0, 0, 0, 0.45);
             line-height: 22px;
             margin-top: 8px;
           }
@@ -199,8 +200,8 @@
             .item {
               display: inline-block;
               font-size: 10px;
-              padding: .3em .9em;
-              margin: 0 .5em .5em 0;
+              padding: 0.3em 0.9em;
+              margin: 0 0.5em 0.5em 0;
               white-space: nowrap;
               background-color: #f1f8ff;
               border-radius: $border-radius-small;
@@ -234,7 +235,7 @@
       overflow-y: auto;
       padding: 25px;
       box-sizing: border-box;
-      border: 1px solid #DEE4EC;
+      border: 1px solid #dee4ec;
       border-radius: 2px;
       background: #ffffff;
 
@@ -243,21 +244,25 @@
         justify-content: space-between;
         align-items: center;
       }
-      .permissions_entry{
-        cursor: pointer;
-        text-align: center;
-        padding: 10px 0;
-        & img{
-          width: 80px;
-        }
-        & div{
-          margin-top: 5px;
+      .permissions_wrap {
+        display: flex;
+        justify-content: flex-start;
+        .permissions_entry {
+          cursor: pointer;
+          text-align: center;
+          padding: 10px 0;
+          & img {
+            width: 80px;
+          }
+          & div {
+            margin-top: 5px;
+          }
         }
       }
 
       .title {
         font-size: $font-size-large;
-        color: rgba(0,0,0,0.85);
+        color: rgba(0, 0, 0, 0.85);
         padding-left: 10px;
         line-height: 1;
         border-left: 3px solid $primary-color;
@@ -280,5 +285,4 @@
       }
     }
   }
-
 }

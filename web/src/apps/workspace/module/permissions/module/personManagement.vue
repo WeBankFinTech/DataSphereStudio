@@ -128,7 +128,7 @@
       @on-cancel="handleModalCancel"
       footer-hide
     >
-      <Form ref="departmentForm" :label-width="100">
+      <Form ref="departmentForm" :label-width="100" v-if="!editingData">
         <FormItem
           :label="$t('message.permissions.userDepart')"
           :error="departmentErrorTip"
@@ -174,6 +174,12 @@
         :label-width="100"
         :rules="ruleValidate"
       >
+        <FormItem
+          :label="$t('message.permissions.userDepart')"
+          v-if="!!editingData"
+        >
+          <div>{{ editingData.departNameList }}</div>
+        </FormItem>
         <FormItem :label="$t('message.permissions.userName')" prop="name">
           <Input
             type="text"
@@ -418,9 +424,16 @@ export default {
       GetUserList(query)
         .then(data => {
           this.tableLoading = false;
-          console.log(data);
-          this.userList = data.userList;
           this.pageData.total = data.total;
+          this.userList = data.userList.map(item => {
+            const user = { ...item };
+            if (user.createTime) {
+              user.createTime = moment(user.createTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+              );
+            }
+            return user;
+          });
         })
         .catch(e => {
           console.log(e);
@@ -491,11 +504,13 @@ export default {
       }
     },
     edit(rowData) {
-      console.log(rowData);
+      rowData.departNameList = this.getParentName({ id: rowData.deptId });
       this.editingData = rowData;
       const newObj = {};
       Object.keys(this.userForm).forEach(key => {
-        newObj[key] = rowData[key];
+        if (key !== "password") {
+          newObj[key] = rowData[key];
+        }
       });
       this.userForm = newObj;
       this.modalTitle = this.$t("message.permissions.editUser");
@@ -557,16 +572,16 @@ export default {
               );
               this.modalVisible = false;
               this.confirmLoading = false;
-              this.resetUserForm();
               this.getUserList({});
+              this.resetUserForm();
             })
             .catch(() => {
               this.confirmLoading = false;
-              this.$Message.error(
-                isAdd
-                  ? this.$t("message.permissions.addUserFailed")
-                  : this.$t("message.permissions.updateUserFailed")
-              );
+              // this.$Message.error(
+              //   isAdd
+              //     ? this.$t("message.permissions.addUserFailed")
+              //     : this.$t("message.permissions.updateUserFailed")
+              // );
             });
         }
       });

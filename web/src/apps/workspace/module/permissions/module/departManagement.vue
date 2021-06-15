@@ -136,9 +136,10 @@
             v-model="departForm.parentName"
             :placeholder="$t('message.permissions.pleaseInput')"
             style="width: 300px"
-            :disabled="!!editingData"
+            v-if="!editingData"
           >
           </Input>
+          <div v-if="!!editingData">{{ departForm.parentName }}</div>
         </FormItem>
         <FormItem
           :label="
@@ -211,6 +212,7 @@
 <script>
 import _ from "lodash";
 import Treeselect from "@riophae/vue-treeselect";
+import moment from "moment";
 import {
   GetDepartmentList,
   GetDepartmentTree,
@@ -329,6 +331,11 @@ export default {
           depts.map(item => {
             const dept = { ...item };
             const level = dept.ancestors.split(",").length - 1;
+            if (dept.createTime) {
+              dept.createTime = moment(dept.createTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+              );
+            }
             dept.level = level;
             MAX_LEVEL = level > MAX_LEVEL ? level : MAX_LEVEL;
             departs.push(dept);
@@ -474,7 +481,6 @@ export default {
           this.confirmLoading = true;
           executeMethod(params)
             .then(data => {
-              console.log(data);
               this.$Message.success(
                 isAdd
                   ? this.$t("message.permissions.addDeptSucess")

@@ -103,6 +103,7 @@
         <if test="email != null and email != ''">email,</if>
         <if test="phonenumber != null and phonenumber != ''">phonenumber,</if>
         <if test="password != null and password != ''">password,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
         create_time
         )values(
         <if test="id != null and id != ''">#{id},</if>

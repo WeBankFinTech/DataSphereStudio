@@ -128,7 +128,7 @@
       @on-cancel="handleModalCancel"
       footer-hide
     >
-      <Form ref="departmentForm" :label-width="100" v-if="!editingData">
+      <Form ref="departmentForm" :label-width="100">
         <FormItem
           :label="$t('message.permissions.userDepart')"
           :error="departmentErrorTip"
@@ -137,7 +137,6 @@
           <treeselect
             v-model="userForm.deptId"
             :options="departTreeOrigin"
-            :disabled="!!editingData"
             :placeholder="
               $t('message.permissions.pleaseInput') +
                 $t('message.permissions.userDepart') +
@@ -174,12 +173,6 @@
         :label-width="100"
         :rules="ruleValidate"
       >
-        <FormItem
-          :label="$t('message.permissions.userDepart')"
-          v-if="!!editingData"
-        >
-          <div>{{ editingData.departNameList }}</div>
-        </FormItem>
         <FormItem :label="$t('message.permissions.userName')" prop="name">
           <Input
             type="text"
@@ -572,16 +565,11 @@ export default {
               );
               this.modalVisible = false;
               this.confirmLoading = false;
-              this.getUserList({});
+              this.getUserList(isAdd ?{} : {pageNum: this.pageData.pageNum});
               this.resetUserForm();
             })
             .catch(() => {
               this.confirmLoading = false;
-              // this.$Message.error(
-              //   isAdd
-              //     ? this.$t("message.permissions.addUserFailed")
-              //     : this.$t("message.permissions.updateUserFailed")
-              // );
             });
         }
       });

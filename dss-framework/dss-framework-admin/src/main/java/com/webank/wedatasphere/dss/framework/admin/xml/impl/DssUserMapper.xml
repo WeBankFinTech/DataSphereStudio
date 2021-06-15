@@ -2,32 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper">
     <resultMap type="DssAdminUser" id="DssUserResult">
-        <result property="id"    column="id"    />
-        <result property="userName"    column="username"    />
-        <result property="name"    column="name"    />
-        <result property="isFirstLogin"    column="is_first_login"    />
-        <result property="deptId"    column="dept_id"    />
-        <result property="isAdmin"    column="is_admin"    />
-        <result property="email"    column="email"    />
-        <result property="phonenumber"    column="phonenumber"    />
-        <result property="password"    column="password"    />
-        <result property="delFlag"    column="del_flag"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="remark"    column="remark"    />
-        <association property="dept"    column="id" javaType="DssAdminDept" resultMap="deptResult" />
+        <result property="id" column="id"/>
+        <result property="userName" column="username"/>
+        <result property="name" column="name"/>
+        <result property="isFirstLogin" column="is_first_login"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="isAdmin" column="is_admin"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="password" column="password"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <association property="dept" column="id" javaType="DssAdminDept" resultMap="deptResult"/>
     </resultMap>
 
     <resultMap id="deptResult" type="DssAdminDept">
-        <id     property="deptId"   column="id"     />
-        <result property="parentId" column="parent_id"   />
-        <result property="deptName" column="dept_name"   />
-        <result property="orderNum" column="order_num"   />
-        <result property="leader"   column="leader"      />
-        <result property="status"   column="dept_status" />
+        <id property="deptId" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="status" column="dept_status"/>
     </resultMap>
-
-
 
 
     <sql id="selectUserVo">
@@ -39,9 +37,9 @@
     </sql>
 
 
-
     <select id="selectUserList" parameterType="DssAdminUser" resultMap="DssUserResult">
-        select u.id, u.username, u.name, u.is_first_login, u.dept_id, u.is_admin, u.email, u.phonenumber, u.password, u.del_flag, u.create_time, u.update_time, u.remark,d.dept_name, d.leader from dss_user u
+        select u.id, u.username, u.name, u.is_first_login, u.dept_id, u.is_admin, u.email, u.phonenumber, u.password,
+        u.del_flag, u.create_time, u.update_time, u.remark,d.dept_name, d.leader from dss_user u
         left join dss_admin_dept d on u.dept_id = d.id
         where u.del_flag = '0'
         <if test="userName != null and userName != ''">
@@ -60,6 +58,7 @@
             AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.id FROM dss_admin_dept t WHERE find_in_set(#{deptId},
             ancestors) ))
         </if>
+        order by u.create_time desc
     </select>
 
 
@@ -67,7 +66,6 @@
         <include refid="selectUserVo"/>
         where u.id = #{userId}
     </select>
-
 
 
     <update id="updateUser" parameterType="DssAdminUser">
@@ -94,8 +92,6 @@
     <select id="checkEmailUnique" parameterType="String" resultMap="DssUserResult">
 		select id, email from dss_user where email = #{email} limit 1
 	</select>
-
-
 
 
     <insert id="insertUser" parameterType="DssAdminUser" useGeneratedKeys="true" keyProperty="id">

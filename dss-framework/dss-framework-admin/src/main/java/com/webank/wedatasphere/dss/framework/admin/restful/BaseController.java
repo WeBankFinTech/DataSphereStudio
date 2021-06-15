@@ -45,7 +45,7 @@ public class BaseController {
         rspData.setStatus(ResponseEnum.SUCCESS.getStatus());
         HashMap<String, Object> data = (HashMap<String, Object>) Message.ok().data("total" , new PageInfo(list).getTotal()).data("userList" , list).getData();
         rspData.setData(data);
-        rspData.setMsg("查询成功");
+        rspData.setMessage("查询成功");
 
         return rspData;
     }

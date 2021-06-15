@@ -182,22 +182,26 @@ export default {
     this.username()
     this.init()
     this.deptId = storage.get("curWorkspace", 'local').department
+    this.getUserList()
   },
   methods: {
+    getUserList(query) {
+      this.loading1 = true
+      api.fetch(`${this.$API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/user/list`,{
+        deptId: this.deptId,
+        userName: query,
+        pageSize: 1000,
+        pageNum: 1
+      },'get').then((res)=>{
+        this.loading1 = false
+        this.options = res.userList
+      })
+    },
     remoteMethod1(query) {
       if (query !== "") {
-        this.loading1 = true;
-        api.fetch(`${this.$API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/user/list`,{
-          deptId: this.deptId,
-          userName: query,
-          pageSize: 1000,
-          pageNum: 1
-        },'get').then((res)=>{
-          this.loading1 = false;
-          this.options = res.rows
-        })
+        this.getUserList(query)
       } else {
-        this.options = [];
+        this.options = []
       }
     },
     init() {

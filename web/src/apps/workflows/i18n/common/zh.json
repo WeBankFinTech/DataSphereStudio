@@ -170,6 +170,8 @@
                 "usersAllowedToEdit": "请选择可编辑用户",
                 "viewPermissions": "查看权限",
                 "usersAllowedToView": "请选择可查看用户",
+                "publishPermissions": "发布权限",
+                "userAllowedPublish": "请选择可发布用户",
                 "devProcess": "开发流程",
                 "orchestratorMode": "编排模式",
                 "GZL": "工作流",

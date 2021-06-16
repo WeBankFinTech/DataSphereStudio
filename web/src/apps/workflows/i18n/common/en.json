@@ -171,6 +171,8 @@
         "usersAllowedToEdit": "Users Allowed To Edit",
         "viewPermissions": "View Permissions",
         "usersAllowedToView": "Users Allowed To View",
+        "publishPermissions": "Publish Permissions",
+        "userAllowedPublish": "Users Allowed To Publish",
         "devProcess": "Development process",
         "orchestratorMode": "Orchestrator mode",
         "GZL": "Workflow",

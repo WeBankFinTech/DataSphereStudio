@@ -19,6 +19,8 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
@@ -72,7 +74,7 @@ public class DSSWorkspaceUserRestful {
 
     @GET
     @Path("getWorkspaceUsers")
-    public Response getWorkspaceUsers(@Context HttpServletRequest request, @QueryParam(WORKSPACE_ID_STR) String workspaceId,
+    public Response getWorkspaceUsers(@Context HttpServletRequest request, @QueryParam("workspaceId") String workspaceId,
                                       @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize,
                                       @QueryParam("department") String department, @QueryParam("username") String username,
                                       @QueryParam("roleName") String roleName){
@@ -128,8 +130,9 @@ public class DSSWorkspaceUserRestful {
             }
         }
         int workspaceId = jsonNode.get("workspaceId").getIntValue();
-        String userName = jsonNode.get("username").getTextValue();
-        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator);
+        String userName = jsonNode.get("userName").getTextValue();
+        String userId = String.valueOf(jsonNode.get("userId").getBigIntegerValue());
+        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator,userId);
         return Message.messageToResponse(Message.ok());
     }
 

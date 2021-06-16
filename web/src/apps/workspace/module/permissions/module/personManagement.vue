@@ -18,7 +18,7 @@
         <p>{{ $t("message.permissions.phone") }}</p>
         <Input
           type="text"
-          v-model="queries.phone"
+          v-model="queries.phonenumber"
           :placeholder="
             $t('message.permissions.pleaseInput') +
               $t('message.permissions.phone')
@@ -282,7 +282,7 @@ export default {
     return {
       queries: {
         userName: "",
-        phone: "",
+        phonenumber: "",
         createTime: ""
       },
       departTree: [],
@@ -401,10 +401,10 @@ export default {
           if (key === "createTime") {
             if (value[0] && value[1]) {
               params.push(
-                `params[beginTime]=${moment(value[0]).format("YYYY-MM-DD")}`
+                `beginTime=${moment(value[0]).format("YYYY-MM-DD")}`
               );
               params.push(
-                `params[endTime]=${moment(value[1]).format("YYYY-MM-DD")}`
+                `endTime=${moment(value[1]).format("YYYY-MM-DD")}`
               );
             }
           } else {
@@ -436,7 +436,7 @@ export default {
     handleReset() {
       this.queries = {
         userName: "",
-        phone: "",
+        phonenumber: "",
         createTime: ""
       };
       this.getUserList({

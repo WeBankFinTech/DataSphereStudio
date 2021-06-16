@@ -78,6 +78,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
+              :disabled="isSuperAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -104,6 +105,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
+              :disabled="isSuperAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -183,6 +185,10 @@ export default {
     this.getUserList()
   },
   methods: {
+    isSuperAdmin(item){
+      //管理+创建人才能赋权管理员权限
+      return item.roleId===1&&this.row.creator!==this.getUserName();
+    },
     queryWhenOpen(isOpen) {
       if (isOpen) {
         this.getUserList()
@@ -301,6 +307,9 @@ export default {
     del() {
       const userInfoName = storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
       const username = userInfoName
+      if(this.row.creator === this.row.name){
+        return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
+      }
       if(username === this.row.name){
         return this.$Message.error(this.$t('message.workspaceManagemnet.notDeleteMsg'));
       }
@@ -316,7 +325,7 @@ export default {
     },
     edit(row) {
       // 如果是当前用户修改自己的权限，提示用户不能修改
-      if (this.getUserName() === row.name) return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
+      if (row.name === row.creator) return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
       this.edituser = {
         role: [...row.roles]
       }

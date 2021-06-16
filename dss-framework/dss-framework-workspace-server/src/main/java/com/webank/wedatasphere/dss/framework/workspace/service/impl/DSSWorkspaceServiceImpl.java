@@ -116,7 +116,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int createWorkspace(String workspaceName, String tags, String userName,
-                               String description, String department, String productName) throws ErrorException {
+                               String description, String department, String productName,String workspaceType) throws ErrorException {
         DSSWorkspace dssWorkspace = new DSSWorkspace();
         dssWorkspace.setDescription(description);
         dssWorkspace.setName(workspaceName);
@@ -127,6 +127,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspace.setCreateTime(new Date());
         dssWorkspace.setLastUpdateTime(new Date());
         dssWorkspace.setLastUpdateUser(userName);
+        dssWorkspace.setWorkspaceType(workspaceType);
         try{
             dssWorkspaceMapper.createWorkSpace(dssWorkspace);
         }catch(Exception e){
@@ -134,8 +135,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             exception1.initCause(e);
             throw exception1;
         }
-        dssWorkspaceUserMapper.insertUser(userName, dssWorkspace.getId(), userName);
-        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), CommonRoleEnum.ADMIN.getId(), userName, userName);
+        String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
+        dssWorkspaceUserMapper.insertUser(userName, dssWorkspace.getId(), userName,userId);
+        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), CommonRoleEnum.ADMIN.getId(), userName, userName,userId);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -146,18 +148,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     //把用户及角色添加到工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creator) {
+    public void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creator,String userId) {
         //根据用户名 从用户表拿到用户id
-        Long userId = dssUserService.getUserID(userName);
+//        Long userId = dssUserService.getUserID(userName);
         if(userId == null){
             //保存 - dss_user、linkis_user
             dssUserService.saveWorkspaceUser(userName);
         }
         //保存 - dss_workspace_user
-        dssWorkspaceUserMapper.insertUser(userName, workspaceId, creator);
+        dssWorkspaceUserMapper.insertUser(userName, workspaceId, creator,userId);
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator,userId);
         }
     }
 
@@ -198,9 +200,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 //            while(userId == null || userId.intValue() < 0){
 //                userId = dssWorkspaceUserMapper.getUserID(userName);
 //            }
+            String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.insertUser(userName, workspaceId, "system");
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, CommonRoleEnum.ANALYSER.getId(), userName, "system");
+            dssWorkspaceUserMapper.insertUser(userName, workspaceId, "system",userId);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, CommonRoleEnum.ANALYSER.getId(), userName, "system",userId);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, CommonRoleEnum.ANALYSER.getId());
             if(ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)){
                 homepageUrl= ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
@@ -275,6 +278,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         return dssWorkspaceUserVOs;
     }
+
 
     private DSSWorkspaceUserVO changeToUserVO(DSSWorkspaceUser dssWorkspaceUser, List<Integer> roles){
         DSSWorkspaceUserVO vo = new DSSWorkspaceUserVO();
@@ -464,7 +468,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public DSSWorkspace getWorkspacesById(Long id) {
-        return workspaceMapper.getWorkspaceById(id);
+        DSSWorkspace dssWorkSpace = workspaceMapper.getWorkspaceById(id);
+        String originDepart = dssWorkSpace.getDepartment();
+        if(StringUtils.isNotBlank(originDepart)){
+            String departName = workspaceMapper.getDepartName(Long.valueOf(originDepart));
+            dssWorkSpace.setDepartment(departName);
+        }
+        return dssWorkSpace;
     }
 
 

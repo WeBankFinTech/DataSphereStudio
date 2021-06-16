@@ -32,6 +32,10 @@ public interface ProjectConf {
     CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
     CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "http://192.168.10.223:12345/dolphinscheduler");
 
+    CommonVars<String> LDAP_ADMIN_NAME = CommonVars.apply("wds.dss.ldap.admin.name", "cn=Manager,dc=example,dc=com");
+    CommonVars<String> LDAP_ADMIN_PASS = CommonVars.apply("wds.dss.ldap.admin.password", "Aaht123@chinanet");
+    CommonVars<String> LDAP_URL = CommonVars.apply("wds.dss.ldap.url", "ldap://192.168.10.201:389");
+    CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "ou=user,dc=example,dc=com");
 
 
 }

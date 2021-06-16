@@ -46,7 +46,28 @@
     </select>
 
     <select id="getWorkspaceById" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
-        SELECT * FROM dss_workspace WHERE id = #{workspaceId}
+     SELECT
+	     id,
+	    NAME,
+	    label,
+	    description,
+	    create_by,
+	    create_time,
+	    department,
+	    product,
+	    source,
+	    last_update_time,
+	    last_update_user,
+    CASE
+
+		workspace_type
+		WHEN 'department' THEN
+		'部门导向'
+		WHEN 'project' THEN
+		'项目导向' ELSE ''
+	END AS workspace_type
+    FROM
+	    dss_workspace WHERE id = #{workspaceId}
     </select>
 
     <select id="findByWorkspaceName" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
@@ -68,6 +89,7 @@
     </select>
     <select id="getHomepageDemoMenusEn" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`description`,`icon`,`order`
+
         FROM dss_homepage_demo_menu
         <where>
             `is_active` = 1
@@ -194,4 +216,40 @@
             AND username = #{username}
             AND workspace_id = #{workspaceId}
     </delete>
+
+
+    <select id="getDepartName" resultType="java.lang.String">
+    SELECT
+       concat_ws('-',
+	   t1.dept_name,
+	   t2.dept_name,
+	   t3.dept_name )
+   FROM
+	( SELECT dept_name, parent_id FROM dss_admin_dept WHERE id = #{id} ) t3
+	JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
+	JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
+    </select>
+
+    <select id="getWorkspaceUsers" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01">
+  SELECT
+     t1.id,
+	t2.NAME,
+	t1.join_time,
+	t1.created_by,
+	t3.dept_name department,
+	t4.dept_name office,
+	GROUP_CONCAT(t5.front_name SEPARATOR '-') as roles
+
+  FROM
+	( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
+	JOIN dss_user t2 ON t2.NAME = t1.username
+	JOIN dss_admin_dept t3 ON t3.id = t2.dept_id
+	JOIN dss_admin_dept t4 ON t4.id = t3.parent_id
+
+  left join
+   dss_role t5
+   on t5.name = t2.name
+
+
+    </select>
 </mapper>

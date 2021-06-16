@@ -41,50 +41,57 @@
         </Select>
       </FormItem>
       <FormItem
+        :label="$t('message.workflow.projectDetail.publishPermissions')"
+        prop="releaseUsers"
+        >
+        <luban-select
+          v-model="projectDataCurrent.releaseUsers"
+          multiple
+          filterable
+          :placeholder="$t('message.workflow.projectDetail.userAllowedPublish')">
+          <Option
+            v-for="(item, index) in releaseUsers"
+            :disabled="item==projectDataCurrent.createBy"
+            :label="item"
+            :value="item"
+            :key="index"/>
+        </luban-select>
+      </FormItem>
+      <FormItem
         :label="$t('message.workflow.projectDetail.editPermissions')"
         prop="editUsers">
-        <Select
+        <luban-select
           v-model="projectDataCurrent.editUsers"
+          :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
           :placeholder="$t('message.workflow.projectDetail.usersAllowedToEdit')">
           <Option
             v-for="(item, index) in editUsersMap"
+            :disabled="item==projectDataCurrent.createBy"
             :label="item"
             :value="item"
             :key="index"/>
-        </Select>
+        </luban-select>
       </FormItem>
       <FormItem
         :label="$t('message.workflow.projectDetail.viewPermissions')"
         prop="accessUsers">
-        <Select
+        <luban-select
           v-model="projectDataCurrent.accessUsers"
+          :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
           :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')">
           <Option
             v-for="(item, index) in accessUsersMap"
+            :disabled="item==projectDataCurrent.createBy"
             :label="item"
             :value="item"
             :key="index"/>
-        </Select>
+        </luban-select>
       </FormItem>
-      <FormItem
-        :label="$t('message.workflow.projectDetail.viewPermissions')"
-        prop="releaseUsers">
-        <Select
-          v-model="projectDataCurrent.releaseUsers"
-          multiple
-          filterable
-          :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')">
-          <Option
-            v-for="(item, index) in releaseUsers"
-            :label="item"
-            :value="item"
-            :key="index"/>
-        </Select>
-      </FormItem>
+      
       <FormItem :label="$t('message.workflow.projectDetail.devProcess')" prop="devProcessList">
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
           <Checkbox v-for="item in devProcess" :label="item.dicValue" :key="item.dicKey">
@@ -136,10 +143,13 @@
 <script>
 import storage from "@/common/helper/storage";
 import tag from '@component/tag/index.vue';
+import lubanSelect from '@component/select/index.vue';
+import _ from 'lodash';
 import { GetWorkspaceUserList, GetDicList } from '@/common/service/apiCommonMethod.js';
 export default {
   components: {
     'we-tag': tag,
+    'luban-select': lubanSelect
   },
   props: {
     projectData: {
@@ -169,6 +179,7 @@ export default {
   },
   data() {
     return {
+      test: [],
       ProjectShow: false,
       originBusiness: '',
       editUsersMap: [],
@@ -189,13 +200,11 @@ export default {
         }
       ],
       devProcessList: [],
-      selectCompiling: []
+      selectCompiling: [],
+      projectDataCurrent: {},
     };
   },
   computed: {
-    projectDataCurrent() {
-      return this.projectData;
-    },
     formValid() {
       let validateName = (rule, value, callback) => {
         let currentWorkspaceName = storage.get("currentWorkspace") ? storage.get("currentWorkspace").name : null;
@@ -227,6 +236,9 @@ export default {
         ],
         orchestratorModeList: [
           { required: true, message: this.$t('message.workflow.projectDetail.pleaseSelect'), trigger: 'blur', type: "array" }
+        ],
+        releaseUsers: [
+          { required: true, message: this.$t('message.workflow.projectDetail.userAllowedPublish'), trigger: 'change', type: 'array' },
         ]
       }
     }
@@ -249,6 +261,21 @@ export default {
       }
       this.$emit('show', val);
     },
+    projectData(value){
+      const handleCreateUser = (arr,createBy)=> {
+        const index = arr.indexOf(createBy);
+        if(index === -1){
+          arr.unshift(index);
+        }else {
+          arr.unshift(arr.splice(index)[0])
+        }
+      }
+      const cloneObj = _.cloneDeep(value);
+      handleCreateUser(cloneObj.accessUsers, cloneObj.createBy);
+      handleCreateUser(cloneObj.editUsers, cloneObj.createBy);
+
+      this.projectDataCurrent = cloneObj;
+    }
   },
   methods: {
     getData() {

@@ -65,8 +65,9 @@
                 filterable
                 remote
                 :remote-method="remoteMethod1"
+                @on-open-change="queryWhenOpen"
                 :loading="loading1">
-                <Option v-for="(option, index) in options" :value="option.id" :key="index">{{option.userName}}</Option>
+                <Option v-for="(option, index) in options" :value="option.id" :key="index" :disabled="option.disabled">{{option.userName}}</Option>
               </Select>
             </Col>
           </Row>
@@ -182,6 +183,11 @@ export default {
     this.getUserList()
   },
   methods: {
+    queryWhenOpen(isOpen) {
+      if (isOpen) {
+        this.getUserList()
+      }
+    },
     getUserList(query) {
       this.loading1 = true
       api.fetch(`${this.$API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/user/list`,{
@@ -191,7 +197,17 @@ export default {
         pageNum: 1
       },'get').then((res)=>{
         this.loading1 = false
-        this.options = res.userList
+        let list = res.userList
+        this.data.datalist.forEach(item => {
+          for (let i = 0; i < list.length; i++) {
+            if (list[i].userName === item.name) {
+              list[i].disabled = true
+              break
+            }
+          }
+        })
+        this.options = list
+        console.log(list)
       })
     },
     remoteMethod1(query) {
@@ -351,10 +367,12 @@ export default {
       }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}addWorkspaceUser`, params).then(() => {
         this.init()
-        this.$Message.success(this.$t('message.workspaceManagemnet.addSuccess'));
+        this.$Message.success(this.$t('message.workspaceManagemnet.addSuccess'))
+        this.options = []
       }).catch(() => {
-        this.$Message.warning(this.$t('message.workspaceManagemnet.addFail'));
-      });
+        this.$Message.warning(this.$t('message.workspaceManagemnet.addFail'))
+        this.options = []
+      })
       this.creatershow = false;
     },
     editrole(){

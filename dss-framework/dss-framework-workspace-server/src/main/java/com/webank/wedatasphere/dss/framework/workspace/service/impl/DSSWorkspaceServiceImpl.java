@@ -293,11 +293,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());
         List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-//        for (DSSWorkspaceUser workspaceUser : workspaceUsers) {
-//            List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), workspaceUser.getUsername());
-//            dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
-//        }
-//        return dssWorkspaceUserVOs;
         return workspaceUsers;
     }
 

@@ -78,8 +78,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Autowired
     private DSSProjectUserService projectUserService;
     @Autowired
-    private DSSOrchestratorService orchestratorService;
-    @Autowired
     private DSSProjectUserMapper projectUserMapper;
 
     @Autowired
@@ -150,7 +148,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Override
     public List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest) {
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
-        List<QueryProjectVo> list = projectMapper.getListByParam(projectRequest);
+        List<QueryProjectVo> list;
+        if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) {
+            list = projectMapper.getListForAdmin(projectRequest);
+        } else {
+            list = projectMapper.getListByParam(projectRequest);
+        }
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
@@ -209,6 +212,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             }
         }
         return projectResponseList;
+    }
+
+    private boolean isWorkspaceAdmin(Long workspaceId, String username) {
+        return !projectUserMapper.getUserWorkspaceAdminRole(workspaceId, username).isEmpty();
     }
 
     @Override

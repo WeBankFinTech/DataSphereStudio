@@ -18,13 +18,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
 import com.webank.wedatasphere.dss.framework.project.entity.po.DSSProjectPo;
@@ -32,6 +25,12 @@ import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 /**
  * created by cooperyang on 2020/9/30
@@ -76,4 +75,5 @@ public interface DSSProjectMapper extends BaseMapper<DSSProject> {
     @Update("DELETE FROM dss_project where `id` = #{projectId}")
     void deleteProjectInfo(@Param("projectId") Long projectId);
 
+    List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 }

@@ -18,22 +18,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -56,12 +40,26 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author v_wbzwchen
@@ -77,8 +75,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
-    @Autowired
-    private DSSOrchestratorService orchestratorService;
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
 
@@ -150,7 +146,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Override
     public List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest) {
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
-        List<QueryProjectVo> list = projectMapper.getListByParam(projectRequest);
+        List<QueryProjectVo> list;
+        if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) {
+            list = projectMapper.getListForAdmin(projectRequest);
+        } else {
+            list = projectMapper.getListByParam(projectRequest);
+        }
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
@@ -183,7 +184,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
             // 用户是否具有编辑权限  编辑权限和创建者都有
             if (!StringUtils.isEmpty(pusername) &&
-                    (pusername.contains(editPriv) || projectRequest.getUsername() == projectVo.getCreateBy())) {
+                    (pusername.contains(editPriv) ||
+                            projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
+                            isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()))) {
                 projectResponse.setEditable(true);
                 Map<String, List<String>> userPricMap = new HashMap<>();
                 String[] tempstrArr = pusername.split(MODE_SPLIT);
@@ -204,11 +207,18 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                 projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
                 projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
                 projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+            } else if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) ||
+                    projectVo.getCreateBy().equals(projectRequest.getUsername())) {
+                projectResponse.setEditable(true);
             } else {
                 projectResponse.setEditable(false);
             }
         }
         return projectResponseList;
+    }
+
+    private boolean isWorkspaceAdmin(Long workspaceId, String username) {
+        return !projectUserMapper.getUserWorkspaceAdminRole(workspaceId, username).isEmpty();
     }
 
     @Override
@@ -264,7 +274,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException  {
+    public boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException {
         //校验当前登录用户是否含有删除权限，默认创建用户可以删除工程
         QueryWrapper<DSSProject> queryWrapper = new QueryWrapper<DSSProject>();
         queryWrapper.eq("id", projectId);

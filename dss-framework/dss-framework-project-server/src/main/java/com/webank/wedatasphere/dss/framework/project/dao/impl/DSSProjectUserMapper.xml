@@ -18,20 +18,12 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper">
+<mapper namespace="com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper">
 
-    <select id="getUserID" resultType="java.lang.Long">
-        SELECT id FROM `dss_user` WHERE username = #{userName}
-    </select>
-
-    <select id="getWorkspaceEditUsers" resultType="java.lang.String">
-        SELECT username FROM `dss_workspace_user_role`
-        WHERE workspace_id = #{workspaceId} AND role_id = 3
-    </select>
-
-    <select id="getWorkspaceReleaseUsers" resultType="java.lang.String">
-        SELECT username FROM `dss_workspace_user_role`
-        WHERE workspace_id = #{workspaceId} AND role_id = 2
+    <select id="getUserWorkspaceAdminRole" resultType="java.lang.Long">
+        SELECT id
+        FROM dss_workspace_user_role
+        WHERE username = #{username} and workspace_id = #{workspaceId} and role_id = 1
     </select>
 
 </mapper>

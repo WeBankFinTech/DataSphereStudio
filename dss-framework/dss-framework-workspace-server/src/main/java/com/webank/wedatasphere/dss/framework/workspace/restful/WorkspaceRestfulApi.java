@@ -88,12 +88,13 @@ public class WorkspaceRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         if (!dssWorkspaceService.checkAdmin(userName)){
             return Message.messageToResponse(Message.error("您好，您不是管理员,没有权限建立工作空间"));
+
         }
         String name = json.get("name").getTextValue();
         if (dssWorkspaceService.existWorkspaceName(name)) {
             return Message.messageToResponse(Message.error("工作空间名重复"));
         }
-        String department = json.get("department").getTextValue();
+        String department = String.valueOf(json.get("department").getIntValue());
         String label = json.get("label").getTextValue();
         String description = json.get("description").getTextValue();
         String workspaceType = json.get("workspace_type").getTextValue();

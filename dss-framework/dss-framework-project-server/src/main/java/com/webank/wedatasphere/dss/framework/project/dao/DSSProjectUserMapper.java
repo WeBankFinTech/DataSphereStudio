@@ -20,10 +20,12 @@ package com.webank.wedatasphere.dss.framework.project.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * created by v_wbzwchen  on 2020/12/16
@@ -46,4 +48,5 @@ public interface DSSProjectUserMapper extends BaseMapper<DSSProjectUser> {
     @Delete("delete from dss_project_user where project_id = #{projectID}")
     void deleteAllPriv(@Param("projectID") long projectID);
 
+    List<Long> getUserWorkspaceAdminRole(@Param("workspaceId") Long workspaceId, @Param("username") String username);
 }

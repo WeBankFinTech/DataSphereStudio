@@ -173,13 +173,13 @@
         :label-width="100"
         :rules="ruleValidate"
       >
-        <FormItem :label="$t('message.permissions.userName')" prop="name">
+        <FormItem :label="$t('message.permissions.username')" prop="name">
           <Input
             type="text"
             v-model="userForm.name"
             :placeholder="
               $t('message.permissions.pleaseInput') +
-                $t('message.permissions.userName')
+                $t('message.permissions.username')
             "
             style="width: 300px"
           >
@@ -187,7 +187,7 @@
         </FormItem>
 
         <FormItem
-          :label="$t('message.permissions.account')"
+          :label="$t('message.permissions.login')"
           prop="userName"
           v-if="!editingData"
         >
@@ -196,7 +196,7 @@
             v-model="userForm.userName"
             :placeholder="
               $t('message.permissions.pleaseInput') +
-                $t('message.permissions.account')
+                $t('message.permissions.login')
             "
             style="width: 300px"
           >
@@ -297,7 +297,7 @@ export default {
       },
       columns: [
         {
-          title: this.$t("message.permissions.order"),
+          title: "ID",
           key: "id"
         },
         {
@@ -434,6 +434,7 @@ export default {
         });
     },
     handleReset() {
+      this.departChooedId = "";
       this.queries = {
         userName: "",
         phonenumber: "",
@@ -447,6 +448,7 @@ export default {
     },
     handleQuery() {
       console.log(this.queries);
+      this.departChooedId = "";
       this.getUserList({});
     },
     handleDeptChoosed(depart) {

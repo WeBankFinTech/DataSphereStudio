@@ -7,7 +7,7 @@
         <label>{{$t('message.workspaceManagemnet.productsetting.productName')}}<span>{{ workspaceData.name }}</span></label>
         <label>{{$t('message.workspaceManagemnet.productsetting.createTime')}}<span>{{ dateFormatter(workspaceData.createTime) }}</span></label>
         <label>{{$t('message.workspaceManagemnet.productsetting.createBy')}}<span>{{ workspaceData.createBy}}</span></label>
-        <label>{{$t('message.workspaceManagemnet.productsetting.department')}}<span>{{ filterDepartment(workspaceData.department) }}</span></label>
+        <label>{{$t('message.workspaceManagemnet.productsetting.department')}}<span>{{ workspaceData.department }}</span></label>
         <!-- <label>{{$t('message.workspaceManagemnet.productsetting.admin')}}<span>enjoyyin</span></label> -->
         <label>{{$t('message.workspaceManagemnet.productsetting.status')}}<span>{{ $t('message.workspace.normal') }}</span></label>
         <label>{{$t('message.workspaceManagemnet.productsetting.desc')}}<span>{{ workspaceData.description}}</span></label>

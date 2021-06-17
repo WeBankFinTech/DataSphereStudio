@@ -46,9 +46,12 @@
         <result property="creator" column="created_by"/>
         <result property="department" column="department"/>
         <result property="office" column="office"/>
-        <collection property="roles" ofType="java.lang.Integer" javaType="java.util.List">
-            <result column="roles"/>
-        </collection>
+        <collection property="roles" resultMap="roles"/>
+
+    </resultMap>
+
+    <resultMap  id="roles" type="Integer" >
+        <result column="role_id" property="roleId"/>
     </resultMap>
 
     <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
@@ -249,8 +252,7 @@
 		t1.created_by,
 		t3.dept_name department,
 		t4.dept_name office,
-		GROUP_CONCAT(t5.role_id SEPARATOR ',') as roles
-
+        t5.role_id
 		FROM
 		( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
 		JOIN dss_user t2 ON t2.username = t1.username
@@ -259,10 +261,6 @@
 
 	join dss_workspace_user_role t5
 	on t5.username = t1.username and t5.workspace_id=t1.workspace_id
-
-	group by t1.username
-
-
 
     </select>
 </mapper>

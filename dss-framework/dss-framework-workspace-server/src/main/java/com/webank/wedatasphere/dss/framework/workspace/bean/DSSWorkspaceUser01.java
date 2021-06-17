@@ -1,13 +1,16 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DSSWorkspaceUser01 {
     private String id;
     private String name ;
     private String joinTime;
-    private String createdBy;
+    private String creator;
     private String department;
     private String office;
-    private String roles;
+    private List<Integer> roles;
 
     public String getId() {
         return id;
@@ -34,11 +37,11 @@ public class DSSWorkspaceUser01 {
     }
 
     public String getCreatedBy() {
-        return createdBy;
+        return creator;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setCreatedBy(String creator) {
+        this.creator = creator;
     }
 
     public String getDepartment() {
@@ -57,11 +60,11 @@ public class DSSWorkspaceUser01 {
         this.office = office;
     }
 
-    public String getRoles() {
+    public List<Integer> getRoles() {
         return roles;
     }
 
-    public void setRoles(String roles) {
+    public void setRoles(List<Integer> roles) {
         this.roles = roles;
     }
 

@@ -199,6 +199,14 @@ public class DssAdminDeptServiceImpl extends ServiceImpl<DssAdminDeptMapper, Dss
         return dssAdminDeptMapper.deleteDeptById(id);
     }
 
+    @Override
+    public boolean checkDeptFinalStage(Long parentId) {
+
+        int result = dssAdminDeptMapper.checkDeptFinalStage(parentId);
+        return result > 2 ? true : false;
+
+    }
+
     /**
      * 修改子元素关系
      *

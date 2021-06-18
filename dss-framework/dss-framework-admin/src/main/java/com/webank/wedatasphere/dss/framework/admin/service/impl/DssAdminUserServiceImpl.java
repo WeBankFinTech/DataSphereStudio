@@ -118,4 +118,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         return dssUserMapper.updateUser(user);
     }
 
+    @Override
+    public int resetPwd(DssAdminUser user) {
+        return dssUserMapper.updateUser(user);
+    }
+
+
 }

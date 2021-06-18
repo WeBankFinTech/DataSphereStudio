@@ -197,9 +197,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                  */
                 for (String s : tempstrArr) {
                     String[] strArr = s.split(KEY_SPLIT);
-                    String key = strArr[0] + KEY_SPLIT + strArr[1];
-                    userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
-                    userPricMap.get(key).add(strArr[2]);
+                    if (strArr.length == 3) {
+                        String key = strArr[0] + KEY_SPLIT + strArr[1];
+                        userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                        userPricMap.get(key).add(strArr[2]);
+                    }
                 }
                 List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
                 List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());

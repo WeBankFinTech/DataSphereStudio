@@ -51,7 +51,6 @@
           :placeholder="$t('message.workflow.projectDetail.userAllowedPublish')">
           <Option
             v-for="(item, index) in releaseUsers"
-            :disabled="item==projectDataCurrent.createBy"
             :label="item"
             :value="item"
             :key="index"/>

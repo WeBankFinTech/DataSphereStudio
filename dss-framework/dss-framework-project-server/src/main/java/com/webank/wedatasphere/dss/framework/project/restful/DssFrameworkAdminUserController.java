@@ -121,9 +121,17 @@ public class DssFrameworkAdminUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
             return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         return Message.ok().data("修改用户成功", dssAdminUserService.updateUser(user));
     }
 
+    @POST
+    @Path("/resetPsw")
+    public Message resetPwd(@RequestBody DssAdminUser user)
+    {
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+
+        return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
+    }
 }
 

@@ -143,7 +143,7 @@
     <delete id="deleteDeptById" parameterType="Long">
 		update dss_admin_dept set del_flag = '2' where id = #{id}
 	</delete>
-    <select id="checkDeptFinalStage" resultMap="DssAdminDeptResult">
+    <select id="checkDeptFinalStage" parameterType="Long" resultType="int">
         SELECT LENGTH(ancestors)-LENGTH(REPLACE(ancestors,',',''))  FROM   dss_admin_dept WHERE id = #{parentId} and del_flag = '0'
     </select>
 

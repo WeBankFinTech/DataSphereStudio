@@ -57,6 +57,8 @@ public class DssFrameworkAdminDeptController {
 
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dssAdminDept))) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，部门名称已存在");
+        }else if (dssAdminDeptService.checkDeptFinalStage(dssAdminDept.getParentId())) {
+            return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，该部门是末级部门,不能新增下级部门");
         }
 
         int saveResult = dssAdminDeptService.insertDept(dssAdminDept);

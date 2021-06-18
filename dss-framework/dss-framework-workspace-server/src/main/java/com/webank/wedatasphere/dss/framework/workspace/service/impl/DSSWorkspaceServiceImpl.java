@@ -20,13 +20,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRolePriv;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
@@ -255,6 +249,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return dssMenuList;
     }
 
+/*
     @Override
     public List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                       String roleName, int pageNow, int pageSize, List<Long> total) {
@@ -277,6 +272,28 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
         }
         return dssWorkspaceUserVOs;
+    }
+*/
+
+
+    @Override
+    public List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
+                                                      String roleName, int pageNow, int pageSize, List<Long> total) {
+        int roleId = -1;
+        if (StringUtils.isNotEmpty(roleName)){
+            roleId = workspaceDBHelper.getRoleIdByName(roleName);
+        }
+        PageHelper.startPage(pageNow, pageSize);
+        List<DSSWorkspaceUser01> workspaceUsers = new ArrayList<>();
+        try{
+            workspaceUsers = workspaceMapper.getWorkspaceUsers(Long.valueOf(workspaceId));
+        }finally {
+            PageHelper.clearPage();
+        }
+        PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
+        total.add(pageInfo.getTotal());
+        List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
+        return workspaceUsers;
     }
 
 

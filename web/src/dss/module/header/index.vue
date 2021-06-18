@@ -27,7 +27,7 @@
           <img
             @click.stop="goHome"
             class="logo-img"
-            :style="{ cursor: isAdmin ? 'pointer' : 'default' }"
+            :style="{ cursor: 'pointer'}"
             src="../../assets/images/dssLogo5_1.png"
             :alt="$t('message.common.logoName')"
           >
@@ -201,9 +201,11 @@ export default {
     '$route'(v) {
       // 设定条件只有切换在工作空间首页时才触发
       if(v.name === 'workspaceHome') {
+        this.init();
         this.getWorkspacesRoles().then(res => {
           // cookies改变最新后再执行其他方法
           if(res) {
+            
             this.getApplications();
             this.getWorkspaces();
             this.getWorkspaceFavorites();
@@ -285,6 +287,7 @@ export default {
     },
     init() {
       GetBaseInfo().then(rst => {
+        
         if (!isEmpty(rst)) {
           this.userName = rst.username;
           // 根据权限来判断是否开启logo跳转(管理员才会开启)
@@ -394,7 +397,12 @@ export default {
       }
     },
     goHome() {
-      if(this.isAdmin) this.$router.push("/newhome");
+      if(this.isAdmin){
+        this.$router.push("/newhome");
+      }
+      else {
+        this.goSpaceHome();
+      }
     },
     linkTo(type) {
       let url = "";

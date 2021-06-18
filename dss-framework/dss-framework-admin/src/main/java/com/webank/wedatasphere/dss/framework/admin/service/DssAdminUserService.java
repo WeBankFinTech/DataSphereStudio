@@ -28,4 +28,6 @@ public interface DssAdminUserService extends IService<DssAdminUser> {
     DssAdminUser selectUserById(Long userId);
 
     int updateUser(DssAdminUser user);
+
+    public int resetPwd(DssAdminUser user);
 }

@@ -372,7 +372,7 @@ export default {
         id: node.id,
         name: node.title,
         version: '',
-        priv: node.priv,
+        releasable: node.releasable,
         editable: node.editable
       })
     },
@@ -385,7 +385,7 @@ export default {
         name: subItem.orchestratorName,
         version: String(subItem.orchestratorVersionId),
         orchestratorMode: subItem.orchestratorMode,
-        priv: subItem.priv, // 权限字段
+        releasable: subItem.releasable,// 可发布权限字段
         editable: subItem.editable
       })
     },
@@ -438,11 +438,11 @@ export default {
           id: row.orchestratorId,
           version: String(row.id), // 在编排列表返回的是版本id
           name: row._index === 0 ? `${this.currentOrchetratorData.orchestratorName}` : `${this.currentOrchetratorData.orchestratorName}(${this.$t('message.workflow.historicalVersion')})`,
-          priv: this.currentOrchetratorData.priv,
           orchestratorMode: this.currentOrchetratorData.orchestratorMode,
           readonly: row._index === 0 ? 'false' : 'true',
           appId: row.appId,
-          orchestratorVersionId: row.id
+          orchestratorVersionId: row.id,
+          releasable: this.currentOrchetratorData.releasable
         });
     },
     goBack() {

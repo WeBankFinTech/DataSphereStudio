@@ -237,7 +237,7 @@
       "nameEmpty": "The name cannot be empty",
       "userNameEmpty": "The userName cannot be empty",
       "passwordEmpty": "The password cannot be empty",
-      "modifyPassword": "Modify Password",
+      "modifyPassword": "Modify user's Password",
       "inputPassword": "Please input user's new password:",
       "modifyPwdSuccess": "Modify password Success!"
     }

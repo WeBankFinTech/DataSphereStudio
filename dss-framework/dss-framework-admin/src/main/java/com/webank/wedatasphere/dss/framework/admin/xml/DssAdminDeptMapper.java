@@ -121,4 +121,6 @@ public interface DssAdminDeptMapper extends BaseMapper<DssAdminDept> {
      * @return 结果
      */
     public int deleteDeptById(Long deptId);
+
+    public int checkDeptFinalStage(Long parentId);
 }

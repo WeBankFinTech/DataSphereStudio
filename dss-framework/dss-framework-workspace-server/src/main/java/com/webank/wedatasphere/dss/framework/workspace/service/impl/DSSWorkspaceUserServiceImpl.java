@@ -51,7 +51,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         roles.forEach(role ->{
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator,"");
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator,String.valueOf(0));
         });
     }
 

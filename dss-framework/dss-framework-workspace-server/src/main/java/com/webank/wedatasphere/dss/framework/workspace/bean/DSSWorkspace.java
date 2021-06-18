@@ -46,8 +46,6 @@ public class DSSWorkspace {
         this.workspaceType = workspaceType;
     }
 
-
-
     public int getId() {
         return id;
     }

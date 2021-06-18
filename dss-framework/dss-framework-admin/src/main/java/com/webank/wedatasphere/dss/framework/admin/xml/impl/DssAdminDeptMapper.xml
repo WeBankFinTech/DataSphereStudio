@@ -69,7 +69,7 @@
 
     <select id="checkDeptNameUnique" resultMap="DssAdminDeptResult">
         <include refid="selectDeptVo"/>
-        where dept_name=#{deptName} and parent_id = #{parentId} limit 1
+        where dept_name=#{deptName} and del_flag = '0' and parent_id = #{parentId} limit 1
     </select>
 
     <insert id="insertDept" parameterType="DssAdminDept">
@@ -143,6 +143,9 @@
     <delete id="deleteDeptById" parameterType="Long">
 		update dss_admin_dept set del_flag = '2' where id = #{id}
 	</delete>
+    <select id="checkDeptFinalStage" parameterType="Long" resultType="int">
+        SELECT LENGTH(ancestors)-LENGTH(REPLACE(ancestors,',',''))  FROM   dss_admin_dept WHERE id = #{parentId} and del_flag = '0'
+    </select>
 
 
 </mapper>

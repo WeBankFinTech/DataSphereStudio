@@ -12,18 +12,20 @@
           :publishingList="publishingList"
           tag-prop="uses"
           @goto="gotoWorkflow"
+          @add="ProjectMergeAdd"
           @detail="versionDetail"
           @modify="projectModify"
           @delete="deleteWorkflow"
           @publish="orchestratorPublish"
           @Export="orchestraorExport">
+          <!--以下header-search部分不再显示，若删除代码需要清理很多相关代码，暂时保留不显示即可-->
           <div class="workflow-header-search">
             <div>
               <Button class="button-text" type="primary" @click="addProject" v-if="checkEditable">
                 <Icon :size="20" type="ios-add"></Icon>
                 {{$t('message.orchestratorModes.createOrchestrator')}}
               </Button>
-              <Button class="button-text" style="margin-left: 20px" type="primary" @click="orchestratorImport" v-if="checkEditable">
+              <Button class="button-text" style="margin-left: 20px" type="primary" @click="initUpload" v-if="checkEditable">
                 {{$t('message.orchestratorModes.importOrchestrator')}}
               </Button>
             </div>
@@ -97,35 +99,43 @@
         @publishSuccess="$emit('publishSuccess', currentOrchetratorData)"></publishComponent>
 
     </Modal>
-    <!-- 导入弹窗 -->
-    <Modal
-      v-model="importModal"
-      :footer-hide="true">
-      <div
-        class="process-module-title"
-        slot="header">
-        {{$t('message.orchestratorModes.importOrchestrator')}}
-      </div>
-      <Upload
-        ref="uploadJson"
-        type="drag"
-        :data="uploadData"
-        :before-upload="handleUpload"
-        :on-success="handleSuccess"
-        :on-error="handleError"
-        :format="['zip']"
-        :max-size="2001000"
-        :action="uploadUrl">
-        <div style="padding: 20px 0">
-          <Icon
-            type="ios-cloud-upload"
-            size="52"
-            style="color: #3399ff"></Icon>
-          <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
-        </div>
-      </Upload>
 
+    <!--新增和导入 二合一弹窗-->
+    <Modal
+      v-model="mergeModalShow"
+      :footer-hide="true">
+      <Tabs value="form">
+        <Tab-pane label="新建编排" name="form">
+          <WorkflowFormNew
+            :workflow-data="currentOrchetratorData"
+            :orchestratorModeList="orchestratorModeList"
+            :selectOrchestratorList="selectOrchestratorList"
+            @cancel="ProjectMergeCancel"
+            @confirm="ProjectMergeConfirm"></WorkflowFormNew>
+        </Tab-pane>
+        <Tab-pane label="导入编排" name="upload">
+          <Upload
+            ref="uploadJson"
+            type="drag"
+            :data="uploadData"
+            :before-upload="handleUpload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :format="['zip']"
+            :max-size="2001000"
+            :action="uploadUrl">
+            <div style="padding: 120px 0">
+              <Icon
+                type="ios-cloud-upload"
+                size="52"
+                style="color: #3399ff"></Icon>
+              <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
+            </div>
+          </Upload>
+        </Tab-pane>
+      </Tabs>
     </Modal>
+
     <Spin
       v-if="loading"
       size="large"
@@ -135,6 +145,7 @@
 <script>
 import commonModule from '@/apps/workflows/module/common';
 import WorkflowForm from './module/workflowForm.vue';
+import WorkflowFormNew from './module/workflowFormNew.vue';
 import VersionDetail from './module/versionDetail.vue';
 import storage from '@/common/helper/storage';
 import api from '@/common/service/api';
@@ -160,17 +171,23 @@ export default {
     selectOrchestratorList: {
       type: Array,
       default: () => []
-    }
+    },
+    refreshFlow: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     projectContentItem: commonModule.component.workflowContentItem,
     WorkflowForm,
+    WorkflowFormNew,
     VersionDetail,
     dataMap,
     publishComponent
   },
   data() {
     return {
+      mergeModalShow: false, // 二合一弹窗展示
       ProjectShow: false, // 添加工作流展示
       versionDetailShow: false,
       deleteProjectShow: false, // 删除工作流弹窗展示
@@ -199,7 +216,6 @@ export default {
       applicationAreaMap: [],
       publishShow: false, // 发布弹窗
       publishingList: [], // 发布中的编排，只记录ID
-      importModal: false,
       uploadUrl: ``,
       uploadData: null
     };
@@ -228,6 +244,12 @@ export default {
     },
     publishingList(val) {//监听发布中的编排
       storage.set('runningPublish', val);
+    },
+    refreshFlow(val) {
+      if (val) {
+        // 收到通知刷新flow
+        this.fetchFlowData();
+      }
     }
   },
   created() {
@@ -267,6 +289,31 @@ export default {
       }).catch(() => {
         this.loading = false;
       });
+    },
+    ProjectMergeAdd() {
+      this.mergeModalShow = true;
+      this.init();
+      this.initUpload();
+    },
+    ProjectMergeCancel() {
+      this.mergeModalShow = false;
+    },
+    ProjectMergeConfirm(orchestratorData) {
+      orchestratorData.dssLabels = [this.getCurrentDsslabels()];
+      if (this.checkName(this.dataList[0].dwsFlowList, orchestratorData.orchestratorName, orchestratorData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
+      api.fetch(`${this.$API_PATH.PROJECT_PATH}createOrchestrator`, orchestratorData, 'post').then(() => {
+        this.$Message.success(this.$t('message.workflow.createdSuccess'));
+        this.ProjectMergeCancel();
+        // 更新左侧tree，同时父组件会通知刷新flow
+        this.noticeParent();
+      })
+    },
+    noticeParent() {
+      // 更新左侧tree，同时父组件会通知刷新flow
+      this.$emit('on-tree-modal-confirm', {
+        id: this.$route.query.projectID,
+        name: this.$route.query.projectName
+      })
     },
     // 新增工作流
     addProject() {
@@ -431,7 +478,6 @@ export default {
     },
     // 点击版本的打开跳转工作流编辑
     versionGotoWorkflow(row) {
-      console.log(row, 'row')
       this.$emit('open-workflow',
         {
           ...this.$route.query,
@@ -532,14 +578,13 @@ export default {
     removeRuning(id) {
       this.publishingList = this.publishingList.filter((i) => i !== id);
     },
-    orchestratorImport() {
+    initUpload() {
       this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
       this.uploadData = {
         projectName: this.$route.query.projectName,
         projectID: +this.$route.query.projectID,
         dssLabels: 'dev'
       }
-      this.importModal = true;
       this.$refs.uploadJson.clearFiles();
     },
     // 手动上传
@@ -552,14 +597,14 @@ export default {
     handleSuccess(response, file) {
       if (response.status === 0) {
         this.$Message.success(`${file.name} ${this.$t('message.orchestratorModes.importSuccess')}`);
-
-        this.getFlowData(this.params);
+        // 更新左侧tree，同时父组件会通知刷新flow
+        this.noticeParent();
       }
-      this.importModal = false;
+      this.ProjectMergeCancel();
     },
     handleError() {
       this.$Message.error(this.$t('message.orchestratorModes.importFail'));
-      this.importModal = false;
+      this.ProjectMergeCancel();
     }
   },
 };

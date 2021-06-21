@@ -100,6 +100,7 @@
             style="width: 300px"
             :noResultsText="$t('message.permissions.noMatch')"
             @close="parentChange"
+            @select="checkParentValid"
           >
             <div
               slot="value-label"
@@ -225,7 +226,8 @@ import {
   addIdChain,
   expandAll,
   getParentDepartName,
-  removeEmptyChildren
+  removeEmptyChildren,
+  keepTreeNLevel
 } from "../util";
 
 //构建表格所需的树形结构
@@ -369,6 +371,7 @@ export default {
     handleAdd() {
       GetDepartmentTree({}).then(data => {
         const tree = (data && data.deptTree) || [];
+        keepTreeNLevel(tree, 3);
         removeEmptyChildren(tree);
         this.editingData = "";
         this.departTree = tree;
@@ -453,6 +456,11 @@ export default {
       console.log(value);
       this.parentErrorTip =
         value !== undefined ? "" : this.$t("message.permissions.parentIdEmpty");
+    },
+    checkParentValid(node){
+
+      console.log(node);
+
     },
     getParentName(data) {
       return getParentDepartName(data, this.departTree);

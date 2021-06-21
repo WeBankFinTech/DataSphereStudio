@@ -2133,20 +2133,24 @@ export default {
     },
     
     workflowPublishIsShow(event) {
-      // 已经在发布不能再点击
-      if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.$Message.warning(this.$t('message.workflow.warning.unChange'));
-        return;
-      }
-      if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
-        this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
-        return;
-      }
-      if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
-      this.pubulishShow = true;
-      this.pubulishFlowComment = ''
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+        // 已经在发布不能再点击
+        // if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
+        //   event.preventDefault();
+        //   event.stopPropagation();
+        //   this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        //   return;
+        // }
+        if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+          this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
+          return;
+        }
+        if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
+        this.pubulishShow = true;
+        this.pubulishFlowComment = '';
+      })
+      
     },
     async workflowPublish() {
       // 发布之前先保存

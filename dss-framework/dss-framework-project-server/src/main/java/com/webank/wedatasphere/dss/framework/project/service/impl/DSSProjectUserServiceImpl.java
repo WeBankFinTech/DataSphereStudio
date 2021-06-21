@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
@@ -50,6 +51,8 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
     @Autowired
+    private DSSProjectMapper dssProjectMapper;
+    @Autowired
     @Qualifier("projectServerBMLService")
     private BMLService bmlService;
 
@@ -68,10 +71,20 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         queryWrapper.eq("username", username);
         queryWrapper.ge("priv", ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
         long count = projectUserMapper.selectCount(queryWrapper);
-        if (count == 0) {
+        if (count == 0 && !isProjectOwner(projectId, username)) {
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
         }
         return true;
+    }
+
+    /**
+     * 判断是否是project的owner
+     */
+    private boolean isProjectOwner(Long projectId, String username) {
+        QueryWrapper<DSSProject> queryWrapper = new QueryWrapper<DSSProject>();
+        queryWrapper.eq("id", projectId);
+        queryWrapper.eq("create_by", username);
+        return dssProjectMapper.selectCount(queryWrapper) > 0;
     }
 
     /**

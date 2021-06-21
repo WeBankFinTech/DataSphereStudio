@@ -20,7 +20,14 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRolePriv;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
@@ -51,6 +58,7 @@ import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceDup
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -72,6 +80,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 /**
@@ -92,7 +101,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private DSSWorkspaceInfoMapper dssWorkspaceInfoMapper;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
-
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
+    @Autowired
+    private DSSWorkspaceUserService dssWorkspaceUserService;
     @Autowired
     private DSSUserService dssUserService;
     @Autowired
@@ -135,7 +147,16 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
+        setAllRolesToWorkspaceCreator(dssWorkspace.getId(), userName);
         return dssWorkspace.getId();
+    }
+
+    private void setAllRolesToWorkspaceCreator(int workspaceId, String userName) {
+        List<Integer> roleIds = dssWorkspaceService.getWorkspaceRoles(workspaceId)
+                .stream()
+                .map(DSSWorkspaceRoleVO::getRoleId)
+                .collect(Collectors.toList());
+        dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
 

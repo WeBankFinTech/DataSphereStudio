@@ -236,7 +236,10 @@
       "updateUserFailed": "跟新用户失败！",
       "nameEmpty": "用户名称不能为空",
       "userNameEmpty": "登录账号不能为空",
-      "passwordEmpty": "密码不能为空"
+      "passwordEmpty": "密码不能为空",
+      "modifyPassword": "修改用户密码",
+      "inputPassword": "请输入用户新密码:",
+      "modifyPwdSuccess": "修改密码成功！"
     }
   }
 }

@@ -41,6 +41,15 @@
         &:hover {
           box-shadow: 0 2px 12px 0 $shadow-color;
         }
+        .project-add {
+          display: flex;
+          height: 100%;
+          align-items: center;
+          justify-content: center;
+          span {
+            font-size: 20px;
+          }
+        }
         .project-main {
           height: 100%;
           .top-bar {

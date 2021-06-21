@@ -103,6 +103,10 @@
               <div class="operation" @click="edit(row, index)">
                 {{ $t("message.permissions.edit") }}
               </div>
+              <Divider type="vertical" />
+              <div class="operation" @click="modifyPassword(row, index)">
+                {{ $t("message.permissions.modifyPassword") }}
+              </div>
               <Divider v-if="false" type="vertical" />
               <div class="operation" v-if="false">
                 {{ $t("message.permissions.delete") }}
@@ -128,7 +132,11 @@
       @on-cancel="handleModalCancel"
       footer-hide
     >
-      <Form ref="departmentForm" :label-width="100">
+      <Form
+        ref="departForm"
+        :label-width="100"
+        v-if="modalType !== 'modifyPassword'"
+      >
         <FormItem
           :label="$t('message.permissions.userDepart')"
           :error="departmentErrorTip"
@@ -172,14 +180,15 @@
         :model="userForm"
         :label-width="100"
         :rules="ruleValidate"
+        v-if="modalType !== 'modifyPassword'"
       >
-        <FormItem :label="$t('message.permissions.userName')" prop="name">
+        <FormItem :label="$t('message.permissions.username')" prop="name">
           <Input
             type="text"
             v-model="userForm.name"
             :placeholder="
               $t('message.permissions.pleaseInput') +
-                $t('message.permissions.userName')
+                $t('message.permissions.username')
             "
             style="width: 300px"
           >
@@ -187,7 +196,7 @@
         </FormItem>
 
         <FormItem
-          :label="$t('message.permissions.account')"
+          :label="$t('message.permissions.login')"
           prop="userName"
           v-if="!editingData"
         >
@@ -196,13 +205,17 @@
             v-model="userForm.userName"
             :placeholder="
               $t('message.permissions.pleaseInput') +
-                $t('message.permissions.account')
+                $t('message.permissions.login')
             "
             style="width: 300px"
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.password')" prop="password">
+        <FormItem
+          :label="$t('message.permissions.password')"
+          prop="password"
+          v-if="modalType === 'addUser'"
+        >
           <Input
             type="password"
             v-model="userForm.password"
@@ -239,6 +252,22 @@
           </Input>
         </FormItem>
       </Form>
+      <Form
+        ref="passwordForm"
+        :model="userForm"
+        v-if="modalType === 'modifyPassword'"
+      >
+      <div class="newPassword">{{$t('message.permissions.inputPassword')}}</div>
+        <FormItem prop="password" required :error="pwdErrorTip">
+          <Input
+            type="password"
+            v-model="userForm.password"
+            @on-change="hanldePwdChange"
+            :placeholder="$t('message.permissions.pleaseInput')"
+          >
+          </Input>
+        </FormItem>
+      </Form>
       <slot name="footer">
         <div class="modalFooter">
           <Button @click="handleModalCancel()" size="large">{{
@@ -267,7 +296,8 @@ import {
   GetDepartmentTree,
   GetUserList,
   AddNewUser,
-  ModifyUser
+  ModifyUser,
+  ModifyUserPassword
 } from "@/common/service/permissions";
 import {
   ID_CHAIN,
@@ -297,7 +327,7 @@ export default {
       },
       columns: [
         {
-          title: this.$t("message.permissions.order"),
+          title: "ID",
           key: "id"
         },
         {
@@ -331,6 +361,7 @@ export default {
       tableLoading: false,
       modalVisible: false,
       modalTitle: "",
+      modalType: "",
       userForm: {
         deptId: "",
         userName: "",
@@ -339,6 +370,7 @@ export default {
         phonenumber: "",
         email: ""
       },
+      pwdErrorTip: "",
       editingData: "",
       confirmLoading: false,
       departmentErrorTip: "",
@@ -357,6 +389,15 @@ export default {
             trigger: "blur"
           }
         ],
+        password: [
+          {
+            required: true,
+            message: this.$t("message.permissions.passwordEmpty"),
+            trigger: "blur"
+          }
+        ]
+      },
+      passwordRuleValidate: {
         password: [
           {
             required: true,
@@ -400,12 +441,8 @@ export default {
         if (value || value === 0) {
           if (key === "createTime") {
             if (value[0] && value[1]) {
-              params.push(
-                `beginTime=${moment(value[0]).format("YYYY-MM-DD")}`
-              );
-              params.push(
-                `endTime=${moment(value[1]).format("YYYY-MM-DD")}`
-              );
+              params.push(`beginTime=${moment(value[0]).format("YYYY-MM-DD")}`);
+              params.push(`endTime=${moment(value[1]).format("YYYY-MM-DD")}`);
             }
           } else {
             params.push(`${key}=${value}`);
@@ -434,6 +471,7 @@ export default {
         });
     },
     handleReset() {
+      this.departChooedId = "";
       this.queries = {
         userName: "",
         phonenumber: "",
@@ -447,6 +485,7 @@ export default {
     },
     handleQuery() {
       console.log(this.queries);
+      this.departChooedId = "";
       this.getUserList({});
     },
     handleDeptChoosed(depart) {
@@ -466,6 +505,7 @@ export default {
     },
     handleAdd() {
       this.editingData = "";
+      this.modalType = "addUser";
       this.modalTitle = this.$t("message.permissions.addUser");
       this.modalVisible = true;
       this.userForm.deptId =
@@ -499,6 +539,7 @@ export default {
     edit(rowData) {
       rowData.departNameList = this.getParentName({ id: rowData.deptId });
       this.editingData = rowData;
+      this.modalType = "updateUser";
       const newObj = {};
       Object.keys(this.userForm).forEach(key => {
         if (key !== "password") {
@@ -507,6 +548,12 @@ export default {
       });
       this.userForm = newObj;
       this.modalTitle = this.$t("message.permissions.editUser");
+      this.modalVisible = true;
+    },
+    modifyPassword(rowData) {
+      this.modalType = "modifyPassword";
+      this.modalTitle = this.$t("message.permissions.modifyPassword");
+      this.editingData = rowData;
       this.modalVisible = true;
     },
     deleteRow(rowData) {
@@ -535,51 +582,86 @@ export default {
         pageNum: page
       });
     },
+    hanldePwdChange() {
+      if (this.pwdErrorTip) {
+        this.pwdErrorTip = "";
+      }
+      console.log(122333);
+    },
     handleModalCancel() {
       this.modalVisible = false;
       this.resetUserForm();
     },
     handleModalOk() {
-      this.$refs["userForm"].validate(valid => {
-        console.log(this.userForm);
-        const deptId = this.userForm.deptId;
-        if (!deptId && deptId !== 0) {
-          this.departmentErrorTip = this.$t("message.permissions.deptEmpty");
+      if (this.modalType === "modifyPassword") {
+        if (!this.userForm.password) {
+          this.pwdErrorTip = this.$t("message.permissions.passwordEmpty");
           return;
         }
-        if (valid) {
-          const isAdd = !this.editingData;
-          const executeMethod = isAdd ? AddNewUser : ModifyUser;
-          const { userName, ...rest } = this.userForm;
-          const params = isAdd
-            ? { ...this.userForm, userName }
-            : { ...rest, id: this.editingData.id };
-          this.confirmLoading = true;
-          executeMethod(params)
-            .then(data => {
-              console.log(data);
-              this.$Message.success(
-                isAdd
-                  ? this.$t("message.permissions.addUserSucess")
-                  : this.$t("message.permissions.updateUserSucess")
-              );
-              this.modalVisible = false;
-              this.confirmLoading = false;
-              this.getUserList(isAdd ?{} : {pageNum: this.pageData.pageNum});
-              this.resetUserForm();
-            })
-            .catch(() => {
-              this.confirmLoading = false;
-            });
-        }
-      });
+        const params = {
+          password: this.userForm.password,
+          id: this.editingData.id
+        };
+        this.confirmLoading = true;
+        ModifyUserPassword(params)
+          .then(data => {
+            console.log(data);
+            this.$Message.success(this.$t("message.permissions.modifyPwdSuccess"));
+            this.modalVisible = false;
+            this.confirmLoading = false;
+            this.resetUserForm();
+          })
+          .catch(() => {
+            this.confirmLoading = false;
+          });
+      } else {
+        this.$refs["userForm"].validate(valid => {
+          console.log(this.userForm);
+          const deptId = this.userForm.deptId;
+          if (!deptId && deptId !== 0) {
+            this.departmentErrorTip = this.$t("message.permissions.deptEmpty");
+            return;
+          }
+          if (valid) {
+            const isAdd = !this.editingData;
+            const executeMethod = isAdd ? AddNewUser : ModifyUser;
+            const { userName, password, ...rest } = this.userForm;
+            const params = isAdd
+              ? { ...this.userForm, userName, password }
+              : { ...rest, id: this.editingData.id };
+            this.confirmLoading = true;
+            executeMethod(params)
+              .then(data => {
+                console.log(data);
+                this.$Message.success(
+                  isAdd
+                    ? this.$t("message.permissions.addUserSucess")
+                    : this.$t("message.permissions.updateUserSucess")
+                );
+                this.modalVisible = false;
+                this.confirmLoading = false;
+                this.getUserList(
+                  isAdd ? {} : { pageNum: this.pageData.pageNum }
+                );
+                this.resetUserForm();
+              })
+              .catch(() => {
+                this.confirmLoading = false;
+              });
+          }
+        });
+      }
     },
     departmentChange(value) {
       this.departmentErrorTip =
         value !== undefined ? "" : this.$t("message.permissions.deptEmpty");
     },
     resetUserForm() {
-      this.$refs["userForm"].resetFields();
+      if (this.modalType === "modifyPassword") {
+        this.$refs["passwordForm"].resetFields();
+      } else {
+        this.$refs["userForm"].resetFields();
+      }
       this.departmentErrorTip = "";
       this.editingData = "";
       this.userForm = {
@@ -589,6 +671,9 @@ export default {
         password: "",
         phonenumber: "",
         email: ""
+      };
+      this.passwordForm = {
+        password: ""
       };
     }
   }
@@ -699,5 +784,10 @@ export default {
   align-items: center;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding-top: 10px;
+}
+.newPassword {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 </style>

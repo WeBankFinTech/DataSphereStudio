@@ -59,6 +59,10 @@
     <div class="defaultSlot">
       <slot></slot>
     </div>
+    <Spin
+      v-if="loading"
+      size="large"
+      fix/>
   </div>
 </template>
 <script>
@@ -105,6 +109,10 @@ export default {
     },
     currentTab: {
       type: null
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

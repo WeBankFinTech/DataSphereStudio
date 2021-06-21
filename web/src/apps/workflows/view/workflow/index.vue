@@ -1,6 +1,38 @@
 <template>
   <div class="workflow-wrap">
+
+    <div class="workflow-nav-tree" :class="{'tree-fold': treeFold }" >
+      <div class="project-nav-menu">
+        <div class="project-nav-menu-item active" @click="handleTreeToggle">
+          <Icon custom="iconfont icon-project" size="26"></Icon>
+        </div>
+      </div>
+      <div class="project-nav-tree">
+        <Tree 
+          class="tree-container" 
+          :nodes="projectsTree" 
+          :load="getFlow" 
+          @on-item-click="handleTreeClick" 
+          @on-add-click="handleTreeModal" 
+          @on-sync-tree="handleTreeSync"
+        />
+        <Spin v-show="loadingTree" size="large" fix/>
+      </div>
+      <WorkflowModal
+        :treeModalShow="treeModalShow"
+        :currentTreeProject="currentTreeProject"
+        :orchestratorModeList="orchestratorModeList"
+        :currentMode="currentMode"
+        :selectOrchestratorList="selectOrchestratorList"
+        @on-tree-modal-cancel="handleTreeModalCancel"
+        @on-tree-modal-confirm="handleTreeModalConfirm"
+      >
+      </WorkflowModal>
+    </div>
+
     <WorkflowTabList
+      :class="{'tree-fold': treeFold }"
+      :loading="loading"
       :textColor="textColor"
       :tabName="tabName"
       :topTabList="topTabList"
@@ -19,34 +51,34 @@
           <Workflow
             class="workflowListLeft"
             ref="workflow"
+            :refreshFlow="refreshFlow"
             :projectData="currentProjectData"
             :orchestratorModeList="orchestratorModeList"
             :currentMode="currentMode"
             :selectOrchestratorList="selectOrchestratorList"
             @open-workflow="openWorkflow"
-            @publishSuccess="publishSuccess">
+            @publishSuccess="publishSuccess"
+            @on-tree-modal-confirm="handleTreeModalConfirm">
             <Tabs class="tabs-content" slot="tagList" v-model="currentMode">
               <TabPane v-for="item in selectOrchestratorList"  :label="item.dicName" :key="item.dicKey" :name="item.dicKey">
               </TabPane>
             </Tabs>
           </Workflow>
         </div>
-        <template>
-          <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
-            <process
-              v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
-              :key="item.tabId"
-              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-              :query="item.query"
-              @updateWorkflowList="updateWorkflowList"
-              @isChange="isChange(index, arguments)"
-            ></process>
-            <makeUp
-              v-else
-              v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
-              :key="item.name"
-              :currentVal="currentVal"></makeUp>
-          </template>
+        <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
+          <process
+            v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
+            :key="item.tabId"
+            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+            :query="item.query"
+            @updateWorkflowList="updateWorkflowList"
+            @isChange="isChange(index, arguments)"
+          ></process>
+          <makeUp
+            v-else
+            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+            :key="item.name"
+            :currentVal="currentVal"></makeUp>
         </template>
       </template>
       <template v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
@@ -67,17 +99,15 @@
       @getDevProcessData="getDevProcessData"
       @show="ProjectShowAction"
       @confirm="ProjectConfirm"></ProjectForm>
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
   </div>
 </template>
 <script>
 import projectDb from '@/apps/workflows/service/db/project.js';
 import Workflow from '@/apps/workflows/module/workflow';
+import WorkflowModal from '@/apps/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/apps/workflows/module/process';
 import storage from '@/common/helper/storage';
+import Tree from '@/apps/workflows/module/common/tree/tree.vue';
 import WorkflowTabList from '@/apps/workflows/module/common/tabList/index.vue';
 import MakeUp from '@/apps/workflows/module/makeUp'
 import ProjectForm from '@/components/projectForm/index.js'
@@ -88,6 +118,8 @@ import DS from '@/apps/workflows/module/dispatch'
 
 export default {
   components: {
+    Tree,
+    WorkflowModal,
     Workflow: Workflow.component,
     process: Process.component,
     WorkflowTabList,
@@ -130,7 +162,14 @@ export default {
       selectDevprocess: [],
       DEVPROCESS,
       ORCHESTRATORMODES,
-      loading: false
+      loading: false,
+      loadingTree: false,
+      projectsTree: [],
+      treeFold: false,
+      treeModalShow: false,
+      currentTreeId: this.$route.query.projectID, // tree中active节点
+      currentTreeProject: null, // 点击哪个project的添加
+      refreshFlow: false, // 左侧树添加工作流后通知右侧刷新
     }
   },
   watch: {
@@ -144,6 +183,7 @@ export default {
       this.lastVal = null;
       this.getAreaMap();
       this.getProjectData();
+      this.tryOpenWorkFlow();
     },
     selectOrchestratorList(val) {
       if (val.length > 0) {
@@ -157,20 +197,13 @@ export default {
   created() {
     this.getAreaMap();
     this.getDicSecondList();
+    // 获取所有project展示tree
+    this.getAllProjects();
   },
   mounted() {
     // this.getCache();
-    let workspaceId = this.$route.query.workspaceId;
-
-    let currentWorkspaceName = storage.get('currentWorkspace') ? storage.get('currentWorkspace').name : '';
-    let projectName = this.$route.query.projectName;
-    this.topTabList = [
-      { name: currentWorkspaceName, url: `/workspaceHome?workspaceId=${workspaceId}` },
-      { name: projectName, url: `` }
-    ]
-    if (this.$route.query && this.$route.query.flowId) {
-      this.openWorkflow(this.$route.query)
-    }
+    this.updateBread();
+    this.tryOpenWorkFlow();
   },
   computed: {
     currentWorkdapceData() {
@@ -178,6 +211,9 @@ export default {
     }
   },
   methods: {
+    handleTreeToggle() {
+      this.treeFold = !this.treeFold;
+    },
     // 获取开发流程基本数据
     getDevProcessData(data) {
       this.devProcessBase = data;
@@ -215,6 +251,168 @@ export default {
         this.getSelectOrchestratorList();
         this.loading = false;
       })
+    },
+    // 获取所有project展示tree
+    getAllProjects() {
+      this.loadingTree = true;
+      api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {
+        workspaceId: +this.$route.query.workspaceId
+      }, 'post').then((res) => {
+        this.loadingTree = false;
+        this.projectsTree = res.projects.map(n => {
+          return {
+            id: n.id,
+            name: n.name,
+            type: 'project'
+          }
+        });
+      })
+    },
+    // 获取project下工作流
+    getFlow(param, resolve) {
+      api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, {
+        workspaceId: this.$route.query.workspaceId,
+        // orchestratorMode: "pom_work_flow",
+        projectId: param.id,
+      }, 'post').then((res) => {
+        const flow = res.page.map(f => {
+          return {
+            ...f,
+            id: f.orchestratorId, // flow的id是orchestratorId
+            name: f.orchestratorName,
+            projectId: param.id || f.projectId,
+            // 补充projectName，点击工作流切换project时使用
+            projectName: param.name,
+            type: 'flow'
+          }
+        });
+        resolve(flow);
+      })
+    },
+    handleTreeModal(project) {
+      this.treeModalShow = true;
+      this.currentTreeProject = project;
+    },
+    handleTreeModalCancel() {
+      this.treeModalShow = false;
+    },
+    handleTreeModalConfirm(param) {
+      // tree弹窗添加成功后要更新tree，还要通知右侧workFlow刷新
+      this.refreshFlow = false; // 复位
+      api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, {
+        workspaceId: this.$route.query.workspaceId,
+        // orchestratorMode: "pom_work_flow",
+        projectId: param.id,
+      }, 'post').then((res) => {
+        const flow = res.page.map(f => {
+          return {
+            ...f,
+            id: f.orchestratorId, // flow的id是orchestratorId
+            name: f.orchestratorName,
+            projectId: param.id || f.projectId,
+            // 补充projectName，点击工作流切换project时使用
+            projectName: param.name,
+            type: 'flow'
+          }
+        });
+        this.projectsTree = this.projectsTree.map(item => {
+          if (item.id == param.id) {
+            return {
+              ...item,
+              loaded: true,
+              loading: false,
+              opened: true, // 展开
+              isLeaf: flow.length ? false : true,
+              children: flow.length ? flow : item.children
+            }
+          } else {
+            return item
+          }
+        });
+        this.handleTreeModalCancel();
+        this.refreshFlow = true;
+      })
+    },
+    handleTreeSync(data) {
+      // tree中的状态同步到父级，保持状态，handleTreeModalConfirm用到
+      this.projectsTree = data;
+    },
+    handleTreeClick(node) {
+      if (node.type == 'flow') {
+        this.currentTreeId = node.orchestratorId;
+        // 如果点击其它project的flow，应该切换project
+        if (node.projectId != this.$route.query.projectID) {
+          // 跨工程，会监听projectID
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: node.projectId,
+            projectName: node.projectName, // getFlow时补充的
+            flowId: node.orchestratorId, // 先切换project，然后尝试打开工作流
+          }
+          // 存储flow
+          storage.set('clickFlowInTree', node);
+          this.$router.replace({
+            name: 'Workflow',
+            query,
+          });
+          this.updateBread();
+        } else {
+          const param = {
+            ...this.$route.query,
+            id: node.orchestratorId, // flow的id是orchestratorId
+            name: node.orchestratorName,
+            version: String(node.orchestratorVersionId),
+            orchestratorMode: node.orchestratorMode,
+            priv: node.priv // 权限字段
+          };
+          this.openWorkflow(param)
+        }
+      } else if (node.type == 'project') {
+        this.currentTreeId = node.id;
+        if (node.id == this.$route.query.projectID) {
+          this.selectProject();
+        } else {
+          // 跨工程，会监听projectID
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: node.id,
+            projectName: node.name,
+          }
+          this.$router.replace({
+            name: 'Workflow',
+            query,
+          });
+          this.updateBread();
+        }
+      }
+    },
+    // 切换project，更新面包屑
+    updateBread() {
+      let workspaceId = this.$route.query.workspaceId;
+      let currentWorkspaceName = storage.get('currentWorkspace') ? storage.get('currentWorkspace').name : '首页';
+      let projectName = this.$route.query.projectName;
+      this.topTabList = [
+        { name: currentWorkspaceName, url: `/workspaceHome?workspaceId=${workspaceId}` },
+        { name: projectName, url: `` }
+      ]
+    },
+    tryOpenWorkFlow() {
+      // this.modeOfKey不能为空
+      if (this.modeOfKey && this.$route.query && this.$route.query.flowId) {
+        const flow = storage.get('clickFlowInTree');
+        if (flow && flow.orchestratorId && flow.orchestratorMode) {
+          const param = {
+            ...this.$route.query,
+            id: +this.$route.query.flowId || flow.orchestratorId, // flow的id是orchestratorId
+            name: flow.orchestratorName,
+            version: String(flow.orchestratorVersionId),
+            orchestratorMode: flow.orchestratorMode,
+            priv: flow.priv // 权限字段
+          };
+          this.openWorkflow(param);
+        }
+        storage.remove('clickFlowInTree');
+      }
     },
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData) {
@@ -261,7 +459,6 @@ export default {
      */
     openWorkflow(params) {
       if(this.loading) return;
-      console.log(params, this.tabList, 'params')
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
       const isIn = this.tabList.find(item => item.id === params.id && item.version === params.version);
       if (!isIn || isIn === -1) {

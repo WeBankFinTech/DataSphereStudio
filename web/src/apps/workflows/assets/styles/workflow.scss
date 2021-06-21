@@ -19,6 +19,52 @@
     width: 100%;
     height: 100%;
     background: $workspace-background;
+    .workflow-nav-tree {
+        display: flex;
+        position: fixed;
+        left: 0;
+        top: 54px;
+        bottom: 0;
+        width: 304px;
+        background: #F8F9FC;
+        transition: all .3s;
+        &.tree-fold {
+            width: 54px;
+            .project-nav-tree {
+                transform: translateX(-304px);
+            }
+        }
+        .project-nav-menu {
+            z-index: 1;
+            width: 54px;
+            background: #F8F9FC;
+            border-right: 1px solid #DEE4EC;
+            &-item {
+                height: 44px;
+                line-height: 44px;
+                text-align: center;
+                cursor: pointer;
+                &:hover {
+                    background: #ECEFF4;
+                }
+            }
+            .active {
+                background: #ECEFF4;
+                border-left: 3px solid #2E92F7;
+            }
+        }
+        .project-nav-tree {
+            position: absolute;
+            width: 250px;
+            left: 54px;
+            top: 0;
+            bottom: 0;
+            transition: all .3s;
+            padding: 10px;
+            overflow-y: auto;
+            border-right: 1px solid #DEE4EC;
+        }
+    }
     .workflowListContainer {
         display: flex;
         margin: 0 $padding-25;
@@ -27,6 +73,7 @@
         border: $border-width-base  $border-style-base $border-color-base;
         background: $body-background;
         .workflowListLeft {
+            position: relative;
             flex: 1;
             .tabs-content {
                 /deep/ .ivu-tabs-tab {

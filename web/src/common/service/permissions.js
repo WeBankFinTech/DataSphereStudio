@@ -32,6 +32,9 @@ const AddNewUser = (params) => api.fetch(`${API_PATHG_PERMISSIONS_USER}/add`, pa
 // 修改用户信息
 const ModifyUser = (params) => api.fetch(`${API_PATHG_PERMISSIONS_USER}/edit`, params, 'post');
 
+// 修改用户密码
+const ModifyUserPassword = (params) => api.fetch(`${API_PATHG_PERMISSIONS_USER}/resetPsw`, params, 'post');
+
 export {
   GetDepartmentDetail,
   GetDepartmentList,
@@ -41,5 +44,6 @@ export {
   DeleteDepartment,
   GetUserList,
   AddNewUser,
-  ModifyUser
+  ModifyUser,
+  ModifyUserPassword
 }

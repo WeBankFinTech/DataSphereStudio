@@ -82,10 +82,35 @@ function removeEmptyChildren(data = []){
     }
   })
 }
+
+//树形结构数据仅保留N层数据，一下的children删除
+function keepTreeNLevel(tree, N){
+  function inner(data, currentLevel){
+    if(!data){
+      return;
+    }
+    const {children} = data;
+    if( children && children.length > 0){
+      if(currentLevel < N ){
+        inner();
+        children.forEach(item => {
+          inner(item, currentLevel + 1);
+        });
+      }else{
+        delete data.children;
+      }
+
+    }
+  }
+  tree.forEach(item => {
+    inner(item, 1);
+  })
+}
 export {
   ID_CHAIN,
   addIdChain,
   expandAll,
   getParentDepartName,
-  removeEmptyChildren
+  removeEmptyChildren,
+  keepTreeNLevel
 }

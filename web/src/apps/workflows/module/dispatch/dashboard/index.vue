@@ -118,7 +118,7 @@ export default {
   .perject-home-content {
     padding: 10px 20px;
     position: relative;
-    width: calc(100vw - 310px);
+    width: 100%;
     .time-model {
       position: absolute;
       right: 8px;

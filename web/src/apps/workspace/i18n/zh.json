@@ -239,7 +239,8 @@
       "passwordEmpty": "密码不能为空",
       "modifyPassword": "修改用户密码",
       "inputPassword": "请输入用户新密码:",
-      "modifyPwdSuccess": "修改密码成功！"
+      "modifyPwdSuccess": "修改密码成功！",
+      "pwdCheckError": "以字母开头，必须含有大小写字母、数字和特殊字符，且8到26位"
     }
   }
 }

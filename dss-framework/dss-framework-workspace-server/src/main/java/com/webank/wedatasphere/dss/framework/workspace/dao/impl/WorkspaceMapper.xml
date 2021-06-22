@@ -41,7 +41,7 @@
 
     <resultMap id="dss_workspace_user01_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01">
         <result property="id" column="id"/>
-        <result property="name" column="name"/>
+        <result property="name" column="username"/>
         <result property="joinTime" column="join_time"/>
         <result property="creator" column="created_by"/>
         <result property="department" column="department"/>
@@ -247,7 +247,7 @@
 
    		SELECT
 	    t1.id,
-		t2.NAME,
+		t2.username,
 		t1.join_time,
 		t1.created_by,
 		t3.dept_name department,

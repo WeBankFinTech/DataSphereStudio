@@ -86,6 +86,8 @@ public class DSSWorkspaceUserRestful {
             //默认改成20
             pageSize = 20;
         }
+        //数据量不多，暂时不分页
+        pageSize = 500;
         if(StringUtils.isNotEmpty(roleName)){
             //如果roleName不是空的话，就按照roleName来吧
             List<Long> totals = new ArrayList<>();
@@ -98,13 +100,13 @@ public class DSSWorkspaceUserRestful {
             return Message.messageToResponse(Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0)));
         }else{
             List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUserVO> workspaceUsers =
+            List<DSSWorkspaceUser01> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
-            PageInfo<DSSWorkspaceUserVO> pageInfo = new PageInfo<>(workspaceUsers);
-            List<DSSWorkspaceUserVO> list = pageInfo.getList();
+            PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
+            List<DSSWorkspaceUser01> list = pageInfo.getList();
             long total = pageInfo.getTotal();
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.messageToResponse(Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0)));
+            return Message.messageToResponse(Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", workspaceUsers.size()));
         }
     }
 

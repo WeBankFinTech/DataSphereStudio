@@ -105,4 +105,6 @@ public interface DssAdminDeptService extends IService<DssAdminDept> {
      * @return 结果
      */
     public int deleteDeptById(Long id);
+
+    boolean checkDeptFinalStage(Long parentId);
 }

@@ -97,9 +97,9 @@
       <div class="newHome_main_right">
         <div class="right_header">
           <h3 class="title">{{ $t("message.workspace.KSRM") }}</h3>
-          <Button type="text" @click="changeVideos">{{
+          <!-- <Button type="text" @click="changeVideos">{{
             $t("message.workspace.HYP")
-          }}</Button>
+          }}</Button> -->
         </div>
         <div class="permissions_wrap">
           <div class="permissions_entry" @click="gotoPermissions()">

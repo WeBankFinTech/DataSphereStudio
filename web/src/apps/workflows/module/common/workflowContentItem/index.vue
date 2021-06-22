@@ -1,7 +1,21 @@
 <template>
   <div class="workflow-item">
-    <slot></slot>
-    <Row v-if="dataList.length > 0" class="content-item">
+    <!-- <slot></slot> -->
+    <Row class="content-item">
+      <i-col
+        class="project-item"
+        :xs="12"
+        :sm="8"
+        :md="6"
+        :xl="5"
+        @click.native="add"
+      >
+        <div class="project-add">
+          <Icon :size="32" type="ios-add"></Icon>
+          <span>新建/导入编排</span>
+        </div>
+      </i-col>
+
       <i-col
         class="project-item"
         :xs="12"
@@ -49,9 +63,8 @@
         </Tooltip>
       </i-col>
     </Row>
-    <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
     <Page
-      v-if="dataList.length > 0 && pagination.size < dataList.length "
+      v-if="dataList.length > 0"
       class="page-bar"
       :total="dataList.length"
       show-sizer
@@ -137,6 +150,9 @@ export default {
       // } else {
       //   return false
       // }
+    },
+    add() {
+      this.$emit("add");
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

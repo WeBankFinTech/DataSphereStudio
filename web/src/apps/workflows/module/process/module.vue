@@ -528,6 +528,25 @@ export default {
       schedulingStatus: {
         published: false,
         releaseStatus: ''
+      },
+      // 工作流icon
+      workFlowImage: {
+        'sql': require('./images/workflow/sql.png'),
+        'python': require('./images/workflow/python.png'),
+        'pyspark': require('./images/workflow/pyspark.png'),
+        'scala': require('./images/workflow/scala.png'),
+        'hql': require('./images/workflow/hql.png'),
+        'shell': require('./images/workflow/shell.png'),
+        'display': require('./images/workflow/display.png'),
+        'dashboard': require('./images/workflow/dashboard.png'),
+        'widget': require('./images/workflow/widget.png'),
+        'mlss': require('./images/workflow/mlss.png'),
+        'eventreceiver': require('./images/workflow/eventreceiver.png'),
+        'eventsender': require('./images/workflow/eventsender.png'),
+        'datachecker': require('./images/workflow/datachecker.png'),
+        'connector': require('./images/workflow/connector.png'),
+        'subFlow': require('./images/workflow/subflow.png'),
+        'sendemail': require('./images/workflow/sendemail.png'),
       }
     };
   },
@@ -908,7 +927,10 @@ export default {
         this.shapes = res.nodeTypes.map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
-              if (subItem.image) {
+              // svg绘制的点太多，导致动画卡顿，使用图片代替
+              if (this.workFlowImage[subItem.title]) {
+                subItem.image = this.workFlowImage[subItem.title];
+              } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               }
               return subItem
@@ -2133,20 +2155,24 @@ export default {
     },
     
     workflowPublishIsShow(event) {
-      // 已经在发布不能再点击
-      if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.$Message.warning(this.$t('message.workflow.warning.unChange'));
-        return;
-      }
-      if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
-        this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
-        return;
-      }
-      if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
-      this.pubulishShow = true;
-      this.pubulishFlowComment = ''
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+        // 已经在发布不能再点击
+        // if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
+        //   event.preventDefault();
+        //   event.stopPropagation();
+        //   this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        //   return;
+        // }
+        if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+          this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
+          return;
+        }
+        if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
+        this.pubulishShow = true;
+        this.pubulishFlowComment = '';
+      })
+      
     },
     async workflowPublish() {
       // 发布之前先保存

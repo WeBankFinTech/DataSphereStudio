@@ -67,7 +67,7 @@
         "repeat": "不能重复添加相同的应用"
       },
       "ALTY": "案例体验",
-      "KSRM": "快速入门",
+      "KSRM": "管理员功能",
       "HYP": "换一批",
       "ok": "确认",
       "open": "打开",
@@ -224,7 +224,7 @@
       "deleteTip": "确认删除吗？",
       "parentIdEmpty": "上级部门不能为空",
       "deptEmpty": "部门不能为空",
-      "invalidEmail" : "邮箱格式不正确",
+      "invalidEmail": "邮箱格式不正确",
       "noMatch": "没有匹配的结果",
       "addDeptSucess": "新增部门成功！",
       "addDeptFailed": "新增部门失败！",

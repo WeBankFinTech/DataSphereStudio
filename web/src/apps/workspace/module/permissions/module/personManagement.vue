@@ -422,6 +422,15 @@ export default {
             trigger: "blur"
           }
         ]
+      },
+      passwordRuleValidate: {
+        password: [
+          {
+            required: true,
+            message: this.$t("message.permissions.passwordEmpty"),
+            trigger: "blur"
+          }
+        ]
       }
     };
   },

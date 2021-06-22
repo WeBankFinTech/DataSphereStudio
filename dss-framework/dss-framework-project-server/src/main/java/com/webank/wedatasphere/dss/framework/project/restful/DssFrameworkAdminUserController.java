@@ -3,7 +3,9 @@ package com.webank.wedatasphere.dss.framework.project.restful;
 
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
+import com.webank.wedatasphere.dss.framework.admin.common.domain.PasswordResult;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.TableDataInfo;
+import com.webank.wedatasphere.dss.framework.admin.common.utils.PasswordUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.SecurityUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
@@ -14,6 +16,7 @@ import com.webank.wedatasphere.dss.framework.project.service.LdapService;
 import com.webank.wedatasphere.dss.framework.project.utils.LdapUtils;
 import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -88,10 +91,12 @@ public class DssFrameworkAdminUserController extends BaseController {
             } else if (StringUtils.isNotEmpty(user.getEmail())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(),user))){
+                return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
             }
 
             String pwd = user.getPassword();
-            user.setPassword(SecurityUtils.encryptPassword(pwd));
+            user.setPassword(DigestUtils.md5Hex(pwd));
             user.setCreateBy(SecurityFilter.getLoginUsername(req));
             int rows = dssAdminUserService.insertUser(user);
             String userName = user.getUserName();
@@ -129,8 +134,10 @@ public class DssFrameworkAdminUserController extends BaseController {
     @Path("/resetPsw")
     public Message resetPwd(@RequestBody DssAdminUser user)
     {
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-
+        if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(),user))){
+            return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+        }
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
     }
 }

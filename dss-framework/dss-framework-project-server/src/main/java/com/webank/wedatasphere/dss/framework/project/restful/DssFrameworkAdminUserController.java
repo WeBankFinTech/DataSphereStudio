@@ -134,8 +134,10 @@ public class DssFrameworkAdminUserController extends BaseController {
     @Path("/resetPsw")
     public Message resetPwd(@RequestBody DssAdminUser user)
     {
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-
+        if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(),user))){
+            return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+        }
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
     }
 }

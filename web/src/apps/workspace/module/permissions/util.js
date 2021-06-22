@@ -106,11 +106,36 @@ function keepTreeNLevel(tree, N){
     inner(item, 1);
   })
 }
+
+//检测密码是否符合要求return{valid:是否有效， tag: 无效原因};
+function testPassword(value){
+  if (value === "") {
+    return {valid: false, tag: 'empty'};
+  } else {
+    const reg = /^[A-Za-z]\S{7,25}$/g;
+    const reg1 = /[A-Z]+/;
+    const reg2 = /\d+/;
+    const reg3 = /[^\w\s]+/;
+    const reg4 = /[a-z]+/;
+    if (
+      reg.test(value) &&
+      reg1.test(value) &&
+      reg2.test(value) &&
+      reg3.test(value) &&
+      reg4.test(value) 
+    ) {
+      return {valid: true};
+    } else {
+      return {valid: false, tag: 'invalid'};
+    }
+  }
+}
 export {
   ID_CHAIN,
   addIdChain,
   expandAll,
   getParentDepartName,
   removeEmptyChildren,
-  keepTreeNLevel
+  keepTreeNLevel,
+  testPassword
 }

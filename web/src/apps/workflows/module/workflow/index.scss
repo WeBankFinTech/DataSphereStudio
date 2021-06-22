@@ -50,7 +50,7 @@
 }
 .page-bgc {
     background-color: $body-background;
-    overflow: auto;
+    // overflow: auto;
     .process-bar {
         height: calc(100% - 4px);
     }

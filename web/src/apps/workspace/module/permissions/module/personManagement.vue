@@ -257,7 +257,9 @@
         :model="userForm"
         v-if="modalType === 'modifyPassword'"
       >
-      <div class="newPassword">{{$t('message.permissions.inputPassword')}}</div>
+        <div class="newPassword">
+          {{ $t("message.permissions.inputPassword") }}
+        </div>
         <FormItem prop="password" required :error="pwdErrorTip">
           <Input
             type="password"
@@ -304,11 +306,26 @@ import {
   addIdChain,
   expandAll,
   getParentDepartName,
-  removeEmptyChildren
+  removeEmptyChildren,
+  testPassword
 } from "../util";
 export default {
   components: { Treeselect },
   data() {
+    const validatePass = (rule, value, callback) => {
+      const { valid, tag } = testPassword(value);
+      if (valid) {
+        callback();
+      } else {
+        callback(
+          new Error(
+            tag === "empty"
+              ? this.$t("message.permissions.passwordEmpty")
+              : this.$t("message.permissions.pwdCheckError")
+          )
+        );
+      }
+    };
     return {
       queries: {
         userName: "",
@@ -389,6 +406,15 @@ export default {
             trigger: "blur"
           }
         ],
+        password: [
+          {
+            required: true,
+            validator: validatePass,
+            trigger: "blur"
+          }
+        ]
+      },
+      passwordRuleValidate: {
         password: [
           {
             required: true,
@@ -586,7 +612,6 @@ export default {
       if (this.pwdErrorTip) {
         this.pwdErrorTip = "";
       }
-      console.log(122333);
     },
     handleModalCancel() {
       this.modalVisible = false;
@@ -594,8 +619,12 @@ export default {
     },
     handleModalOk() {
       if (this.modalType === "modifyPassword") {
-        if (!this.userForm.password) {
-          this.pwdErrorTip = this.$t("message.permissions.passwordEmpty");
+        const { valid, tag } = testPassword(this.userForm.password);
+        if (!valid) {
+          this.pwdErrorTip =
+            tag === "empty"
+              ? this.$t("message.permissions.passwordEmpty")
+              : this.$t("message.permissions.pwdCheckError");
           return;
         }
         const params = {
@@ -606,7 +635,9 @@ export default {
         ModifyUserPassword(params)
           .then(data => {
             console.log(data);
-            this.$Message.success(this.$t("message.permissions.modifyPwdSuccess"));
+            this.$Message.success(
+              this.$t("message.permissions.modifyPwdSuccess")
+            );
             this.modalVisible = false;
             this.confirmLoading = false;
             this.resetUserForm();

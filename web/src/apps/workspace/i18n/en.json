@@ -239,7 +239,8 @@
       "passwordEmpty": "The password cannot be empty",
       "modifyPassword": "Modify user's Password",
       "inputPassword": "Please input user's new password:",
-      "modifyPwdSuccess": "Modify password Success!"
+      "modifyPwdSuccess": "Modify password Success!",
+      "pwdCheckError": "Begin with a letter, must contain upper and lower case letters, numbers and special characters, and between 8 to 26 bits"
     }
   }
 }

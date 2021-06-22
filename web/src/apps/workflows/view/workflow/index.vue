@@ -363,9 +363,17 @@ export default {
             name: node.orchestratorName,
             version: String(node.orchestratorVersionId),
             orchestratorMode: node.orchestratorMode,
-            priv: node.priv // 权限字段
+            releasable: node.releasable,
+            editable: node.editable
           };
-          this.openWorkflow(param)
+          // 同工程下切换flow还要兼顾右侧tab的状态
+          const isIn = this.tabList.find(item => item.id === param.id && item.version === param.version);
+          if (isIn) {
+            const tabId = param.id + param.version;
+            this.onTabClick(tabId);
+          } else {
+            this.openWorkflow(param)
+          }
         }
       } else if (node.type == 'project') {
         this.currentTreeId = node.id;
@@ -407,7 +415,8 @@ export default {
             name: flow.orchestratorName,
             version: String(flow.orchestratorVersionId),
             orchestratorMode: flow.orchestratorMode,
-            priv: flow.priv // 权限字段
+            releasable: flow.releasable,
+            editable: flow.editable
           };
           this.openWorkflow(param);
         }

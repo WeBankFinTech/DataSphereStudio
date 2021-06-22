@@ -1325,6 +1325,7 @@ export default {
     padding: 10px 25px;
     border-left: 1px solid #DEE4EC;
     min-height: calc(80vh - 16px);
+    width: calc(100% - 250px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;
@@ -1333,7 +1334,7 @@ export default {
       font-weight: bolder;
     }
     .scheduler-table {
-      width: calc(100vw - 250px - 70px);
+      width: 100%;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
     }

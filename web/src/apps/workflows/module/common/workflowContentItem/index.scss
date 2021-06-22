@@ -17,7 +17,7 @@
 
 @import '@/common/style/variables.scss';
 .workflow-item {
-    overflow: hidden;
+    // overflow: hidden;
 }
 .content-item {
     margin: 2px 0px 25px 0px;
@@ -34,6 +34,7 @@
         margin-bottom: 25px;
         background: #fff;
         max-width: 430px;
+        min-width: 320px;
         border-radius: 2px;
         border: 1px solid #dcdee2;
         padding: 20px;

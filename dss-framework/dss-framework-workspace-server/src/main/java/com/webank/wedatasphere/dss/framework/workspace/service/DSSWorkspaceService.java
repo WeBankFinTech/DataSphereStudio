@@ -44,7 +44,7 @@ public interface DSSWorkspaceService {
 
     List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
 
-    List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
+    List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);

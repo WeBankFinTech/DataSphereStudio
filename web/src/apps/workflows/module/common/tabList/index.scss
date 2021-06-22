@@ -1,9 +1,15 @@
 @import '@/common/style/variables.scss';
 .workflowTabContainer {
+    margin-left: 304px;
+    transition: margin-left .3s;
+    position: relative;
     height: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    &.tree-fold {
+        margin-left: 54px;
+    }
     .tap-bar {
         background: #fff;
         margin-bottom: $padding-25;

@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.framework.admin.common.utils;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.Collection;
@@ -407,5 +408,21 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     {
         AntPathMatcher matcher = new AntPathMatcher();
         return matcher.match(pattern, url);
+    }
+
+
+    public static boolean hasText(@Nullable CharSequence str) {
+        return str != null && str.length() > 0 && containsText(str);
+    }
+    private static boolean containsText(CharSequence str) {
+        int strLen = str.length();
+
+        for(int i = 0; i < strLen; ++i) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

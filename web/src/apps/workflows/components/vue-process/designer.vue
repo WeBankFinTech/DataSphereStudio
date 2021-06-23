@@ -154,7 +154,7 @@ export default {
       let shapeView = this.showViews.shapeView;
       this.showViews = Object.assign({}, defaultViewOptions, v);
       if (shapeView !== this.showViews.shapeView) {
-        commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 250 : 0 });
+        commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 180 : 0 });
         this.$nextTick(() => {
           if (this.$refs.designerView) {
             this.$refs.designerView.initView();
@@ -204,7 +204,7 @@ export default {
   },
   mounted() {
     this._cacheChange = {};
-    commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 250 : 0 });
+    commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 180 : 0 });
     this.$nextTick(() => {
       if (this.$refs.designerView) {
         this.$refs.designerView.initView();
@@ -313,6 +313,7 @@ export default {
     },
     toggleShape() {
       this.shapeFold = !this.shapeFold;
+      this.$emit('toggle-shape', this.shapeFold);
     },
     moveShape(e) {
       if (this.state.disabled) return;

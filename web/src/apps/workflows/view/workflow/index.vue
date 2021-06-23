@@ -12,6 +12,7 @@
           class="tree-container" 
           :nodes="projectsTree" 
           :load="getFlow" 
+          :currentTreeId="currentTreeId"
           @on-item-click="handleTreeClick" 
           @on-add-click="handleTreeModal" 
           @on-sync-tree="handleTreeSync"
@@ -167,7 +168,7 @@ export default {
       projectsTree: [],
       treeFold: false,
       treeModalShow: false,
-      currentTreeId: this.$route.query.projectID, // tree中active节点
+      currentTreeId: +this.$route.query.projectID, // tree中active节点
       currentTreeProject: null, // 点击哪个project的添加
       refreshFlow: false, // 左侧树添加工作流后通知右侧刷新
     }
@@ -184,6 +185,7 @@ export default {
       this.getAreaMap();
       this.getProjectData();
       this.tryOpenWorkFlow();
+      this.updateBread();
     },
     selectOrchestratorList(val) {
       if (val.length > 0) {
@@ -403,6 +405,11 @@ export default {
         { name: currentWorkspaceName, url: `/workspaceHome?workspaceId=${workspaceId}` },
         { name: projectName, url: `` }
       ]
+      if (this.$route.query.flowId) {
+        this.currentTreeId = +this.$route.query.flowId;
+      } else {
+        this.currentTreeId = +this.$route.query.projectID
+      }
     },
     tryOpenWorkFlow() {
       // this.modeOfKey不能为空

@@ -24,11 +24,13 @@ export default {
     load: {
       type: Function, default: () => false
     },
+    currentTreeId: {
+      type: Number, default: 0
+    }
   },
   data() {
     return {
       data: this.nodes,
-      currentTreeId: +this.$route.query.projectID
     };
   },
   watch: {
@@ -53,7 +55,6 @@ export default {
       this.$emit('on-add-click', project)
     },
     handleItemClick(node) {
-      this.currentTreeId = node.orchestratorId || node.id;
       this.$emit('on-item-click', node)
     },
     handleItemToggle(node) {

@@ -251,6 +251,18 @@ export default {
       if(this.$route.query.workspaceId) {
         GetWorkspaceApplications(this.$route.query.workspaceId).then(data=>{
           this.menuList = data.applications || [];
+          // 展示有权限的实例
+          this.menuList = this.menuList.map(app => {
+            if (app.appInstances && app.appInstances.length) {
+              return {
+                ...app,
+                appInstances: app.appInstances.filter(item => item.accessable)
+              }
+            }
+            return app;
+          });
+          // 类别下没有实例则隐藏
+          this.menuList = this.menuList.filter(app => app.appInstances.length)
         })
       }
     },
@@ -387,7 +399,7 @@ export default {
         this.$router.replace({
           path: this.$route.path,
           query: {
-            ...this.$route.query,
+            workspaceId: this.$route.query.workspaceId,
             projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,

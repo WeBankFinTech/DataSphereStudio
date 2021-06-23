@@ -797,6 +797,12 @@ export default {
       })
     })
   },
+  beforeDestroy() {
+    // 清除计时器
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  },
   methods: {
     getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
       if (!this.dagProcessId) return
@@ -1059,6 +1065,10 @@ export default {
       this.showTimingTaskModal = false
     },
     activeList(type, data) {
+      // 清除计时器
+      if (this.timer) {
+        clearInterval(this.timer)
+      }
       this.activeDS = type
       if (this.activeDS === 1) {
         this.getListData(1, data)
@@ -1078,6 +1088,7 @@ export default {
       }
     },
     openDag(index) {
+      // 清除计时器
       if (this.timer)
         clearInterval(this.timer)
       api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/select-by-id`, {

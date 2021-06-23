@@ -8,6 +8,7 @@
       :ctx-menu-options="nodeMenuOptions"
       :view-options="viewOptions"
       :disabled="workflowIsExecutor || myReadonly"
+      @toggle-shape="toggleShape"
       @change="change"
       @message="message"
       @node-click="click"
@@ -355,7 +356,7 @@
       :node="openningNode"
       :stop="workflowIsExecutor"
       class="process-console"
-      :style="{'left': shapeWidth + 'px', 'width': `calc(100% - ${shapeWidth}px)`}"
+      :style="getConsoleStyle"
       @close-console="closeConsole"></console>
   </div>
 </template>
@@ -551,6 +552,12 @@ export default {
     };
   },
   computed: {
+    getConsoleStyle() {
+      return {
+        'left': this.shapeWidth + 'px',
+        'width': `calc(100% - ${this.shapeWidth}px)`
+      }
+    },
     // 获取新建节点时需要的参数列表
     createNodeParamsList() {
       return this.clickCurrentNode.nodeUiVOS ? this.clickCurrentNode.nodeUiVOS.filter((item) => !item.nodeMenuType) : [];
@@ -1837,6 +1844,14 @@ export default {
     },
     closeConsole() {
       this.openningNode = null;
+    },
+    toggleShape(shapeFold) {
+      // 工作流icon是否收起
+      if (shapeFold) {
+        this.shapeWidth = 0;
+      } else {
+        this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth;
+      }
     },
     saveCommonIframe(node, cb) {
       if (!(node.supportJump && node.shouldCreationBeforeNode)) return;

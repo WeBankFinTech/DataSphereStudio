@@ -101,7 +101,7 @@
             $t("message.workspace.HYP")
           }}</Button> -->
         </div>
-        <div class="permissions_wrap">
+        <div v-if="isAdmin" class="permissions_wrap">
           <div class="permissions_entry" @click="gotoPermissions()">
             <img src="../../assets/images/u111.svg" />
             <div>{{ $t("message.workspace.permissions") }}</div>
@@ -193,7 +193,8 @@ export default {
       videosClick: 1,
       videosMaxClick: null,
       listWrap: 0, //屏幕宽度
-      isAdminAndSingleServe: false
+      isAdminAndSingleServe: false,
+      isAdmin: false
     };
   },
   created() {
@@ -202,6 +203,7 @@ export default {
     GetBaseInfo().then(res => {
       const currentModules = util.currentModules();
       // 是管理员且是数据服务的微服务
+      this.isAdmin = res.isAdmin;
       this.isAdminAndSingleServe =
         res.isAdmin && currentModules.microModule === "apiServices";
     });

@@ -18,15 +18,16 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
+import java.util.List;
+
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProcessNode;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-
-import java.util.List;
 
 /**
  * created by cooperyang on 2020/9/22
@@ -49,6 +50,7 @@ public interface DSSFrameworkProjectService {
 
     void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws DSSProjectErrorException;
 
+    void deleteProject(ProjectDeleteRequest projectDeleteRequest, String username) throws DSSProjectErrorException;
 
     List<ProcessNode> getProcessNodes(String username, Long workspaceId, Long projectId);
 }

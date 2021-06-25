@@ -124,8 +124,8 @@ public class DSSFrameworkProjectRestfulApi {
     public Response createProject(@Context HttpServletRequest request, @Valid ProjectCreateRequest projectCreateRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        String workspaceName = dssWorkspaceService.getWorkspaceName(
-            String.valueOf(projectCreateRequest.getWorkspaceId()));
+        String workspaceName =
+            dssWorkspaceService.getWorkspaceName(String.valueOf(projectCreateRequest.getWorkspaceId()));
         projectCreateRequest.setWorkspaceName(workspaceName);
         try {
             DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username,
@@ -152,6 +152,9 @@ public class DSSFrameworkProjectRestfulApi {
     @Path("modifyProject")
     public Response modifyProject(@Context HttpServletRequest request, @Valid ProjectModifyRequest projectModifyRequest) {
         String username = SecurityFilter.getLoginUsername(request);
+        String workspaceName =
+            dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
+        projectModifyRequest.setWorkspaceName(workspaceName);
         try {
             dssFrameworkProjectService.modifyProject(projectModifyRequest, username);
             return Message.messageToResponse(Message.ok("修改工程成功"));
@@ -175,7 +178,7 @@ public class DSSFrameworkProjectRestfulApi {
         try{
             // 检查是否具有删除项目权限
             projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
-            projectService.deleteProject(username,projectDeleteRequest);
+            dssFrameworkProjectService.deleteProject(projectDeleteRequest, username);
             return RestfulUtils.dealOk("删除工程成功");
         } catch (Exception e) {
             LOGGER.error("Failed to delete project {} for user {}", projectDeleteRequest, username, e);

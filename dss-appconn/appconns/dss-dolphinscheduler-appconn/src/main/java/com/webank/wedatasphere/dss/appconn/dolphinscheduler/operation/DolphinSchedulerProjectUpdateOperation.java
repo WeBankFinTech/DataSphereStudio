@@ -27,21 +27,20 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 /**
- * The type Dolphin scheduler project creation operation.
+ * The type Dolphin scheduler project update operation.
  *
  * @author yuxin.yuan
- * @date 2021/05/18
+ * @date 2021/06/23
  */
-public class DolphinSchedulerProjectCreationOperation implements ProjectCreationOperation, DolphinSchedulerConf {
+public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOperation, DolphinSchedulerConf {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectCreationOperation.class);
-    private static final Long DEFAULT_PROJECT_ID = 0L;
+    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectUpdateOperation.class);
 
     private SSOUrlBuilderOperation ssoUrlBuilderOperation;
 
@@ -51,9 +50,9 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
 
     private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
 
-    private String projectUrl;
+    private String projectUpdateUrl;
 
-    public DolphinSchedulerProjectCreationOperation(DolphinSchedulerProjectService dolphinSchedulerProjectService) {
+    public DolphinSchedulerProjectUpdateOperation(DolphinSchedulerProjectService dolphinSchedulerProjectService) {
         this.dolphinSchedulerProjectService = dolphinSchedulerProjectService;
         init();
     }
@@ -61,24 +60,28 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
     private void init() {
         this.baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
         this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
-        this.projectUrl = baseUrl.endsWith("/") ? baseUrl + "projects/create" : baseUrl + "/projects/create";
+        this.projectUpdateUrl = baseUrl.endsWith("/") ? baseUrl + "projects/update" : baseUrl + "/projects/update";
     }
 
     @Override
-    public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef updateProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
         // Dolphin Scheduler项目名
-        String dsProjectName = ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
-        logger.info("begin to create project in Dolphin Scheduler, project is {}", dsProjectName);
+        String dsProjectName =
+            ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
+        logger.info("begin to update project in Dolphin Scheduler, project is {}", dsProjectName);
+
+        DolphinSchedulerProjectQueryOperation projectQueryOperation =
+            new DolphinSchedulerProjectQueryOperation(this.baseUrl);
+        Long projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
 
         List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("projectId", String.valueOf(projectId)));
         params.add(new BasicNameValuePair("projectName", dsProjectName));
         params.add(new BasicNameValuePair("description", requestRef.getDescription()));
-        HttpEntity entity = EntityBuilder.create()
-            .setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
-            .setParameters(params)
-            .build();
-        // 使用管理员账户创建项目
-        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(projectUrl, Constant.DS_ADMIN_USERNAME);
+        HttpEntity entity =
+            EntityBuilder.create().setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
+                .setParameters(params).build();
+        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(projectUpdateUrl, Constant.DS_ADMIN_USERNAME);
         httpPost.setEntity(entity);
 
         DolphinSchedulerProjectResponseRef responseRef = new DolphinSchedulerProjectResponseRef();
@@ -87,46 +90,34 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
 
-            if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()) {
-                String codeString = DolphinAppConnUtils.getValueFromEntity(entString, "code");
-                int code = Integer.parseInt(codeString);
-
-                if (Constant.DS_RESULT_CODE_SUCCESS == code) {
-                    logger.info("Dolphin Scheduler新建项目 {} 成功, 返回的信息是 {}", dsProjectName,
-                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
-                } else if (Constant.DS_RESULT_CODE_PROJECT_ALREADY_EXISTS == code) {
-                    logger.info("Dolphin Scheduler项目 {} 已经存在, 返回的信息是 {}", dsProjectName,
-                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
-                    // 不返回project id
-                    responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
-                    return responseRef;
-                } else {
-                    throw new ExternalOperationFailedException(90021, "新建工程失败, 原因:" + entString);
-                }
+            if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
+                && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                logger.info("Dolphin Scheduler更新项目 {} 成功, 返回的信息是 {}", dsProjectName,
+                    DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
             } else {
-                throw new ExternalOperationFailedException(90021, "新建工程失败, 原因:" + entString);
-            }
-        } catch (final Exception e) {
-            throw new ExternalOperationFailedException(90022, "failed to create project in Dolphin Scheduler", e);
-        }
-
-        // 需要授权的用户名
-        List<String> releaseUsers = (List<String>)requestRef.getParameter("releaseUsers");
-
-        DolphinSchedulerProjectQueryOperation projectQueryOperation =
-            new DolphinSchedulerProjectQueryOperation(this.baseUrl);
-        DolphinSchedulerUserOperation userOperation = new DolphinSchedulerUserOperation(this.baseUrl);
-        try {
-            Long projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
-            for (String userName : releaseUsers) {
-                userOperation.grantProject(userName, projectId, false);
+                throw new ExternalOperationFailedException(90026, "调度中心更新工程失败, 原因:" + entString);
             }
         } catch (ExternalOperationFailedException e) {
-            throw new ExternalOperationFailedException(90025, "新建工程成功，调度中心授权出错", e);
+            throw e;
+        } catch (Exception e) {
+            throw new ExternalOperationFailedException(90026, "调度中心更新项目失败", e);
         }
 
-        // 不返回project id
-        responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
+        DolphinSchedulerUserOperation userOperation = new DolphinSchedulerUserOperation(this.baseUrl);
+        // 新增授权用户
+        List<String> releaseUsersIncreased = (List<String>)requestRef.getParameter("releaseUsersIncreased");
+        List<String> releaseUsersDecreased = (List<String>)requestRef.getParameter("releaseUsersDecreased");
+        try {
+            for (String userName : releaseUsersIncreased) {
+                userOperation.grantProject(userName, projectId, false);
+            }
+            for (String userName : releaseUsersDecreased) {
+                userOperation.grantProject(userName, projectId, true);
+            }
+        } catch (ExternalOperationFailedException e) {
+            throw new ExternalOperationFailedException(90025, "调度中心授权出错", e);
+        }
+
         return responseRef;
     }
 
@@ -136,5 +127,4 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
             this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
         }
     }
-
 }

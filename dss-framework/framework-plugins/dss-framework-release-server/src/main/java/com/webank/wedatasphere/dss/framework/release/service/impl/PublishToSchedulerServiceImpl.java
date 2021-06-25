@@ -31,8 +31,10 @@ import com.webank.wedatasphere.dss.framework.release.entity.project.ProjectInfo;
 import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
 import com.webank.wedatasphere.dss.framework.release.entity.task.ReleaseTask;
+import com.webank.wedatasphere.dss.framework.release.exception.AuthException;
 import com.webank.wedatasphere.dss.framework.release.job.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
+import com.webank.wedatasphere.dss.framework.release.service.ReleaseServerDSSProjectUserService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
 
@@ -48,6 +50,9 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
     private static final Logger LOGGER = LoggerFactory.getLogger(PublishToSchedulerServiceImpl.class);
 
     @Autowired
+    private ReleaseServerDSSProjectUserService dssProjectUserService;
+
+    @Autowired
     private ReleaseEnv releaseEnv;
 
     @Autowired
@@ -55,7 +60,6 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
 
     @Override
     public Long publish(String releaseUser, ReleaseOrchestratorRequest releaseOrchestratorRequest, Workspace workspace) {
-
         Long orchestratorId = releaseOrchestratorRequest.getOrchestratorId();
         Long orchestratorVersionId = releaseOrchestratorRequest.getOrchestratorVersionId();
         String dssLabel = releaseOrchestratorRequest.getDssLabel();
@@ -64,14 +68,20 @@ public class PublishToSchedulerServiceImpl implements PublishToSchedulerService 
 
         // 1.通过orchestratorId获取到project的信息
         ProjectInfo projectInfo = releaseEnv.getProjectService().getProjectInfoByOrchestratorId(orchestratorId);
+        // 2.有发布权限才可发布
+        if (!dssProjectUserService.isPublishAuth(projectInfo.getProjectId(), releaseUser)) {
+            LOGGER.info("user {} do not have publish authorization for project {}", releaseUser,
+                projectInfo.getProjectName());
+            throw new AuthException("没有发布权限");
+        }
         String orchestratorName = releaseEnv.getProjectService()
             .getOrchestratorName(orchestratorId, orchestratorVersionId);
 
-        // 2.插入数据到数据库
+        // 3.插入数据到数据库
         ReleaseTask releaseTask = releaseEnv.getTaskService()
             .addReleaseTask(releaseUser, projectInfo.getProjectId(), orchestratorId, orchestratorVersionId,
                 orchestratorName);
-        //3.生成任务,然后放入到线程池中
+        // 4.生成任务,然后放入到线程池中
         OrchestratorPublishJob job = new OrchestratorPublishJob();
         job.setReleaseTask(releaseTask);
         job.setReleaseEnv(releaseEnv);

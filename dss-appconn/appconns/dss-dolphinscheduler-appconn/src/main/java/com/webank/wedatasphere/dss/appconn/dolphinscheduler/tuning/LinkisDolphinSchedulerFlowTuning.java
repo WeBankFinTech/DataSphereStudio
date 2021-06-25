@@ -1,7 +1,17 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.tuning;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerFlow;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerSchedulerNode;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerNode;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob.NodeConverter;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
@@ -10,15 +20,6 @@ import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerFlow;
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appconn.schedule.core.tuning.AbstractFlowTuning;
 import com.webank.wedatasphere.dss.appconn.schedule.core.tuning.NodeTuning;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The type Linkis dolphin scheduler flow tuning.
@@ -49,7 +50,7 @@ public class LinkisDolphinSchedulerFlowTuning extends AbstractFlowTuning {
             = new DolphinSchedulerFlow.ProcessDefinitionJson();
         Map<String, DolphinSchedulerFlow.LocationInfo> locations = new HashMap<>();
         for (SchedulerNode node : schedulerFlow.getSchedulerNodes()) {
-            DolphinSchedulerSchedulerNode dolphinSchedulerSchedulerNode = (DolphinSchedulerSchedulerNode)node;
+            DolphinSchedulerNode dolphinSchedulerSchedulerNode = (DolphinSchedulerNode)node;
             dolphinSchedulerSchedulerNode.setUser(user);
             DolphinSchedulerTask dolphinSchedulerTask = dolphinSchedulerSchedulerNode.toDolphinSchedulerTask(
                 nodeConverter);

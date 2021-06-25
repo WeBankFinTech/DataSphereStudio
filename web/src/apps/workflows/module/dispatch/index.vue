@@ -218,12 +218,12 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.CreateTime'),
-          width: 100,
+          width: 200,
           key: 'createTime'
         },
         {
           title: this.$t('message.scheduler.header.UpdateTime'),
-          width: 100,
+          width: 200,
           key: 'updateTime'
         },
         {
@@ -445,17 +445,17 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.SchedulingTime'),
-          width: 100,
+          width: 200,
           key: 'scheduleTime'
         },
         {
           title: this.$t('message.scheduler.header.StartTime'),
-          width: 100,
+          width: 200,
           key: 'startTime'
         },
         {
           title: this.$t('message.scheduler.header.EndTime'),
-          width: 100,
+          width: 200,
           key: 'endTime'
         },
         {
@@ -627,12 +627,12 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.StartTime'),
-          width: 100,
+          width: 200,
           key: 'startTime'
         },
         {
           title: this.$t('message.scheduler.header.EndTime'),
-          width: 100,
+          width: 200,
           key: 'endTime'
         },
         {
@@ -652,12 +652,12 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.CreateTime'),
-          width: 100,
+          width: 200,
           key: 'createTime'
         },
         {
           title: this.$t('message.scheduler.header.UpdateTime'),
-          width: 100,
+          width: 200,
           key: 'updateTime'
         },
         {
@@ -796,6 +796,12 @@ export default {
         }
       })
     })
+  },
+  beforeDestroy() {
+    // 清除计时器
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
   },
   methods: {
     getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
@@ -1059,6 +1065,10 @@ export default {
       this.showTimingTaskModal = false
     },
     activeList(type, data) {
+      // 清除计时器
+      if (this.timer) {
+        clearInterval(this.timer)
+      }
       this.activeDS = type
       if (this.activeDS === 1) {
         this.getListData(1, data)
@@ -1078,6 +1088,7 @@ export default {
       }
     },
     openDag(index) {
+      // 清除计时器
       if (this.timer)
         clearInterval(this.timer)
       api.fetch(`dolphinscheduler/projects/${this.projectName}/instance/select-by-id`, {

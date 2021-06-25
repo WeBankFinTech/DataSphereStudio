@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProcessDefinitionQueryOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectDeletionOperation;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
@@ -46,9 +47,10 @@ public class DolphinSchedulerProjectService implements ProjectService {
         operationMap.put(DolphinSchedulerProjectCreationOperation.class,
             new DolphinSchedulerProjectCreationOperation(this));
         operationMap.put(RefQueryOperation.class, new DolphinSchedulerProcessDefinitionQueryOperation(this.appDesc));
+        operationMap.put(DolphinSchedulerProjectUpdateOperation.class,
+            new DolphinSchedulerProjectUpdateOperation(this));
         operationMap.put(DolphinSchedulerProjectDeletionOperation.class,
             new DolphinSchedulerProjectDeletionOperation(this));
-        //        operationMap.put(SchedulisProjectUpdateOperation.class, new SchedulisProjectUpdateOperation(this));
     }
 
     @Override
@@ -63,13 +65,15 @@ public class DolphinSchedulerProjectService implements ProjectService {
 
     @Override
     public ProjectUpdateOperation createProjectUpdateOperation() {
-        //        if (operationMap.containsKey(SchedulisProjectUpdateOperation.class)) {
-        //            return (SchedulisProjectUpdateOperation)operationMap.get(SchedulisProjectUpdateOperation.class);
-        //        } else {
-        //            operationMap.put(SchedulisProjectUpdateOperation.class, new SchedulisProjectUpdateOperation(this));
-        //            return (SchedulisProjectUpdateOperation)operationMap.get(SchedulisProjectUpdateOperation.class);
-        //        }
-        return null;
+        if (operationMap.containsKey(DolphinSchedulerProjectUpdateOperation.class)) {
+            return (DolphinSchedulerProjectUpdateOperation)operationMap
+                .get(DolphinSchedulerProjectUpdateOperation.class);
+        } else {
+            operationMap.put(DolphinSchedulerProjectUpdateOperation.class,
+                new DolphinSchedulerProjectUpdateOperation(this));
+            return (DolphinSchedulerProjectUpdateOperation)operationMap
+                .get(DolphinSchedulerProjectUpdateOperation.class);
+        }
     }
 
     @Override

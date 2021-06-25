@@ -1,11 +1,9 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.parser;
 
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerSchedulerNode;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerNode;
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode;
 import com.webank.wedatasphere.dss.appconn.schedule.core.parser.AbstractNodeParser;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The type Dolphin scheduler node parser.
@@ -15,11 +13,9 @@ import org.slf4j.LoggerFactory;
  */
 public class DolphinSchedulerNodeParser extends AbstractNodeParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerNodeParser.class);
-
     @Override
     public SchedulerNode parseNode(DSSNode dwsNode) {
-        DolphinSchedulerSchedulerNode schedulerNode = new DolphinSchedulerSchedulerNode();
+        DolphinSchedulerNode schedulerNode = new DolphinSchedulerNode();
         schedulerNode.setDSSNode(dwsNode);
         return schedulerNode;
     }

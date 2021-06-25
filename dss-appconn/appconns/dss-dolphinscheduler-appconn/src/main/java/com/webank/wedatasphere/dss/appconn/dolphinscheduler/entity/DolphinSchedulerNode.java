@@ -9,7 +9,7 @@ import com.webank.wedatasphere.dss.appconn.schedule.core.entity.AbstractSchedule
  * @author yuxin.yuan
  * @date 2021/04/29
  */
-public class DolphinSchedulerSchedulerNode extends AbstractSchedulerNode {
+public class DolphinSchedulerNode extends AbstractSchedulerNode {
 
     private String user;
 

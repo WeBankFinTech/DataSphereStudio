@@ -1,24 +1,20 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob;
 
-import com.google.gson.Gson;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerSchedulerNode;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.LinkisAzkabanReadNode;
-import com.webank.wedatasphere.dss.common.entity.Resource;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
-import com.webank.wedatasphere.linkis.filesystem.bml.BMLHelper;
-import org.apache.commons.io.IOUtils;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerNode;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.LinkisAzkabanReadNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
+import com.webank.wedatasphere.linkis.filesystem.bml.BMLHelper;
 
 /**
  * The type Node converter.
@@ -46,7 +42,7 @@ public class NodeConverter {
      * @param schedulerNode the scheduler node
      * @return the dolphin scheduler task
      */
-    public DolphinSchedulerTask conversion(DolphinSchedulerSchedulerNode schedulerNode) {
+    public DolphinSchedulerTask conversion(DolphinSchedulerNode schedulerNode) {
         return baseConversion(schedulerNode);
     }
 
@@ -58,7 +54,7 @@ public class NodeConverter {
         return tmpConversion + readNodePrefix + shareNodeIds + "\n";
     }
 
-    private DolphinSchedulerTask baseConversion(DolphinSchedulerSchedulerNode schedulerNode) {
+    private DolphinSchedulerTask baseConversion(DolphinSchedulerNode schedulerNode) {
         DSSNodeDefault dssNode = (DSSNodeDefault) schedulerNode.getDSSNode();
 
         DolphinSchedulerTask task = new DolphinSchedulerTask();

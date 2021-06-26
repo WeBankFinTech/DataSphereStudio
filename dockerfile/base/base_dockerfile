@@ -1,0 +1,29 @@
+FROM centos:7.9.2009
+ENV TZ="Asia/Shanghai"
+ENV LANG en_US.UTF-8
+RUN set -eux; \
+	yum install wget -y; \
+	mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
+    wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
+	yum update -y; \
+	yum install -y \
+		gzip \
+		tar \
+		unzip \
+        which \
+		binutils \
+		freetype fontconfig \
+	; \
+	rm -rf /var/cache/yum
+RUN yum install -y openssh-server sudo
+RUN sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
+RUN yum  install -y openssh-clients
+RUN echo "root:pass" | chpasswd
+RUN echo "root   ALL=(ALL)       ALL" >> /etc/sudoers
+RUN ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
+RUN mkdir /var/run/sshd
+COPY dss.sh dss.sh
+COPY ssh-copy-id.sh ssh-copy-id.sh
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

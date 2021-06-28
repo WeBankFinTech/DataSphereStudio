@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob.NodeConver
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.ReadNode;
 import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode;
 
-public class LinkisAzkabanReadNode extends DolphinSchedulerSchedulerNode implements ReadNode {
+public class LinkisAzkabanReadNode extends DolphinSchedulerNode implements ReadNode {
 
   private SchedulerNode schedulerNode;
   private String[] nodeIds;

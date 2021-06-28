@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerFlow;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerProject;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.hooks.LinkisDolphinSchedulerProjectPublishHook;
@@ -157,9 +158,9 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.prePublish(schedulerProject)));
         // 未发布过，则执行发布
         if (processDefinitionId == null) {
-            processDefinitionId = publish(schedulerProject);
+            processDefinitionId = publish(schedulerProject, publishUser);
         } else {
-            processDefinitionId = update(schedulerProject, processDefinitionId);
+            processDefinitionId = update(schedulerProject, processDefinitionId, publishUser);
         }
         // 成功发布后，获取Dolphin Scheduler中工作流定义id
         Stream.of(projectPublishHooks).forEach(DSSExceptionUtils.handling(hook -> hook.postPublish(schedulerProject)));
@@ -180,7 +181,8 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         }
     }
 
-    private Long publish(SchedulerProject schedulerProject) throws ExternalOperationFailedException {
+    private Long publish(SchedulerProject schedulerProject, String publishUser)
+        throws ExternalOperationFailedException {
         DolphinSchedulerProject dolphinSchedulerProject = (DolphinSchedulerProject)schedulerProject;
         List<SchedulerFlow> schedulerFlows = dolphinSchedulerProject.getSchedulerFlows();
         if (schedulerFlows.size() != 1) {
@@ -202,8 +204,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         String projectName = ProjectUtils.generateDolphinProjectName(
             dolphinSchedulerProject.getDSSProject().getWorkspaceName(), dolphinSchedulerProject.getName());
         String saveUrl = StringUtils.replace(saveProcessDefinitionUrl, "${projectName}", projectName);
-        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(saveUrl,
-            dolphinSchedulerProject.getCreateBy());
+        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(saveUrl, publishUser);
         httpPost.setEntity(entity);
 
         String entString = null;
@@ -215,8 +216,8 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
             httpStatusCode = httpResponse.getStatusLine().getStatusCode();
         } catch (ExternalOperationFailedException e) {
             throw e;
-        } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", t, ExternalOperationFailedException.class);
+        } catch (final Exception e) {
+            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", e, ExternalOperationFailedException.class);
         }
 
         try {
@@ -245,7 +246,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         String projectName = ProjectUtils.generateDolphinProjectName(
             dolphinSchedulerProject.getDSSProject().getWorkspaceName(), dolphinSchedulerProject.getName());
         String queryUrl = StringUtils.replace(this.listProcessDefinitionUrl, "${projectName}", projectName);
-        DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(queryUrl, dolphinSchedulerProject.getCreateBy());
+        DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(queryUrl, Constant.DS_ADMIN_USERNAME);
 
         CloseableHttpResponse httpResponse = null;
         try {
@@ -269,8 +270,8 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
             }
         } catch (ExternalOperationFailedException e) {
             throw e;
-        } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(90014, "从调度中心获取工作流信息失败", t,
+        } catch (final Exception e) {
+            SchedulisExceptionUtils.dealErrorException(90014, "从调度中心获取工作流信息失败", e,
                 ExternalOperationFailedException.class);
         } finally {
             IOUtils.closeQuietly(httpResponse);
@@ -278,7 +279,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         throw new ExternalOperationFailedException(90014, "从调度中心获取工作流信息失败");
     }
 
-    private Long update(SchedulerProject schedulerProject, Long processDefinitionId)
+    private Long update(SchedulerProject schedulerProject, Long processDefinitionId, String publishUser)
         throws ExternalOperationFailedException {
         DolphinSchedulerProject dolphinSchedulerProject = (DolphinSchedulerProject)schedulerProject;
         List<SchedulerFlow> schedulerFlows = dolphinSchedulerProject.getSchedulerFlows();
@@ -303,8 +304,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
         String projectName = ProjectUtils.generateDolphinProjectName(
             dolphinSchedulerProject.getDSSProject().getWorkspaceName(), dolphinSchedulerProject.getName());
         String updateUrl = StringUtils.replace(updateProcessDefinitionUrl, "${projectName}", projectName);
-        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(updateUrl,
-            dolphinSchedulerProject.getCreateBy());
+        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(updateUrl, publishUser);
         httpPost.setEntity(entity);
 
         String entString = null;
@@ -316,8 +316,8 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
             httpStatusCode = httpResponse.getStatusLine().getStatusCode();
         } catch (ExternalOperationFailedException e) {
             throw e;
-        } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", t,
+        } catch (final Exception e) {
+            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", e,
                 ExternalOperationFailedException.class);
         }
 
@@ -330,7 +330,7 @@ public class DolphinSchedulerWorkflowUploadOperation implements UploadToSchedule
                 } else if (DolphinAppConnUtils.getCodeFromEntity(entString) == 50003) {
                     logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} ，更新失败：{}，执行创建操作", schedulerFlow.getName(),
                         projectName, entString);
-                    return publish(schedulerProject);
+                    return publish(schedulerProject, publishUser);
                 } else if (DolphinAppConnUtils.getCodeFromEntity(entString) == 50008) {
                     logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} ，更新失败：{}，项目处于上线状态", schedulerFlow.getName(),
                         projectName, entString);

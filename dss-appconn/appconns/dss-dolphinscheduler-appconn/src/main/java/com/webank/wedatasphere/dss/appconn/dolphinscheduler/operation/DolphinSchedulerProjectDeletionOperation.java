@@ -12,6 +12,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
@@ -43,6 +44,8 @@ public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletion
 
     private SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> getOperation;
 
+    private String baseUrl;
+
     private String deleteProcessDefinitionByIdUrl;
 
     private String deleteProjectByIdUrl;
@@ -50,7 +53,7 @@ public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletion
     public DolphinSchedulerProjectDeletionOperation(DolphinSchedulerProjectService dolphinSchedulerProjectService) {
         this.dolphinSchedulerProjectService = dolphinSchedulerProjectService;
 
-        String baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
+        this.baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
         this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
         this.deleteProcessDefinitionByIdUrl = baseUrl.endsWith("/") ? baseUrl + "projects/${projectName}/process/delete"
             : baseUrl + "/projects/${projectName}/process/delete";
@@ -117,13 +120,23 @@ public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletion
     }
 
     private void deleteDolphinSchedulerProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
+        // Dolphin Scheduler项目名
+        String dsProjectName =
+            ProjectUtils.generateDolphinProjectName(projectRef.getWorkspaceName(), projectRef.getName());
+        logger.info("begin to delete project in Dolphin Scheduler, project is {}", dsProjectName);
+
+        DolphinSchedulerProjectQueryOperation projectQueryOperation =
+            new DolphinSchedulerProjectQueryOperation(this.baseUrl);
+        Long projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
+
         CloseableHttpResponse httpResponse = null;
         String entString = null;
         int httpStatusCode = 0;
         try {
             URIBuilder uriBuilder = new URIBuilder(this.deleteProjectByIdUrl);
-            uriBuilder.addParameter("projectId", String.valueOf(projectRef.getId()));
-            DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(uriBuilder.build(), projectRef.getCreateBy());
+            uriBuilder.addParameter("projectId", String.valueOf(projectId));
+            DolphinSchedulerHttpGet httpGet =
+                new DolphinSchedulerHttpGet(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
             httpResponse = this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);
 
@@ -140,8 +153,7 @@ public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletion
             if (HttpStatus.SC_OK == httpStatusCode) {
                 int resultCode = DolphinAppConnUtils.getCodeFromEntity(entString);
                 if (resultCode == 0 || resultCode == 10018) { // 删除成功/项目不存在
-                    logger.info("Dolphin Scheduler删除项目 {} 成功",
-                        ProjectUtils.generateDolphinProjectName(projectRef.getWorkspaceName(), projectRef.getName()));
+                    logger.info("Dolphin Scheduler删除项目 {} 成功", dsProjectName);
                 } else if (resultCode == 10137) {
                     throw new ExternalOperationFailedException(90034, "该工程项下存在工作流，请先删除对应工作流");
                 } else {

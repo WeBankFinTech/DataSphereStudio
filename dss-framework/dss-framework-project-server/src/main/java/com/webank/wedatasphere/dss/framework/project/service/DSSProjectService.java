@@ -32,7 +32,6 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 public interface DSSProjectService  extends IService<DSSProject> {
 
@@ -56,6 +55,17 @@ public interface DSSProjectService  extends IService<DSSProject> {
      * @return
      */
     public DSSProject getProjectByName(String name);
+
+    /**
+     * 根据工程名称获取指定工作空间的工程详情
+     *
+     * @param workspaceId
+     *            the workspace id
+     * @param name
+     *            the name
+     * @return project by name
+     */
+    public DSSProject getProjectByName(Long workspaceId, String name);
 
     /**
      * 根据id获取工程详情
@@ -82,9 +92,10 @@ public interface DSSProjectService  extends IService<DSSProject> {
 
     Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception;
 
-    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) throws ErrorException;
+    void deleteProject(ProjectDeleteRequest projectDeleteRequest);
 
     List<String> getProjectAbilities(String username);
 
     boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
+
 }

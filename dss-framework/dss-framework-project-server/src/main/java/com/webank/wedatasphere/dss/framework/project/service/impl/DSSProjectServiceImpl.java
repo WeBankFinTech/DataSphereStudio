@@ -18,6 +18,22 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -44,22 +60,6 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author v_wbzwchen
@@ -136,6 +136,14 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         projectQueryWrapper.eq("name", name);
         List<DSSProject> projectList = projectMapper.selectList(projectQueryWrapper);
         return CollectionUtils.isEmpty(projectList) ? null : projectList.get(0);
+    }
+
+    @Override
+    public DSSProject getProjectByName(Long workspaceId, String name) {
+        QueryWrapper<DSSProject> projectQueryWrapper = new QueryWrapper<DSSProject>();
+        projectQueryWrapper.eq("workspace_id", workspaceId);
+        projectQueryWrapper.eq("name", name);
+        return projectMapper.selectOne(projectQueryWrapper);
     }
 
     @Override
@@ -254,19 +262,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
     @Override
     @Transactional
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest) throws ErrorException {
-        LOGGER.warn("user {} begins to delete project {}", username, projectDeleteRequest);
-
-        Long projectId = projectDeleteRequest.getId();
-        if (projectMapper.hasOrchestrator(projectId) != null) {
-            throw new DSSProjectErrorException(90041, "该工程项下存在工作流，请先删除对应工作流");
-        }
-
+    public void deleteProject(ProjectDeleteRequest projectDeleteRequest) {
         // 删除项目信息
         projectMapper.deleteProjectInfo(projectDeleteRequest.getId());
         // 删除项目角色信息
         projectUserMapper.deleteAllPriv(projectDeleteRequest.getId());
-        LOGGER.warn("user {} deleted project {}", username, projectDeleteRequest);
     }
 
     @Override

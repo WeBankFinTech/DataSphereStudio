@@ -18,13 +18,14 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
+import java.util.List;
+
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-
-import java.util.List;
 
 public interface DSSProjectUserService {
 
@@ -60,4 +61,15 @@ public interface DSSProjectUserService {
 
     //根据空间id和用户名获取工程与用户关系
     public List<DSSProjectUser> getListByParam(Long workspaceId, String username);
+
+    /**
+     * 获取某个项目下指定权限的用户名合.
+     *
+     * @param projectId
+     *            the project id
+     * @param privEnum
+     *            the priv enum
+     * @return the list
+     */
+    public List<DSSProjectUser> listByPriv(Long projectId, ProjectUserPrivEnum privEnum);
 }

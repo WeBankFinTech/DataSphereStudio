@@ -18,21 +18,6 @@
 
 package com.webank.wedatasphere.dss.framework.release.restful;
 
-import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
-import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
-import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
-import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
-import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
-import com.webank.wedatasphere.dss.framework.release.utils.ReleaseUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -45,6 +30,23 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
+import com.webank.wedatasphere.dss.framework.release.entity.orchestrator.WorkflowStatus;
+import com.webank.wedatasphere.dss.framework.release.entity.request.ReleaseOrchestratorRequest;
+import com.webank.wedatasphere.dss.framework.release.entity.task.PublishStatus;
+import com.webank.wedatasphere.dss.framework.release.exception.AuthException;
+import com.webank.wedatasphere.dss.framework.release.service.PublishToSchedulerService;
+import com.webank.wedatasphere.dss.framework.release.utils.ReleaseUtils;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 
 /**
  * created by cooperyang on 2021/2/22
@@ -71,9 +73,11 @@ public class FrameworkPublishRestful {
         try{
             Long releaseTaskId = publishToSchedulerService.publish(username, releaseOrchestratorRequest, workspace);
             return RestfulUtils.dealOk("提交发布任务成功", new Pair<>("releaseTaskId", releaseTaskId));
-        }catch(final Throwable t){
+        } catch (AuthException e) {
+            return RestfulUtils.dealError(e.getMessage());
+        } catch (final Throwable t) {
             LOGGER.error("failed to do publish to Scheduler for user {} , req is {}",
-                    username, ReleaseUtils.GSON.toJson(releaseOrchestratorRequest), t);
+                username, ReleaseUtils.GSON.toJson(releaseOrchestratorRequest), t);
             return RestfulUtils.dealError("提交发布任务失败");
         }
     }

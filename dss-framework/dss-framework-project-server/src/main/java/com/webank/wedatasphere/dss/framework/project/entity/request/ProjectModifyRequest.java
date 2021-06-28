@@ -18,9 +18,10 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.request;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 /**
  * created by cooperyang on 2020/11/11
@@ -62,6 +63,8 @@ public class ProjectModifyRequest {
      */
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
+
+    private String workspaceName;
 
     /*
    开发流程 code list
@@ -151,6 +154,14 @@ public class ProjectModifyRequest {
 
     public void setWorkspaceId(Long workspaceId) {
         this.workspaceId = workspaceId;
+    }
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
     }
 
     public List<String> getDevProcessList() {

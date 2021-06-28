@@ -18,6 +18,15 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
@@ -32,14 +41,6 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author v_wbzwchen
@@ -174,5 +175,12 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         if (tempAddList.size() > 0) {
             projectUserMapper.insertBatchProjectUser(tempAddList);
         }
+    }
+
+    @Override
+    public List<DSSProjectUser> listByPriv(Long projectId, ProjectUserPrivEnum privEnum) {
+        QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("username").eq("project_id", projectId).ge("priv", privEnum.getRank());
+        return projectUserMapper.selectList(queryWrapper);
     }
 }

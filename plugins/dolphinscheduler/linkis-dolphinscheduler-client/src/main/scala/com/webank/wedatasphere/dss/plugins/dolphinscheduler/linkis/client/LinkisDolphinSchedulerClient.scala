@@ -8,13 +8,11 @@ import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.L
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.job.DolphinSchedulerJobBuilder
 import com.webank.wedatasphere.linkis.common.utils.Logging
 import org.apache.commons.io.IOUtils
-import org.json4s.{DefaultFormats, Formats}
 
 import java.io.{FileInputStream, InputStream, InputStreamReader}
 import java.util.{Properties, Map => JMap}
 
 object LinkisDolphinSchedulerClient extends Logging {
-  implicit val formats: Formats = DefaultFormats
   val DEFAULT_PROPERTY_FILE_NAME = "linkis.properties"
   val DEFAULT_CONFIG_DIR = "conf"
   val CHARSET_NAME = "utf-8"
@@ -40,10 +38,10 @@ object LinkisDolphinSchedulerClient extends Logging {
     execution.runJob(job)
     execution.waitForComplete(job)
 
-    info("\n\n执行成功\n+++++++++++++++++++++++++++++++++++++++++")
+
     val resultSize = execution.getResultSize(job)
     val result = LinkisNodeExecutionImpl.getLinkisNodeExecution.getResult(job, 0, resultSize)
-    info(result)
+    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++\n执行结果：\n\n$result\n\n**************************************************")
   }
 
   def parseKVMapFromArgs(args: Array[String]): JMap[String, String] = {

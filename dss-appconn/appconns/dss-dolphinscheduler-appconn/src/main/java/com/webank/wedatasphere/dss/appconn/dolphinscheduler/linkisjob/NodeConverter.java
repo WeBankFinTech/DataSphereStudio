@@ -82,7 +82,7 @@ public class NodeConverter {
             }
 
             //TODO 改为参数配置路径
-            String dolphinScript = "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar " + new Gson().toJson(map);
+            String dolphinScript = "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar '" + new Gson().toJson(map) + "'";
             taskParams.setRawScript(dolphinScript);
         } catch (Exception e) {
             logger.error("任务转换失败", e);

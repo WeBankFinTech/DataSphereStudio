@@ -1,6 +1,5 @@
 package com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.job
 
-import com.google.gson.Gson
 import com.webank.wedatasphere.dss.linkis.node.execution.job.{Builder, CommonLinkisJob, Job, LinkisJob}
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
@@ -18,7 +17,7 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
   }
 
   override protected def fillJobInfo(job: Job): Unit = {
-    job.setCode(new Gson().toJson(jobProps.get("command")))
+    job.setCode(jobProps.get("command"))
     job.setParams(new java.util.HashMap[String, Object]())
     job.setRuntimeParams(new java.util.HashMap[String, Object]())
     job.setJobProps(jobProps)
@@ -31,7 +30,7 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
   }
 
   override protected def fillCommonLinkisJobInfo(commonLinkisJob: CommonLinkisJob): Unit = {
-    commonLinkisJob.setJobResourceList(LinkisJobExecutionUtils.getResourceListByJson(new Gson().toJson(jobProps.get("resources"))));
+    commonLinkisJob.setJobResourceList(LinkisJobExecutionUtils.getResourceListByJson(jobProps.get("resources")))
     //
     //    val projectResourceName = LinkisJobExecutionConfiguration.PROJECT_PREFIX + "." + jobProps.get(LinkisJobTypeConf.PROJECT_NAME) + LinkisJobExecutionConfiguration.RESOURCES_NAME;
     //    commonLinkisJob.setProjectResourceList(LinkisJobExecutionUtils.getResourceListByJson(jobProps.get(projectResourceName)));

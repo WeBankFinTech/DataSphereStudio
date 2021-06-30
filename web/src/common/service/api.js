@@ -202,7 +202,7 @@ const success = function(response) {
           api.error[data.code](response);
           throw new Error('');
         } else {
-          throw new Error(message || '后台接口异常，请联系开发处理！');
+          throw new Error(data.msg || '后台接口异常，请联系开发处理！');
         }
       }
     } else {
@@ -234,6 +234,7 @@ const success = function(response) {
 const fail = function(error) {
   let _message = '';
   let response = error.response;
+  console.log('error', error);
   if (response && api.error[response.status]) {
     api.error[response.status].forEach((fn) => fn(response));
   } else {
@@ -311,6 +312,7 @@ const action = function(url, data, option) {
     })
     .catch(function(error) {
       error.message && Message.error(error.message);
+      error.msg && Message.error(error.msg);
       throw error;
     });
 };

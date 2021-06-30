@@ -180,7 +180,15 @@ export default {
     },
     activeTab() {
       this.activeDS = this.activeTab
-    }
+    },
+    '$route.query.projectID': {
+      handler: function(projectID) {
+        this.activeList(this.activeDS);
+      },
+      deep: true,
+      immediate: true
+      
+    },
   },
   computed: {
     projectName() {

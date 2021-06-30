@@ -574,6 +574,10 @@ export default {
     },
     // 切换开发流程
     handleChangeButton(item) {
+      if(item.dicValue === DEVPROCESS.OPERATIONCENTER && (!this.currentProjectData.releaseUsers
+      || this.currentProjectData.releaseUsers.indexOf(this.getUserName()) === -1)) {
+        return this.$Message.warning("无运维权限");
+      }
       // 当前流程的value
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取

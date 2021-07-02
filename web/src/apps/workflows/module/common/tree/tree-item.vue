@@ -12,7 +12,7 @@
         <Icon custom="iconfont icon-xingzhuang" size="16"></Icon>
       </div>
       <div class="tree-name" :class="{'tree-name-active': currentTreeId == model.id}" @click="handleItemClick">{{model.name}}</div>
-      <div class="tree-add" @click="handleAddClick" v-if="model.type=='project'">
+      <div class="tree-add" @click="handleAddClick" v-if="model.type=='project' && model.canWrite">
         <Icon custom="iconfont icon-plus" size="20"></Icon>
       </div>
       <div class="tree-hold" v-else></div>

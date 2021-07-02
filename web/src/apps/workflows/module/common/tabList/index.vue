@@ -113,6 +113,9 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    modeOfKey: {
+      type: String
     }
   },
   data() {
@@ -131,6 +134,9 @@ export default {
         this.currentButton = val[0];
         this.$emit('handleChangeButton', this.currentButton);
       }
+    },
+    modeOfKey(val) {
+      this.currentButton = this.buttonText.find((item) => item.dicValue === val);
     }
   },
   methods: {
@@ -141,8 +147,8 @@ export default {
       this.$emit('bandleTapTab', tabData.tabId)
     },
     handleChangeButton(dicValue) {
-      this.currentButton = this.buttonText.find((item) => item.dicValue === dicValue);
-      this.$emit('handleChangeButton', this.currentButton);
+      const btn = this.buttonText.find((item) => item.dicValue === dicValue);
+      this.$emit('handleChangeButton', btn);
     },
     selectProject() {
       this.$emit('selectProject');

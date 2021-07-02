@@ -9,6 +9,7 @@
         :md="6"
         :xl="5"
         @click.native="add"
+        v-if="canWrite"
       >
         <div class="project-add">
           <Icon :size="32" type="ios-add"></Icon>
@@ -106,6 +107,10 @@ export default {
     applicationAreaMap: {
       type: Array,
       default: () => []
+    },
+    canWrite: {
+      type: Boolean,
+      default: true
     }
   },
   data() {

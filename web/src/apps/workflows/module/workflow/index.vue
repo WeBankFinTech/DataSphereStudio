@@ -10,6 +10,7 @@
           :data-list="item.dwsFlowList"
           :applicationAreaMap="applicationAreaMap"
           :publishingList="publishingList"
+          :canWrite="projectData.canWrite"
           tag-prop="uses"
           @goto="gotoWorkflow"
           @add="ProjectMergeAdd"

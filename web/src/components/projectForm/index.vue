@@ -270,8 +270,8 @@ export default {
         }
       }
       const cloneObj = _.cloneDeep(value);
-      handleCreateUser(cloneObj.accessUsers, cloneObj.createBy);
-      handleCreateUser(cloneObj.editUsers, cloneObj.createBy);
+      handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
+      handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
 
       this.projectDataCurrent = cloneObj;
     }

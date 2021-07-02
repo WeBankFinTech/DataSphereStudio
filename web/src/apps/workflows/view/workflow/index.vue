@@ -37,6 +37,7 @@
       :textColor="textColor"
       :tabName="tabName"
       :topTabList="topTabList"
+      :modeOfKey="modeOfKey"
       :buttonText="selectDevprocess"
       :bottomTapList="tabList"
       :modeName="modeName"
@@ -115,6 +116,7 @@ import ProjectForm from '@/components/projectForm/index.js'
 import api from '@/common/service/api'
 import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js'
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js'
+import {setVirtualRoles} from '@/common/config/permissions.js';
 import DS from '@/apps/workflows/module/dispatch'
 
 export default {
@@ -248,7 +250,12 @@ export default {
         workspaceId: +this.$route.query.workspaceId,
         id: +this.$route.query.projectID
       }, 'post').then((res) => {
-        this.currentProjectData = res.projects[0];
+        const project = res.projects[0];
+        setVirtualRoles(project, this.getUserName())
+        this.currentProjectData = {
+          ...res.projects[0],
+          canWrite: project.canWrite()
+        };
         this.getSelectDevProcess();
         this.getSelectOrchestratorList();
         this.loading = false;
@@ -262,10 +269,12 @@ export default {
       }, 'post').then((res) => {
         this.loadingTree = false;
         this.projectsTree = res.projects.map(n => {
+          setVirtualRoles(n, this.getUserName())
           return {
             id: n.id,
             name: n.name,
-            type: 'project'
+            type: 'project',
+            canWrite: n.canWrite()
           }
         });
       })
@@ -340,6 +349,8 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
+      // 切换到开发模式
+      this.modeOfKey = this.selectDevprocess && this.selectDevprocess.length ? this.selectDevprocess[0].dicValue : DEVPROCESS.DEVELOPMENTCENTER;
       if (node.type == 'flow') {
         this.currentTreeId = node.orchestratorId;
         // 如果点击其它project的flow，应该切换project
@@ -432,7 +443,12 @@ export default {
     },
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData) {
-      this.currentProjectData = {...projectData};
+      const project = projectData;
+      setVirtualRoles(project, this.getUserName())
+      this.currentProjectData = {
+        ...projectData,
+        canWrite: project.canWrite()
+      };
       this.getSelectDevProcess();
       this.getSelectOrchestratorList();
       projectData.workspaceId = +this.$route.query.workspaceId;

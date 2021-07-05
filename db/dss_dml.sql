@@ -477,62 +477,43 @@ INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_datacheckerId, 'DEV', 'datachecker', '{"job.datachecker.jdo.option.name":"job","job.datachecker.jdo.option.url":"DATACHECKER_JOB_JDBC_URL","job.datachecker.jdo.option.username":"DATACHECKER_JOB_JDBC_USERNAME","job.datachecker.jdo.option.password":"DATACHECKER_JOB_JDBC_PASSWORD","bdp.datachecker.jdo.option.name":"bdp","bdp.datachecker.jdo.option.url":"DATACHECKER_BDP_JDBC_URL","bdp.datachecker.jdo.option.username":"DATACHECKER_BDP_JDBC_USERNAME","bdp.datachecker.jdo.option.password":"DATACHECKER_BDP_JDBC_PASSWORD","bdp.datachecker.jdo.option.login.type":"base64","bdp.mask.url":"http://BDP_MASK_IP:BDP_MASK_PORT/api/v1/mask-status?","bdp.mask.app.id":"wtss","bdp.mask.app.token":"20a0ccdfc0"}', NULL, NULL);
 
 
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'6','0',now(),'system');
 
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'6','0',now(),'system');
-
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'6','0',now(),'system');
-
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','6','0',now(),'system');
-
-
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'6','0',now(),'system');
-
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'6','0',now(),'system');
-
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'7','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'1','1',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'2','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'3','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'4','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'5','0',now(),'system');
-INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'6','0',now(),'system');
 
 
 INSERT INTO `source` (id,name,description,config,type,project_id,create_by,create_time,update_by,update_time,parent_id,full_parent_id,is_folder,`index`) VALUES (1,'hiveDataSource','','{"parameters":"","password":"","url":"test","username":"hiveDataSource-token"}','hive',-1,null,null,null,null,null,null,null,null);
+
+
+
+ALTER TABLE dss_workspace  ADD COLUMN `workspace_type`  varchar(20) comment '工作空间类型';
+ALTER TABLE dss_menu ADD COLUMN `menu_application_id` bigint(20);
+
+DELETE FROM dss_role;
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (1, '-1', 'admin', '管理员', '2020-07-13 02:43:35', '通用角色管理员');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (2, '-1', 'maintenance', '运维用户', '2020-07-13 02:43:35', '通用角色运维用户');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (3, '-1', 'developer', '开发用户', '2020-07-13 02:43:35', '通用角色开发用户');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (4, '-1', 'analyser', '分析用户', '2020-07-13 02:43:36', '通用角色分析用户');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (5, '-1', 'operator', '运营用户', '2020-07-13 02:43:36', '通用角色运营用户');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (6, '-1', 'dataApiUser', '数据服务用户', '2020-07-13 02:43:36', '通用数据服务用户');
+INSERT INTO `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES (7, '-1', 'visitor', '访客', '2020-07-13 02:43:36', '通用访客用户');
+
+DELETE FROM dss_menu;
+INSERT INTO `dss_menu` VALUES (1, 'data_access', '1', 0, '数据接入', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 1);
+INSERT INTO `dss_menu` VALUES (2, 'application_development', '1', 0, '应用开发', NULL, NULL, 1, 0, 'icon-fenxizhongxin', 0, 2);
+INSERT INTO `dss_menu` VALUES (3, 'data_service', '1', 0, '数据服务', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 3);
+INSERT INTO `dss_menu` VALUES (4, 'data_analysis', '1', 0, '数据分析', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 4);
+INSERT INTO `dss_menu` VALUES (5, 'maintenance', '1', 0, '生产运维', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 5);
+INSERT INTO `dss_menu` VALUES (6, 'data_quality', '1', 0, '数据质量', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 6);
+INSERT INTO `dss_menu` VALUES (7, 'management_desk', '1', 0, '管理台', NULL, NULL, 1, 0, 'icon-kaifazhongxinmorenzhuangtai', 0, 7);
+
+DELETE FROM dss_application;
+INSERT INTO `dss_application` VALUES (1, 'Exchangis', 'http://192.168.10.201:9001', 0, 1, NULL, 0, '/home', '{\"watermark\":false,\"rsDownload\":true}', 0, '/home', NULL);
+INSERT INTO `dss_application` VALUES (2, 'Stream SQL', 'http://:8088', 0, 1, NULL, 0, 'http://:8088/dss/visualis/#/project/${projectId}', '{\"watermark\":false,\"rsDownload\":true}', 1, 'http://:8088/dss/visualis/#/projects', NULL);
+INSERT INTO `dss_application` VALUES (3, 'workflow', '/workspaceHome', 0, 1, NULL, 0, '/workspaceHome', NULL, 0, '/workspaceHome', NULL);
+INSERT INTO `dss_application` VALUES (4, 'ApiService', NULL, 0, 1, NULL, 0, '/console', NULL, 0, '/console', NULL);
+INSERT INTO `dss_application` VALUES (5, 'Scriptis', '/home', 0, 1, NULL, 0, '/home', NULL, NULL, '/home', NULL);
+INSERT INTO `dss_application` VALUES (6, 'Superset', 'http://192.168.10.200/report', 0, 1, NULL, 0, 'http://192.168.10.200/report', '{\"scheduleHistory\":\"http://127.0.0.1:8290/manager?project=${projectName}&flow=${flowName}&hideHead=true#executions\"}', 0, 'http://192.168.10.200/report', 'http://192.168.10.200/report/login');
+INSERT INTO `dss_application` VALUES (7, 'EasyIDE', 'http://127.0.0.1:9001', 0, 1, NULL, 0, '/apiservices', NULL, 0, '/apiservices', NULL);
+INSERT INTO `dss_application` VALUES (8, 'dataportal', 'http://127.0.0.1:8088', 0, 1, NULL, 0, 'http://127.0.0.1:8088/dss/easyide', '{\"watermark\":false,\"rsDownload\":true}', 1, 'http://127.0.0.1:8088/dss/easyide', NULL);
+INSERT INTO `dss_application` VALUES (9, 'Schedulis', 'http://127.0.0.1:30793', 0, 1, NULL, 1, 'http://127.0.0.1:30793', NULL, 1, 'http://127.0.0.1:30793/#/dashboard', 'http://127.0.0.1:30793/#/mlFlow');
+INSERT INTO `dss_application` VALUES (10, 'Qualitis', 'http://127.0.0.1:8088', 0, 1, NULL, 0, '/portal/portalhome', '{\"watermark\":false,\"rsDownload\":true}', 0, '/portal/portalhome', NULL);
+INSERT INTO `dss_application` VALUES (11, 'console', NULL, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

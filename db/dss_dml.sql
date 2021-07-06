@@ -507,3 +507,4 @@ INSERT INTO `dss_application` VALUES (8, 'dataportal', 'http://127.0.0.1:8088', 
 INSERT INTO `dss_application` VALUES (9, 'Schedulis', 'http://127.0.0.1:30793', 0, 1, NULL, 1, 'http://127.0.0.1:30793', NULL, 1, 'http://127.0.0.1:30793/#/dashboard', 'http://127.0.0.1:30793/#/mlFlow');
 INSERT INTO `dss_application` VALUES (10, 'Qualitis', 'http://127.0.0.1:8088', 0, 1, NULL, 0, '/portal/portalhome', '{\"watermark\":false,\"rsDownload\":true}', 0, '/portal/portalhome', NULL);
 INSERT INTO `dss_application` VALUES (11, 'console', NULL, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `dss_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','天翼云科技','0','ctyunuser','1888888888','ctyun@ctyun.com','0','0','admin',now(),'admin',now());

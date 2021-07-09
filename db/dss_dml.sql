@@ -1,4 +1,3 @@
-insert into `dss_workspace` (`name`, `label`, `description`, `create_by`, `create_time`, `department`, `product`, `source`, `last_update_time`, `last_update_user`) values('bdapWorkspace','','bdapWorkspace','jianfuzhang','2020-07-13 02:39:41','企业直通银行部','bdapWorkspace',NULL,'2020-07-13 02:39:41','jianfuzhang');
 
 insert  into `dss_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (1,0,'0','空间开发流程','Space development process','w_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'空间开发流程','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
 insert  into `dss_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'w_develop_process','需求','Demand','wdp_demand','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'xuqiu',1,'空间开发流程-需求','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:07');
@@ -47,6 +46,12 @@ insert into `dss_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (1,0,'空间概览','An overview of the space','空间概览','An overview of the space',0,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:45:41');
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'菜单','Menu','菜单','Menu',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:45:50');
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,'知识库','Common problem','知识库','Common problem',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:46:18');
+
+INSERT INTO `dss_sidebar_content` VALUES (1,0,3,NULL,NULL,'使用手册','The manual','https://saas.ctyun.cn/luban/doc/docs/mindoc',1,'wendang',1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:47:29');
+INSERT INTO `dss_sidebar_content` VALUES (3,0,2,NULL,NULL,'工作空间管理','Workspace management','/workspaceManagement/productsettings',0,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:49');
+INSERT INTO `dss_sidebar_content` VALUES (4,0,2,NULL,NULL,'知识库','Knowledge base','https://saas.ctyun.cn/luban/doc/docs/mindoc',1,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:11');
+INSERT INTO `dss_sidebar_content` VALUES (5,0,3,NULL,NULL,'内置参数使用',NULL,'https://saas.ctyun.cn/luban/doc/docs/mindoc/mindoc-1d1i89mmjbp6n',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:16:52');
+
 
 Exchangis
 DELETE FROM dss_onestop_menu;
@@ -507,3 +512,4 @@ INSERT INTO `dss_application` VALUES (8, 'dataportal', 'http://127.0.0.1:8088', 
 INSERT INTO `dss_application` VALUES (9, 'Schedulis', 'http://127.0.0.1:30793', 0, 1, NULL, 1, 'http://127.0.0.1:30793', NULL, 1, 'http://127.0.0.1:30793/#/dashboard', 'http://127.0.0.1:30793/#/mlFlow');
 INSERT INTO `dss_application` VALUES (10, 'Qualitis', 'http://127.0.0.1:8088', 0, 1, NULL, 0, '/portal/portalhome', '{\"watermark\":false,\"rsDownload\":true}', 0, '/portal/portalhome', NULL);
 INSERT INTO `dss_application` VALUES (11, 'console', NULL, 0, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `dss_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','天翼云科技','0','ctyunuser','1888888888','ctyun@ctyun.com','0','0','admin',now(),'admin',now());

@@ -41,6 +41,7 @@
         <module>dss-framework-project-server</module>
         <module>dss-framework-admin</module>
         <module>dss-framework-dbapi-server</module>
+        <module>dss-framework-sql-template</module>
     </modules>
 
 </project>

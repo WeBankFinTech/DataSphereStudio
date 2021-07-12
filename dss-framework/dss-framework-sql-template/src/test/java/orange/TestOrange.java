@@ -1,3 +1,5 @@
+package orange;
+
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import com.webank.wedatasphere.dss.orange.engine.DynamicSqlEngine;
 import org.junit.Test;

@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.framework.dbapi.util;
 
-import com.jq.orange.engine.DynamicSqlEngine;
+import com.webank.wedatasphere.dss.orange.engine.DynamicSqlEngine;
 
 
 public class SqlEngineUtil {

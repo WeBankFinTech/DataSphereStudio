@@ -16,8 +16,11 @@ import lombok.Data;
 @TableName(value = "datasource")
 public class DataSource {
 
-    @TableId(value = "id",type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     Integer id;
+
+    @TableField
+    Integer workspaceId;
 
     @TableField
     String name;
@@ -32,10 +35,21 @@ public class DataSource {
     String username;
 
     @TableField
-    String password;
+    String pwd;
 
     @TableField
     String type;
+
+
+    @TableField
+    String createBy;
+
+    @TableField
+    String updateBy;
+
+
+    @TableField
+    Integer isDelete;
 
     @TableField(exist = false)
     String className;

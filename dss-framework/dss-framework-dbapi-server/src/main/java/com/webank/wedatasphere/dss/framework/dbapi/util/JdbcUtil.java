@@ -3,10 +3,10 @@ package com.webank.wedatasphere.dss.framework.dbapi.util;
 import com.alibaba.druid.util.JdbcConstants;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jettison.json.JSONObject;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -109,8 +109,9 @@ public class JdbcUtil {
      * @param table
      * @return
      */
-    public static List<JSONObject> getRDBMSColumnProperties(Connection conn, String type, String table) {
-        List<JSONObject> list = new ArrayList<>();
+    public static List<HashMap> getRDBMSColumnProperties(Connection conn, String type, String table) {
+        List<HashMap> list = new ArrayList<>();
+
         ResultSet resultSet = null;
         try {
             String sql;
@@ -122,31 +123,15 @@ public class JdbcUtil {
                     sql = "show full columns from " + table;
             }
             log.info(sql);
-//            pst = conn.prepareStatement(sql);
-//            ResultSetMetaData rsd = pst.executeQuery().getMetaData();
-
-//            for (int i = 0; i < rsd.getColumnCount(); i++) {
-//                JSONObject jsonObject = new JSONObject();
-//
-//                String columnTypeName = rsd.getColumnTypeName(i + 1);
-//                jsonObject.put("fieldTypeName", columnTypeName);//数据库字段类型名
-//                jsonObject.put("TypeName",  columnTypeName);
-//                jsonObject.put("fieldJavaTypeName", rsd.getColumnClassName(i + 1));//映射到java的类型名
-//                String columnName = rsd.getColumnName(i + 1);
-//                if (columnName.contains("."))
-//                    columnName = columnName.split("\\.")[1];
-//                jsonObject.put("fieldName", columnName);//表字段
-//                list.add(jsonObject);
-//            }
 
              resultSet = conn.prepareStatement(sql).executeQuery();
             while (resultSet.next()) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("Comment",resultSet.getString("Comment"));
-                jsonObject.put("fieldType",resultSet.getString("Type"));
-                jsonObject.put("columnName",resultSet.getString("Field"));
+                HashMap<String, String> colProp = new HashMap<>();
+                colProp.put("Comment",resultSet.getString("Comment"));
+                colProp.put("fieldType",resultSet.getString("Type"));
+                colProp.put("columnName",resultSet.getString("Field"));
 
-                list.add(jsonObject);
+                list.add(colProp);
             }
             return list;
         } catch (Exception e) {

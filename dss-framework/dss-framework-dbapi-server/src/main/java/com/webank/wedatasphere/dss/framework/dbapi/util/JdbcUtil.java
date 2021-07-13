@@ -46,7 +46,7 @@ public class JdbcUtil {
                 break;
         }
 
-        Connection connection = DriverManager.getConnection(url, ds.getUsername(), ds.getPassword());
+        Connection connection = DriverManager.getConnection(url, ds.getUsername(), ds.getPwd());
         log.info("获取连接成功");
         return connection;
     }
@@ -111,7 +111,7 @@ public class JdbcUtil {
      */
     public static List<JSONObject> getRDBMSColumnProperties(Connection conn, String type, String table) {
         List<JSONObject> list = new ArrayList<>();
-        PreparedStatement pst = null;
+        ResultSet resultSet = null;
         try {
             String sql;
             switch (type) {
@@ -119,23 +119,33 @@ public class JdbcUtil {
                     sql = "select * from \"" + table + "\" where 1=2";
                     break;
                 default:
-                    sql = "select * from " + table + " where 1=2";
+                    sql = "show full columns from " + table;
             }
             log.info(sql);
-            pst = conn.prepareStatement(sql);
-            ResultSetMetaData rsd = pst.executeQuery().getMetaData();
+//            pst = conn.prepareStatement(sql);
+//            ResultSetMetaData rsd = pst.executeQuery().getMetaData();
 
-            for (int i = 0; i < rsd.getColumnCount(); i++) {
+//            for (int i = 0; i < rsd.getColumnCount(); i++) {
+//                JSONObject jsonObject = new JSONObject();
+//
+//                String columnTypeName = rsd.getColumnTypeName(i + 1);
+//                jsonObject.put("fieldTypeName", columnTypeName);//数据库字段类型名
+//                jsonObject.put("TypeName",  columnTypeName);
+//                jsonObject.put("fieldJavaTypeName", rsd.getColumnClassName(i + 1));//映射到java的类型名
+//                String columnName = rsd.getColumnName(i + 1);
+//                if (columnName.contains("."))
+//                    columnName = columnName.split("\\.")[1];
+//                jsonObject.put("fieldName", columnName);//表字段
+//                list.add(jsonObject);
+//            }
+
+             resultSet = conn.prepareStatement(sql).executeQuery();
+            while (resultSet.next()) {
                 JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Comment",resultSet.getString("Comment"));
+                jsonObject.put("fieldType",resultSet.getString("Type"));
+                jsonObject.put("columnName",resultSet.getString("Field"));
 
-                String columnTypeName = rsd.getColumnTypeName(i + 1);
-                jsonObject.put("fieldTypeName", columnTypeName);//数据库字段类型名
-                jsonObject.put("TypeName",  columnTypeName);
-                jsonObject.put("fieldJavaTypeName", rsd.getColumnClassName(i + 1));//映射到java的类型名
-                String columnName = rsd.getColumnName(i + 1);
-                if (columnName.contains("."))
-                    columnName = columnName.split("\\.")[1];
-                jsonObject.put("fieldName", columnName);//表字段
                 list.add(jsonObject);
             }
             return list;
@@ -144,8 +154,8 @@ public class JdbcUtil {
             return null;
         } finally {
             try {
-                if (pst != null)
-                    pst.close();
+                if (resultSet != null)
+                    resultSet.close();
                 if (conn != null)
                     conn.close();
             } catch (SQLException e) {

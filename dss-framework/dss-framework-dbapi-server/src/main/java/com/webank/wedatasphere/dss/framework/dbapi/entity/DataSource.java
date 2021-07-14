@@ -9,7 +9,6 @@ import lombok.Data;
 /**
  * @program: dbApi
  * @description:
- * @author: jiangqiang
  * @create: 2021-01-20 09:52
  **/
 @Data

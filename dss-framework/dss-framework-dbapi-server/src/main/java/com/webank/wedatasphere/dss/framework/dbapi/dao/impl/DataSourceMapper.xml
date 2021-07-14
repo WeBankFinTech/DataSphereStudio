@@ -36,7 +36,7 @@
 
     <select id="selectByTypeAndWorkspaceId"
             parameterType="com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource"
-            resultType="DataSourceResult">
+            resultMap="DataSourceResult">
         SELECT * FROM dss_dataapi_datasource
         WHERE  is_delete=0 AND type = #{type} AND workspace_id = #{workspace_id}
         order by updateTime desc

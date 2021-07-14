@@ -86,6 +86,12 @@
             <version>1.18.16</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.70</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

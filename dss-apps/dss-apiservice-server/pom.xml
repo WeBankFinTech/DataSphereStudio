@@ -349,6 +349,12 @@
             <version>1.4.11.1</version>
         </dependency>
 
+        <!-- suyc   import org.mortbay.log.Log;  -->
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.26</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -18,7 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +29,11 @@ import java.util.List;
 @Path("/dss/framework/dbapi/datasource")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DSSDbApiDataSourceController {
+public class DSSDbApiDataSourceRestful {
     private DataSourceMapper dataSourceMapper;
     @Resource
     private DSSDbApiDataSourceService dssDbApiDataSourceService;
-    private static final Logger logger = LoggerFactory.getLogger(DSSDbApiDataSourceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DSSDbApiDataSourceRestful.class);
 
     @GET
     @Path("/connections")

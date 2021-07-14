@@ -1,5 +1,10 @@
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import com.webank.wedatasphere.dss.orange.engine.DynamicSqlEngine;
+//import org.codehaus.jettison.json.JSONArray;
+//import org.codehaus.jettison.json.JSONException;
+//import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -167,5 +172,17 @@ public class TestOrange {
         Set<String> set = engine.parseParameter(sql);
         set.stream().forEach(System.out::println);
     }
+@Test
+    public void test01()  {
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("naem",1);
+    JSONArray jsonArray = new JSONArray();
+    jsonArray.add(jsonObject);
+    JSONObject jsonObject01 =new JSONObject();
+    jsonObject01.put("field",jsonArray);
+    System.out.println(String.valueOf(jsonObject01.toJSONString()));
 
+
+
+}
 }

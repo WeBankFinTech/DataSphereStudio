@@ -1,15 +1,15 @@
 <template>
   <div>
-    <dataMangement />
+    <dataManagement />
   </div>
 </template>
 
 <script>
-import dataMangement from '../../module/dataMangement';
+import dataManagement from '../../module/dataManagement';
 
 export default {
   components: {
-    dataMangement: dataMangement.component
+    dataManagement: dataManagement.component
   }
 }
 </script>

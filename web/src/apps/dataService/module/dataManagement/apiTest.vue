@@ -1,16 +1,11 @@
 <template>
   <div>
-    <navMenu />
-    服务管理
+    apiTest
   </div>
 </template>
 <script>
-import navMenu from '../common/navMenu.vue';
 // import api from "@/common/service/api";
 export default {
-  components: {
-    navMenu,
-  },
   data() {
     return {
     }
@@ -46,6 +41,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
 </style>
 

@@ -183,11 +183,18 @@ export default {
     },
     '$route.query.projectID': {
       handler: function(projectID) {
-        this.activeList(this.activeDS);
+        if (!this.workspaceName) {
+          GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+            this.workspaceName = data.workspace.name
+            this.activeList(this.activeDS)
+          })
+        } else {
+          this.activeList(this.activeDS)
+        }
       },
       deep: true,
       immediate: true
-      
+
     },
   },
   computed: {

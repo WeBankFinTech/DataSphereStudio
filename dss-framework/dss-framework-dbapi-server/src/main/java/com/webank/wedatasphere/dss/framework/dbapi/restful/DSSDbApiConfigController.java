@@ -20,20 +20,23 @@ package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.request.ApiConfigRequest;
-import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.service.DSSApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 
 @Component
@@ -43,7 +46,7 @@ import javax.ws.rs.core.Response;
 public class DSSDbApiConfigController {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigController.class);
     @Autowired
-    ApiConfigService apiConfigService;
+    DSSApiConfigService apiConfigService;
 
 
 
@@ -64,6 +67,23 @@ public class DSSDbApiConfigController {
     }
 
 
+    @POST
+    @Path("/group/create")
+    public Response saveApi( ApiGroup apiGroup) {
+//        String username = SecurityFilter.getLoginUsername(request);
+        String userName = "demo";
+        apiGroup.setCreateBy(userName);
+        apiConfigService.addGroup(apiGroup);
+        Message message = Message.ok("创建API group 成功").data("groupId",apiGroup.getId());
+        return Message.messageToResponse(message);
+    }
 
+    @GET
+    @Path("/list")
+    public Response getApi(@QueryParam("workspaceId") String workspaceId) {
+        List<ApiGroupInfo> list =  apiConfigService.getGroupList(workspaceId);
+        Message message = Message.ok("创建API group 成功").data("list",list);
+        return Message.messageToResponse(message);
+    }
 
 }

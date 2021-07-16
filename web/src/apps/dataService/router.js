@@ -9,13 +9,13 @@ const routes = [
     component: () => import('./view/develop/index.vue')
   },
   {
-    path: '/dataMangement',
-    name: 'dataMangement',
+    path: '/dataManagement',
+    name: 'dataManagement',
     meta: {
       title: '鲁班',
       publicPage: true
     },
-    component: () => import('./view/mangement/index.vue')
+    component: () => import('./view/management/index.vue')
   },
 ]
 

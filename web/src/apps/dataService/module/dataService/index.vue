@@ -1,12 +1,15 @@
 <template>
   <div>
+    <navMenu />
     服务开发
   </div>
 </template>
 <script>
+import navMenu from '../common/navMenu.vue';
 // import api from "@/common/service/api";
 export default {
   components: {
+    navMenu,
   },
   data() {
     return {

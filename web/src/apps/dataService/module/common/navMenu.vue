@@ -4,7 +4,7 @@
         <div class="ds-nav-menu-item" :class="{'active': currentTab == '/dataService' }" @click="handleTabClick('dataService')">
           <Icon custom="iconfont icon-project" size="26"></Icon>
         </div>
-        <div class="ds-nav-menu-item" :class="{'active': currentTab == '/dataManagement' }" @click="handleTabClick('dataManagement')">
+        <div class="ds-nav-menu-item" :class="{'active': currentTab.startsWith('/dataManagement') }" @click="handleTabClick('dataManagement')">
           <Icon custom="iconfont icon-project" size="26"></Icon>
         </div>
       </div>
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     handleTabClick(tab) {
-      if (this.$route.path == `/${tab}`) {
+      if (this.$route.path == `/${tab}` || this.$route.path.startsWith(`/${tab}`)) {
         this.handleTreeToggle();
       } else {
         this.$router.push({

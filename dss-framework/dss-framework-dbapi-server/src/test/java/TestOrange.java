@@ -1,5 +1,5 @@
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+/*
+
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import com.webank.wedatasphere.dss.orange.engine.DynamicSqlEngine;
 //import org.codehaus.jettison.json.JSONArray;
@@ -12,12 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+*/
 /**
  * @program: orange
  * @description:
  * @author: jiangqiang
  * @create: 2021-02-23 10:19
- **/
+ **//*
+
 public class TestOrange {
 
     @Test
@@ -106,6 +108,7 @@ public class TestOrange {
         sqlMeta.getJdbcParamValues().forEach(System.out::println);
     }
 
+*/
 /*
     @Test
     public void testForeachMap() {
@@ -126,7 +129,8 @@ public class TestOrange {
         System.out.println(sqlMeta.getSql());
         sqlMeta.getJdbcParamValues().forEach(System.out::println);
     }
-*/
+*//*
+
 
     @Test
     public void testMultiForeach() {
@@ -172,17 +176,6 @@ public class TestOrange {
         Set<String> set = engine.parseParameter(sql);
         set.stream().forEach(System.out::println);
     }
-@Test
-    public void test01()  {
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("naem",1);
-    JSONArray jsonArray = new JSONArray();
-    jsonArray.add(jsonObject);
-    JSONObject jsonObject01 =new JSONObject();
-    jsonObject01.put("field",jsonArray);
-    System.out.println(String.valueOf(jsonObject01.toJSONString()));
-
-
 
 }
-}
+*/

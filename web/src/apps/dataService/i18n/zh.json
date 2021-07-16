@@ -1,0 +1,8 @@
+{
+  "message": {
+    "dataService": {
+      "viewAll": "显示全部",
+      "viewValid": "屏蔽已删除"
+    }
+  }
+}

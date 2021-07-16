@@ -40,7 +40,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .manage-menu-wrap {
-  width: 250px;
   background: #F8F9FC;
   .manage-title {
     padding: 10px 12px;

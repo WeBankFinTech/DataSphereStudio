@@ -20,20 +20,22 @@
         />
         <Spin v-show="loadingTree" size="large" fix/>
       </div>
-      <div class="ds-nav-panel" v-if="currentTab == '/dataManagement'">
-        服务管理菜单
+      <div class="ds-nav-panel" v-if="currentTab.startsWith('/dataManagement')">
+        <ManageMenu />
       </div>
     </div>
 </template>
 <script>
 
 import Tree from '@/apps/workflows/module/common/tree/tree.vue';
+import ManageMenu from './manageMenu.vue';
 import api from '@/common/service/api'
 
 export default {
   name: 'navMenu',
   components: {
     Tree,
+    ManageMenu
   },
   data() {
     return {
@@ -225,9 +227,11 @@ export default {
         top: 0;
         bottom: 0;
         transition: all .3s;
-        padding: 10px;
         overflow-y: auto;
         border-right: 1px solid #DEE4EC;
+        .tree-container {
+          padding: 10px;
+        }
     }
 }
 </style>

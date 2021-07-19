@@ -19,12 +19,14 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.DSSApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +50,6 @@ public class DSSDbApiConfigController {
     @Autowired
     DSSApiConfigService apiConfigService;
 
-
-
     /**
      * 保存api配置信息
      *
@@ -59,9 +59,9 @@ public class DSSDbApiConfigController {
      */
     @POST
     @Path("save")
-    public Response saveApi(@Context HttpServletRequest request, ApiConfig apiConfig) {
+    public Response saveApi(@Context HttpServletRequest request, ApiConfig apiConfig) throws JSONException {
 //        String username = SecurityFilter.getLoginUsername(request);
-        apiConfigService.save(apiConfig);
+        apiConfigService.saveApi(apiConfig);
         Message message = Message.ok("创建API成功");
         return Message.messageToResponse(message);
     }
@@ -69,20 +69,42 @@ public class DSSDbApiConfigController {
 
     @POST
     @Path("/group/create")
-    public Response saveApi( ApiGroup apiGroup) {
+    public Response saveApi(ApiGroup apiGroup) {
 //        String username = SecurityFilter.getLoginUsername(request);
         String userName = "demo";
         apiGroup.setCreateBy(userName);
         apiConfigService.addGroup(apiGroup);
-        Message message = Message.ok("创建API group 成功").data("groupId",apiGroup.getId());
+        Message message = Message.ok("创建API group 成功").data("groupId", apiGroup.getId());
         return Message.messageToResponse(message);
     }
 
     @GET
     @Path("/list")
-    public Response getApi(@QueryParam("workspaceId") String workspaceId) {
-        List<ApiGroupInfo> list =  apiConfigService.getGroupList(workspaceId);
-        Message message = Message.ok("创建API group 成功").data("list",list);
+    public Response getApiList(@QueryParam("workspaceId") String workspaceId) {
+        List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
+        Message message = Message.ok("获取API列表成功").data("list", list);
+        return Message.messageToResponse(message);
+    }
+
+
+    @GET
+    @Path("/detail")
+    public Response getApiDetail(@QueryParam("apiId") int apiId) {
+        ApiConfig apiConfig = apiConfigService.getById(apiId);
+        Message message = Message.ok("获取API详情成功").data("detail", apiConfig);
+        return Message.messageToResponse(message);
+    }
+
+    @GET
+    @Path("/test/{path}")
+    public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path) {
+        ApiConfig apiConfig = apiConfigService.getOne(new QueryWrapper<ApiConfig>().eq("api_path",path));
+        if(apiConfig != null){
+            String reqFields = apiConfig.getReqFields();
+            String sqlText = apiConfig.getSql();
+        }
+
+        Message message = Message.ok("获取API详情成功").data("detail", apiConfig);
         return Message.messageToResponse(message);
     }
 

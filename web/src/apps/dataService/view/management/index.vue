@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <dataManagement />
-  </div>
+  <dataManagement />
 </template>
 
 <script>

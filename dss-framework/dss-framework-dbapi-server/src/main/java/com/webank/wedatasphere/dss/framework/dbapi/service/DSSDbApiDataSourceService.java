@@ -13,4 +13,6 @@ public interface DSSDbApiDataSourceService extends IService<DataSource> {
 
 
     List<String> getAvailableConnNames(List<DataSource> allConnections);
+
+    List<DataSource> getAvailableConns(List<DataSource> allConnections);
 }

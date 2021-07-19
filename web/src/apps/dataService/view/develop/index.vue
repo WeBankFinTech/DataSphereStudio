@@ -1,7 +1,5 @@
 <template>
-  <div style="height: 100%">
-    <dataService />
-  </div>
+  <dataService />
 </template>
 
 <script>

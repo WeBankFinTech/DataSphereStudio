@@ -58,4 +58,31 @@ public class DSSDbApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper,
         }
         return availableConns;
     }
+
+    @Override
+    public List<DataSource> getAvailableConns(List<DataSource> allConnections) {
+
+        Connection connection = null;
+        List<DataSource> availableConns = new ArrayList<DataSource>();
+        for (DataSource datasource : allConnections) {
+            try {
+                connection = JdbcUtil.getConnection(datasource);
+                datasource.setPwd("***");
+                availableConns.add(datasource);
+            } catch (Exception e) {
+                logger.warning(e.getMessage());
+            } finally {
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        logger.info(e.getMessage());
+                    }
+                }
+            }
+
+        }
+        return availableConns;
+
+    }
 }

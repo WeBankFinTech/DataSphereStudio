@@ -1,7 +1,9 @@
 <template>
   <div>
-    <navMenu />
-    服务开发
+    <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
+    <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
+      服务开发
+    </div>
   </div>
 </template>
 <script>
@@ -13,6 +15,7 @@ export default {
   },
   data() {
     return {
+      menuFold: false
     }
   },
   computed: {
@@ -24,6 +27,11 @@ export default {
     //   id: this.$route.query.id,
     // }, 'get').then((rst) => {
     //   if (rst.result) {
+    //     // api的基础信息
+    //     this.apiData = rst.result;
+    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
+    //     // 更改网页title
+    //     document.title = rst.result.aliasName || rst.result.name;
     //     // 加工api信息tab的数据
     //     this.apiInfoData = [
     //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
@@ -36,10 +44,20 @@ export default {
     // });
   },
   methods: {
+    handleMenuToggle() {
+      this.menuFold = !this.menuFold;
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-@import "@/common/style/variables.scss";
+.ds-main-content {
+  margin-left: 304px;
+  transition: margin-left .3s;
+  &.ds-main-content-fold {
+    margin-left: 54px;
+  }
+}
 </style>
+

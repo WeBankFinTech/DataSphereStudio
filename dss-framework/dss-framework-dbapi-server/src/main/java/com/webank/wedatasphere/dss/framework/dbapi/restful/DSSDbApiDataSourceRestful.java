@@ -40,8 +40,8 @@ public class DSSDbApiDataSourceRestful {
     public Message connect(@QueryParam("workspaceId") Integer workspaceId, @QueryParam("type") String type) {
 
 
-        List<String> availableConnections = dssDbApiDataSourceService.getAvailableConnNames(dssDbApiDataSourceService.getAllConnections(workspaceId, type));
-        return Message.ok().data("availableConnNames", availableConnections);
+        List<DataSource> availableConnections = dssDbApiDataSourceService.getAvailableConns(dssDbApiDataSourceService.getAllConnections(workspaceId, type));
+        return Message.ok().data("availableConns", availableConnections);
 
     }
 

@@ -244,15 +244,32 @@ export default {
         {
           title: this.$t('message.scheduler.header.Description'),
           width: 200,
-          key: 'description'
+          key: 'description',
+          render: (h, params) => {
+            return h('div', [
+              h('span', {
+                style: {
+                  overflow: 'hidden',
+                  wordBreak: 'break-all',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'block'
+                },
+                attrs: {
+                  title: params.row.description
+                },
+              }, params.row.description)
+            ])
+          }
         },
         {
           title: this.$t('message.scheduler.header.ModifyBy'),
-          width: 100,
+          width: 120,
           key: 'modifyBy'
         },
         {
           title: this.$t('message.scheduler.header.TimingState'),
+          width: 150,
           key: 'scheduleReleaseStateDesc'
         },
         {

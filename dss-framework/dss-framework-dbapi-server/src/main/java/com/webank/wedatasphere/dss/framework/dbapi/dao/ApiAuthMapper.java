@@ -19,8 +19,11 @@
 package com.webank.wedatasphere.dss.framework.dbapi.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DSSDataApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @Classname DSSDataApiAuthMapper
@@ -29,8 +32,12 @@ import org.apache.ibatis.annotations.Mapper;
  * @Created by suyc
  */
 @Mapper
-public interface DSSDataApiAuthMapper extends BaseMapper<DSSDataApiAuth> {
+public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
-    void addDataApiAuth(DSSDataApiAuth dssDataApiAuth);
+    void addApiAuth(ApiAuth dssDataApiAuth);
 
+    List<ApiAuth> getApiAuthList(Long workspaceId);
+
+
+    List<ApiInfo> getApiInfoList(Long workspaceId);
 }

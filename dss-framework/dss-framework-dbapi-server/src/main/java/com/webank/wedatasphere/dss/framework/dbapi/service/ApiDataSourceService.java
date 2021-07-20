@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 
 import java.util.List;
 
-public interface DSSDbApiDataSourceService extends IService<DataSource> {
+public interface ApiDataSourceService extends IService<DataSource> {
 
     DataSource selectById(Integer datasourceId);
 
@@ -13,4 +13,6 @@ public interface DSSDbApiDataSourceService extends IService<DataSource> {
 
 
     List<String> getAvailableConnNames(List<DataSource> allConnections);
+
+    List<DataSource> getAvailableConns(List<DataSource> allConnections);
 }

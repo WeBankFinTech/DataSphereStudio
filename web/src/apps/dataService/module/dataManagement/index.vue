@@ -2,7 +2,14 @@
   <div>
     <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
     <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
-      <router-view></router-view>
+      <div class="ds-main-container">
+        <div class="ds-breadcumb">
+          <span>数据服务</span>
+          <span class="ds-breadcumb-divider">/</span>
+          <span>服务管理</span>
+        </div>
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </template>
@@ -30,6 +37,19 @@ export default {
   transition: margin-left .3s;
   &.ds-main-content-fold {
     margin-left: 54px;
+  }
+  .ds-main-container {
+    background: #f3f5fc;
+    .ds-breadcumb {
+      padding: 24px;
+      background: #fff;
+      font-size: 22px;
+      line-height: 30px;
+      color: #333;
+      .ds-breadcumb-divider {
+        margin: 0 10px;
+      }
+    }
   }
 }
 </style>

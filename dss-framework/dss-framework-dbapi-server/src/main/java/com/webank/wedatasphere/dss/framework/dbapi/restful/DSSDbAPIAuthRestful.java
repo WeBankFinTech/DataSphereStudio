@@ -19,8 +19,8 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DSSDataApiAuth;
-import com.webank.wedatasphere.dss.framework.dbapi.service.DSSDataApiAuthService;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -34,44 +34,62 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
- * @Classname DataAPIAuthRestful
- * @Description 数据API授权相关REST服务
+ * @Classname DSSDataAPIAuthRestful
+ * @Description 服务管理--数据API授权相关REST服务
  * @Date 2021/7/14 10:44
  * @Created by suyc
  */
 @Component
-@Path("/dss/framework/dataapi")
+@Path("/dss/framework/dbapi/apiauth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DataAPIAuthRestful {
+public class DSSDbAPIAuthRestful {
     @Autowired
-    private DSSDataApiAuthService dssDataApiAuthService;
+    private ApiAuthService apiAuthService;
 
     @POST
-    @Path("/createDataApiAuth")
-    public Response createDataApiAuth(@Context HttpServletRequest request, @RequestBody DSSDataApiAuth dssDataApiAuth) throws ErrorException {
+    @Path("/create")
+    public Response createDataApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth dssDataApiAuth) throws ErrorException {
         //String userName = SecurityFilter.getLoginUsername(request);
         String userName ="suyc";
         dssDataApiAuth.setCreateBy(userName);
         dssDataApiAuth.setCreateTime(new Date(System.currentTimeMillis()));
 
-        Long dataApiAuthId = dssDataApiAuthService.createDataApiAuth(dssDataApiAuth);
+        Long dataApiAuthId = apiAuthService.createApiAuth(dssDataApiAuth);
         return Message.messageToResponse(Message.ok().data("dataApiAuthId", dataApiAuthId));
     }
 
     @GET
-    @Path("/generateToken")
+    @Path("/token")
     public Response generateToken(@Context HttpServletRequest request) {
         String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
         return Message.messageToResponse(Message.ok().data("token",token));
     }
 
+    @GET
+    @Path("/list")
+    public Response getDSSDadaApiAuths(@Context HttpServletRequest request, @QueryParam("workspaceId") Long workspaceId,
+                                       @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+        if(pageNow == null){
+            pageNow = 1;
+        }
+        if(pageSize == null){
+            pageSize = 20;
+        }
+
+        List<Long> totals = new ArrayList<>();
+        List<ApiAuth> dssDataApiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
+        return Message.messageToResponse(Message.ok().data("dssDataApiAuths",dssDataApiAuths).data("total", totals.get(0)));
+    }
 }
 

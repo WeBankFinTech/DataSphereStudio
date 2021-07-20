@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ /*
+  ~  * Copyright 2019 WeBank
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  *  you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  * http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper">
+    <resultMap id="dataapi_auth" type="com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth">
+        <id property="id" column="id"/>
+        <id property="caller" column="caller"/>
+        <id property="token" column="token"/>
+        <id property="expire" column="expire"/>
+        <id property="createTime" column="create_time"/>
+    </resultMap>
+
+    <resultMap id="apiinfo" type="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
+        <id property="id" column="id"/>
+        <id property="caller" column="caller"/>
+        <id property="token" column="token"/>
+        <id property="expire" column="expire"/>
+        <id property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="apiauth_main">
+        id,`workspace_id`,`caller`,`token`, `expire`,`group_id`,`create_by`,`create_time`
+    </sql>
+
+    <insert id="addApiAuth" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth">
+        INSERT INTO dss_dataapi_auth (<include refid="apiauth_main"/>)
+        VALUES
+        (#{id},#{workspaceId},#{caller},#{token}, #{expire}, #{groupId},#{createBy},#{createTime})
+    </insert>
+
+    <select id="getApiAuthList" resultMap="dataapi_auth">
+        SELECT * FROM dss_dataapi_auth
+        <where>
+            `is_delete` =0 AND `workspace_id` = #{workspaceId}
+        </where>
+    </select>
+
+
+    <select id="getApiInfoList" resultType="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
+        SELECT a.id,a.api_name,a.api_path,a.api_type,b.name AS 'groupName', c.name AS 'datasourceName'
+        FROM DSS_DATAAPI_CONFIG a
+        LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
+        LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id
+        <where>
+            a.is_delete =0 AND a.workspace_id = #{workspaceId}
+        </where>
+    </select>
+
+
+</mapper>

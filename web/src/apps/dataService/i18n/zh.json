@@ -1,8 +1,20 @@
 {
   "message": {
     "dataService": {
-      "viewAll": "显示全部",
-      "viewValid": "屏蔽已删除"
+      "online": "上线",
+      "offline": "下线",
+      "test": "测试",
+      "copy": "复制调用地址",
+      "edit": "编辑",
+      "delete": "删除",
+      "addAuthorize": "新增授权",
+
+      "modalAuthTile": "API授权",
+      "authName": "授权的登录名称",
+      "inputAuthName": "请输入名称",
+      "authFlow": "授权的业务流程",
+      "cancel": "取消",
+      "ok": "确定"
     }
   }
 }

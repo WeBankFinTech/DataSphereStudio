@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -47,5 +48,23 @@ public class DSSDbApiManagerRestful {
         List<Long> totals = new ArrayList<>();
         List<ApiInfo> apiInfoList = apiAuthService.getApiInfoList(workspaceId,totals,pageNow,pageSize);
         return Message.messageToResponse(Message.ok().data("apiInfoList",apiInfoList).data("total", totals.get(0)));
+    }
+
+    @POST
+    @Path("offline")
+    public Response offlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
+        apiAuthService.offlineApi(apiId);
+
+        Message message = Message.ok("下线API成功").data("apiId", apiId);
+        return Message.messageToResponse(message);
+    }
+
+    @POST
+    @Path("online")
+    public Response onlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
+        apiAuthService.onlineApi(apiId);
+
+        Message message = Message.ok("上线API成功").data("apiId", apiId);
+        return Message.messageToResponse(message);
     }
 }

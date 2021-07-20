@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
-public interface DSSApiConfigMapper extends BaseMapper<ApiConfig> {
+public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
 
     @Insert("insert into dss_dataapi_group(workspace_id, name, note, create_by) " +
             "values(#{apiGroup.workspaceId}, #{apiGroup.name}, #{apiGroup.note}, #{apiGroup.createBy})")

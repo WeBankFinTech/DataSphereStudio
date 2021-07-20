@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 
 import java.util.List;
 
-public interface DSSDbApiDataSourceService extends IService<DataSource> {
+public interface ApiDataSourceService extends IService<DataSource> {
 
     DataSource selectById(Integer datasourceId);
 

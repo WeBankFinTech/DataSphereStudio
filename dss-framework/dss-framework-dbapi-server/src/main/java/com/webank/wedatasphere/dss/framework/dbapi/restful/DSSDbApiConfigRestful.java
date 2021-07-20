@@ -19,11 +19,12 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
-import com.webank.wedatasphere.dss.framework.dbapi.service.DSSApiConfigService;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
 import org.codehaus.jettison.json.JSONException;
@@ -31,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -45,10 +45,10 @@ import java.util.List;
 @Path("/dss/framework/dbapi")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DSSDbApiConfigController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigController.class);
+public class DSSDbApiConfigRestful {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigRestful.class);
     @Autowired
-    DSSApiConfigService apiConfigService;
+    ApiConfigService apiConfigService;
 
     /**
      * 保存api配置信息
@@ -98,14 +98,16 @@ public class DSSDbApiConfigController {
     @GET
     @Path("/test/{path}")
     public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path) {
-        ApiConfig apiConfig = apiConfigService.getOne(new QueryWrapper<ApiConfig>().eq("api_path",path));
-        if(apiConfig != null){
-            String reqFields = apiConfig.getReqFields();
-            String sqlText = apiConfig.getSql();
+        try {
+
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request);
+            Message message = Message.ok("服务测试成功").data("response",resJo);
+            return Message.messageToResponse(message);
+
+        } catch (Exception exception) {
+            return RestfulUtils.dealError("获取token失败:" + exception.getMessage());
         }
 
-        Message message = Message.ok("获取API详情成功").data("detail", apiConfig);
-        return Message.messageToResponse(message);
     }
 
 }

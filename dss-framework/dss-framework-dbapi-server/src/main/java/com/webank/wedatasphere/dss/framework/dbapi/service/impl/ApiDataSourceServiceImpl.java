@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.framework.dbapi.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.DataSourceMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
-import com.webank.wedatasphere.dss.framework.dbapi.service.DSSDbApiDataSourceService;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.framework.dbapi.util.JdbcUtil;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @Service
-public class DSSDbApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, DataSource> implements DSSDbApiDataSourceService {
+public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, DataSource> implements ApiDataSourceService {
     @Resource
     private DataSourceMapper dataSourceMapper;
     private Logger logger;

@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.framework.dbapi.restful;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.DataSourceMapper;
-import com.webank.wedatasphere.dss.framework.dbapi.service.DSSDbApiDataSourceService;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.framework.dbapi.util.JdbcUtil;
 import com.webank.wedatasphere.dss.framework.dbapi.util.PoolManager;
 import com.webank.wedatasphere.linkis.server.Message;
@@ -32,7 +32,7 @@ import java.util.List;
 public class DSSDbApiDataSourceRestful {
     private DataSourceMapper dataSourceMapper;
     @Resource
-    private DSSDbApiDataSourceService dssDbApiDataSourceService;
+    private ApiDataSourceService dssDbApiDataSourceService;
     private static final Logger logger = LoggerFactory.getLogger(DSSDbApiDataSourceRestful.class);
 
     @GET

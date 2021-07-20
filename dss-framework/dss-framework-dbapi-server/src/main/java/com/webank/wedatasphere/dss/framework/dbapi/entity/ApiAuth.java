@@ -20,10 +20,11 @@ import java.util.Date;
  */
 @TableName(value = "dss_dataapi_auth")
 @Data
-public class DSSDataApiAuth implements Serializable {
+public class ApiAuth implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    private Long workspaceId;
     private String caller;
     private String token;
     @JsonSerialize(using= DateJsonSerializer.class)
@@ -31,8 +32,12 @@ public class DSSDataApiAuth implements Serializable {
     private Date expire;
     private Long groupId;
 
+    @JsonSerialize(using= DateJsonSerializer.class)
+    @JsonDeserialize(using= DateJsonDeserializer.class)
     private Date createTime;
     private String createBy;
+    @JsonSerialize(using= DateJsonSerializer.class)
+    @JsonDeserialize(using= DateJsonDeserializer.class)
     private Date updateTime;
     private String updateBy;
     private Integer isDelete;

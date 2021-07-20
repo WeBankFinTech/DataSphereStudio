@@ -1479,6 +1479,9 @@ CREATE TABLE `dss_dataapi_config` (
 	`api_type` VARCHAR ( 20 ) NOT NULL COMMENT 'API类型：GUIDE-向导模式，SQL-脚本模式',
 	`protocol` VARCHAR ( 20 ) NOT NULL COMMENT 'Http协议',
 	`datasource_id` BIGINT ( 20 ) NOT NULL COMMENT '数据源id',
+	`datasource_name` VARCHAR ( 50 ) DEFAULT NULL COMMENT '数据源名称',
+	`datasource_type` VARCHAR ( 20 ) DEFAULT NULL COMMENT '数据源类型',
+
 	`sql` text COMMENT 'sql模板',
 	`tbl_name` VARCHAR ( 100 ) DEFAULT NULL COMMENT '数据表名称',
 	`req_fields` VARCHAR ( 1000 ) DEFAULT NULL COMMENT '请求字段名称',

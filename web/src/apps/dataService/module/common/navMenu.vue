@@ -60,6 +60,7 @@ export default {
   },
   mounted() {
     this.getAllProjects();
+    this.getAllApi();
   },
   methods: {
     handleTabClick(tab) {
@@ -74,6 +75,7 @@ export default {
     },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
+      this.$emit("handleFold", this.treeFold);
     },
     // 获取所有project展示tree
     getAllProjects() {
@@ -187,6 +189,9 @@ export default {
         });
     },
     handleTreeModal(project) {
+      console.log(project);
+      console.log("addApi");
+      this.$emit("showModal", { type: "api", data: { ...project } });
       this.treeModalShow = true;
       this.currentTreeProject = project;
     },
@@ -201,9 +206,22 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {},
+    getAllApi() {
+      api
+        .fetch(
+          `/dss/framework/dbapi/list`,
+          {
+            workspaceId: this.$route.query.workspaceId
+          },
+          "post"
+        )
+        .then(res => {
+          console.log(res);
+        });
+    },
     addGroup() {
       console.log("addGroup");
-      this.$emit("showModal", "group");
+      this.$emit("showModal", { type: "group" });
     }
   }
 };

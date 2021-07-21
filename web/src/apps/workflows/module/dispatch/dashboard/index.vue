@@ -26,6 +26,15 @@
               </m-process-state-count>
             </div>
           </div>
+          <div class="col-md-6">
+            <div class="chart-title">
+              <span>{{$t('message.scheduler.taskStatusStatistics')}}</span>
+            </div>
+            <div class="row">
+              <m-task-status-count :search-params="searchParams" @goToList="goToList">
+              </m-task-status-count>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-12">
@@ -48,6 +57,7 @@ import util from "@/common/util"
 import dayjs from 'dayjs'
 import mDefineUserCount from './source/defineUserCount'
 import mProcessStateCount from './source/processStateCount'
+import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 
@@ -109,7 +119,8 @@ export default {
   components: {
     mListConstruction,
     mDefineUserCount,
-    mProcessStateCount
+    mProcessStateCount,
+    mTaskStatusCount
   }
 }
 </script>

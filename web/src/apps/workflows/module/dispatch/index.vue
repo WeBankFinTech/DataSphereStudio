@@ -22,7 +22,7 @@
           <template>
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processDefinition')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right">
+              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(1)">
                 <Icon type="ios-search" slot="suffix" @click="activeList(1)" style="cursor: pointer;"/>
               </Input>
             </div>
@@ -46,7 +46,7 @@
           <template v-if="!showGantt">
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processInstance')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right">
+              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
                 <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
               </Input>
               <template>
@@ -110,9 +110,30 @@
           <template>
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.taskInstance')}}</span>
-              <Input v-model="taskName" style="width: auto;float: right">
-              <Icon type="ios-search" slot="suffix" @click="activeList(5)" style="cursor: pointer;"/>
+              <Input v-model="taskName" style="width: auto;float: right" @on-enter="activeList(5)">
+                <Icon type="ios-search" slot="suffix" @click="activeList(5)" style="cursor: pointer;"/>
               </Input>
+              <template>
+                <Date-picker
+                  style="width: 350px;float: right;margin-right: 10px;"
+                  v-model="dateTime2"
+                  type="datetimerange"
+                  @on-ok="_datepicker2"
+                  @on-clear="_datepicker2"
+                  range-separator="-"
+                  :start-placeholder="$t('message.scheduler.runTask.startDate')"
+                  :end-placeholder="$t('message.scheduler.runTask.endDate')"
+                  format="yyyy-MM-dd HH:mm:ss">
+                </Date-picker>
+                <Select v-model="instanceStateType2"
+                        @on-change="_changeInstanceState2"
+                        :placeholder="$t('message.scheduler.selectState')"
+                        style="width: 150px;float: right;margin-right: 10px;"
+                >
+                  <Option value="" key="-">-</Option>
+                  <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
+                </Select>
+              </template>
             </div>
             <Table class="scheduler-table" :columns="columns5" :data="list5"></Table>
             <Page
@@ -234,6 +255,8 @@ export default {
       taskName: '', //任务实例名称
       dateTime: [], //实例列表搜索时间
       instanceStateType: '',//实例列表搜索状态
+      dateTime2: [], //任务列表搜索时间
+      instanceStateType2: '',//任务列表搜索状态
       workspaceName: '',
       activeDS: this.activeTab,
       showRunTaskModal: false,
@@ -799,7 +822,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.Name'),
-          width: 200,
+          minWidth: 200,
           key: 'name'
         },
         {
@@ -863,7 +886,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.retryTimes'),
-          width: 100,
+          width: 120,
           key: 'retryTimes'
         },
         {
@@ -876,21 +899,20 @@ export default {
             return  h('div', [
               h('Button', {
                 props: {
-                  type: 'success',
+                  type: 'info',
                   shape: "circle",
-                  icon: "md-arrow-dropright",
-                  size: 'small',
-                  disabled: !params.row.isOnline
+                  icon: "md-paper",
+                  size: 'small'
                 },
                 style: {
                   marginRight: '5px'
                 },
                 attrs: {
-                  title: this.$t('message.scheduler.run')
+                  title: this.$t('message.scheduler.viewLog')
                 },
                 on: {
                   click: () => {
-                    this.run(params.index)
+                    this._viewLog(params.index)
                   }
                 }
               })
@@ -981,10 +1003,11 @@ export default {
         api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
           pageSize: this.pagination5.size,
           pageNo: page,
+          searchVal: this.taskName,
           ...data
         }, 'get').then((res) => {
           res.totalList.forEach(item => {
-            item.scheduleTime = formatDate(item.submitTime)
+            item.submitTime = formatDate(item.submitTime)
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
             item.duration = filterNull(item.duration)
@@ -1269,10 +1292,19 @@ export default {
       } else if (this.activeDS === 2) {
         this.showGantt = false
         if (data) {
-          data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
-          data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
-          this.dateTime = [data.startDate, data.endDate]
-          this.instanceStateType = data.stateType
+          if (data.startDate && data.endDate) {
+            data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
+            data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
+            this.dateTime = [data.startDate, data.endDate]
+          } else {
+            data.startDate = this.dateTime.length > 1 ? this.dateTime[0] : ''
+            data.endDate = this.dateTime.length > 1 ? this.dateTime[1] : ''
+          }
+          if (data.stateType) {
+            this.instanceStateType = data.stateType
+          } else {
+            data.stateType = this.instanceStateType
+          }
         }
         this.getInstanceListData(1, data)
       } else if (this.activeDS === 3) {
@@ -1280,7 +1312,22 @@ export default {
       } else if (this.activeDS === 4) {
         console.log('运维大屏')
       } else if (this.activeDS === 5) {
-        this.getTaskInstanceList()
+        if (data) {
+          if (data.startDate && data.endDate) {
+            data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
+            data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
+            this.dateTime2 = [data.startDate, data.endDate]
+          } else {
+            data.startDate = this.dateTime2.length > 1 ? this.dateTime2[0] : ''
+            data.endDate = this.dateTime2.length > 1 ? this.dateTime2[1] : ''
+          }
+          if (data.stateType) {
+            this.instanceStateType2 = data.stateType
+          } else {
+            data.stateType = this.instanceStateType2
+          }
+        }
+        this.fetchTaskInstanceList(1, data)
       }
     },
     openDag(index) {
@@ -1390,6 +1437,12 @@ export default {
         })
       }
     },
+    _viewLog(index) {
+      let item = this.list5[index]
+      this.logId = item.id
+      this.logData = {}
+      this.showLog = true
+    },
     deleteScheduler(index) {
       let item = this.list3[index]
       this.$Modal.confirm({
@@ -1475,6 +1528,7 @@ export default {
       this.searchVal = ''
       this.activeList(active, data)
     },
+    // 实例列表
     _datepicker() {
       let searchDate = this.dateTime.length > 1 ? {
         startDate: this.dateTime[0],
@@ -1483,7 +1537,22 @@ export default {
       this.activeList(2, searchDate)
     },
     _changeInstanceState() {
-      this.activeList(2, {stateType: this.instanceStateType})
+      this.activeList(2, {
+        stateType: this.instanceStateType
+      })
+    },
+    // 任务列表
+    _datepicker2() {
+      let searchDate = this.dateTime2.length > 1 ? {
+        startDate: this.dateTime2[0],
+        endDate: this.dateTime2[1]
+      } : {}
+      this.activeList(5, searchDate)
+    },
+    _changeInstanceState2() {
+      this.activeList(5, {
+        stateType: this.instanceStateType2
+      })
     }
   }
 };

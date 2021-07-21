@@ -56,7 +56,7 @@
         </Form>
       </div>
     </div>
-    <div class="cardWrap">
+    <div class="cardWrap cardTableWrap">
       <div class="cardTitle">选择参数</div>
       <div class="contentWrap">
         <Table
@@ -64,6 +64,11 @@
           :data="paramsList"
           :loading="tableLoading"
         >
+          <template slot-scope="{ index, column }" slot="checkbox">
+            <Checkbox
+              @on-change="value => changeParams(value, index, column)"
+            />
+          </template>
           <template slot-scope="{ row }" slot="fieldSort">
             <div class="fieldSort" @click="addToSort(row)">
               添加到字段排序
@@ -72,7 +77,7 @@
         </Table>
       </div>
     </div>
-    <div class="cardWrap">
+    <div class="cardWrap cardTableWrap">
       <div class="cardTitle">排序字段</div>
       <div style="margin-top: 10px;">
         <Alert show-icon closable
@@ -108,6 +113,51 @@
             </div>
           </template>
         </Table>
+      </div>
+    </div>
+    <div class="cardWrap cardTableWrap">
+      <div class="cardTitle">请求参数</div>
+      <div class="contentWrap">
+        <Table :columns="sqlColumns" :data="sqlList">
+          <template slot-scope="{ index, column }" slot="input">
+            <Input
+              type="text"
+              @on-change="
+                value => changeSqlParams(value.target.value, index, column)
+              "
+              placeholder="请输入"
+            ></Input>
+          </template>
+          <template slot-scope="{ index, row, column }" slot="type">
+            <Select
+              :value="row.type"
+              transfer
+              style="width:200px"
+              @on-change="value => changeSqlParams(value, index, column)"
+            >
+              <Option
+                v-for="(item, index) in sqlTypeOptions"
+                :value="item.value"
+                :key="index"
+                >{{ item.label }}</Option
+              >
+            </Select>
+          </template>
+          <template slot-scope="{ index, column }" slot="required">
+            <Checkbox
+              @on-change="value => changeSqlParams(value, index, column)"
+            />
+          </template>
+          <template slot-scope="{ index }" slot="operation">
+            <div class="sqlOperation" @click="deleteSqlRow(index)">
+              删除
+            </div>
+          </template>
+        </Table>
+        <div class="addSqlParams" @click="addSqlParams()">
+          <Icon type="md-add" />
+          <div style="margin-left:5px;">新增参数</div>
+        </div>
       </div>
     </div>
   </div>
@@ -168,6 +218,7 @@ export default {
         {
           title: "设为请求参数",
           key: "setRequest",
+          slot: "checkbox",
           renderHeader: (h, params) => {
             return h("div", [
               h(
@@ -197,6 +248,7 @@ export default {
         {
           title: "设为返回参数",
           key: "setResponse",
+          slot: "checkbox",
           renderHeader: (h, params) => {
             return h("div", [
               h(
@@ -274,17 +326,62 @@ export default {
           index: 1,
           id: "a",
           type: "asc"
-        },
-        {
-          index: 2,
-          id: "b",
-          type: "asc"
-        },
-        {
-          index: 3,
-          id: "bigint(20)",
-          type: "asc"
         }
+      ],
+      sqlColumns: [
+        {
+          title: "参数名称",
+          key: "name",
+          slot: "input"
+        },
+        {
+          title: "参数类型",
+          key: "type",
+          slot: "type"
+        },
+        {
+          title: "是否必填",
+          key: "required",
+          slot: "required"
+        },
+        {
+          title: "示例值",
+          key: "example",
+          slot: "input"
+        },
+        {
+          title: "默认值",
+          key: "defaultValue",
+          slot: "input"
+        },
+        {
+          title: "描述",
+          key: "comment",
+          slot: "input"
+        },
+        {
+          title: "操作",
+          key: "operation",
+          slot: "operation"
+        }
+      ],
+      sqlList: [
+        {
+          index: 1,
+          id: "a",
+          type: "string"
+        }
+      ],
+      sqlTypeOptions: [
+        { label: "string", value: "string" },
+        { label: "bigint", value: "bigint" },
+        { label: "double", value: "double" },
+        { label: "date", value: "date" },
+
+        { label: "string 数组", value: "Array<string>" },
+        { label: "bigint 数组", value: "Array<bigint>" },
+        { label: "double 数组", value: "Array<double>" },
+        { label: "date 数组", value: "Array<date>" }
       ]
     };
   },
@@ -322,6 +419,10 @@ export default {
     setParamsChoose(column) {
       console.log(column);
     },
+    changeParams(value, index, column){
+      const datas = [...this.paramsList];
+      datas[index][column.key] = value;
+    },
     changeSort(value, rowData) {
       console.log(value);
       console.log(rowData);
@@ -353,6 +454,26 @@ export default {
           index: index + 1
         };
       });
+    },
+    deleteSqlRow(index) {
+      const datas = [...this.sqlList];
+      datas.splice(index, 1);
+      this.sqlList = datas;
+    },
+    changeSqlParams(value, index, column) {
+      console.log(value);
+      console.log(column);
+      const datas = [...this.sqlList];
+      datas[index][column.key] = value;
+    },
+    addSqlParams() {
+      const datas = [...this.sqlList];
+      datas.push({
+        index: 1,
+        id: "a",
+        type: "asc"
+      });
+      this.sqlList = datas;
     }
   }
 };
@@ -390,7 +511,34 @@ export default {
           cursor: pointer;
         }
       }
+      .sqlOperation {
+        font-size: 14px;
+        color: #2e92f7;
+        cursor: pointer;
+        font-family: PingFangSC-Medium;
+      }
+      .addSqlParams {
+        margin-top: 10px;
+        display: flex;
+        background: #ffffff;
+        border: 1px dashed #d9d9d9;
+        border-radius: 4px;
+        box-sizing: border-box;
+        height: 32px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-family: PingFangSC-Regular;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.65);
+        &:hover {
+          background-color: #f0faff;
+        }
+      }
     }
+  }
+  .cardTableWrap {
+    border-bottom-width: 0;
   }
 }
 </style>

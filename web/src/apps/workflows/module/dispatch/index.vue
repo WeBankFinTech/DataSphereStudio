@@ -250,7 +250,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.ProcessName'),
-          width: 200,
+          minWidth: 200,
           key: 'name'
         },
         {
@@ -270,7 +270,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.Description'),
-          width: 200,
+          width: 300,
           key: 'description',
           render: (h, params) => {
             return h('div', [
@@ -461,7 +461,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.ProcessName'),
-          width: 200,
+          minWidth: 200,
           key: 'name',
           render: (h, params) => {
             return h('div', [

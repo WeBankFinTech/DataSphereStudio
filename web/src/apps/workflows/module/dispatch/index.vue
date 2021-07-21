@@ -7,6 +7,7 @@
             <li :class="activeDS == 4? 'active' : ''" @click="activeList(4)">{{$t('message.scheduler.dashboard')}}</li>
             <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
             <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
+            <li :class="activeDS == 5? 'active' : ''" @click="activeList(5)">{{$t('message.scheduler.taskInstance')}}</li>
           </ul>
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
@@ -102,6 +103,30 @@
               :page-size-opts="pagination3.opts"
               @on-change="pageChange3"
               @on-page-size-change="pageSizeChange3"
+            ></Page>
+          </template>
+        </div>
+        <div class="scheduler-list" v-if="activeDS == 5">
+          <template>
+            <div class="scheduler-list-title">
+              <span>{{$t('message.scheduler.taskInstance')}}</span>
+              <Input v-model="taskName" style="width: auto;float: right">
+              <Icon type="ios-search" slot="suffix" @click="activeList(5)" style="cursor: pointer;"/>
+              </Input>
+            </div>
+            <Table class="scheduler-table" :columns="columns5" :data="list5"></Table>
+            <Page
+              size="small"
+              v-if="list5.length > 0"
+              class="page-bar fr"
+              :total="pagination5.total"
+              show-sizer
+              show-total
+              :current="pagination5.current"
+              :page-size="pagination5.size"
+              :page-size-opts="pagination5.opts"
+              @on-change="pageChange5"
+              @on-page-size-change="pageSizeChange5"
             ></Page>
           </template>
         </div>
@@ -206,6 +231,7 @@ export default {
     return {
       userId: '', //列表入参,用户id
       searchVal: this.tabName, //搜索名字
+      taskName: '', //任务实例名称
       dateTime: [], //实例列表搜索时间
       instanceStateType: '',//实例列表搜索状态
       workspaceName: '',
@@ -215,6 +241,7 @@ export default {
       list: [],
       list2: [],
       list3: [],
+      list5: [],
       columns: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -654,7 +681,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.ProcessName'),
-          width: 200,
+          minWidth: 200,
           key: 'processDefinitionName'
         },
         {
@@ -764,6 +791,113 @@ export default {
           }
         }
       ],
+      columns5: [
+        {
+          title: this.$t('message.scheduler.header.id'),
+          width: 100,
+          key: 'id'
+        },
+        {
+          title: this.$t('message.scheduler.header.Name'),
+          width: 200,
+          key: 'name'
+        },
+        {
+          title: this.$t('message.scheduler.header.ProcessInstance'),
+          width: 150,
+          key: 'processInstanceName'
+        },
+        {
+          title: this.$t('message.scheduler.header.Executor'),
+          width: 100,
+          key: 'executorName'
+        },
+        {
+          title: this.$t('message.scheduler.header.nodeType'),
+          width: 100,
+          key: 'taskType'
+        },
+        {
+          title: this.$t('message.scheduler.header.State'),
+          key: 'stateDesc',
+          width: 100,
+          render: (h, params) => {
+            return h('div', [
+              h('Icon', {
+                props: {
+                  custom: "iconfont " + params.row.stateIcon,
+                  color: params.row.stateColor,
+                  size: 15
+                },
+                attrs: {
+                  title: params.row.stateDesc
+                }
+              })
+            ])
+          }
+        },
+        {
+          title: this.$t('message.scheduler.header.SubmitTime'),
+          width: 200,
+          key: 'submitTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.StartTime'),
+          width: 200,
+          key: 'startTime'
+        },
+        {
+          title: this.$t('message.scheduler.header.EndTime'),
+          width: 200,
+          key: 'endTime'
+        },
+        {
+          title: 'host',
+          width: 150,
+          key: 'host'
+        },
+        {
+          title: this.$t('message.scheduler.header.Duration') + 's',
+          width: 100,
+          key: 'duration'
+        },
+        {
+          title: this.$t('message.scheduler.header.retryTimes'),
+          width: 100,
+          key: 'retryTimes'
+        },
+        {
+          title: this.$t('message.scheduler.header.Operation'),
+          key: 'action',
+          fixed: 'right',
+          width: 250,
+          align: 'center',
+          render: (h, params) => {
+            return  h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  shape: "circle",
+                  icon: "md-arrow-dropright",
+                  size: 'small',
+                  disabled: !params.row.isOnline
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                attrs: {
+                  title: this.$t('message.scheduler.run')
+                },
+                on: {
+                  click: () => {
+                    this.run(params.index)
+                  }
+                }
+              })
+            ]);
+          }
+        }
+      ],
       startData: {},
       timingData: {
         item: {},
@@ -782,6 +916,12 @@ export default {
         total: 0
       },
       pagination3: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
+      pagination5: {
         size: 10,
         opts: [5, 10, 30, 45, 60],
         current: 1,
@@ -836,6 +976,28 @@ export default {
     }
   },
   methods: {
+    fetchTaskInstanceList(page=1, data) {
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
+          pageSize: this.pagination5.size,
+          pageNo: page,
+          ...data
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.scheduleTime = formatDate(item.submitTime)
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
+            item.duration = filterNull(item.duration)
+            item.stateDesc = this.tasksState[item.state].desc
+            item.stateColor = this.tasksState[item.state].color
+            item.stateIcon = this.tasksState[item.state].icon
+            item.disabled = false
+          })
+          this.list5 = res.totalList
+          this.pagination5.total = res.total
+        })
+      })
+    },
     getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
       if (!this.dagProcessId) return
       api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
@@ -1117,6 +1279,8 @@ export default {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
         console.log('运维大屏')
+      } else if (this.activeDS === 5) {
+        this.getTaskInstanceList()
       }
     },
     openDag(index) {
@@ -1294,6 +1458,14 @@ export default {
     pageSizeChange3(size) {
       this.pagination3.size = size
       this.getSchedulerData()
+    },
+    pageChange5(page) {
+      this.pagination5.current = page
+      this.fetchTaskInstanceList(page)
+    },
+    pageSizeChange5(size) {
+      this.pagination5.size = size
+      this.fetchTaskInstanceList()
     },
     _gantt (item) {
       this.instanceId = item.id

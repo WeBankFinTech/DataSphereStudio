@@ -13,7 +13,7 @@
           <div class="guide-box-title">{{guide.title}}</div>
           <div class="guide-box-desc">{{guide.desc}}</div>
           <div class="guide-steps">
-            <div class="step" v-for="step in guide.steps" :key="step.seq">
+            <div class="step" :class="{'step-expand': step.expand}" v-for="step in guide.steps" :key="step.seq">
               <div class="step-head" @click="toggleStep(step)">
                 <span class="step-seq">{{step.seq}}</span>
                 <span class="step-divider"></span>
@@ -23,7 +23,7 @@
                   <Icon custom="iconfont icon-open" v-else />
                 </span>
               </div>
-              <div class="step-content" v-show="step.expand">
+              <div class="step-content">
                 <p v-for="content in step.content" :key="content.text || content.img">
                   <strong v-if="content.bold && content.text">{{content.text}}</strong>
                   <img v-else-if="content.img" :src="require(`./${content.img}`)" @click="showImgModal(require(`./${content.img}`))" />
@@ -131,7 +131,6 @@ export default {
       }
     },
     showImgModal(img) {
-      console.log('show img', img)
       this.modalImg = true;
       this.selectedImg = img;
     }
@@ -181,7 +180,9 @@ export default {
     .guide-body {
       height: calc(100% - 48px);
       padding-bottom: 48px;
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      overflow-y: overlay;
       background: #fff;
       .guide-box {
         border-top: 1px solid #DEE4EC;
@@ -241,8 +242,11 @@ export default {
               }
             }
             .step-content {
-              border-top: 1px solid #DEE4EC;
-              padding: 10px;
+              overflow: hidden;
+              height: 0;
+              opacity: 0;
+              transform: translateY(-10px);
+              transition: opacity,transform .4s ease-out;
               p {
                 margin: 6px 0;
                 font-size: 14px;
@@ -252,6 +256,17 @@ export default {
                 max-width: 100%;
                 cursor: zoom-in;
               }
+            }
+          }
+          .step-expand {
+            .step-head {
+              border-bottom: 1px solid #DEE4EC;
+            }
+            .step-content {
+              padding: 10px;
+              height: auto;
+              opacity: 1;
+              transform: translateY(0);
             }
           }
         }

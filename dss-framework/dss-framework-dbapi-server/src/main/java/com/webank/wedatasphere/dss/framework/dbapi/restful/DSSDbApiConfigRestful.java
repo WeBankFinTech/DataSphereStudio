@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
+import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import java.util.List;
 @Path("/dss/framework/dbapi")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Slf4j
 public class DSSDbApiConfigRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigRestful.class);
     @Autowired
@@ -97,10 +99,10 @@ public class DSSDbApiConfigRestful {
     }
 
     @GET
-    @Path("/test/{path}")
-    public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path) {
+    @Path("/test/{path:[a-zA-Z0-9_/]+}")
+    public Response testApi(@Context HttpServletRequest request,@PathParam("path") String path) {
         try {
-
+            log.info(request.getQueryString() + request.getRequestURL());
             ApiExecuteInfo resJo = apiConfigService.apiTest(path, request);
             Message message = Message.ok("服务测试成功").data("response",resJo);
             return Message.messageToResponse(message);

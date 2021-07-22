@@ -12,7 +12,7 @@
           <a class="operation" @click="edit(row, index)">
             {{ $t("message.dataService.edit") }}
           </a>
-          <a class="operation">
+          <a class="operation" @click="deleteApi(row)">
             {{ $t("message.dataService.delete") }}
           </a>
         </div>
@@ -29,11 +29,25 @@
       />
     </div>
 
+    <!--确认删除-->
+    <Modal v-model="modelConfirm" width="480" :closable="false">
+      <div class="modal-confirm-body">
+        <div class="confirm-title">
+          <Icon custom="iconfont icon-project" size="26"></Icon>
+          <span>{{ $t("message.dataService.deleteConfirm") }}</span>
+        </div>
+        <div class="confirm-desc">删除后，获得权限调用的用户将不能继续调用该API</div>
+      </div>
+      <div slot="footer">
+        <Button type="default" @click="deleteCancel">取消</Button>
+        <Button type="primary" @click="deleteConfirm">确定</Button>
+      </div>
+    </Modal>
+
     <!--授权弹窗-->
     <Modal
       v-model="modalAuthShow"
       :title="$t('message.dataService.modalAuthTile')"
-      @on-cancel="ProjectMergeCancel"
       :footer-hide="true"
     >
       <Form
@@ -45,7 +59,6 @@
           :label="$t('message.dataService.authName')"
           prop="authName">
           <Input
-            :disabled="isPublished"
             v-model="formData.name"
             :placeholder="$t('message.dataService.inputAuthName')"
           ></Input>
@@ -58,8 +71,8 @@
           </Select>
         </FormItem>
         <Form-item>
-          <Button size="large" @click="Cancel">{{$t('message.dataService.cancel')}}</Button>
-          <Button type="primary" size="large" style="margin-left: 20px;" @click="Ok">{{$t('message.dataService.ok')}}</Button>
+          <Button size="large">{{$t('message.dataService.cancel')}}</Button>
+          <Button type="primary" size="large" style="margin-left: 20px;">{{$t('message.dataService.ok')}}</Button>
         </Form-item>
       </Form>
     </Modal>
@@ -110,7 +123,9 @@ export default {
       modalAuthShow: false,
       formData: {
         name: '',
-      }
+      },
+      modelConfirm: false,
+      selectedApi: null
     }
   },
   computed: {
@@ -118,8 +133,7 @@ export default {
       return {
         authName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
-          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
+          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 }
         ],
         description: [
           { required: true, trigger: 'blur' },
@@ -156,6 +170,18 @@ export default {
   methods: {
     addAuthorize() {
       this.modalAuthShow = true;
+    },
+    deleteApi(row) {
+      this.selectedApi = row;
+      this.modelConfirm = true;
+    },
+    deleteCancel() {
+      this.selectedApi = null;
+      this.modelConfirm = false;
+    },
+    deleteConfirm() {
+      console.log('confirm', this.selectedApi)
+      this.modelConfirm = false;
     },
     handlePageSizeChange(pageSize) {
       console.log(pageSize);
@@ -205,6 +231,29 @@ export default {
     float: right;
     margin-top: 15px;
     padding: 10px 0;
+  }
+}
+
+.modal-confirm-body {
+  .confirm-title {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    color: #FF9F3A;
+    span {
+      margin-left: 15px;
+      font-size: 16px;
+      line-height: 24px;
+      color: #333;
+    }
+  }
+  .confirm-desc {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: 42px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
   }
 }
 </style>

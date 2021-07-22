@@ -30,9 +30,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -45,7 +47,7 @@ import java.util.UUID;
 
 /**
  * @Classname DSSDataAPIAuthRestful
- * @Description 服务管理--数据API授权相关REST服务
+ * @Description 服务管理--API授权
  * @Date 2021/7/14 10:44
  * @Created by suyc
  */
@@ -59,27 +61,26 @@ public class DSSDbAPIAuthRestful {
 
     @POST
     @Path("/create")
-    public Response createDataApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth dssDataApiAuth) throws ErrorException {
+    public Response createApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         //String userName = SecurityFilter.getLoginUsername(request);
         String userName ="suyc";
-        dssDataApiAuth.setCreateBy(userName);
-        dssDataApiAuth.setCreateTime(new Date(System.currentTimeMillis()));
+        apiAuth.setCreateBy(userName);
+        apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
 
-        Long dataApiAuthId = apiAuthService.createApiAuth(dssDataApiAuth);
-        return Message.messageToResponse(Message.ok().data("dataApiAuthId", dataApiAuthId));
+        Long apiAuthId = apiAuthService.createApiAuth(apiAuth);
+        return Message.messageToResponse(Message.ok().data("apiAuthId", apiAuthId));
     }
 
     @GET
     @Path("/token")
-    public Response generateToken(@Context HttpServletRequest request) {
+    public Response generateToken( ) {
         String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
         return Message.messageToResponse(Message.ok().data("token",token));
     }
 
     @GET
     @Path("/list")
-    public Response getDSSDadaApiAuths(@Context HttpServletRequest request, @QueryParam("workspaceId") Long workspaceId,
-                                       @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+    public Response getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -88,8 +89,17 @@ public class DSSDbAPIAuthRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiAuth> dssDataApiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("dssDataApiAuths",dssDataApiAuths).data("total", totals.get(0)));
+        List<ApiAuth> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
+        return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response deleteApiAuth(@PathParam("id") Long id){
+        apiAuthService.deleteApiAuth(id);
+
+        Message message = Message.ok("删除成功");
+        return Message.messageToResponse(message);
     }
 }
 

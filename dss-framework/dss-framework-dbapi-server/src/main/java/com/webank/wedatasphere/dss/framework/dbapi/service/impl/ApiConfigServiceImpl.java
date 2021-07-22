@@ -253,4 +253,11 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
     }
 
+    @Autowired
+    ApiConfigMapper apiConfigMapper;
+    @Override
+    public Boolean release(Integer status, String apiId) {
+        return    apiConfigMapper.release(status,apiId);
+    }
+
 }

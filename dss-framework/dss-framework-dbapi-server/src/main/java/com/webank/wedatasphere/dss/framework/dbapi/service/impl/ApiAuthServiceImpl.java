@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.framework.dbapi.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper;
@@ -19,7 +20,7 @@ import java.util.List;
  * @Created by suyc
  */
 @Service
-public class ApiAuthServiceImpl implements ApiAuthService {
+public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> implements ApiAuthService {
     @Autowired
     private ApiAuthMapper apiAuthMapper;
 
@@ -40,6 +41,15 @@ public class ApiAuthServiceImpl implements ApiAuthService {
     }
 
     @Override
+    public void deleteApiAuth(Long id){
+        apiAuthMapper.deleteApiAuth(id);
+    }
+
+
+
+
+
+    @Override
     public List<ApiInfo> getApiInfoList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow,pageSize,true);
         List<ApiInfo> apiInfoList = apiAuthMapper.getApiInfoList(workspaceId);
@@ -49,4 +59,13 @@ public class ApiAuthServiceImpl implements ApiAuthService {
         return apiInfoList;
     }
 
+    @Override
+    public void offlineApi(Long apiId){
+        apiAuthMapper.offlineApi(apiId);
+    }
+
+    @Override
+    public void onlineApi(Long apiId){
+        apiAuthMapper.onlineApi(apiId);
+    }
 }

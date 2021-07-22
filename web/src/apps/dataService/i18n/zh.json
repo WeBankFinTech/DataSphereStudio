@@ -7,6 +7,7 @@
       "copy": "复制调用地址",
       "edit": "编辑",
       "delete": "删除",
+      "deleteConfirm": "您确认删除该API调用吗",
       "addAuthorize": "新增授权",
 
       "modalAuthTile": "API授权",

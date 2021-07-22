@@ -3,18 +3,26 @@ package com.webank.wedatasphere.dss.framework.dbapi.service.impl;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiCallMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiConfigMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiCall;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
+import com.webank.wedatasphere.dss.framework.dbapi.util.DateJsonDeserializer;
+import com.webank.wedatasphere.dss.framework.dbapi.util.DateJsonSerializer;
 import com.webank.wedatasphere.dss.framework.dbapi.util.PoolManager;
 import com.webank.wedatasphere.dss.framework.dbapi.util.SqlEngineUtil;
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -33,6 +41,10 @@ import java.util.stream.Collectors;
 public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig> implements ApiConfigService {
     @Autowired
     ApiConfigMapper dssApiConfigMapper;
+    @Autowired
+    ApiAuthMapper apiAuthMapper;
+    @Autowired
+    ApiCallMapper apiCallMapper;
 
     public void saveApi(ApiConfig apiConfig) throws JSONException {
 
@@ -86,6 +98,42 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         }
         return apiExecuteInfo;
     }
+
+    @Override
+    public ApiExecuteInfo apiExecute(String path, HttpServletRequest request) throws Exception {
+        ApiCall apiCall = new ApiCall();
+        //校验token
+        String appKey = request.getHeader("appKey");
+        String appSecret = request.getHeader("appSecret");
+        if(StringUtils.isAnyBlank(appKey,appSecret)){
+            throw new Exception("请求头需添加appkey,appSecret");
+        }
+
+        ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
+        if(apiConfig != null){
+            long startTime = System.currentTimeMillis();
+            apiCall.setApiId(apiConfig.getId().longValue());
+            apiCall.setTimeStart(new Date(startTime));
+            apiCall.setCaller(appKey);
+            int groupId = apiConfig.getGroupId();
+            Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
+            if(expireTime != null && (expireTime * 1000) > startTime){
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request);
+                long endTime = System.currentTimeMillis();
+                apiCall.setTimeEnd(new Date(endTime));
+                apiCall.setTimeLength(endTime-startTime);
+                apiCall.setStatus(0);
+                apiCallMapper.addApiCall(apiCall);
+                return apiExecuteInfo;
+            }else {
+                throw new Exception("token已失效");
+            }
+        }else {
+            throw new Exception("该服务不存在,请检查服务url是否正确");
+        }
+    }
+
+
 
     @Override
     public void addGroup(ApiGroup apiGroup) {

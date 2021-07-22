@@ -59,4 +59,9 @@ public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
     @Select("SELECT COUNT(1) FROM dss_dataapi_config WHERE `is_delete` = 0 AND `status` = 0 AND `workspace_id` = #{workspaceId}")
     Long getOfflineApiCnt(Long workspaceId);
+
+    @Select("select UNIX_TIMESTAMP(expire) from dss_dataapi_auth where caller = #{caller} and group_id = #{groupId} and token = #{token}")
+    Long getToken(@Param("caller") String caller,@Param("groupId") int groupId,@Param("token") String  token);
+
+
 }

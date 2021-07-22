@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface ApiConfigService extends IService<ApiConfig> {
 
-    public  Boolean release(Integer status,String apiId);
+    Boolean release(Integer status,String apiId);
 
     void addGroup(ApiGroup apiGroup);
 
@@ -25,4 +25,6 @@ public interface ApiConfigService extends IService<ApiConfig> {
     void saveApi(ApiConfig apiConfig) throws JSONException;
 
     ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest) throws  Exception;
+
+    ApiExecuteInfo apiExecute(String path, HttpServletRequest request) throws Exception;
 }

@@ -136,4 +136,19 @@ public class DSSDbApiConfigRestful {
         return Message.messageToResponse(message);
     }
 
+
+    @GET
+    @Path("/execute/{path:[a-zA-Z0-9_/]+}")
+    public Response executeApi(@Context HttpServletRequest request,@PathParam("path") String path) {
+        try {
+            ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request);
+            Message message = Message.ok("调用服务成功").data("response",resJo);
+            return Message.messageToResponse(message);
+
+        } catch (Exception exception) {
+            return RestfulUtils.dealError("调用服务失败:" + exception.getMessage());
+        }
+
+    }
+
 }

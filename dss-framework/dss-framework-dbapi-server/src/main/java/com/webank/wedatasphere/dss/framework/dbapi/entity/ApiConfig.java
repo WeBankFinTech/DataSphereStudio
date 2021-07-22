@@ -54,7 +54,7 @@ public class ApiConfig {
 
     private String sql;
     private int workspaceId;
-    private String groupId;
+    private int groupId;
 
     private String datasourceName;
     private String datasourceType;

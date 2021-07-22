@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
 
+    public Boolean release(@Param("status") Integer status, @Param("apiId")  String apiId);
+
     @Insert("insert into dss_dataapi_group(workspace_id, name, note, create_by) " +
             "values(#{apiGroup.workspaceId}, #{apiGroup.name}, #{apiGroup.note}, #{apiGroup.createBy})")
     @Options(useGeneratedKeys = true, keyProperty = "apiGroup.id", keyColumn = "id")

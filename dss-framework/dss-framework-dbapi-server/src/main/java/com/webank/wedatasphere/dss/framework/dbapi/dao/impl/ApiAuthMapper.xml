@@ -27,40 +27,12 @@
         <id property="createTime" column="create_time"/>
     </resultMap>
 
-    <resultMap id="apiinfo" type="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
-        <id property="id" column="id"/>
-        <id property="caller" column="caller"/>
-        <id property="token" column="token"/>
-        <id property="expire" column="expire"/>
-        <id property="createTime" column="create_time"/>
-    </resultMap>
 
-    <sql id="apiauth_main">
-        id,`workspace_id`,`caller`,`token`, `expire`,`group_id`,`create_by`,`create_time`
-    </sql>
-
-    <insert id="addApiAuth" useGeneratedKeys="true" keyProperty="id"
-            parameterType="com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth">
-        INSERT INTO dss_dataapi_auth (<include refid="apiauth_main"/>)
-        VALUES
-        (#{id},#{workspaceId},#{caller},#{token}, #{expire}, #{groupId},#{createBy},#{createTime})
-    </insert>
 
     <select id="getApiAuthList" resultMap="dataapi_auth">
         SELECT * FROM dss_dataapi_auth
         <where>
             `is_delete` =0 AND `workspace_id` = #{workspaceId}
-        </where>
-    </select>
-
-
-    <select id="getApiInfoList" resultType="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
-        SELECT a.id,a.api_name,a.api_path,a.api_type,b.name AS 'groupName', c.name AS 'datasourceName'
-        FROM DSS_DATAAPI_CONFIG a
-        LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
-        LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id
-        <where>
-            a.is_delete =0 AND a.workspace_id = #{workspaceId}
         </where>
     </select>
 

@@ -144,6 +144,28 @@ export const guideConfig = {
           }
         ]
       }
+    ],
+    questions: [
+      {
+        title: '如何查看自己的账户信息？',
+        url: ''
+      },
+      {
+        title: '如何修改账户密码？',
+        url: ''
+      },
+      {
+        title: '如何快速配置功能菜单？',
+        url: ''
+      },
+      {
+        title: '如何快速切换工作空间？',
+        url: ''
+      },
+      {
+        title: '个人工作台可以自定义吗？',
+        url: ''
+      }
     ]
   },
   "/workspaceManagement": {
@@ -433,7 +455,7 @@ export const guideConfig = {
         url: ''
       },
       {
-        title: '右下角弹出框的作用是？（右下角弹出框点击后是类似于Windows的任务管理器类似的功能，用户可以快速的对任务管，引擎，队列资源进行查看和管理）',
+        title: '右下角弹出框的作用是？',
         url: ''
       }
     ]

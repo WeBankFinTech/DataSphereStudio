@@ -59,8 +59,11 @@ export default {
     };
   },
   mounted() {
-    this.getAllProjects();
-    this.getAllApi();
+    if (this.currentTab == "/dataService") {
+      this.getAllApi();
+    } else {
+      this.getAllProjects();
+    }
   },
   methods: {
     handleTabClick(tab) {
@@ -163,30 +166,55 @@ export default {
     },
     // 获取project下工作流
     getFlow(param, resolve) {
-      api
-        .fetch(
-          `${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`,
-          {
-            workspaceId: this.$route.query.workspaceId,
-            // orchestratorMode: "pom_work_flow",
-            projectId: param.id
-          },
-          "post"
-        )
-        .then(res => {
-          const flow = res.page.map(f => {
+      if (this.currentTab == "/dataService") {
+        // resolve([
+        //   {
+        //     id: "shfhsd",
+        //     name: "sfafd",
+        //     projectId: param.id,
+        //     projectName: param.name,
+        //     type: "flow"
+        //   }
+        // ]);
+        this.projectsTree = this.projectsTree.map(item => {
+          if (item.id == param.id) {
             return {
-              ...f,
-              id: f.orchestratorId, // flow的id是orchestratorId
-              name: f.orchestratorName,
-              projectId: param.id || f.projectId,
-              // 补充projectName，点击工作流切换project时使用
-              projectName: param.name,
-              type: "flow"
+              ...item,
+              loaded: true,
+              loading: false,
+              opened: true,
+              isLeaf: false
             };
-          });
-          resolve(flow);
+          } else {
+            return item;
+          }
         });
+      } else {
+        api
+          .fetch(
+            `${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`,
+            {
+              workspaceId: this.$route.query.workspaceId,
+              // orchestratorMode: "pom_work_flow",
+              projectId: param.id
+            },
+            "post"
+          )
+          .then(res => {
+            const flow = res.page.map(f => {
+              return {
+                ...f,
+                id: f.orchestratorId, // flow的id是orchestratorId
+                name: f.orchestratorName,
+                projectId: param.id || f.projectId,
+                // 补充projectName，点击工作流切换project时使用
+                projectName: param.name,
+                type: "flow"
+              };
+            });
+            resolve(flow);
+          });
+      }
     },
     handleTreeModal(project) {
       console.log(project);
@@ -207,21 +235,52 @@ export default {
     },
     handleTreeClick(node) {},
     getAllApi() {
+      //获取数据服务所有的api
       api
         .fetch(
-          `/dss/framework/dbapi/list`,
-          {
-            workspaceId: this.$route.query.workspaceId
-          },
-          "post"
+          `/dss/framework/dbapi/list?workspaceId=${this.$route.query.workspaceId}`,
+          {},
+          "get"
         )
         .then(res => {
           console.log(res);
+          if (res && res.list) {
+            this.projectsTree = res.list.map(n => {
+              return {
+                id: n.groupId,
+                name: n.groupName,
+                type: "project",
+                canWrite: () => true,
+                children: n.apis,
+                apis: n.apis
+              };
+            });
+          } else {
+            this.projectsTree = [];
+          }
         });
     },
     addGroup() {
+      //添加数据服务api分组
       console.log("addGroup");
       this.$emit("showModal", { type: "group" });
+    },
+    addApi(groupId, apiData) {
+      //添加数据服务api
+      this.projectsTree = this.projectsTree.map(item => {
+        if (item.id == groupId) {
+          return {
+            ...item,
+            loaded: true,
+            loading: false,
+            opened: true,
+            isLeaf: false,
+            children: [...item.children, apiData]
+          };
+        } else {
+          return item;
+        }
+      });
     }
   }
 };

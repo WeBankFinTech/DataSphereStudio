@@ -58,6 +58,8 @@ public class ApiConfig {
 
     private String datasourceName;
     private String datasourceType;
+    @TableField(exist = false)
+    private String resType;
 }
 
 

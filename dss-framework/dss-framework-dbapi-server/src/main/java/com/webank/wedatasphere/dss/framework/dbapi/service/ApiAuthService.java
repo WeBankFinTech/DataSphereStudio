@@ -28,4 +28,5 @@ public interface ApiAuthService extends IService<ApiAuth> {
     public void offlineApi(Long apiId);
 
     public void onlineApi(Long apiId);
+
 }

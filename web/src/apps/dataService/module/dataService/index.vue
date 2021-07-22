@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navMenu @showModal="showModal" @handleFold="handleFold"/>
+    <navMenu @showModal="showModal" @handleFold="handleFold" ref="navMenu" />
     <Modal
       v-model="modalVisible"
       :title="modalTitle"
@@ -14,18 +14,18 @@
         :rules="ruleValidate"
         v-if="modalType === 'group'"
       >
-        <FormItem label="业务名称" prop="groupName">
+        <FormItem label="业务名称" prop="name">
           <Input
             type="text"
-            v-model="groupForm.groupName"
+            v-model="groupForm.name"
             placeholder="请输入业务名称"
             style="width: 300px"
           ></Input>
         </FormItem>
-        <FormItem label="描述" prop="description">
+        <FormItem label="描述" prop="note">
           <Input
             type="textarea"
-            v-model="groupForm.description"
+            v-model="groupForm.note"
             placeholder="请输入描述"
             style="width: 300px"
           >
@@ -43,17 +43,6 @@
           <RadioGroup v-model="apiForm.apiType">
             <Radio label="GUIDE">向导模式</Radio>
             <Radio label="SQL">脚本模式</Radio>
-          </RadioGroup>
-        </FormItem>
-        <FormItem
-          label="SQL模式"
-          required
-          prop="sqlType"
-          v-if="apiForm.apiType === 'SQL'"
-        >
-          <RadioGroup v-model="apiForm.sqlType">
-            <Radio label="BASE">基础SQL</Radio>
-            <Radio label="ADCANCED">高级SQL</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="API名称" prop="apiName">
@@ -75,10 +64,10 @@
           </Input>
         </FormItem>
         <FormItem label="API协议" prop="protocol">
-          <CheckboxGroup v-model="apiForm.protocol">
-            <Checkbox label="HTTP"></Checkbox>
-            <Checkbox label="HTTPS"></Checkbox>
-          </CheckboxGroup>
+          <RadioGroup v-model="apiForm.protocol">
+            <Radio label="HTTP">HTTP</Radio>
+            <Radio label="HTTPS">HTTPS</Radio>
+          </RadioGroup>
         </FormItem>
         <FormItem label="请求方式" prop="method">
           <Select v-model="apiForm.method" style="width:300px">
@@ -88,8 +77,7 @@
         </FormItem>
         <FormItem label="返回类型" prop="returnType">
           <Select v-model="apiForm.returnType" style="width:300px">
-            <Option value="GET">GET</Option>
-            <Option value="POST">POST</Option>
+            <Option value="JSON">JSON</Option>
           </Select>
         </FormItem>
         <FormItem label="可见范围" prop="previlege">
@@ -132,14 +120,16 @@
         </div></slot
       >
     </Modal>
-    <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }"><api-congfig/></div>
+    <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
+      <api-congfig />
+    </div>
   </div>
 </template>
 <script>
 import navMenu from "../common/navMenu.vue";
 import tag from "@/components/tag/index.vue";
 import apiCongfig from "./apiConfig.vue";
-// import api from "@/common/service/api";
+import api from "@/common/service/api";
 export default {
   components: {
     navMenu,
@@ -154,12 +144,11 @@ export default {
       modalVisible: false,
       modalTitle: "",
       groupForm: {
-        groupName: "",
-        description: "",
-        password: ""
+        name: "",
+        note: ""
       },
       ruleValidate: {
-        groupName: [
+        name: [
           {
             required: true,
             message: "请输入业务名称",
@@ -169,13 +158,12 @@ export default {
       },
       apiForm: {
         apiType: "GUIDE",
-        sqlType: "BASE",
         apiName: "",
         apiPath: "",
-        protocol: [],
-        method: "",
-        returnType: "",
-        previlege: "",
+        protocol: "HTTP",
+        method: "GET",
+        returnType: "JSON",
+        previlege: "WORKSPACE",
         description: "",
         label: ""
       },
@@ -222,7 +210,8 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      groupData: ""
     };
   },
   computed: {},
@@ -244,14 +233,17 @@ export default {
     // });
   },
   methods: {
-    handleFold(fold){
+    handleFold(fold) {
       this.navFold = fold;
     },
     showModal(pyload) {
-      const { type } = pyload;
+      const { type, data } = pyload;
       this.modalVisible = true;
       this.modalType = type;
       this.modalTitle = type === "group" ? "新增业务流程" : "生成API";
+      if (type === "api") {
+        this.groupData = data;
+      }
     },
     handleModalCancel() {
       this.modalVisible = false;
@@ -261,10 +253,42 @@ export default {
       if (this.modalType === "group") {
         this.$refs["groupForm"].validate(valid => {
           console.log(valid);
+          this.$refs.navMenu.getAllApi();
+          if (valid) {
+            this.confirmLoading = true;
+            api
+              .fetch(
+                `/dss/framework/dbapi/group/create`,
+                {
+                  workspaceId: this.$route.query.workspaceId,
+                  ...this.groupForm
+                },
+                "post"
+              )
+              .then(res => {
+                console.log(res);
+                this.confirmLoading = false;
+                this.$refs.navMenu.getAllApi();
+                this.handleModalCancel();
+              })
+              .catch(() => {
+                this.confirmLoading = false;
+              });
+          }
         });
       } else {
         this.$refs["apiForm"].validate(valid => {
           console.log(valid);
+          if (valid) {
+            const { id, name } = this.groupData;
+            this.$refs.navMenu.addApi(id, {
+              name: this.apiForm.apiName,
+              projectId: id,
+              projectName: name,
+              type: "flow"
+            });
+            this.handleModalCancel();
+          }
         });
       }
     },
@@ -308,5 +332,5 @@ export default {
   &.ds-nav-menu-fold {
     padding-left: 54px;
   }
-  }
+}
 </style>

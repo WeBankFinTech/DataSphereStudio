@@ -4,8 +4,15 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiListInfo;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -31,4 +38,19 @@ public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
 
     @Select("select id,api_name as name from dss_dataapi_config where group_id = #{groupId}")
     List<ApiListInfo> getApiListByGroup(@Param("groupId") int groupId);
+
+
+    List<ApiInfo> getApiInfoList(@Param("workspaceId") Long workspaceId, @Param("apiName") String apiName);
+
+    @Update("UPDATE dss_dataapi_config SET `status` = 0 WHERE `id` = #{apiId}")
+    void offlineApi(@Param("apiId") Long apiId);
+
+    @Update("UPDATE dss_dataapi_config SET `status` = 1 WHERE `id` = #{apiId}")
+    void onlineApi(@Param("apiId") Long apiId);
+
+    @Select("SELECT COUNT(1) FROM dss_dataapi_config WHERE `is_delete` = 0 AND `status` = 1 AND `workspace_id` = #{workspaceId}")
+    Long getOnlineApiCnt(Long workspaceId);
+
+    @Select("SELECT COUNT(1) FROM dss_dataapi_config WHERE `is_delete` = 0 AND `status` = 0 AND `workspace_id` = #{workspaceId}")
+    Long getOfflineApiCnt(Long workspaceId);
 }

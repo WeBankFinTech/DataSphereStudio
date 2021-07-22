@@ -1,9 +1,15 @@
 package com.webank.wedatasphere.dss.framework.dbapi.service.impl;
 
-import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiCallMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiConfigMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiMonitorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Classname ApiMonitorServiceImpl
@@ -14,15 +20,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiMonitorServiceImpl implements ApiMonitorService {
     @Autowired
-    private ApiAuthMapper apiAuthMapper;
+    private ApiConfigMapper apiConfigMapper;
+
+    @Autowired
+    private ApiCallMapper apiCallMapper;
 
     @Override
     public Long getOnlineApiCnt(Long workspaceId) {
-        return apiAuthMapper.getOnlineApiCnt(workspaceId);
+        return apiConfigMapper.getOnlineApiCnt(workspaceId);
     }
 
     @Override
     public Long getOfflineApiCnt(Long workspaceId) {
-        return apiAuthMapper.getOfflineApiCnt(workspaceId);
+        return apiConfigMapper.getOfflineApiCnt(workspaceId);
+    }
+
+    @Override
+    public long getCallTotalCnt(Long workspaceId) {
+        return apiCallMapper.getCallTotalCnt(workspaceId);
+    }
+
+    @Override
+    public long getCallTotalTime(Long workspaceId) {
+        return apiCallMapper.getCallTotalTime(workspaceId);
+    }
+
+    @Override
+    public List<ApiCallInfoByCnt> getCallListByCnt(CallMonitorResquest callMonitorResquest) {
+        return apiCallMapper.getCallListByCnt(callMonitorResquest);
+    }
+
+    @Override
+    public List<ApiCallInfoByFailRate> getCallListByFailRate(CallMonitorResquest callMonitorResquest) {
+        return apiCallMapper.getCallListByFailRate(callMonitorResquest);
     }
 }

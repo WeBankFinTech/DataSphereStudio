@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,15 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     private ApiAuthMapper apiAuthMapper;
 
     @Override
-    public Long createApiAuth(ApiAuth apiAuth) throws ErrorException {
-        apiAuthMapper.insert(apiAuth);
-        return apiAuth.getId();
+    public boolean saveApiAuth(ApiAuth apiAuth) throws ErrorException {
+        Long id = apiAuth.getId();
+
+        if(id != null){
+            return this.updateById(apiAuth);
+        }
+        else {
+            return this.save(apiAuth);
+        }
     }
 
     @Override
@@ -46,26 +51,4 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     }
 
 
-
-
-
-    @Override
-    public List<ApiInfo> getApiInfoList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
-        PageHelper.startPage(pageNow,pageSize,true);
-        List<ApiInfo> apiInfoList = apiAuthMapper.getApiInfoList(workspaceId);
-        PageInfo<ApiInfo> pageInfo = new PageInfo<>(apiInfoList);
-        totals.add(pageInfo.getTotal());
-
-        return apiInfoList;
-    }
-
-    @Override
-    public void offlineApi(Long apiId){
-        apiAuthMapper.offlineApi(apiId);
-    }
-
-    @Override
-    public void onlineApi(Long apiId){
-        apiAuthMapper.onlineApi(apiId);
-    }
 }

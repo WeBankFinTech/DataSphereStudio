@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,29 @@ public class DSSDbApiConfigRestful {
             return RestfulUtils.dealError("获取token失败:" + exception.getMessage());
         }
 
+    }
+
+    /**
+     * 服务发布/下线
+     *
+     * @param request
+
+     * @return
+     */
+    @POST
+    @Path("release")
+    public  Response releaseApi(@Context HttpServletRequest request , JsonNode jsonNode){
+        Integer status = jsonNode.get("status").getValueAsInt() ;
+        String apiId = jsonNode.get("apiId").getTextValue();
+        Boolean release = apiConfigService.release(status, apiId);
+        Message message=new Message();
+        if(release==true){
+            message=Message.ok("更新成功");
+        }
+        else {
+            message=Message.ok("更新失败");
+        }
+        return Message.messageToResponse(message);
     }
 
 }

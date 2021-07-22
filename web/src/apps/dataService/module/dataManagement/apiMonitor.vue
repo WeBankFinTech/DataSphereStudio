@@ -16,11 +16,14 @@
                 v-else
                 :open="datePickerOpen"
                 :value="datePickerRange"
-                type="date"
+                type="daterange"
                 placement="bottom-end"
                 @on-change="handlePickerChange"
               >
-                <span class="date-trigger" @click="handlePickerClick">日期</span>
+                <div class="date-trigger" @click="handlePickerClick">
+                  <span v-if="datePickerRange" class="date-show">{{datePickerRange.join('   -   ')}}</span>
+                  <span>日期</span>
+                </div>
               </Date-picker>
             </div>
           </div>
@@ -126,14 +129,14 @@ export default {
         pageSize: 10
       },
       rangeOptions: [
-        { key: '7', name: '7天' },
-        { key: '1', name: '昨天' },
-        { key: '0', name: '今天' },
+        { key: 'week', name: '7天' },
+        { key: 'yesterday', name: '昨天' },
+        { key: 'today', name: '今天' },
         { key: 'picker', name: 'picker' }
       ],
-      currentRange: '',
+      currentRange: 'week',
       datePickerOpen: false,
-      datePickerRange: ''
+      datePickerRange: []
     }
   },
   computed: {
@@ -172,6 +175,10 @@ export default {
     },
     handleDateChange(option) {
       this.currentRange = option.key;
+      if (option.key != 'picker') {
+        this.datePickerRange = [];
+        this.datePickerOpen = false;
+      }
     },
 
     handlePickerClick () {
@@ -224,7 +231,7 @@ export default {
     display: flex;
     align-items: center;
     .range-group-item {
-      width: 60px;
+      min-width: 60px;
       height: 32px;
       font-size: 14px;
       line-height: 30px;
@@ -254,6 +261,9 @@ export default {
       .date-trigger {
         padding: 0 15px;
         line-height: 32px;
+        .date-show {
+          margin-right: 15px;
+        }
       }
     }
   }

@@ -15,6 +15,18 @@
       "authFlow": "授权的业务流程",
       "cancel": "取消",
       "ok": "确定"
+    },
+    "apiTest": {
+      "apiTest": "API测试",
+      "requestParam": "请求参数",
+      "requestLog": "请求详情",
+      "response": "返回内容",
+      "name": "参数名称",
+      "type": "参数类型",
+      "required": "是否必填",
+      "value": "值",
+      "start": "开始测试",
+      "api_not_selected": "请先选择API"
     }
   }
 }

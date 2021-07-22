@@ -40,4 +40,9 @@ public class DSSDbApiMonitorRestful {
         return Message.messageToResponse(Message.ok().data("offlineApiCnt",apiMonitorService.getOfflineApiCnt(workspaceId)));
     }
 
+    //总调用次数
+
+    //总调用时长
+
+
 }

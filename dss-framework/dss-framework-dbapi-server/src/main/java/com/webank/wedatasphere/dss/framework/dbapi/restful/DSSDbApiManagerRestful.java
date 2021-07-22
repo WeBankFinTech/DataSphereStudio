@@ -36,6 +36,7 @@ public class DSSDbApiManagerRestful {
 
     @GET
     @Path("/list")
+    //支持按name搜索
     public Response getApiList(@Context HttpServletRequest request, @QueryParam("workspaceId") Long workspaceId,
                                        @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
@@ -67,4 +68,8 @@ public class DSSDbApiManagerRestful {
         Message message = Message.ok("上线API成功").data("apiId", apiId);
         return Message.messageToResponse(message);
     }
+
+    //复制调用地址
+
+
 }

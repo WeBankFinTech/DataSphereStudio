@@ -21,7 +21,11 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -31,12 +35,6 @@ import java.util.List;
  */
 @Mapper
 public interface DSSWorkspaceMenuMapper {
-
-
-
-    @Select("select url from dss_menu_component_url where menu_id = #{menuId}")
-    String getSubMenuUrl(@Param("menuId") int menuId);
-
 
     @Select("select * from dss_component_role where workspace_id = #{workspaceId}")
     @Results({

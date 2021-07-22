@@ -19,7 +19,14 @@
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSOnestopMenu;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponent;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentPriv;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepage;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuComponentUrl;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.linkis.common.utils.Utils;
@@ -30,7 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -51,7 +64,7 @@ public class WorkspaceDBHelper {
 
     private final Object lock = new Object();
 
-    private List<DSSMenu> dssMenus;
+    private List<DSSOnestopMenu> dssOnestopMenus;
 
     private List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls;
 
@@ -77,7 +90,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssMenus = dssWorkspaceRoleMapper.getMenus();
+                    dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -137,7 +150,7 @@ public class WorkspaceDBHelper {
             dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
             dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
             dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
-            dssMenus = dssWorkspaceRoleMapper.getMenus();
+            dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
     }
@@ -207,31 +220,6 @@ public class WorkspaceDBHelper {
         list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 7, 0, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 7, 0, date, username));
         list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 7, 0, date, username));
-//        //运维用户，只可以看见生产中心
-//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,2,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,2,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,2,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,2,0, date, username));
-//        //开发用户，只可以看见开发中心
-//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,3,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,3,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,3,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,3,0, date, username));
-//        //分析用户，只可以看见分析中心
-//     //   list.add(new DSSWorkspaceMenuRole(workspaceId, 1,4,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,4,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,4,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,4,0, date, username));
-//        //运营用户，只可以看见核心指标
-//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,5,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,5,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,5,0, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,5,0, date, username));
-//        //领导，默认全部可见
-//       // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,6,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,6,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,6,1, date, username));
-//        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,6,0, date, username));
         return list;
     }
 
@@ -447,9 +435,9 @@ public class WorkspaceDBHelper {
         return vo;
     }
 
-    public DSSMenu getMenuNameById(int menuId) {
-        if (dssMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
-            return dssMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
+    public DSSOnestopMenu getMenuNameById(int menuId) {
+        if (dssOnestopMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
+            return dssOnestopMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
         } else {
             return null;
         }
@@ -472,7 +460,7 @@ public class WorkspaceDBHelper {
     }
 
     public List<Integer> getAllMenuIds() {
-        return dssMenus.stream().filter(dssMenu -> dssMenu.getLevel() == 1).map(DSSMenu::getId).collect(Collectors.toList());
+        return dssOnestopMenus.stream().map(DSSOnestopMenu::getId).collect(Collectors.toList());
     }
 
     public List<Integer> getAllComponentIds() {

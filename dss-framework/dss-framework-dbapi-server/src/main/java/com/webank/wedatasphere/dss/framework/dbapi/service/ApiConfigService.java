@@ -16,6 +16,8 @@ import java.util.List;
 
 public interface ApiConfigService extends IService<ApiConfig> {
 
+    public  Boolean release(Integer status,String apiId);
+
     void addGroup(ApiGroup apiGroup);
 
     List<ApiGroupInfo> getGroupList(String workspaceId);

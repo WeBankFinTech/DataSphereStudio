@@ -11,8 +11,7 @@
         >
           <FormItem label="数据源类型" prop="dataSource">
             <Select v-model="dbForm.dataSource" style="width:300px">
-              <Option value="GET">GET</Option>
-              <Option value="POST">POST</Option>
+              <Option value="MYSQL">MYSQL</Option>
             </Select>
           </FormItem>
           <FormItem label="数据源名称" prop="dataSourceId">
@@ -41,8 +40,7 @@
         >
           <FormItem label="内存" prop="memory">
             <Select v-model="envForm.memory" style="width:300px">
-              <Option value="GET">GET</Option>
-              <Option value="POST">POST</Option>
+              <Option value="4096M">4096M</Option>
             </Select>
           </FormItem>
           <FormItem label="超时时间" prop="reqTimeout">
@@ -167,7 +165,7 @@ export default {
   data() {
     return {
       dbForm: {
-        dataSource: "",
+        dataSource: "MYSQL",
         dataSourceId: "",
         tblName: ""
       },
@@ -195,7 +193,7 @@ export default {
         ]
       },
       envForm: {
-        memory: "",
+        memory: "4096M",
         reqTimeout: ""
       },
       envRuleValidate: {
@@ -340,18 +338,8 @@ export default {
           slot: "type"
         },
         {
-          title: "是否必填",
-          key: "required",
-          slot: "required"
-        },
-        {
           title: "示例值",
           key: "example",
-          slot: "input"
-        },
-        {
-          title: "默认值",
-          key: "defaultValue",
           slot: "input"
         },
         {

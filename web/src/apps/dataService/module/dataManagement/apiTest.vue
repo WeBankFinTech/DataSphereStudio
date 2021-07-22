@@ -1,17 +1,16 @@
 <template>
-  <div class="manage-wrap">
-    <div class="manage-head">API测试</div>
-  </div>
+  <Test />
 </template>
 <script>
 // import api from "@/common/service/api";
+import Test from '../common/test.vue';
 export default {
+  components: {
+    Test,
+  },
   data() {
     return {
     }
-  },
-  computed: {
-
   },
   created() {
     // 获取api相关数据
@@ -36,29 +35,9 @@ export default {
     // });
   },
   methods: {
-    handlePageSizeChange(pageSize) {
-      console.log(pageSize);
-      this.pageData.pageSize = pageSize;
-    },
-    handlePageChange(page) {
-      console.log(page);
-      this.pageData.pageNum = page;
-    },
   },
 }
 </script>
-
 <style lang="scss" scoped>
-.manage-wrap {
-  padding: 0 24px;
-  background: #fff;
-  .manage-head {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    font-size: 16px;
-    color: #333;
-    font-weight: bold;
-    border-bottom: 1px solid #DEE4EC;
-  }
-}
+
 </style>

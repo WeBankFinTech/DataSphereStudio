@@ -22,6 +22,11 @@ public class ApiManagerServiceImpl implements ApiManagerService {
     private ApiConfigMapper apiConfigMapper;
 
     @Override
+    public ApiInfo getApiInfo(Long apiId){
+        return apiConfigMapper.getApiInfo(apiId);
+    }
+
+    @Override
     public List<ApiInfo> getApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow,pageSize,true);
         List<ApiInfo> apiInfoList = apiConfigMapper.getApiInfoList(workspaceId,apiName);

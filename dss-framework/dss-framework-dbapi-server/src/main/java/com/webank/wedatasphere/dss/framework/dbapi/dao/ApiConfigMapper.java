@@ -54,4 +54,6 @@ public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
 
     @Select("SELECT COUNT(1) FROM dss_dataapi_config WHERE `is_delete` = 0 AND `status` = 0 AND `workspace_id` = #{workspaceId}")
     Long getOfflineApiCnt(Long workspaceId);
+
+    ApiInfo getApiInfo(Long apiId);
 }

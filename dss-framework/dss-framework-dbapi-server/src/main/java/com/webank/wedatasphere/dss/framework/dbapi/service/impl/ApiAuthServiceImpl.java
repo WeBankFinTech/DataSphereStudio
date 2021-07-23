@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper;
+import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiConfigMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import java.util.List;
 public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> implements ApiAuthService {
     @Autowired
     private ApiAuthMapper apiAuthMapper;
+    @Autowired
+    private ApiConfigMapper apiConfigMapper;
 
     @Override
     public boolean saveApiAuth(ApiAuth apiAuth) throws ErrorException {
@@ -50,5 +54,8 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
         apiAuthMapper.deleteApiAuth(id);
     }
 
-
+    @Override
+    public List<ApiGroupInfo> getApiGroupList(Long workspaceId){
+        return apiConfigMapper.getGroupByWorkspaceId(workspaceId.toString());
+    }
 }

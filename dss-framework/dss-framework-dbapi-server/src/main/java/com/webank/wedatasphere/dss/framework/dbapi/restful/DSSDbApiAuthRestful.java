@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
@@ -65,6 +66,9 @@ public class DSSDbApiAuthRestful {
         //String userName = SecurityFilter.getLoginUsername(request);
         String userName ="suyc";
         if(apiAuth.getId() ==null) {
+            String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
+            apiAuth.setToken(token);
+
             apiAuth.setCreateBy(userName);
             apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
         }
@@ -109,6 +113,15 @@ public class DSSDbApiAuthRestful {
         apiAuthService.deleteApiAuth(id);
 
         Message message = Message.ok("删除成功");
+        return Message.messageToResponse(message);
+    }
+
+    @GET
+    @Path("/apigroup")
+    public Response getApiGroup(@QueryParam("workspaceId") Long workspaceId){
+        List<ApiGroupInfo> apiGroupInfoList = apiAuthService.getApiGroupList(workspaceId);
+
+        Message message = Message.ok().data("list",apiGroupInfoList);
         return Message.messageToResponse(message);
     }
 }

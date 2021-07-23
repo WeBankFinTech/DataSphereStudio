@@ -71,14 +71,14 @@ public class DSSDbApiMonitorRestful {
 
     @GET
     @Path("callTotalCnt")
-    public Response getCallTotalCnt(@QueryParam("workspaceId") Long workspaceId){
-        return Message.messageToResponse(Message.ok().data("callTotalCnt",apiMonitorService.getCallTotalCnt(workspaceId)));
+    public Response getCallTotalCnt(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.messageToResponse(Message.ok().data("callTotalCnt",apiMonitorService.getCallTotalCnt(callMonitorResquest)));
     }
 
     @GET
     @Path("callTotalTime")
-    public Response getCallTotalTime(@QueryParam("workspaceId") Long workspaceId){
-        return Message.messageToResponse(Message.ok().data("callTotalTime",apiMonitorService.getCallTotalTime(workspaceId)));
+    public Response getCallTotalTime(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.messageToResponse(Message.ok().data("callTotalTime",apiMonitorService.getCallTotalTime(callMonitorResquest)));
     }
 
     @GET

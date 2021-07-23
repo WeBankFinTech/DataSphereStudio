@@ -57,8 +57,9 @@ public class DSSDbApiManagerRestful {
     @Path("/offline/{apiId}")
     public Response offlineApi(@PathParam("apiId") Long apiId){
         apiManagerService.offlineApi(apiId);
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
 
-        Message message = Message.ok("下线API成功");
+        Message message = Message.ok("下线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }
 
@@ -66,8 +67,9 @@ public class DSSDbApiManagerRestful {
     @Path("/online/{apiId}")
     public Response onlineApi(@PathParam("apiId") Long apiId){
         apiManagerService.onlineApi(apiId);
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
 
-        Message message = Message.ok("上线API成功");
+        Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }
 

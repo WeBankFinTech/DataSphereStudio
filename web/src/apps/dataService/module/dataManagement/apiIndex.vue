@@ -1,25 +1,25 @@
 <template>
   <Tabs value="publish" class="tab-publish">
-    <Tab-pane label="发布的API" name="publish">
+    <Tab-pane :label='$t("message.dataService.apiIndex.publishApi")' name="publish">
       <div class="filter-box">
         <div class="filter-input">
-          <Input v-model="apiName" icon="ios-clock-outline" placeholder="API名称" @on-click="handleSearch" @on-enter="handleSearch" />
+          <Input v-model="apiName" icon="ios-clock-outline" :placeholder='$t("message.dataService.apiIndex.apiName")' @on-click="handleSearch" @on-enter="handleSearch" />
         </div>
       </div>
-      <Table :columns="columns" :data="data" size="large">
-        <template slot-scope="{ row, index }" slot="operation">
+      <Table :columns="columns" :data="apiList" size="large">
+        <template slot-scope="{ row }" slot="operation">
           <div class="operation-wrap">
-            <a class="operation" @click="edit(row, index)">
-              {{ $t("message.dataService.online") }}
+            <a class="operation" @click="online(row)" v-if="row.status == 0">
+              {{ $t("message.dataService.apiIndex.online") }}
             </a>
-            <a class="operation" @click="edit(row, index)">
-              {{ $t("message.dataService.offline") }}
+            <a class="operation" @click="offline(row)" v-if="row.status == 1">
+              {{ $t("message.dataService.apiIndex.offline") }}
             </a>
-            <a class="operation">
-              {{ $t("message.dataService.test") }}
+            <a class="operation" @click="test(row)">
+              {{ $t("message.dataService.apiIndex.test") }}
             </a>
-            <a class="operation">
-              {{ $t("message.dataService.copy") }}
+            <a class="operation" @click="copy(row)">
+              {{ $t("message.dataService.apiIndex.copy") }}
             </a>
           </div>
         </template>
@@ -27,7 +27,7 @@
       <div class="pagebar">
         <Page
           :total="pageData.total"
-          :current="pageData.pageNum"
+          :current="pageData.pageNow"
           show-elevator
           show-sizer
           @on-change="handlePageChange"
@@ -38,44 +38,41 @@
   </Tabs>
 </template>
 <script>
-// import api from "@/common/service/api";
+import api from "@/common/service/api";
 export default {
   data() {
     return {
       columns: [
         {
-          title: '姓名',
-          key: 'name'
+          title: 'ID',
+          key: 'id'
         },
         {
-          title: '年龄',
-          key: 'age'
+          title: 'API名称',
+          key: 'apiName'
         },
         {
-          title: '地址',
-          key: 'address'
+          title: '业务流程',
+          key: 'groupName'
         },
         {
-          title: this.$t("message.permissions.operation"),
+          title: '数据源名称',
+          key: 'datasourceName'
+        },
+        {
+          title: 'API类型',
+          key: 'apiType'
+        },
+        {
+          title: this.$t("message.dataService.operation"),
           key: "operation",
           slot: "operation"
         }
       ],
-      data: [
-        {
-          name: '李小红',
-          age: 30,
-          address: '上海市浦东新区世纪大道'
-        },
-        {
-          name: '周小伟',
-          age: 26,
-          address: '深圳市南山区深南大道'
-        }
-      ],
+      apiList: [],
       pageData: {
-        total: 20,
-        pageNum: 1,
+        total: 0,
+        pageNow: 1,
         pageSize: 10
       },
       apiName: ''
@@ -85,38 +82,90 @@ export default {
 
   },
   created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // api的基础信息
-    //     this.apiData = rst.result;
-    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
-    //     // 更改网页title
-    //     document.title = rst.result.aliasName || rst.result.name;
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
+    this.getApiList();
   },
   methods: {
+    getApiList() {
+      // 获取api相关数据
+      api.fetch('/dss/framework/dbapi/apimanager/list', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        apiName: this.apiName,
+        pageNow: this.pageData.pageNow,
+        pageSize: this.pageData.pageSize,
+      }, 'get').then((res) => {
+        console.log(res)
+        if (res.list) {
+          this.apiList = res.list;
+          this.pageData.total = res.total;
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
     handlePageSizeChange(pageSize) {
       console.log(pageSize);
       this.pageData.pageSize = pageSize;
+      this.getApiList();
     },
     handlePageChange(page) {
       console.log(page);
-      this.pageData.pageNum = page;
+      this.pageData.pageNow = page;
+      this.getApiList();
     },
     handleSearch() {
       console.log('search', this.apiName)
+      this.getApiList();
+    },
+    test(row) {
+      this.$router.push({
+        name: 'dataManagement/test',
+        query: {...this.$route.query, apiId: row.id || 1},
+      });
+    },
+    online(row) {
+      api.fetch(`/dss/framework/dbapi/apimanager/online/${row.id}`, {
+      }, 'post').then((res) => {
+        console.log(res)
+        if (res) {
+          // this.getApiList();
+          this.apiList = this.apiList.map(i => {
+            if (i.id == row.id) {
+              return res.apiInfo;
+            } else {
+              return i;
+            }
+          })
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    offline(row) {
+      api.fetch(`/dss/framework/dbapi/apimanager/offline/${row.id}`, {
+      }, 'post').then((res) => {
+        console.log(res)
+        if (res) {
+          // this.getApiList();
+          this.apiList = this.apiList.map(i => {
+            if (i.id == row.id) {
+              return res.apiInfo;
+            } else {
+              return i;
+            }
+          })
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    copy(row) {
+      api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {
+      }, 'get').then((res) => {
+        console.log(res.callPathPrefix)
+      }).catch((err) => {
+        console.error(err)
+      });
     },
   },
 }

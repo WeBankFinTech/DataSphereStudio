@@ -1,8 +1,60 @@
 {
   "message": {
     "dataService": {
-      "viewAll": "View All",
-      "viewValid": "View Valid"
+      "dataService": "Data Service",
+      "serviceManage": "Service Management",
+      "operation": "operation",
+      "cancel": "cancel",
+      "ok": "ok",
+      "apiIndex": {
+        "publishApi": "API Published",
+        "apiName": "api name",
+        "online": "online",
+        "offline": "offline",
+        "test": "test",
+        "copy": "copy curl"
+      },
+      "apiMonitor": {
+        "staticsScreen": "API Statics Screen",
+        "staticsDetail": "API Statics Detail",
+        "apiTotal": "API total",
+        "published": "published",
+        "notPublish": "unpublished",
+        "resource": "resource",
+        "dashboard": "dashboard",
+        "callCnt": "call count",
+        "callTime": "call time",
+        "errorTop10": "error top10",
+        "callTop10": "call count top10"
+      },
+      "apiCall": {
+        "apiCall": "Api Call",
+        "edit": "edit",
+        "delete": "delete",
+        "deleteApiCallTitle": "Are you sure delete the api?",
+        "deleteApiCallDesc": "you will not call the api which after delete",
+        "addAuthorize": "Add Authorize",
+        "authForm": {
+          "modalAuthTile": "API Authorize",
+          "labelName": "authorize name",
+          "labelFlow": "authorize flow",
+          "enterName": "name is required",
+          "enterFlow": "flow is required",
+          "holderName": "input name"
+        }
+      },
+      "apiTest": {
+        "apiTest": "API Test",
+        "requestParam": "Request Params",
+        "requestLog": "Request Logs",
+        "response": "Response",
+        "name": "name",
+        "type": "type",
+        "required": "required",
+        "value": "value",
+        "start": "start test",
+        "api_not_selected": "api not selected"
+      }
     }
   }
 }

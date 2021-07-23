@@ -1,33 +1,60 @@
 {
   "message": {
     "dataService": {
-      "online": "上线",
-      "offline": "下线",
-      "test": "测试",
-      "copy": "复制调用地址",
-      "edit": "编辑",
-      "delete": "删除",
-      "deleteConfirm": "您确认删除该API调用吗",
-      "addAuthorize": "新增授权",
-
-      "modalAuthTile": "API授权",
-      "authName": "授权的登录名称",
-      "inputAuthName": "请输入名称",
-      "authFlow": "授权的业务流程",
+      "dataService": "数据服务",
+      "serviceManage": "服务管理",
+      "operation": "操作",
       "cancel": "取消",
-      "ok": "确定"
-    },
-    "apiTest": {
-      "apiTest": "API测试",
-      "requestParam": "请求参数",
-      "requestLog": "请求详情",
-      "response": "返回内容",
-      "name": "参数名称",
-      "type": "参数类型",
-      "required": "是否必填",
-      "value": "值",
-      "start": "开始测试",
-      "api_not_selected": "请先选择API"
+      "ok": "确定",
+      "apiIndex": {
+        "publishApi": "发布的API",
+        "apiName": "API名称",
+        "online": "上线",
+        "offline": "下线",
+        "test": "测试",
+        "copy": "复制调用地址"
+      },
+      "apiMonitor": {
+        "staticsScreen": "API计量大屏",
+        "staticsDetail": "API计量详情",
+        "apiTotal": "API总数",
+        "published": "已发布",
+        "notPublish": "未发布",
+        "resource": "服务资源分配",
+        "dashboard": "总体计量",
+        "callCnt": "总调用次数",
+        "callTime": "总调用时长",
+        "errorTop10": "昨日出错排行Top10",
+        "callTop10": "昨日调用量排行Top10"
+      },
+      "apiCall": {
+        "edit": "编辑",
+        "delete": "删除",
+        "deleteApiCallTitle": "您确认删除该API调用吗",
+        "deleteApiCallDesc": "删除后，获得权限调用的用户将不能继续调用该API",
+        "apiCall": "API调用",
+        "addAuthorize": "新增授权",
+        "authForm": {
+          "modalAuthTile": "API授权",
+          "labelName": "授权的登录名称",
+          "labelFlow": "授权的业务流程",
+          "enterName": "请输入授权的登录名称",
+          "enterFlow": "请选择授权的业务流程",
+          "holderName": "请输入名称"
+        }
+      },
+      "apiTest": {
+        "apiTest": "API测试",
+        "requestParam": "请求参数",
+        "requestLog": "请求详情",
+        "response": "返回内容",
+        "name": "参数名称",
+        "type": "参数类型",
+        "required": "是否必填",
+        "value": "值",
+        "start": "开始测试",
+        "api_not_selected": "请先选择API"
+      }
     }
   }
 }

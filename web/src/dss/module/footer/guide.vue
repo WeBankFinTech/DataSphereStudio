@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <Modal v-model="modalImg" :closable="false" width="60%">
+    <Modal v-model="modalImg" :closable="false" :footer-hide="true" width="60%">
       <div class="modal-img-container">
         <img :src="selectedImg" />
       </div>

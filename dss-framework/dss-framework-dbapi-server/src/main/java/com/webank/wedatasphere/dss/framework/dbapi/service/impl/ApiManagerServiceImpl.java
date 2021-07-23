@@ -32,6 +32,16 @@ public class ApiManagerServiceImpl implements ApiManagerService {
     }
 
     @Override
+    public List<ApiInfo> getOnlineApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize){
+        PageHelper.startPage(pageNow,pageSize,true);
+        List<ApiInfo> apiInfoList = apiConfigMapper.getOnlineApiInfoList(workspaceId,apiName);
+        PageInfo<ApiInfo> pageInfo = new PageInfo<>(apiInfoList);
+        totals.add(pageInfo.getTotal());
+
+        return apiInfoList;
+    }
+
+    @Override
     public void offlineApi(Long apiId){
         apiConfigMapper.offlineApi(apiId);
     }

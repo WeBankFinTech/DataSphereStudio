@@ -12,6 +12,7 @@ import java.util.List;
  */
 public interface ApiManagerService {
     public List<ApiInfo> getApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize);
+    public List<ApiInfo> getOnlineApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize);
 
     public void offlineApi(Long apiId);
 

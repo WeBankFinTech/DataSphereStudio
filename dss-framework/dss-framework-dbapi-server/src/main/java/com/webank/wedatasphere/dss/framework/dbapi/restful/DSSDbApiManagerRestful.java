@@ -11,6 +11,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -53,8 +54,8 @@ public class DSSDbApiManagerRestful {
     }
 
     @POST
-    @Path("offline")
-    public Response offlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
+    @Path("/offline/{apiId}")
+    public Response offlineApi(@PathParam("apiId") Long apiId){
         apiManagerService.offlineApi(apiId);
 
         Message message = Message.ok("下线API成功");
@@ -62,8 +63,8 @@ public class DSSDbApiManagerRestful {
     }
 
     @POST
-    @Path("online")
-    public Response onlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
+    @Path("/online/{apiId}")
+    public Response onlineApi(@PathParam("apiId") Long apiId){
         apiManagerService.onlineApi(apiId);
 
         Message message = Message.ok("上线API成功");
@@ -71,8 +72,8 @@ public class DSSDbApiManagerRestful {
     }
 
     @GET
-    @Path("callPath")
-    public Response getApiCallPath(@QueryParam("apiId") Long apiId){
+    @Path("/callPath/{apiId}")
+    public Response getApiCallPath(@PathParam("apiId") Long apiId){
         StringBuilder callPath =new StringBuilder("http://xxxx");
         callPath.append("/api/rest_j/v1");
 

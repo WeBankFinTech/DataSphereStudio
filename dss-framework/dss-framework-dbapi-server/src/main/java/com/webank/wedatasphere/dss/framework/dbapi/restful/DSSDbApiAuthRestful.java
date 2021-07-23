@@ -104,7 +104,7 @@ public class DSSDbApiAuthRestful {
     }
 
     @DELETE
-    @Path("{id}")
+    @Path("/{id}")
     public Response deleteApiAuth(@PathParam("id") Long id){
         apiAuthService.deleteApiAuth(id);
 

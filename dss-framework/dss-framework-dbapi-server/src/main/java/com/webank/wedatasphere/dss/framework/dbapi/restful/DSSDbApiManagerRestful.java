@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
-import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiManagerService;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,6 +11,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @author lenovo
  * @Classname DSSDbApiManagerRestful
  * @Description 服务管理--API管理
  * @Date 2021/7/19 15:38
@@ -32,13 +34,13 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DSSDbApiManagerRestful {
     @Autowired
-    private ApiAuthService apiAuthService;
+    private ApiManagerService apiManagerService;
 
     @GET
     @Path("/list")
-    //支持按name搜索
-    public Response getApiList(@Context HttpServletRequest request, @QueryParam("workspaceId") Long workspaceId,
-                                       @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+    public Response getApiList(@Context HttpServletRequest request,
+                               @QueryParam("workspaceId") Long workspaceId, @QueryParam("apiName") String apiName,
+                               @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -47,29 +49,39 @@ public class DSSDbApiManagerRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiInfo> apiInfoList = apiAuthService.getApiInfoList(workspaceId,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("apiInfoList",apiInfoList).data("total", totals.get(0)));
+        List<ApiInfo> apiInfoList = apiManagerService.getApiInfoList(workspaceId,apiName,totals,pageNow,pageSize);
+        return Message.messageToResponse(Message.ok().data("list",apiInfoList).data("total", totals.get(0)));
     }
 
     @POST
-    @Path("offline")
-    public Response offlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
-        apiAuthService.offlineApi(apiId);
+    @Path("/offline/{apiId}")
+    public Response offlineApi(@PathParam("apiId") Long apiId){
+        apiManagerService.offlineApi(apiId);
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
 
-        Message message = Message.ok("下线API成功").data("apiId", apiId);
+        Message message = Message.ok("下线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }
 
     @POST
-    @Path("online")
-    public Response onlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
-        apiAuthService.onlineApi(apiId);
+    @Path("/online/{apiId}")
+    public Response onlineApi(@PathParam("apiId") Long apiId){
+        apiManagerService.onlineApi(apiId);
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
 
-        Message message = Message.ok("上线API成功").data("apiId", apiId);
+        Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }
 
-    //复制调用地址
+    @GET
+    @Path("/callPath/{apiId}")
+    public Response getApiCallPath(@PathParam("apiId") Long apiId){
+        StringBuilder callPath =new StringBuilder("http://xxxx");
+        callPath.append("/api/rest_j/v1");
+
+        Message message = Message.ok().data("callPathPrefix", callPath.toString());
+        return Message.messageToResponse(message);
+    }
 
 
 }

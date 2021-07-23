@@ -6,6 +6,8 @@ import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,7 +25,7 @@ import javax.ws.rs.core.Response;
 @Component
 @Path("/dss/framework/dbapi/apimonitor")
 @Produces(MediaType.APPLICATION_JSON)
-//@Consumes(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class DSSDbApiMonitorRestful {
     @Autowired
     private ApiMonitorService apiMonitorService;
@@ -56,15 +58,16 @@ public class DSSDbApiMonitorRestful {
 
     @GET
     @Path("callListByCnt")
-    public Response getCallListByCnt(CallMonitorResquest callMonitorResquest){
+    public Response getCallListByCnt(@BeanParam CallMonitorResquest callMonitorResquest){
         return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallListByCnt(callMonitorResquest)));
     }
 
     @GET
     @Path("callListByFailRate")
-    public Response getCallListByFailRate(CallMonitorResquest callMonitorResquest){
+    public Response getCallListByFailRate(@BeanParam CallMonitorResquest callMonitorResquest){
         return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallListByFailRate(callMonitorResquest)));
     }
+
 
 
 

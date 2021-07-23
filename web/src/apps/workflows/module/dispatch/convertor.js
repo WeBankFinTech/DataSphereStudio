@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
+export function ds2butterfly(tasks, connects, locations, taskList, isNode, contextMenu) {
   let nodes = [],
     edges = []
   tasks.forEach(task => {
@@ -12,6 +12,7 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
       node_type: task.type,
       node_params: task.params,
       node_preTasks: task.preTasks,
+      contextMenu: contextMenu,
       state: '',
       endpoints: isNode ? [] : [
         {

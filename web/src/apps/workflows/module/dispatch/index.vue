@@ -180,6 +180,7 @@
       </div>
     </Modal>
     <m-log v-if="showLog" :key="logId" :item="logData" :source="source" :logId="logId" @ok="showLog=false" @close="showLog=false"></m-log>
+    <div id="rightMenu" class="right-menu"></div>
   </div>
 </template>
 <script>
@@ -1342,14 +1343,18 @@ export default {
         let tasks = processInstanceJson.tasks
         let connects = JSON.parse(data.connects)
         let locations = JSON.parse(data.locations)
+        const contextMenu = {
+          start: this.$t('message.scheduler.run'),
+          log: this.$t('message.scheduler.viewLog')
+        }
         this.dagProcessId = this.list2[index].id
         this.pollTask(this.list2[index].id, taskList => {
-          this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+          this.dagData = ds2butterfly(tasks, connects, locations, taskList, false, contextMenu)
           this.showDag = 1
         })
         this.timer = setInterval(() => {
           this.pollTask(this.list2[index].id, taskList => {
-            this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+            this.dagData = ds2butterfly(tasks, connects, locations, taskList, false, contextMenu)
           })
         }, 1000*30)
       }).catch(() => {
@@ -1661,4 +1666,16 @@ export default {
     margin-top: 20px;
   }
 }
+</style>
+<style lang="scss">
+  .right-menu {
+    position: fixed;
+    width: 90px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    visibility: hidden;
+    z-index: 99
+  }
 </style>

@@ -1,19 +1,25 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.service.ApiManagerService;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiMonitorService;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Classname DSSDbApiMonitorRestful
@@ -29,6 +35,25 @@ import javax.ws.rs.core.Response;
 public class DSSDbApiMonitorRestful {
     @Autowired
     private ApiMonitorService apiMonitorService;
+    @Autowired
+    private ApiManagerService apiManagerService;
+
+    @GET
+    @Path("/list")
+    public Response getApiList(@Context HttpServletRequest request,
+                               @QueryParam("workspaceId") Long workspaceId, @QueryParam("apiName") String apiName,
+                               @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+        if(pageNow == null){
+            pageNow = 1;
+        }
+        if(pageSize == null){
+            pageSize = 20;
+        }
+
+        List<Long> totals = new ArrayList<>();
+        List<ApiInfo> apiInfoList = apiManagerService.getOnlineApiInfoList(workspaceId,apiName,totals,pageNow,pageSize);
+        return Message.messageToResponse(Message.ok().data("list",apiInfoList).data("total", totals.get(0)));
+    }
 
     @GET
     @Path("onlineApiCnt")

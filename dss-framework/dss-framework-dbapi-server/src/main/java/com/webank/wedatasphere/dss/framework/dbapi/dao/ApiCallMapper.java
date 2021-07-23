@@ -25,13 +25,15 @@ public interface ApiCallMapper {
 
     @Select("SELECT COUNT(b.id) FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
-            "WHERE a.workspace_id = #{workspaceId}")
-    long getCallTotalCnt(@Param("workspaceId") Long workspaceId);   //总调用次数
+            "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
+    long getCallTotalCnt(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);   //总调用次数
 
     @Select("SELECT SUM(b.time_length) FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
-            "WHERE a.workspace_id = #{workspaceId}")
-    long getCallTotalTime(@Param("workspaceId") Long workspaceId);   //总调用时长
+            "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
+    long getCallTotalTime(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);  //总调用时长
 
 
     /**

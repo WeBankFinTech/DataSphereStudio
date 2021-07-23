@@ -11,6 +11,9 @@ import java.util.List;
  * @Created by suyc
  */
 public interface ApiManagerService {
+    //public List<ApiGroup> getApiGroupList(Long workspaceId);
+
+    public ApiInfo getApiInfo(Long apiId);
     public List<ApiInfo> getApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize);
     public List<ApiInfo> getOnlineApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize);
 

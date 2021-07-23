@@ -55,20 +55,30 @@ import java.util.UUID;
 @Path("/dss/framework/dbapi/apiauth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DSSDbAPIAuthRestful {
+public class DSSDbApiAuthRestful {
     @Autowired
     private ApiAuthService apiAuthService;
 
     @POST
-    @Path("/create")
-    public Response createApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
+    @Path("/save")
+    public Response saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         //String userName = SecurityFilter.getLoginUsername(request);
         String userName ="suyc";
-        apiAuth.setCreateBy(userName);
-        apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
+        if(apiAuth.getId() ==null) {
+            apiAuth.setCreateBy(userName);
+            apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
+        }
+        else{
+            apiAuth.setUpdateBy(userName);
+            apiAuth.setUpdateTime(new Date(System.currentTimeMillis()));
+        }
 
-        Long apiAuthId = apiAuthService.createApiAuth(apiAuth);
-        return Message.messageToResponse(Message.ok().data("apiAuthId", apiAuthId));
+        boolean flag = apiAuthService.saveApiAuth(apiAuth);
+        if(flag) {
+            return Message.messageToResponse(Message.ok("保存成功"));
+        }else{
+            return Message.messageToResponse(Message.error("保存失败"));
+        }
     }
 
     @GET

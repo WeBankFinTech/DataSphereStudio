@@ -21,7 +21,6 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
@@ -44,7 +43,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SecondaryWorkspaceMenuVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSComponentRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper;
@@ -76,10 +74,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
@@ -212,9 +208,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 forEach(workspaceIds::add);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = new DSSWorkspaceHomePageVO();
         if (workspaceIds.size() == 0){
-//            while(userId == null || userId.intValue() < 0){
-//                userId = dssWorkspaceUserMapper.getUserID(userName);
-//            }
             String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.insertUser(userName, workspaceId, "system",userId);
@@ -252,50 +245,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         return dssWorkspaceHomePageVO;
     }
-
-    @Override
-    public List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId) {
-        //根据用户及工作空间id获取到用户角色id，根据角色和工作空间id 获取菜单id，根据菜单id 封装1级2级菜单并返回
-        List<Integer> roleIds = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), userName);
-        Set<Integer> menuIds = new HashSet<>();
-        for (Integer roleId : roleIds) {
-            List<Integer> menuList = dssWorkspaceMapper.getMenuId(roleId, workspaceId);
-            menuIds.addAll(menuList);
-        }
-        List<DSSMenu> dssMenuList = new ArrayList<>();
-        for (int menuId : menuIds){
-            DSSMenu dssMenu = dssWorkspaceMapper.getSpaceMenu(menuId);
-            dssMenuList.add(dssMenu);
-        }
-        return dssMenuList;
-    }
-
-/*
-    @Override
-    public List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
-                                                      String roleName, int pageNow, int pageSize, List<Long> total) {
-        int roleId = -1;
-        if (StringUtils.isNotEmpty(roleName)){
-            roleId = workspaceDBHelper.getRoleIdByName(roleName);
-        }
-        PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser> workspaceUsers = new ArrayList<>();
-        try{
-            workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, department,username, roleId);
-        }finally {
-            PageHelper.clearPage();
-        }
-        PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
-        total.add(pageInfo.getTotal());
-        List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-        for (DSSWorkspaceUser workspaceUser : workspaceUsers) {
-            List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), workspaceUser.getUsername());
-            dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
-        }
-        return dssWorkspaceUserVOs;
-    }
-*/
-
 
     @Override
     public List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
@@ -362,10 +311,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             map.get(menuId).add(dssWorkspaceMenuPriv);
         }
         // 得到(menuId, dssWorkspaceMenuRolePrivs)
+
         map.forEach((k,v) ->{
             DSSWorkspaceMenuPrivVO vo = new DSSWorkspaceMenuPrivVO();
             vo.setId(k);
-            vo.setName(workspaceDBHelper.getMenuNameById(k).getFrontName());
+            vo.setName(workspaceDBHelper.getMenuNameById(k).getTitleCn());
             Map<String, Boolean> menuPrivs = new HashMap<>();
             v.forEach(priv -> {
                 menuPrivs.put(workspaceDBHelper.getRoleNameById(priv.getRoleId()), priv.getPriv() == 1);
@@ -422,15 +372,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceOverviewVO.setDescription(dssWorkspace.getDescription());
         return dssWorkspaceOverviewVO;
     }
-
-    private SecondaryWorkspaceMenuVO menuChangeToVO(DSSMenu dssMenu){
-        SecondaryWorkspaceMenuVO secondaryWorkspaceMenuVO = new SecondaryWorkspaceMenuVO();
-        secondaryWorkspaceMenuVO.setId(dssMenu.getId());
-        secondaryWorkspaceMenuVO.setName(dssMenu.getFrontName());
-        secondaryWorkspaceMenuVO.setUrl(dssMenu.getUrl());
-        return secondaryWorkspaceMenuVO;
-    }
-
 
     @Override
     public DSSWorkspaceHomepageSettingVO getWorkspaceHomepageSettings(int workspaceId) {

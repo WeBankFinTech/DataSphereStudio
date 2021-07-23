@@ -18,8 +18,18 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import org.apache.ibatis.annotations.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSOnestopMenu;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponent;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuComponentUrl;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -44,14 +54,12 @@ public interface DSSWorkspaceRoleMapper {
     List<String> getAllRoles(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
 
-    @Select("select * from dss_menu")
+    @Select("select * from dss_onestop_menu")
     @Results({
-            @Result(property = "upperMenuId", column = "upper_menu_id"),
-            @Result(property = "frontName", column = "front_name"),
-            @Result(property = "isActive", column = "is_active")
+            @Result(property = "titleCn", column = "title_cn"),
+            @Result(property = "titleEn", column = "title_En")
     })
-    List<DSSMenu> getMenus();
-
+    List<DSSOnestopMenu> getOnestopMenus();
 
     @Select("select * from dss_menu_component_url")
     @Results({

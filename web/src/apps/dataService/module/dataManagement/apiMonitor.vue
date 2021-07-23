@@ -2,12 +2,12 @@
   <div>
     <div class="monitor-holder"></div>
     <Tabs value="screen" class="tab-wrap">
-      <Tab-pane label="API计量大屏" name="screen">
+      <Tab-pane :label='$t("message.dataService.apiMonitor.staticsScreen")' name="screen">
         <div class="dashboard">
           <div class="dash-content">
-            <span class="dash-title">API总数</span>
-            <span class="dash-item">已发布<span class="dash-value">3</span></span>
-            <span class="dash-item">未发布<span class="dash-value">3</span></span>
+            <span class="dash-title">{{$t("message.dataService.apiMonitor.apiTotal")}}</span>
+            <span class="dash-item">{{$t("message.dataService.apiMonitor.published")}}<span class="dash-value">{{onlineCnt}}</span></span>
+            <span class="dash-item">{{$t("message.dataService.apiMonitor.notPublish")}}<span class="dash-value">{{offlineCnt}}</span></span>
           </div>
           <div class="dash-range-group">
             <div class="range-group-item" :class="{'group-item-checked': option.key == currentRange}" v-for="option in rangeOptions" :key="option.key" @click="handleDateChange(option)">
@@ -31,7 +31,7 @@
         <div class="metrics-wrap">
           <div class="metrics metrics-mr">
             <div class="metrics-head">
-              <div class="metrics-head-title">服务资源分配</div>
+              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.resource")}}</div>
             </div>
             <div class="metrics-body">
               hold
@@ -39,21 +39,21 @@
           </div>
           <div class="metrics">
             <div class="metrics-head">
-              <div class="metrics-head-title">总体计量</div>
+              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.dashboard")}}</div>
             </div>
             <div class="metrics-body">
               <div class="overview">
                 <div class="overview-icon"></div>
                 <div class="overview-info">
-                  <div class="overview-label">总调用次数</div>
-                  <div class="overview-value"><span>0</span>次</div>
+                  <div class="overview-label">{{$t("message.dataService.apiMonitor.callCnt")}}</div>
+                  <div class="overview-value"><span>{{callTotalCnt}}</span>次</div>
                 </div>
               </div>
               <div class="overview">
                 <div class="overview-icon"></div>
                 <div class="overview-info">
-                  <div class="overview-label">总调用次数</div>
-                  <div class="overview-value"><span>0</span>GB/s</div>
+                  <div class="overview-label">{{$t("message.dataService.apiMonitor.callTime")}}</div>
+                  <div class="overview-value"><span>{{callTotalTime}}</span>ms</div>
                 </div>
               </div>
             </div>
@@ -62,29 +62,53 @@
         <div class="metrics-wrap">
           <div class="metrics">
             <div class="metrics-head">
-              <div class="metrics-head-title">昨日出错排行Top10</div>
+              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.errorTop10")}}</div>
             </div>
             <div class="metrics-body">
-              <Table :columns="columns" :data="data" size="large"></Table>
+              <Table :columns="columnsRate" :data="listRate" size="large">
+                <template slot-scope="{ index }" slot="rank">
+                  <span>{{index + 1}}</span>
+                </template>
+              </Table>
             </div>
           </div>
         </div>
         <div class="metrics-wrap">
           <div class="metrics">
             <div class="metrics-head">
-              <div class="metrics-head-title">昨日调用量排行Top10</div>
+              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.callTop10")}}</div>
             </div>
             <div class="metrics-body">
-              <Table :columns="columns" :data="data" size="large"></Table>
+              <Table :columns="columnsCnt" :data="listCnt" size="large">
+                <template slot-scope="{ index }" slot="rank">
+                  <span>{{index + 1}}</span>
+                </template>
+              </Table>
             </div>
           </div>
         </div>
       </Tab-pane>
-      <Tab-pane label="API计量详情" name="detail">
+      <Tab-pane :label='$t("message.dataService.apiMonitor.staticsDetail")' name="detail">
         <div class="metrics-wrap">
           <div class="metrics">
             <div class="metrics-body">
-              <Table :columns="columns" :data="data" size="large"></Table>
+              <Table :columns="columnsDetail" :data="listDetail" size="large">
+                <template slot-scope="{ row }" slot="operation">
+                  <a class="operation" @click="copy(row)">
+                    查看监控图表
+                  </a>
+                </template>
+              </Table>
+              <div class="pagebar">
+                <Page
+                  :total="pageData.total"
+                  :current="pageData.pageNow"
+                  show-elevator
+                  show-sizer
+                  @on-change="handlePageChange"
+                  @on-page-size-change="handlePageSizeChange"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -93,39 +117,95 @@
   </div>
 </template>
 <script>
-// import api from "@/common/service/api";
+import api from "@/common/service/api";
 export default {
   data() {
     return {
-      columns: [
+      columnsRate: [
         {
-          title: '姓名',
-          key: 'name'
+          title: '排名',
+          slot: 'rank'
         },
         {
-          title: '年龄',
-          key: 'age'
+          title: 'ID',
+          key: 'id'
         },
         {
-          title: '地址',
-          key: 'address'
+          title: 'API名称',
+          key: 'apiName'
+        },
+        {
+          title: '请求次数',
+          key: 'totalCnt'
+        },
+        {
+          title: '请求失败率',
+          key: 'failRate'
         }
       ],
-      data: [
+      columnsCnt: [
         {
-          name: '李小红',
-          age: 30,
-          address: '上海市浦东新区世纪大道'
+          title: '排名',
+          slot: 'rank'
         },
         {
-          name: '周小伟',
-          age: 26,
-          address: '深圳市南山区深南大道'
+          title: 'ID',
+          key: 'id'
+        },
+        {
+          title: 'API名称',
+          key: 'apiName'
+        },
+        {
+          title: '请求次数',
+          key: 'totalCnt'
+        },
+        {
+          title: '执行时长',
+          key: 'totalTime'
+        },
+        {
+          title: '平均调用时长(ms)',
+          key: 'avgTime'
         }
       ],
+      columnsDetail: [
+        {
+          title: 'ID',
+          key: 'id'
+        },
+        {
+          title: 'API名称',
+          key: 'apiName'
+        },
+        {
+          title: '业务流程',
+          key: 'groupName'
+        },
+        {
+          title: '标签',
+          key: 'label'
+        },
+        {
+          title: '负责人',
+          key: 'createBy'
+        },
+        {
+          title: this.$t("message.dataService.operation"),
+          key: "operation",
+          slot: "operation"
+        }
+      ],
+      onlineCnt: 0,
+      offlineCnt: 0,
+      callTotalCnt: 0,
+      callTotalTime: 0,
+      listCnt: [],
+      listRate: [],
+      listDetail: [],
       pageData: {
-        total: 20,
-        pageNum: 1,
+        total: 0,
+        pageNow: 1,
         pageSize: 10
       },
       rangeOptions: [
@@ -143,35 +223,112 @@ export default {
 
   },
   created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // api的基础信息
-    //     this.apiData = rst.result;
-    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
-    //     // 更改网页title
-    //     document.title = rst.result.aliasName || rst.result.name;
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
+    this.getOnlineApiCnt();
+    this.getOfflineApiCnt();
+    this.getCallTotalCnt();
+    this.getCallTotalTime();
+    this.getCallListByCnt();
+    this.getCallListByFailRate();
+    this.getCallListDetail();
   },
   methods: {
+    getOnlineApiCnt() {
+      api.fetch('/dss/framework/dbapi/apimonitor/onlineApiCnt', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+      }, 'get').then((res) => {
+        console.log(res)
+        this.onlineCnt = res.onlineApiCnt;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getOfflineApiCnt() {
+      api.fetch('/dss/framework/dbapi/apimonitor/offlineApiCnt', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+      }, 'get').then((res) => {
+        console.log(res)
+        this.offlineCnt = res.offlineApiCnt;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getCallTotalCnt() {
+      api.fetch('/dss/framework/dbapi/apimonitor/callTotalCnt', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        beginTime: '2021-07-21 00:00:00',
+        endTime: '2021-07-23 00:00:00'
+      }, 'get').then((res) => {
+        console.log(res)
+        this.callTotalCnt = res.callTotalCnt;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getCallTotalTime() {
+      api.fetch('/dss/framework/dbapi/apimonitor/callTotalTime', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        beginTime: '2021-07-21 00:00:00',
+        endTime: '2021-07-23 00:00:00'
+      }, 'get').then((res) => {
+        console.log(res)
+        this.callTotalTime = res.callTotalTime;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getCallListByCnt() {
+      api.fetch('/dss/framework/dbapi/apimonitor/callListByCnt', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        beginTime: '2021-07-21 00:00:00',
+        endTime: '2021-07-23 00:00:00'
+      }, 'get').then((res) => {
+        console.log(res)
+        this.listCnt = res.list;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getCallListByFailRate() {
+      api.fetch('/dss/framework/dbapi/apimonitor/callListByFailRate', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        beginTime: '2021-07-21 00:00:00',
+        endTime: '2021-07-23 00:00:00'
+      }, 'get').then((res) => {
+        console.log(res)
+        this.listRate = res.list;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getCallListDetail() {
+      api.fetch('/dss/framework/dbapi/apimonitor/list', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        pageNow: this.pageData.pageNow,
+        pageSize: this.pageData.pageSize,
+      }, 'get').then((res) => {
+        console.log(res)
+        this.listDetail = res.list;
+        this.pageData.total = res.total;
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
     handlePageSizeChange(pageSize) {
       console.log(pageSize);
       this.pageData.pageSize = pageSize;
+      this.getCallListDetail();
     },
     handlePageChange(page) {
       console.log(page);
-      this.pageData.pageNum = page;
+      this.pageData.pageNow = page;
+      this.getCallListDetail();
     },
     handleDateChange(option) {
       this.currentRange = option.key;
@@ -223,6 +380,7 @@ export default {
       line-height: 20px;
       color: #666;
       .dash-value {
+        margin-left: 5px;
         color: #220000;
       }
     }

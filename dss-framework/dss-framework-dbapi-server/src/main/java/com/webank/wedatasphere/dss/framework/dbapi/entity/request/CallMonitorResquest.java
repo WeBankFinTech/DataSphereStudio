@@ -1,11 +1,8 @@
 package com.webank.wedatasphere.dss.framework.dbapi.entity.request;
 
-import com.webank.wedatasphere.dss.framework.dbapi.util.DateJsonDeserializer;
 import lombok.Data;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
-import java.io.Serializable;
-import java.util.Date;
+import javax.ws.rs.QueryParam;
 
 /**
  * @Classname CallMonitorResquest
@@ -14,12 +11,15 @@ import java.util.Date;
  * @Created by suyc
  */
 @Data
-public class CallMonitorResquest implements Serializable {
+public class CallMonitorResquest {
+    @QueryParam("workspaceId")
     private Long workspaceId;
 
-    @JsonDeserialize(using= DateJsonDeserializer.class)
-    private Date beginTime;
+    @QueryParam("beginTime")
+    private String beginTime;
 
-    @JsonDeserialize(using= DateJsonDeserializer.class)
-    private Date endTime;
+
+    @QueryParam("endTime")
+    private String endTime;
+
 }

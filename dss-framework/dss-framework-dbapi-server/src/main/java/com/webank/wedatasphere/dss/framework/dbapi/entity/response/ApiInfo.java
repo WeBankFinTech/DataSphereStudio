@@ -15,7 +15,11 @@ public class ApiInfo {
     private String apiName;
     private String apiPath;
     private String apiType;
+    private Integer status;
+    private String label;
+    private String createBy;
 
     private String groupName;
     private String datasourceName;
+
 }

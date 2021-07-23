@@ -36,13 +36,13 @@ public class ApiMonitorServiceImpl implements ApiMonitorService {
     }
 
     @Override
-    public long getCallTotalCnt(Long workspaceId) {
-        return apiCallMapper.getCallTotalCnt(workspaceId);
+    public long getCallTotalCnt(CallMonitorResquest callMonitorResquest) {
+        return apiCallMapper.getCallTotalCnt(callMonitorResquest);
     }
 
     @Override
-    public long getCallTotalTime(Long workspaceId) {
-        return apiCallMapper.getCallTotalTime(workspaceId);
+    public long getCallTotalTime(CallMonitorResquest callMonitorResquest) {
+        return apiCallMapper.getCallTotalTime(callMonitorResquest);
     }
 
     @Override

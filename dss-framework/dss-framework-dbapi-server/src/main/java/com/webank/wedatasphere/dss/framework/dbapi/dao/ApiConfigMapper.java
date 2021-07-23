@@ -41,6 +41,7 @@ public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
 
 
     List<ApiInfo> getApiInfoList(@Param("workspaceId") Long workspaceId, @Param("apiName") String apiName);
+    List<ApiInfo> getOnlineApiInfoList(@Param("workspaceId") Long workspaceId, @Param("apiName") String apiName);
 
     @Update("UPDATE dss_dataapi_config SET `status` = 0 WHERE `id` = #{apiId}")
     void offlineApi(@Param("apiId") Long apiId);

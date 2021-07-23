@@ -57,7 +57,7 @@ public class DSSDbApiManagerRestful {
     public Response offlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
         apiManagerService.offlineApi(apiId);
 
-        Message message = Message.ok("下线API成功").data("apiId", apiId);
+        Message message = Message.ok("下线API成功");
         return Message.messageToResponse(message);
     }
 
@@ -66,7 +66,7 @@ public class DSSDbApiManagerRestful {
     public Response onlineApi(@Context HttpServletRequest request, @QueryParam("apiId") Long apiId){
         apiManagerService.onlineApi(apiId);
 
-        Message message = Message.ok("上线API成功").data("apiId", apiId);
+        Message message = Message.ok("上线API成功");
         return Message.messageToResponse(message);
     }
 

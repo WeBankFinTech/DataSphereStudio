@@ -32,8 +32,18 @@
         FROM DSS_DATAAPI_CONFIG a
         LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
         LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id
-        WHERE a.is_delete =0
-        AND a.workspace_id = #{workspaceId}
+        WHERE a.is_delete =0 AND a.workspace_id = #{workspaceId}
+        <if test="apiName != null and apiName != ''">
+            AND a.api_name LIKE concat('%', #{apiName}, '%')
+        </if>
+    </select>
+
+    <select id="getOnlineApiInfoList" resultType="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
+        SELECT a.id,a.api_name,a.api_path,a.api_type,a.status,a.create_by,b.name AS 'groupName', c.name AS 'datasourceName'
+        FROM DSS_DATAAPI_CONFIG a
+        LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
+        LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id
+        WHERE a.is_delete =0 AND a.status =1 AND a.workspace_id = #{workspaceId}
         <if test="apiName != null and apiName != ''">
             AND a.api_name LIKE concat('%', #{apiName}, '%')
         </if>

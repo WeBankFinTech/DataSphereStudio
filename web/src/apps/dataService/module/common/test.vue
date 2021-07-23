@@ -1,10 +1,10 @@
 <template>
   <div class="apiTest-wrap">
-    <div class="apiTest-title">{{$t('message.apiTest.apiTest')}}</div>
+    <div class="apiTest-title">{{$t('message.dataService.apiTest.apiTest')}}</div>
     <div class="apiTest-head">
       <div class="api-select">
-        <Select v-model="currentApiPath" style="width:200px" @on-change="handleChangeApi">
-          <Option v-for="item in apiList" :value="item.path" :key="item.path">{{ item.label }}</Option>
+        <Select v-model="currentApiId" style="width:200px" @on-change="handleChangeApi">
+          <Option v-for="item in apiList" :value="item.id" :key="item.path">{{ item.label }}</Option>
         </Select>
       </div>
       <div class="api-path" v-if="currentApi">
@@ -15,7 +15,7 @@
     <div class="apiTest-main">
       <div class="apiTest-panel">
         <template v-if="currentApi">
-          <div class="panel-title">{{$t('message.apiTest.requestParam')}}</div>
+          <div class="panel-title">{{$t('message.dataService.apiTest.requestParam')}}</div>
           <Table :columns="columns" :data="currentApi.params">
             <template slot-scope="{row}" slot="value">
               <Input v-model="currentParams[row.name]" placeholder="请输入" style="width: 140px"></Input>
@@ -23,15 +23,15 @@
           </Table>
         </template>
         <div class="panel-btn">
-          <Button type="primary" @click="test">{{$t('message.apiTest.start')}}</Button>
+          <Button type="primary" @click="test">{{$t('message.dataService.apiTest.start')}}</Button>
         </div>
       </div>
       <div class="apiTest-panel">
-        <div class="panel-title">{{$t('message.apiTest.requestLog')}}</div>
+        <div class="panel-title">{{$t('message.dataService.apiTest.requestLog')}}</div>
         <div class="panel-content">
           <p v-for="log in logs" :key="log">{{log}}</p>
         </div>
-        <div class="panel-title">{{$t('message.apiTest.response')}}</div>
+        <div class="panel-title">{{$t('message.dataService.apiTest.response')}}</div>
         <div class="panel-content-response">
           <Input v-model="response" type="textarea" :autosize="{minRows: 10,maxRows: 20}"></Input>
         </div>
@@ -44,12 +44,12 @@
 export default {
   data() {
     return {
-      currentApiPath: '',
+      currentApiId: this.$route.query.apiId || '',
       currentApi: null,
       currentParams: {},
       apiList: [
         { 
-          value: 'api1', 
+          id: '1',
           label: 'Api1', 
           path: '/user/api1', 
           params: [
@@ -62,7 +62,7 @@ export default {
           ]
         },
         { 
-          value: 'api2', 
+          id: '2',
           label: 'Api2', 
           path: '/user/api2', 
           params: [
@@ -83,19 +83,19 @@ export default {
       ],
       columns: [
         {
-          title: this.$t("message.apiTest.name"),
+          title: this.$t("message.dataService.apiTest.name"),
           key: 'name'
         },
         {
-          title: this.$t("message.apiTest.type"),
+          title: this.$t("message.dataService.apiTest.type"),
           key: 'type'
         },
         {
-          title: this.$t("message.apiTest.required"),
+          title: this.$t("message.dataService.apiTest.required"),
           key: 'required'
         },
         {
-          title: this.$t("message.apiTest.value"),
+          title: this.$t("message.dataService.apiTest.value"),
           key: "value",
           slot: "value"
         }
@@ -119,15 +119,6 @@ export default {
     //   if (rst.result) {
     //     // api的基础信息
     //     this.apiData = rst.result;
-    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
-    //     // 更改网页title
-    //     document.title = rst.result.aliasName || rst.result.name;
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
     //   }
     // }).catch((err) => {
     //   console.error(err)
@@ -135,7 +126,7 @@ export default {
   },
   methods: {
     handleChangeApi(val) {
-      this.currentApi = this.apiList.find(i => i.path == val);
+      this.currentApi = this.apiList.find(i => i.id == val);
       // 构造请求参数
       const params = {};
       this.currentApi.params.forEach(row => {
@@ -145,7 +136,7 @@ export default {
     },
     test() {
       if (!this.currentApi) {
-        this.$Message.warning(this.$t('message.apiTest.api_not_selected')); 
+        this.$Message.warning(this.$t('message.dataService.apiTest.api_not_selected')); 
       } else {
         console.log(this.currentParams)
       }

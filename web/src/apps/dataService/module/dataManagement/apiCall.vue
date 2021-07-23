@@ -1,19 +1,19 @@
 <template>
   <div class="manage-wrap">
-    <div class="manage-head">API调用</div>
+    <div class="manage-head">{{ $t("message.dataService.apiCall.apiCall") }}</div>
     <div class="filter-box">
       <div class="filter-area">
-        <Button type="primary" size="large" icon="ios-search" @click="addAuthorize">{{ $t("message.dataService.addAuthorize") }}</Button>
+        <Button type="primary" size="large" icon="ios-search" @click="addAuthorize">{{ $t("message.dataService.apiCall.addAuthorize") }}</Button>
       </div>
     </div>
-    <Table :columns="columns" :data="data" size="large">
-      <template slot-scope="{ row, index }" slot="operation">
+    <Table :columns="columns" :data="apiCallList" size="large">
+      <template slot-scope="{ row }" slot="operation">
         <div class="operation-wrap">
-          <a class="operation" @click="edit(row, index)">
-            {{ $t("message.dataService.edit") }}
+          <a class="operation" @click="editApiAuth(row)">
+            {{ $t("message.dataService.apiCall.edit") }}
           </a>
           <a class="operation" @click="deleteApi(row)">
-            {{ $t("message.dataService.delete") }}
+            {{ $t("message.dataService.apiCall.delete") }}
           </a>
         </div>
       </template>
@@ -21,7 +21,7 @@
     <div class="pagebar">
       <Page
         :total="pageData.total"
-        :current="pageData.pageNum"
+        :current="pageData.pageNow"
         show-elevator
         show-sizer
         @on-change="handlePageChange"
@@ -34,95 +34,94 @@
       <div class="modal-confirm-body">
         <div class="confirm-title">
           <Icon custom="iconfont icon-project" size="26"></Icon>
-          <span>{{ $t("message.dataService.deleteConfirm") }}</span>
+          <span>{{ $t("message.dataService.apiCall.deleteApiCallTitle") }}</span>
         </div>
-        <div class="confirm-desc">删除后，获得权限调用的用户将不能继续调用该API</div>
+        <div class="confirm-desc">{{ $t("message.dataService.apiCall.deleteApiCallDesc") }}</div>
       </div>
       <div slot="footer">
-        <Button type="default" @click="deleteCancel">取消</Button>
-        <Button type="primary" @click="deleteConfirm">确定</Button>
+        <Button type="default" @click="deleteCancel">{{$t('message.dataService.cancel')}}</Button>
+        <Button type="primary" @click="deleteConfirm">{{$t('message.dataService.ok')}}</Button>
       </div>
     </Modal>
 
     <!--授权弹窗-->
     <Modal
       v-model="modalAuthShow"
-      :title="$t('message.dataService.modalAuthTile')"
-      :footer-hide="true"
+      :title="$t('message.dataService.apiCall.authForm.modalAuthTile')"
     >
       <Form
         :label-width="120"
-        ref="projectForm"
-        :model="formData"
+        ref="authForm"
+        :model="authFormData"
         :rules="formValid">
         <FormItem
-          :label="$t('message.dataService.authName')"
-          prop="authName">
+          :label="$t('message.dataService.apiCall.authForm.labelName')"
+          prop="caller">
           <Input
-            v-model="formData.name"
-            :placeholder="$t('message.dataService.inputAuthName')"
+            v-model="authFormData.caller"
+            :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
-        <FormItem :label="$t('message.dataService.authFlow')" prop="authFlow">
-          <Select v-model="formData.authFlow">
-            <Option v-for="item in selectOrchestratorList" :key="item.dicKey" :value="item.dicKey">
-              {{ item.dicName}}
+        <FormItem :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
+          <Select v-model="authFormData.groupId">
+            <Option v-for="item in groups" :key="item.groupId" :value="item.groupId">
+              {{ item.groupName}}
             </Option>
           </Select>
         </FormItem>
-        <Form-item>
-          <Button size="large">{{$t('message.dataService.cancel')}}</Button>
-          <Button type="primary" size="large" style="margin-left: 20px;">{{$t('message.dataService.ok')}}</Button>
-        </Form-item>
       </Form>
+      <div slot="footer">
+        <Button @click="authCancel">{{$t('message.dataService.cancel')}}</Button>
+        <Button type="primary" @click="authSubmit">{{$t('message.dataService.ok')}}</Button>
+      </div>
     </Modal>
   </div>
 </template>
 <script>
-// import api from "@/common/service/api";
+import api from "@/common/service/api";
 export default {
   data() {
     return {
       columns: [
         {
-          title: '姓名',
-          key: 'name'
+          title: '序号',
+          key: 'id'
         },
         {
-          title: '年龄',
-          key: 'age'
+          title: '登录名称',
+          key: 'caller'
         },
         {
-          title: '地址',
-          key: 'address'
+          title: 'Token',
+          key: 'token'
         },
         {
-          title: this.$t("message.permissions.operation"),
+          title: '有效期',
+          key: 'expire'
+        },
+        {
+          title: '创建时间',
+          key: 'createTime'
+        },
+        {
+          title: this.$t("message.dataService.operation"),
           key: "operation",
           slot: "operation"
         }
       ],
-      data: [
-        {
-          name: '李小红',
-          age: 30,
-          address: '上海市浦东新区世纪大道'
-        },
-        {
-          name: '周小伟',
-          age: 26,
-          address: '深圳市南山区深南大道'
-        }
-      ],
+      apiCallList: [],
       pageData: {
-        total: 20,
-        pageNum: 1,
+        total: 0,
+        pageNow: 1,
         pageSize: 10
       },
 
+      groups: [],
+
       modalAuthShow: false,
-      formData: {
-        name: '',
+      authFormData: {
+        caller: '',
+        groupId: ''
       },
       modelConfirm: false,
       selectedApi: null
@@ -131,45 +130,91 @@ export default {
   computed: {
     formValid() {
       return {
-        authName: [
-          { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 }
+        caller: [
+          { required: true, message: this.$t('message.dataService.apiCall.authForm.enterName'), trigger: 'blur' },
         ],
-        description: [
-          { required: true, trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}200`, max: 200 },
-        ],
-        authFlow: [
-          { required: true, trigger: 'blur' }
-        ]
+        // groupId: [
+        //   { required: false, message: this.$t('message.dataService.apiCall.authForm.enterFlow'), trigger: 'blur' }
+        // ]
       }
     },
   },
   created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // api的基础信息
-    //     this.apiData = rst.result;
-    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
-    //     // 更改网页title
-    //     document.title = rst.result.aliasName || rst.result.name;
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
+    this.getApiGroup();
+    this.getApiCallList();
   },
   methods: {
+    getApiGroup() {
+      api.fetch('/dss/framework/dbapi/apiauth/apigroup', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+      }, 'get').then((res) => {
+        console.log(res)
+        if (res.list) {
+          this.groups = res.list;
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
+    getApiCallList() {
+      // 获取api相关数据
+      api.fetch('/dss/framework/dbapi/apiauth/list', {
+        // workspaceId: this.$route.query.workspaceId,
+        workspaceId: 1,
+        pageNow: this.pageData.pageNow,
+        pageSize: this.pageData.pageSize,
+      }, 'get').then((res) => {
+        console.log(res)
+        if (res.list) {
+          this.apiCallList = res.list;
+          this.pageData.total = res.total;
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
     addAuthorize() {
       this.modalAuthShow = true;
+    },
+    authCancel() {
+      this.modalAuthShow = false;
+    },
+    authSubmit() {
+      this.$refs['authForm'].validate((valid) => {
+        if (valid) {
+          const data = {
+            // workspaceId: this.$route.query.workspaceId,
+            workspaceId: 1,
+            caller: this.authFormData.caller,
+            groupId: this.authFormData.groupId,
+            expire: "2021-09-27 19:00:00",
+          }
+          if (this.authFormData.id) {
+            data.id = this.authFormData.id;
+          }
+          api.fetch('/dss/framework/dbapi/apiauth/save', data, 'post').then((res) => {
+            console.log(res)
+            this.modalAuthShow = false;
+            this.pageData = {
+              total: 0,
+              pageNow: 1,
+              pageSize: 10
+            }
+            this.getApiCallList();
+          }).catch((err) => {
+            console.error(err)
+          });
+        }
+      })
+    },
+    editApiAuth(auth) {
+      this.modalAuthShow = true;
+      this.authFormData = {
+        id: auth.id,
+        caller: auth.caller,
+        groupId: auth.groupId
+      }
     },
     deleteApi(row) {
       this.selectedApi = row;
@@ -182,14 +227,23 @@ export default {
     deleteConfirm() {
       console.log('confirm', this.selectedApi)
       this.modelConfirm = false;
+      api.fetch(`/dss/framework/dbapi/apiauth/${this.selectedApi.id}`, {
+      }, 'delete').then((res) => {
+        console.log(res)
+        this.getApiCallList();
+      }).catch((err) => {
+        console.error(err)
+      });
     },
     handlePageSizeChange(pageSize) {
       console.log(pageSize);
       this.pageData.pageSize = pageSize;
+      this.getApiCallList();
     },
     handlePageChange(page) {
       console.log(page);
-      this.pageData.pageNum = page;
+      this.pageData.pageNow = page;
+      this.getApiCallList();
     },
   },
 }

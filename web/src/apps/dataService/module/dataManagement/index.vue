@@ -4,9 +4,9 @@
     <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
       <div class="ds-main-container">
         <div class="ds-breadcumb">
-          <span>数据服务</span>
+          <span>{{$t("message.dataService.dataService")}}</span>
           <span class="ds-breadcumb-divider">/</span>
-          <span>服务管理</span>
+          <span>{{$t("message.dataService.serviceManage")}}</span>
         </div>
         <router-view></router-view>
       </div>

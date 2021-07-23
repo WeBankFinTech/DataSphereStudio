@@ -3,7 +3,6 @@ package com.webank.wedatasphere.dss.framework.dbapi.service;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,12 +26,12 @@ public interface ApiMonitorService {
     /**
      * 总调用次数
      */
-    long getCallTotalCnt(@Param("workspaceId") Long workspaceId);
+    long getCallTotalCnt(CallMonitorResquest callMonitorResquest);
 
     /**
      * 总执行时长
      */
-    long getCallTotalTime(@Param("workspaceId") Long workspaceId);
+    long getCallTotalTime(CallMonitorResquest callMonitorResquest);
 
     /**
      * 出错率排行TOP10

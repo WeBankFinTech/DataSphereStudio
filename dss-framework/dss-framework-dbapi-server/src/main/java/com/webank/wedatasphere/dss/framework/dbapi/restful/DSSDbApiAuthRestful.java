@@ -55,27 +55,20 @@ import java.util.UUID;
 @Path("/dss/framework/dbapi/apiauth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DSSDbApiAuthRestful {
+public class DSSDbAPIAuthRestful {
     @Autowired
     private ApiAuthService apiAuthService;
 
     @POST
-    @Path("/save")
+    @Path("/create")
     public Response createApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         //String userName = SecurityFilter.getLoginUsername(request);
         String userName ="suyc";
-        if(null == apiAuth.getCreateBy()) {
-            apiAuth.setCreateBy(userName);
-            apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
-            apiAuth.setToken(DigestUtils.md5Hex(UUID.randomUUID().toString()));
-        }
-        else {
-            apiAuth.setUpdateBy(userName);
-            apiAuth.setUpdateTime(new Date(System.currentTimeMillis()));
-        }
+        apiAuth.setCreateBy(userName);
+        apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
 
-        boolean result = apiAuthService.saveApiAuth(apiAuth);
-        return Message.messageToResponse(Message.ok().data("result", result));
+        Long apiAuthId = apiAuthService.createApiAuth(apiAuth);
+        return Message.messageToResponse(Message.ok().data("apiAuthId", apiAuthId));
     }
 
     @GET

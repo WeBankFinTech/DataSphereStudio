@@ -13,6 +13,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 public interface ApiConfigService extends IService<ApiConfig> {
 
@@ -24,7 +25,7 @@ public interface ApiConfigService extends IService<ApiConfig> {
 
     void saveApi(ApiConfig apiConfig) throws JSONException;
 
-    ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest) throws  Exception;
+    ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest, Map<String,Object> map) throws  Exception;
 
     ApiExecuteInfo apiExecute(String path, HttpServletRequest request) throws Exception;
 }

@@ -77,12 +77,12 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
     @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request) throws Exception {
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws Exception {
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
 
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if (apiConfig != null) {
-            Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig);
+            Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig,map);
             String sql = apiConfig.getSql();
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, sqlParam);
             log.info(sqlMeta.getSql());
@@ -119,7 +119,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             int groupId = apiConfig.getGroupId();
             Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
             if(expireTime != null && (expireTime * 1000) > startTime){
-                ApiExecuteInfo apiExecuteInfo = apiTest(path,request);
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,null);
                 long endTime = System.currentTimeMillis();
                 apiCall.setTimeEnd(new Date(endTime));
                 apiCall.setTimeLength(endTime-startTime);
@@ -201,7 +201,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
 
-    private Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfig config) throws JSONException {
+    private Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfig config,Map<String,Object> maps) throws JSONException {
         Map<String, Object> map = new HashMap<>();
         JSONArray requestParams = new JSONArray(config.getReqFields());
         for (int i = 0; i < requestParams.length(); i++) {
@@ -209,7 +209,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             String name = jo.getString("name");
             String type = jo.getString("type");
             if (type.startsWith("Array")) {
-                String[] values = request.getParameterValues(name);
+//                String[] values = request.getParameterValues(name);
+                String[] values = (String[])maps.get(name);
                 if (values != null) {
                     List<String> list = Arrays.asList(values);
                     if (values.length > 0) {
@@ -235,7 +236,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 }
             } else {
 
-                String value = request.getParameter(name);
+//                String value = request.getParameter(name);
+
+                String value = String.valueOf(maps.get(name));
                 if (StringUtils.isNotBlank(value)) {
 
                     switch (type) {

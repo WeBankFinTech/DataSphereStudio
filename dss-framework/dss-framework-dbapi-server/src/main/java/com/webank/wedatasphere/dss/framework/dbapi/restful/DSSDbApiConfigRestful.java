@@ -40,6 +40,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Enumeration;
 import java.util.List;
 
 
@@ -100,8 +101,18 @@ public class DSSDbApiConfigRestful {
 
     @GET
     @Path("/test/{path:[a-zA-Z0-9_/]+}")
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response testApi(@Context HttpServletRequest request,@PathParam("path") String path) {
+
         try {
+
+            Enumeration<String> names = request.getParameterNames();
+            while (names.hasMoreElements()){
+                String name = names.nextElement();
+                System.out.println("name======"+name);
+            }
+            String[] ids = request.getParameterValues("id");
             log.info(request.getQueryString() + request.getRequestURL());
             ApiExecuteInfo resJo = apiConfigService.apiTest(path, request);
             Message message = Message.ok("服务测试成功").data("response",resJo);
@@ -137,10 +148,11 @@ public class DSSDbApiConfigRestful {
     }
 
 
-    @GET
+    @POST
     @Path("/execute/{path:[a-zA-Z0-9_/]+}")
     public Response executeApi(@Context HttpServletRequest request,@PathParam("path") String path) {
         try {
+
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request);
             Message message = Message.ok("调用服务成功").data("response",resJo);
             return Message.messageToResponse(message);

@@ -35,12 +35,9 @@
               filterable
               @on-change="value => getTableCols(value)"
             >
-              <Option
-                v-for="item in dbTables"
-                :value="item"
-                :key="item"
-                >{{ item }}</Option
-              >
+              <Option v-for="item in dbTables" :value="item" :key="item">{{
+                item
+              }}</Option>
             </Select>
           </FormItem>
         </Form>
@@ -62,16 +59,17 @@
           </FormItem>
           <FormItem label="超时时间" prop="reqTimeout">
             <Input
-              type="text"
+              type="number"
               v-model="envForm.reqTimeout"
-              placeholder="请输入业务名称"
+              placeholder="请输入超时时间"
               style="width: 300px"
-            ></Input>
+              ><span slot="append">ms</span></Input
+            >
           </FormItem>
         </Form>
       </div>
     </div>
-    <div class="cardWrap cardTableWrap">
+    <div class="cardWrap cardTableWrap" v-if="apiData.data.apiType === 'GUIDE'">
       <div class="cardTitle">选择参数</div>
       <div class="contentWrap">
         <Table
@@ -92,7 +90,7 @@
         </Table>
       </div>
     </div>
-    <div class="cardWrap cardTableWrap">
+    <div class="cardWrap cardTableWrap" v-if="apiData.data.apiType === 'GUIDE'">
       <div class="cardTitle">排序字段</div>
       <div style="margin-top: 10px;">
         <Alert show-icon closable
@@ -130,7 +128,7 @@
         </Table>
       </div>
     </div>
-    <div class="cardWrap cardTableWrap">
+    <div class="cardWrap cardTableWrap" v-if="apiData.data.apiType === 'SQL'">
       <div class="cardTitle">请求参数</div>
       <div class="contentWrap">
         <Table :columns="sqlColumns" :data="sqlList">
@@ -180,6 +178,12 @@
 <script>
 import api from "@/common/service/api";
 export default {
+  props: {
+    apiData: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
       dbForm: {

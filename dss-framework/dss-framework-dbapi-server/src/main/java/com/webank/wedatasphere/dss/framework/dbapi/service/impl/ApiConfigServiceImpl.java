@@ -45,6 +45,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     ApiAuthMapper apiAuthMapper;
     @Autowired
     ApiCallMapper apiCallMapper;
+    @Autowired
+    ApiConfigMapper apiConfigMapper;
 
     public void saveApi(ApiConfig apiConfig) throws JSONException {
 
@@ -85,7 +87,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, sqlParam);
             log.info(sqlMeta.getSql());
             DataSource dataSource = new DataSource();
-
             dataSource.setUrl("jdbc:mysql://192.168.10.219:3306/dss_test?characterEncoding=UTF-8");
             dataSource.setClassName("com.mysql.jdbc.Driver");
             dataSource.setUsername("root");
@@ -148,6 +149,12 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             apiGroupInfo.setApis(dssApiConfigMapper.getApiListByGroup(groupId));
         }
         return apiGroupInfoList;
+    }
+
+
+    @Override
+    public Boolean release(Integer status, String apiId) {
+        return    apiConfigMapper.release(status,apiId);
     }
 
 
@@ -301,11 +308,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
     }
 
-    @Autowired
-    ApiConfigMapper apiConfigMapper;
-    @Override
-    public Boolean release(Integer status, String apiId) {
-        return    apiConfigMapper.release(status,apiId);
-    }
+
 
 }

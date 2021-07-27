@@ -6,9 +6,9 @@
       <p class="header-subTitle">服务开发</p>
     </div>
     <div class="tabWrap">
-      <template v-for="(work, index) in apiItems">
+      <template v-for="(work, index) in tabDatas">
         <div
-          :key="work.id"
+          :key="index"
           :class="{ active: work.isActive }"
           class="tab-item"
           ref="work_item"
@@ -34,7 +34,7 @@
         <div class="divider" :class="{ 'last-divider': index === 4 }" />
       </div>
     </div>
-    <params-config />
+    <params-config :apiData="choosedData"/>
   </div>
 </template>
 <script>
@@ -58,7 +58,7 @@ export default {
       //   { name: "sdfsaf", id: 1 },
       //   { name: "fdj89", id: 3 }
       // ],
-      apiItems: this.tabDatas,
+      //apiItems: this.tabDatas,
       toolItems: [
         {
           name: "属性",
@@ -93,7 +93,12 @@ export default {
       modalVisible: false
     };
   },
-  computed: {},
+  computed: {
+    choosedData(){
+      console.log(12333);
+      return this.tabDatas.find(item => item.isActive)
+    }
+  },
   created() {
     // 获取api相关数据
     // api.fetch('/dss/apiservice/queryById', {
@@ -117,6 +122,13 @@ export default {
     },
     onChooseWork(tabData) {
       console.log(tabData);
+      if(tabData.isActive){
+        return;
+      }else{
+        this.tabDatas = this.tabDatas.map(item => {
+          return {...item, isActive: item.name === tabData.name}
+        })
+      }
     },
     handleToolShow(data) {
       console.log(data);

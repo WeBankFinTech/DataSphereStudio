@@ -121,7 +121,7 @@
       >
     </Modal>
     <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
-      <api-congfig />
+      <api-congfig tabDatas="apiTabDatas" />
     </div>
   </div>
 </template>
@@ -211,7 +211,8 @@ export default {
           }
         ]
       },
-      groupData: ""
+      groupData: "",
+      apiTabDatas: []
     };
   },
   computed: {},
@@ -311,7 +312,8 @@ export default {
       } else {
         this.$refs["apiForm"].resetFields();
       }
-    }
+    },
+
   }
 };
 </script>

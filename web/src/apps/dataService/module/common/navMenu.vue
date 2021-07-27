@@ -23,7 +23,14 @@
           <Icon custom="iconfont icon-plus" size="20"></Icon>
         </div>
       </div>
-      <Input prefix="ios-search" placeholder="请输入" style="width: auto" />
+      <Input
+        size="small"
+        :value="searchValue"
+        prefix="ios-search"
+        placeholder="请输入"
+        style="width: 230px;border:0;margin-top: 10px;"
+        @on-change="handleSearch"
+      />
       <Tree
         class="tree-container"
         :nodes="projectsTree"
@@ -43,6 +50,7 @@
 <script>
 import Tree from "@/apps/workflows/module/common/tree/tree.vue";
 import api from "@/common/service/api";
+import _ from "lodash";
 
 export default {
   name: "navMenu",
@@ -55,7 +63,9 @@ export default {
       loadingTree: false,
       projectsTree: [],
       treeFold: false,
-      currentTreeId: +this.$route.query.projectID // tree中active节点
+      currentTreeId: +this.$route.query.projectID, // tree中active节点,
+      searchValue: 123,
+      originDatas: []
     };
   },
   mounted() {
@@ -236,6 +246,7 @@ export default {
     handleTreeClick(node) {},
     getAllApi() {
       //获取数据服务所有的api
+      this.searchValue = "";
       api
         .fetch(
           `/dss/framework/dbapi/list?workspaceId=${this.$route.query.workspaceId}`,
@@ -255,6 +266,7 @@ export default {
                 apis: n.apis
               };
             });
+            this.originDatas = _.cloneDeep(this.projectsTree);
           } else {
             this.projectsTree = [];
           }
@@ -267,7 +279,8 @@ export default {
     },
     addApi(groupId, apiData) {
       //添加数据服务api
-      this.projectsTree = this.projectsTree.map(item => {
+      this.searchValue = "";
+      this.projectsTree = this.originDatas.map(item => {
         if (item.id == groupId) {
           return {
             ...item,
@@ -281,6 +294,24 @@ export default {
           return item;
         }
       });
+      this.originDatas = _.cloneDeep(this.projectsTree);
+    },
+    handleSearch: _.debounce(function(e) {
+      const value = e.target.value;
+      console.log(value);
+      console.log(2333);
+      this.executeSearch(value);
+    }, 500),
+    executeSearch(value) {
+      this.searchValue = value;
+      if (value) {
+        const temp = _.cloneDeep(this.originDatas);
+        this.projectsTree = temp.filter(item => {
+          return !!item.children.find(child => child.name.include(value));
+        });
+      } else {
+        this.projectsTree = _.cloneDeep(this.originDatas);
+      }
     }
   }
 };

@@ -9,7 +9,7 @@
       <template v-for="(work, index) in apiItems">
         <div
           :key="work.id"
-          :class="{ active: currentTab.id === work.id }"
+          :class="{ active: work.isActive }"
           class="tab-item"
           ref="work_item"
         >
@@ -34,7 +34,7 @@
         <div class="divider" :class="{ 'last-divider': index === 4 }" />
       </div>
     </div>
-    <params-config/>
+    <params-config />
   </div>
 </template>
 <script>
@@ -46,12 +46,19 @@ export default {
     webTab,
     paramsConfig
   },
+  props: {
+    tabDatas: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
-      apiItems: [
-        { name: "sdfsaf", id: 1 },
-        { name: "fdj89", id: 3 }
-      ],
+      // apiItems: [
+      //   { name: "sdfsaf", id: 1 },
+      //   { name: "fdj89", id: 3 }
+      // ],
+      apiItems: this.tabDatas,
       toolItems: [
         {
           name: "属性",

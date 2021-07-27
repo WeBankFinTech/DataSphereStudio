@@ -121,7 +121,7 @@
       >
     </Modal>
     <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
-      <api-congfig tabDatas="apiTabDatas" />
+      <api-congfig :tabDatas="apiTabDatas" />
     </div>
   </div>
 </template>
@@ -288,6 +288,17 @@ export default {
               projectName: name,
               type: "flow"
             });
+            const newApis = this.apiTabDatas.map(item => {
+              const tmp = {...item};
+              tmp.isActive = false;
+              return tmp;
+            });
+            newApis.push({
+              isActive: true,
+              name: this.apiForm.apiName,
+              data: {...this.apiForm}
+            })
+            this.apiTabDatas = newApis;
             this.handleModalCancel();
           }
         });

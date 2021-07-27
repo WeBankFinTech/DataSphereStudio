@@ -36,7 +36,7 @@ public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
     List<ApiGroupInfo> getGroupByWorkspaceId(@Param("workspaceId") String workspaceId);
 
 
-    @Select("select id,api_name as name from dss_dataapi_config where group_id = #{groupId}")
+    @Select("select id,api_name as name,req_fields,api_path as path from dss_dataapi_config where group_id = #{groupId}")
     List<ApiListInfo> getApiListByGroup(@Param("groupId") int groupId);
 
 

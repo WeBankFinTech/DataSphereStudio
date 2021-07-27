@@ -15,15 +15,32 @@
             </Select>
           </FormItem>
           <FormItem label="数据源名称" prop="dataSourceId">
-            <Select v-model="dbForm.dataSourceId" style="width:300px">
-              <Option value="GET">GET</Option>
-              <Option value="POST">POST</Option>
+            <Select
+              v-model="dbForm.dataSourceId"
+              style="width:300px"
+              @on-change="value => getDbTables(value)"
+            >
+              <Option
+                v-for="item in dataSourceIds"
+                :value="item.datasourceId"
+                :key="item.datasourceId"
+                >{{ item.name }}</Option
+              >
             </Select>
           </FormItem>
           <FormItem label="数据表名称" prop="tblName">
-            <Select v-model="dbForm.tblName" style="width:300px">
-              <Option value="GET">GET</Option>
-              <Option value="POST">POST</Option>
+            <Select
+              v-model="dbForm.tblName"
+              style="width:300px"
+              filterable
+              @on-change="value => getTableCols(value)"
+            >
+              <Option
+                v-for="item in dbTables"
+                :value="item"
+                :key="item"
+                >{{ item }}</Option
+              >
             </Select>
           </FormItem>
         </Form>
@@ -161,6 +178,7 @@
   </div>
 </template>
 <script>
+import api from "@/common/service/api";
 export default {
   data() {
     return {
@@ -192,6 +210,8 @@ export default {
           }
         ]
       },
+      dataSourceIds: [],
+      dbTables: [],
       envForm: {
         memory: "4096M",
         reqTimeout: ""
@@ -391,6 +411,9 @@ export default {
     //   console.error(err)
     // });
   },
+  mounted() {
+    this.getDataSourceIds(this.dbForm.dataSource);
+  },
   methods: {
     removeWork(tabData) {
       console.log(tabData);
@@ -407,7 +430,7 @@ export default {
     setParamsChoose(column) {
       console.log(column);
     },
-    changeParams(value, index, column){
+    changeParams(value, index, column) {
       const datas = [...this.paramsList];
       datas[index][column.key] = value;
     },
@@ -462,6 +485,82 @@ export default {
         type: "asc"
       });
       this.sqlList = datas;
+    },
+    getDataSourceIds(dataSource) {
+      //获取数据源
+      this.searchValue = "";
+      api
+        .fetch(
+          `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${dataSource}`,
+          {},
+          "get"
+        )
+        .then(res => {
+          console.log(res);
+          if (res && res.availableConns) {
+            this.dataSourceIds = res.availableConns;
+            this.dataSourceIds = [
+              {
+                datasourceId: 1,
+                workspaceId: null,
+                name: "tete",
+                note: null,
+                url:
+                  "jdbc:mysql://192.168.10.219:3306/dss_test?useSSL=false&characterEncoding=UTF-8&serverTimezone=GMT%2B8",
+                username: "root",
+                pwd: "***",
+                type: "mysql",
+                createBy: "hadoop",
+                updateBy: null,
+                isDelete: 0,
+                className: null
+              }
+            ];
+          } else {
+            this.dataSourceIds = [];
+          }
+        });
+    },
+    getDbTables(dataSourceId) {
+      //获取数据表
+      this.searchValue = "";
+      this.dbTables = [];
+      this.paramsList = [];
+      this.sortList = [];
+      api
+        .fetch(
+          `/dss/framework/dbapi/datasource/tables?datasourceId=${dataSourceId}`,
+          {},
+          "get"
+        )
+        .then(res => {
+          console.log(res);
+          if (res && res.allTables) {
+            this.dbTables = res.allTables;
+          } else {
+            this.dbTables = [];
+          }
+        });
+    },
+    getTableCols(tableName) {
+      //获取数据表的字段
+      this.searchValue = "";
+      this.paramsList = [];
+      this.sortList = [];
+      api
+        .fetch(
+          `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.dataSourceId}&tableName=${tableName}`,
+          {},
+          "get"
+        )
+        .then(res => {
+          console.log(res);
+          if (res && res.allCols) {
+            this.paramsList = res.allCols;
+          } else {
+            this.paramsList = [];
+          }
+        });
     }
   }
 };

@@ -120,7 +120,7 @@
         </div></slot
       >
     </Modal>
-    <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
+    <div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
       <api-congfig :tabDatas="apiTabDatas" />
     </div>
   </div>

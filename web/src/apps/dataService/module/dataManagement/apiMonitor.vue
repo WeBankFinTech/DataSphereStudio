@@ -21,8 +21,8 @@
                 @on-change="handlePickerChange"
               >
                 <div class="date-trigger" @click="handlePickerClick">
-                  <span v-if="datePickerRange" class="date-show">{{datePickerRange.join('   -   ')}}</span>
-                  <span>日期</span>
+                  <span v-if="datePickerRange.length" class="date-show">{{datePickerRange.join('   -   ')}}</span>
+                  <Icon custom="iconfont icon-riqi" size="16"></Icon>
                 </div>
               </Date-picker>
             </div>
@@ -43,14 +43,14 @@
             </div>
             <div class="metrics-body">
               <div class="overview">
-                <div class="overview-icon"></div>
+                <Icon custom="iconfont icon-zongtiaoyongcishu" class="overview-icon"></Icon>
                 <div class="overview-info">
                   <div class="overview-label">{{$t("message.dataService.apiMonitor.callCnt")}}</div>
                   <div class="overview-value"><span>{{callTotalCnt}}</span>次</div>
                 </div>
               </div>
               <div class="overview">
-                <div class="overview-icon"></div>
+                <Icon custom="iconfont icon-zongzhihangshichangyongliang" class="overview-icon"></Icon>
                 <div class="overview-info">
                   <div class="overview-label">{{$t("message.dataService.apiMonitor.callTime")}}</div>
                   <div class="overview-value"><span>{{callTotalTime}}</span>ms</div>
@@ -94,7 +94,7 @@
             <div class="metrics-body">
               <Table :columns="columnsDetail" :data="listDetail" size="large">
                 <template slot-scope="{ row }" slot="operation">
-                  <a class="operation" @click="copy(row)">
+                  <a class="operation" @click="viewMonitor(row)">
                     {{$t("message.dataService.apiMonitor.viewMonitor")}}
                   </a>
                 </template>
@@ -365,6 +365,7 @@ export default {
       this.datePickerOpen = false;
       this.getRangeScreenData();
     },
+    viewMonitor(row) {}
   },
 }
 </script>
@@ -441,6 +442,9 @@ export default {
         .date-show {
           margin-right: 15px;
         }
+        i {
+          vertical-align: 0;
+        }
       }
     }
   }
@@ -479,10 +483,8 @@ export default {
           margin-bottom: 0;
         }
         .overview-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: aqua;
+          font-size: 40px;
+          color: #2E92F7;;
         }
         .overview-info {
           flex: 1;

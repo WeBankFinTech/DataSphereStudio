@@ -26,7 +26,7 @@
           </Table>
         </template>
         <div class="panel-btn">
-          <Button type="primary" @click="test">{{$t('message.dataService.apiTest.start')}}</Button>
+          <Button type="primary" size="large" @click="test">{{$t('message.dataService.apiTest.start')}}</Button>
         </div>
       </div>
       <div class="apiTest-panel">

@@ -3,7 +3,7 @@
     <Tab-pane :label='$t("message.dataService.apiIndex.publishApi")' name="publish">
       <div class="filter-box">
         <div class="filter-input">
-          <Input v-model="apiName" icon="ios-clock-outline" :placeholder='$t("message.dataService.apiIndex.apiName")' @on-click="handleSearch" @on-enter="handleSearch" />
+          <Input v-model="apiName" icon="ios-search" :placeholder='$t("message.dataService.apiIndex.apiName")' @on-click="handleSearch" @on-enter="handleSearch" />
         </div>
       </div>
       <Table :columns="columns" :data="apiList" size="large">
@@ -22,7 +22,7 @@
               <a class="operation" :data-id="row.id" @click="copy(row)">
                 {{ $t("message.dataService.apiIndex.copy") }}
               </a>
-              <div slot="content">
+              <div slot="content" v-if="row.visibleCopy">
                 {{ $t("message.dataService.apiIndex.copyTips") }}
                 <Button type="primary" size="small" class="operation-copy">{{ $t("message.dataService.apiIndex.copyBtn") }}</Button>
               </div>
@@ -59,6 +59,10 @@ export default {
           key: 'apiName'
         },
         {
+          title: 'API Path',
+          key: 'apiPath'
+        },
+        {
           title: this.$t("message.dataService.apiIndex.col_groupName"),
           key: 'groupName'
         },
@@ -73,6 +77,7 @@ export default {
         {
           title: this.$t("message.dataService.operation"),
           key: "operation",
+          width: '260',
           slot: "operation"
         }
       ],
@@ -90,7 +95,6 @@ export default {
   },
   methods: {
     getApiList() {
-      // 获取api相关数据
       api.fetch('/dss/framework/dbapi/apimanager/list', {
         workspaceId: this.$route.query.workspaceId,
         apiName: this.apiName,

@@ -3,7 +3,10 @@
     <div class="manage-head">{{ $t("message.dataService.apiCall.apiCall") }}</div>
     <div class="filter-box">
       <div class="filter-area">
-        <Button type="primary" size="large" icon="ios-search" @click="addAuthorize">{{ $t("message.dataService.apiCall.addAuthorize") }}</Button>
+        <Button type="primary" size="large" @click="addAuthorize">
+          <Icon custom="iconfont icon-xinzeng1" size="12"></Icon>
+          {{ $t("message.dataService.apiCall.addAuthorize") }}
+        </Button>
       </div>
     </div>
     <Table :columns="columns" :data="apiCallList" size="large">

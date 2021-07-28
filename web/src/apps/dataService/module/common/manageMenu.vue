@@ -1,6 +1,6 @@
 <template>
   <div class="manage-menu-wrap">
-    <div class="manage-title">服务管理</div>
+    <div class="manage-title">{{ $t("message.dataService.serviceManage") }}</div>
     <div class="manage-menu">
       <div
         v-for="menu in menuList"
@@ -9,7 +9,7 @@
         :class="{'active': $route.path == `/${menu.path}` }" 
         @click="handleTabClick(menu.path)"
       >
-        <Icon custom="iconfont icon-project" size="26"></Icon>
+        <Icon custom="iconfont" :class="menu.icon" size="16"></Icon>
         <span>{{menu.name}}</span>
       </div>
     </div>
@@ -21,10 +21,10 @@ export default {
   data() {
     return {
       menuList: [
-        { name: 'API管理', path: 'dataManagement/index'},
-        { name: 'API监控', path: 'dataManagement/monitor'},
-        { name: 'API测试', path: 'dataManagement/test'},
-        { name: 'API调用', path: 'dataManagement/call'},
+        { name: 'API管理', icon: 'icon-APIguanli', path: 'dataManagement/index'},
+        { name: 'API监控', icon: 'icon-APIjiankong', path: 'dataManagement/monitor'},
+        { name: 'API测试', icon: 'icon-APIceshi', path: 'dataManagement/test'},
+        { name: 'API调用', icon: 'icon-APItiaoyong', path: 'dataManagement/call'},
       ]
     }
   },

@@ -12,7 +12,14 @@
         "online": "online",
         "offline": "offline",
         "test": "test",
-        "copy": "copy curl"
+        "copy": "copy curl",
+        "copied": "copied",
+        "copyTips": "get curl success",
+        "copyBtn": "copy",
+        "col_apiName": "ApiName",
+        "col_groupName": "GroupName",
+        "col_datasourceName": "Datasource",
+        "col_apiType": "ApiType"
       },
       "apiMonitor": {
         "staticsScreen": "API Statics Screen",
@@ -20,12 +27,25 @@
         "apiTotal": "API total",
         "published": "published",
         "notPublish": "unpublished",
+        "range_week": "week",
+        "range_yesterday": "yesterday",
+        "range_today": "today",
         "resource": "resource",
         "dashboard": "dashboard",
         "callCnt": "call count",
         "callTime": "call time",
         "errorTop10": "error top10",
-        "callTop10": "call count top10"
+        "callTop10": "call count top10",
+        "col_rank": "Rank",
+        "col_apiName": "ApiName",
+        "col_reqCnt": "TotalCount",
+        "col_failRate": "FailRate",
+        "col_totalTime": "TotalTime",
+        "col_avgTime": "AvgTime(ms)",
+        "col_groupName": "GroupName",
+        "col_label": "Label",
+        "col_createBy": "CreateBy",
+        "viewMonitor": "View Monitor"
       },
       "apiCall": {
         "apiCall": "Api Call",
@@ -38,10 +58,18 @@
           "modalAuthTile": "API Authorize",
           "labelName": "authorize name",
           "labelFlow": "authorize flow",
+          "labelExpire": "authorize expire",
           "enterName": "name is required",
           "enterFlow": "flow is required",
-          "holderName": "input name"
-        }
+          "enterExpire": "expire is required",
+          "holderName": "input name",
+          "holderExpire": "input expire",
+          "short": "short",
+          "long": "long"
+        },
+        "col_caller": "caller",
+        "col_expire": "expire",
+        "col_createTime": "createTime"
       },
       "apiTest": {
         "apiTest": "API Test",
@@ -52,6 +80,8 @@
         "type": "type",
         "required": "required",
         "value": "value",
+        "holderInput": "input",
+        "holderArray": "comma separated values",
         "start": "start test",
         "api_not_selected": "api not selected"
       }

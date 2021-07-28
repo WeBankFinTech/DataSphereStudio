@@ -13,10 +13,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
-import com.webank.wedatasphere.dss.framework.dbapi.util.DateJsonDeserializer;
-import com.webank.wedatasphere.dss.framework.dbapi.util.DateJsonSerializer;
-import com.webank.wedatasphere.dss.framework.dbapi.util.PoolManager;
-import com.webank.wedatasphere.dss.framework.dbapi.util.SqlEngineUtil;
+import com.webank.wedatasphere.dss.framework.dbapi.util.*;
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
@@ -45,6 +42,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     ApiAuthMapper apiAuthMapper;
     @Autowired
     ApiCallMapper apiCallMapper;
+    @Autowired
+    ApiConfigMapper apiConfigMapper;
 
     public void saveApi(ApiConfig apiConfig) throws JSONException {
 
@@ -75,17 +74,16 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
     @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request) throws Exception {
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws Exception {
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
 
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if (apiConfig != null) {
-            Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig);
+            Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig,map);
             String sql = apiConfig.getSql();
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, sqlParam);
             log.info(sqlMeta.getSql());
             DataSource dataSource = new DataSource();
-
             dataSource.setUrl("jdbc:mysql://192.168.10.219:3306/dss_test?characterEncoding=UTF-8");
             dataSource.setClassName("com.mysql.jdbc.Driver");
             dataSource.setUsername("root");
@@ -118,7 +116,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             int groupId = apiConfig.getGroupId();
             Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
             if(expireTime != null && (expireTime * 1000) > startTime){
-                ApiExecuteInfo apiExecuteInfo = apiTest(path,request);
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,null);
                 long endTime = System.currentTimeMillis();
                 apiCall.setTimeEnd(new Date(endTime));
                 apiCall.setTimeLength(endTime-startTime);
@@ -148,6 +146,12 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             apiGroupInfo.setApis(dssApiConfigMapper.getApiListByGroup(groupId));
         }
         return apiGroupInfoList;
+    }
+
+
+    @Override
+    public Boolean release(Integer status, String apiId) {
+        return    apiConfigMapper.release(status,apiId);
     }
 
 
@@ -194,7 +198,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
 
-    private Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfig config) throws JSONException {
+    private Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfig config,Map<String,Object> paraMap) throws JSONException {
         Map<String, Object> map = new HashMap<>();
         JSONArray requestParams = new JSONArray(config.getReqFields());
         for (int i = 0; i < requestParams.length(); i++) {
@@ -202,7 +206,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             String name = jo.getString("name");
             String type = jo.getString("type");
             if (type.startsWith("Array")) {
-                String[] values = request.getParameterValues(name);
+//                String[] values = request.getParameterValues(name);
+                String[] values = CommUtil.objectToArray(paraMap.get(name));
                 if (values != null) {
                     List<String> list = Arrays.asList(values);
                     if (values.length > 0) {
@@ -228,7 +233,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 }
             } else {
 
-                String value = request.getParameter(name);
+//                String value = request.getParameter(name);
+
+                String value = String.valueOf(paraMap.get(name));
                 if (StringUtils.isNotBlank(value)) {
 
                     switch (type) {
@@ -301,11 +308,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
     }
 
-    @Autowired
-    ApiConfigMapper apiConfigMapper;
-    @Override
-    public Boolean release(Integer status, String apiId) {
-        return    apiConfigMapper.release(status,apiId);
-    }
+
 
 }

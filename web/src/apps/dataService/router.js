@@ -45,6 +45,15 @@ const routes = [
       component: () => import('./module/dataManagement/apiTest.vue'),
     },
     {
+      path: 'test/:apiId',
+      name: 'dataManagement/test/apiId',
+      meta: {
+        title: 'API测试',
+        publicPage: true
+      },
+      component: () => import('./module/dataManagement/apiTest.vue'),
+    },
+    {
       path: 'call',
       name: 'dataManagement/call',
       meta: {

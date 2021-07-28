@@ -18,13 +18,19 @@
             <a class="operation" @click="test(row)">
               {{ $t("message.dataService.apiIndex.test") }}
             </a>
-            <a class="operation" @click="copy(row)">
-              {{ $t("message.dataService.apiIndex.copy") }}
-            </a>
+            <Poptip v-model="row.visibleCopy">
+              <a class="operation" :data-id="row.id" @click="copy(row)">
+                {{ $t("message.dataService.apiIndex.copy") }}
+              </a>
+              <div slot="content">
+                {{ $t("message.dataService.apiIndex.copyTips") }}
+                <Button type="primary" size="small" class="operation-copy">{{ $t("message.dataService.apiIndex.copyBtn") }}</Button>
+              </div>
+            </Poptip>
           </div>
         </template>
       </Table>
-      <div class="pagebar">
+      <div class="pagebar" v-if="pageData.total">
         <Page
           :total="pageData.total"
           :current="pageData.pageNow"
@@ -39,6 +45,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
+import ClipboardJS from 'clipboard';
 export default {
   data() {
     return {
@@ -48,19 +55,19 @@ export default {
           key: 'id'
         },
         {
-          title: 'API名称',
+          title: this.$t("message.dataService.apiIndex.col_apiName"),
           key: 'apiName'
         },
         {
-          title: '业务流程',
+          title: this.$t("message.dataService.apiIndex.col_groupName"),
           key: 'groupName'
         },
         {
-          title: '数据源名称',
+          title: this.$t("message.dataService.apiIndex.col_datasourceName"),
           key: 'datasourceName'
         },
         {
-          title: 'API类型',
+          title: this.$t("message.dataService.apiIndex.col_apiType"),
           key: 'apiType'
         },
         {
@@ -75,11 +82,8 @@ export default {
         pageNow: 1,
         pageSize: 10
       },
-      apiName: ''
+      apiName: '',
     }
-  },
-  computed: {
-
   },
   created() {
     this.getApiList();
@@ -88,13 +92,11 @@ export default {
     getApiList() {
       // 获取api相关数据
       api.fetch('/dss/framework/dbapi/apimanager/list', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId,
         apiName: this.apiName,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
-        console.log(res)
         if (res.list) {
           this.apiList = res.list;
           this.pageData.total = res.total;
@@ -104,31 +106,25 @@ export default {
       });
     },
     handlePageSizeChange(pageSize) {
-      console.log(pageSize);
       this.pageData.pageSize = pageSize;
       this.getApiList();
     },
     handlePageChange(page) {
-      console.log(page);
       this.pageData.pageNow = page;
       this.getApiList();
     },
     handleSearch() {
-      console.log('search', this.apiName)
       this.getApiList();
     },
     test(row) {
       this.$router.push({
-        name: 'dataManagement/test',
-        query: {...this.$route.query, apiId: row.id || 1},
+        path: `test/${row.id}`,
+        query: this.$route.query
       });
     },
     online(row) {
-      api.fetch(`/dss/framework/dbapi/apimanager/online/${row.id}`, {
-      }, 'post').then((res) => {
-        console.log(res)
+      api.fetch(`/dss/framework/dbapi/apimanager/online/${row.id}`, {}, 'post').then((res) => {
         if (res) {
-          // this.getApiList();
           this.apiList = this.apiList.map(i => {
             if (i.id == row.id) {
               return res.apiInfo;
@@ -144,9 +140,7 @@ export default {
     offline(row) {
       api.fetch(`/dss/framework/dbapi/apimanager/offline/${row.id}`, {
       }, 'post').then((res) => {
-        console.log(res)
         if (res) {
-          // this.getApiList();
           this.apiList = this.apiList.map(i => {
             if (i.id == row.id) {
               return res.apiInfo;
@@ -160,17 +154,49 @@ export default {
       });
     },
     copy(row) {
-      api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {
-      }, 'get').then((res) => {
-        console.log(res.callPathPrefix)
+      api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
+        this.apiList = this.apiList.map(i => {
+          if (i.id == row.id) {
+            return {
+              ...i,
+              visibleCopy: true,
+              contentCopy: res.callPathPrefix
+            };
+          } else {
+            return {
+              ...i,
+              visibleCopy: false,
+              contentCopy: ''
+            };
+          }
+        })
+        const clipboard = new ClipboardJS('.operation-copy', {
+          text: function (trigger) {
+            return res.callPathPrefix;
+          },
+        });
+        clipboard.on('success', e => {
+          this.$Message.success(this.$t('message.dataService.apiIndex.copied')); 
+          this.apiList = this.apiList.map(i => {
+            if (i.id == row.id) {
+              return {
+                ...i,
+                visibleCopy: false,
+                contentCopy: ''
+              };
+            } else {
+              return i;
+            }
+          })
+          clipboard.destroy();
+        });
       }).catch((err) => {
         console.error(err)
       });
-    },
+    }
   },
 }
 </script>
-
 <style lang="scss" scoped>
 .tab-publish {
   padding: 0 24px;

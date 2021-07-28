@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "23183738",
+      "name": "新增",
+      "font_class": "xinzeng1",
+      "unicode": "e6ef",
+      "unicode_decimal": 59119
+    },
+    {
+      "icon_id": "23183418",
+      "name": "日期",
+      "font_class": "riqi",
+      "unicode": "e6ee",
+      "unicode_decimal": 59118
+    },
+    {
+      "icon_id": "23181388",
+      "name": "组件接入管理",
+      "font_class": "zujianjieruguanli",
+      "unicode": "e6eb",
+      "unicode_decimal": 59115
+    },
+    {
+      "icon_id": "23181389",
+      "name": "控制台",
+      "font_class": "kongzhitai",
+      "unicode": "e6ec",
+      "unicode_decimal": 59116
+    },
+    {
+      "icon_id": "23181390",
+      "name": "部门和用户管理",
+      "font_class": "bumenheyonghuguanli",
+      "unicode": "e6ed",
+      "unicode_decimal": 59117
+    },
+    {
       "icon_id": "22920894",
       "name": "电信 5G天翼云纯色logo",
       "font_class": "a-dianxin5Gtianyiyunchunselogo",

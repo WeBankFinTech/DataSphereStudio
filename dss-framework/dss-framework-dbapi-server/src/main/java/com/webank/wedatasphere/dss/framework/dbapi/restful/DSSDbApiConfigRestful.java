@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
 
 import com.webank.wedatasphere.linkis.server.Message;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpRequest;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
@@ -40,7 +41,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -98,12 +101,17 @@ public class DSSDbApiConfigRestful {
         return Message.messageToResponse(message);
     }
 
-    @GET
+    @POST
     @Path("/test/{path:[a-zA-Z0-9_/]+}")
-    public Response testApi(@Context HttpServletRequest request,@PathParam("path") String path) {
+//    @Produces(MediaType.MULTIPART_FORM_DATA)
+//    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response testApi(@Context HttpServletRequest request,@PathParam("path") String path, Map<String,Object> map) {
+
         try {
+
+
             log.info(request.getQueryString() + request.getRequestURL());
-            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request);
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request,map);
             Message message = Message.ok("服务测试成功").data("response",resJo);
             return Message.messageToResponse(message);
 
@@ -137,10 +145,11 @@ public class DSSDbApiConfigRestful {
     }
 
 
-    @GET
+    @POST
     @Path("/execute/{path:[a-zA-Z0-9_/]+}")
     public Response executeApi(@Context HttpServletRequest request,@PathParam("path") String path) {
         try {
+
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request);
             Message message = Message.ok("调用服务成功").data("response",resJo);
             return Message.messageToResponse(message);

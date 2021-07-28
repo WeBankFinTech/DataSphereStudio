@@ -95,11 +95,11 @@
               <Table :columns="columnsDetail" :data="listDetail" size="large">
                 <template slot-scope="{ row }" slot="operation">
                   <a class="operation" @click="copy(row)">
-                    查看监控图表
+                    {{$t("message.dataService.apiMonitor.viewMonitor")}}
                   </a>
                 </template>
               </Table>
-              <div class="pagebar">
+              <div class="pagebar" v-if="pageData.total">
                 <Page
                   :total="pageData.total"
                   :current="pageData.pageNow"
@@ -123,7 +123,7 @@ export default {
     return {
       columnsRate: [
         {
-          title: '排名',
+          title: this.$t("message.dataService.apiMonitor.col_rank"),
           slot: 'rank'
         },
         {
@@ -131,21 +131,21 @@ export default {
           key: 'id'
         },
         {
-          title: 'API名称',
+          title: this.$t("message.dataService.apiMonitor.col_apiName"),
           key: 'apiName'
         },
         {
-          title: '请求次数',
+          title: this.$t("message.dataService.apiMonitor.col_reqCnt"),
           key: 'totalCnt'
         },
         {
-          title: '请求失败率',
+          title: this.$t("message.dataService.apiMonitor.col_failRate"),
           key: 'failRate'
         }
       ],
       columnsCnt: [
         {
-          title: '排名',
+          title: this.$t("message.dataService.apiMonitor.col_rank"),
           slot: 'rank'
         },
         {
@@ -153,19 +153,19 @@ export default {
           key: 'id'
         },
         {
-          title: 'API名称',
+          title: this.$t("message.dataService.apiMonitor.col_apiName"),
           key: 'apiName'
         },
         {
-          title: '请求次数',
+          title: this.$t("message.dataService.apiMonitor.col_reqCnt"),
           key: 'totalCnt'
         },
         {
-          title: '执行时长',
+          title: this.$t("message.dataService.apiMonitor.col_totalTime"),
           key: 'totalTime'
         },
         {
-          title: '平均调用时长(ms)',
+          title: this.$t("message.dataService.apiMonitor.col_avgTime"),
           key: 'avgTime'
         }
       ],
@@ -175,19 +175,19 @@ export default {
           key: 'id'
         },
         {
-          title: 'API名称',
+          title: this.$t("message.dataService.apiMonitor.col_apiName"),
           key: 'apiName'
         },
         {
-          title: '业务流程',
+          title: this.$t("message.dataService.apiMonitor.col_groupName"),
           key: 'groupName'
         },
         {
-          title: '标签',
+          title: this.$t("message.dataService.apiMonitor.col_label"),
           key: 'label'
         },
         {
-          title: '负责人',
+          title: this.$t("message.dataService.apiMonitor.col_createBy"),
           key: 'createBy'
         },
         {
@@ -209,9 +209,9 @@ export default {
         pageSize: 10
       },
       rangeOptions: [
-        { key: 'week', name: '7天' },
-        { key: 'yesterday', name: '昨天' },
-        { key: 'today', name: '今天' },
+        { key: 'week', name: this.$t("message.dataService.apiMonitor.range_week") },
+        { key: 'yesterday', name: this.$t("message.dataService.apiMonitor.range_yesterday") },
+        { key: 'today', name: this.$t("message.dataService.apiMonitor.range_today") },
         { key: 'picker', name: 'picker' }
       ],
       currentRange: 'week',
@@ -220,22 +220,52 @@ export default {
     }
   },
   computed: {
-
+    range() {
+      const now = Date.now();
+      if (this.currentRange == 'week') {
+        return {
+          startTime: this.dateFormat(new Date(now - 7*86400*1000)),
+          endTime: this.dateFormat()
+        }
+      } else if (this.currentRange == 'yesterday') {
+        return {
+          startTime: this.dateFormat(new Date(now - 86400*1000)),
+          endTime: this.dateFormat()
+        }
+      } else if (this.currentRange == 'today') {
+        return {
+          startTime: this.dateFormat(),
+          endTime: this.dateFormat(new Date(now + 86400*1000))
+        }
+      } else if (this.currentRange == 'picker') {
+        return {
+          startTime: `${this.datePickerRange[0]} 00:00:00`,
+          endTime: `${this.datePickerRange[1]} 00:00:00`
+        }
+      }
+      return {
+        startTime: this.dateFormat(),
+        endTime: this.dateFormat()
+      }
+    }
   },
   created() {
     this.getOnlineApiCnt();
     this.getOfflineApiCnt();
-    this.getCallTotalCnt();
-    this.getCallTotalTime();
-    this.getCallListByCnt();
-    this.getCallListByFailRate();
+    this.getRangeScreenData();
     this.getCallListDetail();
   },
   methods: {
+    dateFormat(date) {
+      const dt = date ? date : new Date();
+      const format = [
+        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
+      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
+      return `${format} 00:00:00`;
+    },
     getOnlineApiCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/onlineApiCnt', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         console.log(res)
         this.onlineCnt = res.onlineApiCnt;
@@ -245,8 +275,7 @@ export default {
     },
     getOfflineApiCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/offlineApiCnt', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         console.log(res)
         this.offlineCnt = res.offlineApiCnt;
@@ -254,14 +283,17 @@ export default {
         console.error(err)
       });
     },
+    getRangeScreenData() {
+      this.getCallTotalCnt();
+      this.getCallTotalTime();
+      this.getCallListByCnt();
+      this.getCallListByFailRate();
+    },
     getCallTotalCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/callTotalCnt', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
-        beginTime: '2021-07-21 00:00:00',
-        endTime: '2021-07-23 00:00:00'
+        ...this.range,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.callTotalCnt = res.callTotalCnt;
       }).catch((err) => {
         console.error(err)
@@ -269,12 +301,9 @@ export default {
     },
     getCallTotalTime() {
       api.fetch('/dss/framework/dbapi/apimonitor/callTotalTime', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
-        beginTime: '2021-07-21 00:00:00',
-        endTime: '2021-07-23 00:00:00'
+        ...this.range,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.callTotalTime = res.callTotalTime;
       }).catch((err) => {
         console.error(err)
@@ -282,12 +311,9 @@ export default {
     },
     getCallListByCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/callListByCnt', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
-        beginTime: '2021-07-21 00:00:00',
-        endTime: '2021-07-23 00:00:00'
+        ...this.range,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.listCnt = res.list;
       }).catch((err) => {
         console.error(err)
@@ -295,12 +321,9 @@ export default {
     },
     getCallListByFailRate() {
       api.fetch('/dss/framework/dbapi/apimonitor/callListByFailRate', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
-        beginTime: '2021-07-21 00:00:00',
-        endTime: '2021-07-23 00:00:00'
+        ...this.range,
+        workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.listRate = res.list;
       }).catch((err) => {
         console.error(err)
@@ -308,12 +331,10 @@ export default {
     },
     getCallListDetail() {
       api.fetch('/dss/framework/dbapi/apimonitor/list', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
-        console.log(res)
         this.listDetail = res.list;
         this.pageData.total = res.total;
       }).catch((err) => {
@@ -321,12 +342,10 @@ export default {
       });
     },
     handlePageSizeChange(pageSize) {
-      console.log(pageSize);
       this.pageData.pageSize = pageSize;
       this.getCallListDetail();
     },
     handlePageChange(page) {
-      console.log(page);
       this.pageData.pageNow = page;
       this.getCallListDetail();
     },
@@ -335,20 +354,20 @@ export default {
       if (option.key != 'picker') {
         this.datePickerRange = [];
         this.datePickerOpen = false;
+        this.getRangeScreenData();
       }
     },
-
     handlePickerClick () {
       this.datePickerOpen = !this.datePickerOpen;
     },
     handlePickerChange (date) {
       this.datePickerRange = date;
       this.datePickerOpen = false;
+      this.getRangeScreenData();
     },
   },
 }
 </script>
-
 <style lang="scss" scoped>
 .monitor-holder {
   height: 36px;
@@ -486,5 +505,10 @@ export default {
       }
     }
   }
+}
+.pagebar {
+  float: right;
+  margin-top: 15px;
+  padding: 10px 0;
 }
 </style>

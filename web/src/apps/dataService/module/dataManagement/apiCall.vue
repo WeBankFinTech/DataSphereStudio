@@ -18,7 +18,7 @@
         </div>
       </template>
     </Table>
-    <div class="pagebar">
+    <div class="pagebar" v-if="pageData.total">
       <Page
         :total="pageData.total"
         :current="pageData.pageNow"
@@ -47,6 +47,7 @@
     <!--授权弹窗-->
     <Modal
       v-model="modalAuthShow"
+      @on-cancel="authCancel"
       :title="$t('message.dataService.apiCall.authForm.modalAuthTile')"
     >
       <Form
@@ -62,6 +63,26 @@
             :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
+        <Form-item
+          :label="$t('message.dataService.apiCall.authForm.labelExpire')"
+          prop="expire"
+        >
+          <Radio-group v-model="authFormData.expire">
+            <Radio label="short">{{$t('message.dataService.apiCall.authForm.short')}}</Radio>
+            <Radio label="long">{{$t('message.dataService.apiCall.authForm.long')}}</Radio>
+          </Radio-group>
+        </Form-item>
+        <Form-item
+          v-if="authFormData.expire == 'short'"
+          prop="expireDate"
+        >
+          <Date-picker 
+            type="date"
+            format="yyyy-MM-dd"
+            :options="dateOptions"
+            :placeholder="$t('message.dataService.apiCall.authForm.holderExpire')"
+            v-model="authFormData.expireDate"></Date-picker>
+        </Form-item>
         <FormItem :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
           <Select v-model="authFormData.groupId">
             <Option v-for="item in groups" :key="item.groupId" :value="item.groupId">
@@ -84,11 +105,11 @@ export default {
     return {
       columns: [
         {
-          title: '序号',
+          title: 'ID',
           key: 'id'
         },
         {
-          title: '登录名称',
+          title: this.$t("message.dataService.apiCall.col_caller"),
           key: 'caller'
         },
         {
@@ -96,11 +117,11 @@ export default {
           key: 'token'
         },
         {
-          title: '有效期',
+          title: this.$t("message.dataService.apiCall.col_expire"),
           key: 'expire'
         },
         {
-          title: '创建时间',
+          title: this.$t("message.dataService.apiCall.col_createTime"),
           key: 'createTime'
         },
         {
@@ -115,13 +136,18 @@ export default {
         pageNow: 1,
         pageSize: 10
       },
-
       groups: [],
-
       modalAuthShow: false,
       authFormData: {
         caller: '',
-        groupId: ''
+        groupId: '',
+        expire: '',
+        expireDate: ''
+      },
+      dateOptions: {
+        disabledDate (date) {
+          return date && date.valueOf() < Date.now() - 86400000;
+        }
       },
       modelConfirm: false,
       selectedApi: null
@@ -133,9 +159,28 @@ export default {
         caller: [
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterName'), trigger: 'blur' },
         ],
-        // groupId: [
-        //   { required: false, message: this.$t('message.dataService.apiCall.authForm.enterFlow'), trigger: 'blur' }
-        // ]
+        groupId: [
+          { required: true, message: this.$t('message.dataService.apiCall.authForm.enterFlow'), trigger: 'change' }
+        ],
+        expire: [
+          { required: true, message: this.$t('message.dataService.apiCall.authForm.enterExpire'), trigger: 'change' }
+        ],
+        expireDate: [
+          { 
+            validator: (rule, value, callback) => {
+              if (this.authFormData.expire === 'short') {
+                if (!value) {
+                  callback(new Error(this.$t('message.dataService.apiCall.authForm.enterExpire')));
+                } else {
+                  callback();
+                }
+              } else {
+                callback();
+              }
+            }, 
+            trigger: 'blur' 
+          }
+        ]
       }
     },
   },
@@ -144,12 +189,17 @@ export default {
     this.getApiCallList();
   },
   methods: {
+    dateFormat(date) {
+      const dt = date ? date : new Date();
+      const format = [
+        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
+      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
+      return `${format} 00:00:00`;
+    },
     getApiGroup() {
       api.fetch('/dss/framework/dbapi/apiauth/apigroup', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId,
       }, 'get').then((res) => {
-        console.log(res)
         if (res.list) {
           this.groups = res.list;
         }
@@ -158,14 +208,11 @@ export default {
       });
     },
     getApiCallList() {
-      // 获取api相关数据
       api.fetch('/dss/framework/dbapi/apiauth/list', {
-        // workspaceId: this.$route.query.workspaceId,
-        workspaceId: 1,
+        workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
-        console.log(res)
         if (res.list) {
           this.apiCallList = res.list;
           this.pageData.total = res.total;
@@ -179,23 +226,32 @@ export default {
     },
     authCancel() {
       this.modalAuthShow = false;
+      this.authFormData = {
+        caller: '',
+        groupId: '',
+        expire: '',
+        expireDate: ''
+      }
     },
     authSubmit() {
       this.$refs['authForm'].validate((valid) => {
         if (valid) {
           const data = {
-            // workspaceId: this.$route.query.workspaceId,
-            workspaceId: 1,
+            workspaceId: this.$route.query.workspaceId,
             caller: this.authFormData.caller,
             groupId: this.authFormData.groupId,
-            expire: "2021-09-27 19:00:00",
+          }
+          if (this.authFormData.expire == 'short') {
+            data.expire = `${this.dateFormat(this.authFormData.expireDate)} 00:00:00`;
+          } else if (this.authFormData.expire == 'long') {
+            const date = new Date(date.now() + 365*86400*1000)
+            data.expire = `${this.dateFormat(date)} 00:00:00`
           }
           if (this.authFormData.id) {
             data.id = this.authFormData.id;
           }
           api.fetch('/dss/framework/dbapi/apiauth/save', data, 'post').then((res) => {
-            console.log(res)
-            this.modalAuthShow = false;
+            this.authCancel();
             this.pageData = {
               total: 0,
               pageNow: 1,
@@ -225,30 +281,24 @@ export default {
       this.modelConfirm = false;
     },
     deleteConfirm() {
-      console.log('confirm', this.selectedApi)
       this.modelConfirm = false;
-      api.fetch(`/dss/framework/dbapi/apiauth/${this.selectedApi.id}`, {
-      }, 'delete').then((res) => {
-        console.log(res)
+      api.fetch(`/dss/framework/dbapi/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
         console.error(err)
       });
     },
     handlePageSizeChange(pageSize) {
-      console.log(pageSize);
       this.pageData.pageSize = pageSize;
       this.getApiCallList();
     },
     handlePageChange(page) {
-      console.log(page);
       this.pageData.pageNow = page;
       this.getApiCallList();
     },
   },
 }
 </script>
-
 <style lang="scss" scoped>
 .manage-wrap {
   padding: 0 24px;

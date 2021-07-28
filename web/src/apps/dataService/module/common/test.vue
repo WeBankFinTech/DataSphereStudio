@@ -4,7 +4,7 @@
     <div class="apiTest-head">
       <div class="api-select">
         <Select v-model="currentApiId" style="width:200px" @on-change="handleChangeApi">
-          <Option v-for="item in apiList" :value="item.id" :key="item.path">{{ item.label }}</Option>
+          <Option v-for="item in apiList" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </div>
       <div class="api-path" v-if="currentApi">
@@ -16,9 +16,12 @@
       <div class="apiTest-panel">
         <template v-if="currentApi">
           <div class="panel-title">{{$t('message.dataService.apiTest.requestParam')}}</div>
-          <Table :columns="columns" :data="currentApi.params">
+          <Table :columns="columns" :data="currentApi.reqFields">
             <template slot-scope="{row}" slot="value">
-              <Input v-model="currentParams[row.name]" placeholder="请输入" style="width: 140px"></Input>
+              <Input 
+                v-model="currentParams[row.name]" 
+                :placeholder="row.type.includes('Array') ? $t('message.dataService.apiTest.holderArray') : $t('message.dataService.apiTest.holderInput')" 
+              ></Input>
             </template>
           </Table>
         </template>
@@ -40,47 +43,14 @@
   </div>
 </template>
 <script>
-// import api from "@/common/service/api";
+import api from "@/common/service/api";
 export default {
   data() {
     return {
-      currentApiId: this.$route.query.apiId || '',
+      currentApiId: this.$route.params.apiId ? +this.$route.params.apiId : '',
       currentApi: null,
       currentParams: {},
-      apiList: [
-        { 
-          id: '1',
-          label: 'Api1', 
-          path: '/user/api1', 
-          params: [
-            {
-              name: 'id',
-              type: 'INT',
-              required: '是',
-              value: ''
-            }
-          ]
-        },
-        { 
-          id: '2',
-          label: 'Api2', 
-          path: '/user/api2', 
-          params: [
-            {
-              name: 'id',
-              type: 'INT',
-              required: '是',
-              value: ''
-            },
-            {
-              name: 'name',
-              type: 'String',
-              required: '是',
-              value: 'luban'
-            }
-          ]
-        },
-      ],
+      apiList: [],
       columns: [
         {
           title: this.$t("message.dataService.apiTest.name"),
@@ -91,60 +61,75 @@ export default {
           key: 'type'
         },
         {
-          title: this.$t("message.dataService.apiTest.required"),
-          key: 'required'
-        },
-        {
           title: this.$t("message.dataService.apiTest.value"),
           key: "value",
           slot: "value"
         }
       ],
-      logs: [
-        '[INFO][14:00:00] resource group',
-        '[INFO][14:00:00] resource group is very hard, too long to read, resource group is very hard, too long to read, { too long to read too long to read too long to read }'
-      ],
-      response: JSON.stringify({
-        "data": "ok",
-        "message": "ok",
-        "status": 1
-      }, null, 4) 
+      logs: [],
+      response: ''
     }
   },
   created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // api的基础信息
-    //     this.apiData = rst.result;
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
+    this.getApiList();
   },
   methods: {
+    getApiList() {
+      api.fetch('/dss/framework/dbapi/list', {
+        workspaceId: this.$route.query.workspaceId
+      }, 'get').then((res) => {
+        if (res.list) {
+          const apiList = res.list.map(i => i.apis);
+          this.apiList = [].concat(...apiList)
+          if (this.currentApiId) {
+            this.handleChangeApi(this.currentApiId)
+          }
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
+    },
     handleChangeApi(val) {
-      this.currentApi = this.apiList.find(i => i.id == val);
-      // 构造请求参数
-      const params = {};
-      this.currentApi.params.forEach(row => {
-        params[row.name] = row.value;
-      })
-      this.currentParams = params;
+      const currentApi = this.apiList.find(i => i.id == val);
+      if (currentApi) {
+        this.currentApi = {
+          ...currentApi,
+          reqFields: JSON.parse(currentApi.reqFields)
+        }
+        // 构造请求参数
+        const params = {};
+        this.currentApi.reqFields.forEach(row => {
+          params[row.name] = "";
+        })
+        this.currentParams = params;
+      }
     },
     test() {
       if (!this.currentApi) {
         this.$Message.warning(this.$t('message.dataService.apiTest.api_not_selected')); 
       } else {
-        console.log(this.currentParams)
+        const data = this.currentParams;
+        this.currentApi.reqFields.forEach(row => {
+          if (row.type.includes('Array')) {
+            // 如果是数组类型，逗号分隔且trim，并过滤掉无效参数
+            data[row.name] = this.currentParams[row.name].split(',').map(i => i.trim()).filter(i => !!`${i}`)
+          } else {
+            data[row.name] = this.currentParams[row.name];
+          }
+        })
+        api.fetch(`/dss/framework/dbapi/test/${this.currentApi.path}`, data, 'post').then((res) => {
+          if (res.response) {
+            this.logs = res.response.log.split('\n')
+            this.response = JSON.stringify(res.response.resList, null, 4) 
+          }
+        }).catch((err) => {
+          console.error(err)
+        });
       }
     }
   },
 }
 </script>
-
 <style lang="scss" scoped>
 .apiTest-wrap {
   padding: 0 24px;

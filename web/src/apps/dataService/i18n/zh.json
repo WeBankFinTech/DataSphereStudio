@@ -12,7 +12,14 @@
         "online": "上线",
         "offline": "下线",
         "test": "测试",
-        "copy": "复制调用地址"
+        "copy": "复制调用地址",
+        "copied": "复制成功",
+        "copyTips": "调用地址获取成功",
+        "copyBtn": "复制",
+        "col_apiName": "API名称",
+        "col_groupName": "业务流程",
+        "col_datasourceName": "数据源名称",
+        "col_apiType": "API类型"
       },
       "apiMonitor": {
         "staticsScreen": "API计量大屏",
@@ -20,12 +27,25 @@
         "apiTotal": "API总数",
         "published": "已发布",
         "notPublish": "未发布",
+        "range_week": "7天",
+        "range_yesterday": "昨天",
+        "range_today": "今天",
         "resource": "服务资源分配",
         "dashboard": "总体计量",
         "callCnt": "总调用次数",
         "callTime": "总调用时长",
         "errorTop10": "昨日出错排行Top10",
-        "callTop10": "昨日调用量排行Top10"
+        "callTop10": "昨日调用量排行Top10",
+        "col_rank": "排名",
+        "col_apiName": "API名称",
+        "col_reqCnt": "请求次数",
+        "col_failRate": "请求失败率",
+        "col_totalTime": "执行时长",
+        "col_avgTime": "平均调用时长(ms)",
+        "col_groupName": "业务流程",
+        "col_label": "标签",
+        "col_createBy": "负责人",
+        "viewMonitor": "查看监控图表"
       },
       "apiCall": {
         "edit": "编辑",
@@ -38,10 +58,18 @@
           "modalAuthTile": "API授权",
           "labelName": "授权的登录名称",
           "labelFlow": "授权的业务流程",
+          "labelExpire": "授权有效期",
           "enterName": "请输入授权的登录名称",
           "enterFlow": "请选择授权的业务流程",
-          "holderName": "请输入名称"
-        }
+          "enterExpire": "请选择授权有效期",
+          "holderName": "请输入名称",
+          "holderExpire": "请选择日期",
+          "short": "短期",
+          "long": "长期"
+        },
+        "col_caller": "登录名称",
+        "col_expire": "有效期",
+        "col_createTime": "创建时间"
       },
       "apiTest": {
         "apiTest": "API测试",
@@ -52,6 +80,8 @@
         "type": "参数类型",
         "required": "是否必填",
         "value": "值",
+        "holderInput": "请输入",
+        "holderArray": "多值以逗号分隔",
         "start": "开始测试",
         "api_not_selected": "请先选择API"
       }

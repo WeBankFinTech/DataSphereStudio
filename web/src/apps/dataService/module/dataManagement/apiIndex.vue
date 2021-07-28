@@ -18,15 +18,9 @@
             <a class="operation" @click="test(row)">
               {{ $t("message.dataService.apiIndex.test") }}
             </a>
-            <Poptip v-model="row.visibleCopy">
-              <a class="operation" :data-id="row.id" @click="copy(row)">
-                {{ $t("message.dataService.apiIndex.copy") }}
-              </a>
-              <div slot="content" v-if="row.visibleCopy">
-                {{ $t("message.dataService.apiIndex.copyTips") }}
-                <Button type="primary" size="small" class="operation-copy">{{ $t("message.dataService.apiIndex.copyBtn") }}</Button>
-              </div>
-            </Poptip>
+            <a class="operation" :data-id="row.id" @click="copy(row)">
+              {{ $t("message.dataService.apiIndex.copy") }}
+            </a>
           </div>
         </template>
       </Table>
@@ -45,7 +39,6 @@
 </template>
 <script>
 import api from "@/common/service/api";
-import ClipboardJS from 'clipboard';
 export default {
   data() {
     return {
@@ -159,41 +152,13 @@ export default {
     },
     copy(row) {
       api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
-        this.apiList = this.apiList.map(i => {
-          if (i.id == row.id) {
-            return {
-              ...i,
-              visibleCopy: true,
-              contentCopy: res.callPathPrefix
-            };
-          } else {
-            return {
-              ...i,
-              visibleCopy: false,
-              contentCopy: ''
-            };
-          }
-        })
-        const clipboard = new ClipboardJS('.operation-copy', {
-          text: function (trigger) {
-            return res.callPathPrefix;
-          },
-        });
-        clipboard.on('success', e => {
-          this.$Message.success(this.$t('message.dataService.apiIndex.copied')); 
-          this.apiList = this.apiList.map(i => {
-            if (i.id == row.id) {
-              return {
-                ...i,
-                visibleCopy: false,
-                contentCopy: ''
-              };
-            } else {
-              return i;
-            }
-          })
-          clipboard.destroy();
-        });
+        let inputEl = document.createElement('input');
+        inputEl.value = `${res.callPathPrefix}`;
+        document.body.appendChild(inputEl);
+        inputEl.select(); // 选择对象;
+        document.execCommand("Copy"); // 执行浏览器复制命令
+        this.$Message.success(this.$t('message.dataService.apiIndex.copied')); 
+        inputEl.remove();
       }).catch((err) => {
         console.error(err)
       });

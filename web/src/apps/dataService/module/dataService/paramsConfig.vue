@@ -330,7 +330,7 @@ export default {
         },
         {
           title: "字段名",
-          key: "id"
+          key: "columnName"
         },
         {
           title: "排序方式",
@@ -430,6 +430,9 @@ export default {
     },
     addToSort(rowData) {
       console.log(rowData);
+      this.sortList = [...this.sortList, rowData].map((item, index) => {
+        return {...item, index: index + 1}
+      });
     },
     setParamsChoose(column) {
       console.log(column);
@@ -439,7 +442,7 @@ export default {
       datas[index][column.key] = value;
     },
     changeSort(value, rowData) {
-      console.log(value);
+      console.log(value);``
       console.log(rowData);
     },
     moveSortRow(index, action) {

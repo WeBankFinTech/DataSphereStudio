@@ -66,6 +66,15 @@ export const apiServicesRoutes = [
     },
     component: () => import('./view/permissions/index.vue'),
   },
+  {
+    path: 'managementPlatform',
+    name: 'ManagementPlatform',
+    meta: {
+      title: 'DataSphere Studio',
+      publicPage: true,
+    },
+    component: () => import('./view/managementPlatform/index.vue'),
+  }
 ];
 
 const routes = apiServicesRoutes.concat([{

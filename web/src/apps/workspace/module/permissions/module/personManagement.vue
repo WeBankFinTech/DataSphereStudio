@@ -422,15 +422,6 @@ export default {
             trigger: "blur"
           }
         ]
-      },
-      passwordRuleValidate: {
-        password: [
-          {
-            required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
-            trigger: "blur"
-          }
-        ]
       }
     };
   },
@@ -713,7 +704,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  height: 100%;
+  // height: 100%;
   display: flex;
   flex-direction: column;
 }

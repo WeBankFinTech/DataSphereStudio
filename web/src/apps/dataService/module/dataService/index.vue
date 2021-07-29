@@ -264,7 +264,7 @@ export default {
       if (this.modalType === "group") {
         this.$refs["groupForm"].validate(valid => {
           console.log(valid);
-          this.$refs.navMenu.getAllApi();
+          this.$refs.navMenu.treeMethod("getApi");
           if (valid) {
             this.confirmLoading = true;
             api
@@ -279,7 +279,7 @@ export default {
               .then(res => {
                 console.log(res);
                 this.confirmLoading = false;
-                this.$refs.navMenu.getAllApi();
+                this.$refs.navMenu.treeMethod("getApi");
                 this.handleModalCancel();
               })
               .catch(() => {
@@ -292,11 +292,14 @@ export default {
           console.log(valid);
           if (valid) {
             const { id, name } = this.groupData;
-            this.$refs.navMenu.addApi(id, {
-              name: this.apiForm.apiName,
-              projectId: id,
-              projectName: name,
-              type: "flow"
+            this.$refs.navMenu.treeMethod("addApi", {
+              id,
+              data: {
+                name: this.apiForm.apiName,
+                projectId: id,
+                projectName: name,
+                type: "flow"
+              }
             });
             const newApis = this.apiTabDatas.map(item => {
               const tmp = { ...item };

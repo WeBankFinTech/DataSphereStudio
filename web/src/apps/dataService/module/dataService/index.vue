@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navMenu @showModal="showModal" @handleFold="handleFold" ref="navMenu" />
+    <navMenu :menuFold="navFold" @showModal="showModal" @on-menu-toggle="handleFold" ref="navMenu" />
     <Modal
       v-model="modalVisible"
       :title="modalTitle"
@@ -120,7 +120,7 @@
         </div></slot
       >
     </Modal>
-    <div div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
+    <div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
       <api-congfig :tabDatas="apiTabDatas" />
     </div>
   </div>
@@ -222,6 +222,11 @@ export default {
     //   id: this.$route.query.id,
     // }, 'get').then((rst) => {
     //   if (rst.result) {
+    //     // api的基础信息
+    //     this.apiData = rst.result;
+    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
+    //     // 更改网页title
+    //     document.title = rst.result.aliasName || rst.result.name;
     //     // 加工api信息tab的数据
     //     this.apiInfoData = [
     //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
@@ -234,8 +239,8 @@ export default {
     // });
   },
   methods: {
-    handleFold(fold) {
-      this.navFold = fold;
+    handleFold() {
+      this.navFold = !this.navFold;
     },
     showModal(pyload) {
       const { type, data } = pyload;
@@ -347,3 +352,4 @@ export default {
   }
 }
 </style>
+

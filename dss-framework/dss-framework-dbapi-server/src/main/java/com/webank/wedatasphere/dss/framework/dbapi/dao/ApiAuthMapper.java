@@ -19,8 +19,13 @@
 package com.webank.wedatasphere.dss.framework.dbapi.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DSSDataApiAuth;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 /**
  * @Classname DSSDataApiAuthMapper
@@ -29,8 +34,17 @@ import org.apache.ibatis.annotations.Mapper;
  * @Created by suyc
  */
 @Mapper
-public interface DSSDataApiAuthMapper extends BaseMapper<DSSDataApiAuth> {
+public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
-    void addDataApiAuth(DSSDataApiAuth dssDataApiAuth);
+    void addApiAuth(ApiAuth dssDataApiAuth);
+
+    List<ApiAuth> getApiAuthList(Long workspaceId);
+
+    @Update("UPDATE dss_dataapi_auth SET `is_delete` = 1 WHERE `id` = #{id}")
+    void deleteApiAuth(@Param("id") Long id);
+
+    @Select("select UNIX_TIMESTAMP(expire) from dss_dataapi_auth where caller = #{caller} and group_id = #{groupId} and token = #{token}")
+    Long getToken(@Param("caller") String caller,@Param("groupId") int groupId,@Param("token") String  token);
+
 
 }

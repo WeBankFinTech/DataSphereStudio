@@ -9,31 +9,33 @@ import lombok.Data;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Classname DSSDataApiAuth
+ * @Classname ApiCall
  * @Description TODO
- * @Date 2021/7/13 14:03
+ * @Date 2021/7/20 13:36
  * @Created by suyc
  */
-@TableName(value = "dss_dataapi_auth")
 @Data
-public class DSSDataApiAuth implements Serializable {
+@TableName(value = "dss_dataapi_call")
+public class ApiCall {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private String caller;
-    private String token;
+    private Long apiId;
+    private String paramsValue;
+
+    private Integer status;
+
     @JsonSerialize(using= DateJsonSerializer.class)
     @JsonDeserialize(using= DateJsonDeserializer.class)
-    private Date expire;
-    private Long groupId;
+    private Date timeStart;
 
-    private Date createTime;
-    private String createBy;
-    private Date updateTime;
-    private String updateBy;
-    private Integer isDelete;
+    @JsonSerialize(using= DateJsonSerializer.class)
+    @JsonDeserialize(using= DateJsonDeserializer.class)
+    private Date timeEnd;
+
+    private Long timeLength;
+    private String caller;
 }

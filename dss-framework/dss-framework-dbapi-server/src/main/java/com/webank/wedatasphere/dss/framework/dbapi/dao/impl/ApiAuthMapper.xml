@@ -18,16 +18,23 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.webank.wedatasphere.dss.framework.dbapi.dao.DSSDataApiAuthMapper">
-    <sql id="apiauth_main">
-        id,`caller`,`token`, `expire`,`group_id`,`create_by`,`create_time`
-    </sql>
+<mapper namespace="com.webank.wedatasphere.dss.framework.dbapi.dao.ApiAuthMapper">
+    <resultMap id="dataapi_auth" type="com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth">
+        <id property="id" column="id"/>
+        <id property="caller" column="caller"/>
+        <id property="token" column="token"/>
+        <id property="expire" column="expire"/>
+        <id property="createTime" column="create_time"/>
+    </resultMap>
 
-    <insert id="addDataApiAuth" useGeneratedKeys="true" keyProperty="id"
-            parameterType="com.webank.wedatasphere.dss.framework.dbapi.entity.DSSDataApiAuth">
-        INSERT INTO dss_dataapi_auth (<include refid="apiauth_main"/>)
-        VALUES
-        (#{id},#{caller},#{token}, #{expire}, #{groupId},#{createBy},#{createTime})
-    </insert>
+
+
+    <select id="getApiAuthList" resultMap="dataapi_auth">
+        SELECT * FROM dss_dataapi_auth
+        <where>
+            `is_delete` =0 AND `workspace_id` = #{workspaceId}
+        </where>
+    </select>
+
 
 </mapper>

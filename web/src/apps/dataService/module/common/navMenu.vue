@@ -1,5 +1,5 @@
 <template>
-  <div class="ds-nav-menu-wrap" :class="{ 'ds-nav-menu-fold': treeFold }">
+  <div class="ds-nav-menu-wrap" :class="{ 'ds-nav-menu-fold': menuFold }">
     <div class="ds-nav-menu">
       <div
         class="ds-nav-menu-item"
@@ -10,7 +10,7 @@
       </div>
       <div
         class="ds-nav-menu-item"
-        :class="{ active: currentTab == '/dataManagement' }"
+        :class="{ active: currentTab.startsWith('/dataManagement') }"
         @click="handleTabClick('dataManagement')"
       >
         <Icon custom="iconfont icon-project" size="26"></Icon>
@@ -42,12 +42,13 @@
       />
       <Spin v-show="loadingTree" size="large" fix />
     </div>
-    <div class="ds-nav-panel" v-if="currentTab == '/dataManagement'">
-      服务管理菜单
+    <div class="ds-nav-panel" v-if="currentTab.startsWith('/dataManagement')">
+      <ManageMenu />
     </div>
   </div>
 </template>
 <script>
+import ManageMenu from './manageMenu.vue';
 import Tree from "@/apps/workflows/module/common/tree/tree.vue";
 import api from "@/common/service/api";
 import _ from "lodash";
@@ -55,14 +56,20 @@ import _ from "lodash";
 export default {
   name: "navMenu",
   components: {
-    Tree
+    Tree,
+    ManageMenu
+  },
+  props: {
+    menuFold: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
       currentTab: this.$route.path,
       loadingTree: false,
       projectsTree: [],
-      treeFold: false,
       currentTreeId: +this.$route.query.projectID, // tree中active节点,
       searchValue: 123,
       originDatas: []
@@ -77,18 +84,14 @@ export default {
   },
   methods: {
     handleTabClick(tab) {
-      if (this.$route.path == `/${tab}`) {
-        this.handleTreeToggle();
+      if (this.$route.path == `/${tab}` || this.$route.path.startsWith(`/${tab}`)) {
+        this.$emit('on-menu-toggle')
       } else {
         this.$router.push({
           name: tab,
           query: this.$route.query
         });
       }
-    },
-    handleTreeToggle() {
-      this.treeFold = !this.treeFold;
-      this.$emit("handleFold", this.treeFold);
     },
     // 获取所有project展示tree
     getAllProjects() {
@@ -318,7 +321,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
-
 .ds-nav-menu-wrap {
   display: flex;
   position: fixed;

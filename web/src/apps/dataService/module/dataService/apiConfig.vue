@@ -22,18 +22,7 @@
         </div>
       </template>
     </div>
-    <div class="toolBar">
-      <div
-        v-for="(toolItem, index) in toolItems"
-        :key="index"
-        class="toolWrap"
-        @click="handleToolShow(toolItem)"
-      >
-        <img :src="toolItem.iconSrc" />
-        <div>{{ toolItem.name }}</div>
-        <div class="divider" :class="{ 'last-divider': index === 4 }" />
-      </div>
-    </div>
+
     <params-config :apiData="choosedData"/>
   </div>
 </template>
@@ -130,9 +119,6 @@ export default {
         })
       }
     },
-    handleToolShow(data) {
-      console.log(data);
-    }
   }
 };
 </script>

@@ -63,7 +63,7 @@
           <Form :model="envForm" :label-width="90">
             <FormItem label="内存" prop="memory">
               <Select v-model="envForm.memory" style="width:300px">
-                <Option value="4096M">4096M</Option>
+                <Option value="4096">4096M</Option>
               </Select>
             </FormItem>
             <FormItem label="超时时间" prop="reqTimeout">
@@ -176,7 +176,7 @@
             <template slot-scope="{ index, row, column }" slot="input">
               <Input
                 type="text"
-                :value="column.key === 'name' ? row.name : column.key === 'comment' ? row.comment : row.example"
+                :value="column.key === 'name' ? row.name : row.comment"
                 @on-change="
                   value => changeSqlParams(value.target.value, index, column)
                 "
@@ -303,7 +303,7 @@ export default {
       datasourceIds: [],
       dbTables: [],
       envForm: {
-        memory: "4096M",
+        memory: "4096",
         reqTimeout: ""
       },
       paramsColumns: [
@@ -434,8 +434,7 @@ export default {
         },
         {
           title: "示例值",
-          key: "example",
-          slot: "input"
+          key: "demo"
         },
         {
           title: "描述",
@@ -450,15 +449,23 @@ export default {
       ],
       sqlList: [],
       sqlTypeOptions: [
-        { label: "string", value: "string" },
-        { label: "bigint", value: "bigint" },
-        { label: "double", value: "double" },
-        { label: "date", value: "date" },
+        { label: "string", value: "string", demo: "liming" },
+        { label: "bigint", value: "bigint", demo: 11 },
+        { label: "double", value: "double", demo: 20.01 },
+        { label: "date", value: "date", demo: "2020-09-21 14:30:05" },
 
-        { label: "string 数组", value: "Array<string>" },
-        { label: "bigint 数组", value: "Array<bigint>" },
-        { label: "double 数组", value: "Array<double>" },
-        { label: "date 数组", value: "Array<date>" }
+        {
+          label: "string 数组",
+          value: "Array<string>",
+          demo: ["liming", "xiaohua"]
+        },
+        { label: "bigint 数组", value: "Array<bigint>", demo: [1, 2] },
+        { label: "double 数组", value: "Array<double>", demo: [1.01, 2.02] },
+        {
+          label: "date 数组",
+          value: "Array<date>",
+          demo: ["2020-09-21 14:00:00", "2020-09-23 15:23:01"]
+        }
       ]
     };
   },
@@ -496,7 +503,13 @@ export default {
       const { data } = this.apiData;
       const { apiType } = data;
       const { reqTimeout, memory } = this.envForm;
-      let reqParams = { ...data, ...this.dbForm, memory };
+      let reqParams = {
+        ...data,
+        ...this.dbForm,
+        memory: parseFloat(memory),
+        id: data.id || "",
+        workspaceId: 223
+      };
       if (reqTimeout) {
         reqParams.reqTimeout = parseFloat(reqTimeout);
       }
@@ -505,7 +518,7 @@ export default {
         if (valid) {
           if (apiType === "GUIDE") {
             const reqFields = [];
-            const reses = [];
+            const resFields = [];
             this.paramsList.forEach(item => {
               if (item.setRequest) {
                 reqFields.push({
@@ -516,25 +529,26 @@ export default {
                 });
               }
               if (item.setResponse) {
-                reses.push("`" + item.columnName + "`");
+                resFields.push("`" + item.columnName + "`");
               }
             });
-            if (reqFields.length === 0) {
-              this.$Message.error("请求参数不能为空");
+            if (resFields.length === 0) {
+              this.$Message.error("返回参数不能为空");
               return;
             }
-            if (this.sortList.length === 0) {
-              this.$Message.error("排序字段不能为空");
-              return;
-            }
+            // if (this.sortList.length === 0) {
+            //   this.$Message.error("排序字段不能为空");
+            //   return;
+            // }
             const orderFields = this.sortList.map(item => {
               return { name: item.columnName, type: item.type };
             });
             reqParams = {
               ...reqParams,
-              reqFields,
-              orderFields,
-              resType: reses.join(",")
+              reqFields: reqFields.length > 0 ? JSON.stringify(reqFields) : "",
+              orderFields:
+                orderFields.length > 0 ? JSON.stringify(orderFields) : "",
+              resFields: resFields.join(",")
             };
           } else {
             if (!this.sql) {
@@ -548,8 +562,8 @@ export default {
             }
             reqParams = {
               ...reqParams,
-              reqFields: [...reqes],
-              sql: this.sql,
+              reqFields: reqes.length > 0 ? JSON.stringify(reqes) : "",
+              sql: this.sql
             };
           }
           api
@@ -629,16 +643,20 @@ export default {
       this.sqlList = datas;
     },
     changeSqlParams(value, index, column) {
-      console.log(value);
-      console.log(column);
       const datas = [...this.sqlList];
       datas[index][column.key] = value;
+      if(column.key === 'type'){
+        const demo = this.sqlTypeOptions.find(item => item.value === value);
+        datas[index]["demo"] = demo.demo;
+      }
+      this.sqlList = datas;
     },
     addSqlParams() {
       const datas = [...this.sqlList];
       datas.push({
         name: "",
         type: "string",
+        demo: "liming",
         comment: ""
       });
       this.sqlList = datas;

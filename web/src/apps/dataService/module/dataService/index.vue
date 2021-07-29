@@ -351,11 +351,13 @@ export default {
     },
     handleApiChoosed(payload) {
       console.log(payload);
-      this.addTab({
-        ...payload,
-        apiName: payload.name,
-        groupId: payload.projectId
-      });
+      if (payload.type === "api") {
+        this.addTab({
+          ...payload,
+          apiName: payload.name,
+          groupId: payload.projectId
+        });
+      }
     }
   }
 };

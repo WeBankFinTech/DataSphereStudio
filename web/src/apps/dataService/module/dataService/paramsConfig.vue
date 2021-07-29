@@ -22,19 +22,20 @@
             :label-width="90"
             :rules="ruleValidate"
           >
-            <FormItem label="数据源类型" prop="dataSource">
-              <Select v-model="dbForm.dataSource" style="width:300px">
+            <FormItem label="数据源类型" prop="datasourceType">
+              <Select v-model="dbForm.datasourceType" style="width:300px">
                 <Option value="MYSQL">MYSQL</Option>
               </Select>
             </FormItem>
-            <FormItem label="数据源名称" prop="dataSourceId">
+            <FormItem label="数据源名称" prop="datasourceId" required>
               <Select
-                v-model="dbForm.dataSourceId"
+                v-model="dbForm.datasourceId"
                 style="width:300px"
+                filterable
                 @on-change="value => getDbTables(value)"
               >
                 <Option
-                  v-for="item in dataSourceIds"
+                  v-for="item in datasourceIds"
                   :value="item.datasourceId"
                   :key="item.datasourceId"
                   >{{ item.name }}</Option
@@ -59,7 +60,7 @@
       <div class="cardWrap">
         <div class="cardTitle">环境配置</div>
         <div class="contentWrap">
-          <Form ref="envForm" :model="envForm" :label-width="90">
+          <Form :model="envForm" :label-width="90">
             <FormItem label="内存" prop="memory">
               <Select v-model="envForm.memory" style="width:300px">
                 <Option value="4096M">4096M</Option>
@@ -230,6 +231,9 @@ export default {
     apiData: {
       type: Object,
       default: () => {}
+    },
+    showApiForm: {
+      type: Function
     }
   },
   data() {
@@ -262,54 +266,38 @@ export default {
         }
       ],
       dbForm: {
-        dataSource: "MYSQL",
-        dataSourceId: "",
+        datasourceType: "MYSQL",
+        datasourceId: "",
         tblName: ""
       },
       ruleValidate: {
-        dataSource: [
+        datasourceType: [
           {
             required: true,
             message: "请选择数据源类型",
             trigger: "blur"
           }
         ],
-        dataSourceId: [
+        datasourceIdss: [
           {
             required: true,
             message: "请选择数据源名称",
-            trigger: "blur"
+            trigger: "change"
           }
         ],
         tblName: [
           {
             required: true,
             message: "请选择数据表名称",
-            trigger: "blur"
+            trigger: "change"
           }
         ]
       },
-      dataSourceIds: [],
+      datasourceIds: [],
       dbTables: [],
       envForm: {
         memory: "4096M",
         reqTimeout: ""
-      },
-      envRuleValidate: {
-        memory: [
-          {
-            required: true,
-            message: "请选择数据源类型",
-            trigger: "blur"
-          }
-        ],
-        reqTimeout: [
-          {
-            required: true,
-            message: "请选择数据源名称",
-            trigger: "blur"
-          }
-        ]
       },
       paramsColumns: [
         {
@@ -395,13 +383,7 @@ export default {
           slot: "fieldSort"
         }
       ],
-      paramsList: [
-        {
-          Comment: "部门id",
-          fieldType: "bigint(20)",
-          columnName: "id"
-        }
-      ],
+      paramsList: [],
       compareItems,
       tableLoading: false,
       sortColumns: [
@@ -497,16 +479,74 @@ export default {
     // });
   },
   mounted() {
-    this.getDataSourceIds(this.dbForm.dataSource);
+    this.getDataSourceIds(this.dbForm.datasourceType);
   },
   methods: {
-    handleToolShow(data) {
-      console.log(data);
+    handleToolShow(item) {
+      const { type } = item;
+      if (type === "property") {
+        this.$emit("showApiForm", this.apiData);
+      } else if (type === "save") {
+        this.saveApi();
+      }
+    },
+    saveApi() {
+      const { data } = this.apiData;
+      const { apiType } = data;
+      let reqParams = { ...data, ...this.dbForm, ...this.envForm };
+      this.$refs["dbForm"].validate(valid => {
+        console.log(valid);
+        if (valid) {
+          if (apiType === "GUIDE") {
+            const reqFields = [];
+            const reses = [];
+            this.paramsList.forEach(item => {
+              if (item.setRequest) {
+                reqFields.push({
+                  name: item.columnName,
+                  type: item.fieldType,
+                  compare: item.compare,
+                  comment: item.Comment
+                });
+              }
+              if (item.setResponse) {
+                reses.push("`" + item.columnName + "`");
+              }
+            });
+            if (reqFields.length === 0) {
+              this.$Message.error("请求参数不能为空");
+              return;
+            }
+            if (this.sortList.length === 0) {
+              this.$Message.error("排序字段不能为空");
+              return;
+            }
+            const orderFields = this.sortList.map(item => {
+              return { name: item.columnName, type: item.type };
+            });
+            reqParams = {
+              ...reqParams,
+              reqFields,
+              orderFields,
+              resType: reses.join(",")
+            };
+          }
+          api
+            .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
+            .then(res => {
+              console.log(res);
+              this.confirmLoading = false;
+            })
+            .catch(() => {
+              this.confirmLoading = false;
+            });
+        }
+      });
     },
     addToSort(rowData) {
       console.log(rowData);
       this.sortList = [...this.sortList, rowData].map((item, index) => {
-        return { ...item, index: index + 1 };
+        return { ...item, index: index + 1, type: "asc" };
       });
     },
     setParamsChoose(column) {
@@ -526,8 +566,13 @@ export default {
     },
     changeSort(value, rowData) {
       console.log(value);
-      ``;
-      console.log(rowData);
+      this.sortList = [...this.sortList].map((item, index) => {
+        const newItem = { ...item };
+        if (rowData.columnName === item.columnName) {
+          newItem.type = value;
+        }
+        return newItem;
+      });
     },
     moveSortRow(index, action) {
       const datas = [...this.sortList];
@@ -577,42 +622,25 @@ export default {
       });
       this.sqlList = datas;
     },
-    getDataSourceIds(dataSource) {
+    getDataSourceIds(datasourceType) {
       //获取数据源
       this.searchValue = "";
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${dataSource}`,
+          `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
           {},
           "get"
         )
         .then(res => {
           console.log(res);
           if (res && res.availableConns) {
-            this.dataSourceIds = res.availableConns;
-            this.dataSourceIds = [
-              {
-                datasourceId: 1,
-                workspaceId: null,
-                name: "tete",
-                note: null,
-                url:
-                  "jdbc:mysql://192.168.10.219:3306/dss_test?useSSL=false&characterEncoding=UTF-8&serverTimezone=GMT%2B8",
-                username: "root",
-                pwd: "***",
-                type: "mysql",
-                createBy: "hadoop",
-                updateBy: null,
-                isDelete: 0,
-                className: null
-              }
-            ];
+            this.datasourceIds = [...res.availableConns];
           } else {
-            this.dataSourceIds = [];
+            this.datasourceIds = [];
           }
         });
     },
-    getDbTables(dataSourceId) {
+    getDbTables(datasourceId) {
       //获取数据表
       this.searchValue = "";
       this.dbTables = [];
@@ -620,7 +648,7 @@ export default {
       this.sortList = [];
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/tables?datasourceId=${dataSourceId}`,
+          `/dss/framework/dbapi/datasource/tables?datasourceId=${datasourceId}`,
           {},
           "get"
         )
@@ -640,7 +668,7 @@ export default {
       this.sortList = [];
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.dataSourceId}&tableName=${tableName}`,
+          `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
           {},
           "get"
         )

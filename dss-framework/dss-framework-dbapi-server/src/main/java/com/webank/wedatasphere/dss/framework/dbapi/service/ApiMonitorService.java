@@ -26,12 +26,12 @@ public interface ApiMonitorService {
     /**
      * 总调用次数
      */
-    long getCallTotalCnt(CallMonitorResquest callMonitorResquest);
+    Long getCallTotalCnt(CallMonitorResquest callMonitorResquest);
 
     /**
      * 总执行时长
      */
-    long getCallTotalTime(CallMonitorResquest callMonitorResquest);
+    Long getCallTotalTime(CallMonitorResquest callMonitorResquest);
 
     /**
      * 出错率排行TOP10

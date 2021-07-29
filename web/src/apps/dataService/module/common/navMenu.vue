@@ -16,7 +16,7 @@
         <Icon custom="iconfont icon-project" size="26"></Icon>
       </div>
     </div>
-    <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
+    <div class="ds-nav-panel" v-if="currentTab == '/dataService1'">
       <div class="panel-title-wrap">
         <p>服务开发</p>
         <div @click="addGroup()">
@@ -42,13 +42,17 @@
       />
       <Spin v-show="loadingTree" size="large" fix />
     </div>
+    <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
+      <TreeMenu />
+    </div>
     <div class="ds-nav-panel" v-if="currentTab.startsWith('/dataManagement')">
       <ManageMenu />
     </div>
   </div>
 </template>
 <script>
-import ManageMenu from './manageMenu.vue';
+import ManageMenu from "./manageMenu.vue";
+import TreeMenu from "./treeMenu.vue";
 import Tree from "@/apps/workflows/module/common/tree/tree.vue";
 import api from "@/common/service/api";
 import _ from "lodash";
@@ -57,7 +61,8 @@ export default {
   name: "navMenu",
   components: {
     Tree,
-    ManageMenu
+    ManageMenu,
+    TreeMenu
   },
   props: {
     menuFold: {
@@ -84,8 +89,11 @@ export default {
   },
   methods: {
     handleTabClick(tab) {
-      if (this.$route.path == `/${tab}` || this.$route.path.startsWith(`/${tab}`)) {
-        this.$emit('on-menu-toggle')
+      if (
+        this.$route.path == `/${tab}` ||
+        this.$route.path.startsWith(`/${tab}`)
+      ) {
+        this.$emit("on-menu-toggle");
       } else {
         this.$router.push({
           name: tab,

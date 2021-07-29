@@ -80,8 +80,8 @@
             <Option value="POST">POST</Option>
           </Select>
         </FormItem>
-        <FormItem label="返回类型" prop="returnType">
-          <Select v-model="apiForm.returnType" style="width:300px">
+        <FormItem label="返回类型" prop="resType">
+          <Select v-model="apiForm.resType" style="width:300px">
             <Option value="JSON">JSON</Option>
           </Select>
         </FormItem>
@@ -99,10 +99,10 @@
             @delete-tag="deleteTag"
           ></we-tag>
         </FormItem>
-        <FormItem label="描述" prop="description">
+        <FormItem label="描述" prop="describe">
           <Input
             type="textarea"
-            v-model="apiForm.description"
+            v-model="apiForm.describe"
             placeholder="请输入描述"
             style="width: 300px"
           >
@@ -167,9 +167,9 @@ export default {
         apiPath: "",
         protocol: "HTTP",
         method: "GET",
-        returnType: "JSON",
+        resType: "JSON",
         previlege: "WORKSPACE",
-        description: "",
+        describe: "",
         label: ""
       },
       apiRuleValidate: {
@@ -201,7 +201,7 @@ export default {
             trigger: "blur"
           }
         ],
-        returnType: [
+        resType: [
           {
             required: true,
             message: "请选择返回类型",
@@ -306,7 +306,7 @@ export default {
             newApis.push({
               isActive: true,
               name: this.apiForm.apiName,
-              data: { ...this.apiForm }
+              data: { ...this.apiForm, groupId: this.groupData.id }
             });
             this.apiTabDatas = newApis;
             this.handleModalCancel();

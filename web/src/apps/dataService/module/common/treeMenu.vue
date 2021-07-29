@@ -147,20 +147,18 @@ export default {
     },
     handleSearch: _.debounce(function(e) {
       const value = e.target.value;
-      console.log(value);
-      console.log(2333);
       this.executeSearch(value);
     }, 500),
     executeSearch(value) {
       this.searchValue = value;
-      if (value) {
-        const temp = _.cloneDeep(this.originDatas);
-        this.projectsTree = temp.filter(item => {
-          return !!item.children.find(child => child.name.include(value));
-        });
-      } else {
-        this.projectsTree = _.cloneDeep(this.originDatas);
-      }
+      const temp = _.cloneDeep(this.originDatas);
+      temp.forEach(item => {
+        item.opened = true;
+        item.children = item.children.filter(
+          child => !value || child.name.includes(value)
+        );
+      });
+      this.projectsTree = temp;
     }
   }
 };

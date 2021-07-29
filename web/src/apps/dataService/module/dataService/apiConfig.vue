@@ -23,7 +23,7 @@
       </template>
     </div>
 
-    <params-config :apiData="choosedData"/>
+    <params-config :apiData="choosedData" @showApiForm="showApiModel"/>
   </div>
 </template>
 <script>
@@ -39,6 +39,9 @@ export default {
     tabDatas: {
       type: Array,
       default: () => []
+    },
+    showApiForm: {
+      type: Function
     }
   },
   data() {
@@ -119,6 +122,10 @@ export default {
         })
       }
     },
+    showApiModel(apiData){
+      console.log(apiData);
+      this.$emit("showApiForm", apiData);
+    }
   }
 };
 </script>

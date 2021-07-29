@@ -1,6 +1,11 @@
 <template>
   <div>
-    <navMenu :menuFold="navFold" @showModal="showModal" @on-menu-toggle="handleFold" ref="navMenu" />
+    <navMenu
+      :menuFold="navFold"
+      @showModal="showModal"
+      @on-menu-toggle="handleFold"
+      ref="navMenu"
+    />
     <Modal
       v-model="modalVisible"
       :title="modalTitle"
@@ -121,7 +126,7 @@
       >
     </Modal>
     <div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
-      <api-congfig :tabDatas="apiTabDatas" />
+      <api-congfig :tabDatas="apiTabDatas" @showApiForm="showApiForm" />
     </div>
   </div>
 </template>
@@ -294,15 +299,15 @@ export default {
               type: "flow"
             });
             const newApis = this.apiTabDatas.map(item => {
-              const tmp = {...item};
+              const tmp = { ...item };
               tmp.isActive = false;
               return tmp;
             });
             newApis.push({
               isActive: true,
               name: this.apiForm.apiName,
-              data: {...this.apiForm}
-            })
+              data: { ...this.apiForm }
+            });
             this.apiTabDatas = newApis;
             this.handleModalCancel();
           }
@@ -329,7 +334,14 @@ export default {
         this.$refs["apiForm"].resetFields();
       }
     },
-
+    showApiForm(apiData) {
+      console.log(apiData);
+      const { data } = apiData;
+      this.apiForm = { ...data };
+      this.modalVisible = true;
+      this.modalType = "api";
+      this.modalTitle = "API属性";
+    }
   }
 };
 </script>
@@ -352,4 +364,3 @@ export default {
   }
 }
 </style>
-

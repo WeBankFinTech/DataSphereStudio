@@ -1479,6 +1479,9 @@ CREATE TABLE `dss_dataapi_config` (
 	`api_type` VARCHAR ( 20 ) NOT NULL COMMENT 'API类型：GUIDE-向导模式，SQL-脚本模式',
 	`protocol` VARCHAR ( 20 ) NOT NULL COMMENT 'Http协议',
 	`datasource_id` BIGINT ( 20 ) NOT NULL COMMENT '数据源id',
+	`datasource_name` VARCHAR ( 50 ) DEFAULT NULL COMMENT '数据源名称',
+	`datasource_type` VARCHAR ( 20 ) DEFAULT NULL COMMENT '数据源类型',
+
 	`sql` text COMMENT 'sql模板',
 	`tbl_name` VARCHAR ( 100 ) DEFAULT NULL COMMENT '数据表名称',
 	`req_fields` VARCHAR ( 1000 ) DEFAULT NULL COMMENT '请求字段名称',
@@ -1499,4 +1502,19 @@ CREATE TABLE `dss_dataapi_config` (
 	`is_delete` TINYINT ( 1 ) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
 	PRIMARY KEY ( `id` )
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API'
+
+
+CREATE TABLE `dss_dataapi_group` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',
+  `name` varchar(255) NOT NULL COMMENT '名称',
+  `note` varchar(255) DEFAULT NULL COMMENT '描述',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `create_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT='服务组'
+
 

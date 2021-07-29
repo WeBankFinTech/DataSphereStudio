@@ -3,6 +3,7 @@
     <navMenu
       :menuFold="navFold"
       @showModal="showModal"
+      @handleApiChoosed="handleApiChoosed"
       @on-menu-toggle="handleFold"
       ref="navMenu"
     />
@@ -298,24 +299,27 @@ export default {
                 name: this.apiForm.apiName,
                 projectId: id,
                 projectName: name,
-                type: "flow"
+                type: "api"
               }
             });
-            const newApis = this.apiTabDatas.map(item => {
-              const tmp = { ...item };
-              tmp.isActive = false;
-              return tmp;
-            });
-            newApis.push({
-              isActive: true,
-              name: this.apiForm.apiName,
-              data: { ...this.apiForm, groupId: this.groupData.id }
-            });
-            this.apiTabDatas = newApis;
+            this.addTab({ ...this.apiForm, groupId: this.groupData.id });
             this.handleModalCancel();
           }
         });
       }
+    },
+    addTab(data) {
+      const newApis = this.apiTabDatas.map(item => {
+        const tmp = { ...item };
+        tmp.isActive = false;
+        return tmp;
+      });
+      newApis.push({
+        isActive: true,
+        name: data.apiName,
+        data
+      });
+      this.apiTabDatas = newApis;
     },
     addTag(label) {
       if (this.apiForm.label) {
@@ -344,6 +348,14 @@ export default {
       this.modalVisible = true;
       this.modalType = "api";
       this.modalTitle = "API属性";
+    },
+    handleApiChoosed(payload) {
+      console.log(payload);
+      this.addTab({
+        ...payload,
+        apiName: payload.name,
+        groupId: payload.projectId
+      });
     }
   }
 };

@@ -81,7 +81,10 @@ export default {
       // tree中的状态同步到父级，保持状态，handleTreeModalConfirm用到
       this.projectsTree = data;
     },
-    handleTreeClick(node) {},
+    handleTreeClick(node) {
+      console.log(node);
+      this.$emit("handleApiChoosed", node);
+    },
     getAllApi() {
       //获取数据服务所有的api
       this.searchValue = "";
@@ -95,13 +98,21 @@ export default {
           console.log(res);
           if (res && res.list) {
             this.projectsTree = res.list.map(n => {
+              const childs = n.apis.map(item => {
+                return {
+                  ...item,
+                  projectId: n.groupId,
+                  projectName: n.groupName,
+                  type: "api"
+                };
+              });
               return {
                 id: n.groupId,
                 name: n.groupName,
                 type: "project",
                 canWrite: () => true,
-                children: n.apis,
-                apis: n.apis
+                children: childs,
+                apis: childs
               };
             });
             this.originDatas = _.cloneDeep(this.projectsTree);

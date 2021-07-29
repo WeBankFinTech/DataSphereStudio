@@ -78,6 +78,17 @@
           </Form>
         </div>
       </div>
+      <div class="cardWrap" v-if="apiData.data.apiType === 'SQL'">
+        <div class="cardTitle">编写查询SQL</div>
+        <div class="contentWrap">
+          <Input
+            v-model="sql"
+            type="textarea"
+            placeholder="请填写SQL语句"
+            rows="10"
+          />
+        </div>
+      </div>
       <div
         class="cardWrap cardTableWrap"
         v-if="apiData.data.apiType === 'GUIDE'"
@@ -162,9 +173,10 @@
         <div class="cardTitle">请求参数</div>
         <div class="contentWrap">
           <Table :columns="sqlColumns" :data="sqlList">
-            <template slot-scope="{ index, column }" slot="input">
+            <template slot-scope="{ index, row, column }" slot="input">
               <Input
                 type="text"
+                :value="column.key === 'name' ? row.name : column.key === 'comment' ? row.comment : row.example"
                 @on-change="
                   value => changeSqlParams(value.target.value, index, column)
                 "
@@ -185,11 +197,6 @@
                   >{{ item.label }}</Option
                 >
               </Select>
-            </template>
-            <template slot-scope="{ index, column }" slot="required">
-              <Checkbox
-                @on-change="value => changeSqlParams(value, index, column)"
-              />
             </template>
             <template slot-scope="{ index }" slot="operation">
               <div class="sqlOperation" @click="deleteSqlRow(index)">
@@ -413,6 +420,7 @@ export default {
           type: "asc"
         }
       ],
+      sql: "",
       sqlColumns: [
         {
           title: "参数名称",
@@ -440,13 +448,7 @@ export default {
           slot: "operation"
         }
       ],
-      sqlList: [
-        {
-          index: 1,
-          id: "a",
-          type: "string"
-        }
-      ],
+      sqlList: [],
       sqlTypeOptions: [
         { label: "string", value: "string" },
         { label: "bigint", value: "bigint" },
@@ -493,7 +495,11 @@ export default {
     saveApi() {
       const { data } = this.apiData;
       const { apiType } = data;
-      let reqParams = { ...data, ...this.dbForm, ...this.envForm };
+      const { reqTimeout, memory } = this.envForm;
+      let reqParams = { ...data, ...this.dbForm, memory };
+      if (reqTimeout) {
+        reqParams.reqTimeout = parseFloat(reqTimeout);
+      }
       this.$refs["dbForm"].validate(valid => {
         console.log(valid);
         if (valid) {
@@ -529,6 +535,21 @@ export default {
               reqFields,
               orderFields,
               resType: reses.join(",")
+            };
+          } else {
+            if (!this.sql) {
+              this.$Message.error("SQL语句不能为空");
+
+              return;
+            }
+            const reqes = this.sqlList.filter(item => !!item.name);
+            if (reqes.length === 0) {
+              this.$Message.error("请求参数不能为空");
+            }
+            reqParams = {
+              ...reqParams,
+              reqFields: [...reqes],
+              sql: this.sql,
             };
           }
           api
@@ -616,9 +637,9 @@ export default {
     addSqlParams() {
       const datas = [...this.sqlList];
       datas.push({
-        index: 1,
-        id: "a",
-        type: "asc"
+        name: "",
+        type: "string",
+        comment: ""
       });
       this.sqlList = datas;
     },

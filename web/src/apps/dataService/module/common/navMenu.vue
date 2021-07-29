@@ -17,7 +17,11 @@
       </div>
     </div>
     <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
-      <TreeMenu @showModal="showModal" ref="treeMenu" />
+      <TreeMenu
+        @showModal="showModal"
+        @handleApiChoosed="handleApiChoosed"
+        ref="treeMenu"
+      />
     </div>
     <div class="ds-nav-panel" v-if="currentTab.startsWith('/dataManagement')">
       <ManageMenu />
@@ -69,6 +73,9 @@ export default {
     showModal(pyload) {
       console.log("addApi");
       this.$emit("showModal", pyload);
+    },
+    handleApiChoosed(pyload) {
+      this.$emit("handleApiChoosed", pyload);
     },
 
     treeMethod(name, payload = {}) {

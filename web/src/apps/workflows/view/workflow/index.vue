@@ -351,6 +351,7 @@ export default {
     },
     handleTreeClick(node) {
       // 切换到开发模式
+      debugger
       this.modeOfKey = this.selectDevprocess && this.selectDevprocess.length ? this.selectDevprocess[0].dicValue : DEVPROCESS.DEVELOPMENTCENTER;
       if (node.type == 'flow') {
         this.currentTreeId = node.orchestratorId;

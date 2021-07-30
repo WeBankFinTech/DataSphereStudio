@@ -86,13 +86,13 @@
             :placeholder="$t('message.dataService.apiCall.authForm.holderExpire')"
             v-model="authFormData.expireDate"></Date-picker>
         </Form-item>
-        <FormItem :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
+        <Form-item :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
           <Select v-model="authFormData.groupId">
-            <Option v-for="item in groups" :key="item.groupId" :value="item.groupId">
+            <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">
               {{ item.groupName}}
             </Option>
           </Select>
-        </FormItem>
+        </Form-item>
       </Form>
       <div slot="footer">
         <Button @click="authCancel">{{$t('message.dataService.cancel')}}</Button>
@@ -235,6 +235,7 @@ export default {
         expire: '',
         expireDate: ''
       }
+      this.$refs['authForm'].resetFields();
     },
     authSubmit() {
       this.$refs['authForm'].validate((valid) => {

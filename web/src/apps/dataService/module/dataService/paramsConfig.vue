@@ -99,9 +99,11 @@
             :columns="paramsColumns"
             :data="paramsList"
             :loading="tableLoading"
+            v-if="!hideParamTable"
           >
-            <template slot-scope="{ index, column }" slot="checkbox">
+            <template slot-scope="{ index, row, column }" slot="checkbox">
               <Checkbox
+                :value="row[column.key]"
                 @on-change="value => changeParams(value, index, column)"
               />
             </template>
@@ -306,6 +308,9 @@ export default {
         memory: "4096",
         reqTimeout: ""
       },
+      setRequest: false,
+      setResponse: false,
+      hideParamTable: false,
       paramsColumns: [
         {
           title: "设为请求参数",
@@ -413,13 +418,7 @@ export default {
           slot: "operation"
         }
       ],
-      sortList: [
-        {
-          index: 1,
-          id: "a",
-          type: "asc"
-        }
-      ],
+      sortList: [],
       sql: "",
       sqlColumns: [
         {
@@ -470,26 +469,40 @@ export default {
     };
   },
   computed: {},
-  created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
-  },
-  mounted() {
+  beforeMount() {
+    const { data = {} } = this.apiData;
+    const {
+      id,
+      apiType,
+      datasourceId,
+      tblName,
+      memory,
+      reqTimeout,
+      sql
+    } = data;
     this.getDataSourceIds(this.dbForm.datasourceType);
+    if (!id) {
+      return;
+    }
+    this.dbForm = {
+      datasourceType: "MYSQL",
+      datasourceId: datasourceId ? parseFloat(datasourceId) : "",
+      tblName
+    };
+    this.envForm = {
+      memory,
+      reqTimeout
+    };
+    if (apiType === "SQL") {
+      this.sql = sql;
+    }
+    console.log(data);
+    if (datasourceId && tblName) {
+      this.getDbTables(datasourceId);
+      this.getTableCols(tblName, true);
+    }
   },
+  mounted() {},
   methods: {
     handleToolShow(item) {
       const { type } = item;
@@ -502,9 +515,21 @@ export default {
     saveApi() {
       const { data } = this.apiData;
       const { apiType } = data;
+      const {
+        name,
+        type,
+        projectId,
+        projectName,
+        tempId,
+        datasourceName,
+        sql,
+        path,
+        ...rest
+      } = data;
+      console.log(type + tempId + sql + path + name + projectId + projectName + datasourceName);
       const { reqTimeout, memory } = this.envForm;
       let reqParams = {
-        ...data,
+        ...rest,
         ...this.dbForm,
         memory: parseFloat(memory),
         id: data.id || "",
@@ -579,13 +604,25 @@ export default {
       });
     },
     addToSort(rowData) {
-      console.log(rowData);
+      const hit = this.sortList.find(
+        item => item.columnName === rowData.columnName
+      );
+      if (hit) {
+        return;
+      }
       this.sortList = [...this.sortList, rowData].map((item, index) => {
         return { ...item, index: index + 1, type: "asc" };
       });
     },
     setParamsChoose(column) {
-      console.log(column);
+      const { key } = column;
+      const result = !this[key];
+      this.paramsList = this.paramsList.map(item => {
+        const tmp = { ...item };
+        tmp[key] = result;
+        return tmp;
+      });
+      this[key] = result;
     },
     changeParams(value, index, column) {
       const datas = [...this.paramsList];
@@ -645,7 +682,7 @@ export default {
     changeSqlParams(value, index, column) {
       const datas = [...this.sqlList];
       datas[index][column.key] = value;
-      if(column.key === 'type'){
+      if (column.key === "type") {
         const demo = this.sqlTypeOptions.find(item => item.value === value);
         datas[index]["demo"] = demo.demo;
       }
@@ -663,7 +700,6 @@ export default {
     },
     getDataSourceIds(datasourceType) {
       //获取数据源
-      this.searchValue = "";
       api
         .fetch(
           `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
@@ -671,7 +707,6 @@ export default {
           "get"
         )
         .then(res => {
-          console.log(res);
           if (res && res.availableConns) {
             this.datasourceIds = [...res.availableConns];
           } else {
@@ -681,10 +716,10 @@ export default {
     },
     getDbTables(datasourceId) {
       //获取数据表
-      this.searchValue = "";
       this.dbTables = [];
       this.paramsList = [];
       this.sortList = [];
+      this.destoryParamsTable();
       api
         .fetch(
           `/dss/framework/dbapi/datasource/tables?datasourceId=${datasourceId}`,
@@ -692,19 +727,16 @@ export default {
           "get"
         )
         .then(res => {
-          console.log(res);
           if (res && res.allTables) {
             this.dbTables = res.allTables;
-          } else {
-            this.dbTables = [];
           }
         });
     },
-    getTableCols(tableName) {
+    getTableCols(tableName, isInit) {
       //获取数据表的字段
-      this.searchValue = "";
       this.paramsList = [];
       this.sortList = [];
+      this.destoryParamsTable();
       api
         .fetch(
           `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
@@ -712,15 +744,42 @@ export default {
           "get"
         )
         .then(res => {
-          console.log(res);
           if (res && res.allCols) {
+            const { data = {} } = this.apiData;
+            const { reqFields, orderFields, resFields } = data;
+            const reqValues = reqFields && isInit ? JSON.parse(reqFields) : [];
+            let resValues =
+              resFields && isInit
+                ? resFields.split(",").map(re => re.replace(/`/g, ""))
+                : [];
+            if (isInit) {
+              const orderValues = orderFields ? JSON.parse(orderFields) : [];
+              this.sortList = orderValues.map((ov, index) => {
+                return { index: index + 1, ...ov, columnName: ov.name };
+              });
+            }
+            console.log(resValues);
             this.paramsList = res.allCols.map(item => {
-              return { ...item, compare: compareItems[0].value };
+              const { columnName } = item;
+              const hit = reqValues.find(re => re.name === columnName);
+              const tmp = {
+                ...item,
+                compare: hit ? hit.compare : compareItems[0].value,
+                setResponse: resValues.includes(columnName),
+                setRequest: !!hit
+              };
+              return tmp;
             });
-          } else {
-            this.paramsList = [];
           }
         });
+    },
+    destoryParamsTable() {
+      this.setRequest = false;
+      this.setResponse = false;
+      this.hideParamTable = true;
+      this.$nextTick(() => {
+        this.hideParamTable = false;
+      });
     }
   }
 };

@@ -123,7 +123,6 @@ export default {
     },
     addGroup() {
       //添加数据服务api分组
-      console.log("addGroup");
       this.$emit("showModal", { type: "group" });
     },
     addApi(groupId, apiData) {
@@ -148,7 +147,7 @@ export default {
     handleSearch: _.debounce(function(e) {
       const value = e.target.value;
       this.executeSearch(value);
-    }, 500),
+    }, 200),
     executeSearch(value) {
       this.searchValue = value;
       const temp = _.cloneDeep(this.originDatas);

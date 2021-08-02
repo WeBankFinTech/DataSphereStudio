@@ -23,7 +23,7 @@
       </template>
     </div>
 
-    <params-config :apiData="choosedData" @showApiForm="showApiModel"/>
+    <params-config v-for="(configData, index) in tabDatas" :key="index" v-show="configData.isActive" :apiData="configData" @showApiForm="showApiModel" />
   </div>
 </template>
 <script>
@@ -86,43 +86,23 @@ export default {
     };
   },
   computed: {
-    choosedData(){
+    choosedData() {
       console.log(12333);
-      return this.tabDatas.find(item => item.isActive)
+      return this.tabDatas.find(item => item.isActive);
     }
-  },
-  created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
   },
   methods: {
     removeWork(tabData) {
-      console.log(tabData);
+      this.$emit("removeTab", tabData.id);
     },
     onChooseWork(tabData) {
-      console.log(tabData);
-      if(tabData.isActive){
+      if (tabData.isActive) {
         return;
-      }else{
-        this.tabDatas = this.tabDatas.map(item => {
-          return {...item, isActive: item.name === tabData.name}
-        })
+      } else {
+        this.$emit("changeTab", tabData.id);
       }
     },
-    showApiModel(apiData){
+    showApiModel(apiData) {
       console.log(apiData);
       this.$emit("showApiForm", apiData);
     }

@@ -43,12 +43,16 @@
         :model="apiForm"
         :label-width="100"
         :rules="apiRuleValidate"
-        v-if="modalType === 'api'"
+        v-if="modalType !== 'group'"
       >
         <FormItem label="API模式" required prop="apiType">
           <RadioGroup v-model="apiForm.apiType">
-            <Radio label="GUIDE">向导模式</Radio>
-            <Radio label="SQL">脚本模式</Radio>
+            <Radio label="GUIDE" :disabled="modalType === 'updateApi'"
+              >向导模式</Radio
+            >
+            <Radio label="SQL" :disabled="modalType === 'updateApi'"
+              >脚本模式</Radio
+            >
           </RadioGroup>
         </FormItem>
         <FormItem label="API名称" prop="apiName">
@@ -57,6 +61,7 @@
             v-model="apiForm.apiName"
             placeholder="请输入名称"
             style="width: 300px"
+            :disabled="modalType === 'updateApi'"
           >
           </Input>
         </FormItem>
@@ -66,6 +71,7 @@
             v-model="apiForm.apiPath"
             placeholder="请输入路径"
             style="width: 300px"
+            :disabled="modalType === 'updateApi'"
           >
           </Input>
         </FormItem>
@@ -127,7 +133,13 @@
       >
     </Modal>
     <div class="main-wrap" :class="{ 'ds-nav-menu-fold': navFold }">
-      <api-congfig :tabDatas="apiTabDatas" @showApiForm="showApiForm" />
+      <api-congfig
+        :tabDatas="apiTabDatas"
+        @showApiForm="showApiForm"
+        @removeTab="removeTab"
+        @changeTab="changeTab"
+      />
+      <Spin v-show="loadingData" size="large" fix />
     </div>
   </div>
 </template>
@@ -144,6 +156,7 @@ export default {
   },
   data() {
     return {
+      loadingData: false,
       navFold: false,
       confirmLoading: false,
       modalType: "",
@@ -222,28 +235,6 @@ export default {
     };
   },
   computed: {},
-  created() {
-    // 获取api相关数据
-    // api.fetch('/dss/apiservice/queryById', {
-    //   id: this.$route.query.id,
-    // }, 'get').then((rst) => {
-    //   if (rst.result) {
-    //     // api的基础信息
-    //     this.apiData = rst.result;
-    //     this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
-    //     // 更改网页title
-    //     document.title = rst.result.aliasName || rst.result.name;
-    //     // 加工api信息tab的数据
-    //     this.apiInfoData = [
-    //       { label: this.$t('message.apiServices.label.apiName'), value: rst.result.name },
-    //       { label: this.$t('message.apiServices.label.path'), value: rst.result.path },
-    //       { label: this.$t('message.apiServices.label.scriptsPath'), value: rst.result.scriptPath },
-    //     ]
-    //   }
-    // }).catch((err) => {
-    //   console.error(err)
-    // });
-  },
   methods: {
     handleFold() {
       this.navFold = !this.navFold;
@@ -259,10 +250,11 @@ export default {
     },
     handleModalCancel() {
       this.modalVisible = false;
-      this.resetDepartForm();
+      this.resetForm();
     },
     handleModalOk() {
-      if (this.modalType === "group") {
+      const modalType = this.modalType;
+      if (modalType === "group") {
         this.$refs["groupForm"].validate(valid => {
           console.log(valid);
           this.$refs.navMenu.treeMethod("getApi");
@@ -292,17 +284,28 @@ export default {
         this.$refs["apiForm"].validate(valid => {
           console.log(valid);
           if (valid) {
-            const { id, name } = this.groupData;
-            this.$refs.navMenu.treeMethod("addApi", {
-              id,
-              data: {
-                name: this.apiForm.apiName,
-                projectId: id,
-                projectName: name,
-                type: "api"
-              }
-            });
-            this.addTab({ ...this.apiForm, groupId: this.groupData.id });
+            if (modalType === "api") {
+              const { id, name } = this.groupData;
+              const tempId = Date.now();
+              this.$refs.navMenu.treeMethod("addApi", {
+                id,
+                data: {
+                  name: this.apiForm.apiName,
+                  projectId: id,
+                  projectName: name,
+                  tempId,
+                  type: "api"
+                }
+              });
+              this.addTab({
+                ...this.apiForm,
+                groupId: this.groupData.id,
+                tempId
+              });
+            } else {
+              this.updateApi();
+            }
+
             this.handleModalCancel();
           }
         });
@@ -317,9 +320,19 @@ export default {
       newApis.push({
         isActive: true,
         name: data.apiName,
+        id: data.id || data.tempId,
         data
       });
       this.apiTabDatas = newApis;
+    },
+    updateApi() {
+      this.apiTabDatas = this.apiTabDatas.map(item => {
+        const temp = { ...item };
+        if (temp.isActive) {
+          temp.data = { ...temp.data, ...this.apiForm };
+        }
+        return temp;
+      });
     },
     addTag(label) {
       if (this.apiForm.label) {
@@ -334,30 +347,87 @@ export default {
       tmpArr.splice(index, 1);
       this.apiForm.label = tmpArr.toString();
     },
-    resetDepartForm() {
+    resetForm() {
       if (this.modalType === "group") {
         this.$refs["groupForm"].resetFields();
+        this.groupForm = {
+          name: "",
+          note: ""
+        };
       } else {
         this.$refs["apiForm"].resetFields();
+        this.apiForm = {
+          apiType: "GUIDE",
+          apiName: "",
+          apiPath: "",
+          protocol: "HTTP",
+          method: "GET",
+          resType: "JSON",
+          previlege: "WORKSPACE",
+          describe: "",
+          label: ""
+        };
       }
     },
     showApiForm(apiData) {
-      console.log(apiData);
       const { data } = apiData;
       this.apiForm = { ...data };
       this.modalVisible = true;
-      this.modalType = "api";
+      this.modalType = "updateApi";
       this.modalTitle = "API属性";
     },
     handleApiChoosed(payload) {
       console.log(payload);
+      const { id, tempId } = payload;
       if (payload.type === "api") {
-        this.addTab({
-          ...payload,
-          apiName: payload.name,
-          groupId: payload.projectId
-        });
+        const newApis = [...this.apiTabDatas];
+        const hitIndex = newApis.findIndex(
+          item => item.id === id || item.id === tempId
+        );
+        if (hitIndex !== -1) {
+          this.apiTabDatas = newApis.map((item, index) => {
+            const tmp = { ...item };
+            tmp.isActive = hitIndex === index;
+            return tmp;
+          });
+          return;
+        }
+        this.loadingData = true;
+        api
+          .fetch(`/dss/framework/dbapi/detail?apiId=${id}`, {}, "get")
+          .then(res => {
+            console.log(res);
+            this.loadingData = false;
+            const data = res && res.detail;
+            if (data) {
+              this.addTab({
+                ...payload,
+                apiName: payload.name,
+                groupId: payload.projectId,
+                ...data,
+                resType: data.resType || 'JSON',
+              });
+            }
+          })
+          .catch(() => {
+            this.loadingData = false;
+          });
       }
+    },
+    removeTab(id) {
+      console.log(id);
+      const newApis = [...this.apiTabDatas];
+      const hitIndex = newApis.findIndex(item => item.id === id);
+      newApis.splice(hitIndex, 1);
+      if (this.apiTabDatas[hitIndex].isActive && newApis.length > 0) {
+        newApis[0].isActive = true;
+      }
+      this.apiTabDatas = newApis;
+    },
+    changeTab(id) {
+      this.apiTabDatas = this.apiTabDatas.map(item => {
+        return { ...item, isActive: item.id === id };
+      });
     }
   }
 };

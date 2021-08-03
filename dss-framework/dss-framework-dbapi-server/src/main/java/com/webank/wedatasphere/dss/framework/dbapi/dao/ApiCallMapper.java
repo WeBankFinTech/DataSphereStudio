@@ -27,19 +27,19 @@ public interface ApiCallMapper {
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
             "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
-    long getCallTotalCnt(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);   //总调用次数
+    Long getCallTotalCnt(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);   //总调用次数
 
-    @Select("SELECT SUM(b.time_length) FROM dss_dataapi_config a\n" +
+    @Select("SELECT IFNULL(SUM(b.time_length),0) FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
             "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
-    long getCallTotalTime(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);  //总调用时长
+    Long getCallTotalTime(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);  //总调用时长
 
 
     /**
      * 调用量排行TOP10
      */
-    @Select("SELECT a.id, a.api_name, COUNT(b.id) total_cnt, SUM(b.time_length) total_time, ROUND(AVG(b.time_length),0) avg_time\n" +
+    @Select("SELECT a.id, a.api_name, COUNT(b.id) total_cnt, IFNULL(SUM(b.time_length),0) total_time, IFNULL(ROUND(AVG(b.time_length),0),0) avg_time\n" +
             "FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +

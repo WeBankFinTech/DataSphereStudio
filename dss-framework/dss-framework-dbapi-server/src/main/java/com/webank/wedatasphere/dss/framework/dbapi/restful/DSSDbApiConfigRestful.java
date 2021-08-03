@@ -17,31 +17,28 @@
  */
 
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
-
-
 import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiConfig;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.exception.DataApiException;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
-
 import com.webank.wedatasphere.linkis.server.Message;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpRequest;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.bind.annotation.RequestBody;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -65,58 +62,78 @@ public class DSSDbApiConfigRestful {
      */
     @POST
     @Path("save")
-    public Response saveApi(@Context HttpServletRequest request, ApiConfig apiConfig) throws JSONException {
+    public Response saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
 //        String username = SecurityFilter.getLoginUsername(request);
         apiConfigService.saveApi(apiConfig);
-        Message message = Message.ok("创建API成功");
+        Message message = Message.ok();
         return Message.messageToResponse(message);
     }
 
-
+    /**
+     * 创建API 组
+     *
+     * @param apiGroup
+     * @return
+     */
     @POST
     @Path("/group/create")
-    public Response saveApi(ApiGroup apiGroup) {
+    public Response saveGroup(@Valid @RequestBody  ApiGroup apiGroup) {
 //        String username = SecurityFilter.getLoginUsername(request);
         String userName = "demo";
         apiGroup.setCreateBy(userName);
         apiConfigService.addGroup(apiGroup);
-        Message message = Message.ok("创建API group 成功").data("groupId", apiGroup.getId());
+        Message message = Message.ok().data("groupId", apiGroup.getId());
         return Message.messageToResponse(message);
     }
 
+    /**
+     * API list
+     *
+     * @param workspaceId
+     * @return
+     */
     @GET
     @Path("/list")
     public Response getApiList(@QueryParam("workspaceId") String workspaceId) {
         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
-        Message message = Message.ok("获取API列表成功").data("list", list);
+        Message message = Message.ok().data("list", list);
         return Message.messageToResponse(message);
     }
 
+    /**
+     * 查询api详情
+     *
+     * @param apiId
+     * @return
+     */
 
     @GET
     @Path("/detail")
     public Response getApiDetail(@QueryParam("apiId") int apiId) {
         ApiConfig apiConfig = apiConfigService.getById(apiId);
-        Message message = Message.ok("获取API详情成功").data("detail", apiConfig);
+        Message message = Message.ok().data("detail", apiConfig);
         return Message.messageToResponse(message);
     }
 
+    /**
+     * 测试 API
+     *
+     * @param request
+     * @param path
+     * @param map
+     * @return
+     */
+
     @POST
     @Path("/test/{path:[a-zA-Z0-9_/]+}")
-//    @Produces(MediaType.MULTIPART_FORM_DATA)
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response testApi(@Context HttpServletRequest request,@PathParam("path") String path, Map<String,Object> map) {
+    public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
 
         try {
-
-
-            log.info(request.getQueryString() + request.getRequestURL());
-            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request,map);
-            Message message = Message.ok("服务测试成功").data("response",resJo);
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map);
+            Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
-
         } catch (Exception exception) {
-            return RestfulUtils.dealError("获取token失败:" + exception.getMessage());
+            return RestfulUtils.dealError(exception.getMessage());
         }
 
     }
@@ -125,37 +142,35 @@ public class DSSDbApiConfigRestful {
      * 服务发布/下线
      *
      * @param request
-
      * @return
      */
     @POST
     @Path("release")
-    public  Response releaseApi(@Context HttpServletRequest request , JsonNode jsonNode){
-        Integer status = jsonNode.get("status").getValueAsInt() ;
+    public Response releaseApi(@Context HttpServletRequest request, JsonNode jsonNode) {
+        Integer status = jsonNode.get("status").getValueAsInt();
         String apiId = jsonNode.get("apiId").getTextValue();
-        Boolean release = apiConfigService.release(status, apiId);
-        Message message=new Message();
-        if(release==true){
-            message=Message.ok("更新成功");
-        }
-        else {
-            message=Message.ok("更新失败");
-        }
-        return Message.messageToResponse(message);
+        apiConfigService.release(status, apiId);
+        return Message.messageToResponse(Message.ok());
     }
 
-
+    /**
+     * 第三方调用 api
+     *
+     * @param request
+     * @param path
+     * @param map
+     * @return
+     */
     @POST
     @Path("/execute/{path:[a-zA-Z0-9_/]+}")
-    public Response executeApi(@Context HttpServletRequest request,@PathParam("path") String path) {
+    public Response executeApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
         try {
-
-            ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request);
-            Message message = Message.ok("调用服务成功").data("response",resJo);
+            ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
+            Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
 
         } catch (Exception exception) {
-            return RestfulUtils.dealError("调用服务失败:" + exception.getMessage());
+            return RestfulUtils.dealError(exception.getMessage());
         }
 
     }

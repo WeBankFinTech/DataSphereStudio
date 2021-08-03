@@ -12,21 +12,19 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.exception.DataApiException;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiConfigService;
 import com.webank.wedatasphere.dss.framework.dbapi.util.*;
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,51 +43,72 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     @Autowired
     ApiConfigMapper apiConfigMapper;
 
-    public void saveApi(ApiConfig apiConfig) throws JSONException {
+    /**
+     * 保存API配置信息
+     * @param apiConfig
+     * @throws JSONException
+     */
+    public void saveApi(ApiConfig apiConfig) throws JSONException, DataApiException {
 
+        List<ApiConfig> apiList = this.list(new QueryWrapper<ApiConfig>().eq("api_path", apiConfig.getApiPath()));
+        Integer id = apiConfig.getId();
+        if(apiList.size() > 0 && id == null){
+            throw new DataApiException("路径已经存在");
+        }
         String apiType = apiConfig.getApiType();
         if ("GUIDE".equals(apiType)) {
             String table = apiConfig.getTblName();
             String resFields = apiConfig.getResFields();
             String reqFields = apiConfig.getReqFields();
             String orderFields = apiConfig.getOrderFields();
-            String whereCause = getWhereCause(reqFields);
-            String orderCause = getOrderCause(orderFields);
+            String whereCause = StringUtils.isBlank(reqFields) ? "" : CommUtil.getWhereCause(reqFields);
+            String orderCause = StringUtils.isBlank(orderFields) ? "" : CommUtil.getOrderCause(orderFields);
             String sql = String.format("%s%s%s%s%s%s", "select ", resFields, " from ", table, whereCause, orderCause);
             apiConfig.setSql(sql);
         }
-
-        Integer id = apiConfig.getId();
+//        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
+//                .eq("id", id);
         if (id != null) {
-            this.updateById(apiConfig);
+            this.saveOrUpdate(apiConfig);
         } else {
             this.save(apiConfig);
         }
-
-//
-//        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
-//                .eq("id", id);
-
-
     }
 
-    @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws Exception {
-        ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
+    /**
+     * API 测试
+     * @param path
+     * @param request
+     * @param map
+     * @return
+     * @throws Exception
+     */
 
+    @Override
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws JSONException, SQLException {
+        ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
+        List<Object > jdbcParamValues = new ArrayList<>();
+        String sqlText = null;
         if (apiConfig != null) {
             Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig,map);
-            String sql = apiConfig.getSql();
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, sqlParam);
-            log.info(sqlMeta.getSql());
+            String sqlFiled = apiConfig.getSql();
+            if(!sqlParam.isEmpty()){
+                SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sqlFiled, sqlParam);
+                sqlText = sqlMeta.getSql();
+                jdbcParamValues = sqlMeta.getJdbcParamValues();
+            }else {
+                sqlText = sqlFiled;
+            }
+
+            sqlText = String.format("%s %s",sqlText,"limit 500");
             DataSource dataSource = new DataSource();
-            dataSource.setUrl("jdbc:mysql://192.168.10.219:3306/dss_test?characterEncoding=UTF-8");
+            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
             dataSource.setClassName("com.mysql.jdbc.Driver");
             dataSource.setUsername("root");
             dataSource.setPwd("123456");
             dataSource.setDatasourceId(1);
-            apiExecuteInfo = this.executeSql(1, dataSource, sqlMeta.getSql(), sqlMeta.getJdbcParamValues());
+            apiExecuteInfo = this.executeSql(1, dataSource, sqlText, jdbcParamValues);
 
         }else {
             apiExecuteInfo.setLog("该服务不存在,请检查服务url是否正确");
@@ -97,16 +116,23 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         return apiExecuteInfo;
     }
 
+
+    /**
+     * 第三方调用APi
+     * @param path
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @Override
-    public ApiExecuteInfo apiExecute(String path, HttpServletRequest request) throws Exception {
+    public ApiExecuteInfo apiExecute(String path, HttpServletRequest request,Map<String,Object> map) throws DataApiException, JSONException, SQLException {
         ApiCall apiCall = new ApiCall();
         //校验token
         String appKey = request.getHeader("appKey");
         String appSecret = request.getHeader("appSecret");
         if(StringUtils.isAnyBlank(appKey,appSecret)){
-            throw new Exception("请求头需添加appkey,appSecret");
+            throw new DataApiException("请求头需添加appkey,appSecret");
         }
-
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if(apiConfig != null){
             long startTime = System.currentTimeMillis();
@@ -116,7 +142,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             int groupId = apiConfig.getGroupId();
             Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
             if(expireTime != null && (expireTime * 1000) > startTime){
-                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,null);
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,map);
                 long endTime = System.currentTimeMillis();
                 apiCall.setTimeEnd(new Date(endTime));
                 apiCall.setTimeLength(endTime-startTime);
@@ -124,10 +150,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 apiCallMapper.addApiCall(apiCall);
                 return apiExecuteInfo;
             }else {
-                throw new Exception("token已失效");
+                throw new DataApiException("token已失效");
             }
         }else {
-            throw new Exception("该服务不存在,请检查服务url是否正确");
+            throw new DataApiException("该服务不存在,请检查服务url是否正确");
         }
     }
 
@@ -151,112 +177,70 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
     @Override
     public Boolean release(Integer status, String apiId) {
-        return    apiConfigMapper.release(status,apiId);
-    }
-
-
-    private String getWhereCause(String requestFields) throws JSONException {
-        JSONArray jsonArray = new JSONArray(requestFields);
-        StringBuilder whereCauseBuild = new StringBuilder();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            if (i == 0) {
-                whereCauseBuild.append(" where ");
-            }
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String columnName = jsonObject.getString("name");
-            String compareType = jsonObject.getString("compare");
-            String whereCause = String.format("%s %s #{%s}", columnName, compareType, columnName);
-            System.out.println(whereCause);
-            if (i < jsonArray.length() - 1) {
-                whereCauseBuild.append(whereCause).append(" and ");
-            } else {
-                whereCauseBuild.append(whereCause);
-            }
-        }
-        return whereCauseBuild.toString();
-    }
-
-    private String getOrderCause(String orderFields) throws JSONException {
-        JSONArray jsonArray = new JSONArray(orderFields);
-        StringBuilder orderCauseBuild = new StringBuilder();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            if (i == 0) {
-                orderCauseBuild.append(" order by ");
-            }
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String columnName = jsonObject.getString("name");
-            String orderType = jsonObject.getString("type");
-            String orderCause = String.format("%s %s", columnName, orderType);
-            System.out.println(orderCause);
-            if (i < jsonArray.length() - 1) {
-                orderCauseBuild.append(orderCause).append(",");
-            } else {
-                orderCauseBuild.append(orderCause);
-            }
-        }
-        return orderCauseBuild.toString();
+        return   apiConfigMapper.release(status,apiId);
     }
 
 
     private Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfig config,Map<String,Object> paraMap) throws JSONException {
         Map<String, Object> map = new HashMap<>();
-        JSONArray requestParams = new JSONArray(config.getReqFields());
-        for (int i = 0; i < requestParams.length(); i++) {
-            JSONObject jo = requestParams.getJSONObject(i);
-            String name = jo.getString("name");
-            String type = jo.getString("type");
-            if (type.startsWith("Array")) {
-//                String[] values = request.getParameterValues(name);
-                String[] values = CommUtil.objectToArray(paraMap.get(name));
-                if (values != null) {
-                    List<String> list = Arrays.asList(values);
-                    if (values.length > 0) {
+        String reqFields = config.getReqFields();
+        if(StringUtils.isNotBlank(reqFields)){
+            JSONArray requestParams = new JSONArray(config.getReqFields());
+            for (int i = 0; i < requestParams.length(); i++) {
+                JSONObject jo = requestParams.getJSONObject(i);
+                String name = jo.getString("name");
+                String type = jo.getString("type");
+                if (type.startsWith("Array")) {
+                    String[] values = CommUtil.objectToArray(paraMap.get(name));
+                    if (values != null) {
+                        List<String> list = Arrays.asList(values);
+                        if (values.length > 0) {
+                            switch (type) {
+                                case "Array<double>":
+                                    List<Double> collect = list.stream().map(value -> Double.valueOf(value)).collect(Collectors.toList());
+                                    map.put(name, collect);
+                                    break;
+                                case "Array<bigint>":
+                                    List<Long> longs = list.stream().map(value -> Long.valueOf(value)).collect(Collectors.toList());
+                                    map.put(name, longs);
+                                    break;
+                                case "Array<string>":
+                                case "Array<date>":
+                                    map.put(name, list);
+                                    break;
+                            }
+                        } else {
+                            map.put(name, list);
+                        }
+                    } else {
+                        map.put(name, null);
+                    }
+                } else {
+                    String value = paraMap.get(name) == null ? null : String.valueOf(paraMap.get(name));
+                    if (StringUtils.isNotBlank(value)) {
+
                         switch (type) {
-                            case "Array<double>":
-                                List<Double> collect = list.stream().map(value -> Double.valueOf(value)).collect(Collectors.toList());
-                                map.put(name, collect);
+                            case "double":
+                                Double v = Double.valueOf(value);
+                                map.put(name, v);
                                 break;
-                            case "Array<bigint>":
-                                List<Long> longs = list.stream().map(value -> Long.valueOf(value)).collect(Collectors.toList());
-                                map.put(name, longs);
+                            case "bigint":
+                                Long longV = Long.valueOf(value);
+                                map.put(name, longV);
                                 break;
-                            case "Array<string>":
-                            case "Array<date>":
-                                map.put(name, list);
+                            case "string":
+                            case "date":
+                                map.put(name, value);
                                 break;
                         }
                     } else {
-                        map.put(name, list);
+                        map.put(name, value);
                     }
-                } else {
-                    map.put(name, null);
-                }
-            } else {
-
-//                String value = request.getParameter(name);
-
-                String value = String.valueOf(paraMap.get(name));
-                if (StringUtils.isNotBlank(value)) {
-
-                    switch (type) {
-                        case "double":
-                            Double v = Double.valueOf(value);
-                            map.put(name, v);
-                            break;
-                        case "bigint":
-                            Long longV = Long.valueOf(value);
-                            map.put(name, longV);
-                            break;
-                        case "string":
-                        case "date":
-                            map.put(name, value);
-                            break;
-                    }
-                } else {
-                    map.put(name, value);
                 }
             }
+
         }
+
         return map;
     }
 
@@ -264,7 +248,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql, List<Object> jdbcParamValues) throws SQLException {
         DruidPooledConnection connection = null;
         StringBuilder logBuilder = new StringBuilder();
-
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ArrayList<HashMap<String,Object>> list = new ArrayList<>();
         try {

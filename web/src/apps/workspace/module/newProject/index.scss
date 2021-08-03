@@ -88,23 +88,22 @@
 
     .header-tool {
       float: right;
-      margin-right: 6%;
       color: $primary-color;
       cursor: pointer;
 
       .sort-icon {
         font-size: 14px;
         margin-right: 20px;
-
         .icon {
           margin-left: 5px;
+          font-size: 14px;
           color: $primary-color;
         }
       }
 
       .search-input {
         width: 200px;
-        margin-right: 30px;
+        line-height: 100%;
       }
     }
   }

@@ -61,7 +61,6 @@
             v-model="apiForm.apiName"
             placeholder="请输入名称"
             style="width: 300px"
-            :disabled="modalType === 'updateApi'"
           >
           </Input>
         </FormItem>
@@ -256,7 +255,6 @@ export default {
       const modalType = this.modalType;
       if (modalType === "group") {
         this.$refs["groupForm"].validate(valid => {
-          console.log(valid);
           this.$refs.navMenu.treeMethod("getApi");
           if (valid) {
             this.confirmLoading = true;

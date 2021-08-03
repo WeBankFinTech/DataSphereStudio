@@ -304,14 +304,14 @@
                     <include>**/*.xml</include>
                 </includes>
             </resource>
-            <resource>
+           <!-- <resource>
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*.xml</include>
                     <include>**/*.properties</include>
                     <include>**/*.yml</include>
                 </includes>
-            </resource>
+            </resource>-->
         </resources>
     </build>
 </project>

@@ -532,7 +532,7 @@ export default {
         ...rest,
         ...this.dbForm,
         memory: parseFloat(memory),
-        id: data.id || "",
+        id: data.id || null,
         workspaceId: 223
       };
       if (reqTimeout) {

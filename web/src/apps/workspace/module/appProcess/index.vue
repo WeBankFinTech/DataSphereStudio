@@ -59,20 +59,24 @@ export default {
   }
 }
 .list-content {
+  display: flex;
+  flex-direction: row;
   .list-item-bar {
     position: relative;
-    float: left;
-    margin-right: 25px;
-    margin-bottom: 25px;
+    flex: 1;
+    margin-left: 20px;
+    &:first-child {
+      margin-left: 0;
+    }
     .list-item {
-      padding: 10px;
-      border: 1px solid #ccc;
+      padding: 35px 15px 15px 15px;
+      border: 1px solid #DEE4EC;
+      box-shadow: 1px 1px 2px 1px rgba(29, 121, 214, 0.1);
       border-radius: $border-radius-small;
-      width: 186px;
-      height: 386px;
+      min-width: 140px;
+      height: 360px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       align-items: center;
       .status-icon {
         font-size: 115px;
@@ -80,27 +84,34 @@ export default {
       .title {
         font-size: $font-size-large;
         font-weight: bold;
+        margin-top: 5px;
       }
       .desc {
         font-size: $font-size-small;
         display: none;
-        width: 100px;
       }
       .link {
+        height: 30px;
+        width: 95px;
+        margin-top: 35px;
         font-size: $font-size-base;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
       }
       &:hover {
-        transform: translateY(-5px);
+        transform: translateY(-1px);
         transition: transform .2s linear;
-        box-shadow: 0 2px 12px 0 $shadow-color;
+        box-shadow: 2px 2px 2px 1px rgba(29, 121, 214, 0.1);
         .status-icon {
           margin-top: 0;
         }
         .desc {
           display: block;
+          margin-top: 15px;
         }
-        .title {
-          color:$primary-color;
+        .link {
+          margin-top: 15px;
         }
       }
     }
@@ -108,8 +119,19 @@ export default {
       margin: 0 20px;
       position: absolute;
       top: 50%;
-      right: -35px;
+      right: -40px;
       font-size: 30px;
+      /deep/.svg-icon {
+        height: 20px;
+      }
+    }
+  }
+  @media only screen and (min-width: 1600px){
+    .list-item-bar {
+      margin-left: 40px;
+      &:first-child {
+        margin-left: 0;
+      }
     }
   }
 }

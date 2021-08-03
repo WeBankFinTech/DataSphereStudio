@@ -1,5 +1,13 @@
 import dayjs from 'dayjs'
-
+/**
+ * 
+ * @param {*} tasks 
+ * @param {*} connects 
+ * @param {*} locations 
+ * @param {*} taskList 
+ * @param {*} isNode 
+ * @param {*} contextMenu 
+ */
 export function ds2butterfly(tasks, connects, locations, taskList, isNode, contextMenu) {
   let nodes = [],
     edges = []
@@ -116,7 +124,10 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode, conte
     edges
   }
 }
-
+/**
+ * 
+ * @param {*} date 
+ */
 function formatISODate (date) {
   let [datetime, timezone] = date.split('+')
   if (!timezone || timezone.indexOf(':') >= 0) return date
@@ -124,6 +135,11 @@ function formatISODate (date) {
   let secondOfTz = timezone.substring(2, 4) || '00'
   return `${datetime}+${hourOfTz}:${secondOfTz}`
 }
+/**
+ * 
+ * @param {*} value 
+ * @param {*} fmt 
+ */
 export function formatDate(value, fmt) {
   fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
   if (value === null) {
@@ -133,6 +149,10 @@ export function formatDate(value, fmt) {
   }
 }
 
+/**
+ * 
+ * @param {*} value 
+ */
 export function filterNull(value) {
   if (value === null || value === '') {
     return '-'

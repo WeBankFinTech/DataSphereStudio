@@ -7,6 +7,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiGroup;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiListInfo;
+import com.webank.wedatasphere.dss.framework.dbapi.exception.DataApiException;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -23,9 +24,9 @@ public interface ApiConfigService extends IService<ApiConfig> {
 
     List<ApiGroupInfo> getGroupList(String workspaceId);
 
-    void saveApi(ApiConfig apiConfig) throws JSONException;
+    void saveApi(ApiConfig apiConfig) throws JSONException, DataApiException;
 
     ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest, Map<String,Object> map) throws  Exception;
 
-    ApiExecuteInfo apiExecute(String path, HttpServletRequest request) throws Exception;
+    ApiExecuteInfo apiExecute(String path, HttpServletRequest request, Map<String,Object> map) throws Exception;
 }

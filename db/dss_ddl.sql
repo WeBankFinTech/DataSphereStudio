@@ -1501,7 +1501,7 @@ CREATE TABLE `dss_dataapi_config` (
 	`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
 	`is_delete` TINYINT ( 1 ) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
 	PRIMARY KEY ( `id` )
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API'
+) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API';
 
 
 CREATE TABLE `dss_dataapi_group` (

@@ -707,6 +707,7 @@ export default {
   // height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0px;
 }
 .formWrap {
   width: 100%;

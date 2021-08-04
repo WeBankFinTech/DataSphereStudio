@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div class="formWrap">
       <Form ref="queries" :model="queries" inline>
         <FormItem
@@ -230,7 +230,10 @@ import {
   keepTreeNLevel
 } from "../util";
 
-//构建表格所需的树形结构
+/**
+ * 构建表格所需的树形结构
+ *
+ */
 function assembleTree(level, datas, result) {
   if (level !== 0) {
     const nexts = datas.filter(item => item.level !== level);
@@ -521,11 +524,19 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.container {
+  width: 100%;
+  // height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+}
 .formWrap {
   width: 100%;
   padding: 20px;
   padding-bottom: 0px;
   border-bottom: 1px solid #dee4ec;
+  padding-left: 0px;
 }
 .tableWrap {
   width: 100%;

@@ -1,0 +1,17 @@
+{
+  "name": "koa-mayql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.6.2",
+    "koa-body": "^4.2.0",
+    "koa-router": "^10.0.0",
+    "mysql": "^2.16.0"
+  }
+}

@@ -1,47 +1,19 @@
 <template>
-  <div>
+  <div class="monitor-wrap">
     <div class="monitor-holder"></div>
-    <Tabs value="screen" class="tab-wrap">
+    <Tabs value="screen" :animated="false" class="tab-wrap">
       <Tab-pane :label='$t("message.dataService.apiMonitor.staticsScreen")' name="screen">
-        <div class="dashboard">
-          <div class="dash-content">
-            <span class="dash-title">{{$t("message.dataService.apiMonitor.apiTotal")}}</span>
-            <span class="dash-item">{{$t("message.dataService.apiMonitor.published")}}<span class="dash-value">{{onlineCnt}}</span></span>
-            <span class="dash-item">{{$t("message.dataService.apiMonitor.notPublish")}}<span class="dash-value">{{offlineCnt}}</span></span>
-          </div>
-          <div class="dash-range-group">
-            <div class="range-group-item" :class="{'group-item-checked': option.key == currentRange}" v-for="option in rangeOptions" :key="option.key" @click="handleDateChange(option)">
-              <template v-if="option.key != 'picker'">{{option.name}}</template>
-              <Date-picker
-                v-else
-                :open="datePickerOpen"
-                :value="datePickerRange"
-                type="daterange"
-                placement="bottom-end"
-                @on-change="handlePickerChange"
-              >
-                <div class="date-trigger" @click="handlePickerClick">
-                  <span v-if="datePickerRange.length" class="date-show">{{datePickerRange.join('   -   ')}}</span>
-                  <Icon custom="iconfont icon-riqi" size="16"></Icon>
-                </div>
-              </Date-picker>
-            </div>
-          </div>
-        </div>
         <div class="metrics-wrap">
-          <div class="metrics metrics-mr">
-            <div class="metrics-head">
-              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.resource")}}</div>
-            </div>
-            <div class="metrics-body">
-              hold
-            </div>
-          </div>
           <div class="metrics">
-            <div class="metrics-head">
-              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.dashboard")}}</div>
+            <div class="metrics-dashboard">
+              <div class="dash-content">
+                <span class="dash-title">{{$t("message.dataService.apiMonitor.apiTotal")}}</span>
+                <span class="dash-item">{{$t("message.dataService.apiMonitor.published")}}<span class="dash-value">{{onlineCnt}}</span></span>
+                <span class="dash-item">{{$t("message.dataService.apiMonitor.notPublish")}}<span class="dash-value">{{offlineCnt}}</span></span>
+              </div>
+              <rangeGroup @on-date-change="getRangeScreenData" />
             </div>
-            <div class="metrics-body">
+            <div class="metrics-overview">
               <div class="overview">
                 <Icon custom="iconfont icon-zongtiaoyongcishu" class="overview-icon"></Icon>
                 <div class="overview-info">
@@ -56,6 +28,16 @@
                   <div class="overview-value"><span>{{callTotalTime}}</span>ms</div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="metrics-wrap">
+          <div class="metrics">
+            <div class="metrics-head">
+              <div class="metrics-head-title">{{$t("message.dataService.apiMonitor.resource")}}</div>
+            </div>
+            <div class="metrics-body">
+              <div ref="resourceLine" style="height:300px"></div>
             </div>
           </div>
         </div>
@@ -94,7 +76,7 @@
             <div class="metrics-body">
               <Table :columns="columnsDetail" :data="listDetail" size="large">
                 <template slot-scope="{ row }" slot="operation">
-                  <a class="operation" @click="viewMonitor(row)">
+                  <a class="operation" @click="showMonitorModal(row)">
                     {{$t("message.dataService.apiMonitor.viewMonitor")}}
                   </a>
                 </template>
@@ -114,11 +96,53 @@
         </div>
       </Tab-pane>
     </Tabs>
+    <div class="monitor-chart-mask" :class="{'shown': monitorModalShow}" @click="hideMonitorModal"></div>
+    <div class="monitor-chart-modal" :class="{'shown': monitorModalShow}">
+      <div class="mc-title">
+        <span>API监控图表</span>
+        <div class="mc-close" @click="hideMonitorModal">
+          <Icon custom="iconfont icon-riqi" size="16"></Icon>
+        </div>
+      </div>
+      <div class="mc-body">
+        <Tabs type="card">
+          <Tab-pane label="数据服务错误码">
+            <div class="mc-range">
+              <rangeGroup @on-date-change="getModalChartData" />
+            </div>
+            <div ref="chartErrorcode" style="height:300px"></div>
+          </Tab-pane>
+          <Tab-pane label="APP请求次数">
+            <div class="mc-range">
+              <rangeGroup @on-date-change="getModalChartData" />
+            </div>
+            <div ref="chartReq" style="height:300px"></div>
+          </Tab-pane>
+          <Tab-pane label="流量带宽">
+            <div class="mc-range">
+              <rangeGroup @on-date-change="getModalChartData" />
+            </div>
+            <div ref="chartBrandwidth" style="height:300px"></div>
+          </Tab-pane>
+          <Tab-pane label="平均响应时间">
+            <div class="mc-range">
+              <rangeGroup @on-date-change="getModalChartData" />
+            </div>
+            <div ref="chartAvgTime" style="height:300px"></div>
+          </Tab-pane>
+        </Tabs>
+      </div>
+    </div>
   </div>
 </template>
 <script>
+import echarts from 'echarts';
 import api from "@/common/service/api";
+import rangeGroup from '../common/rangeGroup.vue';
 export default {
+  components: {
+    rangeGroup,
+  },
   data() {
     return {
       columnsRate: [
@@ -208,52 +232,21 @@ export default {
         pageNow: 1,
         pageSize: 10
       },
-      rangeOptions: [
-        { key: 'week', name: this.$t("message.dataService.apiMonitor.range_week") },
-        { key: 'yesterday', name: this.$t("message.dataService.apiMonitor.range_yesterday") },
-        { key: 'today', name: this.$t("message.dataService.apiMonitor.range_today") },
-        { key: 'picker', name: 'picker' }
-      ],
-      currentRange: 'week',
-      datePickerOpen: false,
-      datePickerRange: []
+      monitorModalShow: false,
     }
   },
-  computed: {
-    range() {
-      const now = Date.now();
-      if (this.currentRange == 'week') {
-        return {
-          startTime: this.dateFormat(new Date(now - 7*86400*1000)),
-          endTime: this.dateFormat()
-        }
-      } else if (this.currentRange == 'yesterday') {
-        return {
-          startTime: this.dateFormat(new Date(now - 86400*1000)),
-          endTime: this.dateFormat()
-        }
-      } else if (this.currentRange == 'today') {
-        return {
-          startTime: this.dateFormat(),
-          endTime: this.dateFormat(new Date(now + 86400*1000))
-        }
-      } else if (this.currentRange == 'picker') {
-        return {
-          startTime: `${this.datePickerRange[0]} 00:00:00`,
-          endTime: `${this.datePickerRange[1]} 00:00:00`
-        }
-      }
-      return {
-        startTime: this.dateFormat(),
-        endTime: this.dateFormat()
-      }
-    }
-  },
-  created() {
+  mounted() {
     this.getOnlineApiCnt();
     this.getOfflineApiCnt();
+    this.getCallListByCnt();
+    this.getCallListByFailRate();
     this.getRangeScreenData();
     this.getCallListDetail();
+    this.drawLine();
+    window.addEventListener('resize', this.chartResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.chartResize)
   },
   methods: {
     dateFormat(date) {
@@ -263,11 +256,58 @@ export default {
       ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
       return `${format} 00:00:00`;
     },
+    chartResize() {
+      this.echart && this.echart.resize()
+    },
+    drawLine() {
+      this.echart = echarts.init(this.$refs.resourceLine)
+      var option = {
+        grid: {
+          left: 100,
+          right: 40,
+          top: 30,
+          bottom: 30
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          type: 'category',
+          axisTick: {
+            show: false
+          },
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          name: "请求数目(平均QPS)",
+          nameLocation: "middle",
+          nameTextStyle: {
+            color: "#333",
+            fontSize: 16,
+            verticalAlign: "top",
+          },
+          nameGap: 80
+        },
+        series: [{
+          data: [82000, 93200, 90100, 93400, 129000, 133000, 130200],
+          type: 'line',
+          smooth: true,
+          color: '#2E92F7'
+        }]
+      };
+      this.echart.setOption(option);
+    },
     getOnlineApiCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/onlineApiCnt', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.onlineCnt = res.onlineApiCnt;
       }).catch((err) => {
         console.error(err)
@@ -277,21 +317,22 @@ export default {
       api.fetch('/dss/framework/dbapi/apimonitor/offlineApiCnt', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
-        console.log(res)
         this.offlineCnt = res.offlineApiCnt;
       }).catch((err) => {
         console.error(err)
       });
     },
-    getRangeScreenData() {
-      this.getCallTotalCnt();
-      this.getCallTotalTime();
-      this.getCallListByCnt();
-      this.getCallListByFailRate();
+    getRangeScreenData(date) {
+      const range = date || {
+        startTime: this.dateFormat(new Date(Date.now() - 7*86400*1000)),
+        endTime: this.dateFormat()
+      }
+      this.getCallTotalCnt(range);
+      this.getCallTotalTime(range);
     },
-    getCallTotalCnt() {
+    getCallTotalCnt(range) {
       api.fetch('/dss/framework/dbapi/apimonitor/callTotalCnt', {
-        ...this.range,
+        ...range,
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.callTotalCnt = res.callTotalCnt;
@@ -299,9 +340,9 @@ export default {
         console.error(err)
       });
     },
-    getCallTotalTime() {
+    getCallTotalTime(range) {
       api.fetch('/dss/framework/dbapi/apimonitor/callTotalTime', {
-        ...this.range,
+        ...range,
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.callTotalTime = res.callTotalTime;
@@ -311,7 +352,8 @@ export default {
     },
     getCallListByCnt() {
       api.fetch('/dss/framework/dbapi/apimonitor/callListByCnt', {
-        ...this.range,
+        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listCnt = res.list;
@@ -321,7 +363,8 @@ export default {
     },
     getCallListByFailRate() {
       api.fetch('/dss/framework/dbapi/apimonitor/callListByFailRate', {
-        ...this.range,
+        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listRate = res.list;
@@ -349,138 +392,188 @@ export default {
       this.pageData.pageNow = page;
       this.getCallListDetail();
     },
-    handleDateChange(option) {
-      this.currentRange = option.key;
-      if (option.key != 'picker') {
-        this.datePickerRange = [];
-        this.datePickerOpen = false;
-        this.getRangeScreenData();
-      }
+    showMonitorModal(row) {
+      this.monitorModalShow = true;
+      // ajax
+      this.drawMonitorChart();
     },
-    handlePickerClick () {
-      this.datePickerOpen = !this.datePickerOpen;
+    hideMonitorModal() {
+      this.monitorModalShow = false;
     },
-    handlePickerChange (date) {
-      this.datePickerRange = date;
-      this.datePickerOpen = false;
-      this.getRangeScreenData();
+    getModalChartData(range) {
+      console.log(range)
     },
-    viewMonitor(row) {}
+    drawMonitorChart() {
+      var option = {
+        grid: {
+          left: 100,
+          right: 40,
+          top: 30,
+          bottom: 30
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        xAxis: {
+          type: 'category',
+          axisTick: {
+            show: false
+          },
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          name: "请求数目(平均QPS)",
+          nameLocation: "middle",
+          nameTextStyle: {
+            color: "#333",
+            fontSize: 16,
+            verticalAlign: "top",
+          },
+          nameGap: 80
+        },
+        series: [{
+          data: [82000, 93200, 90100, 93400, 129000, 133000, 130200],
+          type: 'line',
+          smooth: true,
+          color: '#2E92F7'
+        }]
+      };
+      const chart1 = echarts.init(this.$refs.chartErrorcode)
+      const chart2 = echarts.init(this.$refs.chartReq)
+      const chart3 = echarts.init(this.$refs.chartBrandwidth)
+      const chart4 = echarts.init(this.$refs.chartAvgTime)
+      chart1.setOption(option)
+      chart2.setOption(option)
+      chart3.setOption(option)
+      chart4.setOption(option)
+    }
   },
 }
 </script>
 <style lang="scss" scoped>
-.monitor-holder {
-  height: 36px;
-  background: #fff;
-}
-.tab-wrap {
-  margin-top: -36px;
-  padding: 0 24px;
-}
-.dashboard {
-  height: 80px;
-  display: flex;
-  align-items: center;
-  padding: 10px 24px;
-  border-radius: 2px;
-  margin-top: 10px;
-  margin-bottom: 24px;
-  background: #fff;
-  .dash-content {
-    flex: 1;
-    .dash-title {
-      font-size: 16px;
-      line-height: 20px;
-      color: #333;
-    }
-    .dash-item {
-      margin-left: 10px;
-      font-size: 14px;
-      line-height: 20px;
-      color: #666;
-      .dash-value {
-        margin-left: 5px;
-        color: #220000;
-      }
+.monitor-wrap {
+  min-height: calc(100% - 78px);
+  position: relative;
+  .monitor-holder {
+    height: 36px;
+    background: #fff;
+  }
+  .tab-wrap {
+    margin-top: -36px;
+    padding: 0 24px;
+  }
+  .monitor-chart-mask {
+    display: none;
+    z-index: 1;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    &.shown {
+      display: block;
     }
   }
-  .dash-range-group {
-    display: flex;
-    align-items: center;
-    .range-group-item {
-      min-width: 60px;
-      height: 32px;
-      font-size: 14px;
-      line-height: 30px;
-      transition: all .2s ease-in-out;
-      cursor: pointer;
-      border: 1px solid #D9D9D9;
-      border-left: 0;
-      background: #fff;
-      text-align: center;
-      color: #666;
-      &:first-child {
-        border-radius: 4px 0 0 4px;
-        border-left: 1px solid #D9D9D9;
+  .monitor-chart-modal {
+    z-index: 2;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 460px;
+    background: #fff;
+    box-shadow: -2px 0 10px 0 #DEE4EC;
+    border-radius: 2px;
+    opacity: 0;
+    &.shown {
+      opacity: 1;
+      animation: modalshow .4s 1;
+    }
+    @keyframes modalshow {
+      from {
+        transform: translateY(100%);
       }
-      &:last-child {
-        border-radius: 0 4px 4px 0;
+      to {
+        transform: translateY(0);
       }
-      &.group-item-checked {
-        background: #fff;
-        border-color: #1890FF;
-        color: #1890FF;
-        box-shadow: -1px 0 0 0 #1890FF;
+    }
+    .mc-title {
+      position: relative;
+      padding: 12px 24px;
+      font-size: 16px;
+      line-height: 24px;
+      color: #333;
+      background: #F8F9FC;
+      .mc-close {
+        position: absolute;
+        padding: 12px 24px;
+        right: 0;
+        top: 0;
+        cursor: pointer;
       }
-      &.group-item-checked:first-child {
-        box-shadow: none!important;
-      }
-      .date-trigger {
-        padding: 0 15px;
-        line-height: 32px;
-        .date-show {
-          margin-right: 15px;
-        }
-        i {
-          vertical-align: 0;
-        }
-      }
+    }
+    .mc-body {
+      padding: 15px 24px;
+    }
+    .mc-range {
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }
 .metrics-wrap {
   display: flex;
   margin-bottom: 24px;
-  .metrics-mr {
-    margin-right: 24px;
-  }
   .metrics {
     flex: 1;
     background: #fff;
     border-radius: 2px;
-    .metrics-head {
-      padding: 16px 24px;
-      border-bottom: 1px solid #D9D9D9;
-      .metrics-head-title {
-        padding-left: 8px;
-        border-left: 4px solid #2E92F7;
-        font-size: 16px;
-        line-height: 22px;
-        color: #333;
+    .metrics-dashboard {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      padding: 10px 24px;
+      border-radius: 2px;
+      background: #fff;
+      .dash-content {
+        flex: 1;
+        .dash-title {
+          font-size: 16px;
+          line-height: 20px;
+          color: #333;
+        }
+        .dash-item {
+          margin-left: 10px;
+          font-size: 14px;
+          line-height: 20px;
+          color: #666;
+          .dash-value {
+            margin-left: 5px;
+            color: #220000;
+          }
+        }
       }
     }
-    .metrics-body {
+    .metrics-overview {
+      display: flex;
       padding: 20px 24px;
+      padding-top: 0;
       .overview {
+        flex: 1;
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
         padding: 25px 20px;
         border: 1px solid #DEE4EC;
         border-radius: 4px;
         &:last-child {
-          margin-bottom: 0;
+          margin-left: 24px;
         }
         .overview-icon {
           font-size: 40px;
@@ -506,11 +599,25 @@ export default {
         }
       }
     }
+    .metrics-head {
+      padding: 16px 24px;
+      border-bottom: 1px solid #D9D9D9;
+      .metrics-head-title {
+        padding-left: 8px;
+        border-left: 4px solid #2E92F7;
+        font-size: 16px;
+        line-height: 22px;
+        color: #333;
+      }
+    }
+    .metrics-body {
+      padding: 20px 24px;
+    }
   }
 }
 .pagebar {
   float: right;
-  margin-top: 15px;
+  margin: 15px 0;
   padding: 10px 0;
 }
 </style>

@@ -47,9 +47,10 @@ public class CommUtil {
                 whereCauseBuild.append(" where ");
             }
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String columnName = jsonObject.getString("name");
-            String compareType = jsonObject.getString("compare");
-            String whereCause = String.format("%s %s #{%s}", columnName, compareType, columnName);
+            String columnName = jsonObject.getString("name").trim();
+            String columnNameFormat = String.format("%s%s%s","`",columnName,"`");
+            String compareType = jsonObject.getString("compare").replaceAll("<","&lt;");
+            String whereCause = String.format("%s %s #{%s}", columnNameFormat, compareType, columnName);
             System.out.println(whereCause);
             if (i < jsonArray.length() - 1) {
                 whereCauseBuild.append(whereCause).append(" and ");
@@ -75,7 +76,8 @@ public class CommUtil {
                 orderCauseBuild.append(" order by ");
             }
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String columnName = jsonObject.getString("name");
+            String columnName = jsonObject.getString("name").trim();
+            columnName = String.format("%s%s%s","`",columnName,"`");
             String orderType = jsonObject.getString("type");
             String orderCause = String.format("%s %s", columnName, orderType);
             System.out.println(orderCause);

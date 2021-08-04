@@ -8,13 +8,13 @@
         </div>
       </div>
       <div class="project-nav-tree">
-        <Tree 
-          class="tree-container" 
-          :nodes="projectsTree" 
-          :load="getFlow" 
+        <Tree
+          class="tree-container"
+          :nodes="projectsTree"
+          :load="getFlow"
           :currentTreeId="currentTreeId"
-          @on-item-click="handleTreeClick" 
-          @on-add-click="handleTreeModal" 
+          @on-item-click="handleTreeClick"
+          @on-add-click="handleTreeModal"
           @on-sync-tree="handleTreeSync"
         />
         <Spin v-show="loadingTree" size="large" fix/>
@@ -351,7 +351,6 @@ export default {
     },
     handleTreeClick(node) {
       // 切换到开发模式
-      debugger
       this.modeOfKey = this.selectDevprocess && this.selectDevprocess.length ? this.selectDevprocess[0].dicValue : DEVPROCESS.DEVELOPMENTCENTER;
       if (node.type == 'flow') {
         this.currentTreeId = node.orchestratorId;

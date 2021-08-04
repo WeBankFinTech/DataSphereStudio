@@ -1,10 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.tuning;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -49,9 +46,15 @@ public class LinkisDolphinSchedulerFlowTuning extends AbstractFlowTuning {
         DolphinSchedulerFlow.ProcessDefinitionJson processDefinitionJson
             = new DolphinSchedulerFlow.ProcessDefinitionJson();
         Map<String, DolphinSchedulerFlow.LocationInfo> locations = new HashMap<>();
+
+        List<LinkedHashMap<String, String>> globalParams = ((ArrayList<LinkedHashMap<String, String>>) new Gson().fromJson(schedulerFlow.getJsonFlow().getJson(), Map.class).get("props")).stream().filter(stringStringLinkedHashMap -> stringStringLinkedHashMap.containsKey("user.to.proxy")).collect(Collectors.toList());
+
         for (SchedulerNode node : schedulerFlow.getSchedulerNodes()) {
             DolphinSchedulerNode dolphinSchedulerSchedulerNode = (DolphinSchedulerNode)node;
             dolphinSchedulerSchedulerNode.setUser(user);
+            LinkedHashMap<String, String> variableMap = (LinkedHashMap<String, String>) node.getDSSNode().getParams().get("variable");
+            globalParams.forEach(variableMap::putAll);
+
             DolphinSchedulerTask dolphinSchedulerTask = dolphinSchedulerSchedulerNode.toDolphinSchedulerTask(
                 nodeConverter);
             processDefinitionJson.addTask(dolphinSchedulerTask);

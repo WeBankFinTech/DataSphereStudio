@@ -20,6 +20,7 @@ router.get('/query', async (ctx, next) => {
   let data = id ? await mysql.query(id) : await mysql.queryAll()
   ctx.response.body = {
     "code": 0,
+    "status": 0,
     "data": data,
     "message": "success"
   }
@@ -29,6 +30,7 @@ router.post('/update', async (ctx, next) => {
   let data = await mysql.createApplication(ctx.request.body)
   ctx.response.body = {
     "code": 0,
+    "status": 0,
     "message": "success"
   }
 })
@@ -37,6 +39,7 @@ router.get('/getMenu', async (ctx, next) => {
   let data = await mysql.queryMenu()
   ctx.response.body = {
     "code": 0,
+    "status": 0,
     "data": data,
     "message": "success"
   }

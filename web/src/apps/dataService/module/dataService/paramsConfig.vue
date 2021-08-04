@@ -673,8 +673,8 @@ export default {
       this.confirmLoading = true;
       api
         .fetch(
-          `/dss/framework/dbapi/release`,
-          { apiId: this.apiData.data.id, status: 1 },
+          `/dss/framework/dbapi/apimanager/online/${this.apiData.data.id}`,
+          {},
           "post"
         )
         .then(() => {

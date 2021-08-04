@@ -59,6 +59,7 @@ export default {
   methods: {
     handleAddClick (e) {
       this.onAddClick(this.model)
+      this.handleGroupMaxHeight();
     },
     handleItemClick (e) {
       this.onItemClick(this.model)
@@ -70,6 +71,9 @@ export default {
         this.maxHeight = 0;
       }
     },
+  },
+  mounted() {
+    this.handleGroupMaxHeight();
   }
 };
 </script>

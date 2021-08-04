@@ -137,6 +137,7 @@
         @showApiForm="showApiForm"
         @removeTab="removeTab"
         @changeTab="changeTab"
+        @updateApiData="updateApiData"
       />
       <Spin v-show="loadingData" size="large" fix />
     </div>
@@ -147,6 +148,7 @@ import navMenu from "../common/navMenu.vue";
 import tag from "@/components/tag/index.vue";
 import apiCongfig from "./apiConfig.vue";
 import api from "@/common/service/api";
+
 export default {
   components: {
     navMenu,
@@ -376,8 +378,8 @@ export default {
     },
     handleApiChoosed(payload) {
       console.log(payload);
-      const { id, tempId } = payload;
       if (payload.type === "api") {
+        const { id, tempId } = payload;
         const newApis = [...this.apiTabDatas];
         const hitIndex = newApis.findIndex(
           item => item.id === id || item.id === tempId
@@ -403,13 +405,29 @@ export default {
                 apiName: payload.name,
                 groupId: payload.projectId,
                 ...data,
-                resType: data.resType || 'JSON',
+                resType: data.resType || "JSON"
               });
             }
           })
           .catch(() => {
             this.loadingData = false;
           });
+      } else if (payload.type === "saveApi") {
+        const newApis = this.apiTabDatas.map(item => {
+          let tmp = { ...item };
+          const { data, apiData } = payload;
+          if (tmp.isActive) {
+            tmp = {
+              ...item,
+              apiName: data.name,
+              id: data.id,
+              data: { ...apiData, id: data.id, path: apiData.apiPath }
+            };
+          }
+          console.log(tmp);
+          return tmp;
+        });
+        this.apiTabDatas = newApis;
       }
     },
     removeTab(id) {
@@ -426,6 +444,23 @@ export default {
       this.apiTabDatas = this.apiTabDatas.map(item => {
         return { ...item, isActive: item.id === id };
       });
+    },
+    updateApiData(data) {
+      console.log(data);
+      if (data.id) {
+        this.updateTab(data);
+      }
+      this.$refs.navMenu.treeMethod("getApi", data);
+    },
+    updateTab(data) {
+      const newApis = this.apiTabDatas.map(item => {
+        let tmp = { ...item };
+        if (tmp.id === data.id) {
+          tmp = { ...item, name: data.apiName, data };
+        }
+        return tmp;
+      });
+      this.apiTabDatas = newApis;
     }
   }
 };
@@ -442,6 +477,7 @@ export default {
 }
 .main-wrap {
   width: 100%;
+  height: 100%;
   transition: all 0.3s;
   padding-left: 304px;
   &.ds-nav-menu-fold {

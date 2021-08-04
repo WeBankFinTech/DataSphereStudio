@@ -171,16 +171,18 @@ export default {
     executeSearch(value) {
       this.searchValue = value;
       const temp = _.cloneDeep(this.originDatas);
-      const result = [];
-      temp.forEach(item => {
-        item.opened = true;
-        item.children = item.children.filter(
-          child => !value || child.name.includes(value)
-        );
-        if(item.children.length > 0 ){
-          result.push(item);
-        }
-      });
+      const result = !value ? temp : [];
+      if (value) {
+        temp.forEach(item => {
+          item.opened = true;
+          item.children = item.children.filter(
+            child => child.name.includes(value)
+          );
+          if (item.children.length > 0) {
+            result.push(item);
+          }
+        });
+      }
       this.projectsTree = result;
     }
   }

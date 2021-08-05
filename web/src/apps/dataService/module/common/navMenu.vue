@@ -80,7 +80,7 @@ export default {
 
     treeMethod(name, payload = {}) {
       if (name === "getApi") {
-        this.$refs.treeMenu.getAllApi();
+        this.$refs.treeMenu.getAllApi('update', payload);
       } else {
         const { id, data } = payload;
         this.$refs.treeMenu.addApi(id, data);

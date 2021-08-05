@@ -26,13 +26,13 @@ public interface ApiCallMapper {
     @Select("SELECT COUNT(b.id) FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
-            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.startTime} AND #{callMonitorResquest.endTime})")
     Long getCallTotalCnt(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);   //总调用次数
 
     @Select("SELECT IFNULL(SUM(b.time_length),0) FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
-            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})")
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.startTime} AND #{callMonitorResquest.endTime})")
     Long getCallTotalTime(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);  //总调用时长
 
 
@@ -43,7 +43,7 @@ public interface ApiCallMapper {
             "FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
-            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})\n" +
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.startTime} AND #{callMonitorResquest.endTime})\n" +
             "GROUP BY a.id\n" +
             "ORDER BY COUNT(b.id) DESC\n" +
             "LIMIT 10")
@@ -56,7 +56,7 @@ public interface ApiCallMapper {
             "FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +
-            "   AND (b.time_start BETWEEN #{callMonitorResquest.beginTime} AND #{callMonitorResquest.endTime})\n" +
+            "   AND (b.time_start BETWEEN #{callMonitorResquest.startTime} AND #{callMonitorResquest.endTime})\n" +
             "GROUP BY a.id\n" +
             "ORDER BY fail_rate DESC\n" +
             "LIMIT 10")

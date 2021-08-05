@@ -1,42 +1,70 @@
 <template>
   <div class="apiTest-wrap">
-    <div class="apiTest-title">{{$t('message.dataService.apiTest.apiTest')}}</div>
+    <div class="apiTest-title" v-if="!fromDataService">
+      {{ $t("message.dataService.apiTest.apiTest") }}
+    </div>
     <div class="apiTest-head">
-      <div class="api-select">
-        <Select v-model="currentApiId" style="width:200px" @on-change="handleChangeApi">
-          <Option v-for="item in apiList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+      <div class="api-select" v-if="!fromDataService">
+        <Select
+          v-model="currentApiId"
+          style="width:200px"
+          @on-change="handleChangeApi"
+        >
+          <Option v-for="item in apiList" :value="item.id" :key="item.id">{{
+            item.name
+          }}</Option>
         </Select>
       </div>
       <div class="api-path" v-if="currentApi">
-        API Path: {{currentApi.path}}
+        API Path: {{ currentApi.path }}
       </div>
     </div>
 
     <div class="apiTest-main">
       <div class="apiTest-panel">
         <template v-if="currentApi">
-          <div class="panel-title">{{$t('message.dataService.apiTest.requestParam')}}</div>
+          <div class="panel-title">
+            {{ $t("message.dataService.apiTest.requestParam") }}
+          </div>
           <Table :columns="columns" :data="currentApi.reqFields">
-            <template slot-scope="{row}" slot="value">
-              <Input 
-                v-model="currentParams[row.name]" 
-                :placeholder="row.type.includes('Array') ? $t('message.dataService.apiTest.holderArray') : $t('message.dataService.apiTest.holderInput')" 
+            <template slot-scope="{ row }" slot="value">
+              <Input
+                v-model="currentParams[row.name]"
+                :placeholder="
+                  row.type.includes('Array')
+                    ? $t('message.dataService.apiTest.holderArray')
+                    : $t('message.dataService.apiTest.holderInput')
+                "
               ></Input>
             </template>
           </Table>
         </template>
         <div class="panel-btn">
-          <Button type="primary" size="large" @click="test">{{$t('message.dataService.apiTest.start')}}</Button>
+          <Button
+            type="primary"
+            size="large"
+            @click="test"
+            :loading="loading"
+            >{{ $t("message.dataService.apiTest.start") }}</Button
+          >
         </div>
       </div>
       <div class="apiTest-panel">
-        <div class="panel-title">{{$t('message.dataService.apiTest.requestLog')}}</div>
-        <div class="panel-content">
-          <p v-for="log in logs" :key="log">{{log}}</p>
+        <div class="panel-title">
+          {{ $t("message.dataService.apiTest.requestLog") }}
         </div>
-        <div class="panel-title">{{$t('message.dataService.apiTest.response')}}</div>
+        <div class="panel-content">
+          <p v-for="log in logs" :key="log">{{ log }}</p>
+        </div>
+        <div class="panel-title">
+          {{ $t("message.dataService.apiTest.response") }}
+        </div>
         <div class="panel-content-response">
-          <Input v-model="response" type="textarea" :autosize="{minRows: 10,maxRows: 20}"></Input>
+          <Input
+            v-model="response"
+            type="textarea"
+            :autosize="{ minRows: 10, maxRows: 20 }"
+          ></Input>
         </div>
       </div>
     </div>
@@ -45,20 +73,29 @@
 <script>
 import api from "@/common/service/api";
 export default {
+  props: {
+    apiData: {
+      type: Object,
+      default: () => {}
+    },
+    fromDataService: {
+      type: Boolean
+    }
+  },
   data() {
     return {
-      currentApiId: this.$route.params.apiId ? +this.$route.params.apiId : '',
+      currentApiId: this.$route.params.apiId ? +this.$route.params.apiId : "",
       currentApi: null,
       currentParams: {},
       apiList: [],
       columns: [
         {
           title: this.$t("message.dataService.apiTest.name"),
-          key: 'name'
+          key: "name"
         },
         {
           title: this.$t("message.dataService.apiTest.type"),
-          key: 'type'
+          key: "type"
         },
         {
           title: this.$t("message.dataService.apiTest.value"),
@@ -67,68 +104,98 @@ export default {
         }
       ],
       logs: [],
-      response: ''
-    }
+      response: "",
+      loading: false
+    };
   },
   created() {
-    this.getApiList();
+    if (!this.fromDataService) {
+      this.getApiList();
+    } else {
+      this.handleChangeApi();
+    }
   },
   methods: {
     getApiList() {
-      api.fetch('/dss/framework/dbapi/list', {
-        workspaceId: this.$route.query.workspaceId
-      }, 'get').then((res) => {
-        if (res.list) {
-          const apiList = res.list.map(i => i.apis);
-          this.apiList = [].concat(...apiList)
-          if (this.currentApiId) {
-            this.handleChangeApi(this.currentApiId)
+      api
+        .fetch(
+          "/dss/framework/dbapi/list",
+          {
+            workspaceId: this.$route.query.workspaceId
+          },
+          "get"
+        )
+        .then(res => {
+          if (res.list) {
+            const apiList = res.list.map(i => i.apis);
+            this.apiList = [].concat(...apiList);
+            if (this.currentApiId) {
+              this.handleChangeApi(this.currentApiId);
+            }
           }
-        }
-      }).catch((err) => {
-        console.error(err)
-      });
+        })
+        .catch(err => {
+          console.error(err);
+        });
     },
     handleChangeApi(val) {
-      const currentApi = this.apiList.find(i => i.id == val);
+      const currentApi = this.fromDataService
+        ? this.apiData
+        : this.apiList.find(i => i.id == val);
       if (currentApi) {
         this.currentApi = {
           ...currentApi,
           reqFields: JSON.parse(currentApi.reqFields)
-        }
+        };
         // 构造请求参数
         const params = {};
         this.currentApi.reqFields.forEach(row => {
           params[row.name] = "";
-        })
+        });
         this.currentParams = params;
       }
     },
     test() {
       if (!this.currentApi) {
-        this.$Message.warning(this.$t('message.dataService.apiTest.api_not_selected')); 
+        this.$Message.warning(
+          this.$t("message.dataService.apiTest.api_not_selected")
+        );
       } else {
         const data = this.currentParams;
         this.currentApi.reqFields.forEach(row => {
-          if (row.type.includes('Array')) {
+          if (row.type.includes("Array")) {
             // 如果是数组类型，逗号分隔且trim，并过滤掉无效参数
-            data[row.name] = this.currentParams[row.name].split(',').map(i => i.trim()).filter(i => !!`${i}`)
+            data[row.name] = this.currentParams[row.name]
+              .split(",")
+              .map(i => i.trim())
+              .filter(i => !!`${i}`);
           } else {
             data[row.name] = this.currentParams[row.name];
           }
-        })
-        api.fetch(`/dss/framework/dbapi/test/${this.currentApi.path}`, data, 'post').then((res) => {
-          if (res.response) {
-            this.logs = res.response.log.split('\n')
-            this.response = JSON.stringify(res.response.resList, null, 4) 
-          }
-        }).catch((err) => {
-          console.error(err)
         });
+        this.loading = true;
+        api
+          .fetch(
+            `/dss/framework/dbapi/test/${this.currentApi.path}`,
+            data,
+            "post"
+          )
+          .then(res => {
+            this.loading = false;
+            if (res.response) {
+              this.logs = res.response.log.split("\n");
+              this.response = JSON.stringify(res.response.resList, null, 4);
+              this.$emit("testSuccess");
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+            console.error(err);
+          });
       }
     }
-  },
-}
+  }
+};
 </script>
 <style lang="scss" scoped>
 .apiTest-wrap {
@@ -140,7 +207,7 @@ export default {
     font-size: 16px;
     color: #333;
     font-weight: bold;
-    border-bottom: 1px solid #DEE4EC;
+    border-bottom: 1px solid #dee4ec;
   }
   .apiTest-head {
     .api-path {
@@ -173,7 +240,7 @@ export default {
         height: 300px;
         overflow: auto;
         border-radius: 4px;
-        border: 1px solid #DEE4EC;
+        border: 1px solid #dee4ec;
         p {
           font-size: 14px;
           line-height: 24px;

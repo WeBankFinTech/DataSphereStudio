@@ -24,6 +24,7 @@
           </div>
         </template>
       </Table>
+      <Spin v-show="loading" size="large" fix/>
       <div class="pagebar" v-if="pageData.total">
         <Page
           :total="pageData.total"
@@ -75,6 +76,7 @@ export default {
         }
       ],
       apiList: [],
+      loading: true,
       pageData: {
         total: 0,
         pageNow: 1,
@@ -88,6 +90,7 @@ export default {
   },
   methods: {
     getApiList() {
+      this.loading = true;
       api.fetch('/dss/framework/dbapi/apimanager/list', {
         workspaceId: this.$route.query.workspaceId,
         apiName: this.apiName,
@@ -95,10 +98,12 @@ export default {
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
         if (res.list) {
+          this.loading = false;
           this.apiList = res.list;
           this.pageData.total = res.total;
         }
       }).catch((err) => {
+        this.loading = false;
         console.error(err)
       });
     },

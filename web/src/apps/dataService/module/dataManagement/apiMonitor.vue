@@ -91,6 +91,7 @@
                   @on-page-size-change="handlePageSizeChange"
                 />
               </div>
+              <Spin v-show="loadingDetail" size="large" fix/>
             </div>
           </div>
         </div>
@@ -227,6 +228,7 @@ export default {
       listCnt: [],
       listRate: [],
       listDetail: [],
+      loadingDetail: true,
       pageData: {
         total: 0,
         pageNow: 1,
@@ -373,14 +375,17 @@ export default {
       });
     },
     getCallListDetail() {
+      this.loadingDetail = true;
       api.fetch('/dss/framework/dbapi/apimonitor/list', {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
+        this.loadingDetail = false;
         this.listDetail = res.list;
         this.pageData.total = res.total;
       }).catch((err) => {
+        this.loadingDetail = false;
         console.error(err)
       });
     },
@@ -395,7 +400,9 @@ export default {
     showMonitorModal(row) {
       this.monitorModalShow = true;
       // ajax
-      this.drawMonitorChart();
+      this.$nextTick(() => {
+        this.drawMonitorChart();
+      })
     },
     hideMonitorModal() {
       this.monitorModalShow = false;
@@ -482,6 +489,7 @@ export default {
     }
   }
   .monitor-chart-modal {
+    display: none;
     z-index: 2;
     position: absolute;
     bottom: 0;
@@ -491,9 +499,8 @@ export default {
     background: #fff;
     box-shadow: -2px 0 10px 0 #DEE4EC;
     border-radius: 2px;
-    opacity: 0;
     &.shown {
-      opacity: 1;
+      display: block;
       animation: modalshow .4s 1;
     }
     @keyframes modalshow {

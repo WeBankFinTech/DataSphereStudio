@@ -248,8 +248,8 @@ export default {
           if (this.authFormData.expire == 'short') {
             data.expire = `${this.dateFormat(this.authFormData.expireDate)} 00:00:00`;
           } else if (this.authFormData.expire == 'long') {
-            const date = new Date(date.now() + 365*86400*1000)
-            data.expire = `${this.dateFormat(date)} 00:00:00`
+            const date = new Date(Date.now() + 365*86400*1000)
+            data.expire = `${this.dateFormat(date)} 00:00:00`;
           }
           if (this.authFormData.id) {
             data.id = this.authFormData.id;

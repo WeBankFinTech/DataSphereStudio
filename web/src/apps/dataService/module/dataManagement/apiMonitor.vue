@@ -102,7 +102,7 @@
       <div class="mc-title">
         <span>API监控图表</span>
         <div class="mc-close" @click="hideMonitorModal">
-          <Icon custom="iconfont icon-riqi" size="16"></Icon>
+          <Icon custom="iconfont icon-huaban" size="16"></Icon>
         </div>
       </div>
       <div class="mc-body">

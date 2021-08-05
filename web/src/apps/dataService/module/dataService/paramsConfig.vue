@@ -19,7 +19,7 @@
           class="toolWrap"
           @click="handleToolShow(toolItem)"
         >
-          <img :src="toolItem.iconSrc" />
+          <Icon :custom="toolItem.iconName" size="20"></Icon>
           <div>{{ toolItem.name }}</div>
           <div class="divider" :class="{ 'last-divider': index === 4 }" />
         </div>
@@ -280,27 +280,27 @@ export default {
       toolItems: [
         {
           name: "属性",
-          iconSrc: require("../../assets/images/property.svg"),
-          type: "property"
+          type: "property",
+          iconName: "iconfont icon-shuxing"
         },
         {
           name: "版本",
-          iconSrc: require("../../assets/images/version.svg"),
+          iconName: "iconfont icon-banben",
           type: "version"
         },
         {
           name: "保存",
-          iconSrc: require("../../assets/images/save.svg"),
+          iconName: "iconfont icon-baocun",
           type: "save"
         },
         {
           name: "测试",
-          iconSrc: require("../../assets/images/test.svg"),
+          iconName: "iconfont icon-ceshi",
           type: "test"
         },
         {
           name: "发布",
-          iconSrc: require("../../assets/images/release.svg"),
+          iconName: "iconfont icon-fabu",
           type: "release"
         }
       ],

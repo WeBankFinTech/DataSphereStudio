@@ -6,7 +6,7 @@
         :class="{ active: currentTab == '/dataService' }"
         @click="handleTabClick('dataService')"
       >
-        <img src="../../assets/images/develop_nav.svg" class="develop_nav" />
+        <Icon custom="iconfont icon-fuwukaifa" size="26"></Icon>
       </div>
       <div
         class="ds-nav-menu-item"
@@ -80,7 +80,7 @@ export default {
 
     treeMethod(name, payload = {}) {
       if (name === "getApi") {
-        this.$refs.treeMenu.getAllApi('update', payload);
+        this.$refs.treeMenu.getAllApi("update", payload);
       } else {
         const { id, data } = payload;
         this.$refs.treeMenu.addApi(id, data);

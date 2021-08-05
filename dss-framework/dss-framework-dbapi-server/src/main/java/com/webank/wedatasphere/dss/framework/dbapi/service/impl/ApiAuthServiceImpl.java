@@ -9,6 +9,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiAuth;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.List;
  * @Created by suyc
  */
 @Service
+@Slf4j
 public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> implements ApiAuthService {
     @Autowired
     private ApiAuthMapper apiAuthMapper;
@@ -52,6 +54,7 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     @Override
     public void deleteApiAuth(Long id){
         apiAuthMapper.deleteApiAuth(id);
+        log.info("-------delete apiauth:    " + id + ", ok");
     }
 
     @Override

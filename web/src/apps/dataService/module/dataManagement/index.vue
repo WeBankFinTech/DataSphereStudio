@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%;">
     <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
     <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
       <div class="ds-main-container">
@@ -33,6 +33,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .ds-main-content {
+  height: 100%;
   margin-left: 304px;
   transition: margin-left .3s;
   &.ds-main-content-fold {
@@ -40,6 +41,7 @@ export default {
   }
   .ds-main-container {
     background: #f3f5fc;
+    height: 100%;
     .ds-breadcumb {
       padding: 24px;
       background: #fff;

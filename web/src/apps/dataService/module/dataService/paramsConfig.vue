@@ -54,7 +54,11 @@
                   >
                 </Select>
               </FormItem>
-              <FormItem label="数据表名称" prop="tblName">
+              <FormItem
+                label="数据表名称"
+                prop="tblName"
+                v-if="apiData.data.apiType === 'GUIDE'"
+              >
                 <Select
                   v-model="dbForm.tblName"
                   style="width:300px"
@@ -131,6 +135,7 @@
                   transfer
                   style="width:200px"
                   @on-change="value => changeParamCompare(value, index)"
+                  v-if="row.setRequest"
                 >
                   <Option
                     v-for="(item, index) in compareItems"
@@ -250,6 +255,10 @@ const compareItems = [
   {
     label: "小于等于",
     value: "&lt;="
+  },
+  {
+    label: "等于",
+    value: "="
   },
   {
     label: "大于",
@@ -798,6 +807,9 @@ export default {
     },
     getDbTables(datasourceId) {
       //获取数据表
+      if (this.apiData.data.apiType === "SQL") {
+        return;
+      }
       this.dbTables = [];
       this.paramsList = [];
       this.sortList = [];
@@ -816,6 +828,9 @@ export default {
     },
     getTableCols(tableName, isInit) {
       //获取数据表的字段
+      if (this.apiData.data.apiType === "SQL") {
+        return;
+      }
       this.paramsList = [];
       this.sortList = [];
       this.destoryParamsTable();

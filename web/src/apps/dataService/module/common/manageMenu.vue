@@ -6,7 +6,7 @@
         v-for="menu in menuList"
         :key="menu.path"
         class="manage-menu-item" 
-        :class="{'active': $route.path == `/${menu.path}` }" 
+        :class="{'active': $route.path.startsWith(`/${menu.path}`) }" 
         @click="handleTabClick(menu.path)"
       >
         <Icon custom="iconfont" :class="menu.icon" size="16"></Icon>

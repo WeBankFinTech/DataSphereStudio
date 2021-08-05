@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,6 +57,7 @@ import java.util.UUID;
 @Path("/dss/framework/dbapi/apiauth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Slf4j
 public class DSSDbApiAuthRestful {
     @Autowired
     private ApiAuthService apiAuthService;
@@ -110,6 +112,7 @@ public class DSSDbApiAuthRestful {
     @DELETE
     @Path("/{id}")
     public Response deleteApiAuth(@PathParam("id") Long id){
+        log.info("-------delete apiauth:    " + id + ", begin");
         apiAuthService.deleteApiAuth(id);
 
         Message message = Message.ok("删除成功");

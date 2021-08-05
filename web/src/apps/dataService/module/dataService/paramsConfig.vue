@@ -1,222 +1,247 @@
 <template>
   <div class="paramsContainer">
-    <div class="toolBar">
-      <div
-        v-for="(toolItem, index) in toolItems"
-        :key="index"
-        class="toolWrap"
-        @click="handleToolShow(toolItem)"
-      >
-        <img :src="toolItem.iconSrc" />
-        <div>{{ toolItem.name }}</div>
-        <div class="divider" :class="{ 'last-divider': index === 4 }" />
+    <div v-if="showTestPanel">
+      <div class="testTitle">
+        <div class="title">API测试</div>
+        <Icon type="md-close" class="icon" @click="closeTestPanel" />
       </div>
+      <Test
+        :apiData="apiData.data"
+        :fromDataService="true"
+        @testSuccess="setTestSuccess"
+      />
     </div>
-    <div class="paramsCardContainer">
-      <div class="cardWrap">
-        <div class="cardTitle">数据表</div>
-        <div class="contentWrap">
-          <Form
-            ref="dbForm"
-            :model="dbForm"
-            :label-width="90"
-            :rules="ruleValidate"
-          >
-            <FormItem label="数据源类型" prop="datasourceType">
-              <Select v-model="dbForm.datasourceType" style="width:300px">
-                <Option value="MYSQL">MYSQL</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="数据源名称" prop="datasourceId" required>
-              <Select
-                v-model="dbForm.datasourceId"
-                style="width:300px"
-                filterable
-                @on-change="value => getDbTables(value)"
-              >
-                <Option
-                  v-for="item in datasourceIds"
-                  :value="item.datasourceId"
-                  :key="item.datasourceId"
-                  >{{ item.name }}</Option
+    <div v-show="!showTestPanel">
+      <div class="toolBar">
+        <div
+          v-for="(toolItem, index) in toolItems"
+          :key="index"
+          class="toolWrap"
+          @click="handleToolShow(toolItem)"
+        >
+          <img :src="toolItem.iconSrc" />
+          <div>{{ toolItem.name }}</div>
+          <div class="divider" :class="{ 'last-divider': index === 4 }" />
+        </div>
+      </div>
+      <div class="paramsCardContainer">
+        <div class="cardWrap">
+          <div class="cardTitle">数据表</div>
+          <div class="contentWrap">
+            <Form
+              ref="dbForm"
+              :model="dbForm"
+              :label-width="90"
+              :rules="ruleValidate"
+            >
+              <FormItem label="数据源类型" prop="datasourceType">
+                <Select v-model="dbForm.datasourceType" style="width:300px">
+                  <Option value="MYSQL">MYSQL</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="数据源名称" prop="datasourceId" required>
+                <Select
+                  v-model="dbForm.datasourceId"
+                  style="width:300px"
+                  filterable
+                  @on-change="value => getDbTables(value)"
                 >
-              </Select>
-            </FormItem>
-            <FormItem label="数据表名称" prop="tblName">
-              <Select
-                v-model="dbForm.tblName"
-                style="width:300px"
-                filterable
-                @on-change="value => getTableCols(value)"
-              >
-                <Option v-for="item in dbTables" :value="item" :key="item">{{
-                  item
-                }}</Option>
-              </Select>
-            </FormItem>
-          </Form>
-        </div>
-      </div>
-      <div class="cardWrap">
-        <div class="cardTitle">环境配置</div>
-        <div class="contentWrap">
-          <Form :model="envForm" :label-width="90">
-            <FormItem label="内存" prop="memory">
-              <Select v-model="envForm.memory" style="width:300px">
-                <Option value="4096">4096M</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="超时时间" prop="reqTimeout">
-              <Input
-                type="number"
-                v-model="envForm.reqTimeout"
-                placeholder="请输入超时时间"
-                style="width: 300px"
-                ><span slot="append">ms</span></Input
-              >
-            </FormItem>
-          </Form>
-        </div>
-      </div>
-      <div class="cardWrap" v-if="apiData.data.apiType === 'SQL'">
-        <div class="cardTitle">编写查询SQL</div>
-        <div class="contentWrap">
-          <Input
-            v-model="sql"
-            type="textarea"
-            placeholder="请填写SQL语句"
-            rows="10"
-          />
-        </div>
-      </div>
-      <div
-        class="cardWrap cardTableWrap"
-        v-if="apiData.data.apiType === 'GUIDE'"
-      >
-        <div class="cardTitle">选择参数</div>
-        <div class="contentWrap">
-          <Table
-            :columns="paramsColumns"
-            :data="paramsList"
-            :loading="tableLoading"
-            v-if="!hideParamTable"
-          >
-            <template slot-scope="{ index, row, column }" slot="checkbox">
-              <Checkbox
-                :value="row[column.key]"
-                @on-change="value => changeParams(value, index, column)"
-              />
-            </template>
-            <template slot-scope="{ index, row }" slot="compare">
-              <Select
-                :value="row.compare"
-                transfer
-                style="width:200px"
-                @on-change="value => changeParamCompare(value, index)"
-              >
-                <Option
-                  v-for="(item, index) in compareItems"
-                  :value="item.value"
-                  :key="index"
-                  >{{ item.label }}</Option
+                  <Option
+                    v-for="item in datasourceIds"
+                    :value="item.datasourceId"
+                    :key="item.datasourceId"
+                    >{{ item.name }}</Option
+                  >
+                </Select>
+              </FormItem>
+              <FormItem label="数据表名称" prop="tblName">
+                <Select
+                  v-model="dbForm.tblName"
+                  style="width:300px"
+                  filterable
+                  @on-change="value => getTableCols(value)"
                 >
-              </Select>
-            </template>
-            <template slot-scope="{ row }" slot="fieldSort">
-              <div class="fieldSort" @click="addToSort(row)">
-                添加到字段排序
-              </div>
-            </template>
-          </Table>
+                  <Option v-for="item in dbTables" :value="item" :key="item">{{
+                    item
+                  }}</Option>
+                </Select>
+              </FormItem>
+            </Form>
+          </div>
         </div>
-      </div>
-      <div
-        class="cardWrap cardTableWrap"
-        v-if="apiData.data.apiType === 'GUIDE'"
-      >
-        <div class="cardTitle">排序字段</div>
-        <div style="margin-top: 10px;">
-          <Alert show-icon closable
-            >排序字段为非必填项；如果您需要对字段进行排序，请首先在选择参数的列表中选择所需字段</Alert
-          >
+        <div class="cardWrap">
+          <div class="cardTitle">环境配置</div>
+          <div class="contentWrap">
+            <Form :model="envForm" :label-width="90">
+              <FormItem label="内存" prop="memory">
+                <Select v-model="envForm.memory" style="width:300px">
+                  <Option value="4096">4096M</Option>
+                </Select>
+              </FormItem>
+              <FormItem label="超时时间" prop="reqTimeout">
+                <Input
+                  type="number"
+                  v-model="envForm.reqTimeout"
+                  placeholder="请输入超时时间"
+                  style="width: 300px"
+                  ><span slot="append">ms</span></Input
+                >
+              </FormItem>
+            </Form>
+          </div>
         </div>
-        <div class="contentWrap">
-          <Table :columns="sortColumns" :data="sortList">
-            <template slot-scope="{ row }" slot="SortType">
-              <Select
-                :value="row.type"
-                transfer
-                style="width:200px"
-                @on-change="value => changeSort(value, row)"
-              >
-                <Option value="asc">升序</Option>
-                <Option value="desc">降序</Option>
-              </Select>
-            </template>
-            <template slot-scope="{ index }" slot="operation">
-              <div class="sortOperation">
-                <div class="operation" @click="moveSortRow(index, 'up')">
-                  上移
+        <div class="cardWrap" v-if="apiData.data.apiType === 'SQL'">
+          <div class="cardTitle">编写查询SQL</div>
+          <div style="margin-top: 10px;">
+            <Alert show-icon
+              >支持mybaits的 where,foreach,if 动态SQL; 比较字符 "<"请用
+              "&amp;lt;"替代; 比较字符 "> "请用 "&amp;gt;"替代;
+            </Alert>
+          </div>
+          <div class="contentWrap">
+            <Input
+              v-model="sql"
+              type="textarea"
+              placeholder="请填写SQL语句"
+              rows="10"
+            />
+          </div>
+        </div>
+        <div
+          class="cardWrap cardTableWrap"
+          v-if="apiData.data.apiType === 'GUIDE'"
+        >
+          <div class="cardTitle">选择参数</div>
+          <div class="contentWrap">
+            <Table
+              :columns="paramsColumns"
+              :data="paramsList"
+              :loading="tableLoading"
+              v-if="!hideParamTable"
+            >
+              <template slot-scope="{ index, row, column }" slot="checkbox">
+                <Checkbox
+                  :value="row[column.key]"
+                  @on-change="value => changeParams(value, index, column)"
+                />
+              </template>
+              <template slot-scope="{ index, row }" slot="compare">
+                <Select
+                  :value="row.compare"
+                  transfer
+                  style="width:200px"
+                  @on-change="value => changeParamCompare(value, index)"
+                >
+                  <Option
+                    v-for="(item, index) in compareItems"
+                    :value="item.value"
+                    :key="index"
+                    >{{ item.label }}</Option
+                  >
+                </Select>
+              </template>
+              <template slot-scope="{ row }" slot="fieldSort">
+                <div class="fieldSort" @click="addToSort(row)">
+                  添加到字段排序
                 </div>
-                <Divider type="vertical" />
-                <div class="operation" @click="moveSortRow(index, 'down')">
-                  下移
+              </template>
+            </Table>
+          </div>
+        </div>
+        <div
+          class="cardWrap cardTableWrap"
+          v-if="apiData.data.apiType === 'GUIDE'"
+        >
+          <div class="cardTitle">排序字段</div>
+          <div style="margin-top: 10px;">
+            <Alert show-icon closable
+              >排序字段为非必填项；如果您需要对字段进行排序，请首先在选择参数的列表中选择所需字段</Alert
+            >
+          </div>
+          <div class="contentWrap">
+            <Table :columns="sortColumns" :data="sortList">
+              <template slot-scope="{ row }" slot="SortType">
+                <Select
+                  :value="row.type"
+                  transfer
+                  style="width:200px"
+                  @on-change="value => changeSort(value, row)"
+                >
+                  <Option value="asc">升序</Option>
+                  <Option value="desc">降序</Option>
+                </Select>
+              </template>
+              <template slot-scope="{ index }" slot="operation">
+                <div class="sortOperation">
+                  <div class="operation" @click="moveSortRow(index, 'up')">
+                    上移
+                  </div>
+                  <Divider type="vertical" />
+                  <div class="operation" @click="moveSortRow(index, 'down')">
+                    下移
+                  </div>
+                  <Divider type="vertical" />
+                  <div class="operation" @click="moveSortRow(index, 'delete')">
+                    删除
+                  </div>
                 </div>
-                <Divider type="vertical" />
-                <div class="operation" @click="moveSortRow(index, 'delete')">
+              </template>
+            </Table>
+          </div>
+        </div>
+        <div
+          class="cardWrap cardTableWrap"
+          v-if="apiData.data.apiType === 'SQL'"
+        >
+          <div class="cardTitle">请求参数</div>
+          <div class="contentWrap">
+            <Table :columns="sqlColumns" :data="sqlList">
+              <template slot-scope="{ index, row, column }" slot="input">
+                <Input
+                  type="text"
+                  :value="column.key === 'name' ? row.name : row.comment"
+                  @on-change="
+                    value => changeSqlParams(value.target.value, index, column)
+                  "
+                  placeholder="请输入"
+                ></Input>
+              </template>
+              <template slot-scope="{ index, row, column }" slot="type">
+                <Select
+                  :value="row.type"
+                  transfer
+                  style="width:200px"
+                  @on-change="value => changeSqlParams(value, index, column)"
+                >
+                  <Option
+                    v-for="(item, index) in sqlTypeOptions"
+                    :value="item.value"
+                    :key="index"
+                    >{{ item.label }}</Option
+                  >
+                </Select>
+              </template>
+              <template slot-scope="{ index }" slot="operation">
+                <div class="sqlOperation" @click="deleteSqlRow(index)">
                   删除
                 </div>
-              </div>
-            </template>
-          </Table>
-        </div>
-      </div>
-      <div class="cardWrap cardTableWrap" v-if="apiData.data.apiType === 'SQL'">
-        <div class="cardTitle">请求参数</div>
-        <div class="contentWrap">
-          <Table :columns="sqlColumns" :data="sqlList">
-            <template slot-scope="{ index, row, column }" slot="input">
-              <Input
-                type="text"
-                :value="column.key === 'name' ? row.name : row.comment"
-                @on-change="
-                  value => changeSqlParams(value.target.value, index, column)
-                "
-                placeholder="请输入"
-              ></Input>
-            </template>
-            <template slot-scope="{ index, row, column }" slot="type">
-              <Select
-                :value="row.type"
-                transfer
-                style="width:200px"
-                @on-change="value => changeSqlParams(value, index, column)"
-              >
-                <Option
-                  v-for="(item, index) in sqlTypeOptions"
-                  :value="item.value"
-                  :key="index"
-                  >{{ item.label }}</Option
-                >
-              </Select>
-            </template>
-            <template slot-scope="{ index }" slot="operation">
-              <div class="sqlOperation" @click="deleteSqlRow(index)">
-                删除
-              </div>
-            </template>
-          </Table>
-          <div class="addSqlParams" @click="addSqlParams()">
-            <Icon type="md-add" />
-            <div style="margin-left:5px;">新增参数</div>
+              </template>
+            </Table>
+            <div class="addSqlParams" @click="addSqlParams()">
+              <Icon type="md-add" />
+              <div style="margin-left:5px;">新增参数</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <Spin v-show="confirmLoading" size="large" fix />
   </div>
 </template>
 <script>
 import api from "@/common/service/api";
+import Test from "../common/test.vue";
+
 const compareItems = [
   {
     label: "小于",
@@ -236,6 +261,9 @@ const compareItems = [
   }
 ];
 export default {
+  components: {
+    Test
+  },
   props: {
     apiData: {
       type: Object,
@@ -247,6 +275,8 @@ export default {
   },
   data() {
     return {
+      confirmLoading: false,
+      showTestPanel: false,
       toolItems: [
         {
           name: "属性",
@@ -465,7 +495,8 @@ export default {
           value: "Array<date>",
           demo: ["2020-09-21 14:00:00", "2020-09-23 15:23:01"]
         }
-      ]
+      ],
+      hadTestSuccess: false
     };
   },
   computed: {},
@@ -478,7 +509,8 @@ export default {
       tblName,
       memory,
       reqTimeout,
-      sql
+      sql,
+      reqFields
     } = data;
     this.getDataSourceIds(this.dbForm.datasourceType);
     if (!id) {
@@ -495,8 +527,11 @@ export default {
     };
     if (apiType === "SQL") {
       this.sql = sql;
+      const reqValues = reqFields ? JSON.parse(reqFields) : [];
+      this.sqlList = reqValues.map(item => {
+        return { ...item };
+      });
     }
-    console.log(data);
     if (datasourceId && tblName) {
       this.getDbTables(datasourceId);
       this.getTableCols(tblName, true);
@@ -510,7 +545,25 @@ export default {
         this.$emit("showApiForm", this.apiData);
       } else if (type === "save") {
         this.saveApi();
+      } else if (type === "test") {
+        if (!this.apiData.data.id) {
+          this.$Message.info("请先保存API");
+          return;
+        }
+        this.showTestPanel = true;
+      } else if (type === "release") {
+        if (!this.hadTestSuccess) {
+          this.$Message.info("请先测试API");
+          return;
+        }
+        this.releaseApi();
       }
+    },
+    closeTestPanel() {
+      this.showTestPanel = false;
+    },
+    setTestSuccess() {
+      this.hadTestSuccess = true;
     },
     saveApi() {
       const { data } = this.apiData;
@@ -526,7 +579,16 @@ export default {
         path,
         ...rest
       } = data;
-      console.log(type + tempId + sql + path + name + projectId + projectName + datasourceName);
+      console.log(
+        type +
+          tempId +
+          sql +
+          path +
+          name +
+          projectId +
+          projectName +
+          datasourceName
+      );
       const { reqTimeout, memory } = this.envForm;
       let reqParams = {
         ...rest,
@@ -591,10 +653,14 @@ export default {
               sql: this.sql
             };
           }
+          this.confirmLoading = true;
           api
             .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
             .then(res => {
               console.log(res);
+              this.$emit("updateApiData", { ...data, ...reqParams });
+
+              this.$Message.success("保存成功");
               this.confirmLoading = false;
             })
             .catch(() => {
@@ -602,6 +668,22 @@ export default {
             });
         }
       });
+    },
+    releaseApi() {
+      this.confirmLoading = true;
+      api
+        .fetch(
+          `/dss/framework/dbapi/apimanager/online/${this.apiData.data.id}`,
+          {},
+          "post"
+        )
+        .then(() => {
+          this.$Message.success("发布上线成功");
+          this.confirmLoading = false;
+        })
+        .catch(() => {
+          this.confirmLoading = false;
+        });
     },
     addToSort(rowData) {
       const hit = this.sortList.find(
@@ -789,6 +871,28 @@ export default {
 @import "@/common/style/variables.scss";
 .paramsContainer {
   padding: 0 0;
+  .testTitle {
+    width: 100%;
+    height: 48px;
+    background: #f8f9fc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    border-left-width: 0;
+    border-right-width: 0;
+    box-sizing: border-box;
+    margin-top: -5px;
+    .title {
+      font-family: PingFangSC-Medium;
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .icon {
+      cursor: pointer;
+    }
+  }
   .toolBar {
     width: 100%;
     height: 48px;
@@ -826,6 +930,8 @@ export default {
   }
   .paramsCardContainer {
     padding: 0 20px;
+    height: calc(100vh - 230px);
+    overflow-y: auto;
     .cardWrap {
       padding: 20px 0;
       border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);

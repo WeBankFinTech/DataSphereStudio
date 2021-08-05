@@ -23,6 +23,7 @@
       @on-add-click="handleTreeModal"
       @on-sync-tree="handleTreeSync"
     />
+    <div class="dataEmpty" v-if="projectsTree.length === 0">暂无数据</div>
     <Spin v-show="loadingTree" size="large" fix />
   </div>
 </template>
@@ -41,7 +42,7 @@ export default {
       loadingTree: false,
       projectsTree: [],
       currentTreeId: +this.$route.query.projectID, // tree中active节点
-      searchValue: 123,
+      searchValue: "",
       originDatas: []
     };
   },
@@ -85,9 +86,8 @@ export default {
       console.log(node);
       this.$emit("handleApiChoosed", node);
     },
-    getAllApi() {
+    getAllApi(type = "", payload = {}) {
       //获取数据服务所有的api
-      this.searchValue = "";
       api
         .fetch(
           `/dss/framework/dbapi/list?workspaceId=${this.$route.query.workspaceId}`,
@@ -97,7 +97,8 @@ export default {
         .then(res => {
           console.log(res);
           if (res && res.list) {
-            this.projectsTree = res.list.map(n => {
+            const isUpdate = type === "update";
+            const list = res.list.map(n => {
               const childs = n.apis.map(item => {
                 return {
                   ...item,
@@ -106,15 +107,34 @@ export default {
                   type: "api"
                 };
               });
+              let opened = false;
+              if (isUpdate) {
+                const hit = this.projectsTree.find(p => p.id === n.groupId);
+                opened = hit ? !!hit.opened : false;
+                if (!payload.id && payload.groupId === n.groupId) {
+                  const apiDetail = childs.find(
+                    child =>
+                      child.name === payload.apiName &&
+                      child.path === payload.apiPath
+                  );
+                  this.$emit("handleApiChoosed", {
+                    type: "saveApi",
+                    data: { ...apiDetail },
+                    apiData: { ...payload }
+                  });
+                }
+              }
               return {
                 id: n.groupId,
                 name: n.groupName,
                 type: "project",
                 canWrite: () => true,
                 children: childs,
-                apis: childs
+                apis: childs,
+                opened
               };
             });
+            this.projectsTree = list;
             this.originDatas = _.cloneDeep(this.projectsTree);
           } else {
             this.projectsTree = [];
@@ -151,13 +171,19 @@ export default {
     executeSearch(value) {
       this.searchValue = value;
       const temp = _.cloneDeep(this.originDatas);
-      temp.forEach(item => {
-        item.opened = true;
-        item.children = item.children.filter(
-          child => !value || child.name.includes(value)
-        );
-      });
-      this.projectsTree = temp;
+      const result = !value ? temp : [];
+      if (value) {
+        temp.forEach(item => {
+          item.opened = true;
+          item.children = item.children.filter(
+            child => child.name.includes(value)
+          );
+          if (item.children.length > 0) {
+            result.push(item);
+          }
+        });
+      }
+      this.projectsTree = result;
     }
   }
 };
@@ -175,5 +201,16 @@ export default {
   & div {
     cursor: pointer;
   }
+}
+.dataEmpty {
+  margin-top: 30px;
+  display: flex;
+  width: 100%;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  font-family: PingFangSC-Medium;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.85);
 }
 </style>

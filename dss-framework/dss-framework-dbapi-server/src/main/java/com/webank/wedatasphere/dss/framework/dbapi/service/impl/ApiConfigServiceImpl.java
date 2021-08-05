@@ -69,7 +69,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 //        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
 //                .eq("id", id);
         if (id != null) {
-            this.saveOrUpdate(apiConfig);
+            this.updateById(apiConfig);
         } else {
             this.save(apiConfig);
         }
@@ -85,7 +85,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
      */
 
     @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws JSONException, SQLException {
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws JSONException, SQLException, DataApiException {
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         List<Object > jdbcParamValues = new ArrayList<>();
@@ -103,7 +103,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
             sqlText = String.format("%s %s",sqlText,"limit 500");
             DataSource dataSource = new DataSource();
-            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
+//            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
+            dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/dss_test?characterEncoding=UTF-8");
+
             dataSource.setClassName("com.mysql.jdbc.Driver");
             dataSource.setUsername("root");
             dataSource.setPwd("123456");
@@ -190,6 +192,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 JSONObject jo = requestParams.getJSONObject(i);
                 String name = jo.getString("name");
                 String type = jo.getString("type");
+                if(type.indexOf("(") > 0){
+                    type = type.substring(0,type.indexOf("(")).toLowerCase();
+                }
                 if (type.startsWith("Array")) {
                     String[] values = CommUtil.objectToArray(paraMap.get(name));
                     if (values != null) {
@@ -204,8 +209,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                                     List<Long> longs = list.stream().map(value -> Long.valueOf(value)).collect(Collectors.toList());
                                     map.put(name, longs);
                                     break;
-                                case "Array<string>":
-                                case "Array<date>":
+//                                case "Array<string>":
+//                                case "Array<date>":
+                                default:
                                     map.put(name, list);
                                     break;
                             }
@@ -216,7 +222,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                         map.put(name, null);
                     }
                 } else {
-                    String value = paraMap.get(name) == null ? null : String.valueOf(paraMap.get(name));
+
+                    String value = paraMap == null || paraMap.get(name) == null ? null : String.valueOf(paraMap.get(name));
                     if (StringUtils.isNotBlank(value)) {
 
                         switch (type) {
@@ -224,12 +231,17 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                                 Double v = Double.valueOf(value);
                                 map.put(name, v);
                                 break;
+                            case "int":
                             case "bigint":
                                 Long longV = Long.valueOf(value);
                                 map.put(name, longV);
                                 break;
-                            case "string":
-                            case "date":
+//                            case "string":
+//                            case "varchar":
+//                            case "datetime":
+//                            case "timestamp":
+//                            case "date":
+                            default:
                                 map.put(name, value);
                                 break;
                         }
@@ -245,7 +257,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
 
-    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql, List<Object> jdbcParamValues) throws SQLException {
+    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql, List<Object> jdbcParamValues) throws DataApiException, SQLException {
         DruidPooledConnection connection = null;
         StringBuilder logBuilder = new StringBuilder();
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
@@ -282,7 +294,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             apiExecuteInfo.setResList(list);
 
         } catch (Exception e){
-            logBuilder.append(e.getMessage());
+           logBuilder.append(e.getMessage());
+
+            throw new DataApiException(logBuilder.toString());
         }finally {
             connection.close();
         }

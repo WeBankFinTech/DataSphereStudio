@@ -23,7 +23,7 @@
       </template>
     </div>
 
-    <params-config v-for="(configData, index) in tabDatas" :key="index" v-show="configData.isActive" :apiData="configData" @showApiForm="showApiModel" />
+    <params-config v-for="(configData, index) in tabDatas" :key="index" v-show="configData.isActive" :apiData="configData" @showApiForm="showApiModel"        @updateApiData="updateApiData" />
   </div>
 </template>
 <script>
@@ -105,7 +105,11 @@ export default {
     showApiModel(apiData) {
       console.log(apiData);
       this.$emit("showApiForm", apiData);
-    }
+    },
+    updateApiData(data){
+      console.log(data);
+      this.$emit("updateApiData", data);
+    },
   }
 };
 </script>

@@ -15,8 +15,8 @@ public class CallMonitorResquest {
     @QueryParam("workspaceId")
     private Long workspaceId;
 
-    @QueryParam("beginTime")
-    private String beginTime;
+    @QueryParam("startTime")
+    private String startTime;
 
 
     @QueryParam("endTime")

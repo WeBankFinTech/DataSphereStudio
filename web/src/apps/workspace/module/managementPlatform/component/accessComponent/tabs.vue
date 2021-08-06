@@ -5,8 +5,8 @@
     @mouseover="mouseover"
     @mouseout="mouseout">
     <span
-      :title="component.name"
-      class="tabs-title-text">{{ component.name }}</span>
+      :title="component.title_cn"
+      class="tabs-title-text">{{ component.title_cn }}</span>
     <span
       class="tabs-title-button"
     >

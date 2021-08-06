@@ -6,8 +6,8 @@
         <div class="access-component-headers-container">
           <template v-for="(component, index) in topTapList">
             <div
-              :key="component.id"
-              :class="{active:currentTab.id === component.id}"
+              :key="component._id"
+              :class="{active:currentTab._id === component._id}"
               class="tab-item"
               ref="component_item"
             >
@@ -58,15 +58,16 @@ export default {
   },
   watch: {
     currentTab(newValue) {
-      console.log('watch currentTab', newValue)
+      console.log('watch currentTab');
+      this.currentTab = newValue;
     }
   },
   methods: {
     removeComponent(tabData) {
-      this.$emit('handleTabRemove', tabData.id)
+      this.$emit('handleTabRemove', tabData._id)
     },
     onChooseComponent(tabData) {
-      this.$emit('bandleTapTab', tabData.id)
+      this.$emit('bandleTapTab', tabData._id)
     },
     saveComponent(componentItem) {
       this.$emit('on-save', componentItem)

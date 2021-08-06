@@ -120,6 +120,14 @@
     .user-icon {
       padding-right: 10px;
     }
+    .user-avatar {
+      line-height: 100%;
+      vertical-align: middle;
+      /deep/.svg-icon {
+        height: 24px;
+        width: 24px;
+      }
+    }
 
     &.selected,
     &:hover {

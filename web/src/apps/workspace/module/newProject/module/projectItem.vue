@@ -1,25 +1,17 @@
 <template>
   <div>
     <slot></slot>
-    <Row class="content-item">
-      <i-col v-if="checkCreate()"
+    <div class="content-item">
+      <div v-if="checkCreate()"
         class="project-item project-header"
-        :xs="12"
-        :sm="8"
-        :md="6"
-        :lg="5"
         @click.native="addProject">
         <Icon class="add-icon" type="md-add" size="20">
         </Icon>
         <span>{{$t('message.Project.createProject')}}</span>
-      </i-col>
+      </div>
       <template  v-if="dataList.length > 0">
-        <i-col
+        <div
           class="project-item"
-          :xs="12"
-          :sm="8"
-          :md="6"
-          :lg="5"
           @click.native="goto(currentData, subitem)"
           v-for="(subitem, index) in cachedataList"
           :key="subitem.id"
@@ -56,11 +48,11 @@
 
             </span>
           </Tooltip>
-        </i-col>
+        </div>
 
       </template>
       <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
-    </Row>
+    </div>
     <Page
       v-if="dataList.length > 0 && pagination.size < dataList.length "
       class="page-bar"
@@ -226,6 +218,10 @@ export default {
 // 待版本稳定后将card需要重新部样式
 .content-item {
     margin: 15px 0px 25px 0px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-row-gap: 20px;
+    grid-column-gap: 20px;
     .project-list-ul {
         padding: 10px 20px;
         display: flex;
@@ -234,28 +230,27 @@ export default {
         flex-wrap: wrap;
     }
     .project-item {
-        height: 142px;
-        margin-right: 25px;
-        margin-bottom: 25px;
+        min-height: 150px;
         background: #fff;
-        max-width: 319px;
         border-radius: 2px;
-        border: 1px solid #dcdee2;
+        border: 1px solid #DEE4EC;
         padding: $padding-25;
         cursor: pointer;
         &:hover {
-          box-shadow: 0 2px 12px 0 $shadow-color;
+          box-shadow: 0 2px 8px 0 $shadow-color;
         }
         .project-main {
           height: 100%;
+          display: flex;
+          flex-direction: column;
           .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             .project-title {
-              flex: 1;
               font-size: $font-size-large;
+              margin-right: 30px;
               font-weight: 600;
               white-space: nowrap;
               text-overflow: ellipsis;
@@ -270,7 +265,7 @@ export default {
               .menu-list {
                 display: none;
                 position: absolute;
-                bottom: 25px;
+                bottom: 23px;
                 left: -8px;
                 border-radius: 4px;
                 padding: 5px 0;
@@ -301,23 +296,28 @@ export default {
             overflow: hidden;
             font-size: $font-size-14;
             color: rgba(0,0,0,0.5);
-            margin: 10px 0;
+            margin: 15px 0;
           }
           .bottom-bar {
+            margin-bottom: 0;
             display: flex;
             justify-content: flex-start;
             align-items: center;
+            flex-wrap: wrap;
+            height: 22px;
+            overflow: hidden;
             width: 100%;
             .tag-item {
               color: $text-desc-color;
               padding: 2px 10px;
               margin-right: 10px;
-              border-radius: 14px;
+              border-radius: 11px;
               background-color:#F3F3F3;
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Regular;
+              font-size: 12px;
             }
           }
         }

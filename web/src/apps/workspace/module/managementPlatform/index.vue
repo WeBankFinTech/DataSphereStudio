@@ -43,6 +43,8 @@
 <script>
 import Tree from './component/tree/tree.vue';
 import TabList from './component/tabList/index.vue';
+import { GetMenu, QueryAllData, UpdateDataFromId, CreateData } from '@/common/service/componentAccess';
+import { formatComponentDataForPost } from './util/fomat';
 const menu = [
   {
     title: '部门和用户管理',
@@ -68,32 +70,23 @@ const menu = [
   {
     title: '组件接入',
     icon: 'zujianjieruguanli',
-    nodes: [
-      {name: '数据接入', type: 'component', id: 1015, children: [
-        {name: 'xxx', id: 1012, catagory: 'dataAccess', engName: 'xxx', baseurl: 'https://www.baidu.com', homePage: 'https://www.baidu.com', projectPage: 'https://www.baidu.com', spInterface: 'xxx', iframe: false, activate: false, description: 'xxx', engDescription: 'xxx'},
-        {name: 'zzz', id: 1010, catagory: 'dataAccess', engName: 'xxx', baseurl: 'https://www.baidu.com', homePage: 'https://www.baidu.com', projectPage: 'https://www.baidu.com', spInterface: 'xxx', iframe: false, activate: false, description: 'xxx', engDescription: 'xxx'},
-        {name: 'aaa', id: 1009, catagory: 'dataAccess', engName: 'xxx', baseurl: 'https://www.baidu.com', homePage: 'https://www.baidu.com', projectPage: 'https://www.baidu.com', spInterface: 'xxx', iframe: false, activate: false, description: 'xxx', engDescription: 'xxx'}
-      ], pathName: 'accessComponents'},
-      {name: '数据开发', type: 'component', id: 1014, children: [
-        {name: 'ccc', id: 1011, catagory: 'dataAccess', engName: 'xxx', baseurl: 'https://www.baidu.com', homePage: 'https://www.baidu.com', projectPage: 'https://www.baidu.com', spInterface: 'xxx', iframe: false, activate: false, description: 'xxx', engDescription: 'xxx'}
-      ], pathName: 'accessComponents'},
-      {name: '数据治理', type: 'component', id: 1013, children: [], pathName: 'accessComponents'},
-    ]
+    nodes: []
   }
 ];
 const tempComponent = {
-  catagory: 'dataAccess',
-  name: '新增组件',
-  engName: '',
-  baseurl: '',
-  homePage: '',
-  projectPage: '',
-  spInterface: '',
-  iframe: true,
-  activate: true,
-  description: '',
-  engDescription: '',
-  isAdded: true,
+  onestop_menu_id: 1,
+  title_cn: '新增组件',
+  title_en: '',
+  url: '',
+  homepage_url: '',
+  project_url: '',
+  redirect_url: '',
+  if_iframe: 1,
+  is_active: 1,
+  desc_cn: '',
+  desc_en: '',
+  // access_button_en: 'not null',
+  // access_button_cn: '不能为空'
 };
 export default {
   components: {
@@ -106,7 +99,7 @@ export default {
       loadingSidebar: false,
       currentTreeId: 1024,
       menu,
-
+      lastPathName: '',
       defaultMenu: menu[0],
       header: menu[0].title || '',
       breadcrumbName: '',
@@ -114,7 +107,21 @@ export default {
       tabList: [],
       current: null,
 
+      componentMenu: [],
+      componentChildren: [],
+
+      component_id: 16,
+
       addedFlag: false,
+    }
+  },
+  watch: {
+    defaultMenu: {
+      handler: function(newVal) {
+        console.log('watch defaultMenu')
+        this.defaultMenu = newVal;
+      },
+      deep: true
     }
   },
   methods: {
@@ -133,6 +140,7 @@ export default {
       const { id, pathName, name, type } = node;
       const { title } = this.defaultMenu;
 
+      this.lastPathName = pathName || 'accessComponents';
       this.currentTreeId = id;
       this.header = title;
 
@@ -142,13 +150,15 @@ export default {
         this.breadcrumbName = ''
       }
 
-      if ( node.id < 1013 ) {
+      if ( node._id ) {
+        this.currentTreeId = node._id;
         this.current = node;
-        if( this.tabList.every(item => item.id !== node.id) ) {
+        if( this.tabList.every(item => item._id !== node._id) ) {
           this.tabList.push(node);
           return this.$router.push({ name: 'accessComponents' })
         }
       }
+
       this.$router.push({ name: pathName })
     },
     // 新增 子树 适用于组件接入
@@ -156,44 +166,49 @@ export default {
       this.currentTreeId = node.id;
       console.log(node, 'f-node')
       const flag = this.addedFlag;
-      let len = 0;
-      // 计算 id
-      this.defaultMenu.nodes.forEach(node => {
-        len = len + node.children.length;
-      })
-      const componentData = Object.assign({id: 1012 - len, isAdded: true}, tempComponent);
+      let component_id = this.component_id;
       // 已经新增了，再点击新增会重定向到新增页
       if( !flag ) {
+        const componentData = Object.assign({isAdded: true}, tempComponent);
+        component_id = component_id + 1;
+        this.component_id = component_id;
+        componentData._id = component_id;
+        componentData.onestop_menu_id = node.id;
         this.current = componentData;
         this.tabList.push(componentData);
         this.addedFlag = true;
         return this.$router.push({ name: 'accessComponents' })
       } else {
         console.log('重定向')
-        this.current = this.tabList.filter(tab => tab.isAdded)[0];
+        const component_data = this.tabList.filter(tab => tab.isAdded)[0];
+        component_data.onestop_menu_id = node.id;
+        this.current = JSON.parse(JSON.stringify(component_data));
       }
     },
 
     //关闭tab页
-    onTabRemove(id) {
+    onTabRemove(_id) {
       let that = this;
       let index = '';
       let len = this.tabList.length;
       const removeData = this.tabList.filter((item, i) => {
-        if ( item.id == id ) {
+        if ( item._id == _id ) {
           index = i;
           return true
         }
       })[0];
 
       const removeAction = () => {
-        if (removeData.id === that.current.id) {
+        if (removeData._id === that.current._id) {
           if (len > 1 && index < len - 1) {
             that.current = that.tabList[index + 1];
+            that.currentTreeId = that.tabList[index + 1]._id;
           } else if(len > 1 && index == len - 1) {
             that.current = that.tabList[index - 1];
+            that.currentTreeId = that.tabList[index - 1]._id;
           } else {
             that.current = {};
+            that.currentTreeId = 0;
           }
         }
 
@@ -210,27 +225,107 @@ export default {
       removeAction();
     },
     // 点击tab页
-    onTabClick(id) {
-      const currentTab = this.tabList.filter( item => item.id === id )[0];
+    onTabClick(_id) {
+      const currentTab = this.tabList.filter( item => item._id === _id )[0];
+      // tab 页为新增页
+      if ( currentTab.isAdded ) {
+        this.currentTreeId = JSON.stringify(currentTab.onestop_menu_id) - '';
+      } else {
+        this.currentTreeId = _id;
+      }
       this.current = currentTab;
     },
     // 保存component数据
     saveComponent(componentItem) {
+      let _this = this;
       //更新
-      console.log('save component', componentItem)
-      // if(!componentItem.isAdded) {
-
-      // }
-
+      if ( componentItem.id ) {
+        const updateData = formatComponentDataForPost(componentItem);
+        UpdateDataFromId(componentItem.id, updateData).then(data => {
+          let idx = _this.currentTreeId;
+          _this.defaultMenu.nodes.forEach( node => {
+            if( node.id == updateData.onestop_menu_id ) {
+              node.children.forEach(child => {
+                if ( child._id == idx ) {
+                  child = updateData;
+                }
+              })
+            }
+          });
+          _this.$Message.success('更新成功');
+        }).catch(err => {
+          _this.$Message.fail('更新失败');
+        });
+      }
       //新增
+      if( componentItem.isAdded ) {
+        const postData = formatComponentDataForPost(componentItem);
+        CreateData(postData).then(data => {
+          _this.defaultMenu.nodes.forEach( node => {
+            if( node.id == postData.onestop_menu_id ) {
+              node.children.push(postData);
+            }
+          });
+          _this.$Message.success('新增成功');
+        }).catch(err => {
+          _this.$Message.fail('新增失败');
+        })
+      }
+    },
 
+    // 拉取类别数据
+    getMenuForcomponentAccess() {
+      let that = this;
+      GetMenu().then(data => {
+        data.forEach(item => {
+          item.type = 'component';
+          item.children = [];
+        })
+        that.getAllComponentData(data, (nodes) => {
+          menu[2].nodes = nodes;
+          that.menu = menu;
+          console.log('nodes', nodes);
+          console.log('menu', menu);
+        })
+      }).catch(err => {
+        console.log('getMenu error!', err)
+      })
+    },
+
+    // 拉取所有子数据
+    getAllComponentData(nodes, callback) {
+      let that = this;
+      let component_id = this.component_id;
+      QueryAllData().then(data => {
+        console.log('getAllComponentData Success!', data);
+        data.forEach(item => {
+          nodes.forEach(node => {
+            if (node.id === item.onestop_menu_id) {
+              item._id = component_id;
+              node.children.push(item);
+              component_id++;
+            }
+          })
+        });
+        that.component_id = component_id;
+        callback(nodes);
+      }).catch(err => {
+        console.log('getAllComponentData error!', err);
+        callback(nodes);
+      })
     }
+
   },
   mounted() {
+    this.getMenuForcomponentAccess();
 
+    if( this.$route.name !==  this.lastPathName ) {
+      console.log('f5')
+    }
   },
   created() {
     //拉取后端数据
+
   }
 }
 </script>

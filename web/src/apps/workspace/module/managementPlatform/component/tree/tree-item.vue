@@ -95,15 +95,6 @@ export default {
     display: block;
     margin-right: 4px;
   }
-  // .tree-loading {
-  //   display: block;
-  //   animation: ani-demo-spin 1s linear infinite;
-  // }
-  // @keyframes ani-demo-spin {
-  //     from { transform: rotate(0deg);}
-  //     50%  { transform: rotate(180deg);}
-  //     to   { transform: rotate(360deg);}
-  // }
   .tree-add {
     display: block;
   }

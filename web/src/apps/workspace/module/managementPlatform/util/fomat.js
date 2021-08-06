@@ -4,35 +4,35 @@
  * @return component
  */
 function formatComponentData(component) {
-  const _componet = Object.assign({}, component);
-  if( _componet.if_iframe == 1 ) {
-    _componet.if_iframe = true;
+  let _component = Object.assign({}, component);
+  if( _component.if_iframe == 1 ) {
+    _component.if_iframe = true;
   } else {
-    _componet.if_iframe = false;
+    _component.if_iframe = false;
   }
-  if( _componet.is_active == 1 ) {
-    _componet.is_active = true;
+  if( _component.is_active == 1 ) {
+    _component.is_active = true;
   } else {
-    _componet.is_active = false;
+    _component.is_active = false;
   }
-  switch(_componet.onestop_menu_id) {
+  switch(_component.onestop_menu_id) {
     case 1:
-      _componet.onestop_menu_id = 'dataAccess';
+      _component.onestop_menu_id = 'dataAccess';
       break;
     case 2:
-      _componet.onestop_menu_id = 'dataanAlysis';
+      _component.onestop_menu_id = 'dataanAlysis';
       break;
     case 3:
-      _componet.onestop_menu_id = 'productionOperation';
+      _component.onestop_menu_id = 'productionOperation';
       break;
     case 4:
-      _componet.onestop_menu_id = 'dataQuality';
+      _component.onestop_menu_id = 'dataQuality';
       break;
     case 5:
-      _componet.onestop_menu_id = 'administratorFunction';
+      _component.onestop_menu_id = 'administratorFunction';
       break;
   }
-  return _componet
+  return _component
 }
 
 /**
@@ -40,44 +40,44 @@ function formatComponentData(component) {
  * @param {Object} component
  */
 function formatComponentDataForPost(component) {
-  const _componet = Object.assign({}, component);
-  if ( _componet.if_iframe ) {
-    _componet.if_iframe = 1;
+  let _component = Object.assign({}, component);
+  if ( _component.if_iframe ) {
+    _component.if_iframe = 1;
   } else {
-    _componet.if_iframe = 0;
+    _component.if_iframe = 0;
   }
-  if ( _componet.is_active ) {
-    _componet.is_active = 1;
+  if ( _component.is_active ) {
+    _component.is_active = 1;
   } else {
-    _componet.is_active = 0;
+    _component.is_active = 0;
   }
-  switch(_componet.onestop_menu_id) {
+  switch(_component.onestop_menu_id) {
     case 'dataAccess':
-      _componet.onestop_menu_id = 1;
+      _component.onestop_menu_id = 1;
       break;
     case 'dataanAlysis':
-      _componet.onestop_menu_id = 2;
+      _component.onestop_menu_id = 2;
       break;
     case 'productionOperation':
-      _componet.onestop_menu_id = 3;
+      _component.onestop_menu_id = 3;
       break;
     case 'dataQuality':
-      _componet.onestop_menu_id = 4;
+      _component.onestop_menu_id = 4;
       break;
     case 'administratorFunction':
-      _componet.onestop_menu_id = 5;
+      _component.onestop_menu_id = 5;
       break;
   }
 
   // 删除多余的属性
-  if ( Object.keys(_componet).includes('_id') ) {
-    delete _componet._id;
+  if ( Object.keys(_component).includes('_id') ) {
+    delete _component._id;
   }
-  if ( Object.keys(_componet).includes('isAdded') ) {
-    delete _componet.isAdded;
+  if ( Object.keys(_component).includes('isAdded') ) {
+    delete _component.isAdded;
   }
 
-  return _componet
+  return _component
 }
 
 

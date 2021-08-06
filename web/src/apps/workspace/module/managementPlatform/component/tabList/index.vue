@@ -76,6 +76,23 @@ export default {
       type: null
     },
   },
+  watch: {
+    header(newVal) {
+      this.header = newVal
+    },
+    currentTab: {
+      handler(newVal) {
+        this.currentTab = newVal;
+      },
+      deep: true
+    },
+    topTapList: {
+      handler(newVal) {
+        this.topTapList = newVal;
+      },
+      deep: true
+    }
+  },
   computed: {
     skipPath() {
       let path = '';

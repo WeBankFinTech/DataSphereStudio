@@ -45,6 +45,9 @@ class Mysql {
   }
   createApplication(data) {
     return new Promise((resolve, reject) => {
+      if (!data.title_en || !data.title_cn || !data.url || !data.onestop_menu_id || !data.project_url || !data.homepage_url || !data.redirect_url) {
+        throw new Error('必填字段缺损')
+      }
       if (!data.id) {
         let sql = `INSERT INTO dss_application(id,name,url,project_url,if_iframe,homepage_url,redirect_url) VALUES(0,?,?,?,?,?,?)`
         let params = [data.title_en, data.url, data.project_url, data.if_iframe, data.homepage_url, data.redirect_url]

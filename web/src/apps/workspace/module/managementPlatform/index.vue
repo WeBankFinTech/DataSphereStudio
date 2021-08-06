@@ -45,6 +45,7 @@ import Tree from './component/tree/tree.vue';
 import TabList from './component/tabList/index.vue';
 import { GetMenu, QueryAllData, UpdateDataFromId, CreateData } from '@/common/service/componentAccess';
 import { formatComponentDataForPost } from './util/fomat';
+import storage from './util/cache';
 const menu = [
   {
     title: '部门和用户管理',
@@ -136,6 +137,7 @@ export default {
     },
     // 点击 子树
     handleTreeClick(node) {
+      storage.node = node;
       console.log('node', node)
       const { id, pathName, name, type } = node;
       const { title } = this.defaultMenu;
@@ -184,6 +186,7 @@ export default {
         component_data.onestop_menu_id = node.id;
         this.current = JSON.parse(JSON.stringify(component_data));
       }
+      this.header = '组件接入';
     },
 
     //关闭tab页
@@ -229,7 +232,12 @@ export default {
       const currentTab = this.tabList.filter( item => item._id === _id )[0];
       // tab 页为新增页
       if ( currentTab.isAdded ) {
-        this.currentTreeId = JSON.stringify(currentTab.onestop_menu_id) - '';
+        let idx = currentTab.onestop_menu_id;
+        if ( typeof idx === 'number' ) {
+          this.currentTreeId = idx;
+        } else {
+          idx = 0;
+        }
       } else {
         this.currentTreeId = _id;
       }
@@ -252,20 +260,28 @@ export default {
               })
             }
           });
+
           _this.$Message.success('更新成功');
+          _this.$
         }).catch(err => {
           _this.$Message.fail('更新失败');
         });
       }
       //新增
       if( componentItem.isAdded ) {
+        // this.tabList.forEach(tab => {
+        //   if( tab._id == componentItem._id ) {
+        //     Object.assign(tab, componentItem)
+        //   }
+        // })
         const postData = formatComponentDataForPost(componentItem);
         CreateData(postData).then(data => {
-          _this.defaultMenu.nodes.forEach( node => {
-            if( node.id == postData.onestop_menu_id ) {
-              node.children.push(postData);
-            }
-          });
+          // _this.defaultMenu.nodes.forEach( node => {
+          //   if( node.id == postData.onestop_menu_id ) {
+          //     node.children.push(postData);
+          //   }
+          // });
+          this.getMenuForcomponentAccess();
           _this.$Message.success('新增成功');
         }).catch(err => {
           _this.$Message.fail('新增失败');
@@ -318,9 +334,11 @@ export default {
   },
   mounted() {
     this.getMenuForcomponentAccess();
-
     if( this.$route.name !==  this.lastPathName ) {
-      console.log('f5')
+      // 需要页面刷新 数据持久化
+      // const node = menu[0].nodes.slice(1);
+      // this.handleTreeClick(node);
+      this.$router.push('departManagement')
     }
   },
   created() {

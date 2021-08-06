@@ -1,6 +1,6 @@
 <template>
     <div>
-      <tree-item v-for="item in data" :key="item.id" :data="item"
+      <tree-item v-for="item in data" :key="item.id" :sonTree="item"
         :currentTreeId="currentTreeId"
         :on-item-click="handleItemClick"
         :on-add-click="handleAddClick"
@@ -29,9 +29,13 @@ export default {
     };
   },
   watch: {
-    nodes (newValue) {
-      this.data = newValue
-    },
+    nodes: {
+      handler: function(newValue) {
+        console.log('watch nodes')
+        this.data = newValue;
+      },
+      deep: true
+    }
   },
   mounted() {
     // 默认展开当前project
@@ -46,7 +50,7 @@ export default {
     //   this.handleLoading(node);
     //   this.handleAsyncLoad(node);
     // },
-    // 新增 
+    // 新增
     handleAddClick(project) {
       this.$emit('on-add-click', project)
     },
@@ -54,7 +58,7 @@ export default {
       this.$emit('on-item-click', node)
     },
 
-    // 展开子树 
+    // 展开子树
     // handleItemToggle(node) {
     //   if (!node.opened && !node.loaded) {
     //     this.handleLoading(node)

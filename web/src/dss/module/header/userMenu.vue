@@ -44,7 +44,13 @@ export default {
           id: 'changeLang',
           name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : '简体中文',
           icon: 'md-repeat',
-        }, {
+        },
+        {
+          id: 'changeTheme',
+          name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
+          icon: 'md-repeat',
+        }, 
+        {
           id: 'logout',
           name: this.$t('message.common.logOut'),
           icon: 'ios-log-out',
@@ -68,6 +74,9 @@ export default {
           break;
         case 'changeLang':
           this.changeLang();
+          break;
+        case 'changeTheme':
+          this.changeTheme();
           break;
       }
     },
@@ -111,6 +120,16 @@ export default {
         localStorage.setItem('locale', 'en');
       } else {
         localStorage.setItem('locale', 'zh-CN');
+      }
+      window.location.reload();
+    },
+    changeTheme(){
+      if(localStorage.getItem('theme')==='dark'){
+        localStorage.setItem('theme', '');
+        // window.document.documentElement.setAttribute('data-theme', '')
+      }else {
+        localStorage.setItem('theme', 'dark');
+        // window.document.documentElement.setAttribute('data-theme', 'dark')
       }
       window.location.reload();
     }

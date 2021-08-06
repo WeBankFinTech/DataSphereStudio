@@ -27,7 +27,9 @@ import mixinDispatch from './common/service/moduleMixin'
 // import wa from './common/service/wa'
 // 导入各模块的公共路径常量
 import API_PATH from './common/config/apiPath.js'
-import 'iview/dist/styles/iview.css'
+import 'iview/dist/styles/iview.css';
+
+// import '@/common/style/variables.scss';
 
 // Icon
 import './components/svgIcon/index.js'
@@ -70,3 +72,15 @@ new Vue({
   render: (h) => h(App)
 }).$mount('#app')
 console.log(`当前环境:${process.env.NODE_ENV}`)
+
+
+if (localStorage.getItem('theme') === 'dark') {
+  console.log('dark')
+  // delete require.cache[require.resolve('@/common/style/theme/default.less')];
+  require('@/common/style/theme/index.less');
+  window.document.documentElement.setAttribute('data-theme', 'dark');
+} else {
+  // delete require.cache[require.resolve('@/common/style/theme/index.less')];
+  // require('@/common/style/theme/default.less');
+  window.document.documentElement.setAttribute('data-theme', '');
+}

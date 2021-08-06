@@ -2,7 +2,8 @@
   <div class="tree-item">
     <!-- 父树级别 -->
     <div class="tree-content">
-      <div class="tree-name" :class="{'tree-name-active': currentTreeId == model.id}" @click="handleItemClick">{{model.name}}</div>
+      <div class="tree-name" v-if="!model._id" :class="{'tree-name-active': currentTreeId == model.id}" @click="handleItemClick">{{model.name}}</div>
+      <div class="tree-name" v-else :class="{'tree-name-active': currentTreeId == model._id}" @click="handleItemClick">{{model.name}}</div>
       <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'">
         <Icon custom="iconfont icon-plus" size="20"></Icon>
       </div>
@@ -10,7 +11,7 @@
     </div>
     <!-- 子树级别 -->
     <ul class="tree-children" v-if="isFolder" :style="groupStyle">
-      <tree-item v-for="item in model.children" :key="item.id" :data="item"
+      <tree-item v-for="item in model.children" :key="item.id" :sonTree="item"
         :on-item-click="onItemClick"
         :currentTreeId="currentTreeId"
       />
@@ -22,7 +23,7 @@
 export default {
   name: "TreeItem",
   props: {
-    data: {type: Object, required: true},
+    sonTree: {type: Object, required: true},
     onItemClick: {
       type: Function, default: () => false
     },
@@ -35,7 +36,7 @@ export default {
   },
   data() {
     return {
-      model: this.data,
+      model: this.sonTree,
       maxHeight: 0,
     };
   },
@@ -51,10 +52,14 @@ export default {
     }
   },
   watch: {
-    data (newValue) {
-      this.model = newValue
-      this.handleGroupMaxHeight()
-    },
+    sonTree: {
+      handler: function(newValue) {
+        console.log('watch son tree')
+        this.model = newValue
+        this.handleGroupMaxHeight()
+      },
+      deep: true
+    }
   },
   methods: {
     handleAddClick (e) {

@@ -282,8 +282,14 @@ export default {
     async viewHistory(params) {
       const taskID = params.row.taskID;
       // 跳转查看历史详情页面
+      // this.$router.push({
+      //   path: '/console/viewHistory',
+      //   query: {
+      //     taskID
+      //   }
+      // })
       this.$router.push({
-        path: '/console/viewHistory',
+        path: '/managementPlatform/viewHistory',
         query: {
           taskID
         }

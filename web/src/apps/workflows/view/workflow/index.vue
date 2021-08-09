@@ -8,13 +8,13 @@
         </div>
       </div>
       <div class="project-nav-tree">
-        <Tree 
-          class="tree-container" 
-          :nodes="projectsTree" 
-          :load="getFlow" 
+        <Tree
+          class="tree-container"
+          :nodes="projectsTree"
+          :load="getFlow"
           :currentTreeId="currentTreeId"
-          @on-item-click="handleTreeClick" 
-          @on-add-click="handleTreeModal" 
+          @on-item-click="handleTreeClick"
+          @on-add-click="handleTreeModal"
           @on-sync-tree="handleTreeSync"
         />
         <Spin v-show="loadingTree" size="large" fix/>

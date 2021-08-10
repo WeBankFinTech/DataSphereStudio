@@ -248,7 +248,7 @@ module.exports = {
         }
       },
       '/application': {
-        target: 'http://172.24.2.11:3022',
+        target: 'http://172.24.2.230:3022',
         changeOrigin: true,
       }
     }

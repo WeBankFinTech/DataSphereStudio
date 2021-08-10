@@ -96,7 +96,8 @@
         "demoCase": "Demo case",
         "comingSoon": "Coming soon"
       },
-      "permissions": "Department & User management"
+      "permissions": "Department & User management",
+      "managementPlatform":"Management Desk"
     },
     "workspaceManagemnet": {
       "waring": "Warning",

@@ -1,9 +1,11 @@
 package com.webank.wedatasphere.dss.framework.dbapi.restful;
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.request.SingleCallMonitorRequest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiManagerService;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiMonitorService;
+import com.webank.wedatasphere.dss.framework.dbapi.util.TimeUtil;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -94,7 +96,36 @@ public class DSSDbApiMonitorRestful {
     }
 
 
+    /**
+     * 过去24小时内每小时请求次数（平均QPS）
+     */
+    @GET
+    @Path("callCntForPast24H")
+    public Response getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId){
+        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallCntForPast24H(workspaceId)));
+    }
 
+    /**
+     * 单个API每小时的平均响应时间
+     */
+    @GET
+    @Path("callTimeForSinleApi")
+    public Response getCallTimeForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
+        long hourCnt = TimeUtil.getHourCnt(singleCallMonitorRequest.getStartTime(),singleCallMonitorRequest.getEndTime());
+        singleCallMonitorRequest.setHourCnt(hourCnt);
 
+        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallTimeForSinleApi(singleCallMonitorRequest)));
+    }
 
+    /**
+     *单个API每小时的调用次数
+     */
+    @GET
+    @Path("callCntForSinleApi")
+    public Response getCallCntForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
+        long hourCnt = TimeUtil.getHourCnt(singleCallMonitorRequest.getStartTime(),singleCallMonitorRequest.getEndTime());
+        singleCallMonitorRequest.setHourCnt(hourCnt);
+
+        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallCntForSinleApi(singleCallMonitorRequest)));
+    }
 }

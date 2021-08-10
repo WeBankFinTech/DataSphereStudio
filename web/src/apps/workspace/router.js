@@ -68,7 +68,7 @@ export const apiServicesRoutes = [
   },
   {
     path: 'managementPlatform',
-    name: 'managementPlatform',
+    name: 'ManagementPlatform',
     meta: {
       title: 'DataSphere Studio',
       publicPage: true,

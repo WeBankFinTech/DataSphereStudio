@@ -61,8 +61,8 @@
           <Input v-model="formItem.access_button_en" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入英文描述"></Input>
         </FormItem> -->
         <FormItem>
-            <!-- <Button @click="handleCancel">取消</Button> -->
-            <Button type="primary" style="margin-left: 8px" @click="handleSave(formItem)">保存</Button>
+            <Button @click="handleCancel">取消</Button>
+            <Button type="primary" style="margin-left: 8px" @click="handleSave(formItem)">提交</Button>
         </FormItem>
       </Form>
     </div>
@@ -124,13 +124,7 @@ export default {
         desc_en: [
           { required: true, message: '英文描述不能为空', trigger: 'blur' }
         ],
-        // access_button_cn: [
-        //   { required: true, message: '进入按钮描述不能为空', trigger: 'blur' }
-        // ],
-        // access_button_en: [
-        //   { required: true, message: '进入按钮英文描述不能为空', trigger: 'blur' }
-        // ]
-      }
+      },
     }
   },
   watch: {
@@ -141,7 +135,7 @@ export default {
   },
   methods: {
     handleCancel() {
-
+      this.formItem = formatComponentData(this.componentData);
     },
     handleSave(componentItem) {
       // 提交前验证
@@ -154,10 +148,6 @@ export default {
           _this.$emit('on-save', postData);
         } else {
           _this.$Message.error('Fail!')
-          // iview reset func bug!
-          // setTimeout(() => {
-          //   _this.$refs['formValidate'].resetFields();
-          // }, 5000)
         }
       })
     },

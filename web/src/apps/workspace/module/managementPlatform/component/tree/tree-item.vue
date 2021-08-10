@@ -1,16 +1,18 @@
 <template>
   <div class="tree-item">
     <!-- 父树级别 -->
-    <div class="tree-content">
-      <div class="tree-loading" v-if="model._id > 15">
-        <Icon custom="iconfont icon-zujianjieruguanli" size="16"></Icon>
-      </div>
-      <div class="tree-name" v-if="!model._id" :class="{'tree-name-active': currentTreeId == model.id}" @click="handleItemClick">{{model.name}}</div>
-      <div class="tree-name" v-else :class="{'tree-name-active': currentTreeId == model._id}" @click="handleItemClick">{{model.name}}</div>
-      <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'">
-        <Icon custom="iconfont icon-plus" size="20"></Icon>
+    <div class="tree-content" v-if="!model._id" :class="{ 'tree-content-active': currentTreeId == model.id }">
+      <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
+      <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'" :class="{ 'tree-add-active': currentTreeId == model.id }">
+        <Icon custom="iconfont icon-plus" size="16"></Icon>
       </div>
       <div class="tree-hold" v-else></div>
+    </div>
+    <div class="tree-content" v-else :class="{ 'tree-content-active': currentTreeId == model._id }">
+        <div class="tree-loading" v-if="model._id > 15">
+          <Icon custom="iconfont icon-zujianjieruguanli" size="16"></Icon>
+        </div>
+        <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
     </div>
     <!-- 子树级别 -->
     <ul class="tree-children" v-if="isFolder" :style="groupStyle">
@@ -93,13 +95,29 @@ export default {
     display: flex;
     align-items: center;
     cursor: pointer;
+    padding-left: 12px;
+    &:hover {
+      background-color: #EDF1F6;
+      .tree-add {
+        display: block;
+      }
+    }
+  }
+  .tree-content-active {
+    background-color: #EDF1F6;
+    color: rgb(45, 140, 240);
   }
   .tree-icon {
     display: block;
     margin-right: 4px;
   }
+  .tree-add-active {
+    display: block !important;
+    margin-right: 12px;
+  }
   .tree-add {
-    display: block;
+    display: none;
+    margin-right: 12px;
   }
   .tree-hold {
     display: block;
@@ -116,17 +134,14 @@ export default {
     overflow: hidden;
     font-family: PingFangSC-Regular;
     font-size: 14px;
-    color: rgba(0,0,0,0.65);
-    &:hover {
-      background-color: #EDF1F6;
-    }
+    // color: rgba(0,0,0,0.65);
   }
   .tree-name-active {
     background-color: #EDF1F6;
     color: rgb(45, 140, 240);
   }
   .tree-children {
-    margin-left: 26px;
+    // margin-left: 26px;
     transition: max-height .3s;
     max-height: 0;
     overflow: hidden;
@@ -134,6 +149,9 @@ export default {
   .tree-icon {
     display: block;
     margin-right: 4px;
+  }
+  .tree-loading {
+    padding-left: 26px;
   }
 }
 </style>

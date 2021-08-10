@@ -36,7 +36,6 @@
       @on-save="saveComponent"
       />
     </div>
-
   </div>
 </template>
 
@@ -92,7 +91,7 @@ const tempComponent = {
 export default {
   components: {
     Tree,
-    "tab-list": TabList
+    "tab-list": TabList,
   },
   data() {
     return {
@@ -287,6 +286,13 @@ export default {
           _this.$Message.fail('新增失败');
         })
       }
+    },
+
+    ok() {
+
+    },
+    cancel() {
+
     },
 
     // 拉取类别数据

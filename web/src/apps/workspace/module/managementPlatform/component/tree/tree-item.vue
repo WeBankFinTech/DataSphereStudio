@@ -2,6 +2,9 @@
   <div class="tree-item">
     <!-- 父树级别 -->
     <div class="tree-content" v-if="!model._id" :class="{ 'tree-content-active': currentTreeId == model.id }">
+      <div class="tree-open" v-if="model.type=='component'">
+        <Icon custom="iconfont icon-open" size="14"></Icon>
+      </div>
       <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
       <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'" :class="{ 'tree-add-active': currentTreeId == model.id }">
         <Icon custom="iconfont icon-plus" size="16"></Icon>
@@ -152,6 +155,10 @@ export default {
   }
   .tree-loading {
     padding-left: 26px;
+    padding-right: 5px;
+  }
+  .tree-open {
+    padding-right: 8px;
   }
 }
 </style>

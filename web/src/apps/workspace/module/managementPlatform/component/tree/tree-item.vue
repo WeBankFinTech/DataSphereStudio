@@ -3,7 +3,8 @@
     <!-- 父树级别 -->
     <div class="tree-content" v-if="!model._id" :class="{ 'tree-content-active': currentTreeId == model.id }">
       <div class="tree-open" v-if="model.type=='component'">
-        <Icon custom="iconfont icon-open" size="14"></Icon>
+        <Icon custom="iconfont icon-open" size="14" v-if="model.opened" @click="handleItemToggle(model.opened)"></Icon>
+        <Icon custom="iconfont icon-close" size="14" v-else @click="handleItemToggle(model.opened)"></Icon>
       </div>
       <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
       <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'" :class="{ 'tree-add-active': currentTreeId == model.id }">
@@ -78,12 +79,20 @@ export default {
       this.onItemClick(this.model)
     },
     handleGroupMaxHeight () {
-      if (this.model.children) {
+      if (this.model.children && this.model.opened) {
         this.maxHeight = this.model.children.length * 32;
       } else {
         this.maxHeight = 0;
       }
     },
+    handleItemToggle(flag) {
+      if( flag ) {
+        this.maxHeight = 0;
+      } else {
+        this.handleGroupMaxHeight();
+      }
+      this.model.opened = !this.model.opened
+    }
   },
   mounted() {
     this.handleGroupMaxHeight();

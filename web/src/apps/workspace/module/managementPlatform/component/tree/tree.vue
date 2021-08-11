@@ -60,13 +60,14 @@ export default {
 
     // 展开子树
     // handleItemToggle(node) {
-    //   if (!node.opened && !node.loaded) {
+    //   if (!node.opened ) {
     //     this.handleLoading(node)
     //     this.handleAsyncLoad(node)
     //   } else {
     //     this.handleToggle(node)
     //     this.$emit('on-sync-tree', this.data)
     //   }
+    //   console.log('handleItemToggle', node)
     // },
     // handleToggle(node) {
     //   this.data = this.data.map(item => {

@@ -308,15 +308,15 @@ export default {
         data.forEach(item => {
           item.type = 'component';
           item.children = [];
+          item.opened = true;
         })
         that.getAllComponentData(data, (nodes) => {
           menu[2].nodes = nodes;
           that.menu = menu;
-          console.log('nodes', nodes);
-          console.log('menu', menu);
         })
       }).catch(err => {
-        console.log('getMenu error!', err)
+        // that.$Message.fail(err);
+        console.log('err', err)
       })
     },
 

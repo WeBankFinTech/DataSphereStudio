@@ -1,11 +1,14 @@
 var mysql = require('mysql');
 var config = require('../config/default.js')
 
+var env = process.env.NODE_ENV;
+env = env ? env : 'dev';
+
 var pool  = mysql.createPool({
-  host     : config.database.HOST,
-  user     : config.database.USERNAME,
-  password : config.database.PASSWORD,
-  database : config.database.DATABASE
+  host     : config[env].database.HOST,
+  user     : config[env].database.USERNAME,
+  password : config[env].database.PASSWORD,
+  database : config[env].database.DATABASE
 });
 
 

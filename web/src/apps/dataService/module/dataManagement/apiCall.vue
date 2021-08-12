@@ -21,6 +21,7 @@
         </div>
       </template>
     </Table>
+    <Spin v-show="loading" size="large" fix/>
     <div class="pagebar" v-if="pageData.total">
       <Page
         :total="pageData.total"
@@ -133,6 +134,7 @@ export default {
           slot: "operation"
         }
       ],
+      loading: true,
       apiCallList: [],
       pageData: {
         total: 0,
@@ -211,17 +213,20 @@ export default {
       });
     },
     getApiCallList() {
+      this.loading = true;
       api.fetch('/dss/framework/dbapi/apiauth/list', {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
         if (res.list) {
+          this.loading = false;
           this.apiCallList = res.list;
           this.pageData.total = res.total;
         }
       }).catch((err) => {
         console.error(err)
+        this.loading = false;
       });
     },
     addAuthorize() {
@@ -305,6 +310,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .manage-wrap {
+  position: relative;
   padding: 0 24px;
   background: #fff;
   .manage-head {

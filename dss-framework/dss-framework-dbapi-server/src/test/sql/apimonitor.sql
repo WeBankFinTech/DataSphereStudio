@@ -25,7 +25,7 @@ FROM (
 	      FROM dss_project) t0   ##记录大于等于24条的任意一张表
 	LIMIT 40 ) t1
 LEFT JOIN (
-	SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS HOUR, AVG(time_length) AS timeLen
+	SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS HOUR, IFNULL(ROUND(AVG(time_length),0),0) AS timeLen
 	FROM dss_dataapi_call
 	WHERE api_id =18 AND time_start >= '2021-08-03 00:00:00' AND time_start <= '2021-08-10 00:00:00'
 	GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')

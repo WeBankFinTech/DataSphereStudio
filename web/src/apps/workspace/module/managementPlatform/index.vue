@@ -4,7 +4,11 @@
     <!-- tree  侧边栏 -->
     <div class="management-platform-sidebar" :class="{'sidebar-fold': sidebarFold}" >
       <div class="management-platform-sidebar-menu">
-        <div class="management-platform-sidebar-menu-item active" v-for="item in menu" :key="item.title" @click="handleSidebarToggle(item.title)">
+        <div class="management-platform-sidebar-menu-item"
+        v-for="item in menu"
+        :key="item.title"
+        :class="{'menu-active': item.title == currentHeader}"
+        @click="handleSidebarToggle(item.title)">
           <Icon :custom="`iconfont icon-${item.icon}`" size="26"></Icon>
         </div>
       </div>
@@ -52,7 +56,7 @@ const menu = [
     nodes: [
       {name: '部门管理', type: 'permissions', id: 1024, pathName: 'departManagement'},
       {name: '用户管理', type: 'permissions', id: 1023, pathName: 'personManagement'}
-    ]
+    ],
   },
   {
     title: '控制台',
@@ -102,6 +106,7 @@ export default {
       lastPathName: '',
       defaultMenu: menu[0],
       header: menu[0].title || '',
+      currentHeader: '部门和用户管理',
       breadcrumbName: '',
 
       tabList: [],
@@ -127,6 +132,7 @@ export default {
   methods: {
     // 点击 menu
     handleSidebarToggle(title) {
+      this.currentHeader = title
       if( title === this.defaultMenu.title ) {
         this.sidebarFold = !this.sidebarFold
       } else {
@@ -302,15 +308,15 @@ export default {
         data.forEach(item => {
           item.type = 'component';
           item.children = [];
+          item.opened = true;
         })
         that.getAllComponentData(data, (nodes) => {
           menu[2].nodes = nodes;
           that.menu = menu;
-          console.log('nodes', nodes);
-          console.log('menu', menu);
         })
       }).catch(err => {
-        console.log('getMenu error!', err)
+        // that.$Message.fail(err);
+        console.log('err', err)
       })
     },
 
@@ -397,7 +403,6 @@ $per-border-color:#DEE4EC;
     top: 0px;
     bottom: 0px;
     transition: all .3s;
-    padding: 8px 12px;
     overflow-y: auto;
     border-right: 1px solid #DEE4EC;
     &-header {
@@ -413,6 +418,13 @@ $per-border-color:#DEE4EC;
   }
   .management-platform-tablist {
     background-color: #fff;
+  }
+  .management-platform-sidebar-tree-header {
+    padding-left: 12px;
+  }
+  .menu-active {
+    background-color: #EDF1F6;
+    border-left: 3px solid rgb(45, 140, 240);
   }
 }
 </style>

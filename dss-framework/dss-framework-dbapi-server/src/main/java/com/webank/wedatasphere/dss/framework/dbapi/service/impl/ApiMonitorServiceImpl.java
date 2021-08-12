@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.framework.dbapi.service.impl;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiCallMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.dao.ApiConfigMapper;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.request.SingleCallMonitorRequest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
 import com.webank.wedatasphere.dss.framework.dbapi.service.ApiMonitorService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Classname ApiMonitorServiceImpl
@@ -53,5 +55,20 @@ public class ApiMonitorServiceImpl implements ApiMonitorService {
     @Override
     public List<ApiCallInfoByFailRate> getCallListByFailRate(CallMonitorResquest callMonitorResquest) {
         return apiCallMapper.getCallListByFailRate(callMonitorResquest);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCallCntForPast24H(Long workspaceId) {
+        return apiCallMapper.getCallCntForPast24H(workspaceId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCallTimeForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest) {
+        return apiCallMapper.getCallTimeForSinleApi(singleCallMonitorRequest);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCallCntForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest) {
+        return apiCallMapper.getCallCntForSinleApi(singleCallMonitorRequest);
     }
 }

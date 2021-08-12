@@ -270,7 +270,7 @@ export default {
           axisTick: {
             show: false
           },
-          data: this.dataPast24Hour.map(i => i.hour)
+          data: this.dataPast24Hour.map(i => i.key)
         },
         yAxis: {
           type: 'value',
@@ -290,7 +290,7 @@ export default {
           nameGap: 80
         },
         series: [{
-          data: this.dataPast24Hour.map(i => i.cnt),
+          data: this.dataPast24Hour.map(i => i.value),
           type: 'line',
           smooth: true,
           color: '#2E92F7'

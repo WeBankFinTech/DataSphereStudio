@@ -96,7 +96,7 @@ public interface ApiCallMapper {
             "\t      FROM dss_project) t0 \n" +
             "\tLIMIT #{singleCallMonitorRequest.hourCnt} ) t1\n" +
             "LEFT JOIN (\n" +
-            "\tSELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS HOUR, AVG(time_length) AS timeLen\n" +
+            "\tSELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS HOUR, IFNULL(ROUND(AVG(time_length),0),0) AS timeLen\n" +
             "\tFROM dss_dataapi_call\n" +
             "\tWHERE api_id =#{singleCallMonitorRequest.apiId} AND (time_start BETWEEN #{singleCallMonitorRequest.startTime} AND #{singleCallMonitorRequest.endTime})\n" +
             "\tGROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')\n" +

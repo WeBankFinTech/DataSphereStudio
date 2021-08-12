@@ -149,7 +149,7 @@ export default {
       margin-bottom: 10px;
       line-height: 30px;
       width: 100%;
-      // margin-left: -24px;
+      margin-left: -24px;
       padding-left: 24px;
     }
     &-appmain {

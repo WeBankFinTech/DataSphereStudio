@@ -14,7 +14,11 @@ LEFT JOIN (
 	ORDER BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')
 ) t2 ON t1.hour = t2.hour
 
-
+SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS k, IFNULL(ROUND(AVG(time_length),0),0) AS v
+FROM dss_dataapi_call
+WHERE api_id =18 AND time_start >= '2021-08-03 00:00:00' AND time_start <= '2021-08-10 00:00:00'
+GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')
+ORDER BY k
 
 
 ## 数据服务-服务管理-API监控----指定某个api的平均每小时执行时长
@@ -48,3 +52,10 @@ LEFT JOIN (
 	GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')
 ) t2 ON t1.hour = t2.hour
 ORDER BY t1.hour
+
+
+SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS k, COUNT(id) AS v
+FROM dss_dataapi_call
+WHERE api_id =18 AND time_start >= '2021-07-29 00:00:00' AND time_start <= '2021-08-05 00:00:00'
+GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')
+ORDER BY k

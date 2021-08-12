@@ -37,7 +37,7 @@
         </root>
     </loggers>
 
-    <!--  suyc add   --myibatis log configure
+    <!--  suyc add  myibatis log configure
     <logger name="com.apache.ibatis" level="DEBUG"/>
     <logger name="java.sql.Connection" level="DEBUG"/>
     <logger name="java.sql.Statement" level="DEBUG"/>

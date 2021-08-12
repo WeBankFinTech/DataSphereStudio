@@ -19,7 +19,10 @@
         "col_apiName": "API名称",
         "col_groupName": "业务流程",
         "col_datasourceName": "数据源名称",
-        "col_apiType": "API类型"
+        "col_apiType": "API类型",
+        "col_status": "状态",
+        "onlined": "已上线",
+        "offlined": "已下线"
       },
       "apiMonitor": {
         "staticsScreen": "API计量大屏",

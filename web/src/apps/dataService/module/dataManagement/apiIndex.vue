@@ -167,7 +167,7 @@ export default {
     copy(row) {
       api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
         let inputEl = document.createElement('input');
-        inputEl.value = `${res.callPathPrefix}`;
+        inputEl.value = `${res.callPathPrefix}`.replace('{protocol}:', location.protocol).replace('{host}', location.host);
         document.body.appendChild(inputEl);
         inputEl.select(); // 选择对象;
         document.execCommand("Copy"); // 执行浏览器复制命令

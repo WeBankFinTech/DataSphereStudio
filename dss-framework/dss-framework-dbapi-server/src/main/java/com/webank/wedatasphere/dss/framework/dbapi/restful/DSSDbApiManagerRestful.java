@@ -76,8 +76,10 @@ public class DSSDbApiManagerRestful {
     @GET
     @Path("/callPath/{apiId}")
     public Response getApiCallPath(@PathParam("apiId") Long apiId){
-        StringBuilder callPath =new StringBuilder("http://xxxx");
-        callPath.append("/api/rest_j/v1");
+        StringBuilder callPath =new StringBuilder("{protocol}://{host}");
+        callPath.append("/api/rest_j/v1/dss/framework/dbapi/execute");
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
+        callPath.append("/" + apiInfo.getApiPath());
 
         Message message = Message.ok().data("callPathPrefix", callPath.toString());
         return Message.messageToResponse(message);

@@ -4,9 +4,9 @@ import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorRes
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.SingleCallMonitorRequest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.HourMonitorInfo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Classname ApiMonitorService
@@ -48,15 +48,15 @@ public interface ApiMonitorService {
     /**
      * 过去24小时，每小时的请求数目
      */
-    List<Map<String, Object>> getCallCntForPast24H(Long workspaceId);
+    List<HourMonitorInfo> getCallCntForPast24H(Long workspaceId) throws Exception;
 
     /**
      * 时间范围内指定API的每小时的平均响应时间
      */
-    List<Map<String, Object>> getCallTimeForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest);
+    List<HourMonitorInfo> getCallTimeForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest) throws Exception;
 
     /**
      * 时间范围内指定API的每小时的请求次数
      */
-    List<Map<String, Object>> getCallCntForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest);
+    List<HourMonitorInfo> getCallCntForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest)  throws Exception;
 }

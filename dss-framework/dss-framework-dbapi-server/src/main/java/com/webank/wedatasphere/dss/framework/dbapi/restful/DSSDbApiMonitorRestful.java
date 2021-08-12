@@ -101,7 +101,7 @@ public class DSSDbApiMonitorRestful {
      */
     @GET
     @Path("callCntForPast24H")
-    public Response getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId){
+    public Response getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId) throws Exception {
         return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallCntForPast24H(workspaceId)));
     }
 

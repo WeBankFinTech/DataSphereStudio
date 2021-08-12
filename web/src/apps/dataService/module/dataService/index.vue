@@ -18,7 +18,7 @@
         :model="groupForm"
         :label-width="100"
         :rules="ruleValidate"
-        v-if="modalType === 'group'"
+        v-show="modalType === 'group'"
       >
         <FormItem label="业务名称" prop="name">
           <Input
@@ -43,7 +43,7 @@
         :model="apiForm"
         :label-width="100"
         :rules="apiRuleValidate"
-        v-if="modalType !== 'group'"
+        v-show="modalType !== 'group'"
       >
         <FormItem label="API模式" required prop="apiType">
           <RadioGroup v-model="apiForm.apiType">

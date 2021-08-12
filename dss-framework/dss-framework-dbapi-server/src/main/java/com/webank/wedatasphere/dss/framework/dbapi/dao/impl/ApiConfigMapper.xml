@@ -44,6 +44,7 @@
         <if test="apiName != null and apiName != ''">
             AND a.api_name LIKE concat('%', #{apiName}, '%')
         </if>
+        ORDER BY a.create_by DESC
     </select>
 
     <select id="getOnlineApiInfoList" resultType="com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiInfo">
@@ -55,5 +56,6 @@
         <if test="apiName != null and apiName != ''">
             AND a.api_name LIKE concat('%', #{apiName}, '%')
         </if>
+        ORDER BY a.create_by DESC
     </select>
 </mapper>

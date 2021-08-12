@@ -133,7 +133,7 @@ export default {
           axisTick: {
             show: false
           },
-          data: this.dataApiTime.map(i => i.hour)
+          data: this.dataApiTime.map(i => i.key)
         },
         yAxis: {
           type: 'value',
@@ -145,7 +145,7 @@ export default {
           }
         },
         series: [{
-          data: this.dataApiTime.map(i => i.timeLen),
+          data: this.dataApiTime.map(i => i.value),
           type: 'line',
           smooth: true,
           color: '#2E92F7'
@@ -170,7 +170,7 @@ export default {
           axisTick: {
             show: false
           },
-          data: this.dataApiCnt.map(i => i.hour)
+          data: this.dataApiCnt.map(i => i.key)
         },
         yAxis: {
           type: 'value',
@@ -182,7 +182,7 @@ export default {
           }
         },
         series: [{
-          data: this.dataApiCnt.map(i => i.cnt),
+          data: this.dataApiCnt.map(i => i.value),
           type: 'line',
           smooth: true,
           color: '#2E92F7'

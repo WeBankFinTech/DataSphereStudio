@@ -6,7 +6,7 @@
         <div class="overview-box">
           <span class="overview-text" >{{$t('message.workspaceManagemnet.title')}}</span>
         </div>
-        <Menu class="left-mune" width="auto" :active-name="activeName" theme="light" @on-select="checkout">
+        <Menu class="left-mune" width="auto" :active-name="activeName" @on-select="checkout">
           <MenuItem class="left-menuItem" v-for="(item, index) in manageMenus" :key="index" :name="item.path">
             <SvgIcon class="menuItemIcon" :icon-class="item.icon"/>
             <span>{{item.name}}</span>

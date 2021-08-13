@@ -1,6 +1,14 @@
 import dayjs from 'dayjs'
-
-export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
+/**
+ * 
+ * @param {*} tasks 
+ * @param {*} connects 
+ * @param {*} locations 
+ * @param {*} taskList 
+ * @param {*} isNode 
+ * @param {*} contextMenu 
+ */
+export function ds2butterfly(tasks, connects, locations, taskList, isNode, contextMenu) {
   let nodes = [],
     edges = []
   tasks.forEach(task => {
@@ -12,6 +20,7 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
       node_type: task.type,
       node_params: task.params,
       node_preTasks: task.preTasks,
+      contextMenu: contextMenu,
       state: '',
       endpoints: isNode ? [] : [
         {
@@ -56,16 +65,16 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
             prePoint = 'right-' + preId
             curPoint = 'left-' + curId
           } else {
-            prePoint = 'top-' + preId
-            curPoint = 'bottom-' + curId
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
           }
         } else {
           if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
             prePoint = 'right-' + preId
             curPoint = 'left-' + curId
           } else {
-            prePoint = 'bottom-' + preId
-            curPoint = 'top-' + curId
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
           }
         }
       } else {
@@ -74,16 +83,16 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
             prePoint = 'left-' + preId
             curPoint = 'right-' + curId
           } else {
-            prePoint = 'top-' + preId
-            curPoint = 'bottom-' + curId
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
           }
         } else {
           if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
             prePoint = 'left-' + preId
             curPoint = 'right-' + curId
           } else {
-            prePoint = 'bottom-' + preId
-            curPoint = 'top-' + curId
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
           }
         }
       }
@@ -115,7 +124,10 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode) {
     edges
   }
 }
-
+/**
+ * 
+ * @param {*} date 
+ */
 function formatISODate (date) {
   let [datetime, timezone] = date.split('+')
   if (!timezone || timezone.indexOf(':') >= 0) return date
@@ -123,6 +135,11 @@ function formatISODate (date) {
   let secondOfTz = timezone.substring(2, 4) || '00'
   return `${datetime}+${hourOfTz}:${secondOfTz}`
 }
+/**
+ * 
+ * @param {*} value 
+ * @param {*} fmt 
+ */
 export function formatDate(value, fmt) {
   fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
   if (value === null) {
@@ -132,6 +149,10 @@ export function formatDate(value, fmt) {
   }
 }
 
+/**
+ * 
+ * @param {*} value 
+ */
 export function filterNull(value) {
   if (value === null || value === '') {
     return '-'

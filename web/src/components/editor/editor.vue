@@ -133,6 +133,9 @@ export default {
   },
   mounted() {
     this.initMonaco();
+    if (localStorage.getItem('theme')==='dark') {
+      monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
+    }
   },
   beforeDestroy: function() {
     // 销毁 editor，进行gc

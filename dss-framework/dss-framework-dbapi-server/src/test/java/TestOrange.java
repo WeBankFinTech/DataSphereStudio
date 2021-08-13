@@ -1,5 +1,10 @@
+/*
+
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import com.webank.wedatasphere.dss.orange.engine.DynamicSqlEngine;
+//import org.codehaus.jettison.json.JSONArray;
+//import org.codehaus.jettison.json.JSONException;
+//import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -7,12 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+*/
 /**
  * @program: orange
  * @description:
  * @author: jiangqiang
  * @create: 2021-02-23 10:19
- **/
+ **//*
+
 public class TestOrange {
 
     @Test
@@ -101,6 +108,7 @@ public class TestOrange {
         sqlMeta.getJdbcParamValues().forEach(System.out::println);
     }
 
+*/
 /*
     @Test
     public void testForeachMap() {
@@ -121,7 +129,8 @@ public class TestOrange {
         System.out.println(sqlMeta.getSql());
         sqlMeta.getJdbcParamValues().forEach(System.out::println);
     }
-*/
+*//*
+
 
     @Test
     public void testMultiForeach() {
@@ -169,3 +178,4 @@ public class TestOrange {
     }
 
 }
+*/

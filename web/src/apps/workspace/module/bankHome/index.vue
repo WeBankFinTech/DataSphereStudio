@@ -44,8 +44,7 @@
                       <Icon type="md-close" size="20"></Icon>
                     </div>
                     <SvgIcon class="app-icon" :icon-class="item.icon ? item.icon : 'shujukaifa-logo'" />
-                    <!-- <span class="label">{{$t('message.workspace.home.enter', {text: item.title})}}</span> -->
-                    <span class="label">{{$t(item.title)}}</span>
+                    <span class="label">{{$t('message.workspace.home.enter', {text: item.title})}}</span>
                   </div>
                   <div class="app-item-add" @click="show = true">
                     <Icon type="md-add" size="25"></Icon>

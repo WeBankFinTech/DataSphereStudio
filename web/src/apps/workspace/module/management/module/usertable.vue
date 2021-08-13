@@ -1,6 +1,6 @@
 <template>
   <div class="user-serchbar-box">
-    <h3>{{$t('message.workspaceManagemnet.userManagement')}}</h3>
+    <h3 class="user-table-title">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
     <formserch
       @click-serach="search"
       @click-creater="creater"
@@ -453,12 +453,18 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .user-serchbar-box {
   padding: 10px 15px;
   min-width: 1217px;
+  .user-table-title {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
+
   .user-table-page {
     text-align: center;
     padding-top: 10px;
+    @include font-color($light-text-desc-color, $dark-text-desc-color);
   }
 }
 </style>

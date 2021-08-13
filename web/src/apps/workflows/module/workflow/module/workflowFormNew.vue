@@ -1,7 +1,6 @@
 <template>
     <Form
       :label-width="100"
-      label-position="left"
       ref="projectForm"
       :model="workflowDataCurrent"
       :rules="formValid"

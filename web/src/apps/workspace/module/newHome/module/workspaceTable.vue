@@ -117,6 +117,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .workspace-table {
   .desc {
     width: 100%;
@@ -129,7 +130,7 @@ export default {
   cursor: pointer;
   box-sizing: border-box;
   border: 1px dashed #d9d9d9;
-  background:  #F8F9FC;
+  @include border-color($border-color-base, $dark-border-color-base);
   border-radius: 2px;
   position: relative;
   display: flex;

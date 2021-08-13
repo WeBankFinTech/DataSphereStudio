@@ -39,6 +39,7 @@
 
 .we-panel-dash {
     position: absolute;
-    background: transparent;
+    width: 1px !important;
+    @include bg-color(transparent, $dark-workspace-background);
     z-index: $zindex-drawer;
 }

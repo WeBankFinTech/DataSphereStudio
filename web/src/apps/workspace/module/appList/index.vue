@@ -18,16 +18,17 @@
         <div v-for="item in tabsApplication[actionIndex].appInstances" :key="item.name" class="pane-item" >
           <div class="item-main">
             <div class="app-title">
-              <SvgIcon class="app-icon title-sub" :icon-class="item.image" color="#000"/>
-              <span class="label title-sub" :title="item.title">{{item.title}}</span>
+              <SvgIcon class="app-icon" :icon-class="item.image" color="#000"/>
+              <span class="label" :title="item.title">{{item.title}}</span>
               <span class="text-button" @click="navTo(item, item.manualButtonUrl)">{{item.active ? $t('message.workspace.AppStore.demoCase') : $t('message.workspace.AppStore.comingSoon')}}</span>
             </div>
-            <div class="goto-button">
+            <div>
               <Button
                 v-for="subItem in Object.keys(item.nameAndUrls)"
                 :key="subItem"
                 size="small"
                 type="text"
+                class="goto-button"
                 @click="linkTo(item, item.nameAndUrls[subItem])">{{subItem}}</Button>
             </div>
           </div>
@@ -174,67 +175,73 @@ export default {
     border-right: $border-width-base $border-style-base $border-color-base;
     border-radius: $border-radius-small;
     z-index: 1;
+    margin-right: 25px;
   }
   .pane-wrap {
     flex: 1;
-    flex-wrap: wrap;
-    display: flex;
-    justify-content: flex-start;
-  .pane-item {
-    margin: 0px 0px 25px 25px;
-    width: 355px;
-    height: 116px;
-    border-radius: 2px;
-    border: 1px solid #dcdee2;
-    position: relative;
-    overflow: hidden;
-    .item-main {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-    }
-    .app-title {
-      margin-top: 25px;
-      margin-left: 22px;
-      font-size: 18px;
-      line-break: 24px;
-      color: $text-title-color;
-      font-family: PingFangSC-Medium;
-      .label {
-        max-width: 200px;
-        display: inline-block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: middle;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-row-gap: 20px;
+    grid-column-gap: 20px;
+    .pane-item {
+      height: 120px;
+      border-radius: 2px;
+      border: 1px solid #DEE4EC;
+      position: relative;
+      padding-left: 20px;
+      overflow: hidden;
+      .item-main {
+        position: absolute;
+        z-index: 2;
       }
-      .app-icon {
-        font-size: 20px;
-        margin-right: 8px;
-      }
-      .text-button {
-        margin-left: 22px;
-        font-size: $font-size-base;
-        color: #2E92F7;
-        line-height: 22px;
-        cursor: pointer;
-        max-width: 75px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        display: inline-block;
-        vertical-align: middle;
-      }
+      .app-title {
+        display: flex;
+        align-items: center;
+        margin-top: 25px;
+        font-size: 18px;
+        line-height: 24px;
+        color: $text-title-color;
+        font-family: PingFangSC-Medium;
+        .label {
+          width: 120px;
+          display: inline-block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-family: PingFangSC-Medium;
+          font-size: 18px;
+          color: rgba(0,0,0,0.85);
+          line-height: 24px;
+          vertical-align: middle;
+        }
+        .app-icon {
+          font-size: 20px;
+          line-height: 24px;
+          vertical-align: middle;
+        }
+        .text-button {
+          font-family: PingFangSC-Regular;
+          font-size: 14px;
+          color: #2E92F7;
+          line-height: 100%;
+          vertical-align: middle;
+          cursor: pointer;
+          max-width: 75px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          display: inline-block;
+        }
     }
     .goto-button {
-      margin-left: 22px;
-      font-size: $font-size-base;
+      margin-top: 10px;
+      font-family: PingFangSC-Regular;
+      font-size: 14px;
       color: rgba(0,0,0,0.65);
       line-height: 22px;
-      margin-top: 15px;
+      text-align: left;
+      border: 1px solid #DEE4EC;
+      border-radius: 4px;
       cursor: pointer;
     }
     .mask {
@@ -252,12 +259,9 @@ export default {
       color: rgba(0,0,0,0.85);
     }
     .app-bgc {
-      width: 140px;
-      height: 120px;
-      display: inline-block;
-      position: absolute;
-      top: 0;
-      right: 20px;
+      height: 100%;
+      float: right;
+      opacity:0.8;
       z-index: 1;
       /deep/.svg-icon {
         width: 140px;
@@ -265,8 +269,6 @@ export default {
       }
     }
   }
-
-
 }
 }
 .item-header {

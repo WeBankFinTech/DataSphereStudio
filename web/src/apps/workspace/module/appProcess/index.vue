@@ -52,10 +52,12 @@ export default {
   margin-bottom: 20px;
   font-size: $font-size-large;
   font-weight: bold;
+  @include font-color($workspace-title-color,$dark-workspace-title-color);
   &::before {
     content: '';
     padding-right: 12px;
     border-left: 3px solid $primary-color;
+    @include border-color($primary-color, $dark-primary-color);
   }
 }
 .list-content {
@@ -70,7 +72,9 @@ export default {
     }
     .list-item {
       padding: 35px 15px 15px 15px;
+      @include bg-color($app-process-bg-color, $dark-app-process-bg-color);
       border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-app-process-bg-color);
       box-shadow: 1px 1px 2px 1px rgba(29, 121, 214, 0.1);
       border-radius: $border-radius-small;
       min-width: 140px;
@@ -85,10 +89,12 @@ export default {
         font-size: $font-size-large;
         font-weight: bold;
         margin-top: 5px;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
       }
       .desc {
         font-size: $font-size-small;
         display: none;
+        @include font-color($light-text-desc-color, $dark-text-desc-color);
       }
       .link {
         height: 30px;
@@ -98,6 +104,9 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
+        @include bg-color($app-process-bg-color, $dark-app-process-bg-color);
+        @include border-color($border-color-base, $dark-border-color-base);
+        @include font-color($light-text-color, $dark-text-color);
       }
       &:hover {
         transform: translateY(-1px);

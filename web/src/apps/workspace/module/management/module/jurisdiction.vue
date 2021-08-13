@@ -1,6 +1,6 @@
 <template>
   <div class="juri-serchbar-box">
-    <h3 style="width:80%;display: inline-block;" >{{$t('message.workspaceManagemnet.permissionsManagement')}}</h3>
+    <h3 class="juri-title" style="width:80%;display: inline-block;" >{{$t('message.workspaceManagemnet.permissionsManagement')}}</h3>
     <Button
       type="success"
       @click="creater"
@@ -130,7 +130,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .juri-serchbar-box {
   padding:10px 15px;
+  .juri-title {
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
 }
 </style>

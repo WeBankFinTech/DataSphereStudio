@@ -17,6 +17,8 @@ dss-appconn/dss-appconn-core/target
 dss-appconn/dss-appconn-loader/target
 dss-appconn/dss-schedule-appconn-core/target
 dss-appconn/linkis-appconn-engineplugin/target
+dss-appconn/appconns/dss-dolphinscheduler-appconn/target
+
 
 # dss-apps
 dss-apps/dss-apiservice-server/target
@@ -33,6 +35,10 @@ dss-framework/dss-framework-project-server/target
 dss-framework/dss-framework-workspace-server/target
 dss-framework/framework-plugins/dss-framework-orchestrator-publish/target
 dss-framework/framework-plugins/dss-framework-release-server/target
+dss-framework/dss-framework-admin/target
+dss-framework/dss-framework-sql-template/target
+dss-framework/dss-framework-dbapi-server/target
+
 
 # dss-orchestrator
 dss-orchestrator/dss-orchestrator-common/target

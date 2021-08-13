@@ -19,6 +19,7 @@ export default {
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+@import '@/common/style/variables.scss';
   .no-data-model {
     position: relative;
     width: calc(100%);
@@ -34,7 +35,8 @@ export default {
       text-align: center;
       .text {
         padding-top: 10px;
-        color: #666;
+        // color: #666;
+        @include font-color($light-text-color, $dark-text-color);
       }
     }
   }

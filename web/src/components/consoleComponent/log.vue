@@ -187,9 +187,10 @@ export default {
       height: 36px;
       line-height: 36px;
       padding-left: 10px;
-      background: $background-color-base;
+      @include bg-color($light-base-color, $dark-submenu-color);
       position: $relative;
       border-bottom: 2px solid $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
       overflow: hidden;
       margin-bottom: -2px;
       .log-tools-control {
@@ -199,6 +200,7 @@ export default {
         .log-tabs {
           display: inline-block;
           position: $absolute;
+          @include font-color($light-text-desc-color, $dark-text-desc-color);
         }
         .log-search {
           width: 100px;

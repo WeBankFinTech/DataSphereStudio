@@ -83,8 +83,7 @@
         class="user"
         @click="handleUserClick"
       >
-        <!-- 这里仅有一个静态头像 -->
-        <SvgIcon icon-class="avatar" class="user-avatar"/>
+        <span>{{ userName || 'Null' }}</span>
         <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
         <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>

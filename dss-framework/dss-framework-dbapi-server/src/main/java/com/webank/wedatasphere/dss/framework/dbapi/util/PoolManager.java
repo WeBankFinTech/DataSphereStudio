@@ -23,26 +23,26 @@ public class PoolManager {
     static Map<Integer, DruidDataSource> map = new HashMap<>();
 
     public static DruidDataSource getJdbcConnectionPool(DataSource ds) {
-        if (map.containsKey(ds.getId())) {
-            return map.get(ds.getId());
+        if (map.containsKey(ds.getDatasourceId())) {
+            return map.get(ds.getDatasourceId());
         } else {
             lock.lock();
             try {
                 log.info(Thread.currentThread().getName() + "获取锁");
-                if (!map.containsKey(ds.getId())) {
+                if (!map.containsKey(ds.getDatasourceId())) {
                     DruidDataSource druidDataSource = new DruidDataSource();
                     druidDataSource.setName(ds.getName());
                     druidDataSource.setUrl(ds.getUrl());
                     druidDataSource.setUsername(ds.getUsername());
-                    druidDataSource.setPassword(ds.getPassword());
+                    druidDataSource.setPassword(ds.getPwd());
                     druidDataSource.setDriverClassName(ds.getClassName());
                     druidDataSource.setConnectionErrorRetryAttempts(3);       //失败后重连次数
                     druidDataSource.setBreakAfterAcquireFailure(true);
 
-                    map.put(ds.getId(), druidDataSource);
+                    map.put(ds.getDatasourceId(), druidDataSource);
                     log.info("创建Druid连接池成功：{}", ds.getName());
                 }
-                return map.get(ds.getId());
+                return map.get(ds.getDatasourceId());
             } catch (Exception e) {
                 return null;
             } finally {

@@ -123,9 +123,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .tree-item {
   white-space: nowrap;
   outline: none;
+  @include font-color($light-text-color, $dark-text-color);
   .tree-content {
     display: flex;
     align-items: center;
@@ -170,12 +172,15 @@ export default {
     text-overflow: ellipsis;
     overflow: hidden;
     &:hover {
-      background-color: #edf1f6;
+      // background-color: #EDF1F6;
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
     }
   }
   .tree-name-active {
-    background-color: #edf1f6;
-    color: rgb(45, 140, 240);
+    // background-color: #EDF1F6;
+    @include bg-color(#EDF1F6, $dark-active-menu-item);
+    // color: rgb(45, 140, 240);
+    @include font-color($primary-color, $dark-primary-color);
   }
   .tree-children {
     margin-left: 26px;

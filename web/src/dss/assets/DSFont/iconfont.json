@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "23476333",
+      "name": "工作流",
+      "font_class": "gongzuoliu",
+      "unicode": "e6f0",
+      "unicode_decimal": 59120
+    },
+    {
       "icon_id": "23183738",
       "name": "新增",
       "font_class": "xinzeng1",

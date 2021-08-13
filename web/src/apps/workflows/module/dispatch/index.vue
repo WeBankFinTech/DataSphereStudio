@@ -1571,6 +1571,7 @@ export default {
   }
 </style>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .scheduler-center{
   position: relative;
   overflow: hidden;
@@ -1585,40 +1586,45 @@ export default {
   }
 }
 .scheduler-wrapper{
-  background-color: white;
+  @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
   min-height: 80vh;
-  padding-top: 16px;
+  // padding-top: 16px;
   float: left;
   width: 100%;
   .scheduler-menu{
     float: left;
     width: 250px;
+    padding-top: 16px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
+    border-right: 1px solid #DEE4EC;
+    border-left: 1px solid #DEE4EC;
+    @include border-color($border-color-base, $dark-workspace-background);
+    @include bg-color($light-base-color, $dark-base-color);
     li {
     padding: 0 40px;
     cursor: pointer;
     line-height: 40px;
     &:hover{
-       color: #2E92F7;
+       @include font-color($primary-color, $dark-primary-color);
      }
     &.active{
-       background-color: #ECF4FF;
-       color: #2E92F7;
-       border-right: 3px solid  #2E92F7
+       @include bg-color($active-menu-item, $dark-active-menu-item);
+       border-right: 3px solid  #2E92F7;
+       @include font-color($primary-color, $dark-primary-color);
+       @include border-color($primary-color, $dark-primary-color);
      }
     }
   }
   .scheduler-list{
     float: left;
     padding: 10px 25px;
-    border-left: 1px solid #DEE4EC;
     min-height: calc(80vh - 16px);
     width: calc(100% - 250px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;
-      color: rgba(0,0,0,0.65);
+      @include font-color($light-text-color, $dark-text-color);
       line-height: 22px;
       font-weight: bolder;
     }
@@ -1631,7 +1637,7 @@ export default {
   .left-panel{
     height: 80vh;
     width: calc(100vw - 250px - 65px - 250px);
-    background: #FFFFFF;
+    @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
     position: absolute;
     left: 100vw;
     z-index: 99;
@@ -1643,6 +1649,7 @@ export default {
     }
     .dag-page{
       border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
       width: 100%;
       height: 100%;
     }

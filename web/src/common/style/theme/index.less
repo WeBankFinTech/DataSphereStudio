@@ -17,7 +17,7 @@
 
 // Color
 @import '~iview/src/styles/index.less';
-@primary-color: #ff9900;
+@primary-color: #4B8FF3;
 @info-color: #2db7f5;
 @success-color: #19be6b;
 @processing-color: @primary-color;
@@ -35,11 +35,12 @@
 @yellow-color: #f4cf2a;
 
 // Base
-@body-background: #141414;
+@body-background: #1E232D;
 @font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 @code-family: Consolas,Menlo,Courier,monospace;
 @title-color: #17233d;
-@text-color: #515a6e;
+@text-color: rgba(255,255,255,0.65);
+// @text-color: #000;
 @font-size-base: 14px;
 @font-size-small: 12px;
 @font-size-large: 16px;
@@ -50,8 +51,9 @@
 @border-radius-large: 8px;
 @cursor-disabled: not-allowed;
 
-// Border color
-@border-color-base: #dcdee2;
+// Border color  
+@border-color-base:  rgba(255,255,255,0.20);
+
 // outside
 @border-color-split: #e8eaec;
 // inside
@@ -63,7 +65,7 @@
 
 // Background color
 @background-color-white: #fff;
-@background-color-base: #f7f7f7;
+@background-color-base: #1E232D;
 // base
 @background-color-select-hover: #f3f3f3;
 @background-color-header: #001C40;
@@ -72,13 +74,16 @@
 @table-thead-bg: #f8f8f9;
 @table-thead-blue-bg: @primary-color;
 @table-td-stripe-bg: #f8f8f9;
-@table-td-hover-bg: #ebf7ff;
-@table-td-highlight-bg: #ebf7ff;
+// @table-td-hover-bg: #ebf7ff;
+@table-td-hover-bg: #252A35;
+// @table-td-highlight-bg: #ebf7ff;
+@table-td-highlight-bg: #252A35;
 @menu-dark-title: #515a6e;
 @menu-dark-active-bg: #363e4f;
 @menu-dark-subsidiary-color: rgba(255,255,255,.7);
 @menu-dark-group-title-color: rgba(255,255,255,.36);
-@date-picker-cell-hover-bg: #e1f0fe;
+// @date-picker-cell-hover-bg: #e1f0fe;
+@date-picker-cell-hover-bg: #2A303C;
 
 // Shadow
 @shadow-color: rgba(0, 0, 0, .2);
@@ -103,11 +108,12 @@
 @btn-border-radius: 4px;
 @btn-border-radius-small: 3px;
 @btn-group-border: shade(@primary-color, 5%);
-@btn-disable-color: #c5c8ce;
+// @btn-disable-color: #c5c8ce;
+@btn-disable-color: rgba(255,255,255,0.25);
 @btn-disable-bg: @background-color-base;
 @btn-disable-border: @border-color-base;
-@btn-default-color: @text-color;
-@btn-default-bg: #fff;
+@btn-default-color: #FFF;
+@btn-default-bg: @body-background;
 @btn-default-border: @border-color-base;
 @btn-primary-color: #fff;
 @btn-primary-bg: @primary-color;
@@ -147,11 +153,11 @@
 @input-placeholder-color: @btn-disable-color;
 @input-color: @text-color;
 @input-border-color: @border-color-base;
-@input-bg: #fff;
-@input-group-bg: #f8f8f9;
+@input-bg: @body-background;
+@input-group-bg: @body-background;
 @input-hover-border-color: @primary-color;
 @input-focus-border-color: @primary-color;
-@input-disabled-bg: #f3f3f3;
+@input-disabled-bg: #252A35;
 
 // Tag
 @tag-font-size: 12px;
@@ -251,8 +257,10 @@
 @text-click-color: #0a9fec;
 @text-over-color: #b5b5b5;
 @text-red-color: #ff0000;
-@text-color: #515a6e;
-@input-placeholder-color: #c5c8ce;
+// @text-color: #515a6e;
+@text-color: rgba(255,255,255,0.85);
+// @input-placeholder-color: #c5c8ce;
+@input-placeholder-color: rgba(255,255,255,0.45);
 @text-title-color: rgba(0, 0, 0, 0.85);
 @text-desc-color: rgba(0,0,0,0.65);
 @text-tille-light-color: rgba(255,255,255,0.85);

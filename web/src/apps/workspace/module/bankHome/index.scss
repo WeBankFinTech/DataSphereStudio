@@ -38,7 +38,6 @@
     padding: $padding-25;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
     .workspace-main-left {
       flex: 10;
       min-height: 600px;
@@ -46,8 +45,6 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: flex-start;
-      // box-shadow: 0 1px 6px $shadow-color;
-      // border-color: #eee;
       border: $border-width-base  $border-style-base $border-color-base;
       min-height: 200px;
       width: 100%;
@@ -94,7 +91,6 @@
       flex: 3;
       min-width: 200px;
       padding: $padding-25;
-      min-height: 600px;
       margin-left: $padding-25;
       background: $body-background;
       border: $border-width-base  $border-style-base $border-color-base;
@@ -159,7 +155,6 @@
       }
       .video-item {
         background: #f2f2f2;
-        // margin-bottom: 20px;
         cursor: pointer;
         width: 200px;
       }
@@ -173,6 +168,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    margin-bottom: 25px;
     .app-icon {
       font-size: 90px;
       height: 90px;
@@ -200,14 +196,14 @@
     .app-item-wrap {
       display: flex;
       position: relative;
-      margin: 12.5px;
+      margin: 25px 20px 0 20px;
       cursor: pointer;
       // border: 1px solid rgb(245, 245, 245);
       border-radius: 3px;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
-      width: 112px;
+      min-width: 112px;
       height: 112px;
 
       .close-wrap {
@@ -232,7 +228,7 @@
         font-size: 16px;
         color: rgba(0,0,0,0.85);
         text-align: center;
-        width: 100%;
+        max-width: 150px;
         padding: 0 10px;
       }
     }
@@ -269,7 +265,7 @@
       transition: all .2s ease-in-out;
       background-color: #fff;
       .app-shop-top {
-        margin-top: 9px;
+        margin-top: 10px;
         margin-bottom: 20px;
       }
 

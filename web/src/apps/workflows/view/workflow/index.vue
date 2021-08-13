@@ -8,13 +8,13 @@
         </div>
       </div>
       <div class="project-nav-tree">
-        <Tree 
-          class="tree-container" 
-          :nodes="projectsTree" 
-          :load="getFlow" 
+        <Tree
+          class="tree-container"
+          :nodes="projectsTree"
+          :load="getFlow"
           :currentTreeId="currentTreeId"
-          @on-item-click="handleTreeClick" 
-          @on-add-click="handleTreeModal" 
+          @on-item-click="handleTreeClick"
+          @on-add-click="handleTreeModal"
           @on-sync-tree="handleTreeSync"
         />
         <Spin v-show="loadingTree" size="large" fix/>
@@ -118,6 +118,7 @@ import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js'
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js'
 import {setVirtualRoles} from '@/common/config/permissions.js';
 import DS from '@/apps/workflows/module/dispatch'
+import eventbus from '@/common/helper/eventbus';
 
 export default {
   components: {
@@ -598,6 +599,8 @@ export default {
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取
       storage.set('currentDssLabels', this.modeOfKey);
+      // 开发中心和运维中心使用同一个route，所以使用eventbus来触发产品即文档的更新
+      eventbus.emit('workflow.change', this.modeOfKey);
       this.tabList = [];
       this.textColor = '#2D8CF0';
       this.lastVal = null;

@@ -18,11 +18,20 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
 import java.util.List;
@@ -41,8 +50,6 @@ public interface DSSWorkspaceService {
     List<DSSWorkspace> getWorkspaces(String userName);
 
     DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName);
-
-    List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
 
     List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);

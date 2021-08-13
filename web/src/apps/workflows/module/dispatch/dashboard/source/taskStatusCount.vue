@@ -54,13 +54,10 @@ export default {
   },
   methods: {
     _goTask (name) {
-      this.$router.push({
-        name: 'task-instance',
-        query: {
-          stateType: _.find(tasksStateList, ['label', name]).code,
-          startDate: this.searchParams.startDate,
-          endDate: this.searchParams.endDate
-        }
+      this.$emit('goToList', 5, {
+        stateType: _.find(tasksStateList, ['desc', name]).code,
+        startDate: this.searchParams.startDate,
+        endDate: this.searchParams.endDate
       })
     },
     _handleTaskStatus (res) {

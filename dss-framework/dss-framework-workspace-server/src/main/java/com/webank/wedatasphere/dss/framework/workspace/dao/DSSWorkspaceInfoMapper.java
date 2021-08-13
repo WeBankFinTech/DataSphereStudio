@@ -20,7 +20,11 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * created by cooperyang on 2020/3/18
@@ -33,7 +37,7 @@ public interface DSSWorkspaceInfoMapper {
     String getWorkspaceNameById(@Param("workspaceId") int workspaceId);
 
     @Select("select id from dss_workspace where name = #{workspaceName}")
-    int getWorkspaceIdByName(@Param("workspaceName") String workspaceName);
+    Integer getWorkspaceIdByName(@Param("workspaceName") String workspaceName);
 
     @Select("select * from dss_workspace where id = #{workspaceId}")
     @Results({

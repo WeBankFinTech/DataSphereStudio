@@ -4,7 +4,7 @@
     <div class="content-item">
       <div v-if="checkCreate()"
         class="project-item project-header"
-        @click.native="addProject">
+        @click="addProject">
         <Icon class="add-icon" type="md-add" size="20">
         </Icon>
         <span>{{$t('message.Project.createProject')}}</span>
@@ -12,7 +12,7 @@
       <template  v-if="dataList.length > 0">
         <div
           class="project-item"
-          @click.native="goto(currentData, subitem)"
+          @click="goto(currentData, subitem)"
           v-for="(subitem, index) in cachedataList"
           :key="subitem.id"
         >
@@ -231,9 +231,10 @@ export default {
     }
     .project-item {
         min-height: 150px;
-        background: #fff;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         border-radius: 2px;
         border: 1px solid #DEE4EC;
+        @include border-color($border-color-base, $dark-border-color-base);
         padding: $padding-25;
         cursor: pointer;
         &:hover {
@@ -256,12 +257,18 @@ export default {
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Medium;
-              color: $text-title-color;
+              // color: $text-title-color;
+              @include font-color($workspace-title-color, $dark-workspace-title-color);
               letter-spacing: 0;
             }
             .menu-bar {
               position: relative;
               flex-basis: 40px;
+              /deep/.ivu-btn {
+                @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+                @include border-color($border-color-base, $dark-border-color-base);
+                @include font-color($light-text-color, $dark-text-color);
+              }
               .menu-list {
                 display: none;
                 position: absolute;
@@ -271,14 +278,15 @@ export default {
                 padding: 5px 0;
                 box-shadow: 0 1px 6px rgba(0,0,0,.2);
                 z-index: 999;
-                background-color: #fff;
+                @include bg-color($menu-list-bg-color, $dark-menu-list-bg-color);
                 cursor: pointer;
                 .list-item {
                   width: 60px;
                   padding: 5px 8px;
                   text-align: center;
+                  @include font-color($light-text-color, $dark-text-color);
                   &:hover {
-                    background-color: #f3f3f3;
+                    @include bg-color($hover-color-base, $dark-hover-color-base);
                   }
                 }
               }
@@ -295,7 +303,7 @@ export default {
             text-overflow: ellipsis;
             overflow: hidden;
             font-size: $font-size-14;
-            color: rgba(0,0,0,0.5);
+            @include font-color($light-text-desc-color, $dark-text-desc-color);
             margin: 15px 0;
           }
           .bottom-bar {
@@ -308,11 +316,12 @@ export default {
             overflow: hidden;
             width: 100%;
             .tag-item {
-              color: $text-desc-color;
+              // color: $text-desc-color;
+              @include font-color($light-text-color, $dark-text-color);
               padding: 2px 10px;
               margin-right: 10px;
               border-radius: 11px;
-              background-color:#F3F3F3;
+              @include bg-color($active-menu-item, $dark-active-menu-item);
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
@@ -325,9 +334,12 @@ export default {
     .project-header {
       text-align: center;
       font-size: $font-size-large;
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       line-height: 102px;
       border: 1px dashed  #dcdee2;
-      background: #F8F9FC;
+      @include border-color($border-color-base, $dark-border-color-base);
+      // background: #F8F9FC;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
       .add-icon {
         margin-top: -2px;
         margin-right: 5px;
@@ -359,7 +371,8 @@ export default {
     box-shadow: 1px 1px 5px rgba(88, 175, 251, .6);
     -webkit-animation: process 800ms infinite linear;
     animation: process 800ms infinite linear;
-    background-color: $background-color-base;
+    // background-color: $background-color-base;
+    @include bg-color($workspace-background, $dark-workspace-background);
     &:after {
         content: '';
         position: absolute;
@@ -375,6 +388,7 @@ export default {
         position: $absolute;
         left: 0;
         background: $success-color;
+        
         height: 100%;
         border-radius: 10px;
         z-index: 1;

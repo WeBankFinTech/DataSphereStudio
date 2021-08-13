@@ -1142,6 +1142,7 @@ export default {
   overflow: hidden;
   box-sizing: border-box;
   z-index: 3;
+  @include bg-color($light-base-color, $dark-base-color);
   .workbench-tab-wrapper {
     display: flex;
     border-top: $border-width-base $border-style-base #dcdcdc;

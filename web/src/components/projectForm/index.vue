@@ -15,6 +15,7 @@
         prop="name">
         <Input
           v-model="projectDataCurrent.name"
+          maxlength="20"
           :placeholder="$t('message.workflow.enterName')"
           :disabled="actionType === 'modify'"></Input>
       </FormItem>

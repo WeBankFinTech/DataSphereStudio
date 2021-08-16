@@ -15,6 +15,7 @@
         prop="orchestratorName">
         <Input
           :disabled="isPublished"
+          maxlength="20"
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>

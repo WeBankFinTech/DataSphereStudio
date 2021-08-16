@@ -241,9 +241,9 @@ export default {
   },
   created() {
     // 获取是否是历史管理员权限
-    api.fetch('/jobhistory/isJobhistorAdmin', 'get').then((res) => {
-      this.isLogAdmin = res.isJobhistorAdmin;
-    })
+    // api.fetch('/jobhistory/isJobhistorAdmin', 'get').then((res) => {
+    //   this.isLogAdmin = res.isJobhistorAdmin;
+    // })
   },
   mounted() {
     this.init();

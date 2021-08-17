@@ -8,13 +8,13 @@
         </div>
       </div>
       <div class="project-nav-tree">
-        <Tree 
-          class="tree-container" 
-          :nodes="projectsTree" 
-          :load="getFlow" 
+        <Tree
+          class="tree-container"
+          :nodes="projectsTree"
+          :load="getFlow"
           :currentTreeId="currentTreeId"
-          @on-item-click="handleTreeClick" 
-          @on-add-click="handleTreeModal" 
+          @on-item-click="handleTreeClick"
+          @on-add-click="handleTreeModal"
           @on-sync-tree="handleTreeSync"
         />
         <Spin v-show="loadingTree" size="large" fix/>
@@ -706,6 +706,7 @@ export default {
     font-weight: bold;
     padding-left: 5px;
     border-left: 3px solid $primary-color;
+    @include border-color($primary-color, $dark-primary-color);
   }
   .rightCardContainer {
     will-change: auto;
@@ -724,7 +725,8 @@ export default {
         position: absolute;
         bottom: -45px;
         left: 50%;
-        color: $primary-color;
+        // color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
         font-size: 40px;
         transform: translateX(-50%)
       }

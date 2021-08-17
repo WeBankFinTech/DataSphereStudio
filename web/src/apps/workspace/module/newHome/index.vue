@@ -284,14 +284,16 @@ export default {
     workspaceShowAction(val) {
       this.workspaceShow = val;
     },
-    workspaceConfirm(params) {
+    workspaceConfirm(params, callback) {
       GetWorkspaceList(params, "post")
         .then(res => {
+          typeof callback == 'function' && callback();
           this.$Message.success(this.$t("message.workspace.createdSuccess"));
           // 创建成功后跳到工作空间首页
           this.gotoWorkspace(res);
         })
         .catch(() => {
+          typeof callback == 'function' && callback();
           this.$Message.error(this.$t("message.workspace.createdFailed"));
         });
     },

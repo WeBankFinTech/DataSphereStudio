@@ -87,6 +87,7 @@ export default {
       util.windowOpen(this.getFAQUrl());
     },
     clearCache() {
+      localStorage.setItem('cacheGuide', null)
       this.$Modal.confirm({
         title: this.$t('message.common.userMenu.title'),
         content: this.$t('message.common.userMenu.content'),

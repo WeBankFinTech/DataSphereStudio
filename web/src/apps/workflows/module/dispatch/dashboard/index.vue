@@ -126,6 +126,7 @@ export default {
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+@import '@/common/style/variables.scss';
   .perject-home-content {
     padding: 10px 20px;
     position: relative;
@@ -141,7 +142,8 @@ export default {
       line-height: 60px;
       span {
         font-size: 22px;
-        color: #333;
+        // color: #333;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         font-weight: bold;
       }
     }
@@ -155,6 +157,7 @@ export default {
           height: 32px;
           line-height: 32px;
           border-bottom: 1px solid #ecedec;
+          @include border-color($border-color-base, $dark-border-color-base);
         }
       }
     }

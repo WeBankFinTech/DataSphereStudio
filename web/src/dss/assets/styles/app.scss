@@ -1,4 +1,5 @@
 @import '@/common/style/variables.scss';
+@import '@/common/style/overwrite.scss';
 @import '../projectIconFont/iconfont.css';
 @import '../DSFont/iconfont.css';
 @import 'normalize.scss';
@@ -93,22 +94,17 @@ body{
     background: $scrollbar-color;
 }
 
-.we-editor .monaco-editor .margin {
-    background-color: #f2f3f6;
-}
-
 
 .ivu-table:after {
   width: 0 !important;
 }
-.ivu-table th {
-  background-color: #FAFAFA !important;
-}
+
 .ivu-table-wrapper{
   border: none !important;
 }
 .ivu-modal-header{
-  background-color: #FAFAFA !important;
+//   background-color: #FAFAFA !important;
+  @include bg-color(#FAFAFA, $dark-base-color);
 }
 
 .overlay {

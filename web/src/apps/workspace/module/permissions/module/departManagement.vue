@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main-content">
     <div class="formWrap">
       <Form ref="queries" :model="queries" inline>
         <FormItem
@@ -194,7 +194,7 @@
       </Form>
       <slot name="footer">
         <div class="modalFooter">
-          <Button @click="handleModalCancel()" size="large">{{
+          <Button @click="handleModalCancel()" size="large" class="cancle-btn">{{
             $t("message.workspace.cancel")
           }}</Button>
           <Button
@@ -230,7 +230,10 @@ import {
   keepTreeNLevel
 } from "../util";
 
-//构建表格所需的树形结构
+/**
+ * 构建表格所需的树形结构
+ *
+ */
 function assembleTree(level, datas, result) {
   if (level !== 0) {
     const nexts = datas.filter(item => item.level !== level);
@@ -521,47 +524,72 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.formWrap {
-  width: 100%;
-  padding: 20px;
-  padding-bottom: 0px;
-  border-bottom: 1px solid #dee4ec;
-}
-.tableWrap {
-  width: 100%;
-  padding: 0 24px;
-  .addWrap {
+@import '@/common/style/variables.scss';
+.main-content {
+  padding-top: 20px;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+  border: 1px solid $border-color-base;
+  @include border-color($border-color-base, $dark-workspace-background);
+  .formWrap {
+    width: 100%;
+    // padding: 20px;
+    // padding-bottom: 0px;
+    border-bottom: 1px solid #dee4ec;
+    @include border-color($border-color-base, $dark-border-color-base);
+    /deep/.ivu-form-item-label {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
+    }
+    /deep/.ivu-input {
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      border: 1px solid $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
+    }
+    .cancle-btn {
+      @include border-color($border-color-base, $dark-border-color-base);
+      @include font-color($light-text-color, #FFF);
+      &:hover {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
+    }
+  }
+  .tableWrap {
+    width: 100%;
+    // padding: 0 24px;
+    .addWrap {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      height: 72px;
+    }
+  }
+  .deptName {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .iconWrap {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .operation {
+    font-size: 14px;
+    // color: #2e92f7;
+    @include font-color($primary-color, $dark-primary-color);
+    cursor: pointer;
+  }
+  .modalFooter {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    width: 100%;
-    height: 72px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 10px;
   }
 }
-.deptName {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-.iconWrap {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  font-size: 20px;
-  cursor: pointer;
-}
-.operation {
-  font-size: 14px;
-  color: #2e92f7;
-  cursor: pointer;
-}
-.modalFooter {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding-top: 10px;
-}
+
 </style>

@@ -21,7 +21,7 @@
           <div class="left_search">
             <!-- 切换显示方式按钮 -->
             <div class="left_visual" @click="changeVisual">
-              <SvgIcon color="rgba(0,0,0,0.65)" :iconClass="visualCatesIcon" />
+              <SvgIcon :iconClass="visualCatesIcon" />
               <span>
                 {{ visualCatesTitle }}
               </span>
@@ -102,9 +102,9 @@
           }}</Button> -->
         </div>
         <div v-if="isAdmin" class="permissions_wrap">
-          <div class="permissions_entry" @click="gotoPermissions()">
+          <div class="permissions_entry" @click="gotoManagementPlatform()">
             <img src="../../assets/images/u111.svg" />
-            <div>{{ $t("message.workspace.permissions") }}</div>
+            <div>{{ $t("message.workspace.managementPlatform") }}</div>
           </div>
         </div>
         <div class="admin-box-video">
@@ -333,8 +333,8 @@ export default {
         query: { workspaceId: id }
       });
     },
-    gotoPermissions() {
-      this.$router.push({ path: "/permissions" });
+    gotoManagementPlatform() {
+      this.$router.push({ path: "/managementPlatform" });
     }
   }
 };

@@ -348,7 +348,8 @@ export default {
     position: $absolute;
     left: 40px;
     margin-left: -$toolbarWidth;
-    background: $body-background;
+    // background: $body-background;
+    @include bg-color($light-base-color, $dark-menu-base-color);
     .we-poptip {
       padding: 12px;
       line-height: 28px;
@@ -364,6 +365,7 @@ export default {
       width: 100%;
       height: 100%;
       border-right: 1px solid #dcdee2;
+      @include border-color($border-color-base, $dark-menu-base-color);
       padding-top: 10px;
       li {
         padding-bottom: 20px;

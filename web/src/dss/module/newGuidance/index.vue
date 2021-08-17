@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="currentStep === 1">
+    <div v-if="currentStep === 1" key="1">
       <div id="mask1">
         <div class="description">
           <p>你好，我是鲁班的卡通形象，你可以叫我"卤蛋"。</p>
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 2">
+    <div v-else-if="currentStep === 2" key="2">
       <div id="mask2">
         <div class="description">这是鲁班的主页面，即工作空间首页。</div>
         <svg
@@ -116,7 +116,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 3">
+    <div v-else-if="currentStep === 3" key="3">
       <div
         class="maskHeader"
         style="
@@ -162,7 +162,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 4">
+    <div v-else-if="currentStep === 4" key="4">
       <div
         class="maskHeader"
         style="
@@ -212,7 +212,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 5">
+    <div v-else-if="currentStep === 5" key="5">
       <div id="mask5">
         <div class="selected" @click.once="iconRightClick()"></div>
         <div class="arrow">
@@ -247,7 +247,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 6">
+    <div v-else-if="currentStep === 6" key="6">
       <div
         class="maskHeader"
         style="
@@ -295,7 +295,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="currentStep === 7">
+    <div v-else-if="currentStep === 7" key="7">
       <div
         class="maskFooter"
         style="
@@ -343,7 +343,7 @@
         <div class="selected" @click="maskFooterClick()"></div>
       </div>
     </div>
-    <div v-else-if="currentStep === 8">
+    <div v-else-if="currentStep === 8" key="8">
       <div id="mask8">
         <div class="item1">
           <div class="desc">
@@ -455,9 +455,14 @@ export default {
     prev() {
       let head = document.querySelector(".layout-header");
       let foot = document.querySelector(".layout-footer");
+      let user = document.querySelector(".user")
       if (this.currentStep === 3) {
         foot.setAttribute("style", "z-index: 1002");
         this.currentStep -= 1;
+        Vue.nextTick(()=>{
+          let block5 = document.querySelector(".headerSuspension .item1 .block5")
+          block5.setAttribute("style", "width: " + user.clientWidth + "px")
+        })
       } else if (this.currentStep === 4) {
         this.$parent.$children[1].$children[0].hideMenu();
         this.currentStep -= 1;
@@ -467,11 +472,23 @@ export default {
         setTimeout(() => {
           this.currentStep -= 1;
         }, 250);
-      } else if (this.currentStep === 7) {
+      } else if(this.currentStep === 6){
+        this.currentStep -= 1
+        Vue.nextTick(()=>{
+          let select5 = document.querySelector("#mask5 .selected")
+          console.log(select5)
+          select5.style.width = user.clientWidth + "px"
+        })
+      }else if (this.currentStep === 7) {
         head.setAttribute("style", "z-index: 1002");
         foot.setAttribute("style", "z-index: 1000");
         this.$parent.$children[1].handleUserClick();
         this.currentStep -= 1;
+        Vue.nextTick(()=>{
+          let select6 = document.querySelector("#mask6 .selected")
+          let userMenu = document.querySelector(".user-menu")
+          select6.style.width = userMenu.clientWidth + "px"
+        })
       } else if (this.currentStep === 8) {
         this.$parent.$children[2].toggleGuide();
         this.currentStep -= 1;
@@ -484,16 +501,19 @@ export default {
       let overlay = document.querySelector(".overlay");
       let head = document.querySelector(".layout-header");
       let foot = document.querySelector(".layout-footer");
+      let user = document.querySelector(".user")
       if (this.currentStep == 1) {
         head.setAttribute("style", "z-index: 1002");
         foot.setAttribute("style", "z-index: 1002");
         this.currentStep += 1;
         Vue.nextTick(()=>{
           let dropdownWidth = document.querySelector(".ivu-dropdown-rel")
-          let block3 = document.querySelector(".item1 .block3")
-          let img3 = document.querySelector(".item2 .img3")
+          let block3 = document.querySelector(".headerSuspension .item1 .block3")
+          let block5 = document.querySelector(".headerSuspension .item1 .block5")
+          let img3 = document.querySelector(".headerSuspension .item2 .img3")
           let computedStyle3 = getComputedStyle(img3, null)
           let offset = dropdownWidth.clientWidth + 38 - 110
+          block5.setAttribute("style", "width: " + user.clientWidth + "px")
           block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
           img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
         })
@@ -513,10 +533,19 @@ export default {
       } else if (this.currentStep === 4) {
         this.$parent.$children[1].$children[0].hideMenu();
         this.currentStep += 1;
+        Vue.nextTick(()=>{
+          let select5 = document.querySelector("#mask5 .selected")
+          console.log(select5)
+          select5.style.width = user.clientWidth + "px"
+        })
       } else if (this.currentStep === 5) {
-        console.log(this.$parent.$children[1]);
         this.$parent.$children[1].handleUserClick();
         this.currentStep += 1;
+        Vue.nextTick(()=>{
+          let select6 = document.querySelector("#mask6 .selected")
+          let userMenu = document.querySelector(".user-menu")
+          select6.style.width = userMenu.clientWidth + "px"
+        })
       } else if (this.currentStep === 6) {
         head.setAttribute("style", "z-index: 1000");
         foot.setAttribute("style", "z-index: 1002");

@@ -61,6 +61,10 @@ instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
 
+  if (/\/application\//.test(config.url)) {
+    config.url = `http://${window.location.host}` + config.url
+  }
+
   // 增加token
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = api.getToken()

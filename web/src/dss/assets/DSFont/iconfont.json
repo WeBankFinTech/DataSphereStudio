@@ -6,6 +6,209 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "23476333",
+      "name": "工作流",
+      "font_class": "gongzuoliu",
+      "unicode": "e6f0",
+      "unicode_decimal": 59120
+    },
+    {
+      "icon_id": "23183738",
+      "name": "新增",
+      "font_class": "xinzeng1",
+      "unicode": "e6ef",
+      "unicode_decimal": 59119
+    },
+    {
+      "icon_id": "23183418",
+      "name": "日期",
+      "font_class": "riqi",
+      "unicode": "e6ee",
+      "unicode_decimal": 59118
+    },
+    {
+      "icon_id": "23181388",
+      "name": "组件接入管理",
+      "font_class": "zujianjieruguanli",
+      "unicode": "e6eb",
+      "unicode_decimal": 59115
+    },
+    {
+      "icon_id": "23181389",
+      "name": "控制台",
+      "font_class": "kongzhitai",
+      "unicode": "e6ec",
+      "unicode_decimal": 59116
+    },
+    {
+      "icon_id": "23181390",
+      "name": "部门和用户管理",
+      "font_class": "bumenheyonghuguanli",
+      "unicode": "e6ed",
+      "unicode_decimal": 59117
+    },
+    {
+      "icon_id": "22920894",
+      "name": "电信 5G天翼云纯色logo",
+      "font_class": "a-dianxin5Gtianyiyunchunselogo",
+      "unicode": "e6c7",
+      "unicode_decimal": 59079
+    },
+    {
+      "icon_id": "22890665",
+      "name": "勾",
+      "font_class": "gou",
+      "unicode": "e6bb",
+      "unicode_decimal": 59067
+    },
+    {
+      "icon_id": "22890666",
+      "name": "下拉",
+      "font_class": "xiala",
+      "unicode": "e6bc",
+      "unicode_decimal": 59068
+    },
+    {
+      "icon_id": "22890667",
+      "name": "服务管理",
+      "font_class": "fuwuguanli",
+      "unicode": "e6bd",
+      "unicode_decimal": 59069
+    },
+    {
+      "icon_id": "22890668",
+      "name": "收起",
+      "font_class": "shouqi",
+      "unicode": "e6be",
+      "unicode_decimal": 59070
+    },
+    {
+      "icon_id": "22890669",
+      "name": "总调用次数",
+      "font_class": "zongtiaoyongcishu",
+      "unicode": "e6bf",
+      "unicode_decimal": 59071
+    },
+    {
+      "icon_id": "22890670",
+      "name": "api",
+      "font_class": "api",
+      "unicode": "e6c0",
+      "unicode_decimal": 59072
+    },
+    {
+      "icon_id": "22890671",
+      "name": "属性",
+      "font_class": "shuxing",
+      "unicode": "e6c1",
+      "unicode_decimal": 59073
+    },
+    {
+      "icon_id": "22890672",
+      "name": "API调用",
+      "font_class": "APItiaoyong",
+      "unicode": "e6c2",
+      "unicode_decimal": 59074
+    },
+    {
+      "icon_id": "22890673",
+      "name": "总执行时长用量",
+      "font_class": "zongzhihangshichangyongliang",
+      "unicode": "e6c3",
+      "unicode_decimal": 59075
+    },
+    {
+      "icon_id": "22890674",
+      "name": "API监控",
+      "font_class": "APIjiankong",
+      "unicode": "e6c4",
+      "unicode_decimal": 59076
+    },
+    {
+      "icon_id": "22890675",
+      "name": "API测试",
+      "font_class": "APIceshi",
+      "unicode": "e6c5",
+      "unicode_decimal": 59077
+    },
+    {
+      "icon_id": "22890676",
+      "name": "API管理",
+      "font_class": "APIguanli",
+      "unicode": "e6c6",
+      "unicode_decimal": 59078
+    },
+    {
+      "icon_id": "22890657",
+      "name": "！",
+      "font_class": "a-",
+      "unicode": "e6b3",
+      "unicode_decimal": 59059
+    },
+    {
+      "icon_id": "22890658",
+      "name": "版本",
+      "font_class": "banben",
+      "unicode": "e6b4",
+      "unicode_decimal": 59060
+    },
+    {
+      "icon_id": "22890659",
+      "name": "测试",
+      "font_class": "ceshi",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "22890660",
+      "name": "发布",
+      "font_class": "fabu",
+      "unicode": "e6b6",
+      "unicode_decimal": 59062
+    },
+    {
+      "icon_id": "22890661",
+      "name": "服务表",
+      "font_class": "fuwubiao",
+      "unicode": "e6b7",
+      "unicode_decimal": 59063
+    },
+    {
+      "icon_id": "22890662",
+      "name": "保存",
+      "font_class": "baocun",
+      "unicode": "e6b8",
+      "unicode_decimal": 59064
+    },
+    {
+      "icon_id": "22890663",
+      "name": "服务开发",
+      "font_class": "fuwukaifa",
+      "unicode": "e6b9",
+      "unicode_decimal": 59065
+    },
+    {
+      "icon_id": "22890664",
+      "name": "新增",
+      "font_class": "xinzeng",
+      "unicode": "e6ba",
+      "unicode_decimal": 59066
+    },
+    {
+      "icon_id": "22808932",
+      "name": "内存卡底",
+      "font_class": "neicunkadi",
+      "unicode": "e6b0",
+      "unicode_decimal": 59056
+    },
+    {
+      "icon_id": "22808755",
+      "name": "矩形",
+      "font_class": "juxing",
+      "unicode": "e6af",
+      "unicode_decimal": 59055
+    },
+    {
       "icon_id": "22779777",
       "name": "问号",
       "font_class": "wenhao",

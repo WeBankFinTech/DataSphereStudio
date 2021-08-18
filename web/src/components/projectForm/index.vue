@@ -102,7 +102,7 @@
       </FormItem>
       <FormItem v-if="framework" :label="$t('message.workflow.projectDetail.orchestratorMode')" prop="orchestratorModeList">
         <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
-          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey">
+          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey" :disabled="!item.enabled">
             <span class="icon-bar">
               <SvgIcon class="icon-style" :icon-class="item.icon"/>
               <span style="margin-left: 10px">{{item.dicName}}</span>

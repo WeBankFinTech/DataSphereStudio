@@ -7,6 +7,7 @@
     <Tabs value="form">
       <Tab-pane label="新建编排" name="form">
         <WorkflowFormNew
+          v-if="mergeModalShow"
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"

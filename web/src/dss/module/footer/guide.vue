@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="guide-footer">
-        <a>前往用户手册</a>
+        <a target="_blank" href="https://saas.ctyun.cn/luban/doc/docs/mindoc">前往用户手册</a>
       </div>
     </div>
 

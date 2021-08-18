@@ -5,7 +5,6 @@
     :closable="false">
     <Form
       :label-width="100"
-      label-position="left"
       ref="projectForm"
       :model="workflowDataCurrent"
       :rules="formValid"
@@ -15,7 +14,7 @@
         prop="orchestratorName">
         <Input
           :disabled="isPublished"
-          maxlength="20"
+          :maxlength=20
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>
@@ -30,21 +29,21 @@
       <!-- 不同的编排类型显示不同的编排方式， 动态接口获取 -->
       <template v-if="workflowDataCurrent.orchestratorMode">
         <FormItem v-if="selectOrchestrator.dicValue === FORMITEMTYPE.RADIO" :label="$t('message.orchestratorModes.orchestratorMethod')" prop="orchestratorWayString"
-          :rules="[{ required: true, trigger: 'blur' }]">
+          :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
           <RadioGroup v-model="workflowDataCurrent.orchestratorWayString">
             <Radio v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :label="item.dicKey">
               <span>{{item.dicName}}</span>
             </Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur' }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
           <Select v-model="workflowDataCurrent.orchestratorWayString">
             <Option v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :value="item.dicKey">
               {{ item.dicName}}
             </Option>
           </Select>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array' }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array', message: $t('message.workflow.orchestratorWayString') }]">
           <CheckboxGroup v-model="workflowDataCurrent.orchestratorWayArray">
             <Checkbox v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :label="item.dicKey" :key="item.dicKey">
               <span style="margin-left: 10px">{{item.dicName}}</span>
@@ -67,7 +66,7 @@
         <Input
           v-model="workflowDataCurrent.description"
           type="textarea"
-          :maxlength=201
+          :maxlength=200
           :placeholder="$t('message.workflow.inputWorkflowDesc')"></Input>
       </FormItem>
     </Form>
@@ -134,15 +133,15 @@ export default {
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
         ],
         description: [
-          { required: true, trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}200`, max: 200 },
+          { required: true, message: this.$t('message.workflow.enterDesc'), trigger: 'blur' },
+          { message: `${this.$t('message.workflow.descLength')}200`, max: 200 },
         ],
         orchestratorMode: [
-          { required: true, trigger: 'blur' }
+          { required: true, trigger: 'blur', message: this.$t('message.workflow.orchestratorMode') }
         ]
       }
     },

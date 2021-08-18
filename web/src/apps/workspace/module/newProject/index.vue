@@ -189,6 +189,20 @@ export default {
     // 获取编排的数据
     GetDicSecondList(this.$route.query.workspaceId).then((res) => {
       this.orchestratorModeList = res.list
+      this.orchestratorModeList = {
+        ...this.orchestratorModeList,
+        list: this.orchestratorModeList.list.map(i => {
+          if (i.dicKey == 'pom_work_flow') {
+            // 编排模式暂时只支持工作流
+            return {
+              ...i,
+              enabled: true
+            }
+          } else {
+            return i;
+          }
+        })
+      }
     })
   },
   mounted() {

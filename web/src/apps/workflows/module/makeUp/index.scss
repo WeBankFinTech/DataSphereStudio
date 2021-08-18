@@ -1,0 +1,69 @@
+.header-tool {
+  width: 100%;
+  height: 36px;
+  padding-left: 10px;
+  background: #f7f7f7;
+  color: #000;
+  border: 1px solid #d7dde4;
+  margin-bottom: 15px;
+  .icon {
+      display: inline-block;
+      vertical-align: text-top;
+      width: 18px;
+      height: 18px;
+      color: #333;
+      text-align: center;
+  }
+
+  .text {
+      vertical-align: text-top;
+  }
+
+  .button {
+      float: left;
+      margin: 6px 5px 6px 0;
+      padding: 0;
+      height: 18px;
+      // width: 54px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+      svg {
+          margin-right: 5px;
+          color: #666;
+          font-size: 1rem;
+      }
+      .stop {
+          color: red;
+      }
+      span {
+          vertical-align: middle;
+          color: #666;
+      }
+  }
+
+  .long-button {
+      min-width: 60px;
+  }
+
+  .devider {
+      float: left;
+      border-left: 1px solid #e3e8ee;
+      height: 18px;
+      margin: 8px 5px;
+  }
+}
+
+.mutiple {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    .step-bar {
+        flex: 1;
+    }
+    .button-bar {
+        flex-basis: 160px;
+    }
+}

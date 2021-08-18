@@ -15,7 +15,6 @@
         prop="name">
         <Input
           v-model="projectDataCurrent.name"
-          maxlength="20"
           :placeholder="$t('message.workflow.enterName')"
           :disabled="actionType === 'modify'"></Input>
       </FormItem>
@@ -218,7 +217,7 @@ export default {
       return {
         name: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
           { validator: validateName, trigger: 'blur' }
         ],
@@ -262,17 +261,17 @@ export default {
       this.$emit('show', val);
     },
     projectData(value){
-      const handleCreateUser = (arr,createBy)=> {
-        const index = arr.indexOf(createBy);
-        if(index === -1){
-          arr.unshift(index);
-        }else {
-          arr.unshift(arr.splice(index)[0])
-        }
-      }
+      // const handleCreateUser = (arr,createBy)=> {
+      //   const index = arr.indexOf(createBy);
+      //   if(index === -1){
+      //     arr.unshift(index);
+      //   }else {
+      //     arr.unshift(arr.splice(index)[0])
+      //   }
+      // }
       const cloneObj = _.cloneDeep(value);
-      handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
-      handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
+      // handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
+      // handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
 
       this.projectDataCurrent = cloneObj;
     }

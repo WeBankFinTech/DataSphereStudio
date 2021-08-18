@@ -40,7 +40,7 @@ public interface DSSWorkspaceService {
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
-    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName);
+    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception;
 
     List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
 

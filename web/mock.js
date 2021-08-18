@@ -15,5 +15,5 @@
  *
  */
 
-module.exports = function (app, Mock) {
+module.exports = function () {
 }

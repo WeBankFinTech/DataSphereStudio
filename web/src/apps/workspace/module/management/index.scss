@@ -1,0 +1,82 @@
+@import '@/common/style/variables.scss';
+.workspace-home {
+  display: flex;
+  height: 100%;
+  background-color: rgba(242, 242, 242, 1);
+  min-width: 100px;
+  overflow: hidden;
+  width: 100%;
+  .menuItemIcon {
+    margin-right: 5px;
+  }
+  .mune-bar {
+    .ivu-layout-sider {
+      background-color: #fff;// 将侧边栏的背景色样式重新改为白色
+    }
+    .menu-item span{
+      display: inline-block;
+      overflow: hidden;
+      width: 69px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+      transition: width .2s ease .2s;
+    }
+    .menu-item i{
+      transform: translateX(0px);
+      transition: font-size .2s ease, transform .2s ease;
+      vertical-align: middle;
+      font-size: $font-size-large;
+    }
+    .collapsed-menu span{
+      width: 0px;
+      transition: width .2s ease;
+    }
+    .collapsed-menu i{
+      transform: translateX(5px);
+      transition: font-size .2s ease .2s, transform .2s ease .2s;
+      vertical-align: middle;
+      font-size: 22px;
+    }
+    .workspace-title {
+      font-size: $font-size-large;
+      font-weight: 600;
+      padding: 10px 20px 10px 25px;
+    }
+    .ivu-menu-light{
+      background-color: rgba(242, 242, 242, 1);
+    }
+    .overview-box {
+      text-align: left;
+      padding: 0px 23px;
+      height: 22px;
+      cursor: pointer;
+      .overview-icon{
+        font-size: 20px;
+        // float: left;
+        margin-right: 10px;
+      }
+      .overview-text{
+        font-size: 1rem;
+        font-weight: 700;
+        // float: left;
+        padding-top: 2px;
+      }
+    }
+  }
+
+  .right {
+    padding: 20px;
+    flex: 1;
+    background-color: #fff;
+    min-width: 780px;
+    overflow: auto;
+  }
+  .ivu-menu-vertical.ivu-menu-light:after {
+    width: 0;
+  }
+  .active {
+    color: $primary-color 
+  }
+}
+

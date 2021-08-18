@@ -62,7 +62,7 @@
       <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
     </Row>
     <Page
-      v-if="dataList.length > 0 && pagination.size < dataList.length "
+      v-if="dataList.length > 0"
       class="page-bar"
       :total="dataList.length"
       show-sizer

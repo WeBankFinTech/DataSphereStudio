@@ -35,9 +35,6 @@ import java.util.List;
 
 import static com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerClientConfiguration.LINKIS_ADMIN_USER;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
 public class AppConnInfoServiceImpl implements AppConnInfoService {
 
     private ClientConfig clientConfig = DWSClientConfigBuilder.newBuilder().setDWSVersion("v1").addServerUrl(Configuration.getGateWayURL())

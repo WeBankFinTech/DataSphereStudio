@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.appconn.manager.exception;
 
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
+
 public class AppConnHomeNotExistsWarnException extends DSSRuntimeException {
 
     public AppConnHomeNotExistsWarnException(int errCode, String desc) {

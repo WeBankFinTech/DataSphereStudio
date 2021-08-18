@@ -20,9 +20,6 @@ package com.webank.wedatasphere.dss.appconn.manager.action
 import com.webank.wedatasphere.linkis.httpclient.dws.request.DWSHttpAction
 import com.webank.wedatasphere.linkis.httpclient.request.{GetAction, UserAction}
 
-/**
-  * Created by enjoyyin on 2021/8/9.
-  */
 class GetAppConnInfosAction extends GetAction with DWSHttpAction with UserAction{
 
   private var user:String = _

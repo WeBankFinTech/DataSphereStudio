@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.manager.entity;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
 public class AppInstanceInfoImpl implements AppInstanceInfo {
 
     private Long id;

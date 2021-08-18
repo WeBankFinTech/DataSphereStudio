@@ -18,9 +18,6 @@ package com.webank.wedatasphere.dss.appconn.manager.entity;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
 public class AppConnInfoImpl implements AppConnInfo {
 
     private String appConnName;

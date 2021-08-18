@@ -40,9 +40,6 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
 public class AppConnResourceServiceImpl implements AppConnResourceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConnResourceServiceImpl.class);

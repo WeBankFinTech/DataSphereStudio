@@ -18,9 +18,6 @@ package com.webank.wedatasphere.dss.appconn.manager.conf;
 
 import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 
-/**
- * Created by enjoyyin on 2021/8/9.
- */
 public class AppConnManagerClientConfiguration {
 
     public final static CommonVars<String> DSS_APPCONN_CLIENT_TOKEN = CommonVars.apply("wds.dss.appconn.client.user.token","WS-AUTH");

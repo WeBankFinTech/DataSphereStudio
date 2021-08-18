@@ -23,9 +23,6 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.linkis.httpclient.dws.annotation.DWSHttpMessageResult
 import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
 
-/**
-  * Created by enjoyyin on 2021/8/9.
-  */
 @DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/project/appconn/[a-zA-Z0-9]+/get")
 class GetAppConnInfoResult extends DWSResult {
 

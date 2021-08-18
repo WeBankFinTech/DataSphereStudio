@@ -26,9 +26,6 @@ import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
 import scala.collection.convert.wrapAsJava._
 import scala.collection.convert.wrapAsScala._
 
-/**
-  * Created by enjoyyin on 2021/8/9.
-  */
 @DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/project/appconn/[a-zA-Z0-9\\-]+/getAppInstances")
 class GetAppInstancesResult extends DWSResult {
 

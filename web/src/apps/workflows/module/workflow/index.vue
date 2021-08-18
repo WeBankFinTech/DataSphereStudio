@@ -108,6 +108,7 @@
       <Tabs value="form">
         <Tab-pane label="新建编排" name="form">
           <WorkflowFormNew
+            v-if="mergeModalShow"
             :workflow-data="currentOrchetratorData"
             :orchestratorModeList="orchestratorModeList"
             :selectOrchestratorList="selectOrchestratorList"
@@ -553,12 +554,13 @@ export default {
         a.setAttribute('download', `${this.$route.query.projectName}_${orchestrator.orchestratorName}`)
         const evObj = document.createEvent('MouseEvents');
         evObj.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, true, false, 0, null);
-        const flag = a.dispatchEvent(evObj);
-        this.$nextTick(() => {
-          if (flag) {
-            this.$Message.success(this.$t('message.orchestratorModes.exportSuccess'));
-          }
-        });
+        a.dispatchEvent(evObj)
+        // const flag = a.dispatchEvent(evObj);
+        // this.$nextTick(() => {
+        //   if (flag) {
+        //     this.$Message.success(this.$t('message.orchestratorModes.exportSuccess'));
+        //   }
+        // });
       }).catch(() => {
         this.$Message.error(this.$t('message.orchestratorModes.exportFail'))
       })

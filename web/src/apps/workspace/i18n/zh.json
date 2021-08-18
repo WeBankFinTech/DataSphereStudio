@@ -84,6 +84,7 @@
       "failedNotice": "验证项未通过，请检查后再试！",
       "enterName": "请输入名称",
       "nameLength": "名称长度不能大于",
+      "descLength": "工作空间描述长度不能大于",
       "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
       "project": "工程",
       "feedback": "反馈",

@@ -75,6 +75,8 @@
       <Button
         type="primary"
         size="large"
+        :disabled="submiting"
+        :loading="submiting"
         @click="Ok">{{$t('message.workspace.ok')}}</Button>
     </div>
   </Modal>
@@ -108,6 +110,7 @@ export default {
   },
   data() {
     return {
+      submiting: false,
       ProjectShow: false,
       departments: [],
       treeDepartments: []
@@ -115,20 +118,25 @@ export default {
   },
   computed: {
     projectDataCurrent() {
-      if (!this.projectData.department)
-        this.projectData.department = null
-      return this.projectData;
+      // if (!this.projectData.department) 
+      //   this.projectData.department = null
+      // return this.projectData;
+      return {
+        ...this.projectData,
+        department: !this.projectData.department ? null : this.projectData.department
+      }
     },
     formValid() {
       return {
         name: [
           { required: true, message: this.$t('message.workspace.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workspace.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workspace.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workspace.validNameDesc'), trigger: 'blur' },
           { validator: this.checkNameExist, message: this.$t('message.workspace.validNameExist'), trigger: 'blur' },
         ],
         description: [
           { required: true, message: this.$t('message.workspace.pleaseInputWorkspaceDesc'), trigger: 'blur' },
+          { message: `${this.$t('message.workspace.nameLength')}200`, max: 200 },
         ],
         workspace_type: [
           { required: true, message: this.$t('message.workspace.selectWorkspaceType'), trigger: 'change' },
@@ -170,8 +178,11 @@ export default {
           if (this.projectDataCurrent.workspace_type === 'department' && !this.projectDataCurrent.department) {
             return this.$Message.error(this.$t('message.workspace.selectDepartment'));
           }
-          this.$emit('confirm', this.projectDataCurrent);
-          this.ProjectShow = false;
+          this.submiting = true;
+          this.$emit('confirm', this.projectDataCurrent, () => {
+            this.ProjectShow = false;
+            this.submiting = false;
+          });
         } else {
           this.$Message.warning(this.$t('message.workspace.failedNotice'));
         }

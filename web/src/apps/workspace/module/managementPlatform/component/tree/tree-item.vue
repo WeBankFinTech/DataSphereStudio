@@ -3,18 +3,18 @@
     <!-- 父树级别 -->
     <div class="tree-content" v-if="!model._id" :class="{ 'tree-content-active': currentTreeId == model.id }">
       <div class="tree-open" v-if="model.type=='component'">
-        <Icon custom="iconfont icon-open" size="14" v-if="model.opened" @click="handleItemToggle(model.opened)"></Icon>
-        <Icon custom="iconfont icon-close" size="14" v-else @click="handleItemToggle(model.opened)"></Icon>
+        <SvgIcon icon-class="open" v-if="model.opened" @click="handleItemToggle(model.opened)" />
+        <SvgIcon icon-class="close" v-else @click="handleItemToggle(model.opened)" />
       </div>
       <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
       <div class="tree-add" @click="handleAddClick" v-if="model.type=='component'" :class="{ 'tree-add-active': currentTreeId == model.id }">
-        <Icon custom="iconfont icon-plus" size="16"></Icon>
+        <SvgIcon icon-class="plus" />
       </div>
       <div class="tree-hold" v-else></div>
     </div>
     <div class="tree-content" v-else :class="{ 'tree-content-active': currentTreeId == model._id }">
         <div class="tree-loading" v-if="model._id > 15">
-          <Icon custom="iconfont icon-zujianjieruguanli" size="16"></Icon>
+          <SvgIcon icon-class="componentImport" />
         </div>
         <div class="tree-name" @click="handleItemClick">{{model.name}}</div>
     </div>
@@ -100,23 +100,25 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .tree-item {
   white-space: nowrap;
   outline: none;
+  @include font-color($light-text-color, $dark-text-color);
   .tree-content {
     display: flex;
     align-items: center;
     cursor: pointer;
     padding-left: 12px;
     &:hover {
-      background-color: #EDF1F6;
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
       .tree-add {
         display: block;
       }
     }
   }
   .tree-content-active {
-    background-color: #EDF1F6;
+    @include bg-color(#EDF1F6, $dark-active-menu-item);
     color: rgb(45, 140, 240);
   }
   .tree-icon {
@@ -130,6 +132,7 @@ export default {
   .tree-add {
     display: none;
     margin-right: 12px;
+    font-size: 20px;
   }
   .tree-hold {
     display: block;
@@ -149,7 +152,7 @@ export default {
     // color: rgba(0,0,0,0.65);
   }
   .tree-name-active {
-    background-color: #EDF1F6;
+    @include bg-color(#EDF1F6, $dark-active-menu-item);
     color: rgb(45, 140, 240);
   }
   .tree-children {
@@ -165,6 +168,7 @@ export default {
   .tree-loading {
     padding-left: 26px;
     padding-right: 5px;
+    font-size: 16px;
   }
   .tree-open {
     padding-right: 8px;

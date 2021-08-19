@@ -2,7 +2,7 @@
   <div :style="getStyle()" :class="{'show-toolbar': showActionView}" class="designer" @mousemove="moveShape" @mouseup="stopMoveShape">
     <ShapeView v-if="showViews.shapeView" ref="shapeView" :shapes="myShapes" :shapeFold="shapeFold" @on-toggle-shape="toggleShape" />
     <div class="designer-expand" v-if="shapeFold" @click="toggleShape">
-      <Icon custom="iconfont icon-unfold" size="20" />
+      <SvgIcon icon-class="unfold" />
     </div>
     <ActionView v-if="showActionView">
       <slot />

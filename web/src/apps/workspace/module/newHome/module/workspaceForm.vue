@@ -5,7 +5,6 @@
     :closable="false">
     <Form
       :label-width="100"
-      label-position="left"
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"
@@ -113,19 +112,11 @@ export default {
       submiting: false,
       ProjectShow: false,
       departments: [],
-      treeDepartments: []
+      treeDepartments: [],
+      projectDataCurrent: {},
     };
   },
   computed: {
-    projectDataCurrent() {
-      // if (!this.projectData.department) 
-      //   this.projectData.department = null
-      // return this.projectData;
-      return {
-        ...this.projectData,
-        department: !this.projectData.department ? null : this.projectData.department
-      }
-    },
     formValid() {
       return {
         name: [
@@ -161,6 +152,12 @@ export default {
     ProjectShow(val) {
       this.$emit('show', val);
     },
+    projectData(value){
+      this.projectDataCurrent = {
+        ...value,
+        department: !value.department ? null : value.department
+      }
+    }
   },
   methods: {
     checkNameExist(rule, value, callback) {
@@ -202,7 +199,7 @@ export default {
       const tmpArr = this.projectDataCurrent.label.split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.projectData.label = tmpArr.toString();
+      this.projectDataCurrent.label = tmpArr.toString();
     }
   },
 };

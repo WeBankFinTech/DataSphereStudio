@@ -5,6 +5,7 @@
   margin: 10px 0;
   .title-text {
     margin-right: 15px;
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
   }
   .title-icon {
     color: $link-color;

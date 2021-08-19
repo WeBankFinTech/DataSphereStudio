@@ -32,6 +32,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .ds-main-content {
   height: 100%;
   margin-left: 304px;
@@ -40,14 +41,14 @@ export default {
     margin-left: 54px;
   }
   .ds-main-container {
-    background: #f3f5fc;
-    height: 100%;
+    @include bg-color(#f3f5fc, $dark-base-color);
+    min-height: 100%;
     .ds-breadcumb {
       padding: 24px;
-      background: #fff;
+      @include bg-color(#fff, $dark-base-color);
       font-size: 22px;
       line-height: 30px;
-      color: #333;
+      @include font-color(#333, $dark-text-color);
       .ds-breadcumb-divider {
         margin: 0 10px;
       }

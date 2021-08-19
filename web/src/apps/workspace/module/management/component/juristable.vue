@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="item in tablearr" :key="item.title">
-      <h3 style="margin:20px 0px 10px;">{{item.title}}</h3>
+      <h3 class="menu-permission-title" style="margin:20px 0px 10px;">{{item.title}}</h3>
       <div style="overflow: auto;">
         <Table :style="width(item.columns)" border highlight-row  :columns="item.columns" :data="item.datalist">
           <template style="color:#4ACA6D" slot-scope="{ row, index }" slot="action">
@@ -209,6 +209,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
+  .menu-permission-title {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
   .modify-model{
     display: flex;
     flex-wrap: wrap;

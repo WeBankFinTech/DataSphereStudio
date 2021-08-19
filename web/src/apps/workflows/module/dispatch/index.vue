@@ -1601,6 +1601,7 @@ export default {
     border-left: 1px solid #DEE4EC;
     @include border-color($border-color-base, $dark-workspace-background);
     @include bg-color($light-base-color, $dark-base-color);
+    @include font-color($light-text-color, $dark-text-color);
     li {
     padding: 0 40px;
     cursor: pointer;

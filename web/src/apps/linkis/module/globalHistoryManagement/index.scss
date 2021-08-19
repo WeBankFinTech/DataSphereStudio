@@ -63,8 +63,10 @@
         align-items: center;
         margin-top: 16px;
         .ivu-table th {
-            background-color: $table-thead-blue-bg;
-            color: $body-background;
+            // background-color: $table-thead-blue-bg;
+            @include bg-color($table-thead-blue-bg, $dark-header-bg-color);
+            // color: $body-background;
+            @include font-color($light-base-color, $dark-base-color);
         }
     }
     .global-history-loading {

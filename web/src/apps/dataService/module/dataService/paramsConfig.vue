@@ -19,7 +19,7 @@
           class="toolWrap"
           @click="handleToolShow(toolItem)"
         >
-          <Icon :custom="toolItem.iconName" size="20"></Icon>
+          <SvgIcon class="icon" :icon-class="toolItem.iconName" verticalAlign="0px" />
           <div>{{ toolItem.name }}</div>
           <div class="divider" :class="{ 'last-divider': index === 4 }" />
         </div>
@@ -290,26 +290,26 @@ export default {
         {
           name: "属性",
           type: "property",
-          iconName: "iconfont icon-shuxing"
+          iconName: "shuxing"
         },
         {
           name: "版本",
-          iconName: "iconfont icon-banben",
+          iconName: "banben",
           type: "version"
         },
         {
           name: "保存",
-          iconName: "iconfont icon-baocun",
+          iconName: "baocun",
           type: "save"
         },
         {
           name: "测试",
-          iconName: "iconfont icon-ceshi",
+          iconName: "ceshi",
           type: "test"
         },
         {
           name: "发布",
-          iconName: "iconfont icon-fabu",
+          iconName: "fabu",
           type: "release"
         }
       ],
@@ -889,12 +889,14 @@ export default {
   .testTitle {
     width: 100%;
     height: 48px;
-    background: #f8f9fc;
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
+    @include bg-color(#f8f9fc, $dark-menu-base-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    @include border-color(rgba($color: #000000, $alpha: 0.2), $dark-border-color);
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -902,7 +904,7 @@ export default {
     .title {
       font-family: PingFangSC-Medium;
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     }
     .icon {
       cursor: pointer;
@@ -912,7 +914,7 @@ export default {
     width: 100%;
     height: 48px;
     margin-top: -5px;
-    background: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-menu-base-color);
     border: 1px solid rgba($color: #000000, $alpha: 0.2);
     border-left-width: 0;
     border-right-width: 0;
@@ -929,17 +931,20 @@ export default {
       cursor: pointer;
       font-family: PingFangSC-Regular;
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.65);
+      @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
       & img {
         width: 16px;
       }
       .divider {
         width: 1px;
         height: 16px;
-        background: rgba(0, 0, 0, 0.25);
+        @include bg-color(rgba(0, 0, 0, 0.25), $dark-border-color);
         &.last-divider {
           background: transparent;
         }
+      }
+      .icon {
+        font-size: 20px;
       }
     }
   }
@@ -950,10 +955,11 @@ export default {
     .cardWrap {
       padding: 20px 0;
       border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
+      @include border-color(rgba(0, 0, 0, 0.2), $dark-border-color);
       .cardTitle {
         font-family: PingFangSC-Medium;
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.85);
+        @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       }
       .contentWrap {
         margin-top: 20px;

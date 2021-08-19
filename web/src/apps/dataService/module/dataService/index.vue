@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height:100%">
     <navMenu
       :menuFold="navFold"
       @showModal="showModal"
@@ -480,6 +480,7 @@ export default {
   height: 100%;
   transition: all 0.3s;
   padding-left: 304px;
+  @include bg-color(#fff, $dark-base-color);
   &.ds-nav-menu-fold {
     padding-left: 54px;
   }

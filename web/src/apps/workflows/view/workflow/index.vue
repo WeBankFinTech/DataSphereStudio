@@ -4,7 +4,7 @@
     <div class="workflow-nav-tree" :class="{'tree-fold': treeFold }" >
       <div class="project-nav-menu">
         <div class="project-nav-menu-item active" @click="handleTreeToggle">
-          <Icon custom="iconfont icon-project" size="26"></Icon>
+          <SvgIcon class="nav-icon" icon-class="project-workflow" />
         </div>
       </div>
       <div class="project-nav-tree">

@@ -70,6 +70,7 @@
           size="large"
           @click="Cancel">{{$t('message.workflow.cancel')}}</Button>
         <Button
+          style="margin-left:10px;"
           type="primary"
           size="large"
           @click="Ok">{{$t('message.workflow.ok')}}</Button>

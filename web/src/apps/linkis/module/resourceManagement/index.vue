@@ -489,10 +489,12 @@ export default {
 
 <style src="./index.scss" lang="scss" scoped></style>
 <style lang="scss" scoped>
+@import '~@/common/style/variables.scss';
   .noData {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%)
+    transform: translate(-50%,-50%);
+    @include font-color($light-text-color, $dark-text-color);
   }
 </style>

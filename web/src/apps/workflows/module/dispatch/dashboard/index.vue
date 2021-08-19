@@ -152,12 +152,12 @@ export default {
     padding: 0 10px;
     table {
       width: 100%;
+      @include font-color($light-text-color, $dark-text-color);
       tr {
         td {
           height: 32px;
           line-height: 32px;
           border-bottom: 1px solid #ecedec;
-          @include border-color($border-color-base, $dark-border-color-base);
         }
       }
     }

@@ -12,7 +12,7 @@
       >
         <div class="date-trigger" @click="handlePickerClick">
           <span v-if="datePickerRange.length" class="date-show">{{datePickerRange.join('   -   ')}}</span>
-          <Icon custom="iconfont icon-riqi" size="16"></Icon>
+          <SvgIcon icon-class="riqi" />
         </div>
       </Date-picker>
     </div>
@@ -94,6 +94,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .range-group {
   display: flex;
   align-items: center;
@@ -105,20 +106,22 @@ export default {
     transition: all .2s ease-in-out;
     cursor: pointer;
     border: 1px solid #D9D9D9;
+    @include border-color(#D9D9D9, $dark-border-color);
     border-left: 0;
-    background: #fff;
+    @include bg-color(#fff, $dark-base-color);
     text-align: center;
-    color: #666;
+    @include font-color(#666, $dark-text-color);
     &:first-child {
       border-radius: 4px 0 0 4px;
       border-left: 1px solid #D9D9D9;
+      @include border-color(#D9D9D9, $dark-border-color);
     }
     &:last-child {
       border-radius: 0 4px 4px 0;
     }
     &.group-item-checked {
-      background: #fff;
-      border-color: #1890FF;
+      @include bg-color(#fff, $dark-base-color);
+      @include border-color(#1890FF, #1890FF);
       color: #1890FF;
       box-shadow: -1px 0 0 0 #1890FF;
     }
@@ -128,6 +131,7 @@ export default {
     .date-trigger {
       padding: 0 15px;
       line-height: 32px;
+      font-size: 16px;
       .date-show {
         margin-right: 15px;
       }

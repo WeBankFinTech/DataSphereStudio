@@ -1,7 +1,5 @@
 @import '@/common/style/variables.scss';
 @import '@/common/style/overwrite.scss';
-@import '../projectIconFont/iconfont.css';
-@import '../DSFont/iconfont.css';
 @import 'normalize.scss';
 @font-face {
     font-family: 'PingFangSC-Medium';
@@ -26,6 +24,7 @@ body{
     font-size: $font-size-small;
     color: $text-color;
     line-height: $line-height-base;
+    @include bg-color($workspace-background, $dark-base-color);
 }
 
 .layout {
@@ -106,6 +105,13 @@ body{
 //   background-color: #FAFAFA !important;
   @include bg-color(#FAFAFA, $dark-base-color);
 }
+.notransition * { 
+    -webkit-transition: none !important; 
+    -moz-transition: none !important; 
+    -o-transition: none !important; 
+    -ms-transition: none !important; 
+    transition: none !important; 
+} 
 
 .overlay {
     position: fixed;
@@ -117,4 +123,4 @@ body{
     width: 100%;
     height: 100%;
     z-index: 1001;
-  }
+}

@@ -9,7 +9,7 @@
         :key="item.title"
         :class="{'menu-active': item.title == currentHeader}"
         @click="handleSidebarToggle(item.title)">
-          <Icon :custom="`iconfont icon-${item.icon}`" size="26"></Icon>
+          <SvgIcon class="icon" :icon-class="item.icon" verticalAlign="0px" />
         </div>
       </div>
       <div class="management-platform-sidebar-tree">
@@ -52,7 +52,7 @@ import storage from './util/cache';
 const menu = [
   {
     title: '部门和用户管理',
-    icon: 'bumenheyonghuguanli',
+    icon: 'departUser',
     nodes: [
       {name: '部门管理', type: 'permissions', id: 1024, pathName: 'departManagement'},
       {name: '用户管理', type: 'permissions', id: 1023, pathName: 'personManagement'}
@@ -73,7 +73,7 @@ const menu = [
   },
   {
     title: '组件接入',
-    icon: 'zujianjieruguanli',
+    icon: 'componentImport',
     nodes: []
   }
 ];
@@ -373,7 +373,8 @@ $per-border-color:#DEE4EC;
   top: 54px;
   bottom: 0;
   width: 304px;
-  background: #F8F9FC;
+  @include border-color(#dee4ec, $dark-menu-base-color);
+  @include bg-color(#f8f9fc, $dark-menu-base-color);
   transition: all .3s;
   &.sidebar-fold {
     width: 54px;
@@ -384,15 +385,18 @@ $per-border-color:#DEE4EC;
   .management-platform-sidebar-menu {
     z-index: 1;
     width: 54px;
-    background: #F8F9FC;
+    @include bg-color(#f8f9fc, $dark-base-color);
     border-right: 1px solid #DEE4EC;
+    @include border-color(#dee4ec, $dark-menu-base-color);
     &-item {
       height: 44px;
       line-height: 44px;
       text-align: center;
       cursor: pointer;
+      font-size: 26px;
+      @include font-color(#333, $dark-text-color);
       &:hover {
-        background: #ECEFF4;
+        @include bg-color(#eceff4, $dark-menu-base-color);
       }
     }
   }
@@ -405,11 +409,12 @@ $per-border-color:#DEE4EC;
     transition: all .3s;
     overflow-y: auto;
     border-right: 1px solid #DEE4EC;
+    @include border-color(#dee4ec, $dark-menu-base-color);
     &-header {
       font-size: 14px;
       font-weight: bold;
       font-family: PingFangSC-Medium;
-      color: rgba(0,0,0,0.65);
+      @include font-color(rgba(0,0,0,0.65), $dark-text-color);
       line-height: 34px;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -423,8 +428,9 @@ $per-border-color:#DEE4EC;
     padding-left: 12px;
   }
   .menu-active {
-    background-color: #EDF1F6;
     border-left: 3px solid rgb(45, 140, 240);
+    @include bg-color(#EDF1F6, $dark-menu-base-color);
+    @include border-color(#2e92f7, #4B8FF3);
   }
 }
 </style>

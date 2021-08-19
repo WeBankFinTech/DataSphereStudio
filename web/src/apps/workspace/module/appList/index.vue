@@ -267,7 +267,7 @@ export default {
       height: 100%;
       z-index: 3;
       // background: rgba(255,255,255,0.80);
-      @include bg-color(rgba(255,255,255,0.80), rgba(0,0,0,0.80));
+      @include bg-color(rgba(255,255,255,0.80), rgba(0,0,0,0.5));
       text-align: center;
       line-height: 116px;
       font-size: 21px;

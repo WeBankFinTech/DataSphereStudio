@@ -4,7 +4,8 @@
       v-if="!$route.query.noHeader"
       :is="showHeader"
       @clear-session="clearSession"
-      @set-init="setInit"></component>
+      @set-init="setInit"
+      ref="layoutHeader"></component>
     <keep-alive v-if="isInit">
       <router-view
         v-if="$route.meta.keepAlive"/>

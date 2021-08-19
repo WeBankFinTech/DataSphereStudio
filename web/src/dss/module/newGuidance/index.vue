@@ -448,8 +448,13 @@ export default {
   methods: {
     iconRightClick() {
       if (this.currentStep === 5) {
-        this.$parent.$children[1].handleUserClick();
+        this.$parent.$refs.layoutHeader.handleUserClick();
         this.currentStep += 1;
+        Vue.nextTick(()=>{
+          let select6 = document.querySelector("#mask6 .selected")
+          let userMenu = document.querySelector(".user-menu")
+          select6.style.width = userMenu.clientWidth + "px"
+        })
       }
     },
     prev() {
@@ -460,15 +465,22 @@ export default {
         foot.setAttribute("style", "z-index: 1002");
         this.currentStep -= 1;
         Vue.nextTick(()=>{
+          let dropdownWidth = document.querySelector(".ivu-dropdown-rel")
+          let block3 = document.querySelector(".headerSuspension .item1 .block3")
           let block5 = document.querySelector(".headerSuspension .item1 .block5")
+          let img3 = document.querySelector(".headerSuspension .item2 .img3")
+          let computedStyle3 = getComputedStyle(img3, null)
+          let offset = dropdownWidth.clientWidth + 38 - 110
           block5.setAttribute("style", "width: " + user.clientWidth + "px")
+          block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
+          img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
         })
       } else if (this.currentStep === 4) {
-        this.$parent.$children[1].$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
         this.currentStep -= 1;
       } else if (this.currentStep === 5) {
-        this.$parent.$children[1].$children[0].handleTriggerClick();
-        this.$parent.$children[1].$children[0].showRight();
+        this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
+        this.$parent.$refs.layoutHeader.$children[0].showRight();
         setTimeout(() => {
           this.currentStep -= 1;
         }, 250);
@@ -476,13 +488,12 @@ export default {
         this.currentStep -= 1
         Vue.nextTick(()=>{
           let select5 = document.querySelector("#mask5 .selected")
-          console.log(select5)
           select5.style.width = user.clientWidth + "px"
         })
       }else if (this.currentStep === 7) {
         head.setAttribute("style", "z-index: 1002");
         foot.setAttribute("style", "z-index: 1000");
-        this.$parent.$children[1].handleUserClick();
+        this.$parent.$refs.layoutHeader.handleUserClick();
         this.currentStep -= 1;
         Vue.nextTick(()=>{
           let select6 = document.querySelector("#mask6 .selected")
@@ -521,25 +532,24 @@ export default {
         foot.setAttribute("style", "z-index: 1000");
         this.currentStep += 1;
       } else if (this.currentStep === 3) {
-        this.$parent.$children[1].$children[0].handleTriggerClick();
-        this.$parent.$children[1].$children[0].showRight();
+        this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
+        this.$parent.$refs.layoutHeader.$children[0].showRight();
         setTimeout(() => {
           this.currentStep += 1;
           navM.removeEventListener(
             "click",
-            this.$parent.$children[1].$children[0].hideMenu
+            this.$parent.$refs.layoutHeader.$children[0].hideMenu
           );
         }, 250);
       } else if (this.currentStep === 4) {
-        this.$parent.$children[1].$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
         this.currentStep += 1;
         Vue.nextTick(()=>{
           let select5 = document.querySelector("#mask5 .selected")
-          console.log(select5)
           select5.style.width = user.clientWidth + "px"
         })
       } else if (this.currentStep === 5) {
-        this.$parent.$children[1].handleUserClick();
+        this.$parent.$refs.layoutHeader.handleUserClick();
         this.currentStep += 1;
         Vue.nextTick(()=>{
           let select6 = document.querySelector("#mask6 .selected")
@@ -563,7 +573,7 @@ export default {
       } else if (this.currentStep === 9) {
         navM.addEventListener(
           "click",
-          this.$parent.$children[1].$children[0].hideMenu
+          this.$parent.$refs.layoutHeader.$children[0].hideMenu
         );
         this.$parent.$children[2].$children[1].flag = true;
         overlay.parentNode.removeChild(overlay);
@@ -579,10 +589,10 @@ export default {
       overlay.parentNode.removeChild(overlay);
       navM.addEventListener(
         "click",
-        this.$parent.$children[1].$children[0].hideMenu
+        this.$parent.$refs.layoutHeader.$children[0].hideMenu
       );
       if (this.currentStep === 4) {
-        this.$parent.$children[1].$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
       }
       if (this.currentStep === 8) {
         this.$parent.$children[2].toggleGuide();
@@ -602,12 +612,12 @@ export default {
     },
     navMenuClick() {
       // 点击导航菜单，打开弹出框，并移除对.luban-nav-mask元素的监听
-      this.$parent.$children[1].$children[0].handleTriggerClick();
-      this.$parent.$children[1].$children[0].showRight();
+      this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
+      this.$parent.$refs.layoutHeader.$children[0].showRight();
       setTimeout(() => {
         this.currentStep += 1;
         let navM = document.querySelector(".luban-nav-mask");
-        navM.removeEventListener("click", this.$parent.$children[1].$children[0].hideMenu);
+        navM.removeEventListener("click", this.$parent.$refs.layoutHeader.$children[0].hideMenu);
       }, 300);
     },
   },

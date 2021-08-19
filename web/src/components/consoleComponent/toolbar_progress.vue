@@ -40,6 +40,7 @@ export default {
     border-right: 1px solid #dcdee2;
     @include border-color($border-color-base, $dark-submenu-color);
     li {
+      @include font-color($light-text-color, $dark-text-color);
       display: flex;
       flex-direction: column;
       align-items: center;

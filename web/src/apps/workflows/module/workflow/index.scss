@@ -70,3 +70,7 @@
         width: 350px;
     }
 }
+.upload-box {
+    padding: 120px 0;
+    @include font-color(#515a6e, $dark-text-color);
+}

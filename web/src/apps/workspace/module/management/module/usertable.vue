@@ -18,9 +18,7 @@
         <span>{{ rolelist(row) }}</span>
       </template>
       <template slot-scope="{ row, index }" slot="action">
-        <Button type="error" size="small" @click="remove(row, index)"
-        >{{$t('message.workspaceManagemnet.delete')}}</Button
-        >
+        <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
         <Button
           type="primary"
           size="small"
@@ -189,6 +187,18 @@ export default {
       //管理+创建人才能赋权管理员权限
       return item.roleId===1&&this.row.creator!==this.getUserName();
     },
+    canDelete(row){
+      //创建者和超级管理员可以删除
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      if (row.creator === currentUser.username || currentUser.isAdmin) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    getUserName() {
+      return  storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
+    },
     queryWhenOpen(isOpen) {
       if (isOpen) {
         this.getUserList()
@@ -213,7 +223,6 @@ export default {
           }
         })
         this.options = list
-        console.log(list)
       })
     },
     remoteMethod1(query) {

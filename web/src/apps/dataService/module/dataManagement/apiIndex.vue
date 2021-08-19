@@ -181,9 +181,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .tab-publish {
   padding: 0 24px;
-  background: #fff;
+  @include bg-color(#fff, $dark-base-color);
   .filter-box {
     margin-bottom: 20px;
     overflow: hidden;

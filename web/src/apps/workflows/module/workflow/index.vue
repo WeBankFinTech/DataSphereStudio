@@ -125,7 +125,7 @@
             :format="['zip']"
             :max-size="2001000"
             :action="uploadUrl">
-            <div style="padding: 120px 0">
+            <div class="upload-box">
               <Icon
                 type="ios-cloud-upload"
                 size="52"

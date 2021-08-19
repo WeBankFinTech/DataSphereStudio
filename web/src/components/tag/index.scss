@@ -23,8 +23,8 @@
         height: 32px;
         padding: 0 10px;
         line-height: 30px;
-        // color: #409eff;
-        @include font-color(#409eff, $dark-workspace-title-color);
+        color: #409eff;
+        // @include font-color(#409eff, $dark-workspace-title-color);
         border: 1px solid #d9ecff;
         @include border-color($border-color-base, $dark-border-color-base);
         border-radius: 4px;
@@ -56,8 +56,8 @@
             &:hover {
                 // color: #fff;
                 @include font-color($active-menu-item, $dark-active-menu-item);
-                // background-color: #409eff;
-                @include bg-color($primary-color, $dark-active-menu-item);
+                background-color: #409eff;
+                // @include bg-color($primary-color, $dark-active-menu-item);
             }
         }
     }

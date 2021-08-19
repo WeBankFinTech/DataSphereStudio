@@ -120,6 +120,7 @@
             :current="pageData.pageNum"
             show-elevator
             show-sizer
+            show-total
             @on-change="handlePageChange"
             @on-page-size-change="handlePageSizeChange"
           />
@@ -135,7 +136,7 @@
       <Form
         ref="departForm"
         :label-width="100"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem
           :label="$t('message.permissions.userDepart')"
@@ -180,7 +181,7 @@
         :model="userForm"
         :label-width="100"
         :rules="ruleValidate"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem :label="$t('message.permissions.username')" prop="name">
           <Input
@@ -227,7 +228,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.phone')">
+        <FormItem :label="$t('message.permissions.phone')" prop="phonenumber">
           <Input
             type="text"
             v-model="userForm.phonenumber"
@@ -239,7 +240,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.email')">
+        <FormItem :label="$t('message.permissions.email')" prop="email">
           <Input
             type="text"
             v-model="userForm.email"
@@ -255,7 +256,7 @@
       <Form
         ref="passwordForm"
         :model="userForm"
-        v-if="modalType === 'modifyPassword'"
+        v-show="modalType === 'modifyPassword'"
       >
         <div class="newPassword">
           {{ $t("message.permissions.inputPassword") }}
@@ -321,9 +322,44 @@ export default {
           new Error(
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError")
+              : tag === "keyboard"
+                ? this.$t("message.permissions.pwdKeyboardError")
+                : this.$t("message.permissions.pwdCheckError")
           )
         );
+      }
+    };
+    const validateUserNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.userNameEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.userNameTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        const valid = /^\w+@[a-z0-9]+\.[a-z]{2,4}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidEmail")));
+        }
+      } else {
+        callback();
+      }
+    };
+    const validatePhone = (rule, value, callback) => {
+      if (value) {
+        const valid = /^1[3456789]\d{9}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidPhone")));
+        }
+      } else {
+        callback();
       }
     };
     return {
@@ -395,7 +431,7 @@ export default {
         userName: [
           {
             required: true,
-            message: this.$t("message.permissions.userNameEmpty"),
+            validator: validateUserNameCheck,
             trigger: "blur"
           }
         ],
@@ -412,22 +448,16 @@ export default {
             validator: validatePass,
             trigger: "blur"
           }
-        ]
-      },
-      passwordRuleValidate: {
-        password: [
+        ],
+        phonenumber: [
           {
-            required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
+            validator: validatePhone,
             trigger: "blur"
           }
-        ]
-      },
-      passwordRuleValidate: {
-        password: [
+        ],
+        email: [
           {
-            required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
+            validator: validateEmail,
             trigger: "blur"
           }
         ]
@@ -624,7 +654,9 @@ export default {
           this.pwdErrorTip =
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError");
+              : tag === "keyboard"
+                ? this.$t("message.permissions.pwdKeyboardError")
+                : this.$t("message.permissions.pwdCheckError");
           return;
         }
         const params = {

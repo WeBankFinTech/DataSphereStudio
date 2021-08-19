@@ -253,6 +253,39 @@ function assembleTree(level, datas, result) {
 export default {
   components: { Treeselect },
   data() {
+    const validateDepartNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.deptEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.deptTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        const valid = /^\w+@[a-z0-9]+\.[a-z]{2,4}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidEmail")));
+        }
+      } else {
+        callback();
+      }
+    };
+    const validatePhone = (rule, value, callback) => {
+      if (value) {
+        const valid = /^1[3456789]\d{9}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidPhone")));
+        }
+      } else {
+        callback();
+      }
+    };
     return {
       queries: {
         deptName: ""
@@ -310,7 +343,19 @@ export default {
         deptName: [
           {
             required: true,
-            message: this.$t("message.permissions.deptEmpty"),
+            validator: validateDepartNameCheck,
+            trigger: "blur"
+          }
+        ],
+        phone: [
+          {
+            validator: validatePhone,
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            validator: validateEmail,
             trigger: "blur"
           }
         ]
@@ -457,10 +502,8 @@ export default {
       this.parentErrorTip =
         value !== undefined ? "" : this.$t("message.permissions.parentIdEmpty");
     },
-    checkParentValid(node){
-
+    checkParentValid(node) {
       console.log(node);
-
     },
     getParentName(data) {
       return getParentDepartName(data, this.departTree);

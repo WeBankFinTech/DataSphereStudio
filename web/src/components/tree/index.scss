@@ -214,7 +214,8 @@
 
 .we-tree-node.is-current {
   >.we-tree-node__content {
-    background-color:  $grey-bg-color;
+    // background-color:  $grey-bg-color;
+    @include bg-color($grey-bg-color, $dark-active-menu-item);
   }
 }
 

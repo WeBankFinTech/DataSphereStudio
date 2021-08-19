@@ -11,7 +11,7 @@
       style="display: flex; justify-content: center; align-items: center;"
       :style="{'height': height + 'px'}"
       v-else>
-      <span>{{ info }}</span>
+      <span class="info">{{ info }}</span>
     </div>
   </div>
 </template>
@@ -55,3 +55,9 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+@import '@/common/style/variables.scss';
+.info {
+  @include font-color($light-text-color, $dark-text-color);
+}
+</style>

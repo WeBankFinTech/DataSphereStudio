@@ -23,3 +23,11 @@
     border-color: $darkColor;
   }
 }
+
+@mixin guide-box-shadow($color, $darkColor) {
+  box-shadow: -2px 0 10px 0 $color;
+
+  [data-theme="dark"] & {
+    box-shadow: -2px 0 10px 0 $darkColor;
+  }
+}

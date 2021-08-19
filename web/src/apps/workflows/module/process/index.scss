@@ -73,7 +73,7 @@
 
   .button[disabled] {
     // background-color: #f3f3f3;
-    @include bg-color(#f3f3f3, $dark-disabled-color);
+    @include bg-color($disabled-bg-color, $dark-disabled-bg-color);
     opacity: 1;
     cursor: not-allowed !important;
     // color: #ccc;
@@ -114,10 +114,12 @@
     align-items: center;
 
     h3 {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       flex: 3;
     }
 
     .save-button {
+      @include font-color($light-text-color, $dark-text-color);
       flex: 2;
       text-align: right;
     }
@@ -130,7 +132,7 @@
       line-height: 20px;
       flex: 1;
       cursor: pointer;
-
+      @include font-color($light-text-color, $dark-text-color);
       &:hover {
         // background-color: #ccc;
         @include bg-color(#ccc, $dark-active-menu-item);
@@ -163,6 +165,7 @@
     }
 
     .node-module-param-modal-header {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       padding-left: 10px;
     }
 
@@ -180,6 +183,7 @@
 
 .workflow-arguments {
   .workflow-arguments-title-wrap {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
     display: flex;
     justify-content: space-between;
     align-items: center;

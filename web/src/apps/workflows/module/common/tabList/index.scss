@@ -46,6 +46,7 @@
             padding: 0px $padding-25;
             border-bottom: $border-width-base $border-style-base $border-color-base;
             @include border-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
             margin-top: 12px;
             flex: none;
             display: flex;

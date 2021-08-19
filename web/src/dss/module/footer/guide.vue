@@ -5,7 +5,7 @@
       <div class="guide-header">
         <span class="header-txt">帮助文档</span>
         <span class="header-close" @click="toggleGuide">
-          <Icon custom="iconfont icon-huaban"/>
+          <SvgIcon icon-class="close2" />
         </span>
       </div>
       <div class="guide-body">
@@ -19,8 +19,8 @@
                 <span class="step-divider"></span>
                 <span class="step-title">{{step.title}}</span>
                 <span class="step-arrow">
-                  <Icon custom="iconfont icon-close" v-if="step.expand" />
-                  <Icon custom="iconfont icon-open" v-else />
+                  <SvgIcon icon-class="close" v-if="step.expand" />
+                  <SvgIcon icon-class="open" v-else />
                 </span>
               </div>
               <div class="step-content">
@@ -139,6 +139,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .guide-mask {
     position: fixed;
     top: 0;
@@ -152,20 +153,20 @@ export default {
     width: 400px;
     top: 54px;
     bottom: 0;
-    background: #fff;
+    @include bg-color(#fff, $dark-menu-base-color);
     transition: all .24s ease-in-out;
     transform: translateX(120%);
-    box-shadow: -2px 0 10px 0 #DEE4EC;
+    @include guide-box-shadow(#DEE4EC, #192235);
     border-radius: 2px;
     .guide-header {
       position: relative;
       height: 48px;
       padding: 0 15px;
-      background: #F8F9FC;
+      @include bg-color(#F8F9FC, #313847);
       .header-txt {
         font-size: 16px;
         line-height: 48px;
-        color: #333
+        @include font-color(#333, $dark-workspace-title-color);
       }
       .header-close {
         position: absolute;
@@ -176,6 +177,7 @@ export default {
         line-height: 48px;
         cursor: pointer;
         text-align: center;
+        @include font-color(#333, $dark-workspace-title-color);
       }
     }
     .guide-body {
@@ -184,36 +186,37 @@ export default {
       overflow-x: hidden;
       overflow-y: scroll;
       overflow-y: overlay;
-      background: #fff;
+      @include bg-color(#fff, $dark-menu-base-color);
       .guide-box {
         border-top: 1px solid #DEE4EC;
+        @include border-color(#DEE4EC, #404A5D);
         padding: 20px 15px;
-        background: #fff;
         .guide-box-title {
           padding-left: 10px;
           margin-bottom: 10px;
           border-left: 4px solid #2E92F7;
           font-size: 14px;
           line-height: 20px;
-          color: #333;
+          @include font-color(#333, $dark-workspace-title-color);
           font-weight: bold;
         }
         .guide-box-desc {
           margin: 10px 0;
           font-size: 14px;
-          color: #666;
+          @include font-color(#666, $dark-text-color);
           line-height: 20px;
         }
         .guide-steps {
           .step {
             margin-top: 10px;
-            background: #F8F9FC;
+            @include bg-color(#F8F9FC, #383F4E);
             border: 1px solid #DEE4EC;
+            @include border-color(#DEE4EC, #404A5D);
             border-radius: 4px;
             .step-head {
               display: flex;
               align-items: center;
-              color: #333;
+              @include font-color(#333, $dark-workspace-title-color);
               cursor: pointer;
               &:hover {
                 color: #2d8cf0;
@@ -229,7 +232,7 @@ export default {
                 margin: 0 20px;
                 width: 1px; 
                 height: 16px;
-                background: #979797;
+                @include bg-color(#979797, #4B576E);
               }
               .step-title {
                 display: block;
@@ -252,6 +255,7 @@ export default {
                 margin: 6px 0;
                 font-size: 14px;
                 line-height: 20px;
+                @include font-color(#333, $dark-text-color);
               }
               img {
                 max-width: 100%;
@@ -262,6 +266,7 @@ export default {
           .step-expand {
             .step-head {
               border-bottom: 1px solid #DEE4EC;
+              @include border-color(#DEE4EC, #404A5D);
             }
             .step-content {
               padding: 10px;
@@ -280,7 +285,7 @@ export default {
             a {
               font-size: 14px;
               line-height: 20px;
-              color: #333;
+              @include font-color(#333, $dark-text-color);
               text-decoration: none;
               &:hover {
                 color: #2E92F7;
@@ -296,14 +301,15 @@ export default {
       left: 0;
       right: 0;
       height: 48px;
-      background: #fff;
-      box-shadow: -2px 0 10px 0 #DEE4EC;
+      @include bg-color(#fff, #313847);
+      @include guide-box-shadow(#DEE4EC, #192235);
+
       border-radius: 2px;
       text-align: center;
       line-height: 48px;
       a {
         font-size: 14px;
-        color: #333;
+        @include font-color(#333, $dark-workspace-title-color);
         text-decoration: none;
         &:hover {
           color: #2E92F7;

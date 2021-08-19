@@ -3,7 +3,7 @@
     <div class="panel-title-wrap">
       <p>服务开发</p>
       <div @click="addGroup()">
-        <Icon custom="iconfont icon-plus" size="20"></Icon>
+        <SvgIcon icon-class="plus" />
       </div>
     </div>
     <Input
@@ -189,6 +189,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .panel-title-wrap {
   display: flex;
   justify-content: space-between;
@@ -196,10 +197,12 @@ export default {
   & p {
     font-family: PingFangSC-Medium;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.65);
+    @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   }
   & div {
     cursor: pointer;
+    font-size: 20px;
+    @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   }
 }
 .dataEmpty {
@@ -211,6 +214,6 @@ export default {
   align-items: center;
   font-family: PingFangSC-Medium;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.85);
+  @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
 }
 </style>

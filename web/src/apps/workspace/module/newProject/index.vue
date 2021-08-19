@@ -402,6 +402,16 @@ export default {
       } else {
         this.dataList = storage.get('projectList', 'local');
       }
+      // 存储到storeage序列化会丢失权限canWrite等
+      this.dataList = this.dataList.map((item) => {
+        if (!id || id === item.id) {
+          item.dwsProjectList = item.dwsProjectList.map(item => {
+            setVirtualRoles(item, this.getUserName())
+            return item;
+          })
+        }
+        return item;
+      });
       this.sortTypeChange();
     },
     // 分类重名检查

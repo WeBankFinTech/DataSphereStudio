@@ -49,7 +49,7 @@
           height: 100%;
           align-items: center;
           justify-content: center;
-          @include font-color($workspace-title-color, $dark-workspace-title-color);
+          @include font-color($light-text-color, $dark-text-color);
           span {
             font-size: 20px;
           }
@@ -61,6 +61,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            /deep/.ivu-btn {
+              @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+              @include border-color($border-color-base, $dark-border-color-base);
+              @include font-color($light-text-color, $dark-text-color);
+            }
             .project-title {
               flex: 1;
               font-size: $font-size-large;
@@ -87,12 +92,13 @@
                 box-shadow: 0 1px 6px rgba(0,0,0,.2);
                 z-index: 999;
                 // background-color: #fff;
-                @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+                @include bg-color($menu-list-bg-color, $dark-menu-list-bg-color);
                 cursor: pointer;
                 .list-item {
                   width: 60px;
                   padding: 5px 8px;
                   text-align: center;
+                  @include font-color($light-text-color, $dark-text-color);
                   &:hover {
                     // background-color: #f3f3f3;
                     @include bg-color($hover-color-base, $dark-hover-color-base);
@@ -127,8 +133,9 @@
               padding: 2px 10px;
               margin-right: 10px;
               border-radius: 14px;
-              background-color:#F3F3F3;
-              @include bg-color(#F3F3F3, rgba(75,143,243,0.50));
+              @include bg-color(#F3F3F3, $dark-base-color);
+              border: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;

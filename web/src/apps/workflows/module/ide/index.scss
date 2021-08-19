@@ -52,7 +52,7 @@
             padding: 32px 4px;
             text-align: center;
             cursor: pointer;
-            @include font-color($primary-color, #fff);
+            @include font-color($primary-color, $dark-text-color);
             &.actived{
                 width: 44px;
                 border-left: 3px solid $primary-color;

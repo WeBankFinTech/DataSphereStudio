@@ -91,8 +91,12 @@ public class DssFrameworkAdminUserController extends BaseController {
             } else if (StringUtils.isNotEmpty(user.getEmail())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-            } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(),user))){
+            } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(), user))) {
                 return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+            }
+            boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName());
+            if(ldapExist){
+                return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号在ldap已存在");
             }
 
             String pwd = user.getPassword();
@@ -132,13 +136,18 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     @POST
     @Path("/resetPsw")
-    public Message resetPwd(@RequestBody DssAdminUser user)
-    {
-        if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(),user))){
-            return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+    public Message resetPwd(@RequestBody DssAdminUser user) {
+        try {
+            if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(), user))) {
+                return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+            }
+            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+            ldapService.addUser(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName(), user.getPassword());
+            return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
+
+        } catch (Exception exception) {
+            return  Message.error().message(exception.getMessage());
         }
-        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-        return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
     }
 }
 

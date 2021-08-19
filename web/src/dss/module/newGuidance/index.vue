@@ -433,7 +433,7 @@ export default {
   mounted() {
     if (this.$route.path === "/workspaceHome") {
       let store = localStorage.getItem("cacheGuide") 
-      if(store === "null"){
+      if(store === "null" | store === null){
         setTimeout(() => {
           this.currentStep += 1;
           let div = document.createElement("div");

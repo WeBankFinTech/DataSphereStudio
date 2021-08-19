@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="guide-mask" v-if="show" @click="toggleGuide"></div>
+    <div class="guide-mask" v-if="show" @click="flag && toggleGuide()"></div>
     <div class="guide-container" :class="{'guide-show': show}">
       <div class="guide-header">
         <span class="header-txt">帮助文档</span>
@@ -73,6 +73,7 @@ export default {
       guide: this.getGuideConfig(),
       selectedImg: '',
       modalImg: false,
+      flag: true,
     };
   },
   watch: {

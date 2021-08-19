@@ -33,7 +33,12 @@
           $t("message.permissions.add")
         }}</Button>
       </div>
-      <Table :columns="columns" :data="departmentList" :loading="loading">
+      <Table
+        :columns="columns"
+        :row-class-name="rowClassName"
+        :data="departmentList"
+        :loading="loading"
+      >
         <template slot-scope="{ row, index }" slot="deptName">
           <div
             class="deptName"
@@ -367,11 +372,25 @@ export default {
     this.getDepartmentList();
   },
   methods: {
-    getDepartmentList(query = "") {
+    getDepartmentList(query = "", isQuery = false) {
       this.loading = true;
       GetDepartmentList(query)
         .then(data => {
+          this.loading = false;
           const depts = (data && data.deptList) || [];
+          if (isQuery && query) {
+            const originList = _.cloneDeep(this.departmentListOrigin);
+            const temp = expandAll(originList);
+            depts.forEach(item => {
+              const index = temp.findIndex(t => t.id === item.id);
+              if (index !== -1) {
+                temp[index].__HITED__ = true;
+              }
+            });
+            this.departmentList = temp;
+
+            return;
+          }
 
           const departs = [];
           let MAX_LEVEL = 0;
@@ -389,12 +408,10 @@ export default {
           });
           let result = {};
           assembleTree(MAX_LEVEL, departs, result);
-          console.log(result);
           const departmentList = result.data;
           departmentList.forEach(item => addIdChain(item, "id"));
           this.departmentListOrigin = [...departmentList];
           this.departmentList = expandAll(departmentList);
-          this.loading = false;
         })
         .catch(e => {
           console.log(e);
@@ -411,7 +428,7 @@ export default {
       console.log("qeuery");
       const deptName = this.queries.deptName;
       const query = deptName ? encodeURI(`?deptName=${deptName}`) : "";
-      this.getDepartmentList(query);
+      this.getDepartmentList(query, true);
     },
     handleAdd() {
       GetDepartmentTree({}).then(data => {
@@ -541,6 +558,9 @@ export default {
               this.resetDepartForm();
               this.confirmLoading = false;
               this.modalVisible = false;
+              this.queries = {
+                deptName: ""
+              };
             })
             .catch(() => {
               this.confirmLoading = false;
@@ -559,6 +579,12 @@ export default {
         phone: "",
         email: ""
       };
+    },
+    rowClassName(row, index) {
+      if (row.__HITED__) {
+        return "table-department-hit";
+      }
+      return "";
     }
   }
 };
@@ -606,5 +632,10 @@ export default {
   align-items: center;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding-top: 10px;
+}
+</style>
+<style>
+.ivu-table .table-department-hit td {
+  background-color: rgb(45, 183, 245, 0.1);
 }
 </style>

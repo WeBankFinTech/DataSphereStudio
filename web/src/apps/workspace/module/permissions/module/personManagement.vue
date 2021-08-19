@@ -823,5 +823,6 @@ export default {
   margin-top: 10px;
   margin-bottom: 10px;
   font-size: 14px;
+  @include font-color($light-text-color, $dark-text-color);
 }
 </style>

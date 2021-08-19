@@ -2,25 +2,17 @@
   <div class="tree-item">
     <div class="tree-content">
       <div class="tree-icon" :class="{ leaf: isLeaf }">
-        <Icon
-          custom="iconfont icon-open"
-          v-if="model.opened"
-          @click="handleItemToggle"
-        ></Icon>
-        <Icon
-          custom="iconfont icon-close"
-          v-else
-          @click="handleItemToggle"
-        ></Icon>
+        <SvgIcon v-if="model.opened" icon-class="open" @click="handleItemToggle"/>
+        <SvgIcon v-else icon-class="close" @click="handleItemToggle"/>
       </div>
       <div class="tree-icon" v-if="model.type == 'flow'">
-        <Icon custom="iconfont icon-flow"></Icon>
+        <SvgIcon icon-class="flow" />
       </div>
       <div class="tree-icon" v-if="model.type == 'api'">
-        <Icon custom="iconfont icon-api"></Icon>
+        <SvgIcon icon-class="api2" />
       </div>
       <div class="tree-loading" v-if="model.loading">
-        <Icon custom="iconfont icon-xingzhuang" size="16"></Icon>
+        <SvgIcon icon-class="loading" />
       </div>
       <div
         class="tree-name"
@@ -34,7 +26,7 @@
         @click="handleAddClick"
         v-if="model.type == 'project' && model.canWrite"
       >
-        <Icon custom="iconfont icon-plus" size="20"></Icon>
+        <SvgIcon icon-class="plus" />
       </div>
       <div class="tree-hold" v-else></div>
     </div>
@@ -142,6 +134,7 @@ export default {
   }
   .tree-loading {
     display: block;
+    font-size: 16px;
     animation: ani-demo-spin 1s linear infinite;
   }
   @keyframes ani-demo-spin {
@@ -157,6 +150,7 @@ export default {
   }
   .tree-add {
     display: block;
+    font-size: 20px;
   }
   .tree-hold {
     display: block;

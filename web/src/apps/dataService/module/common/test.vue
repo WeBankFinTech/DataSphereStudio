@@ -198,22 +198,24 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .apiTest-wrap {
   padding: 0 24px;
-  background: #fff;
+  @include bg-color(#fff, $dark-base-color);
   .apiTest-title {
     margin-bottom: 15px;
     padding-bottom: 10px;
     font-size: 16px;
-    color: #333;
+    @include font-color(#333, $dark-text-color);
     font-weight: bold;
     border-bottom: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-border-color);
   }
   .apiTest-head {
     .api-path {
       margin: 15px 0;
       font-size: 14px;
-      color: #333;
+      @include font-color(#333, $dark-text-color);
       line-height: 20px;
     }
   }
@@ -228,7 +230,7 @@ export default {
       .panel-title {
         margin-bottom: 20px;
         font-size: 14px;
-        color: #333;
+        @include font-color(#333, $dark-text-color);
         line-height: 20px;
       }
       .panel-btn {
@@ -241,6 +243,7 @@ export default {
         overflow: auto;
         border-radius: 4px;
         border: 1px solid #dee4ec;
+        @include border-color(#dee4ec, $dark-border-color);
         p {
           font-size: 14px;
           line-height: 24px;

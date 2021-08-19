@@ -12,7 +12,7 @@
     <router-view
       v-if="!$route.meta.keepAlive"/>
     <layout-footer/>
-    <newGuidance/>
+    <newGuidance v-if="$route.path === '/workspaceHome'"/>
   </div>
 </template>
 <script>

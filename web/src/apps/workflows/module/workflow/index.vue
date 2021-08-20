@@ -71,6 +71,7 @@
       v-model="deleteProjectShow"
       :title="$t('message.orchestratorModes.deleteOrchestrator')"
       @on-ok="deleteProjectConfirm">{{`${$t('message.orchestratorModes.confirmDeleteOrchestrator')}${deleteProjectItem.orchestratorName} ？`}}</Modal>
+    <!--修改编排-->
     <WorkflowForm
       ref="workflowForm"
       :workflow-data="currentOrchetratorData"

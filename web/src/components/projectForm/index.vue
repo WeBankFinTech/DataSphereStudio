@@ -135,6 +135,8 @@
       <Button
         type="primary"
         size="large"
+        :disabled="submiting"
+        :loading="submiting"
         @click="Ok">{{$t('message.workflow.ok')}}</Button>
     </div>
   </Modal>
@@ -201,6 +203,7 @@ export default {
       devProcessList: [],
       selectCompiling: [],
       projectDataCurrent: {},
+      submiting: false,
     };
   },
   computed: {
@@ -290,8 +293,11 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.projectDataCurrent);
-          this.ProjectShow = false;
+          this.submiting = true;
+          this.$emit('confirm', this.projectDataCurrent, () => {
+            this.ProjectShow = false;
+            this.submiting = false;
+          });
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

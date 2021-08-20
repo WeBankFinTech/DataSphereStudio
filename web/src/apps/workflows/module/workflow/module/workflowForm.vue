@@ -14,7 +14,7 @@
         prop="orchestratorName">
         <Input
           :disabled="isPublished"
-          :maxlength=20
+          :maxlength=21
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>
@@ -66,7 +66,7 @@
         <Input
           v-model="workflowDataCurrent.description"
           type="textarea"
-          :maxlength=200
+          :maxlength=201
           :placeholder="$t('message.workflow.inputWorkflowDesc')"></Input>
       </FormItem>
     </Form>

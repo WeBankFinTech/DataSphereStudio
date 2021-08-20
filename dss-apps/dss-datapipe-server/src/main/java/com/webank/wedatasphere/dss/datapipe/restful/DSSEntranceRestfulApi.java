@@ -43,9 +43,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * created by v_wbzwchen on 2021/04/28
- */
+
 @Path("/dss/datapipe")
 @Component
 @Produces(MediaType.APPLICATION_JSON)

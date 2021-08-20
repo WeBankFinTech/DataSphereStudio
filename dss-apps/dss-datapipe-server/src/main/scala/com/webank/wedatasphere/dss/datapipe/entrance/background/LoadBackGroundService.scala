@@ -22,9 +22,7 @@ import com.google.gson.{JsonObject, JsonParser}
 import com.webank.wedatasphere.linkis.server._
 import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent
 
-/**
-  * Created by allenlliu on 2018/12/4.
-  */
+
 class LoadBackGroundService extends AbstractBackGroundService {
 
   override val serviceType: String = "load"

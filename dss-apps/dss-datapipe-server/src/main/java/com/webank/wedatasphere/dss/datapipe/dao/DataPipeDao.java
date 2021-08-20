@@ -17,11 +17,7 @@
 package com.webank.wedatasphere.dss.datapipe.dao;
 
 
-/**
- * dao
- *
- * @author zhulixin
- */
+
 public interface DataPipeDao {
 
 

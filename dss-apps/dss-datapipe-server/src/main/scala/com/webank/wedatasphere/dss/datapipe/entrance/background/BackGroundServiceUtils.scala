@@ -33,9 +33,6 @@ import com.webank.wedatasphere.linkis.storage.utils.FileSystemUtils
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.time.DateFormatUtils
 
-/**
-  * Created by v_wbjftang on 2019/2/25.
-  */
 object BackGroundServiceUtils extends Logging {
 
   private val CODE_STORE_PREFIX = CommonVars("bdp.dataworkcloud.bgservice.store.prefix", "hdfs:///tmp/bdp-ide/")

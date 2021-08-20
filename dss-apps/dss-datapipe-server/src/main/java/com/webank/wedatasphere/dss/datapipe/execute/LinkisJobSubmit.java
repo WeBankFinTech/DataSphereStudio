@@ -31,11 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/12 03:33 PM
- */
+
 public class LinkisJobSubmit {
 
     public static UJESClient getClient(Map<String, String> props) {

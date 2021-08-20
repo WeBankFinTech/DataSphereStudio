@@ -143,7 +143,7 @@
       "nameLongMsg": "角色名字长度不超过8个字符",
       "ruleMsg": "仅支持中文、字符、数字、下划线",
       "nameRepeat": "用户名重复",
-      "deleteHintMsg": "删除用户将会造成不可逆的影响，除非用户离职或者更换部门，否则请慎重！",
+      "deleteHintMsg": "当前操作不可逆，若用户尚未离职或更换部门，请谨慎操作！",
       "notsupported": "不支持当前操作",
       "userManual": "用户手册",
       "NEWWORKSPACE": "新建工作空间",
@@ -183,7 +183,7 @@
     "Project": {
       "title": "项目列表",
       "AppDevProcess": "应用开发流程",
-      "createProject": "创建工程",
+      "createProject": "创建项目",
       "config": "配置",
       "deleteSuccess": "{name}删除成功"
     },

@@ -21,9 +21,7 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.Conve
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-/**
- * Created by enjoyyin on 2021/6/22.
- */
+
 public abstract class DSSToRelConversionOperation implements ConversionOperation<DSSToRelConversionRequestRef, ResponseRef> {
 
     private DSSToRelConversionService conversionService;

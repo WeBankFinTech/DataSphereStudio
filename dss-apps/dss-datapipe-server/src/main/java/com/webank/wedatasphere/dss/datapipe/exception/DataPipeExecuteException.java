@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.datapipe.exception;
 
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/31 02:31 PM
- */
+
 public class DataPipeExecuteException extends ErrorException {
 
         public DataPipeExecuteException(int errCode, String desc) {

@@ -21,9 +21,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
 
 import java.io.Closeable;
 
-/**
- * Created by enjoyyin on 2020/9/1.
- */
+
 public interface AppStandard extends Closeable {
 
     String getStandardName();

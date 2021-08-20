@@ -26,13 +26,14 @@ public interface RefFactory {
     <R extends Ref> R newRef(Class<R> clazz) throws DSSErrorException;
 
     /**
-     * 我们要将Ref进行实例化,因为各个Ref都是在的不同的AppConn中进行实例化，所以他们的ClassLoader也是和主ClassLoader是不一样的，
-     * 所以我们需要将实例化AppConn的ClassLoader传入
-     * @param clazz 需要实例化的类继承的接口
-     * @param classLoader 实例化appConn的classloader
-     * @param packageName 包名
-     * @return
-     * @throws Exception
+     * We need to instantiate Ref, because each Ref is instantiated in a different AppConn,
+     * so their ClassLoader is also different from the main ClassLoader,
+     * so we need to pass in the ClassLoader that instantiates the AppConn.
+     * @param clazz The interface inherited by the class that needs to be instantiated.
+     * @param classLoader Instantiate the classloader of appConn.
+     * @param packageName package name.
+     * @return return a instance of R.
+     * @throws DSSErrorException
      */
     <R extends Ref> R newRef(Class<R> clazz, ClassLoader classLoader, String packageName) throws DSSErrorException;
 

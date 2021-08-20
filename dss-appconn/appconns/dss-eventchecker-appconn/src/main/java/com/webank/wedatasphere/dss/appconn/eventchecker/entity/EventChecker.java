@@ -224,25 +224,4 @@ public class EventChecker implements Runnable{
 	    	return null;
 	    }
     }
-
-	public static void main(String[] args) {
-		Properties p = new Properties();
-		p.put("azkaban.flow.execid","111");
-
-		p.put("msg.type","RECEIVE");
-		p.put("msg.receiver","project@job@v_zhu");
-		p.put("msg.topic","bdp_new_test");
-		p.put("msg.name","TestCheck");
-		p.put("msg.savekey","msg.body");
-		p.put("query.frequency","60");
-		p.put("wait.time","1");
-		p.put("only.receive.today","true");
-		p.put("msg.after.send","true");
-		p.put("msg.eventchecker.jdo.option.name","msg");
-		p.put("msg.eventchecker.jdo.option.url","jdbc:mysql://127.0..0.1:3306/wtss_qyh_test?useUnicode=true&characterEncoding=UTF-8");
-		p.put("msg.eventchecker.jdo.option.username","root");
-		p.put("msg.eventchecker.jdo.option.password","MTIzNDU2");
-	}
-
-
 }

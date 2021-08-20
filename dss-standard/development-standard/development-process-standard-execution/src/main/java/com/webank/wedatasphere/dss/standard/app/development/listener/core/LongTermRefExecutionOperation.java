@@ -35,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Description: LongTermRefExecutionOperation 是一个
+ * Description: LongTermRefExecutionOperation is used to execute long-term tasks in external application systems.
+ * Long-term task usually supports to execute asyncly and can fetch status and logs when it is submitted.
+ *
  */
 public abstract class LongTermRefExecutionOperation implements RefExecutionOperation {
 

@@ -78,6 +78,8 @@
       <Button
         type="primary"
         size="large"
+        :disabled="submiting"
+        :loading="submiting"
         @click="Ok">{{$t('message.workflow.ok')}}</Button>
     </div>
   </Modal>
@@ -122,6 +124,7 @@ export default {
   },
   data() {
     return {
+      submiting: false,
       ProjectShow: false,
       originBusiness: '',
       isPublished: false,
@@ -173,6 +176,7 @@ export default {
     ProjectShow(val) {
       if (val) {
         this.originBusiness = this.workflowDataCurrent.uses;
+        this.submiting = false; // ProjectShow为true时确认按钮可以点击
       }
       this.$emit('show', val);
     },
@@ -198,6 +202,7 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
+          this.submiting = true;
           this.$emit('confirm', this.modeValueTypeChange(this.workflowDataCurrent));
           this.ProjectShow = false;
         } else {

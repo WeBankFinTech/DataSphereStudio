@@ -61,7 +61,7 @@
         <Input
           v-model="workflowDataCurrent.description"
           type="textarea"
-          :maxlength=201
+          :maxlength=200
           :placeholder="$t('message.workflow.inputWorkflowDesc')"></Input>
       </FormItem>
       <Form-item>

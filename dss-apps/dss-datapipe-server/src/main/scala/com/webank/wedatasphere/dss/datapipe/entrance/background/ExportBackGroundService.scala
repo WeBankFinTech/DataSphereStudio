@@ -24,9 +24,7 @@ import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.server._
 import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent
 
-/**
-  * Created by allenlliu on 2018/12/4.
-  */
+
 class ExportBackGroundService extends AbstractBackGroundService with Logging{
   override val serviceType: String = "export"
 

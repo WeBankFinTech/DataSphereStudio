@@ -21,9 +21,7 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.Conve
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
-/**
- * Created by enjoyyin on 2021/6/22.
- */
+
 public interface ConversionOperation<K extends ConversionRequestRef, V extends ResponseRef> extends Operation<K, V> {
 
     void setConversionService(ConversionService conversionService);

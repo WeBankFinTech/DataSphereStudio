@@ -21,10 +21,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorOpenReque
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author allenlliu
- * @date 2020/12/23 15:24
- */
+
 public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRef {
 
     private Long orchestratorId;

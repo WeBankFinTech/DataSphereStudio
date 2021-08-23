@@ -13,13 +13,31 @@ class NormalNode extends Node {
   }
 
   draw = (opts) => {
+    const $contextmenu = $('#rightMenu')
     let container = $('<div class="relation-node"></div>')
       .css('top', opts.top)
       .css('left', opts.left)
       .attr('id', opts.id)
       .addClass(opts.options.className)
-      .on('click', () => {
-        util.Hub.$emit('dagLog', opts.options)
+      .on('contextmenu', (e) => {
+        const html = [
+          `<div id="rmViewLog" class="menu-button"><span>${opts.options.contextMenu.log}</span></div>`
+        ]
+        const operationHtml = () => {
+          return html.splice(',')
+        }
+        $contextmenu.css({
+          left: e.pageX + 5,
+          top: e.pageY + 5,
+          visibility: 'visible',
+          textAlign: 'center'
+        })
+        // Action bar
+        $contextmenu.html('').append(operationHtml)
+        $('#rmViewLog').on('click', () => {
+          util.Hub.$emit('dagLog', opts.options)
+        })
+        return false
       })
     let icon = '<i></i>',
       state = '<span></span>'
@@ -34,7 +52,13 @@ class NormalNode extends Node {
     let logoContainer = $(`<div class="logo-container">${icon}<span>${opts.options.label}</span>${state}</div>`);
     logoContainer.addClass(opts.options.className);
 
-    container.append(logoContainer);
+    container.append(logoContainer)
+
+    let body = $('body').on('click', () => {
+      $contextmenu.css({
+        visibility: 'hidden'
+      })
+    })
 
     return container[0];
   }

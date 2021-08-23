@@ -17,6 +17,9 @@
       <template slot-scope="{ row }" slot="role">
         <span>{{ rolelist(row) }}</span>
       </template>
+      <template slot-scope="{ row }" slot="department">
+        <span>{{row.office + '-' + row.department}}</span>
+      </template>
       <template slot-scope="{ row, index }" slot="action">
         <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
         <Button
@@ -124,7 +127,7 @@ import storage from "@/common/helper/storage";
 import api from "@/common/service/api";
 import moment from 'moment';
 import formserch from "../component/formsechbar";
-import { GetWorkspaceUserManagement } from '@/common/service/apiCommonMethod.js';
+import { GetWorkspaceUserManagement, GetWorkspaceData } from '@/common/service/apiCommonMethod.js';
 
 export default {
   components: {
@@ -132,6 +135,7 @@ export default {
   },
   data() {
     return {
+      workspaceData: null,
       delshow: false,
       creatershow: false,
       editusershow: false,
@@ -179,7 +183,10 @@ export default {
   mounted() {
     this.username()
     this.init()
-    this.deptId = storage.get("curWorkspace", 'local').department
+    GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+      this.workspaceData = data.workspace;
+      this.deptId = this.workspaceData.workspaceType !== "project" ? storage.get("curWorkspace", 'local').department : ''
+    })
     this.getUserList()
   },
   methods: {
@@ -268,8 +275,7 @@ export default {
       const column = [
         { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
         { title: this.$t('message.workspaceManagemnet.role'), slot: "role", align: "center",width: 250 },
-        { title: this.$t('message.workspaceManagemnet.department'), key: "department", align: "center" },
-        { title: this.$t('message.workspaceManagemnet.office'), key: "office", align: "center" },
+        { title: this.$t('message.workspaceManagemnet.department'), slot: "department", align: "center" },
         { title: this.$t('message.workspaceManagemnet.creator'), key: "creator", align: "center" },
         { title: this.$t('message.workspaceManagemnet.joinTime'), key: "joinTime", align: "center" },
         { title: this.$t('message.workspaceManagemnet.action'), slot: "action", width: 150, align: "center" }

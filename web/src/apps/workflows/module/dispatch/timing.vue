@@ -416,6 +416,7 @@ export default {
       }
       this.receivers = item.receivers
       this.receiversCc = item.receiversCc
+      this.previewTimes = []
       this.warningGroupId = item.warningGroupId ? item.warningGroupId : ''
       if (this.timingData.type === 'timing') {
         let date = new Date()

@@ -5,7 +5,7 @@
       <div style="overflow: auto;">
         <Table :style="width(item.columns)" border highlight-row  :columns="item.columns" :data="item.datalist">
           <template style="color:#4ACA6D" slot-scope="{ row, index }" slot="action">
-            <Button type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
+            <Button v-if="isAdmin" type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
           </template>
         </Table>
       </div>
@@ -58,6 +58,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
+import admin from '@/common/util/admin';
 export default {
   props: {
     workspaceMenu: Object,
@@ -89,6 +90,9 @@ export default {
       let title = `${this.$t('message.workspaceManagemnet.permissionsEditor')}·${this.userlist.name}`
       return title
     },
+    isAdmin() {
+      return admin.isAdmin();
+    }
   },
   created(){
     this.workspaceId =parseInt(this.$route.query.workspaceId)

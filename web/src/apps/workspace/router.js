@@ -43,8 +43,7 @@ export const apiServicesRoutes = [
       name: 'usertable',
       meta: {
         title: '鲁班',
-        publicPage: true,
-        admin: true
+        publicPage: true
       },
       component: () =>
         import('./module/management/module/usertable.vue'),
@@ -54,8 +53,7 @@ export const apiServicesRoutes = [
       name: 'jurisdiction',
       meta: {
         title: '鲁班',
-        publicPage: true,
-        admin: true
+        publicPage: true
       },
       component: () =>
         import('./module/management/module/jurisdiction.vue'),

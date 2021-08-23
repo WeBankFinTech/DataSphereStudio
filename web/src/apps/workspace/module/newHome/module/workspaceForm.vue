@@ -64,7 +64,7 @@
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
-          :maxlength=201
+          maxlength="200"
           :placeholder="$t('message.workspace.pleaseInputWorkspaceDesc')" />
       </FormItem>
     </Form>

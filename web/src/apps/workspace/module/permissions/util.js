@@ -68,49 +68,47 @@ function getParentDepartName(data, departTree) {
   }
 }
 
-
 //删除树形结构children为空的节点的children属性
-function removeEmptyChildren(data = []){
+function removeEmptyChildren(data = []) {
   data.forEach((item, index) => {
-    const {children, ...rest} = item;
-    if(children){
-      if(children.length > 0 ){
+    const { children, ...rest } = item;
+    if (children) {
+      if (children.length > 0) {
         removeEmptyChildren(children);
-      }else{
-        data[index] = {...rest}
+      } else {
+        data[index] = { ...rest };
       }
     }
-  })
+  });
 }
 
 //树形结构数据仅保留N层数据，一下的children删除
-function keepTreeNLevel(tree, N){
-  function inner(data, currentLevel){
-    if(!data){
+function keepTreeNLevel(tree, N) {
+  function inner(data, currentLevel) {
+    if (!data) {
       return;
     }
-    const {children} = data;
-    if( children && children.length > 0){
-      if(currentLevel < N ){
+    const { children } = data;
+    if (children && children.length > 0) {
+      if (currentLevel < N) {
         inner();
         children.forEach(item => {
           inner(item, currentLevel + 1);
         });
-      }else{
+      } else {
         delete data.children;
       }
-
     }
   }
   tree.forEach(item => {
     inner(item, 1);
-  })
+  });
 }
 
 //检测密码是否符合要求return{valid:是否有效， tag: 无效原因};
-function testPassword(value){
+function testPassword(value) {
   if (value === "") {
-    return {valid: false, tag: 'empty'};
+    return { valid: false, tag: "empty" };
   } else {
     const reg = /^[A-Za-z]\S{7,25}$/g;
     const reg1 = /[A-Z]+/;
@@ -122,13 +120,47 @@ function testPassword(value){
       reg1.test(value) &&
       reg2.test(value) &&
       reg3.test(value) &&
-      reg4.test(value) 
+      reg4.test(value)
     ) {
-      return {valid: true};
+      if (!testKeyboardSort(value)) {
+        return { valid: false, tag: "keyboard" };
+      }
+      return { valid: true };
     } else {
-      return {valid: false, tag: 'invalid'};
+      return { valid: false, tag: "invalid" };
     }
   }
+}
+
+function testKeyboardSort(str) {
+  const num = "01234567890";
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const keyboard = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+  let hit = false;
+  for (let i = 0; i < str.length - 3; i++) {
+    const substr = str.substring(i, i + 3).toLowerCase();
+    const reStr = substr
+      .split("")
+      .reverse()
+      .join("");
+    if (
+      num.includes(substr) ||
+      num.includes(reStr) ||
+      alphabet.includes(substr) ||
+      alphabet.includes(reStr)
+    ) {
+      hit = true;
+      break;
+    } else {
+      hit = keyboard.some(
+        item => item.includes(substr) || item.includes(reStr)
+      );
+      if (hit) {
+        break;
+      }
+    }
+  }
+  return !hit;
 }
 export {
   ID_CHAIN,
@@ -138,4 +170,4 @@ export {
   removeEmptyChildren,
   keepTreeNLevel,
   testPassword
-}
+};

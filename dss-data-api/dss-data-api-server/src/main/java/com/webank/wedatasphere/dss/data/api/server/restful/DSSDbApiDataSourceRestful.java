@@ -1,11 +1,11 @@
 package com.webank.wedatasphere.dss.data.api.server.restful;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
-import com.webank.wedatasphere.dss.framework.dbapi.dao.DataSourceMapper;
-import com.webank.wedatasphere.dss.framework.dbapi.service.ApiDataSourceService;
-import com.webank.wedatasphere.dss.framework.dbapi.util.JdbcUtil;
-import com.webank.wedatasphere.dss.framework.dbapi.util.PoolManager;
+import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
+import com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper;
+import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
+import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
+import com.webank.wedatasphere.dss.data.api.server.util.PoolManager;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

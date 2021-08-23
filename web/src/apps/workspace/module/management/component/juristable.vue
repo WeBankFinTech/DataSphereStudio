@@ -30,11 +30,6 @@
             <Checkbox v-for="item in workspaceMenu.menuPrivVOS" :key="item.id" :label="item.id">{{item.name}}</Checkbox>
           </Checkbox-group>
         </FormItem>
-        <FormItem v-if="workspaceMenu.componentPrivVOS.length" :label="$t('message.workspaceManagemnet.componentAccessPermissions')" :label-width="85">
-          <Checkbox-group v-model="useradd.componentPrivs">
-            <Checkbox  v-for="item in workspaceMenu.componentPrivVOS" :key="item.id" :label="item.id">{{item.name}}</Checkbox>
-          </Checkbox-group>
-        </FormItem>
       </Form>
       <div slot="footer">
         <Button type="text" size="large" @click="cancel">{{
@@ -77,8 +72,7 @@ export default {
       workspaceId: '',
       useradd: {
         roleName: '',
-        menuPrivs: [],
-        componentPrivs: []
+        menuPrivs: []
       },
       originBusiness: {},
       addrule: {
@@ -189,7 +183,6 @@ export default {
         if(valid){
           const params = {
             menuIds: this.useradd.menuPrivs,
-            componentIds: this.useradd.componentPrivs,
             workspaceId: this.workspaceId,
             roleName: this.useradd.roleName
           }
@@ -212,7 +205,6 @@ export default {
   .modify-model{
     display: flex;
     flex-wrap: wrap;
-    height: 64px;
     align-items: center;
     label{
       width: 100px

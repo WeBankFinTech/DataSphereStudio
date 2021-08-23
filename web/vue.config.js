@@ -241,7 +241,7 @@ module.exports = {
         }
       },
       '/dolphinscheduler': {
-        target: 'http://192.168.10.223:12345',
+        target: 'http://127.0.0.1:12345',
         changeOrigin: true,
         pathRewrite: {
           '^/dolphinscheduler': '/dolphinscheduler'

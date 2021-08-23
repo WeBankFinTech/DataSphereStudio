@@ -1,11 +1,12 @@
-// 首页
-#mask1 {
+// 首页、第九步
+#mask1, #mask9 {
     position : fixed;
     top      : 50%;
     left     : 50%;
     transform: translate(-50%, -50%);
     width    : 305px;
     z-index  : 1002;
+    font-size: 14px;
 
     &::after {
         content            : "";
@@ -15,8 +16,8 @@
         border-top-color   : #4c4c4c;
         position           : absolute;
         border-bottom-width: 0;
-        bottom             : 61px;
-        left               : 109px;
+        bottom: 67px;
+        left: 109px;
     }
 
     .description {
@@ -25,30 +26,36 @@
         color      : #ffffff;
         border     : 2px dashed #ffffff;
         padding    : 16px;
+        position: relative;
 
         p {
             text-align: justify;
-
             span {
                 color: rgb(9, 140, 234);
+                font-weight: 550;
             }
         }
-    }
-
-    .icon {
-        font-size: 25px;
-        position : relative;
-        top      : -10px;
-        left     : 105px;
+        &::after{
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            border-width: 0 2px 2px 0;
+            border-color: #fff;
+            border-style: dashed;
+            position : absolute;
+            bottom      : -7px;
+            left     : 110px;
+        }
     }
 
     #confirm1 {
         padding-left: 126px;
         display     : flex;
+        padding-top: 30px;
 
         .next {
             font-family  : PingFangSC-Medium;
-            font-size    : 14px;
             color        : #FFFFFF;
             text-align   : center;
             line-height  : 35px;
@@ -60,13 +67,24 @@
         }
 
         .luBanLogo {
-            width      : 58px;
-            height     : 51px;
-            margin-top : -11px;
+            width      : 60px;
+            height     : 60px;
+            margin-top : -18px;
             margin-left: -135px;
         }
     }
 }
+
+#mask1 {
+    .description{
+        p{
+            &:first-child{
+                font-weight: bold;
+            }
+        }
+    }
+}
+
 
 // 第二步
 #mask2 {
@@ -85,11 +103,12 @@
         border-top-color   : #4c4c4c;
         position           : absolute;
         border-bottom-width: 0;
-        bottom             : 61px;
-        left               : 164px;
+        bottom: 77px;
+        left: 163.5px;
     }
 
     .description {
+        position: relative;
         font-family: PingFangSC-Regular;
         font-size  : 14px;
         color      : #ffffff;
@@ -101,15 +120,22 @@
 
             span {
                 color: rgb(9, 140, 234);
+                font-weight: bold;
             }
         }
-    }
 
-    .icon {
-        font-size: 25px;
-        position : relative;
-        top      : -10px;
-        left     : 160px;
+        &::after{
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            border-width: 0 2px 2px 0;
+            border-color: #fff;
+            border-style: dashed;
+            position : absolute;
+            bottom      : -7px;
+            left     : 164.5px;
+        }
     }
 
     #confirm2 {
@@ -118,6 +144,7 @@
         align-items    : center;
         font-size      : 14px;
         margin-left    : 28px;
+        padding-top: 30px;
 
         .skip {
             font-family: PingFangSC-Regular;
@@ -139,10 +166,10 @@
         }
 
         .luBanLogo {
-            width      : 58px;
-            height     : 51px;
-            margin-top : -11px;
-            margin-left: -15px;
+            width      : 60px;
+            height     : 60px;
+            margin-top : -8px;
+            margin-left: -22px;
         }
     }
 }
@@ -222,10 +249,10 @@
 
         span {
             color: rgb(9, 140, 234);
+            font-weight: bold;
         }
 
         div {
-            // border: 1px solid red;
             display       : inline-block;
             height        : 60px;
             vertical-align: middle;
@@ -275,6 +302,7 @@
 
         span {
             color: rgb(9, 140, 234);
+            font-weight: bold;
         }
 
         div {
@@ -290,7 +318,6 @@
     }
 
     .item2 {
-        // border: 1px solid red;
         width       : 85px;
         display     : inline-block;
         margin-right: 5px;
@@ -336,8 +363,8 @@
         border-top-color   : #4c4c4c;
         position           : absolute;
         border-bottom-width: 0;
-        bottom             : 61px;
-        left               : 250px;
+        bottom: 77px;
+        left: 251px;
     }
 
     .selected {
@@ -345,6 +372,10 @@
         border    : 2px dashed #ffffff;
         margin-top: 0.3px;
         width     : 54px;
+        cursor: pointer;
+        &:hover{
+            background-color: #ffffff8c;
+        }
     }
 
     .arrow {
@@ -359,17 +390,25 @@
         border     : 2px dashed #ffffff;
         padding    : 16px;
         width      : 200px;
+        position: relative;
 
         span {
             color: rgb(9, 140, 234);
+            font-weight: bold;
         }
-    }
 
-    .icon {
-        font-size: 25px;
-        position : relative;
-        top      : -10px;
-        left     : 246px;
+        &::after{
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            border-width: 0 2px 2px 0;
+            border-color: #fff;
+            border-style: dashed;
+            position : absolute;
+            bottom: -7px;
+            left: 154px;
+        }
     }
 
     #confirm3 {
@@ -378,6 +417,7 @@
         justify-content: center;
         align-items    : center;
         text-align     : center;
+        padding-top: 30px;
 
         .skip {
             font-family: PingFangSC-Regular;
@@ -413,10 +453,10 @@
         }
 
         .luBanLogo {
-            width      : 58px;
-            height     : 51px;
-            margin-top : -11px;
-            margin-left: -15px;
+            width      : 60px;
+            height     : 60px;
+            margin-top : -8px;
+            margin-left: -22px;
         }
     }
 }
@@ -449,8 +489,8 @@
             border-top-color   : #4c4c4c;
             position           : absolute;
             border-bottom-width: 0;
-            top: 234px;
-            left: 251px;
+            top: 233.6px;
+            left: 250.4px;
         }
 
         .desc {
@@ -461,18 +501,27 @@
             border     : 2px dashed #ffffff;
             padding    : 16px;
             width      : 200px;
+            position: relative;
 
             span {
                 color: rgb(9, 140, 234);
+                font-weight: bold;
+            }
+
+            &::after{
+                content: "";
+                width: 10px;
+                height: 10px;
+                transform: rotate(45deg);
+                border-width: 0 2px 2px 0;
+                border-color: #fff;
+                border-style: dashed;
+                position : absolute;
+                bottom      : -7px;
+                left     : 154px;
             }
         }
 
-        .icon {
-            font-size: 25px;
-            position : relative;
-            top      : -10px;
-            left     : 247px;
-        }
 
         #confirm4 {
             margin-left    : 20px;
@@ -480,6 +529,7 @@
             justify-content: center;
             align-items    : center;
             text-align     : center;
+            padding-top: 30px;
 
             .skip {
                 font-family: PingFangSC-Regular;
@@ -515,10 +565,10 @@
             }
 
             .luBanLogo {
-                width      : 58px;
-                height     : 51px;
-                margin-top : -11px;
-                margin-left: -15px;
+                width      : 60px;
+                height     : 60px;
+                margin-top : -8px;
+                margin-left: -22px;
             }
         }
     }
@@ -543,8 +593,8 @@
         border-top-color   : #4c4c4c;
         position           : absolute;
         border-bottom-width: 0;
-        top                : 210px;
-        right              : 160px;
+        top: 209.9px;
+        right: 156px;
     }
 
     .selected {
@@ -553,6 +603,10 @@
         margin-top  : 0.3px;
         width       : 54px;
         margin-right: 5px;
+        cursor: pointer;
+        &:hover{
+            background-color: #ffffff8c;
+        }
     }
 
     .arrow {
@@ -567,17 +621,25 @@
         border      : 2px dashed #ffffff;
         padding     : 16px;
         width       : 200px;
+        position: relative;
 
         span {
             color: rgb(9, 140, 234);
+            font-weight: bold;
         }
-    }
 
-    .icon {
-        font-size: 25px;
-        position : relative;
-        top      : -10px;
-        right    : 156px;
+        &::after{
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            border-width: 0 2px 2px 0;
+            border-color: #fff;
+            border-style: dashed;
+            position : absolute;
+            bottom      : -7px;
+            left     : 158px;
+        }
     }
 
     #confirm5 {
@@ -586,8 +648,8 @@
         justify-content: center;
         align-items    : center;
         text-align     : center;
+        padding-top: 30px;
 
-        // pointer-events: auto;
         .skip {
             font-family: PingFangSC-Regular;
             font-size  : 14px;
@@ -619,14 +681,13 @@
             border-radius    : 22px;
             line-height      : 35px;
             cursor           : pointer;
-            // pointer-events: none;
         }
 
         .luBanLogo {
-            width      : 58px;
-            height     : 51px;
-            margin-top : -11px;
-            margin-left: -15px;
+            width      : 60px;
+            height     : 60px;
+            margin-top : -8px;
+            margin-left: -22px;
         }
     }
 }
@@ -649,8 +710,8 @@
         border-top-color   : #4c4c4c;
         position           : absolute;
         border-bottom-width: 0;
-        bottom             : 59px;
-        left               : 228px;
+        bottom: 77.2px;
+        left: 223.5px;
     }
 
     .selected {
@@ -673,17 +734,25 @@
         border      : 2px dashed #ffffff;
         padding     : 16px;
         width       : 200px;
+        position: relative;
 
         span {
             color: rgb(9, 140, 234);
+            font-weight: bold;
         }
-    }
 
-    .icon {
-        font-size: 25px;
-        position : relative;
-        top      : -10px;
-        right    : 175px;
+        &::after{
+            content: "";
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            border-width: 0 2px 2px 0;
+            border-color: #fff;
+            border-style: dashed;
+            position : absolute;
+            bottom      : -7px;
+            left     : 158px;
+        }
     }
 
     #confirm6 {
@@ -692,6 +761,7 @@
         justify-content: center;
         align-items    : center;
         text-align     : center;
+        padding-top: 30px;
 
         .skip {
             font-family: PingFangSC-Regular;
@@ -727,10 +797,10 @@
         }
 
         .luBanLogo {
-            width      : 58px;
-            height     : 51px;
-            margin-top : -11px;
-            margin-left: -15px;
+            width      : 60px;
+            height     : 60px;
+            margin-top : -8px;
+            margin-left: -22px;
         }
     }
 }
@@ -751,6 +821,10 @@
         margin-right: 0.5px;
         width       : 65px;
         z-index     : 1005;
+        cursor: pointer;
+        &:hover{
+            background-color: #ffffff8c;
+        }
     }
 
     .item1 {
@@ -764,8 +838,8 @@
             border-top-color   : #4c4c4c;
             position           : absolute;
             border-bottom-width: 0;
-            bottom             : 61px;
-            left               : 228px;
+            bottom: 76.6px;
+            left: 222.5px;
         }
 
         .desc {
@@ -776,17 +850,25 @@
             border     : 2px dashed #ffffff;
             padding    : 16px;
             width      : 200px;
+            position: relative;
 
             span {
                 color: rgb(9, 140, 234);
+                font-weight: bold;
             }
-        }
 
-        .icon {
-            font-size: 25px;
-            position : relative;
-            top      : -10px;
-            left     : 224px;
+            &::after{
+                content: "";
+                width: 10px;
+                height: 10px;
+                transform: rotate(45deg);
+                border-width: 0 2px 2px 0;
+                border-color: #fff;
+                border-style: dashed;
+                position : absolute;
+                bottom      : -7px;
+                left     : 146px;
+            }
         }
 
         #confirm7 {
@@ -795,6 +877,7 @@
             justify-content: center;
             align-items    : center;
             text-align     : center;
+            padding-top: 30px;
 
             .skip {
                 font-family: PingFangSC-Regular;
@@ -830,10 +913,10 @@
             }
 
             .luBanLogo {
-                width      : 58px;
-                height     : 51px;
-                margin-top : -11px;
-                margin-left: -15px;
+                width      : 60px;
+                height     : 60px;
+                margin-top : -8px;
+                margin-left: -22px;
             }
         }
     }
@@ -854,11 +937,12 @@
     pointer-events: none;
 
     .selected {
-        width         : 405px;
+        // width         : 405px;
         border        : 2px dashed #ffffff;
         margin-right  : 0.5px;
         height        : 853px;
         pointer-events: auto;
+        animation: rainbow 0.3s forwards;
     }
 
     .item1 {
@@ -874,8 +958,8 @@
             border-top-color   : #4c4c4c;
             position           : absolute;
             border-bottom-width: 0;
-            left: 237px;
-            top: 151px;
+            left: 234.8px;
+            top: 152.7px;
         }
 
         .desc {
@@ -886,17 +970,25 @@
             border     : 2px dashed #ffffff;
             padding    : 16px;
             width      : 210px;
+            position: relative;
 
             span {
                 color: rgb(9, 140, 234);
+                font-weight: bold;
             }
-        }
 
-        .icon {
-            font-size: 25px;
-            position : relative;
-            top      : -10px;
-            left     : 234px;
+            &::after{
+                content: "";
+                width: 10px;
+                height: 10px;
+                transform: rotate(45deg);
+                border-width: 0 2px 2px 0;
+                border-color: #fff;
+                border-style: dashed;
+                position : absolute;
+                bottom      : -7px;
+                left     : 158px;
+            }
         }
 
         #confirm8 {
@@ -904,6 +996,7 @@
             justify-content: center;
             align-items    : center;
             text-align     : center;
+            padding-top: 30px;
 
             .skip {
                 font-family: PingFangSC-Regular;
@@ -939,10 +1032,10 @@
             }
 
             .luBanLogo {
-                width      : 58px;
-                height     : 51px;
-                margin-top : -11px;
-                margin-left: -15px;
+                width      : 60px;
+                height     : 60px;
+                margin-top : -8px;
+                margin-left: -22px;
             }
         }
     }
@@ -982,3 +1075,8 @@
         background: rgba(255, 255, 255, 0.25) !important;
     }
 }
+
+@keyframes rainbow {
+    0% { width: 0; }
+    100% { width: 405px; }
+  }

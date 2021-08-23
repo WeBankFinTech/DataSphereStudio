@@ -234,7 +234,8 @@ export default {
                 props: {
                   type: 'error',
                   size: 'small',
-                  disabled: params.row.isStop
+                  disabled: params.row.isStop,
+                  loading: params.row.isStop
                 },
                 style: {
                   marginRight: '5px'
@@ -250,8 +251,10 @@ export default {
                           engineType: 'EngineConn', // 当期需求是写死此参数
                           engineInstance: params.row.instance,
                         });
+                        params.row.isStop = true;
                         api.fetch(`/linkisManager/rm/enginekill`, data).then(() => {
                           // 由于引擎关闭有延迟所以记录引擎，做前端列表筛选，刷新页面或刷新
+                          params.row.isStop = false;
                           this.stopList.push(params.row.instance);
                           this.initExpandList();
                           this.$Message.success({

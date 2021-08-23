@@ -120,6 +120,10 @@ export default {
     selectOrchestratorList: {
       type: Array,
       default: () => []
+    },
+    classifyList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -133,11 +137,20 @@ export default {
   },
   computed: {
     formValid() {
+      let validateName = (rule, value, callback) => {
+        const list = this.classifyList[0].dwsFlowList;
+        if (list.find(i => i.orchestratorId !== this.workflowData.orchestratorId && i.orchestratorName === value)) {
+          callback(new Error(this.$t('message.workflow.nameRepeat')))
+        } else {
+          callback()
+        }
+      };
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
           { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
+          { trigger: 'blur', validator: validateName }
         ],
         description: [
           { required: true, message: this.$t('message.workflow.enterDesc'), trigger: 'blur' },
@@ -148,9 +161,6 @@ export default {
         ]
       }
     },
-    // selectOrchestratorList() {
-    //   return this.orchestratorModeList.list;
-    // },
     selectOrchestrator() {
       return this.orchestratorModeList.list.find((item) => item.dicKey === this.workflowDataCurrent.orchestratorMode);
     },

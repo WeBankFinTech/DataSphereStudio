@@ -1,7 +1,8 @@
 <template>
   <div class="user-serchbar-box">
-    <h3>{{$t('message.workspaceManagemnet.userManagement')}}</h3>
+    <h3 style="margin-bottom: 20px;">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
     <formserch
+      v-if="hasPermission()"
       @click-serach="search"
       @click-creater="creater"
       :searchBar="searchBar"
@@ -18,8 +19,9 @@
         <span>{{ rolelist(row) }}</span>
       </template>
       <template slot-scope="{ row, index }" slot="action">
-        <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
+        <Button v-if="hasPermission(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
         <Button
+          v-if="hasPermission(row)"
           type="primary"
           size="small"
           style="margin-left: 10px"
@@ -187,7 +189,7 @@ export default {
       //管理+创建人才能赋权管理员权限
       return item.roleId===1&&this.row.creator!==this.getUserName();
     },
-    canDelete(row){
+    hasPermission(row = {}){
       //创建者和超级管理员可以删除
       const currentUser = storage.get("baseInfo", 'local') || {};
       if (row.creator === currentUser.username || currentUser.isAdmin) {

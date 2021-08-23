@@ -3,7 +3,7 @@
     <div v-if="currentStep === 1" key="1">
       <div id="mask1">
         <div class="description">
-          <p>你好，我是鲁班的卡通形象，你可以叫我"卤蛋"。</p>
+          <p>你好，我是鲁班的卡通形象，你可以叫我"鲁蛋"。</p>
           <br />
           <p>
             鲁班Luban是<span>天翼云基于开源，合作共建的一站式大数据开发与服务平台</span>，他可以对于数据进行全生命周期的运营管理，帮助企业快速开发基于大数据分析建模能力的业务系统和构建数据运营能力。
@@ -11,22 +11,6 @@
           <br />
           <p>下面，让我来带你认识一下鲁班的操作界面，请跟着页面引导操作吧。</p>
         </div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm1">
           <div class="next" @click="next()">我知道了</div>
           <img
@@ -40,22 +24,6 @@
     <div v-else-if="currentStep === 2" key="2">
       <div id="mask2">
         <div class="description">这是鲁班的主页面，即工作空间首页。</div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm2">
           <div class="skip" @click="skip()">跳过</div>
           <div class="next" @click="next()">下一步</div>
@@ -134,22 +102,6 @@
           <img src="~@/dss/assets/images/3-1.png" alt="" />
         </div>
         <div class="desc">这是<span>自定义功能菜单</span>，请试着点击它。</div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm3">
           <div class="skip" @click="skip()">跳过</div>
           <div class="prev" @click="prev()">上一步</div>
@@ -183,22 +135,6 @@
           <div class="desc">
             这是<span>自定义功能菜单</span>，点击全部产品内，具体功能旁★号，可以收藏该功能至菜单。点击自定义菜单功能旁叉号，可以删除该收藏。
           </div>
-          <svg
-            t="1628247901676"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="1802"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-              fill="#ffffff"
-              p-id="1803"
-            ></path>
-          </svg>
           <div id="confirm4">
             <div class="skip" @click="skip()">跳过</div>
             <div class="prev" @click="prev()">上一步</div>
@@ -219,22 +155,6 @@
           <img src="~@/dss/assets/images/5-1.png" alt="" />
         </div>
         <div class="desc">这是<span>账户设置</span>，请试着点击它。</div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm5">
           <div class="skip" @click="skip()">跳过</div>
           <div class="prev" @click="prev()">上一步</div>
@@ -267,22 +187,6 @@
         <div class="desc">
           这是<span>账户设置</span>，可切换账号，设置语言，更换界面皮肤等清理缓存，可以清理当前用户运行的任务缓存结果。
         </div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm6">
           <div class="skip" @click="skip()">跳过</div>
           <div class="prev" @click="prev()">上一步</div>
@@ -310,22 +214,6 @@
       <div id="mask7">
         <div class="item1">
           <div class="desc">这是<span>帮助文档</span>，请试着点击他。</div>
-          <svg
-            t="1628247901676"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="1802"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-              fill="#ffffff"
-              p-id="1803"
-            ></path>
-          </svg>
           <div id="confirm7">
             <div class="skip" @click="skip()">跳过</div>
             <div class="prev" @click="prev()">上一步</div>
@@ -346,25 +234,9 @@
     <div v-else-if="currentStep === 8" key="8">
       <div id="mask8">
         <div class="item1">
-          <div class="desc">
+          <div class="desc proc">
             这是<span>帮助文档</span>，点击步骤可弹出对应操作图示。点击常见问题可跳出至外部页查看对应问题答案。点击【前往用户手册】可以跳至外部用户手册页。
           </div>
-          <svg
-            t="1628247901676"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="1802"
-            width="200"
-            height="200"
-          >
-            <path
-              d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-              fill="#ffffff"
-              p-id="1803"
-            ></path>
-          </svg>
           <div id="confirm8">
             <div class="skip" @click="skip()">跳过</div>
             <div class="prev" @click="prev()">上一步</div>
@@ -383,7 +255,7 @@
       </div>
     </div>
     <div v-show="currentStep === 9">
-      <div id="mask1">
+      <div id="mask9">
         <div class="description">
           <p>
             以上就是鲁班的新手介绍了，在后续的使用中，<span>有任何问题，可以随时打开帮助文档</span>，查看当页的使用帮助，希望你在使用的过程中一切顺利。
@@ -393,22 +265,6 @@
             如果你发现了任何bug或者有需要向我们反馈的问题，欢迎你进入用户反馈中心，留下你的宝贵意见。
           </p>
         </div>
-        <svg
-          t="1628247901676"
-          class="icon"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="1802"
-          width="200"
-          height="200"
-        >
-          <path
-            d="M507.8 727.728a30.016 30.016 0 0 1-21.288-8.824L231.104 463.496a30.088 30.088 0 0 1 0-42.568 30.088 30.088 0 0 1 42.568 0l234.128 234.128 234.16-234.128a30.088 30.088 0 0 1 42.568 0 30.088 30.088 0 0 1 0 42.568L529.08 718.904a30 30 0 0 1-21.28 8.824z"
-            fill="#ffffff"
-            p-id="1803"
-          ></path>
-        </svg>
         <div id="confirm1">
           <div class="next" @click="next()">我知道了</div>
           <img
@@ -469,11 +325,13 @@ export default {
           let block3 = document.querySelector(".headerSuspension .item1 .block3")
           let block5 = document.querySelector(".headerSuspension .item1 .block5")
           let img3 = document.querySelector(".headerSuspension .item2 .img3")
+          let img5 = document.querySelector(".headerSuspension .item2 .img5")
           let computedStyle3 = getComputedStyle(img3, null)
           let offset = dropdownWidth.clientWidth + 38 - 110
           block5.setAttribute("style", "width: " + user.clientWidth + "px")
           block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
           img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
+          img5.setAttribute("style", "right: " + ((user.clientWidth / 2) + 5) + "px")
         })
       } else if (this.currentStep === 4) {
         this.$parent.$refs.layoutHeader.$children[0].hideMenu();
@@ -522,11 +380,13 @@ export default {
           let block3 = document.querySelector(".headerSuspension .item1 .block3")
           let block5 = document.querySelector(".headerSuspension .item1 .block5")
           let img3 = document.querySelector(".headerSuspension .item2 .img3")
+          let img5 = document.querySelector(".headerSuspension .item2 .img5")
           let computedStyle3 = getComputedStyle(img3, null)
           let offset = dropdownWidth.clientWidth + 38 - 110
           block5.setAttribute("style", "width: " + user.clientWidth + "px")
           block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
           img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
+          img5.setAttribute("style", "right: " + ((user.clientWidth / 2) + 5) + "px")
         })
       } else if (this.currentStep === 2) {
         foot.setAttribute("style", "z-index: 1000");
@@ -561,11 +421,9 @@ export default {
         foot.setAttribute("style", "z-index: 1002");
         this.currentStep += 1;
       } else if (this.currentStep === 7) {
+        this.currentStep += 1;
         this.$parent.$children[2].toggleGuide();
-        setTimeout(() => {
-          this.currentStep += 1;
-          this.$parent.$children[2].$children[1].flag = false;
-        }, 300);
+        this.$parent.$children[2].$children[1].flag = false;
       } else if (this.currentStep === 8) {
         foot.setAttribute("style", "z-index: 1000");
         this.$parent.$children[2].toggleGuide();
@@ -604,11 +462,9 @@ export default {
     },
     maskFooterClick() {
       // 点击右下角帮助，展开帮助文档，并且设置点击其他区域无法取消弹框
+      this.currentStep += 1;
       this.$parent.$children[2].toggleGuide();
-      setTimeout(() => {
-        this.currentStep += 1;
-        this.$parent.$children[2].$children[1].flag = false;
-      }, 300);
+      this.$parent.$children[2].$children[1].flag = false;
     },
     navMenuClick() {
       // 点击导航菜单，打开弹出框，并移除对.luban-nav-mask元素的监听

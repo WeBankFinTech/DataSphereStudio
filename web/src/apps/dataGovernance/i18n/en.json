@@ -1,0 +1,10 @@
+{
+  "message": {
+    "dataGovernance": {
+      "dataGovernance": "Data Governance",
+      "dataAssets": "Data Assets",
+      "dataOverview": "Data Overview",
+      "dataAssetsIndex": "Data Assets Index"
+    }
+  }
+}

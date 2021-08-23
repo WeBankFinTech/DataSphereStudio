@@ -227,7 +227,15 @@
 
 
     <select id="getDepartName" resultType="java.lang.String">
-    SELECT dept_name FROM dss_admin_dept WHERE id = #{id}
+    SELECT
+       CONCAT_WS('-',
+	   t1.dept_name,
+	   t2.dept_name,
+	   t3.dept_name )
+   FROM
+	( SELECT dept_name, parent_id FROM dss_admin_dept WHERE id = #{id} ) t3
+	LEFT JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
+	LEFT JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
     </select>
 
 

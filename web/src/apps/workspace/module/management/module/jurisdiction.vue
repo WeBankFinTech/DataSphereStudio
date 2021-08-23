@@ -2,6 +2,7 @@
   <div class="juri-serchbar-box">
     <h3 style="width:80%;display: inline-block;" >{{$t('message.workspaceManagemnet.permissionsManagement')}}</h3>
     <Button
+      v-if="isAdmin"
       type="success"
       @click="creater"
     >{{$t('message.workspaceManagemnet.create')}}</Button>
@@ -16,6 +17,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
+import admin from '@/common/util/admin';
 // import formserch from "../component/formsechbar";
 import juristable from '../component/juristable'
 export default {
@@ -66,6 +68,11 @@ export default {
   },
   created(){
     this.workspaceId = parseInt(this.$route.query.workspaceId)
+  },
+  computed: {
+    isAdmin() {
+      return admin.isAdmin();
+    }
   },
 
   mounted() {

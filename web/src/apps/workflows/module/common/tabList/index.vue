@@ -68,6 +68,7 @@
 <script>
 import weTab from './tabs.vue';
 import i18n from '@/common/i18n';
+import eventbus from '@/common/helper/eventbus';
 export default {
   name: "WorkflowTabList",
   components: {
@@ -145,6 +146,8 @@ export default {
     },
     onChooseWork(tabData) {
       this.$emit('bandleTapTab', tabData.tabId)
+      // tabData.id是编排id
+      eventbus.emit('workflow.orchestratorId', { orchestratorId: tabData.id, mod: 'auto' });
     },
     handleChangeButton(dicValue) {
       const btn = this.buttonText.find((item) => item.dicValue === dicValue);
@@ -152,6 +155,7 @@ export default {
     },
     selectProject() {
       this.$emit('selectProject');
+      eventbus.emit('workflow.change', 'dev');
     },
     menuHandleChangeButton() {
       this.$emit('menuHandleChangeButton')

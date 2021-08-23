@@ -1,8 +1,7 @@
 /*
  * Copyright 2019 WeBank
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -19,20 +18,13 @@ package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractCommonLinkisJob;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
-import org.apache.commons.lang.StringUtils;
 
 
-/**
- * Created by peacewong on 2019/11/3.
- */
 public class AzkabanCommonLinkisJob extends AbstractCommonLinkisJob {
 
 
     @Override
     public String getSubmitUser() {
-        if (StringUtils.isEmpty(getJobProps().get(LinkisJobTypeConf.FLOW_SUBMIT_USER))){
-            return getJobProps().get(LinkisJobTypeConf.PROXY_USER);
-        }
         return getJobProps().get(LinkisJobTypeConf.FLOW_SUBMIT_USER);
     }
 

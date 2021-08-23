@@ -1,8 +1,7 @@
 /*
  * Copyright 2019 WeBank
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -19,14 +18,14 @@ package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf;
 
 import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 
-/**
- * Created by peacewong on 2019/11/3.
- */
+
 public class LinkisJobTypeConf {
 
     public static final String COMMAND = "command";
 
     public static final String JOB_ID = "azkaban.job.id";
+
+    public static final String DSS_LABELS_KEY = "labels";
 
     public static final String FLOW_NAME =  "azkaban.flow.flowid";
 
@@ -41,12 +40,8 @@ public class LinkisJobTypeConf {
 
     public static final String FLOW_SUBMIT_USER = "azkaban.flow.submituser";
 
-    public static final String READ_NODE_TOKEN = "read.nodes";
-
-    public static final String SHARED_NODE_TOKEN = "share.num";
-
     public static final String MSG_SAVE_KEY = "msg.savekey";
 
-    public final static CommonVars<String> SIGNAL_NODES = CommonVars.apply("wds.dss.flow.signal.nodes","linkis.appjoint.eventchecker.eventreceiver");
+    public final static CommonVars<String> SIGNAL_NODES = CommonVars.apply("wds.dss.flow.signal.nodes","linkis.appconn.eventchecker.eventreceiver");
 
 }

@@ -1,8 +1,7 @@
 /*
  * Copyright 2019 WeBank
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -22,22 +21,22 @@ import azkaban.jobExecutor.AbstractJob;
 import azkaban.utils.Props;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job.JobBuilder;
-import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppjointLog;
-import org.apache.log4j.Logger;
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppConnLog;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 
-
-/**
- * Created by peacewong on 2019/9/19.
- */
 public class AzkabanDssJobType extends AbstractJob {
-
 
 
     private static final String SENSITIVE_JOB_PROP_NAME_SUFFIX = "_X";
@@ -82,23 +81,51 @@ public class AzkabanDssJobType extends AbstractJob {
 
     }
 
+
     @Override
     public void run() throws Exception {
 
         info("Start to execute job");
         logJobProperties();
+        String runDate = getRunDate();
+        if (StringUtils.isNotBlank(runDate)){
+            this.jobPropsMap.put("run_date", runDate);
+        }
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
-        this.job.setLogObj(new AzkabanAppjointLog(this.log));
+        this.job.setLogObj(new AzkabanAppConnLog(this.log));
         if(JobTypeEnum.EmptyJob == ((LinkisJob)this.job).getJobType()){
             this.log.warn("This node is empty type");
             return;
         }
+       // info("runtimeMap is " + job.getRuntimeParams());
+        //job.getRuntimeParams().put("workspace", getWorkspace(job.getUser()));
+        info("runtimeMap is " + job.getRuntimeParams());
         LinkisNodeExecutionImpl.getLinkisNodeExecution().runJob(this.job);
-        LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
+
+        try {
+            LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
+        } catch (Exception e) {
+            this.log.warn("Failed to execute job", e);
+            //String reason = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
+            //this.log.error("Reason for failure: " + reason);
+            throw e;
+        }
+        try {
+            String endLog = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
+            this.log.info(endLog);
+        } catch (Throwable e){
+            this.log.info("Failed to get log", e);
+        }
 
         LinkisExecutionListener listener = (LinkisExecutionListener)LinkisNodeExecutionImpl.getLinkisNodeExecution();
         listener.onStatusChanged(null,  LinkisNodeExecutionImpl.getLinkisNodeExecution().getState(this.job),this.job);
-        int resultSize =  LinkisNodeExecutionImpl.getLinkisNodeExecution().getResultSize(this.job);
+        int resultSize =  0;
+        try{
+            resultSize = LinkisNodeExecutionImpl.getLinkisNodeExecution().getResultSize(this.job);
+        }catch(final Throwable t){
+            this.log.error("failed to get result size");
+            resultSize = -1;
+        }
         for(int i =0; i < resultSize; i++){
             this.log.info("The content of the " + (i + 1) + "th resultset is :"
                     +  LinkisNodeExecutionImpl.getLinkisNodeExecution().getResult(this.job, i, LinkisJobExecutionConfiguration.RESULT_PRINT_SIZE.getValue(this.jobPropsMap)));
@@ -109,7 +136,7 @@ public class AzkabanDssJobType extends AbstractJob {
 
     @Override
     public void cancel() throws Exception {
-        super.cancel();
+        //super.cancel();
         LinkisNodeExecutionImpl.getLinkisNodeExecution().cancel(this.job);
         isCanceled = true;
         warn("This job has been canceled");
@@ -147,6 +174,39 @@ public class AzkabanDssJobType extends AbstractJob {
                 this.log.error("failed to log job properties ", ex);
             }
         }
+    }
+
+    private String getRunDate(){
+        this.info("begin to get run date");
+        if (this.jobProps != null &&
+                this.jobProps.getBoolean(JOB_DUMP_PROPERTIES_IN_LOG, true)) {
+            try {
+                for (final Map.Entry<String, String> entry : this.jobPropsMap.entrySet()) {
+                    final String key = entry.getKey();
+                    final String value = key.endsWith(SENSITIVE_JOB_PROP_NAME_SUFFIX) ?
+                            SENSITIVE_JOB_PROP_VALUE_PLACEHOLDER :
+                            entry.getValue();
+                    if ("azkaban.flow.start.timestamp".equals(key)){
+                        this.info("run time is " + value);
+                        String runDateNow = value.substring(0, 10).replaceAll("-", "");
+                        this.info("run date now is " + runDateNow);
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                        try {
+                            Date date = simpleDateFormat.parse(runDateNow);
+                            //因为date已经当天的00:00:00 减掉12小时 就是昨天的时间
+                            String runDate = simpleDateFormat.format(new Date(date.getTime() - 24 * 60 * 60 * 1000));
+                            this.info("runDate is " + runDate);
+                            return runDate;
+                        } catch (ParseException e) {
+                            this.log.error("failed to parse run date " + runDateNow, e);
+                        }
+                    }
+                }
+            } catch (final Exception ex) {
+                this.log.error("failed to log job properties ", ex);
+            }
+        }
+        return null;
     }
 
 }

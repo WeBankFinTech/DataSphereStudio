@@ -16,6 +16,7 @@
           v-model="projectDataCurrent.name"
           :maxlength=21
           :placeholder="$t('message.workspace.enterName')"
+          maxlength="20"
           :disabled="actionType === 'modify'" />
       </FormItem>
       <FormItem
@@ -64,7 +65,7 @@
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
-          :maxlength=201
+          maxlength="200"
           :placeholder="$t('message.workspace.pleaseInputWorkspaceDesc')" />
       </FormItem>
     </Form>

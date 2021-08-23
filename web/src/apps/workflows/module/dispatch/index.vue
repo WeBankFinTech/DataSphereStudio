@@ -11,9 +11,6 @@
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
           <template>
-            <!--<div class="scheduler-list-title">-->
-              <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
-            <!--</div>-->
             <dashboard @goToList="goToList"></dashboard>
           </template>
         </div>
@@ -21,8 +18,8 @@
           <template>
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processDefinition')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right">
-                <Icon type="ios-search" slot="suffix" @click="activeList(1)" style="cursor: pointer;"/>
+              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(1)">
+              <Icon type="ios-search" slot="suffix" @click="activeList(1)" style="cursor: pointer;"/>
               </Input>
             </div>
             <Table class="scheduler-table" :columns="columns" :data="list"></Table>
@@ -45,8 +42,8 @@
           <template v-if="!showGantt">
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processInstance')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right">
-                <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
+              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
+              <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
               </Input>
               <template>
                 <Date-picker
@@ -60,9 +57,9 @@
                   format="yyyy-MM-dd HH:mm:ss">
                 </Date-picker>
                 <Select v-model="instanceStateType"
-                  @on-change="_changeInstanceState"
-                  :placeholder="$t('message.scheduler.selectState')"
-                  style="width: 150px;float: right;margin-right: 10px;"
+                        @on-change="_changeInstanceState"
+                        :placeholder="$t('message.scheduler.selectState')"
+                        style="width: 150px;float: right;margin-right: 10px;"
                 >
                   <Option value="" key="-">-</Option>
                   <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
@@ -134,6 +131,7 @@
       </div>
     </Modal>
     <m-log v-if="showLog" :key="logId" :item="logData" :source="source" :logId="logId" @ok="showLog=false" @close="showLog=false"></m-log>
+    <div id="rightMenu" class="right-menu"></div>
   </div>
 </template>
 <script>
@@ -206,8 +204,11 @@ export default {
     return {
       userId: '', //列表入参,用户id
       searchVal: this.tabName, //搜索名字
+      taskName: '', //任务实例名称
       dateTime: [], //实例列表搜索时间
       instanceStateType: '',//实例列表搜索状态
+      dateTime2: [], //任务列表搜索时间
+      instanceStateType2: '',//任务列表搜索状态
       workspaceName: '',
       activeDS: this.activeTab,
       showRunTaskModal: false,
@@ -215,6 +216,7 @@ export default {
       list: [],
       list2: [],
       list3: [],
+      list5: [],
       columns: [
         {
           title: this.$t('message.scheduler.header.id'),
@@ -654,7 +656,7 @@ export default {
         },
         {
           title: this.$t('message.scheduler.header.ProcessName'),
-          width: 200,
+          minWidth: 200,
           key: 'processDefinitionName'
         },
         {
@@ -787,6 +789,12 @@ export default {
         current: 1,
         total: 0
       },
+      pagination5: {
+        size: 10,
+        opts: [5, 10, 30, 45, 60],
+        current: 1,
+        total: 0
+      },
       publishStatus,
       runningType,
       tasksState,
@@ -836,6 +844,29 @@ export default {
     }
   },
   methods: {
+    fetchTaskInstanceList(page=1, data) {
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
+          pageSize: this.pagination5.size,
+          pageNo: page,
+          searchVal: this.taskName,
+          ...data
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.submitTime = formatDate(item.submitTime)
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
+            item.duration = filterNull(item.duration)
+            item.stateDesc = this.tasksState[item.state].desc
+            item.stateColor = this.tasksState[item.state].color
+            item.stateIcon = this.tasksState[item.state].icon
+            item.disabled = false
+          })
+          this.list5 = res.totalList
+          this.pagination5.total = res.total
+        })
+      })
+    },
     getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
       if (!this.dagProcessId) return
       api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
@@ -947,21 +978,24 @@ export default {
       })
     },
     openTiming(index, isEdit) {
-      let id
+      let id, tempData = {}
       if (isEdit) {
-        this.timingData.item = index
-        this.timingData.type = ''
+        tempData.item = index
+        tempData.type = ''
         id = index.processDefinitionId
       } else {
-        this.timingData.item = this.list[index]
-        this.timingData.type = 'timing'
+        tempData.item = this.list[index]
+        tempData.type = 'timing'
         id = this.list[index].id
       }
       this.getReceiver(id, (res) => {
-        this.timingData.item.receivers = res.receivers
-        this.timingData.item.receiversCc = res.receiversCc
+        this.timingData.item = {
+          ...tempData.item,
+          receivers: res.receivers,
+          receiversCc: res.receiversCc
+        }
+        this.showTimingTaskModal = true
       })
-      this.showTimingTaskModal = true
     },
     _copy(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/copy`, {
@@ -1107,16 +1141,42 @@ export default {
       } else if (this.activeDS === 2) {
         this.showGantt = false
         if (data) {
-          data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
-          data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
-          this.dateTime = [data.startDate, data.endDate]
-          this.instanceStateType = data.stateType
+          if (data.startDate && data.endDate) {
+            data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
+            data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
+            this.dateTime = [data.startDate, data.endDate]
+          } else {
+            data.startDate = this.dateTime.length > 1 ? this.dateTime[0] : ''
+            data.endDate = this.dateTime.length > 1 ? this.dateTime[1] : ''
+          }
+          if (data.stateType) {
+            this.instanceStateType = data.stateType
+          } else {
+            data.stateType = this.instanceStateType
+          }
         }
         this.getInstanceListData(1, data)
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
         console.log('运维大屏')
+      } else if (this.activeDS === 5) {
+        if (data) {
+          if (data.startDate && data.endDate) {
+            data.startDate = moment(data.startDate).format('YYYY-MM-DD HH:mm:ss')
+            data.endDate = moment(data.endDate).format('YYYY-MM-DD HH:mm:ss')
+            this.dateTime2 = [data.startDate, data.endDate]
+          } else {
+            data.startDate = this.dateTime2.length > 1 ? this.dateTime2[0] : ''
+            data.endDate = this.dateTime2.length > 1 ? this.dateTime2[1] : ''
+          }
+          if (data.stateType) {
+            this.instanceStateType2 = data.stateType
+          } else {
+            data.stateType = this.instanceStateType2
+          }
+        }
+        this.fetchTaskInstanceList(1, data)
       }
     },
     openDag(index) {
@@ -1131,14 +1191,18 @@ export default {
         let tasks = processInstanceJson.tasks
         let connects = JSON.parse(data.connects)
         let locations = JSON.parse(data.locations)
+        const contextMenu = {
+          start: this.$t('message.scheduler.run'),
+          log: this.$t('message.scheduler.viewLog')
+        }
         this.dagProcessId = this.list2[index].id
         this.pollTask(this.list2[index].id, taskList => {
-          this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+          this.dagData = ds2butterfly(tasks, connects, locations, taskList, false, contextMenu)
           this.showDag = 1
         })
         this.timer = setInterval(() => {
           this.pollTask(this.list2[index].id, taskList => {
-            this.dagData = ds2butterfly(tasks, connects, locations, taskList)
+            this.dagData = ds2butterfly(tasks, connects, locations, taskList, false, contextMenu)
           })
         }, 1000*30)
       }).catch(() => {
@@ -1226,6 +1290,12 @@ export default {
         })
       }
     },
+    _viewLog(index) {
+      let item = this.list5[index]
+      this.logId = item.id
+      this.logData = {}
+      this.showLog = true
+    },
     deleteScheduler(index) {
       let item = this.list3[index]
       this.$Modal.confirm({
@@ -1295,6 +1365,14 @@ export default {
       this.pagination3.size = size
       this.getSchedulerData()
     },
+    pageChange5(page) {
+      this.pagination5.current = page
+      this.fetchTaskInstanceList(page)
+    },
+    pageSizeChange5(size) {
+      this.pagination5.size = size
+      this.fetchTaskInstanceList()
+    },
     _gantt (item) {
       this.instanceId = item.id
       this.showGantt = true
@@ -1303,6 +1381,7 @@ export default {
       this.searchVal = ''
       this.activeList(active, data)
     },
+    // 实例列表
     _datepicker() {
       let searchDate = this.dateTime.length > 1 ? {
         startDate: this.dateTime[0],
@@ -1311,7 +1390,22 @@ export default {
       this.activeList(2, searchDate)
     },
     _changeInstanceState() {
-      this.activeList(2, {stateType: this.instanceStateType})
+      this.activeList(2, {
+        stateType: this.instanceStateType
+      })
+    },
+    // 任务列表
+    _datepicker2() {
+      let searchDate = this.dateTime2.length > 1 ? {
+        startDate: this.dateTime2[0],
+        endDate: this.dateTime2[1]
+      } : {}
+      this.activeList(5, searchDate)
+    },
+    _changeInstanceState2() {
+      this.activeList(5, {
+        stateType: this.instanceStateType2
+      })
     }
   }
 };
@@ -1319,49 +1413,49 @@ export default {
 <style lang="scss">
   a {
     color: #2d8cf0;
-    &:hover {
-      color: #57a3f3;
-    }
+  &:hover {
+     color: #57a3f3;
+   }
   }
 </style>
 <style lang="scss" scoped>
-.scheduler-center{
-  position: relative;
-  overflow: hidden;
+  .scheduler-center{
+    position: relative;
+    overflow: hidden;
   .scheduler-wrapper{
     padding-top: 0;
-    .scheduler-menu{
-      min-height: 80vh;
-    }
-    .scheduler-list{
-      min-height: 80vh;
-    }
+  .scheduler-menu{
+    min-height: 80vh;
   }
-}
-.scheduler-wrapper{
-  background-color: white;
-  min-height: 80vh;
-  padding-top: 16px;
-  float: left;
-  width: 100%;
+  .scheduler-list{
+    min-height: 80vh;
+  }
+  }
+  }
+  .scheduler-wrapper{
+    background-color: white;
+    min-height: 80vh;
+    padding-top: 16px;
+    float: left;
+    width: 100%;
   .scheduler-menu{
     float: left;
     width: 250px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
-    li {
+  li {
     padding: 0 40px;
     cursor: pointer;
     line-height: 40px;
-    &:hover{
-       color: #2E92F7;
-     }
-    &.active{
-       background-color: #ECF4FF;
-       color: #2E92F7;
-       border-right: 3px solid  #2E92F7
-     }
-    }
+  &:hover{
+     color: #2E92F7;
+   }
+  &.active{
+     background-color: #ECF4FF;
+     color: #2E92F7;
+     border-right: 3px solid  #2E92F7
+   }
+  }
   }
   .scheduler-list{
     float: left;
@@ -1369,18 +1463,18 @@ export default {
     border-left: 1px solid #DEE4EC;
     min-height: calc(80vh - 16px);
     width: calc(100% - 250px);
-    .scheduler-list-title {
-      padding-bottom: 17px;
-      font-size: 16px;
-      color: rgba(0,0,0,0.65);
-      line-height: 22px;
-      font-weight: bolder;
-    }
-    .scheduler-table {
-      width: 100%;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-    }
+  .scheduler-list-title {
+    padding-bottom: 17px;
+    font-size: 16px;
+    color: rgba(0,0,0,0.65);
+    line-height: 22px;
+    font-weight: bolder;
+  }
+  .scheduler-table {
+    width: 100%;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
   }
   .left-panel{
     height: 80vh;
@@ -1391,27 +1485,27 @@ export default {
     z-index: 99;
     padding: 23px 26px 23px 0;
     transition: all 1s;
-    &.partial-panel {
-      left: calc(250px + 250px + 60px);
-      transition: all 1s;
-    }
-    .dag-page{
-      border: 1px solid #DEE4EC;
-      width: 100%;
-      height: 100%;
-    }
-    &.full-panel {
-      left: 270px;
-      width: calc(100vw - 270px);
-      transition: all 1s;
-    }
-    .close-panel{
-      position: absolute;
-      right: 26px;
-      top: -5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+  &.partial-panel {
+     left: calc(250px + 250px + 60px);
+     transition: all 1s;
+   }
+  .dag-page{
+    border: 1px solid #DEE4EC;
+    width: 100%;
+    height: 100%;
+  }
+  &.full-panel {
+     left: 270px;
+     width: calc(100vw - 270px);
+     transition: all 1s;
+   }
+  .close-panel{
+    position: absolute;
+    right: 26px;
+    top: -5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
   }
   .fr{
     float: right;
@@ -1419,5 +1513,17 @@ export default {
   .page-bar {
     margin-top: 20px;
   }
-}
+  }
+</style>
+<style lang="scss">
+  .right-menu {
+    position: fixed;
+    width: 90px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    visibility: hidden;
+    z-index: 99
+  }
 </style>

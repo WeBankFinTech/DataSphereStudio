@@ -232,7 +232,8 @@ module.exports = {
         }
       },
       '/dolphinscheduler': {
-        target: 'http://192.168.10.223:12345',
+        //target: 'http://***REMOVED***:12345',
+        target: 'https://dolphin.ctyun.cn:10002',
         changeOrigin: true,
         pathRewrite: {
           '^/dolphinscheduler': '/dolphinscheduler'

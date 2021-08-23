@@ -39,7 +39,7 @@ export default {
     margin-left: 54px;
   }
   .ds-main-container {
-    @include bg-color(#f3f5fc, $dark-base-color);
+    @include bg-color(#fff, $dark-base-color);
     min-height: 100%;
     .ds-breadcumb {
       padding: 24px;
@@ -47,6 +47,7 @@ export default {
       font-size: 22px;
       line-height: 30px;
       @include font-color(#333, $dark-text-color);
+      border-bottom: 24px solid #dee4ec;
       .ds-breadcumb-divider {
         margin: 0 10px;
       }

@@ -132,7 +132,16 @@ export default {
     buttonText(val, old) {
       // 只有新旧值变化的时候才改变
       if (val.length > 0 && JSON.stringify(val) !== JSON.stringify(old)) {
-        this.currentButton = val[0];
+
+        if (this.$route.name === 'Scheduler') {
+          val.forEach(item => {
+            if (item.dicValue === 'scheduler') {
+              this.currentButton = item
+            }
+          })
+        } else {
+          this.currentButton = val[0];
+        }
         this.$emit('handleChangeButton', this.currentButton);
       }
     },

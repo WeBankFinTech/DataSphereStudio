@@ -1474,7 +1474,7 @@ CREATE TABLE `dss_dataapi_config` (
 	`id` BIGINT ( 20 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
 	`workspace_id` BIGINT ( 20 ) NOT NULL COMMENT '工作空间id',
 	`api_name` VARCHAR ( 255 ) NOT NULL COMMENT 'API名称',
-	`api_path` VARCHAR ( 255 ) NOT NULL COMMENT 'API Path',
+	`api_path` VARCHAR ( 255 ) NOT NULL unique COMMENT 'API Path',
 	`group_id` BIGINT ( 20 ) NOT NULL COMMENT 'API组id',
 	`api_type` VARCHAR ( 20 ) NOT NULL COMMENT 'API类型：GUIDE-向导模式，SQL-脚本模式',
 	`protocol` VARCHAR ( 20 ) NOT NULL COMMENT 'Http协议',
@@ -1500,6 +1500,8 @@ CREATE TABLE `dss_dataapi_config` (
 	`update_by` VARCHAR ( 255 ) DEFAULT NULL COMMENT '更新者',
 	`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
 	`is_delete` TINYINT ( 1 ) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+	`page_size` int  DEFAULT 0 COMMENT '每页数据大小',
+
 	PRIMARY KEY ( `id` )
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API';
 
@@ -1515,6 +1517,34 @@ CREATE TABLE `dss_dataapi_group` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
   PRIMARY KEY (`id`)
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT='服务组'
+) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT='服务组';
+
+
+CREATE TABLE `dss_dataapi_auth` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) NOT NULL COMMENT '工作空间ID',
+  `caller` varchar(255)  DEFAULT NULL COMMENT '调用者名称',
+  `token` varchar(255)  DEFAULT NULL COMMENT 'token字符串',
+  `expire` datetime DEFAULT NULL COMMENT 'token过期时间',
+  `group_id` bigint(20) DEFAULT NULL COMMENT 'api组',
+  `create_by` varchar(255)  DEFAULT NULL COMMENT '创建者',
+  `create_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255)  DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API认证';
+
+CREATE TABLE `dss_dataapi_call` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `api_id` bigint(11) NOT NULL COMMENT 'API ID',
+  `params_value` text COMMENT '调用参数名称和值',
+  `status` tinyint(255) DEFAULT NULL COMMENT '执行状态：1成功，2失败，3超时',
+  `time_start` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '开始时间',
+  `time_end` datetime DEFAULT NULL COMMENT '结束时间',
+  `time_length` bigint(20) DEFAULT NULL COMMENT '调用时长',
+  `caller` varchar(255) DEFAULT NULL COMMENT '调用者名称',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API调用记录'
 
 

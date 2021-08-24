@@ -11,4 +11,6 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     List<DataSource> selectByTypeAndWorkspaceId(DataSource dataSource);
 
     DataSource selectById(Integer datasourceId);
+
+    void addDatasource(DataSource dataSource);
 }

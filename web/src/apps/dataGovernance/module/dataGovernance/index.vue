@@ -47,7 +47,6 @@ export default {
       font-size: 22px;
       line-height: 30px;
       @include font-color(#333, $dark-text-color);
-      border-bottom: 24px solid #dee4ec;
       .ds-breadcumb-divider {
         margin: 0 10px;
       }

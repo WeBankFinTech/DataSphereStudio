@@ -52,7 +52,7 @@ export default {
             return h('div', [
               h('SvgIcon', {
                 props: {
-                  'icon-class': 'biaozongshu',
+                  'icon-class': 'biao',
                   'color': '#3495F7'
                 },
                 style: {
@@ -82,7 +82,7 @@ export default {
             return h('div',[
               h('SvgIcon', {
                 props: {
-                  'icon-class': 'biaozongshu',
+                  'icon-class': 'biao',
                   'color': '#3495F7'
                 },
                 style: {
@@ -144,6 +144,7 @@ export default {
   padding-left: 24px;
   padding-top: 24px;
   padding-right: 3px;
+  border-top: 24px solid #dee4ec;
   .overview-t {
       &-card {
           display: flex;

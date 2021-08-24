@@ -5,7 +5,7 @@
       <div style="overflow: auto;">
         <Table :style="width(item.columns)" border highlight-row  :columns="item.columns" :data="item.datalist">
           <template style="color:#4ACA6D" slot-scope="{ row, index }" slot="action">
-            <Button v-if="isAdmin" type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
+            <Button v-if="isAdmin()" type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
           </template>
         </Table>
       </div>
@@ -58,7 +58,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
-import admin from '@/common/util/admin';
+import storage from "@/common/helper/storage";
 export default {
   props: {
     workspaceMenu: Object,
@@ -89,9 +89,6 @@ export default {
     titlename(){
       let title = `${this.$t('message.workspaceManagemnet.permissionsEditor')}·${this.userlist.name}`
       return title
-    },
-    isAdmin() {
-      return admin.isAdmin();
     }
   },
   created(){
@@ -101,6 +98,13 @@ export default {
     this.gethomepagedata()
   },
   methods: {
+    isAdmin(){
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      if (currentUser.isAdmin) {
+        return true;
+      }
+      return false;
+    },
     gethomepagedata(){
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceHomepageSettings`, {
         workspaceId: this.workspaceId,

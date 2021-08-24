@@ -1,8 +1,7 @@
 /*
  * Copyright 2019 WeBank
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -15,14 +14,19 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appjoint.conf
+package com.webank.wedatasphere.linkis.gateway.parser
 
 import com.webank.wedatasphere.linkis.common.conf.CommonVars
 
-/**
-  * created by cooperyang on 2019/11/9
-  * Description:
-  */
-object AppJointLoaderConf {
-  val CLASS_LOADER_CLASS_NAME = CommonVars("dss.appjoint.loader.classname", "")
+
+object DSSGatewayConfiguration {
+  val DSS_SPRING_NAME = CommonVars("wds.linkis.dss.name", "dss-server")
+
+  val DSS_URL_LABEL_PREFIX = CommonVars("wds.dss.gateway.url.prefix.name", "labels")
+
+  val DSS_URL_ROUTE_LABEL_PREFIX = CommonVars("wds.dss.gateway.url.prefix.name", "labelsRoute")
+
+  val DSS_URL_APPCONNS = CommonVars("wds.dss.gateway.url.appconns", "visualis")
+
+
 }

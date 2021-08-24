@@ -122,7 +122,7 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 30, 45, 60]
+        opts: [10, 20, 30, 40]
       },
       isToolbarShow: false,
       cardShowNum: 4,

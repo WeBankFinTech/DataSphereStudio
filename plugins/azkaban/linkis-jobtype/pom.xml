@@ -26,7 +26,7 @@
     </parent>
     <artifactId>linkis-jobtype</artifactId>
     <properties>
-        <azkaban.version>0.6.0</azkaban.version>
+        <azkaban.version>0.6.1</azkaban.version>
     </properties>
 
     <dependencies>

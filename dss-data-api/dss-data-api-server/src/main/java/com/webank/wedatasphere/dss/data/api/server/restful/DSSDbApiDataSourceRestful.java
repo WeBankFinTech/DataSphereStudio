@@ -10,10 +10,13 @@ import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -30,7 +33,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DSSDbApiDataSourceRestful {
-    private DataSourceMapper dataSourceMapper;
+
     @Resource
     private ApiDataSourceService dssDbApiDataSourceService;
     private static final Logger logger = LoggerFactory.getLogger(DSSDbApiDataSourceRestful.class);
@@ -65,6 +68,16 @@ public class DSSDbApiDataSourceRestful {
         List<HashMap> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSource.getType(), tableName);
         return Message.ok().data("allCols", columns);
     }
+
+    @POST
+    @Path("/add")
+    public Message addDatasource(@RequestBody DataSource dataSource){
+
+
+        dssDbApiDataSourceService.addDatasource(dataSource);
+        return Message.ok("保存成功");
+    }
+
 
 
 }

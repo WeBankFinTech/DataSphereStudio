@@ -1159,7 +1159,10 @@ export default {
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
-        console.log('运维大屏')
+        this.activeDS = 0
+        this.$nextTick(() => {
+          this.activeDS = 4
+        })
       } else if (this.activeDS === 5) {
         if (data) {
           if (data.startDate && data.endDate) {

@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.data.api.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.webank.wedatasphere.dss.framework.dbapi.dao.DataSourceMapper;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
-import com.webank.wedatasphere.dss.framework.dbapi.service.ApiDataSourceService;
-import com.webank.wedatasphere.dss.framework.dbapi.util.JdbcUtil;
+import com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper;
+import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
+import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
+import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

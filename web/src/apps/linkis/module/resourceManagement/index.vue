@@ -57,6 +57,10 @@
         <template slot-scope="{row}" slot="startTime">
           <span>{{ timeFormat(row) }}</span>
         </template>
+        <template slot-scope="{row}" slot="action">
+          <Button @click="stopEngine(row)" :disabled="row.isStop" :loading="row.isStop" type="error" size="small" style="margin-right:5px;">{{$t('message.linkis.stop')}}</Button>
+          <Button @click="editEngine(row)" type="primary" size="small">{{$t('message.linkis.tagEdit')}}</Button>
+        </template>
       </Table>
       <div class="page-bar">
         <Page
@@ -228,70 +232,7 @@ export default {
           width: '215',
           fixed: 'right',
           align: 'center',
-          render: (h, params) => {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'error',
-                  size: 'small',
-                  disabled: params.row.isStop,
-                  loading: params.row.isStop
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  click: () => {
-                    this.$Modal.confirm({
-                      title: this.$t('message.linkis.stop'),
-                      content: '请问确认要停止当前引擎？',
-                      onOk: () => {
-                        let data = [];
-                        data.push({
-                          engineType: 'EngineConn', // 当期需求是写死此参数
-                          engineInstance: params.row.instance,
-                        });
-                        params.row.isStop = true;
-                        api.fetch(`/linkisManager/rm/enginekill`, data).then(() => {
-                          // 由于引擎关闭有延迟所以记录引擎，做前端列表筛选，刷新页面或刷新
-                          params.row.isStop = false;
-                          this.stopList.push(params.row.instance);
-                          this.initExpandList();
-                          this.$Message.success({
-                            background: true,
-                            content: 'Stop Success！！'
-                          });
-                        }).catch((err) => {
-                          console.err(err)
-                        });
-                      }
-                    })
-                  }
-                }
-              }, this.$t('message.linkis.stop')),
-              h('Button', {
-                props: {
-                  type: 'primary',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    return this.$Message.success({
-                      background: true,
-                      content: '暂未开放！！'
-                    });
-                    // 待开启
-                    // this.isTagEdit = true;
-                    // let obj = {};
-                    // obj.engineInstance = params.row.engineInstance;
-                    // obj.label = params.row.label;
-                    // obj.status = params.row.status;
-                    // this.formItem = Object.assign(this.formItem, obj)
-                  }
-                }
-              }, this.$t('message.linkis.tagEdit'))
-            ]);
-          }
+          slot: 'action'
         }
       ],
     }
@@ -310,6 +251,63 @@ export default {
     this.initExpandList();
   },
   methods: {
+    stopEngine(row) {
+      this.$Modal.confirm({
+        title: this.$t('message.linkis.stop'),
+        content: '请问确认要停止当前引擎？',
+        onOk: () => {
+          this.tableData = this.tableData.map(i => {
+            if (i.instance == row.instance) {
+              return {
+                ...i,
+                isStop: true
+              }
+            } else {
+              return i;
+            }
+          })
+          let data = [];
+          data.push({
+            engineType: 'EngineConn', // 当期需求是写死此参数
+            engineInstance: row.instance,
+          });
+          api.fetch(`/linkisManager/rm/enginekill`, data).then(() => {
+            // 由于引擎关闭有延迟所以记录引擎，做前端列表筛选，刷新页面或刷新
+            this.tableData = this.tableData.map(i => {
+              if (i.instance == row.instance) {
+                return {
+                  ...i,
+                  isStop: false
+                }
+              } else {
+                return i;
+              }
+            })
+            this.stopList.push(row.instance);
+            this.initExpandList();
+            this.$Message.success({
+              background: true,
+              content: 'Stop Success！！'
+            });
+          }).catch((err) => {
+            console.err(err)
+          });
+        }
+      })
+    },
+    editEngine(row) {
+      return this.$Message.success({
+        background: true,
+        content: '暂未开放！！'
+      });
+      // 待开启
+      // this.isTagEdit = true;
+      // let obj = {};
+      // obj.engineInstance = params.row.engineInstance;
+      // obj.label = params.row.label;
+      // obj.status = params.row.status;
+      // this.formItem = Object.assign(this.formItem, obj)
+    },
     // 刷新进度条
     refreshResource() {
       this.stopList = []; // 初始化停止列表，由于引擎关闭有延迟固设置此参数做判断

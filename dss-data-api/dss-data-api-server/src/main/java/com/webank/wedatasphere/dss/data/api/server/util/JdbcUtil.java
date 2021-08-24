@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.data.api.server.util;
 
 import com.alibaba.druid.util.JdbcConstants;
-import com.webank.wedatasphere.dss.framework.dbapi.entity.DataSource;
+import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;

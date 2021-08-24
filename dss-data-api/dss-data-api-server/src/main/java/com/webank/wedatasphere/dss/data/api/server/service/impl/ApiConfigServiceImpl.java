@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.data.api.server.service.impl;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
+import com.alibaba.druid.sql.PagerUtils;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.data.api.server.dao.ApiAuthMapper;
@@ -89,7 +91,19 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         List<Object > jdbcParamValues = new ArrayList<>();
-        String sqlText = null;
+        int pageSize = apiConfig.getPageSize();
+        String limitSent = "";
+        String sqlText = "";
+
+        //组装分页limit
+        if(pageSize > 0 ){
+            Object pageNumObject = map.get("pageNum");
+            if(pageNumObject == null){
+                throw new DataApiException("请设置pageNum参数");
+            }
+            int pageNum = (Integer)pageNumObject;
+            limitSent = "limit "+ ((pageNum-1) * pageSize)+","+pageSize;
+        }
         if (apiConfig != null) {
             Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig,map);
             String sqlFiled = apiConfig.getSql();
@@ -100,8 +114,12 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             }else {
                 sqlText = sqlFiled;
             }
+            //不分页最多返回500条数据
+            if(pageSize <= 0) {
+                sqlText = String.format("%s %s",sqlText,"limit 500");
+            }
 
-            sqlText = String.format("%s %s",sqlText,"limit 500");
+
             DataSource dataSource = new DataSource();
 //            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
             dataSource.setUrl("jdbc:mysql://172.24.2.61:3306/dss_test?characterEncoding=UTF-8");
@@ -110,7 +128,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             dataSource.setUsername("root");
             dataSource.setPwd("123456");
             dataSource.setDatasourceId(1);
-            apiExecuteInfo = this.executeSql(1, dataSource, sqlText, jdbcParamValues);
+            apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
 
         }else {
             apiExecuteInfo.setLog("该服务不存在,请检查服务url是否正确");
@@ -133,7 +151,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         String appKey = request.getHeader("appKey");
         String appSecret = request.getHeader("appSecret");
         if(StringUtils.isAnyBlank(appKey,appSecret)){
-            throw new DataApiException("请求头需添加appkey,appSecret");
+            throw new DataApiException("请求header需添加appKey,appSecret");
         }
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if(apiConfig != null){
@@ -257,19 +275,18 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
 
-    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql, List<Object> jdbcParamValues) throws DataApiException, SQLException {
+    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql,String pageSent, List<Object> jdbcParamValues,int pageSize) throws DataApiException, SQLException {
         DruidPooledConnection connection = null;
         StringBuilder logBuilder = new StringBuilder();
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ArrayList<HashMap<String,Object>> list = new ArrayList<>();
         try {
             connection = PoolManager.getPooledConnection(datasource);
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(sql+pageSent);
             //参数注入
             for (int i = 1; i <= jdbcParamValues.size(); i++) {
                 statement.setObject(i, jdbcParamValues.get(i - 1));
             }
-            log.info("statement"+statement);
             logBuilder.append("sql:"+statement +"\n");
             if (isSelect == 1) {
                 ResultSet rs = statement.executeQuery();
@@ -279,15 +296,31 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     String columnName = rs.getMetaData().getColumnLabel(i);
                     columns.add(columnName);
                 }
-
+                HashMap<String,Object> jo = new HashMap<>();
                 while (rs.next()) {
-                    HashMap<String,Object> jo = new HashMap<>();
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
                         jo.put(columnName,value.toString() );
                     }
                     list.add(jo);
                 }
+
+                //分页,计算总page
+                if(pageSize > 0){
+                    String countSql = PagerUtils.count(sql, DbType.MYSQL.getDb());
+                    PreparedStatement countStatement = connection.prepareStatement(countSql);
+                    //参数注入
+                    for (int i = 1; i <= jdbcParamValues.size(); i++) {
+                        countStatement.setObject(i, jdbcParamValues.get(i-1));
+                    }
+                    ResultSet  countRs = countStatement.executeQuery();
+                    if ((countRs.next())){
+                        int totalRecord = countRs.getInt(0);
+                        int totalPage = (totalRecord + pageSize-1) / pageSize;
+                        jo.put("totalPage",totalPage);
+                    }
+                }
+
             } else {
                 statement.executeUpdate();
             }

@@ -57,6 +57,7 @@ public class ApiConfig {
     private String datasourceType;
     @TableField(exist = false)
     private String resType;
+    private Integer pageSize;
 }
 
 

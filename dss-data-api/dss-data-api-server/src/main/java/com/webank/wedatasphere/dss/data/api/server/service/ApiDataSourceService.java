@@ -12,7 +12,6 @@ public interface ApiDataSourceService extends IService<DataSource> {
     List<DataSource> getAllConnections(Integer workspaceId, String type);
 
 
-    List<String> getAvailableConnNames(List<DataSource> allConnections);
 
     List<DataSource> getAvailableConns(List<DataSource> allConnections);
 

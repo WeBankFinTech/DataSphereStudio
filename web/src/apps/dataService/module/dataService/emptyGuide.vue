@@ -2,13 +2,13 @@
   <div>
     <div class="title">数据服务操作步骤</div>
     <div class="stepWrap">
-      <div class="stepLeft">
+      <div>
         <div v-for="(value, index) in steps" :key="index" class="leftWrap">
           <div class="stepNumber">{{ index + 1 }}</div>
           <div :class="{'line': true, 'lineNone': index === 4}"></div>
         </div>
       </div>
-      <div class="stepRight">
+      <div>
         <div v-for="(value, index) in steps" :key="index" class="rightWrap">
           {{ value }}
         </div>

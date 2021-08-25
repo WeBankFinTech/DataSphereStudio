@@ -114,8 +114,10 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceHomePage`, {
         micro_module: currentModules.microModule || 'dss'
       }, 'get').then((res) => {
+        storage.set('noWorkSpace', false, 'local')
         return res.workspaceHomePage.homePageUrl;
       }).catch(() => {
+        storage.set('noWorkSpace', true, 'local')
         return '/'
       });
     },
@@ -127,7 +129,11 @@ export default {
     },
     getIfLogin() {
       GetBaseInfo(false).then(() => {
-        this.$router.push('/');
+        // 不应该直接到首页，应该获取当前用户的调转首页的路径
+        this.getPageHomeUrl().then((res) => {
+          this.$router.replace({path: res});
+          this.$Message.success(this.$t('message.common.login.loginSuccess'));
+        })
       }).catch(() => {
         this.clearSession();
       });
@@ -182,7 +188,7 @@ export default {
                 })
                 // 登录之后需要获取当前用户的调转首页的路径
                 this.getPageHomeUrl().then((res) => {
-                  this.$router.push({path: res});
+                  this.$router.replace({path: res});
                   this.$Message.success(this.$t('message.common.login.loginSuccess'));
                 })
                 // // 获取代理用户列表并选择代理用户
@@ -199,7 +205,7 @@ export default {
                 //     })
                 //     // 登录之后需要获取当前用户的调转首页的路径
                 //     this.getPageHomeUrl().then((res) => {
-                //       this.$router.push({path: res});
+                //       this.$router.replace({path: res});
                 //       this.$Message.success(this.$t('message.common.login.loginSuccess'));
                 //     })
                 //   }
@@ -212,7 +218,7 @@ export default {
               }
               if (err.message.indexOf('已经登录，请先退出再进行登录') !== -1) {
                 this.getPageHomeUrl().then((res) => {
-                  this.$router.push({path: res});
+                  this.$router.replace({path: res});
                 })
               }
               this.loading = false;
@@ -263,7 +269,7 @@ export default {
           })
           // 登录之后需要获取当前用户的调转首页的路径
           this.getPageHomeUrl().then((urlRes) => {
-            this.$router.push({ path: urlRes })
+            this.$router.replace({ path: urlRes })
             this.$Message.success(this.$t('message.common.login.loginSuccess'))
           })
         } else {

@@ -50,7 +50,6 @@ import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.ibatis.annotations.Param;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,7 +252,7 @@ public class ApiServiceImpl implements ApiService {
                     apiService.setCreator(maxTargetApiVersionVo.getCreator());
                     apiService.setId(maxTargetApiVersionVo.getApiId());
                     apiServiceDao.updateToTarget(apiService);
-                    Log.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
+                    LOG.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
 
 
                     String version = updateResult.get("version");

@@ -22,6 +22,17 @@ export default [
       import('./view/workflow/index.vue'),
   },
   {
+    path: 'scheduler',
+    name: 'Scheduler',
+    meta: {
+      title: 'My Scheduler',
+      publicPage: true,
+      parent: 'Project',
+    },
+    component: () =>
+      import('./view/workflow/index.vue'),
+  },
+  {
     path: 'process',
     name: 'Process',
     meta: {

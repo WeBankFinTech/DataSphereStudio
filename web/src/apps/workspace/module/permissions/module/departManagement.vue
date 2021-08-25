@@ -379,6 +379,10 @@ export default {
           this.loading = false;
           const depts = (data && data.deptList) || [];
           if (isQuery && query) {
+            if(depts.length == 0){
+              this.departmentList = [];
+              return;
+            }
             const originList = _.cloneDeep(this.departmentListOrigin);
             const temp = expandAll(originList);
             depts.forEach(item => {

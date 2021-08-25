@@ -45,11 +45,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * api service
- *
- * @author zhulixin
- */
+
 @Path("/dss/apiservice")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

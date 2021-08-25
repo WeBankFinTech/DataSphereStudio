@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-/**
- * @author: jinyangrao
- */
+
 public enum SaveTokenEnum {
     SUCCESS(1, "success"), FAILED(2, "failed"), DUPLICATE(3, "duplicate");
 

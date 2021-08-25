@@ -117,7 +117,9 @@ export default {
         storage.set('noWorkSpace', false, 'local')
         return res.workspaceHomePage.homePageUrl;
       }).catch(() => {
-        storage.set('noWorkSpace', true, 'local')
+        storage.set('noWorkSpace', true, 'local');
+        storage.clear();
+        storage.clear('cookie');
         return '/'
       });
     },

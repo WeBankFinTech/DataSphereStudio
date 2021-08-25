@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.exception;
 
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/14 04:22 PM
- */
+
 public class ApiServiceTokenException extends ErrorException {
 
         public ApiServiceTokenException(int errCode, String desc) {

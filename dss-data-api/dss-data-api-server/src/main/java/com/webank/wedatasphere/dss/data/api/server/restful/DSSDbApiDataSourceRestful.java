@@ -42,8 +42,8 @@ public class DSSDbApiDataSourceRestful {
     @Path("/connections")
     public Message connect(@QueryParam("workspaceId") Integer workspaceId, @QueryParam("type") String type) {
 
-
-        List<DataSource> availableConnections = dssDbApiDataSourceService.getAvailableConns(dssDbApiDataSourceService.getAllConnections(workspaceId, type));
+        List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(workspaceId, type);
+        List<DataSource> availableConnections = dssDbApiDataSourceService.getAvailableConns(allConnections);
         return Message.ok().data("availableConns", availableConnections);
 
     }
@@ -73,7 +73,7 @@ public class DSSDbApiDataSourceRestful {
     @Path("/add")
     public Message addDatasource(@RequestBody DataSource dataSource){
 
-
+        dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
         dssDbApiDataSourceService.addDatasource(dataSource);
         return Message.ok("保存成功");
     }

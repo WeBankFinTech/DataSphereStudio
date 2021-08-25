@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.data.api.server.util;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
+import com.webank.wedatasphere.dss.data.api.server.restful.CryptoUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
@@ -69,9 +70,9 @@ public class PoolManager {
     }
 
     public static DruidPooledConnection getPooledConnection(DataSource ds) throws SQLException {
+        ds.setPwd(CryptoUtils.string2Object(ds.getPwd()).toString());
         DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
         DruidPooledConnection connection = pool.getConnection();
-//        log.info("获取连接成功");
         return connection;
     }
 }

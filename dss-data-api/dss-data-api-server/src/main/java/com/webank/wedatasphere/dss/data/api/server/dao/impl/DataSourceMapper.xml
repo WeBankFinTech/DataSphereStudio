@@ -48,23 +48,27 @@
     </select>
 
     <insert id="addDatasource" parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource">
-        insert into dss_dataapi_datasource(
-        <if test="workspace_id and != null  and workspace_id != 0">workspace_id</if>
-        <if test="name and != null and name != ''">name</if>
-        <if test="note and != null and note != ''">note</if>
-        <if test="type and != null and type != ''">type</if>
-        <if test="url and != null and url != ''">url</if>
-        <if test="username and != null and username != ''">username</if>
-        <if test="pwd and != null and pwd != ''">pwd</if>
-        <if test="create_by and != null and create_by != ''">create_by</if>
-         )values( <if test="workspace_id and != null  and workspace_id != 0">#{workspace_id}</if>
-        <if test="name and != null and name != ''">#{name}</if>
-        <if test="note and != null and note != ''">#{note}</if>
-        <if test="type and != null and type != ''">#{type}</if>
-        <if test="url and != null and url != ''">#{url}</if>
-        <if test="username and != null and username != ''">#{username}</if>
-        <if test="pwd and != null and pwd != ''">#{pwd}</if>
-        <if test="create_by and != null and create_by != ''">#{create_by}</if>)
+      insert into dss_dataapi_datasource(
+        <if test="workspaceId  != null and workspaceId != ''">workspace_id,</if>
+        <if test="name  != null and name != ''">name,</if>
+        <if test="note  != null and note != ''">note,</if>
+        <if test="type  != null and type != ''">type,</if>
+        <if test="url  != null and url != ''">url,</if>
+        <if test="username  != null and username != ''">username,</if>
+        <if test="pwd  != null and pwd != ''">pwd,</if>
+        <if test="createBy  != null and createBy != ''">create_by,</if>
+        create_time
+         )values(
+        <if test="workspaceId != null and name != ''">#{workspaceId},</if>
+        <if test="name != null and name != ''">#{name},</if>
+        <if test="note != null and note != ''">#{note},</if>
+        <if test="type != null and type != ''">#{type},</if>
+        <if test="url != null and url != ''">#{url},</if>
+        <if test="username != null and username != ''">#{username},</if>
+        <if test="pwd != null and pwd != ''">#{pwd},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+         sysdate()
+         )
     </insert>
 
 </mapper>

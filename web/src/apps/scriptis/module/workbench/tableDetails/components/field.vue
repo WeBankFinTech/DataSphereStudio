@@ -36,15 +36,6 @@ export default {
         { title: this.$t('message.scripts.tableDetails.ZDGZ'), key: 'rule', className: 'field-table-rule' },
         { title: this.$t('message.scripts.tableDetails.MS'), key: 'comment', className: 'field-table-comment' },
       ],
-
-      // column = [
-      //   { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
-      //   { title: this.$t('message.workspaceManagemnet.role'), slot: "role", align: "center",width: 250 },
-      //   { title: this.$t('message.workspaceManagemnet.department'), slot: "department", align: "center" },
-      //   { title: this.$t('message.workspaceManagemnet.creator'), key: "creator", align: "center" },
-      //   { title: this.$t('message.workspaceManagemnet.joinTime'), key: "joinTime", align: "center" },
-      //   { title: this.$t('message.workspaceManagemnet.action'), slot: "action", width: 150, align: "center" }
-      // ]
     };
   },
   computed: {

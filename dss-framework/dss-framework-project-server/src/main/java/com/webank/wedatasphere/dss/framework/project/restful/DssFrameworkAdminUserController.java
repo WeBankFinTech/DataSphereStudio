@@ -11,6 +11,7 @@ import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.restful.BaseController;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.service.LdapService;
 import com.webank.wedatasphere.dss.framework.project.utils.LdapUtils;
@@ -57,6 +58,9 @@ public class DssFrameworkAdminUserController extends BaseController {
     private DssAdminUserService dssAdminUserService;
     @Autowired
     private LdapService ldapService;
+    @Autowired
+
+    DssUserMapper dssUserMapper;
 
     //    @GetMapping("/list")
     @GET
@@ -142,7 +146,8 @@ public class DssFrameworkAdminUserController extends BaseController {
                 return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
             }
             user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-            ldapService.addUser(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName(), user.getPassword());
+            DssAdminUser dssAdminUser = dssUserMapper.selectUserById(user.getId());
+            ldapService.update(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), dssAdminUser.getUserName(), user.getPassword());
             return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
 
         } catch (Exception exception) {

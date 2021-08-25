@@ -17,11 +17,7 @@ package com.webank.wedatasphere.dss.apiservice.core.bo;
 
 import java.util.Map;
 
-/**
- * 接口调用request
- *
- * @author lidongzhang
- */
+
 public class QueryRequest {
     /**
      * 模块名，也是登录用户名、密码

@@ -18,10 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.dao;
 
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiAccessVo;
 
-/**
- * @author allenlliu
- * @date 2020/11/11 10:25
- */
+
 public interface ApiServiceAccessDao {
     void addAccessRecord(ApiAccessVo apiAccessVo);
 

@@ -17,11 +17,7 @@
 package com.webank.wedatasphere.dss.apiservice.core.bo;
 
 
-/**
- * query
- *
- * @author zhulixin
- */
+
 public class ApiServiceQuery {
 
     /**

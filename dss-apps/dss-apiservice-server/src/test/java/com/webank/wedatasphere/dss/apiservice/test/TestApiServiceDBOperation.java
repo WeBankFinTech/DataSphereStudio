@@ -48,10 +48,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-/**
- * @author allenlliu
- * @date 2020/10/19 03:29 PM
- */
+
 
 @RunWith(SpringJUnit4ClassRunner.class)
 //@MapperScan(annotationClass = Repository.class, basePackages = "com.webank.wedatasphere.dss.apiservice.dao" )
@@ -132,25 +129,7 @@ public class TestApiServiceDBOperation {
 
     }
 
-//
-//    @DisplayName("DataMap单库表解析验证")
-//    @Test
-//    public void testDataMapApprovalTableParse() {
-//        System.out.println("DataMap单库表解析验证");
-//        ApprovalVo approvalVo = new ApprovalVo();
-//        approvalVo.setApiId(1L);
-//        ApiServiceVo apiServiceVo = new ApiServiceVo();
-//        apiServiceVo.setApprovalVo(approvalVo);
-//        ApiVersionVo apiVersionVo = new ApiVersionVo();
-//        String metaDtaInfo = "[default1.a1,default2.b]";
-//        List<DataMapApplyContentData> dataMapApplyContentDataList = apiService.genDataMapApplyContentDatas(apiServiceVo, apiVersionVo, metaDtaInfo);
-//        Assertions.assertAll("tableNames",
-//                () -> Assertions.assertEquals(dataMapApplyContentDataList.get(0).getDbName(), "default1"),
-//                () -> Assertions.assertEquals(dataMapApplyContentDataList.get(1).getTableName(), "b")
-//
-//        );
-//
-//    }
+
 
     @DisplayName("数据服务访问记录验证")
     @Test
@@ -173,26 +152,6 @@ public class TestApiServiceDBOperation {
                 () -> Assertions.assertEquals(targetAccessVo.getApiPublisher(), "testUser")
 
         );
-
-    }
-
-    @DisplayName("Token 解析验证")
-    @Test
-    public void testTokenParse() {
-        System.out.println("Token解析验证");
-        final String applyUser = "allenlliu";
-        ApiServiceToken apiServiceToken = new ApiServiceToken();
-        apiServiceToken.setPublisher("allenlliu");
-        apiServiceToken.setApiServiceId(150L);
-        apiServiceToken.setApplyUser("testUser1");
-        apiServiceToken.setApplyTime(new Date());
-        Long duration = 365L;
-        String token = JwtManager.createToken(applyUser, apiServiceToken, duration);
-
-        ApiServiceToken parseToken = JwtManager.parseToken(token);
-
-        Assertions.assertEquals(parseToken.getApiServiceId(), 150L);
-        Assertions.assertEquals(parseToken.getApplyUser(), "testUser1");
 
     }
 }

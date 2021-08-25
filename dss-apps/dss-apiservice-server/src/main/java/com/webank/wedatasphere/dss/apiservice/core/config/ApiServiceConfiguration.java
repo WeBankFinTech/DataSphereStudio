@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.config;
 
 import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/12 03:46 PM
- */
+
 public class ApiServiceConfiguration {
     public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.api.service.author.user.token","***REMOVED***");
     public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.linkis.client.api.service.adminuser","ws");

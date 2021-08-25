@@ -16,11 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.bo;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/13 11:39 AM
- */
+
 public class LinkisExecuteResult {
 
     public LinkisExecuteResult(String taskId,String execId){

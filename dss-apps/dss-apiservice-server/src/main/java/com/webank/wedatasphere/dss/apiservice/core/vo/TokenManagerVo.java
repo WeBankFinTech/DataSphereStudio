@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.vo;
 
 import java.util.Date;
 
-/**
- * @author jinyangrao
- */
+
 public class TokenManagerVo {
     private Long id;
     private Long apiId;

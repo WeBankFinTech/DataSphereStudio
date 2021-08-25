@@ -14,22 +14,18 @@
  *
  */
 
-package com.webank.wedatasphere.dss.apiservice.core.service;
+package com.webank.wedatasphere.dss.apiservice.core.util;
 
-import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
+import java.util.UUID;
 
-/**
- * @author: jinyangrao
- */
-public interface ApprovalService {
+
+public class UUIDGenerator {
 
     /**
-     * 根据审批单号，查询对应数据
+     * 生成唯一标识uuid
      * */
-    ApprovalVo query(String approvalNo);
-
-    /**
-     * 查询DataMap，依据DataMap审批结果更新审批单状态
-     * */
-    ApprovalVo refreshStatus(String approvalNo) throws Exception;
+    public static String genUUID() {
+        String uuid = UUID.randomUUID().toString();
+        return uuid;
+    }
 }

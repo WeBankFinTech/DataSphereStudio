@@ -24,11 +24,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * DatasourceConfiguration
- *
- * @author lidongzhang
- */
+
 @Configuration
 public class DatasourceService {
     private static final Map<String, NamedParameterJdbcTemplate> CLIENT_MAP = new HashMap<>();

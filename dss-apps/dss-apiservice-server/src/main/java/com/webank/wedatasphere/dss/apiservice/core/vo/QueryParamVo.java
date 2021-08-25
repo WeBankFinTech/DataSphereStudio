@@ -15,9 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.vo;
 
-/**
- * @author chongchuanbing
- */
+
 public class QueryParamVo extends ParamVo {
     
     private String typeStr;

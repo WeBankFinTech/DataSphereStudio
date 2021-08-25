@@ -73,6 +73,7 @@ export default {
       guide: this.getGuideConfig(),
       selectedImg: '',
       modalImg: false,
+      tabModMap: {}
     };
   },
   watch: {
@@ -83,9 +84,12 @@ export default {
   created() {
     // 开发中心和运维中心使用同一个route，所以使用eventbus来监听变化，从而触发产品即文档的更新
     eventbus.on('workflow.change', this.onWorkflowChange);
+    // 工作流编辑-调度中心切换
+    eventbus.on('workflow.orchestratorId', this.onWorkflowSchedulerChange);
   },
   beforeDestroy() {
     eventbus.off('workflow.change', this.onWorkflowChange);
+    eventbus.off('workflow.orchestratorId', this.onWorkflowSchedulerChange);
   },
   methods: {
     onWorkflowChange(mod) {
@@ -93,6 +97,17 @@ export default {
         this.guide = this.getGuideConfig('/workflow/scheduler')
       } else if (mod == 'dev') {
         this.guide = this.getGuideConfig();
+      }
+    },
+    onWorkflowSchedulerChange(data) {
+      if (data.mod == 'scheduler') {
+        this.guide = this.getGuideConfig('/workflow/scheduler')
+        this.tabModMap[data.orchestratorId] = data.mod;
+      } else if (data.mod == 'dev') {
+        this.guide = this.getGuideConfig();
+        this.tabModMap[data.orchestratorId] = data.mod;
+      } else if (data.mod == 'auto') {
+        this.onWorkflowChange(this.tabModMap[data.orchestratorId] || 'dev'); // 默认dev
       }
     },
     getGuideConfig(key) {

@@ -57,7 +57,10 @@ public class DssFrameworkAdminDeptController {
 
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dssAdminDept))) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，部门名称已存在");
-        }else if (dssAdminDeptService.checkDeptFinalStage(dssAdminDept.getParentId())) {
+        }else if (dssAdminDept.getDeptName().contains(UserConstants.SINGLE_SPACE)) {
+            return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'部门名称中不能含有空格");
+        }
+        else if (dssAdminDeptService.checkDeptFinalStage(dssAdminDept.getParentId())) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，该部门是末级部门,不能新增下级部门");
         }
 
@@ -95,7 +98,9 @@ public class DssFrameworkAdminDeptController {
     public Message edit(@Validated @RequestBody DssAdminDept dept) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dept))) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (dept.getParentId().equals(dept.getId())) {
+        } else if (dept.getDeptName().contains(UserConstants.SINGLE_SPACE)) {
+            return Message.error().message("修改部门'" + dept.getDeptName() + "'部门名称中不能含有空格");
+        }else if (dept.getParentId().equals(dept.getId())) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
                 && dssAdminDeptService.selectNormalChildrenDeptById(dept.getId()) > 0) {

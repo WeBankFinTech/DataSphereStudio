@@ -228,12 +228,12 @@ export default {
       priorityList: [
         {
           code: 'HIGHEST',
-          unicode: 'high:highest',
+          unicode: 'highest',
           color: '#ff0000'
         },
         {
           code: 'HIGH',
-          unicode: 'high:highest',
+          unicode: 'highest',
           color: '#ff0000'
         },
         {
@@ -243,12 +243,12 @@ export default {
         },
         {
           code: 'LOW',
-          unicode: 'low:lowest',
+          unicode: 'lowest',
           color: '#2A8734'
         },
         {
           code: 'LOWEST',
-          unicode: 'low:lowest',
+          unicode: 'lowest',
           color: '#2A8734'
         }
       ]

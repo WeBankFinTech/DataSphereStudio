@@ -73,6 +73,7 @@
             "enterDesc": "请输入描述",
             "descLength": "描述长度不能大于",
             "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
+            "nameRepeat": "名称不能重复",
             "project": "工程",
             "feedback": "反馈",
             "GL": "概览",

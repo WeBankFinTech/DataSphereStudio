@@ -89,7 +89,9 @@ public class DssFrameworkAdminUserController extends BaseController {
 
             if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-            } else if (StringUtils.isNotEmpty(user.getPhonenumber())
+            } else if (user.getUserName().contains(UserConstants.SINGLE_SPACE)) {
+                return Message.error().message("新增用户'" + user.getUserName() + "'用户名中不能含有空格");
+            }    else if (StringUtils.isNotEmpty(user.getPhonenumber())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
             } else if (StringUtils.isNotEmpty(user.getEmail())

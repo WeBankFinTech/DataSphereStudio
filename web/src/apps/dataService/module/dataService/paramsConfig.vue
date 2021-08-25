@@ -110,6 +110,12 @@
               rows="10"
             />
           </div>
+          <div style="margin-top: 10px;" class="sqlPageWrap">
+            <Checkbox v-model="sqlPage">返回结果分页</Checkbox>
+            <div class="sqlPageTip">
+              当返回结果记录数大于500时请选择分页，不分页则最多返回500条记录。当无请求参数时，必须开启返回结果分页。
+            </div>
+          </div>
         </div>
         <div
           class="cardWrap cardTableWrap"
@@ -133,7 +139,6 @@
                 <Select
                   :value="row.compare"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeParamCompare(value, index)"
                   v-if="row.setRequest"
                 >
@@ -169,7 +174,6 @@
                 <Select
                   :value="row.type"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeSort(value, row)"
                 >
                   <Option value="asc">升序</Option>
@@ -215,7 +219,6 @@
                 <Select
                   :value="row.type"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeSqlParams(value, index, column)"
                 >
                   <Option
@@ -350,6 +353,7 @@ export default {
       setRequest: false,
       setResponse: false,
       hideParamTable: false,
+      sqlPage: true,
       paramsColumns: [
         {
           title: "设为请求参数",
@@ -1003,6 +1007,16 @@ export default {
     }
     .cardTableWrap {
       border-bottom-width: 0;
+    }
+    .sqlPageWrap {
+      margin-top: 10px;
+      display: flex;
+      .sqlPageTip {
+        font-family: PingFangSC-Regular;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-left: 10px;
+      }
     }
   }
 }

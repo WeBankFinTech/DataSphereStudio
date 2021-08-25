@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.data.api.server.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
-import com.webank.wedatasphere.dss.data.api.server.restful.CryptoUtils;
+import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import org.springframework.stereotype.Service;

@@ -26,9 +26,7 @@ import org.slf4j.LoggerFactory;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 
-/**
- *
- */
+
 public class ApiUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiUtils.class);

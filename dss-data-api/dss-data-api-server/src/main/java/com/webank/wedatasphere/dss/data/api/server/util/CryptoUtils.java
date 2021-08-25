@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.data.api.server.restful;
+package com.webank.wedatasphere.dss.data.api.server.util;
 
 
 import java.io.ByteArrayInputStream;

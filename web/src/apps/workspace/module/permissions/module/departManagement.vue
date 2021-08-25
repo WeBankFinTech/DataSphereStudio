@@ -542,9 +542,15 @@ export default {
           const keys = ["parentId", "deptName", "leader", "phone", "email"];
           const executeMethod = isAdd ? AddNewDepartment : ModifyDepartment;
           const params = {};
-          keys.forEach(key => (params[key] = this.departForm[key]));
+          keys.forEach(key => {
+            params[key] =
+              key !== "parentId" && this.departForm[key]
+                ? this.departForm[key].trim()
+                : this.departForm[key];
+          });
           if (!isAdd) {
             params.id = this.editingData.id;
+            params.parentId = params.parentId ? params.parentId : 0;
           }
           this.confirmLoading = true;
           executeMethod(params)

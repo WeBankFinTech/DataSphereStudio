@@ -692,6 +692,7 @@ export default {
             const params = isAdd
               ? { ...this.userForm, userName, password }
               : { ...rest, id: this.editingData.id };
+            params.userName = params.userName.trim();
             this.confirmLoading = true;
             executeMethod(params)
               .then(data => {

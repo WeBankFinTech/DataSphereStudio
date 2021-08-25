@@ -147,9 +147,9 @@ public class DssFrameworkAdminUserController extends BaseController {
             if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(), user))) {
                 return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
             }
-            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
             DssAdminUser dssAdminUser = dssUserMapper.selectUserById(user.getId());
             ldapService.update(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), dssAdminUser.getUserName(), user.getPassword());
+            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
             return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
 
         } catch (Exception exception) {

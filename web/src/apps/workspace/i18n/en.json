@@ -238,6 +238,7 @@
       "updateUserSucess": "Update user success!",
       "updateUserFailed": "Update user failed!",
       "nameEmpty": "The name cannot be empty",
+      "nameTooLong": "The name is too long and cannot exceed 50 characters",
       "userNameEmpty": "The userName cannot be empty",
       "userNameTooLong": "The user name is too long and cannot exceed 50 characters",
       "passwordEmpty": "The password cannot be empty",

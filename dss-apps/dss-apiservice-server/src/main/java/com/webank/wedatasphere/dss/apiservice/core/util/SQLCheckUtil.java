@@ -19,9 +19,7 @@ package com.webank.wedatasphere.dss.apiservice.core.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author: jinyangrao
- */
+
 public class SQLCheckUtil {
 
     // sql 注入检查

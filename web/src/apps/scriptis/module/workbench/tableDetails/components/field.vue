@@ -1,49 +1,20 @@
 <template>
   <div class="field-list">
-    <Input
-      v-model="searchText"
-      :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
-    <Icon
-      slot="prefix"
-      type="ios-search"/>
-    </Input>
-    <div class="field-list-header">
-      <div class="field-list-item field-list-index">序号</div>
-      <div
-        class="field-list-item"
-        v-for="(item, index) in tableColumns"
-        :key="index"
-        :class="item.className">{{ item.title }}</div>
+    <div style="margin-bottom: 10px;">
+      <Input
+        v-model="searchText"
+        :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
+      <Icon
+        slot="prefix"
+        type="ios-search"/>
+      </Input>
     </div>
-    <virtual-list
-      ref="columnTables"
-      :size="46"
-      :remain="searchColList.length > maxSize ? maxSize : searchColList.length"
-      wtag="ul"
-      class="field-list">
-      <li
-        v-for="(item, index) in searchColList"
-        :key="index"
-        class="field-list-body"
-        :style="{'border-bottom': index === searchColList.length - 1 ? '1px solid #dcdee2' : 'none'}">
-        <div class="field-list-item field-list-index">{{ index + 1 }}</div>
-        <div
-          class="field-list-item"
-          :title="formatValue(item, field)"
-          v-for="(field, index2) in tableColumns"
-          :key="index2"
-          :class="field.className">{{ formatValue(item, field) }}</div>
-      </li>
-    </virtual-list>
+    <Table border :columns="tableColumns" :data="searchColList"></Table>
   </div>
 </template>
 <script>
 import utils from '../utils.js';
-import virtualList from '@/components/virtualList';
 export default {
-  components: {
-    virtualList,
-  },
   props: {
     table: {
       type: Array,
@@ -65,6 +36,15 @@ export default {
         { title: this.$t('message.scripts.tableDetails.ZDGZ'), key: 'rule', className: 'field-table-rule' },
         { title: this.$t('message.scripts.tableDetails.MS'), key: 'comment', className: 'field-table-comment' },
       ],
+
+      // column = [
+      //   { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
+      //   { title: this.$t('message.workspaceManagemnet.role'), slot: "role", align: "center",width: 250 },
+      //   { title: this.$t('message.workspaceManagemnet.department'), slot: "department", align: "center" },
+      //   { title: this.$t('message.workspaceManagemnet.creator'), key: "creator", align: "center" },
+      //   { title: this.$t('message.workspaceManagemnet.joinTime'), key: "joinTime", align: "center" },
+      //   { title: this.$t('message.workspaceManagemnet.action'), slot: "action", width: 150, align: "center" }
+      // ]
     };
   },
   computed: {

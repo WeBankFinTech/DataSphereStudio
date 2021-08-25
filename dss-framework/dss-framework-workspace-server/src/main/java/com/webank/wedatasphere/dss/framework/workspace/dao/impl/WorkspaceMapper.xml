@@ -228,14 +228,14 @@
 
     <select id="getDepartName" resultType="java.lang.String">
     SELECT
-       concat_ws('-',
+       CONCAT_WS('-',
 	   t1.dept_name,
 	   t2.dept_name,
 	   t3.dept_name )
    FROM
 	( SELECT dept_name, parent_id FROM dss_admin_dept WHERE id = #{id} ) t3
-	JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
-	JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
+	LEFT JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
+	LEFT JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
     </select>
 
 
@@ -257,7 +257,7 @@
 		( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
 		JOIN dss_user t2 ON t2.username = t1.username
 		JOIN dss_admin_dept t3 ON t3.id = t2.dept_id
-		JOIN dss_admin_dept t4 ON t4.id = t3.parent_id
+		left JOIN dss_admin_dept t4 ON t4.id = t3.parent_id
 
 	join dss_workspace_user_role t5
 	on t5.username = t1.username and t5.workspace_id=t1.workspace_id

@@ -15,11 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.vo;
 
-/**
- * MessageVo
- *
- * @author lidongzhang
- */
+
 public class MessageVo {
     private Integer status = 0;
 

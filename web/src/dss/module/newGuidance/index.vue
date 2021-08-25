@@ -43,11 +43,11 @@
           <div class="dashed block5"></div>
         </div>
         <div class="item2">
-          <img class="img1" src="~@/dss/assets/images/2-1.png" alt="" />
-          <img class="img2" src="~@/dss/assets/images/2-1.png" alt="" />
-          <img class="img3" src="~@/dss/assets/images/2-1.png" alt="" />
-          <img class="img4" src="~@/dss/assets/images/2-1.png" alt="" />
-          <img class="img5" src="~@/dss/assets/images/2-2.png" alt="" />
+          <img class="img1" src="~@/dss/assets/images/2-1.svg" alt="" />
+          <img class="img2" src="~@/dss/assets/images/2-1.svg" alt="" />
+          <img class="img3" src="~@/dss/assets/images/2-1.svg" alt="" />
+          <img class="img4" src="~@/dss/assets/images/2-1.svg" alt="" />
+          <img class="img5" src="~@/dss/assets/images/2-2.svg" alt="" />
         </div>
         <div class="item3">
           <div class="desc1">
@@ -75,8 +75,8 @@
           </div>
         </div>
         <div class="item2">
-          <img src="~@/dss/assets/images/2-3.png" class="img1" />
-          <img src="~@/dss/assets/images/2-3.png" class="img2" />
+          <img src="~@/dss/assets/images/2-3.svg" class="img1" />
+          <img src="~@/dss/assets/images/2-3.svg" class="img2" />
         </div>
         <div class="item3">
           <div class="dashed block1"></div>
@@ -99,7 +99,7 @@
       <div id="mask3">
         <div class="selected" @click="navMenuClick()"></div>
         <div class="arrow">
-          <img src="~@/dss/assets/images/3-1.png" alt="" />
+          <img src="~@/dss/assets/images/3-1.svg" alt="" />
         </div>
         <div class="desc">这是<span>自定义功能菜单</span>，请试着点击它。</div>
         <div id="confirm3">
@@ -130,7 +130,7 @@
         <div class="left selected"></div>
         <div class="right">
           <div class="arrow">
-            <img src="~@/dss/assets/images/4-1.png" alt="" />
+            <img src="~@/dss/assets/images/4-1.svg" alt="" />
           </div>
           <div class="desc">
             这是<span>自定义功能菜单</span>，点击全部产品内，具体功能旁★号，可以收藏该功能至菜单。点击自定义菜单功能旁叉号，可以删除该收藏。
@@ -152,7 +152,7 @@
       <div id="mask5">
         <div class="selected" @click.once="iconRightClick()"></div>
         <div class="arrow">
-          <img src="~@/dss/assets/images/5-1.png" alt="" />
+          <img src="~@/dss/assets/images/5-1.svg" alt="" />
         </div>
         <div class="desc">这是<span>账户设置</span>，请试着点击它。</div>
         <div id="confirm5">
@@ -182,7 +182,7 @@
       <div id="mask6">
         <div class="selected"></div>
         <div class="arrow">
-          <img src="~@/dss/assets/images/6-1.png" alt="" />
+          <img src="~@/dss/assets/images/6-1.svg" alt="" />
         </div>
         <div class="desc">
           这是<span>账户设置</span>，可切换账号，设置语言，更换界面皮肤等清理缓存，可以清理当前用户运行的任务缓存结果。
@@ -226,7 +226,7 @@
           </div>
         </div>
         <div class="arrow">
-          <img src="~@/dss/assets/images/7-1.png" alt="" />
+          <img src="~@/dss/assets/images/7-1.svg" alt="" />
         </div>
         <div class="selected" @click="maskFooterClick()"></div>
       </div>
@@ -249,7 +249,7 @@
           </div>
         </div>
         <div class="arrow">
-          <img src="~@/dss/assets/images/6-1.png" alt="" />
+          <img src="~@/dss/assets/images/6-1.svg" alt="" />
         </div>
         <div class="selected"></div>
       </div>

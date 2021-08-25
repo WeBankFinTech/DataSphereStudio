@@ -5,6 +5,7 @@ export const apiServicesRoutes = [
     meta: {
       title: '鲁班',
       publicPage: true,
+      admin: true
     },
     component: () => import('./view/home/index.vue'),
   },
@@ -14,6 +15,7 @@ export const apiServicesRoutes = [
     meta: {
       title: 'Workspace',
       publicPage: true,
+      admin: true
     },
     component: () => import('./view/workspace/index.vue'),
   },
@@ -23,7 +25,7 @@ export const apiServicesRoutes = [
     redirect: '/workspaceManagement/productsettings',
     meta: {
       title: '鲁班',
-      publicPage: true,
+      publicPage: true
     },
     component: () => import('./view/management/index.vue'),
     children: [{
@@ -63,6 +65,7 @@ export const apiServicesRoutes = [
     meta: {
       title: 'DataSphere Studio',
       publicPage: true,
+      admin: true
     },
     component: () => import('./view/permissions/index.vue'),
   },

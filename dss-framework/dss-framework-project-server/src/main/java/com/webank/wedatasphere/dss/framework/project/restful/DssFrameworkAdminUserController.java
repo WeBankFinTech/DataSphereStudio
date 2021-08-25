@@ -86,7 +86,7 @@ public class DssFrameworkAdminUserController extends BaseController {
     public Message add(@Validated @RequestBody DssAdminUser user, @Context HttpServletRequest req
     ) {
         try {
-
+            PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
             if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
             } else if (user.getUserName().contains(UserConstants.SINGLE_SPACE)) {
@@ -97,8 +97,8 @@ public class DssFrameworkAdminUserController extends BaseController {
             } else if (StringUtils.isNotEmpty(user.getEmail())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-            } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(), user))) {
-                return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+            } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
+                return Message.error().data("弱密码请关注:",passwordResult.getMessage());
             }
             boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName());
             if(ldapExist){
@@ -144,8 +144,9 @@ public class DssFrameworkAdminUserController extends BaseController {
     @Path("/resetPsw")
     public Message resetPwd(@RequestBody DssAdminUser user) {
         try {
-            if (!PasswordResult.PASSWORD_RULE_PASS.equals(PasswordUtils.checkPwd(user.getPassword(), user))) {
-                return Message.error().message("密码须以字母开头，必须含有大小写字母、数字和特殊字符，且不少于8位");
+            PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
+            if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
+                return Message.error().data("弱密码请关注:",passwordResult.getMessage());
             }
             user.setPassword(DigestUtils.md5Hex(user.getPassword()));
             DssAdminUser dssAdminUser = dssUserMapper.selectUserById(user.getId());

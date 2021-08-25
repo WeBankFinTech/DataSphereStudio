@@ -73,6 +73,7 @@
       "enterDesc": "Please enter the description",
       "descLength": "The description length should not be greater than",
       "validNameDesc": "Must starts with alphabetic characters, followed by only alphanumeric, underscore and Chinese characters",
+      "nameRepeat": "name can not repeat",
       "project": "Project",
       "feedback": "Feedback",
       "GL": "Overview",

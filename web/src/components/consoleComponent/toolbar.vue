@@ -136,14 +136,14 @@
           </div>
         </Poptip>
       </li>
-      <li
+      <!-- <li
         @click="openPopup('export')"
         v-if="$route.name === 'Home' && analysistext.flag !== 2">
         <SvgIcon :style="{ 'font-size': '20px' }" icon-class="export" color="#515a6e"/>
         <span
           class="v-toolbar-icon"
           v-if="isIconLabelShow">{{ $t('message.common.toolbar.export') }}</span>
-      </li>
+      </li> -->
       <li
         @click="openPopup('rowView')"
         v-if="row"

@@ -114,8 +114,10 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceHomePage`, {
         micro_module: currentModules.microModule || 'dss'
       }, 'get').then((res) => {
+        storage.set('noWorkSpace', false, 'local')
         return res.workspaceHomePage.homePageUrl;
       }).catch(() => {
+        storage.set('noWorkSpace', true, 'local')
         return '/'
       });
     },

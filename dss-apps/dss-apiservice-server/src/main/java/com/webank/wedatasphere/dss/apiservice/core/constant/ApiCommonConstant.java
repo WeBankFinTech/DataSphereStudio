@@ -16,11 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/20 11:47 AM
- */
+
 public class ApiCommonConstant {
     public static final String DEFAULT_APPROVAL_NO="0001";
     public static final Integer API_DELETE_STATUS=2;

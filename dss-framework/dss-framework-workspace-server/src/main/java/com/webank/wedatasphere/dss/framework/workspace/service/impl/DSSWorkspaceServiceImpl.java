@@ -195,11 +195,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) {
+    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception {
         //根据用户名 拿到用户ID
         //根据用户id 和工作空间id 拿到 角色id
         //根据role id 和工作空间id 拿到 重定向的 url
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
+        if(tempWorkspaceIds == null || tempWorkspaceIds.isEmpty()){
+            throw  new Exception("该账号尚未加入工作空间，请联系管理员分配工作空间及用户角色");
+        }
         List<Integer> workspaceIds = new ArrayList<>();
         tempWorkspaceIds.stream().
                 map(dssWorkspaceInfoMapper::getWorkspaceNameById).

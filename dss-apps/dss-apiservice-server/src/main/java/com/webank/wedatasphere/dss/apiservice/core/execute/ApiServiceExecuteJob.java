@@ -20,11 +20,7 @@ import com.webank.wedatasphere.linkis.ujes.client.response.JobExecuteResult;
 
 import java.util.Map;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/12 09:01 PM
- */
+
 public interface ApiServiceExecuteJob {
         String getCode();
 

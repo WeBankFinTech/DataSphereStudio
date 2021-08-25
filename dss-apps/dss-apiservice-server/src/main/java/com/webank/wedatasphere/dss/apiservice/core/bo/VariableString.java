@@ -15,11 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.bo;
 
-/**
- * VariableString
- *
- * @author lidongzhang
- */
+
 public class VariableString {
     private String path;
 

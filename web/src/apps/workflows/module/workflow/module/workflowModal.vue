@@ -111,6 +111,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
+      if (!params.projectId && !params.orchestratorMode) return
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.flowList = res.page;
       })

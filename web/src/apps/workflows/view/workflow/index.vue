@@ -304,9 +304,8 @@ export default {
     },
     // 获取project下工作流
     getFlow(param, resolve) {
-      debugger
       if (this.isScheduler) {
-        resolve()
+        return resolve()
       }
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, {
         workspaceId: this.$route.query.workspaceId,
@@ -422,7 +421,6 @@ export default {
           }
         }
       } else if (node.type === 'project' || node.type === 'scheduler') {
-        console.log(node, this.$route.query.projectID, this.$route.query.workspaceId)
         this.currentTreeId = node.id;
         if (node.id == this.$route.query.projectID) {
           this.selectProject();
@@ -629,7 +627,7 @@ export default {
     },
     // 切换开发流程
     handleChangeButton(item) {
-      if(item.dicValue === DEVPROCESS.OPERATIONCENTER && (!this.currentProjectData.releaseUsers
+      if(item.dicValue === DEVPROCESS.OPERATIONCENTER && this.currentProjectData.id == this.$route.query.projectID && (!this.currentProjectData.releaseUsers
       || this.currentProjectData.releaseUsers.indexOf(this.getUserName()) === -1)) {
         return this.$Message.warning("无运维权限");
       }

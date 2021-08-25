@@ -1,10 +1,10 @@
 <template>
   <div style="height: 100%;">
     <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
-    <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
+    <div class="ds-main-content" :class="{ 'ds-main-content-fold': menuFold }">
       <div class="ds-main-container">
         <div class="ds-breadcumb">
-          <span>{{$t("message.dataGovernance.dataOverview")}}</span>
+          <span>{{ $t("message.dataGovernance.dataOverview") }}</span>
         </div>
         <router-view></router-view>
       </div>
@@ -12,29 +12,29 @@
   </div>
 </template>
 <script>
-import navMenu from '../common/navMenu.vue';
+import navMenu from "../common/navMenu.vue";
 export default {
   components: {
-    navMenu,
+    navMenu
   },
   data() {
     return {
       menuFold: false
-    }
+    };
   },
   methods: {
     handleMenuToggle() {
       this.menuFold = !this.menuFold;
-    },
-  },
-}
+    }
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .ds-main-content {
-  height: 100%;
+  min-height: 100%;
   margin-left: 250px;
-  transition: margin-left .3s;
+  transition: margin-left 0.3s;
   &.ds-main-content-fold {
     margin-left: 54px;
   }
@@ -54,4 +54,3 @@ export default {
   }
 }
 </style>
-

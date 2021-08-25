@@ -23,6 +23,24 @@ const routes = [
         publicPage: true
       },
       component: () => import('./module/dataGovernance/assetsIndex.vue'),
+      redirect: '/dataGovernance/assets/search',
+      children: [{
+        path: 'search',
+        name: 'dataGovernance/assets/search',
+        meta: {
+          title: '数据资产目录查询',
+          publicPage: true
+        },
+        component: () => import('./view/assetsSearch/index.vue'),
+      },{
+        path: 'info',
+        name: 'dataGovernance/assets/info',
+        meta: {
+          title: '数据资产详情',
+          publicPage: true
+        },
+        component: () => import('./view/assetsInfo/index.vue'),
+      }]
     }]
   }
 ]

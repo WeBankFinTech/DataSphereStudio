@@ -3,7 +3,6 @@ package com.webank.wedatasphere.dss.data.api.server.util;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
-import com.webank.wedatasphere.dss.data.api.server.restful.CryptoUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;

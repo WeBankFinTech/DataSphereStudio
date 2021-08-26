@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <management-platform/>
-  </div>
+  <management-platform/>
 </template>
 <script>
 import ManagementPlatform from '../../module/managementPlatform/index.vue'

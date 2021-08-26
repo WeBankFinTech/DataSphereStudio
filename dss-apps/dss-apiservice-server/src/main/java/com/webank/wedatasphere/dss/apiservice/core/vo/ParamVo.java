@@ -15,9 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.vo;
 
-/**
- * @author jinyangrao
- */
+
 public class ParamVo {
 
     private Long id;

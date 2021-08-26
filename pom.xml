@@ -226,8 +226,7 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <recompileMode>incremental</recompileMode>
-                        <useZincServer>true</useZincServer>
+                        <recompileMode>all</recompileMode>
                     </configuration>
                 </plugin>
                 <plugin>

@@ -47,5 +47,28 @@
         order by update_time desc
     </select>
 
+    <insert id="addDatasource" parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource">
+      insert into dss_dataapi_datasource(
+        <if test="workspaceId  != null and workspaceId != ''">workspace_id,</if>
+        <if test="name  != null and name != ''">name,</if>
+        <if test="note  != null and note != ''">note,</if>
+        <if test="type  != null and type != ''">type,</if>
+        <if test="url  != null and url != ''">url,</if>
+        <if test="username  != null and username != ''">username,</if>
+        <if test="pwd  != null and pwd != ''">pwd,</if>
+        <if test="createBy  != null and createBy != ''">create_by,</if>
+        create_time
+         )values(
+        <if test="workspaceId != null and name != ''">#{workspaceId},</if>
+        <if test="name != null and name != ''">#{name},</if>
+        <if test="note != null and note != ''">#{note},</if>
+        <if test="type != null and type != ''">#{type},</if>
+        <if test="url != null and url != ''">#{url},</if>
+        <if test="username != null and username != ''">#{username},</if>
+        <if test="pwd != null and pwd != ''">#{pwd},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+         sysdate()
+         )
+    </insert>
 
 </mapper>

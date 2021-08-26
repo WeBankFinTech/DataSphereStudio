@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.data.api.server.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
+import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import org.springframework.stereotype.Service;
@@ -35,37 +36,14 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
     }
 
     @Override
-    public List<String> getAvailableConnNames(List<DataSource> allConnections) {
-
-        Connection connection = null;
-        List<String> availableConns = new ArrayList<String>();
-        for (DataSource datasource : allConnections) {
-            try {
-                connection = JdbcUtil.getConnection(datasource);
-                availableConns.add(datasource.getName());
-            } catch (Exception e) {
-                logger.warning(e.getMessage());
-            } finally {
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (SQLException e) {
-                        logger.info(e.getMessage());
-                    }
-                }
-            }
-
-        }
-        return availableConns;
-    }
-
-    @Override
     public List<DataSource> getAvailableConns(List<DataSource> allConnections) {
 
         Connection connection = null;
         List<DataSource> availableConns = new ArrayList<DataSource>();
         for (DataSource datasource : allConnections) {
             try {
+                datasource.setPwd(CryptoUtils.string2Object(datasource.getPwd()).toString());
+                System.out.println(datasource.getPwd());
                 connection = JdbcUtil.getConnection(datasource);
                 datasource.setPwd("***");
                 availableConns.add(datasource);
@@ -84,5 +62,10 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
         }
         return availableConns;
 
+    }
+
+    @Override
+    public void addDatasource(DataSource dataSource) {
+        dataSourceMapper.addDatasource(dataSource);
     }
 }

@@ -1,5 +1,6 @@
 @import '@/common/style/variables.scss';
 @import '@/common/style/overwrite.scss';
+@import '../projectIconFont/iconfont.css';
 @import 'normalize.scss';
 @font-face {
   font-family: 'PingFangSC-Medium';
@@ -28,12 +29,12 @@ body {
 }
 
 .layout {
-  position: $absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: $body-background;
+    position: $absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    @include bg-color($body-background, $dark-base-color);
 }
 
 .layout-content {

@@ -253,10 +253,16 @@ export default {
     },
     // 获取工程的数据
     getProjectData() {
+
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {
         workspaceId: +this.$route.query.workspaceId,
         id: +this.$route.query.projectID
       }, 'post').then((res) => {
+        //运维中心路由且未选中任何项目
+        if (!this.$route.query.projectID && this.isScheduler) {
+          this.modeOfKey = DEVPROCESS.OPERATIONCENTER
+          return this.getAllProjects()
+        }
         const project = res.projects[0];
         setVirtualRoles(project, this.getUserName())
         this.currentProjectData = {
@@ -648,7 +654,7 @@ export default {
           name: 'Scheduler',
           query: this.$route.query
         })
-      } else if (item.dicValue === 'dev'){
+      } else if (item.dicValue === 'dev' && this.isScheduler){
         this.$router.replace({
           name: 'Workflow',
           query: this.$route.query

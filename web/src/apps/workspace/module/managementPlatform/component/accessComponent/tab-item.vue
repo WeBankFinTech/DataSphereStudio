@@ -167,7 +167,7 @@ export default {
     font-size: 14px;
     font-family: PingFangSC-Regular;
     line-height: 22px;
-    color: #515a6e;
+    @include font-color(#515a6e, $dark-text-color);
     font-weight: bold;
   }
   .swith-label {
@@ -178,7 +178,7 @@ export default {
     font-family: PingFangSC-Regular;
     line-height: 22px;
     font-weight: bold;
-    color: #515a6e;
+    @include font-color(#515a6e, $dark-text-color);
   }
 }
 

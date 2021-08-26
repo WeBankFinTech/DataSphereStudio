@@ -803,7 +803,7 @@ export default {
 }
 .tableWrap {
   flex: 1;
-  margin: 0 24px;
+  margin: 0 24px 24px;
   .addWrap {
     display: flex;
     justify-content: space-between;

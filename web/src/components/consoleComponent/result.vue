@@ -630,7 +630,7 @@ export default {
   height: 100%;
   overflow: hidden;
   padding-left: $toolbarWidth;
-  background: $body-background;
+  @include bg-color($light-base-color, $dark-base-color);
   .html-result-div {
     overflow-y: auto;
   }
@@ -644,6 +644,7 @@ export default {
     .result-normal-table {
       border: none;
       border-right: $border-width-base $border-style-base $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
       min-width: 100%;
       .ivu-table {
         min-width: 100%;

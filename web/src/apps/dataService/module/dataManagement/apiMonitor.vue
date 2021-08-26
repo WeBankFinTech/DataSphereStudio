@@ -1,7 +1,7 @@
 <template>
   <div class="monitor-wrap">
     <div class="monitor-holder"></div>
-    <Tabs value="screen" :animated="false" class="tab-wrap">
+    <Tabs :value="currentTab" :animated="false" @on-click="changeTab" class="tab-wrap">
       <Tab-pane :label='$t("message.dataService.apiMonitor.staticsScreen")' name="screen">
         <div class="metrics-wrap">
           <div class="metrics">
@@ -38,6 +38,7 @@
             </div>
             <div class="metrics-body">
               <div ref="resourceLine" style="height:300px"></div>
+              <Spin v-show="loadingChart" size="large" fix/>
             </div>
           </div>
         </div>
@@ -52,6 +53,7 @@
                   <span>{{index + 1}}</span>
                 </template>
               </Table>
+              <Spin v-show="loadingRate" size="large" fix/>
             </div>
           </div>
         </div>
@@ -66,6 +68,7 @@
                   <span>{{index + 1}}</span>
                 </template>
               </Table>
+              <Spin v-show="loadingCnt" size="large" fix/>
             </div>
           </div>
         </div>
@@ -97,52 +100,18 @@
         </div>
       </Tab-pane>
     </Tabs>
-    <div class="monitor-chart-mask" :class="{'shown': monitorModalShow}" @click="hideMonitorModal"></div>
-    <div class="monitor-chart-modal" :class="{'shown': monitorModalShow}">
-      <div class="mc-title">
-        <span>API监控图表</span>
-        <div class="mc-close" @click="hideMonitorModal">
-          <Icon custom="iconfont icon-huaban" size="16"></Icon>
-        </div>
-      </div>
-      <div class="mc-body">
-        <Tabs type="card">
-          <Tab-pane label="数据服务错误码">
-            <div class="mc-range">
-              <rangeGroup @on-date-change="getModalChartData" />
-            </div>
-            <div ref="chartErrorcode" style="height:300px"></div>
-          </Tab-pane>
-          <Tab-pane label="APP请求次数">
-            <div class="mc-range">
-              <rangeGroup @on-date-change="getModalChartData" />
-            </div>
-            <div ref="chartReq" style="height:300px"></div>
-          </Tab-pane>
-          <Tab-pane label="流量带宽">
-            <div class="mc-range">
-              <rangeGroup @on-date-change="getModalChartData" />
-            </div>
-            <div ref="chartBrandwidth" style="height:300px"></div>
-          </Tab-pane>
-          <Tab-pane label="平均响应时间">
-            <div class="mc-range">
-              <rangeGroup @on-date-change="getModalChartData" />
-            </div>
-            <div ref="chartAvgTime" style="height:300px"></div>
-          </Tab-pane>
-        </Tabs>
-      </div>
-    </div>
+    <monitorChart v-if="monitorModalShow" :monitorModalShow="monitorModalShow" :api="selectApi" @on-hide="hideMonitorModal" />
   </div>
 </template>
 <script>
 import echarts from 'echarts';
 import api from "@/common/service/api";
 import rangeGroup from '../common/rangeGroup.vue';
+import monitorChart from './monitorChart.vue';
 export default {
   components: {
     rangeGroup,
+    monitorChart
   },
   data() {
     return {
@@ -221,12 +190,18 @@ export default {
           slot: "operation"
         }
       ],
+      currentTab: 'screen',
       onlineCnt: 0,
       offlineCnt: 0,
       callTotalCnt: 0,
       callTotalTime: 0,
       listCnt: [],
       listRate: [],
+      dataPast24Hour: [],
+      loadingCnt: true,
+      loadingRate: true,
+      loadingChart: true,
+      // 计量详情tab
       listDetail: [],
       loadingDetail: true,
       pageData: {
@@ -235,16 +210,17 @@ export default {
         pageSize: 10
       },
       monitorModalShow: false,
+      selectApi: {}
     }
   },
   mounted() {
     this.getOnlineApiCnt();
     this.getOfflineApiCnt();
+    this.getResource24Hour();
     this.getCallListByCnt();
     this.getCallListByFailRate();
     this.getRangeScreenData();
     this.getCallListDetail();
-    this.drawLine();
     window.addEventListener('resize', this.chartResize)
   },
   beforeDestroy() {
@@ -258,10 +234,26 @@ export default {
       ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
       return `${format} 00:00:00`;
     },
-    chartResize() {
-      this.echart && this.echart.resize()
+    changeTab(tab) {
+      this.currentTab = tab;
     },
-    drawLine() {
+    chartResize() {
+      this.currentTab == 'screen' && this.echart && this.echart.resize();
+    },
+    getResource24Hour() {
+      this.loadingChart = true;
+      api.fetch('/dss/framework/dbapi/apimonitor/callCntForPast24H', {
+        workspaceId: this.$route.query.workspaceId
+      }, 'get').then((res) => {
+        this.dataPast24Hour = res.list;
+        this.drawResourceChart();
+        this.loadingChart = false;
+      }).catch((err) => {
+        console.error(err)
+        this.loadingChart = false;
+      });
+    },
+    drawResourceChart() {
       this.echart = echarts.init(this.$refs.resourceLine)
       var option = {
         grid: {
@@ -278,7 +270,7 @@ export default {
           axisTick: {
             show: false
           },
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          data: this.dataPast24Hour.map(i => i.key)
         },
         yAxis: {
           type: 'value',
@@ -298,7 +290,7 @@ export default {
           nameGap: 80
         },
         series: [{
-          data: [82000, 93200, 90100, 93400, 129000, 133000, 130200],
+          data: this.dataPast24Hour.map(i => i.value),
           type: 'line',
           smooth: true,
           color: '#2E92F7'
@@ -353,25 +345,31 @@ export default {
       });
     },
     getCallListByCnt() {
+      this.loadingCnt = true;
       api.fetch('/dss/framework/dbapi/apimonitor/callListByCnt', {
         startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
         endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listCnt = res.list;
+        this.loadingCnt = false;
       }).catch((err) => {
         console.error(err)
+        this.loadingCnt = false;
       });
     },
     getCallListByFailRate() {
+      this.loadingRate = true;
       api.fetch('/dss/framework/dbapi/apimonitor/callListByFailRate', {
         startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
         endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listRate = res.list;
+        this.loadingRate = false;
       }).catch((err) => {
         console.error(err)
+        this.loadingRate = false;
       });
     },
     getCallListDetail() {
@@ -398,69 +396,13 @@ export default {
       this.getCallListDetail();
     },
     showMonitorModal(row) {
+      this.selectApi = row;
       this.monitorModalShow = true;
-      // ajax
-      this.$nextTick(() => {
-        this.drawMonitorChart();
-      })
     },
     hideMonitorModal() {
       this.monitorModalShow = false;
+      this.selectApi = {};
     },
-    getModalChartData(range) {
-      console.log(range)
-    },
-    drawMonitorChart() {
-      var option = {
-        grid: {
-          left: 100,
-          right: 40,
-          top: 30,
-          bottom: 30
-        },
-        tooltip: {
-          trigger: 'axis'
-        },
-        xAxis: {
-          type: 'category',
-          axisTick: {
-            show: false
-          },
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-          type: 'value',
-          axisLine: {
-            show: false
-          },
-          axisTick: {
-            show: false
-          },
-          name: "请求数目(平均QPS)",
-          nameLocation: "middle",
-          nameTextStyle: {
-            color: "#333",
-            fontSize: 16,
-            verticalAlign: "top",
-          },
-          nameGap: 80
-        },
-        series: [{
-          data: [82000, 93200, 90100, 93400, 129000, 133000, 130200],
-          type: 'line',
-          smooth: true,
-          color: '#2E92F7'
-        }]
-      };
-      const chart1 = echarts.init(this.$refs.chartErrorcode)
-      const chart2 = echarts.init(this.$refs.chartReq)
-      const chart3 = echarts.init(this.$refs.chartBrandwidth)
-      const chart4 = echarts.init(this.$refs.chartAvgTime)
-      chart1.setOption(option)
-      chart2.setOption(option)
-      chart3.setOption(option)
-      chart4.setOption(option)
-    }
   },
 }
 </script>
@@ -475,64 +417,6 @@ export default {
   .tab-wrap {
     margin-top: -36px;
     padding: 0 24px;
-  }
-  .monitor-chart-mask {
-    display: none;
-    z-index: 1;
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    &.shown {
-      display: block;
-    }
-  }
-  .monitor-chart-modal {
-    display: none;
-    z-index: 2;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 460px;
-    background: #fff;
-    box-shadow: -2px 0 10px 0 #DEE4EC;
-    border-radius: 2px;
-    &.shown {
-      display: block;
-      animation: modalshow .4s 1;
-    }
-    @keyframes modalshow {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
-    }
-    .mc-title {
-      position: relative;
-      padding: 12px 24px;
-      font-size: 16px;
-      line-height: 24px;
-      color: #333;
-      background: #F8F9FC;
-      .mc-close {
-        position: absolute;
-        padding: 12px 24px;
-        right: 0;
-        top: 0;
-        cursor: pointer;
-      }
-    }
-    .mc-body {
-      padding: 15px 24px;
-    }
-    .mc-range {
-      display: flex;
-      justify-content: flex-end;
-    }
   }
 }
 .metrics-wrap {
@@ -618,6 +502,7 @@ export default {
       }
     }
     .metrics-body {
+      position: relative;
       padding: 20px 24px;
     }
   }

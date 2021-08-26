@@ -22,9 +22,7 @@ import com.webank.wedatasphere.dss.apiservice.core.vo.*;
 
 import java.util.List;
 
-/**
- * @author zhulixin
- */
+
 public interface ApiService {
 
     /**

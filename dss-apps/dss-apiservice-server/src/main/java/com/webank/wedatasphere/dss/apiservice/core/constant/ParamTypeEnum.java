@@ -15,9 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-/**
- * @author chongchuanbing
- */
+
 public enum ParamTypeEnum {
 
     STRING(1, "String"),

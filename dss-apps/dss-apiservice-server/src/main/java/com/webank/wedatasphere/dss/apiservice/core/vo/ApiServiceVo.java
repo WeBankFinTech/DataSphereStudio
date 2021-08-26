@@ -20,9 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author jinyangrao
- */
+
 public class ApiServiceVo {
     private Long id;
     private String name;

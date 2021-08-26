@@ -16,10 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.vo;
 
-/**
- * @author allenlliu
- * @date 2020/11/11 10:27
- */
+
 public class ApiAccessVo {
     Long id;
 

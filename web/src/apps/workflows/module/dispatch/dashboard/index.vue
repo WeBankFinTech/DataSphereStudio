@@ -26,6 +26,15 @@
               </m-process-state-count>
             </div>
           </div>
+          <div class="col-md-6">
+            <div class="chart-title">
+              <span>{{$t('message.scheduler.taskStatusStatistics')}}</span>
+            </div>
+            <div class="row">
+              <m-task-status-count :search-params="searchParams" @goToList="goToList">
+              </m-task-status-count>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-12">
@@ -48,6 +57,7 @@ import util from "@/common/util"
 import dayjs from 'dayjs'
 import mDefineUserCount from './source/defineUserCount'
 import mProcessStateCount from './source/processStateCount'
+import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 
@@ -109,12 +119,14 @@ export default {
   components: {
     mListConstruction,
     mDefineUserCount,
-    mProcessStateCount
+    mProcessStateCount,
+    mTaskStatusCount
   }
 }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+@import '@/common/style/variables.scss';
   .perject-home-content {
     padding: 10px 20px;
     position: relative;
@@ -130,7 +142,8 @@ export default {
       line-height: 60px;
       span {
         font-size: 22px;
-        color: #333;
+        // color: #333;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         font-weight: bold;
       }
     }
@@ -144,6 +157,7 @@ export default {
           height: 32px;
           line-height: 32px;
           border-bottom: 1px solid #ecedec;
+          @include border-color($border-color-base, $dark-border-color-base);
         }
       }
     }

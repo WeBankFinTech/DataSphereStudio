@@ -1,8 +1,10 @@
 package com.webank.wedatasphere.dss.framework.dbapi.service;
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.request.SingleCallMonitorRequest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.response.HourMonitorInfo;
 
 import java.util.List;
 
@@ -43,6 +45,18 @@ public interface ApiMonitorService {
      */
     List<ApiCallInfoByFailRate> getCallListByFailRate(CallMonitorResquest callMonitorResquest);
 
+    /**
+     * 过去24小时，每小时的请求数目
+     */
+    List<HourMonitorInfo> getCallCntForPast24H(Long workspaceId) throws Exception;
 
+    /**
+     * 时间范围内指定API的每小时的平均响应时间
+     */
+    List<HourMonitorInfo> getCallTimeForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest) throws Exception;
 
+    /**
+     * 时间范围内指定API的每小时的请求次数
+     */
+    List<HourMonitorInfo> getCallCntForSinleApi(SingleCallMonitorRequest singleCallMonitorRequest)  throws Exception;
 }

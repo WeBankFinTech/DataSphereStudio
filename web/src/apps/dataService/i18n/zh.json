@@ -19,7 +19,10 @@
         "col_apiName": "API名称",
         "col_groupName": "业务流程",
         "col_datasourceName": "数据源名称",
-        "col_apiType": "API类型"
+        "col_apiType": "API类型",
+        "col_status": "状态",
+        "onlined": "已上线",
+        "offlined": "已下线"
       },
       "apiMonitor": {
         "staticsScreen": "API计量大屏",
@@ -56,10 +59,10 @@
         "addAuthorize": "新增授权",
         "authForm": {
           "modalAuthTile": "API授权",
-          "labelName": "授权的登录名称",
+          "labelName": "授权用户登录名",
           "labelFlow": "授权的业务流程",
           "labelExpire": "授权有效期",
-          "enterName": "请输入授权的登录名称",
+          "enterName": "请输入授权的用户登录名",
           "enterFlow": "请选择授权的业务流程",
           "enterExpire": "请选择授权有效期",
           "holderName": "请输入名称",

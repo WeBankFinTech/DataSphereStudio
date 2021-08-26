@@ -19,7 +19,10 @@
         "col_apiName": "ApiName",
         "col_groupName": "GroupName",
         "col_datasourceName": "Datasource",
-        "col_apiType": "ApiType"
+        "col_apiType": "ApiType",
+        "col_status": "Status",
+        "onlined": "online",
+        "offlined": "offline"
       },
       "apiMonitor": {
         "staticsScreen": "API Statics Screen",

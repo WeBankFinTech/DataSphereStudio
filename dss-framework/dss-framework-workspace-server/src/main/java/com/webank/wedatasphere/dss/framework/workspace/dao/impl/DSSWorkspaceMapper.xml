@@ -73,13 +73,13 @@
     </select>
 
     <select id="getUserMenuApplicationId" resultType="java.lang.Long">
-        SELECT DISTINCT(dm.menu_application_id)
+        SELECT DISTINCT(doma.id)
         FROM dss_workspace_user_role dwur
         LEFT JOIN dss_component_role dcr ON dwur.role_id = dcr.role_id
-        LEFT JOIN dss_menu dm ON dcr.component_id = dm.id
+        LEFT JOIN dss_onestop_menu_application doma ON dcr.component_id = doma.application_id
         WHERE dwur.workspace_id=#{workspaceId} AND dwur.username=#{username}
-        AND (dcr.workspace_id=#{workspaceId} OR dcr.workspace_id=-1) AND dcr.priv>0
-        AND dm.menu_application_id IS NOT NULL
+        AND dcr.workspace_id=#{workspaceId} AND dcr.priv>0
+        AND doma.application_id IS NOT NULL
     </select>
 
     <select id="getSpaceMenu" resultMap="dss_menu_map">

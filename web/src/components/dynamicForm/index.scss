@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-
+ @import '@/common/style/variables.scss';
 .dynamic-form {
     padding: 10px 10px 2px;;
     margin: 10px;
-    background: rgba(255,255,255,.7);
+    @include bg-color($menu-dark-subsidiary-color, $dark-base-color);
     border-radius: 4px;
     .dynamic-form-header-wrap {
         display: flex;

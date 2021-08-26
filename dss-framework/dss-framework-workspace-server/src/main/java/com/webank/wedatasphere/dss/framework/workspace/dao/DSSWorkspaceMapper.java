@@ -18,7 +18,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRolePriv;
@@ -39,11 +38,7 @@ public interface DSSWorkspaceMapper {
 
     List<DSSWorkspace> getWorkspaces(String username);
 
-    List<Integer> getMenuId(int roleId, String workspaceId);
-
     List<Long> getUserMenuApplicationId(@Param("username")String username, @Param("workspaceId")Long workspaceId);
-
-    DSSMenu getSpaceMenu(int menuId);
 
     List<DSSWorkspaceMenuRolePriv> getDSSWorkspaceMenuPriv(String workspaceId);
 

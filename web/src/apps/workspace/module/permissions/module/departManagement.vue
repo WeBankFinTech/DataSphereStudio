@@ -632,8 +632,7 @@ export default {
     }
   }
   .tableWrap {
-    width: 100%;
-    // padding: 0 24px;
+    margin: 0 24px 24px;
     .addWrap {
       display: flex;
       justify-content: flex-end;

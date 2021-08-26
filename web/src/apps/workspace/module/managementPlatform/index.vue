@@ -365,7 +365,7 @@ export default {
 $permissions-Backgroud: #F4F7FB;
 $per-border-color:#DEE4EC;
 .management-platform-wrap{
-  min-height: 100%;
+  height: 100%;
   .management-platform-sidebar {
   display: flex;
   position: fixed;
@@ -422,7 +422,7 @@ $per-border-color:#DEE4EC;
   }
   }
   .management-platform-tablist {
-    background-color: #fff;
+    height: 100%;
   }
   .management-platform-sidebar-tree-header {
     padding-left: 12px;

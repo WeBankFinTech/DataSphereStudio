@@ -34,7 +34,7 @@
         <module>dss-orchestrator-db</module>
         <module>dss-orchestrator-loader</module>
         <module>orchestrators/dss-workflow</module>
-        <module>dss-orchestrator-conversion</module>
+        <module>dss-orchestrator-conversion-standard</module>
     </modules>
 
 </project>

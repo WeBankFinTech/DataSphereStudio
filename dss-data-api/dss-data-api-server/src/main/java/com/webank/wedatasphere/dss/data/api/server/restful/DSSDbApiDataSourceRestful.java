@@ -7,18 +7,21 @@ import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import com.webank.wedatasphere.dss.data.api.server.util.PoolManager;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -70,9 +73,10 @@ public class DSSDbApiDataSourceRestful {
 
     @POST
     @Path("/add")
-    public Message addDatasource(@RequestBody DataSource dataSource){
+    public Message addDatasource(@RequestBody DataSource dataSource,@Context HttpServletRequest req){
 
         dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
+        dataSource.setCreateBy(SecurityFilter.getLoginUsername(req));
         dssDbApiDataSourceService.addDatasource(dataSource);
         return Message.ok("保存成功");
     }

@@ -22,11 +22,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * dao
- *
- * @author zhulixin
- */
+
 public interface ApiServiceParamDao {
 
     /**

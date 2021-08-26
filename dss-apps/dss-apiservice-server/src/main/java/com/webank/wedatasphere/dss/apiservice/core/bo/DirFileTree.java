@@ -19,11 +19,7 @@ package com.webank.wedatasphere.dss.apiservice.core.bo;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/09/03 05:29 PM
- */
+
 public class DirFileTree {
 
     private String name;

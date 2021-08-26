@@ -24,11 +24,7 @@ import com.webank.wedatasphere.dss.apiservice.core.vo.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 接口调用service
- *
- * @author lidongzhang
- */
+
 public interface ApiServiceQueryService {
     /**
      * 执行查询

@@ -21,10 +21,7 @@ import com.webank.wedatasphere.linkis.ujes.client.request.UJESJobAction
 
 import scala.tools.nsc.interpreter.InputStream
 
-/**
- * @author allenlliu
- * @version 2.0.0
- */
+
 
 class ResultSetDownloadAction extends GetAction with  DownloadAction with UJESJobAction  {
 

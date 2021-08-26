@@ -16,9 +16,8 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.execute;
 
-import com.webank.wedatasphere.dss.apiservice.core.action.ApiServiceGetAction;
+
 import com.webank.wedatasphere.dss.apiservice.core.action.ResultSetDownloadAction;
-import com.webank.wedatasphere.dss.apiservice.core.action.ResultWorkspaceIds;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiExecuteException;
 import com.webank.wedatasphere.linkis.common.utils.Utils;
@@ -39,10 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * created by cooperyang on 2020/8/26
- * Description:
- */
 public class ExecuteCodeHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteCodeHelper.class);
@@ -72,46 +67,6 @@ public class ExecuteCodeHelper {
         String retStr = String.format(EXECUTE_SCALA_TEMPLATE, SCALA_MARK + executeCode + SCALA_MARK);
         LOGGER.info("execute scala code is {}", retStr);
         return retStr;
-    }
-
-
-    public static Map<String,Object>  getMetaDataInfoByExecute(String user,
-                                             String executeCode,
-                                             Map<String, Object> Params,
-                                             String scriptPath) throws Exception {
-        Map<String, String> props = new HashMap<>();
-        Map<String,Object>  resultMap = new HashMap<>();
-        UJESClient client = LinkisJobSubmit.getClient(props);
-        ApiServiceExecuteJob job = new DefaultApiServiceJob();
-        //sql代码封装成scala执行
-        job.setCode(ExecuteCodeHelper.packageCodeToRelease(executeCode));
-        job.setEngineType("spark");
-        job.setRunType("scala");
-        job.setUser(user);
-        job.setParams(null);
-        job.setRuntimeParams((Map<String,Object>)Params.get("variable"));// pattern注入
-        job.setScriptePath(scriptPath);
-        JobExecuteResult jobExecuteResult = LinkisJobSubmit.execute(job,client, "IDE");
-        job.setJobExecuteResult(jobExecuteResult);
-        try {
-            waitForComplete(job,client);
-        } catch (Exception e) {
-            LOGGER.warn("Failed to execute job", e);
-            String reason = getLog(job,client);
-            LOGGER.error("Reason for failure: " + reason);
-            throw new ApiExecuteException(800024,"获取库表信息失败，执行脚本出错！");
-        }
-        int resultSize = getResultSize(job,client);
-        for(int i =0; i < resultSize; i++){
-            String result = getResult(job, i, ApiServiceConfiguration.RESULT_PRINT_SIZE.getValue().intValue(),client);
-            LOGGER.info("The content of the " + (i + 1) + "th resultset is :"
-                    +  result);
-            resultMap.put(Integer.toString(i),result);
-
-        }
-
-        LOGGER.info("Finished to execute job");
-        return  resultMap;
     }
 
 
@@ -249,14 +204,7 @@ public class ExecuteCodeHelper {
 
 
 
-    public static String getUserWorkspaceIds(String userName,UJESClient client){
-        ApiServiceGetAction apiServiceGetAction = new ApiServiceGetAction();
-        apiServiceGetAction.setUser(userName);
-        apiServiceGetAction.setParameter("userName",userName);
-        ResultWorkspaceIds userWorkspaceIds = (ResultWorkspaceIds)client.executeUJESJob(apiServiceGetAction);
-        return userWorkspaceIds.getUserWorkspaceIds();
 
-    }
 
 
 

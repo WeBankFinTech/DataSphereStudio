@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.exception;
 
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/26 07:51 PM
- */
+
 public class ApiServiceQueryException extends ErrorException {
 
     public ApiServiceQueryException(int errCode, String desc) {

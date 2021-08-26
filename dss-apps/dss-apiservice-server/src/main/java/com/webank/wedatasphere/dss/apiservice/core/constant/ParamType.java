@@ -15,11 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-/**
- * ParamType
- *
- * @author lidongzhang
- */
+
 public class ParamType {
     public static final String number = "2";
 

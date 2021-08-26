@@ -16,11 +16,9 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-import com.webank.wedatasphere.dss.apiservice.core.datamap.DataMapStatus;
 
-/**
- * @author: jinyangrao
- */
+
+
 public enum SQLMetadataInfoCheckStatus {
     LEGAL(0, "该SQL查询合法"), ILLEGALSQL(1,"不支持无库表信息的SQL查询");
 

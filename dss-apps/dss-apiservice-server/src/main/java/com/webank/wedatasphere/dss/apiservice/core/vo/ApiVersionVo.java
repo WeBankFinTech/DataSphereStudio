@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.vo;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author jinyangrao
- */
+
 public class ApiVersionVo {
 
     private Long id;

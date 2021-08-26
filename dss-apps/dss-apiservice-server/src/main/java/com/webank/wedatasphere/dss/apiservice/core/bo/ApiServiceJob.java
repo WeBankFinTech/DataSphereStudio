@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.bo;
 
 import com.webank.wedatasphere.linkis.ujes.client.response.JobExecuteResult;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/09/03 07:28 PM
- */
+
 public class ApiServiceJob {
 
     private String submitUser;

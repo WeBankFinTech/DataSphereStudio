@@ -24,27 +24,32 @@
       </div>
 
       <!-- 生成select 和 DDL 弹窗 -->
-      <Modal
-        v-model="selectFlag"
-        title="生成select语句"
-        width="576"
-        ok-text="复制"
-        cancel-text=""
-      >
+      <Modal v-model="selectFlag" title="生成select语句" width="576">
+        <template v-slot:footer>
+          <div>
+            <Button
+              data-name="select"
+              type="primary"
+              @click="e => copy(e, selectSQL)"
+              >复制</Button
+            >
+          </div>
+        </template>
         <div class="field-info-rich-text">
-          <p>SELECT</p>
-          <p>id</p>
-          <p>name</p>
-          <p>gender</p>
+          <div v-html="selectSql"></div>
         </div>
       </Modal>
-      <Modal
-        v-model="DDLflag"
-        title="生成DDL语句"
-        width="576"
-        ok-text="复制"
-        cancel-text=""
-      >
+      <Modal v-model="DDLflag" title="生成DDL语句" width="576">
+        <template v-slot:footer>
+          <div>
+            <Button data-name="ddl" type="primary" @click="e => copy(e, DDLsql)"
+              >复制</Button
+            >
+          </div>
+        </template>
+        <div class="field-info-rich-text">
+          <div v-html="ddlSql"></div>
+        </div>
       </Modal>
     </div>
 
@@ -65,6 +70,8 @@
 </template>
 
 <script>
+import clipboard from "../../utils/clipboard";
+import { fomatSqlForShow, fomatSqlForCopy } from "../../utils/fomatSQL";
 export default {
   name: "fieldInfo",
   props: {
@@ -139,8 +146,20 @@ export default {
       fieldInfoData: this.fieldInfo,
       rangeInfoData: this.rangeInfo,
       selectFlag: false,
-      DDLflag: false
+      DDLflag: false,
+      selectSQL:
+        "SELECT @$ id, @$ name, @$ sex, @$ city, @$ sdate @$ from  hive_part_test",
+      DDLsql:
+        "CREATE TABLE IF NOT EXISTS hive_part_test @$ ( @$ id int,  @$ name string,  @$ sex string  @$ ) @$ PARTITIONED BY @$  ( @$ city string,  @$ sdate string  @$ )"
     };
+  },
+  computed: {
+    selectSql() {
+      return fomatSqlForShow(this.selectSQL);
+    },
+    ddlSql() {
+      return fomatSqlForShow(this.DDLsql);
+    }
   },
   methods: {
     edit() {
@@ -161,6 +180,12 @@ export default {
     createDDL() {
       this.DDLflag = true;
       // 请求 DDL语句数据
+    },
+    // 复制
+    copy(e, sql) {
+      let str = "";
+      str = fomatSqlForCopy(sql);
+      clipboard(str, e);
     }
   }
 };
@@ -200,10 +225,17 @@ export default {
   background: #ffffff;
   border: 1px solid #dee4ec;
   border-radius: 4px;
-  border-radius: 4px;
-  font-family: PingFangSC-Regular;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.65);
   line-height: 22px;
+  overflow-y: auto;
+  max-height: 200px;
+  div {
+    font-family: Helvetica Neue, Consolas;
+    /deep/ span {
+      font-weight: bold;
+      margin-right: 6px;
+    }
+  }
 }
 </style>

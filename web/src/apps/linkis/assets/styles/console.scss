@@ -59,11 +59,14 @@
 
         .console-page-content-body {
             position: $relative;
+            height: 100%;
             .content-body-side-nav {
                 width: 200px;
+                height: 100%;
                 position: $absolute;
                 top: 0;
                 left: 0;
+                @include bg-color($light-base-color, $dark-menu-base-color);
                 .content-body-card {
                     margin:10px 0 10px;
                 }

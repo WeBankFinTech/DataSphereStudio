@@ -1,16 +1,23 @@
 /**
- *  ""
- *
- *
+ *  转换 后端SQL语句 成 html文本
+ *  @param (String)
+ *  @return (String)
  */
-//  "SELECT \n id, \n name, \n sex, \n city, \n sdate \n from  hive_part_test"
-//  "<p>SELECT</p><p>id</p><p>name</p>"
-
-export function fomatSQL(sql) {
-  sql = typeof sql === 'string' ? sql : ''
-  const arr = sql.replaceAll(' ', '').split('\n');
-  const res = arr.map(item => `<p>${item}</p>`)
+export function fomatSqlForShow(sql) {
+  if ( typeof sql !== 'string' ) return ''
+  const arr = sql.split('@$');
+  const res = arr.map((i, idx) => `<p><span>${idx+1}</span>${i}</p>`)
   return res.join('')
 }
 
-console.log(fomatSQL("SELECT \n id, \n name, \n sex, \n city, \n sdate \n from  hive_part_test"))
+/**
+ *
+ * @param {String} sql
+ * @return {String}
+ */
+export function fomatSqlForCopy(sql) {
+  if ( typeof sql !== 'string' ) return ''
+  const arr = sql.replaceAll(' ', '').split('@$');
+  const res = arr.map(i => `${i}\r\n`)
+  return res.join('')
+}

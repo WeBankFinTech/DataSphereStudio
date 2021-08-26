@@ -110,11 +110,31 @@
               rows="10"
             />
           </div>
-          <div style="margin-top: 10px;" class="sqlPageWrap">
-            <Checkbox v-model="sqlPage">返回结果分页</Checkbox>
+          <div class="sqlPageWrap">
+            <Checkbox v-model="sqlPage" @on-change="handleSqlPageChange"
+              >返回结果分页</Checkbox
+            >
             <div class="sqlPageTip">
               当返回结果记录数大于500时请选择分页，不分页则最多返回500条记录。当无请求参数时，必须开启返回结果分页。
             </div>
+          </div>
+          <div v-show="sqlPage" style="margin-top:10px;">
+            <Form
+              ref="pageForm"
+              :model="pageForm"
+              :label-width="75"
+              :rules="pageRuleValidate"
+            >
+              <FormItem label="每页条数" prop="pageSize">
+                <Input
+                  type="number"
+                  v-model="pageForm.pageSize"
+                  placeholder="请输入每页条数,不超过50条"
+                  style="width: 300px"
+                  ><span slot="append">条</span></Input
+                >
+              </FormItem>
+            </Form>
           </div>
         </div>
         <div
@@ -213,6 +233,7 @@
                     value => changeSqlParams(value.target.value, index, column)
                   "
                   placeholder="请输入"
+                  :readonly="!!row.sqlPage && column.key === 'name'"
                 ></Input>
               </template>
               <template slot-scope="{ index, row, column }" slot="type">
@@ -220,6 +241,7 @@
                   :value="row.type"
                   transfer
                   @on-change="value => changeSqlParams(value, index, column)"
+                  v-if="!row.sqlPage"
                 >
                   <Option
                     v-for="(item, index) in sqlTypeOptions"
@@ -227,6 +249,14 @@
                     :key="index"
                     >{{ item.label }}</Option
                   >
+                </Select>
+                <Select
+                  :value="row.type"
+                  transfer
+                  @on-change="value => changeSqlParams(value, index, column)"
+                  v-if="!!row.sqlPage"
+                >
+                  <Option value="bigint">bigint</Option>
                 </Select>
               </template>
               <template slot-scope="{ index }" slot="operation">
@@ -286,6 +316,18 @@ export default {
     }
   },
   data() {
+    const validatePageSize = (rule, value, callback) => {
+      if (!value && value !== 0) {
+        callback(new Error("每页条数不能为空"));
+      } else {
+        if (value > 50 || value < 1) {
+          callback(new Error("每页条数不能超过50条, 不少于1条"));
+        } else if (!Number.isInteger(parseFloat(value))) {
+          callback(new Error("每页条数必须为整数"));
+        }
+        callback();
+      }
+    };
     return {
       confirmLoading: false,
       showTestPanel: false,
@@ -353,7 +395,7 @@ export default {
       setRequest: false,
       setResponse: false,
       hideParamTable: false,
-      sqlPage: true,
+      sqlPage: false,
       paramsColumns: [
         {
           title: "设为请求参数",
@@ -463,6 +505,18 @@ export default {
       ],
       sortList: [],
       sql: "",
+      pageForm: {
+        pageSize: ""
+      },
+      pageRuleValidate: {
+        pageSize: [
+          {
+            required: true,
+            validator: validatePageSize,
+            trigger: "change"
+          }
+        ]
+      },
       sqlColumns: [
         {
           title: "参数名称",
@@ -523,7 +577,8 @@ export default {
       memory,
       reqTimeout,
       sql,
-      reqFields
+      reqFields,
+      pageSize
     } = data;
     this.getDataSourceIds(this.dbForm.datasourceType);
     if (!id) {
@@ -540,6 +595,8 @@ export default {
     };
     if (apiType === "SQL") {
       this.sql = sql;
+      this.pageForm = { pageSize };
+      this.sqlPage = !!pageSize;
       const reqValues = reqFields ? JSON.parse(reqFields) : [];
       this.sqlList = reqValues.map(item => {
         return { ...item };
@@ -636,10 +693,6 @@ export default {
               this.$Message.error("返回参数不能为空");
               return;
             }
-            // if (this.sortList.length === 0) {
-            //   this.$Message.error("排序字段不能为空");
-            //   return;
-            // }
             const orderFields = this.sortList.map(item => {
               return { name: item.columnName, type: item.type };
             });
@@ -653,7 +706,6 @@ export default {
           } else {
             if (!this.sql) {
               this.$Message.error("SQL语句不能为空");
-
               return;
             }
             const reqes = this.sqlList.filter(item => !!item.name);
@@ -663,24 +715,38 @@ export default {
             reqParams = {
               ...reqParams,
               reqFields: reqes.length > 0 ? JSON.stringify(reqes) : "",
-              sql: this.sql
+              sql: this.sql,
+              pageSize: 0
             };
+            if (this.sqlPage) {
+              this.$refs["pageForm"].validate(valid2 => {
+                if (valid2) {
+                  reqParams.pageSize = parseInt(this.pageForm.pageSize);
+                  this.executeSaveApi(reqParams);
+                }
+              });
+              return;
+            }
           }
-          this.confirmLoading = true;
-          api
-            .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
-            .then(res => {
-              console.log(res);
-              this.$emit("updateApiData", { ...data, ...reqParams });
-
-              this.$Message.success("保存成功");
-              this.confirmLoading = false;
-            })
-            .catch(() => {
-              this.confirmLoading = false;
-            });
+          this.executeSaveApi(reqParams);
         }
       });
+    },
+    executeSaveApi(reqParams) {
+      const { data } = this.apiData;
+      this.confirmLoading = true;
+      api
+        .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
+        .then(res => {
+          console.log(res);
+          this.$emit("updateApiData", { ...data, ...reqParams });
+
+          this.$Message.success("保存成功");
+          this.confirmLoading = false;
+        })
+        .catch(() => {
+          this.confirmLoading = false;
+        });
     },
     releaseApi() {
       this.confirmLoading = true;
@@ -783,13 +849,14 @@ export default {
       }
       this.sqlList = datas;
     },
-    addSqlParams() {
+    addSqlParams(data = {}) {
       const datas = [...this.sqlList];
       datas.push({
         name: "",
         type: "string",
         demo: "liming",
-        comment: ""
+        comment: "",
+        ...data
       });
       this.sqlList = datas;
     },
@@ -881,6 +948,23 @@ export default {
       this.$nextTick(() => {
         this.hideParamTable = false;
       });
+    },
+    handleSqlPageChange(e) {
+      console.log(e);
+      if (e) {
+        this.addSqlParams({
+          name: "pageNum",
+          type: "bigint",
+          demo: "1",
+          comment: "",
+          sqlPage: true
+        });
+      } else {
+        const index = this.sqlList.findIndex(
+          item => item.name === "pageNum" && item.sqlPage
+        );
+        this.deleteSqlRow(index);
+      }
     }
   }
 };
@@ -1009,7 +1093,7 @@ export default {
       border-bottom-width: 0;
     }
     .sqlPageWrap {
-      margin-top: 10px;
+      margin-top: 15px;
       display: flex;
       .sqlPageTip {
         font-family: PingFangSC-Regular;

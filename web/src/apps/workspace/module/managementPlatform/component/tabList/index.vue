@@ -39,7 +39,7 @@
       </div>
 
       <!-- appmain  -->
-      <div  class="management-platform-container-list-appmain" :class="{'addHeight': header == '控制台' }">
+      <div  class="management-platform-container-list-appmain">
         <router-view></router-view>
       </div>
 
@@ -145,8 +145,6 @@ export default {
   &-list {
     flex: 1;
     display: flex;
-    min-height: 685px;
-    // background: #fff;
     @include bg-color($light-base-color, $dark-base-color);
     flex-direction: column;
     &-breadcrumb {
@@ -161,14 +159,11 @@ export default {
     }
     &-appmain {
       overflow: hidden;
+      height: 100%;
     }
   }
 }
 .consoleStyle {
-  min-height: 0px;
   margin-left: 24px;
-}
-.addHeight {
-  height: 400px;
 }
 </style>

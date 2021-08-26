@@ -19,6 +19,9 @@
   .ivu-spin-fix {
     background-color: rgba(0, 0, 0, 0.5);
   }
+  .ivu-table-wrapper > .ivu-spin-fix {
+    border: none;
+  }
   .ivu-alert-info {
     background: $dark-menu-base-color;
     border-color: $dark-border-color;
@@ -153,9 +156,12 @@
           background-color: $dark-active-menu-item !important;
       }
   }
+  .ivu-table-fixed::before, .ivu-table-fixed-right::before {
+    background-color: $dark-border-color-base;
+  }
 
   .ivu-input[disabled], fieldset[disabled] .ivu-input {
-    background-color: $dark-workspace-body-bg-color;
+    background-color: $disabled-bg-color;
   }
   .ivu-input {
     background-color: $dark-workspace-body-bg-color;
@@ -257,8 +263,8 @@
     border-color: $dark-border-color-base;
   }
   .ivu-input-number, .ivu-input-number-default{
-      border:none;
-      border: 1px solid $dark-border-color-base;
+      border-color:$dark-border-color-base;
+      background: $dark-base-color;
   }
   .ivu-divider-vertical {
     background-color: $dark-border-color-base;
@@ -311,14 +317,21 @@
   }
   .ivu-menu {
     background-color: $dark-menu-base-color;
-    border-color: $dark-border-color-base;
     color: $dark-text-color;
   }
   .ivu-menu-item {
     color: $dark-text-color;
+    border-color: $dark-menu-base-color;
   }
   .ivu-menu-item-active, .ivu-menu-item-selected {
     background-color: $dark-active-menu-item !important;
+  }
+  .ivu-steps-head-inner {
+    background-color: $dark-base-color;
+    border-color: $dark-border-color-base;
+  }
+  .ivu-steps-item.ivu-steps-status-finish .ivu-steps-head-inner {
+    background-color: $dark-base-color;
   }
   .ivu-steps-item.ivu-steps-status-wait .ivu-steps-title {
     color: $dark-workspace-title-color;
@@ -341,7 +354,7 @@
     color: $dark-text-color;
   }
   .ivu-input[disabled], fieldset[disabled] .ivu-input {
-    background-color: $dark-disabled-bg-color;
+    background-color: $dark-disabled-bg-color !important;
     color: $dark-text-color;
     &:hover {
       border-color: $dark-border-color-base;
@@ -364,6 +377,71 @@
   }
   .ivu-row {
     color: $dark-text-color;
+  }
+  .ivu-tag-color-white {
+    color: $dark-workspace-title-color;
+  } 
+  .ivu-table-title, .ivu-table-footer {
+    border-color: $dark-border-color-base;
+  }
+  .ivu-menu-vertical.ivu-menu-light {
+    &:after {
+      background: $dark-menu-base-color;
+    }
+  }
+  .ivu-btn.disabled, .ivu-btn[disabled] {
+    background-color: $dark-disable-color;
+    color: $dark-disable-text-color;
+    border: $dark-disable-color;
+    &:hover {
+      background-color: $dark-disable-color;
+      color: $dark-disable-text-color;
+    }
+  }
+
+  // 自定义类
+  .progress-label {
+    color: $dark-text-color !important;
+  }
+  .designer .node-selected {
+    box-shadow: 0 0 8px #0E1118;
+  }
+  .bg-img {
+    opacity: 0.3;
+  }
+
+  .luban-nav-panel .nav-left {
+    background-color: $dark-base-color !important;
+  }
+  .luban-nav-panel .nav-left .nav-all.active, .luban-nav-panel .nav-left .nav-all:hover {
+    background-color: $dark-menu-base-color !important;
+  }
+  .luban-nav-panel .nav-left .nav-all {
+    color: $dark-workspace-title-color !important;
+  }
+  .luban-nav-panel .nav-left .nav-collect .nav-item:hover {
+    background-color: $dark-menu-base-color !important;
+  }
+  .luban-nav-panel .nav-left .nav-collect .nav-item .nav-item-title {
+    color: $dark-workspace-title-color !important;
+  }
+  .luban-nav-panel .nav-right {
+    background-color: $dark-menu-base-color !important;
+  }
+  .luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner:hover {
+    background-color: #373F50 !important;
+  }
+  .luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner .pro-item-txt {
+    color: $dark-workspace-title-color !important;
+    &:hover {
+      color: $dark-primary-color !important;
+    }
+  }
+  .luban-nav-panel .nav-right .pro-box .pro-category {
+    color: $dark-workspace-title-color !important;
+  }
+  .luban-nav-panel .nav-right .pro-box .pro-category:before {
+    background-color: $dark-primary-color !important;
   }
   
 }

@@ -25,11 +25,11 @@
       <!-- 应用列表标签 -->
       <div class="appListTag">
         <div class="tagName">
-          <span>{{$t('message.linkis.tableColumns.label')}}：</span>
+          <span class="tagLabel">{{$t('message.linkis.tableColumns.label')}}：</span>
           <Tag v-for="(item, index) in tagTitle" :key="index" color="primary">{{item}}</Tag>
         </div>
         <div class="resourceList">
-          <span>{{$t('message.linkis.resources')}}：</span>
+          <span class="tagLabel">{{$t('message.linkis.resources')}}：</span>
           <span v-if="applicationList.usedResource">
             <Tag color="success">{{`${calcCompany(applicationList.usedResource.cores)}vcores,${calcCompany(applicationList.usedResource.memory, true)}G`}}(used)</Tag>
             <Tag color="error">{{`${calcCompany(applicationList.maxResource.cores)}vcores,${calcCompany(applicationList.maxResource.memory, true)}G`}}(max)</Tag>

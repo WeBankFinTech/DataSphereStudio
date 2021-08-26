@@ -137,7 +137,7 @@ export default {
     display: inline-block;
     height: 40px;
     line-height: 40px;
-    color: $title-color;
+    @include font-color($title-color, $dark-text-color);
     cursor: pointer;
     min-width: 100px;
     max-width: 200px;

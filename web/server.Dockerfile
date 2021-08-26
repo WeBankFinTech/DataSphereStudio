@@ -6,4 +6,4 @@ COPY server /opt/dss/
 
 RUN npm install --registry http://10.37.31.58:4873/
 
-ENTRYPOINT ["npm run prd"]
+ENTRYPOINT ["npm", "run", "prd"]

@@ -24,11 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-/**
- * Map bean validation exception to response
- * @author liaoyt
- * 2020/02/11
- */
+
 @Provider
 public class BeanValidationExceptionMapper implements ExceptionMapper<ValidationException> {
     @Override

@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.util;
 
 import com.webank.wedatasphere.dss.apiservice.core.exception.AssertException;
 
-/**
- * @author lidongzhang
- */
+
 public class AssertUtil {
 
     public static void isTrue(boolean b, String message) {

@@ -15,11 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.exception;
 
-/**
- * AssertException
- *
- * @author lidongzhang
- */
+
 public class AssertException extends ApiServiceRuntimeException {
 
     public AssertException(String message) {

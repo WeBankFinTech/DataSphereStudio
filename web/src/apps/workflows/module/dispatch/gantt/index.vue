@@ -124,8 +124,8 @@ export default {
 }
 .gantt-model {
   background: url('img/dag_bg.png');
-  height: calc(80vh - 74px);
-  width: calc(100vw - 320px);
+  height: 100%;
+  width: 100%;
   .gantt-state {
     background: #fff;
     height: 37px;

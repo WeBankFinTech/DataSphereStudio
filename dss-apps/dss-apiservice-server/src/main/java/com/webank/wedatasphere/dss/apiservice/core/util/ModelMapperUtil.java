@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author chongchuanbing
- */
+
 public class ModelMapperUtil {
     private static ModelMapper modelMapper = new ModelMapper();
 

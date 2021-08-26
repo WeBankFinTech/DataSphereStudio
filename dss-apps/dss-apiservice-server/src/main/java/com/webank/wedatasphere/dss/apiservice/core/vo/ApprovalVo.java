@@ -18,10 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.vo;
 
 import java.util.Date;
 
-/**
- * @author: jinyangrao
- * @date: 2020-08-26 18:13:41
- */
+
 public class ApprovalVo {
     Long id;
     Long apiId;

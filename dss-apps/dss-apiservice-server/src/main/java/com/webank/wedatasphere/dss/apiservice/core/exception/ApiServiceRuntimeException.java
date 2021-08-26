@@ -15,11 +15,7 @@
  */
 package com.webank.wedatasphere.dss.apiservice.core.exception;
 
-/**
- * OneserviceRuntimeException
- *
- * @author lidongzhang
- */
+
 public class ApiServiceRuntimeException extends RuntimeException {
 
     public ApiServiceRuntimeException(String message) {

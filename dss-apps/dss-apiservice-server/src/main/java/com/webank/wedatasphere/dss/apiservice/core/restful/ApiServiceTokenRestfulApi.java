@@ -18,8 +18,6 @@ package com.webank.wedatasphere.dss.apiservice.core.restful;
 
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.apiservice.core.constant.SaveTokenEnum;
-import com.webank.wedatasphere.dss.apiservice.core.datamap.DataMapStatus;
-import com.webank.wedatasphere.dss.apiservice.core.service.ApprovalService;
 import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
 import com.webank.wedatasphere.dss.apiservice.core.service.TokenQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
@@ -44,11 +42,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/17 05:37 PM
- */
+
 
 @Path("/dss/apiservice")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -60,8 +54,7 @@ public class ApiServiceTokenRestfulApi {
     @Autowired
     TokenQueryService tokenQueryService;
 
-    @Autowired
-    ApprovalService approvalService;
+
 
     @Autowired
     TokenAuth tokenAuth;
@@ -113,24 +106,7 @@ public class ApiServiceTokenRestfulApi {
                             @Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() ->{
-
-            ApprovalVo approvalVo = approvalService.refreshStatus(approvalNo);
-            if(approvalVo.getCreator().equals(userName) == false){
-                return Message.error("'api service user check failed' [用户检查失败！]");
-            }
-            if(null == approvalVo) {
-                return Message.error("'api service approvalNo' is missing[未查询到对应的审批单号]");
-            }
-            if(approvalVo.getStatus().equals(DataMapStatus.SUCCESS.getIndex())) {
-                List<TokenManagerVo> tokenManagerVoList = tokenAuth.genTokenRecord(approvalVo);
-
-                SaveTokenEnum res = tokenAuth.saveTokensToDb(tokenManagerVoList, approvalNo);
-                if(SaveTokenEnum.FAILED == res) {
-                    return Message.error("'token auth process occur error' [token认证过程出现错误]");
-                }
-            }
-            String approvalStatusDesc = DataMapStatus.getDescByIndex(approvalVo.getStatus());
-            return Message.ok().data("approvalStatus", approvalStatusDesc);
-        }, "/apiservice/approvalRefresh/",  "提交审批单查询出错");
+            return Message.ok().data("approvalStatus", "success");
+        }, "/apiservice/approvalRefresh/",  "查询出错");
     }
 }

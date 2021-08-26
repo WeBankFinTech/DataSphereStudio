@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.framework.dbapi.dao;
 
 import com.webank.wedatasphere.dss.framework.dbapi.entity.ApiCall;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.request.CallMonitorResquest;
+import com.webank.wedatasphere.dss.framework.dbapi.entity.request.SingleCallMonitorRequest;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByCnt;
 import com.webank.wedatasphere.dss.framework.dbapi.entity.response.ApiCallInfoByFailRate;
 import org.apache.ibatis.annotations.Insert;
@@ -10,6 +11,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Classname ApiCallMapper
@@ -63,4 +65,38 @@ public interface ApiCallMapper {
     List<ApiCallInfoByFailRate> getCallListByFailRate(@Param("callMonitorResquest") CallMonitorResquest callMonitorResquest);
 
 
+    /**
+     * 过去24小时，每小时的请求数目
+     * 特别注意：dss_project -- 记录数足够的任意一张表，主要是为了给前端拼凑缺失时间段数据
+     */
+    @Select("SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS k, COUNT(*) AS v\n" +
+            "FROM dss_dataapi_config a JOIN dss_dataapi_call b ON a.id =b.api_id \n" +
+            "WHERE a.workspace_id =#{workspaceId} AND time_start >= (NOW() - INTERVAL 24 HOUR)\n" +
+            "GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')\n" +
+            "ORDER BY k")
+    List<Map<String, Object>> getCallCntForPast24H(Long workspaceId);
+
+
+    /**
+     * 时间范围内指定API的每小时的平均响应时间
+     * 特别注意：dss_project -- 记录数足够的任意一张表，主要是为了给前端拼凑缺失时间段数据
+     */
+    @Select("SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS k, IFNULL(ROUND(AVG(time_length),0),0) AS v\n" +
+            "FROM dss_dataapi_call\n" +
+            "WHERE api_id =#{singleCallMonitorRequest.apiId} AND (time_start BETWEEN #{singleCallMonitorRequest.startTime} AND #{singleCallMonitorRequest.endTime})\n" +
+            "GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')\n" +
+            "ORDER BY k")
+    List<Map<String, Object>> getCallTimeForSinleApi(@Param("singleCallMonitorRequest") SingleCallMonitorRequest singleCallMonitorRequest);
+
+
+    /**
+     * 时间范围内指定API的每小时的请求次数
+     *
+     */
+    @Select("SELECT DATE_FORMAT(time_start,'%Y-%m-%d %H:00') AS k, COUNT(id) AS v\n" +
+            "FROM dss_dataapi_call\n" +
+            "WHERE api_id =#{singleCallMonitorRequest.apiId} AND (time_start >= #{singleCallMonitorRequest.startTime} AND time_start <= #{singleCallMonitorRequest.endTime})\n" +
+            "GROUP BY DATE_FORMAT(time_start,'%Y-%m-%d %H:00')\n" +
+            "ORDER BY k")
+    List<Map<String, Object>> getCallCntForSinleApi(@Param("singleCallMonitorRequest") SingleCallMonitorRequest singleCallMonitorRequest);
 }

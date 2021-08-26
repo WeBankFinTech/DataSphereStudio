@@ -1,26 +1,18 @@
 <template>
   <div>
     <slot></slot>
-    <Row class="content-item">
-      <i-col v-if="checkCreate()"
+    <div class="content-item">
+      <div v-if="checkCreate()"
         class="project-item project-header"
-        :xs="12"
-        :sm="8"
-        :md="6"
-        :lg="5"
-        @click.native="addProject">
+        @click="addProject">
         <Icon class="add-icon" type="md-add" size="20">
         </Icon>
         <span>{{$t('message.Project.createProject')}}</span>
-      </i-col>
+      </div>
       <template  v-if="dataList.length > 0">
-        <i-col
+        <div
           class="project-item"
-          :xs="12"
-          :sm="8"
-          :md="6"
-          :lg="5"
-          @click.native="goto(currentData, subitem)"
+          @click="goto(currentData, subitem)"
           v-for="(subitem, index) in cachedataList"
           :key="subitem.id"
         >
@@ -56,11 +48,11 @@
 
             </span>
           </Tooltip>
-        </i-col>
+        </div>
 
       </template>
       <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
-    </Row>
+    </div>
     <Page
       v-if="dataList.length > 0 && pagination.size < dataList.length "
       class="page-bar"
@@ -226,6 +218,10 @@ export default {
 // 待版本稳定后将card需要重新部样式
 .content-item {
     margin: 15px 0px 25px 0px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-row-gap: 20px;
+    grid-column-gap: 20px;
     .project-list-ul {
         padding: 10px 20px;
         display: flex;
@@ -234,56 +230,63 @@ export default {
         flex-wrap: wrap;
     }
     .project-item {
-        height: 142px;
-        margin-right: 25px;
-        margin-bottom: 25px;
-        background: #fff;
-        max-width: 319px;
+        min-height: 150px;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         border-radius: 2px;
-        border: 1px solid #dcdee2;
+        border: 1px solid #DEE4EC;
+        @include border-color($border-color-base, $dark-border-color-base);
         padding: $padding-25;
         cursor: pointer;
         &:hover {
-          box-shadow: 0 2px 12px 0 $shadow-color;
+          box-shadow: 0 2px 8px 0 $shadow-color;
         }
         .project-main {
           height: 100%;
+          display: flex;
+          flex-direction: column;
           .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             .project-title {
-              flex: 1;
               font-size: $font-size-large;
+              margin-right: 30px;
               font-weight: 600;
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Medium;
-              color: $text-title-color;
+              // color: $text-title-color;
+              @include font-color($workspace-title-color, $dark-workspace-title-color);
               letter-spacing: 0;
             }
             .menu-bar {
               position: relative;
               flex-basis: 40px;
+              /deep/.ivu-btn {
+                @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+                @include border-color($border-color-base, $dark-border-color-base);
+                @include font-color($light-text-color, $dark-text-color);
+              }
               .menu-list {
                 display: none;
                 position: absolute;
-                bottom: 25px;
+                bottom: 23px;
                 left: -8px;
                 border-radius: 4px;
                 padding: 5px 0;
                 box-shadow: 0 1px 6px rgba(0,0,0,.2);
                 z-index: 999;
-                background-color: #fff;
+                @include bg-color($menu-list-bg-color, $dark-menu-list-bg-color);
                 cursor: pointer;
                 .list-item {
                   width: 60px;
                   padding: 5px 8px;
                   text-align: center;
+                  @include font-color($light-text-color, $dark-text-color);
                   &:hover {
-                    background-color: #f3f3f3;
+                    @include bg-color($hover-color-base, $dark-hover-color-base);
                   }
                 }
               }
@@ -300,24 +303,30 @@ export default {
             text-overflow: ellipsis;
             overflow: hidden;
             font-size: $font-size-14;
-            color: rgba(0,0,0,0.5);
-            margin: 10px 0;
+            @include font-color($light-text-desc-color, $dark-text-desc-color);
+            margin: 15px 0;
           }
           .bottom-bar {
+            margin-bottom: 0;
             display: flex;
             justify-content: flex-start;
             align-items: center;
+            flex-wrap: wrap;
+            height: 22px;
+            overflow: hidden;
             width: 100%;
             .tag-item {
-              color: $text-desc-color;
+              // color: $text-desc-color;
+              @include font-color($light-text-color, $dark-text-color);
               padding: 2px 10px;
               margin-right: 10px;
-              border-radius: 14px;
-              background-color:#F3F3F3;
+              border-radius: 11px;
+              @include bg-color($active-menu-item, $dark-active-menu-item);
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Regular;
+              font-size: 12px;
             }
           }
         }
@@ -325,9 +334,12 @@ export default {
     .project-header {
       text-align: center;
       font-size: $font-size-large;
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       line-height: 102px;
       border: 1px dashed  #dcdee2;
-      background: #F8F9FC;
+      @include border-color($border-color-base, $dark-border-color-base);
+      // background: #F8F9FC;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
       .add-icon {
         margin-top: -2px;
         margin-right: 5px;
@@ -359,7 +371,8 @@ export default {
     box-shadow: 1px 1px 5px rgba(88, 175, 251, .6);
     -webkit-animation: process 800ms infinite linear;
     animation: process 800ms infinite linear;
-    background-color: $background-color-base;
+    // background-color: $background-color-base;
+    @include bg-color($workspace-background, $dark-workspace-background);
     &:after {
         content: '';
         position: absolute;
@@ -375,6 +388,7 @@ export default {
         position: $absolute;
         left: 0;
         background: $success-color;
+        
         height: 100%;
         border-radius: 10px;
         z-index: 1;

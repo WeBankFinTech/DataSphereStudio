@@ -87,7 +87,7 @@
               "
             />
           </div>
-          <div>{{ row.label }}</div>
+          <div class="folder-label">{{ row.label }}</div>
         </div>
       </div>
       <div class="tableWrap">
@@ -422,15 +422,6 @@ export default {
             trigger: "blur"
           }
         ]
-      },
-      passwordRuleValidate: {
-        password: [
-          {
-            required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
-            trigger: "blur"
-          }
-        ]
       }
     };
   },
@@ -711,19 +702,26 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .container {
   width: 100%;
-  height: 100%;
+  // height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0;
+  @include bg-color($workspace-background, $dark-workspace-background);
 }
 .formWrap {
   width: 100%;
-  padding-left: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #dee4ec;
+  // padding-left: 20px;
+  // padding-bottom: 20px;
+  // border-bottom: 1px solid #dee4ec;
+  // @include border-color($border-color-base, $dark-border-color-base);
   display: flex;
   flex-wrap: wrap;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+  padding-bottom: 24px;
+  padding-left: 24px;
   .formItemWrap {
     display: flex;
     align-items: center;
@@ -733,7 +731,8 @@ export default {
       width: 80px;
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      // color: rgba(0, 0, 0, 0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
   }
 }
@@ -741,22 +740,22 @@ export default {
   display: flex;
   flex: 1;
   min-height: 400px;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
 }
 .deptTree {
   min-width: 230px;
   height: inherit;
-  border-right: 1px solid #dee4ec;
-  padding-top: 24px;
   .emptyTree {
     width: inherit;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.25);
+    // color: rgba(0, 0, 0, 0.25);
+    @include font-color(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25));
     text-align: center;
   }
 }
 .tableWrap {
   flex: 1;
-  padding: 0 24px;
+  margin: 0 24px;
   .addWrap {
     display: flex;
     justify-content: space-between;
@@ -766,7 +765,7 @@ export default {
     & p {
       font-family: PingFangSC-Regular;
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
   }
   .page {
@@ -784,8 +783,8 @@ export default {
   font-family: PingFangSC-Medium;
 }
 .deptChoosed {
-  background: #ecf4ff;
-  color: #2e92f7;
+  @include bg-color($active-menu-item, $dark-active-menu-item);
+  @include font-color($primary-color, $dark-primary-color);
 }
 .leaf {
   cursor: pointer;
@@ -803,10 +802,14 @@ export default {
 }
 .folder {
   width: 22px;
+  @include font-color($light-text-color, $dark-text-color);
+}
+.folder-label, .foldIcon{
+  @include font-color($light-text-color, $dark-text-color);
 }
 .operation {
   font-size: 14px;
-  color: #2e92f7;
+  @include font-color($primary-color, $dark-primary-color);
   cursor: pointer;
 }
 .modalFooter {

@@ -69,9 +69,9 @@ public class PoolManager {
     }
 
     public static DruidPooledConnection getPooledConnection(DataSource ds) throws SQLException {
+        ds.setPwd(CryptoUtils.string2Object(ds.getPwd()).toString());
         DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
         DruidPooledConnection connection = pool.getConnection();
-//        log.info("获取连接成功");
         return connection;
     }
 }

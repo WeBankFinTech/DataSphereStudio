@@ -68,8 +68,8 @@
       <Divider type="vertical" class="divider" />
       <FormItem
         :class="{'float-right': isLogModuleShow}">
+        <Button type="default" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
         <Button type="primary" @click="search" style="margin-right: 10px;" >{{ $t('message.linkis.search') }}</Button>
-        <Button type="warning" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
         <Button
           type="warning"
           @click="logRefresh"

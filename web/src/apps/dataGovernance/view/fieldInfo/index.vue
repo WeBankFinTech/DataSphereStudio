@@ -31,6 +31,12 @@
         ok-text="复制"
         cancel-text=""
       >
+        <div class="field-info-rich-text">
+          <p>SELECT</p>
+          <p>id</p>
+          <p>name</p>
+          <p>gender</p>
+        </div>
       </Modal>
       <Modal
         v-model="DDLflag"
@@ -187,5 +193,17 @@ export default {
       margin-bottom: 15px;
     }
   }
+}
+.field-info-rich-text {
+  margin: 8px 24px;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid #dee4ec;
+  border-radius: 4px;
+  border-radius: 4px;
+  font-family: PingFangSC-Regular;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 22px;
 }
 </style>

@@ -140,6 +140,15 @@ if (process.env.NODE_ENV !== 'dev') {
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  css: {
+    loaderOptions: {
+      less: {
+        lessOptions: {
+          javascriptEnabled: true,
+        }
+      },
+    },
+  },
   chainWebpack: (config) => {
     // set svg-sprite-loader
     config.module
@@ -226,6 +235,7 @@ module.exports = {
         //target: 'http://***REMOVED***:8088', //tangHan
         target: 'http://***REMOVED***:9208/',
         //target: 'http://0.0.0.0:8087',
+        // target: 'http://luban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'
@@ -237,6 +247,10 @@ module.exports = {
         pathRewrite: {
           '^/dolphinscheduler': '/dolphinscheduler'
         }
+      },
+      '/application': {
+        target: 'http://***REMOVED***:3022',
+        changeOrigin: true,
       }
     }
   }

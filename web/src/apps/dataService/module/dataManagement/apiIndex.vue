@@ -7,6 +7,10 @@
         </div>
       </div>
       <Table :columns="columns" :data="apiList" size="large">
+        <template slot-scope="{ row }" slot="status">
+          <Tag v-if="row.status == 1" color="green">{{$t("message.dataService.apiIndex.onlined")}}</Tag>
+          <Tag v-if="row.status == 0" color="red">{{$t("message.dataService.apiIndex.offlined")}}</Tag>
+        </template>
         <template slot-scope="{ row }" slot="operation">
           <div class="operation-wrap">
             <a class="operation" @click="online(row)" v-if="row.status == 0">
@@ -67,6 +71,11 @@ export default {
         {
           title: this.$t("message.dataService.apiIndex.col_apiType"),
           key: 'apiType'
+        },
+        {
+          title: this.$t("message.dataService.apiIndex.col_status"),
+          key: "status",
+          slot: "status"
         },
         {
           title: this.$t("message.dataService.operation"),
@@ -158,7 +167,7 @@ export default {
     copy(row) {
       api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
         let inputEl = document.createElement('input');
-        inputEl.value = `${res.callPathPrefix}`;
+        inputEl.value = `${res.callPathPrefix}`.replace('{protocol}:', location.protocol).replace('{host}', location.host);
         document.body.appendChild(inputEl);
         inputEl.select(); // 选择对象;
         document.execCommand("Copy"); // 执行浏览器复制命令

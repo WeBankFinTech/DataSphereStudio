@@ -31,11 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/14 11:52 AM
- */
+
 
 @Component
 public class DataMapTokenImpl implements TokenAuth {

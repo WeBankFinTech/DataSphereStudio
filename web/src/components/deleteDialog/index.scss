@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-
+ @import '@/common/style/variables.scss';
 .delete-modal {
     display: flex;
     align-items: center;
@@ -27,7 +27,7 @@
 
     .delete-modal-content {
         text-align:center;
-
+        @include font-color($light-text-color, $dark-text-color);
         .delete-modal-content-name {
             color: #409EFF;
             // display: inline-block;

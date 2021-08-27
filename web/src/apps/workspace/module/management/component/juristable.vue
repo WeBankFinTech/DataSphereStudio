@@ -11,7 +11,7 @@
       </div>
     </div>
     <div  v-if="homepagedata && homepagedata.datalist.length" class="hoempage-table">
-      <h3 style="margin:10px 0px;">{{$t('message.workspaceManagemnet.homeSetting')}}</h3>
+      <h3 style="margin:10px 0px;" class="menu-permission-title">{{$t('message.workspaceManagemnet.homeSetting')}}</h3>
       <Table border highlight-row :columns="homepagedata.column" :data="homepagedata.datalist">
         <template style="color:#4ACA6D"  slot="action">
           <Button type="warning" size="small" disabled>{{$t('message.workspaceManagemnet.editor')}}</Button>

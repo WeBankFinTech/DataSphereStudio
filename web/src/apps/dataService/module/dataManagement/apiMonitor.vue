@@ -15,14 +15,14 @@
             </div>
             <div class="metrics-overview">
               <div class="overview">
-                <Icon custom="iconfont icon-zongtiaoyongcishu" class="overview-icon"></Icon>
+                <SvgIcon class="overview-icon" icon-class="total-cnt" />
                 <div class="overview-info">
                   <div class="overview-label">{{$t("message.dataService.apiMonitor.callCnt")}}</div>
                   <div class="overview-value"><span>{{callTotalCnt}}</span>次</div>
                 </div>
               </div>
               <div class="overview">
-                <Icon custom="iconfont icon-zongzhihangshichangyongliang" class="overview-icon"></Icon>
+                <SvgIcon class="overview-icon" icon-class="total-time" />
                 <div class="overview-info">
                   <div class="overview-label">{{$t("message.dataService.apiMonitor.callTime")}}</div>
                   <div class="overview-value"><span>{{callTotalTime}}</span>ms</div>
@@ -407,12 +407,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .monitor-wrap {
   min-height: calc(100% - 78px);
   position: relative;
   .monitor-holder {
     height: 36px;
-    background: #fff;
+    @include bg-color(#fff, $dark-base-color);
   }
   .tab-wrap {
     margin-top: -36px;
@@ -424,7 +425,7 @@ export default {
   margin-bottom: 24px;
   .metrics {
     flex: 1;
-    background: #fff;
+    @include bg-color(#fff, $dark-menu-base-color);
     border-radius: 2px;
     .metrics-dashboard {
       height: 80px;
@@ -432,22 +433,22 @@ export default {
       align-items: center;
       padding: 10px 24px;
       border-radius: 2px;
-      background: #fff;
+      @include bg-color(#fff, $dark-menu-base-color);
       .dash-content {
         flex: 1;
         .dash-title {
           font-size: 16px;
           line-height: 20px;
-          color: #333;
+          @include font-color(#333, $dark-text-color);
         }
         .dash-item {
           margin-left: 10px;
           font-size: 14px;
           line-height: 20px;
-          color: #666;
+          @include font-color(#666, $dark-text-color);
           .dash-value {
             margin-left: 5px;
-            color: #220000;
+            @include font-color(#220000, $dark-text-color);
           }
         }
       }
@@ -462,25 +463,26 @@ export default {
         align-items: center;
         padding: 25px 20px;
         border: 1px solid #DEE4EC;
+        @include border-color(#DEE4EC, $dark-border-color);
         border-radius: 4px;
+        color: #2E92F7;
         &:last-child {
           margin-left: 24px;
         }
         .overview-icon {
           font-size: 40px;
-          color: #2E92F7;;
         }
         .overview-info {
           flex: 1;
           margin-left: 24px;
           .overview-label {
             font-size: 14px;
-            color: #666;
+            @include font-color(#666, $dark-text-color);
             line-height: 20px;
           }
           .overview-value {
             font-size: 14px;
-            color: #000;
+            @include font-color(#000, $dark-text-color);
             line-height: 30px;
             span {
               font-size: 16px;
@@ -493,12 +495,13 @@ export default {
     .metrics-head {
       padding: 16px 24px;
       border-bottom: 1px solid #D9D9D9;
+      @include border-color(#D9D9D9, $dark-border-color);
       .metrics-head-title {
         padding-left: 8px;
         border-left: 4px solid #2E92F7;
         font-size: 16px;
         line-height: 22px;
-        color: #333;
+        @include font-color(#333, $dark-text-color);
       }
     }
     .metrics-body {

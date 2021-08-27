@@ -7,6 +7,7 @@
     <Tabs value="form">
       <Tab-pane label="新建编排" name="form">
         <WorkflowFormNew
+          v-if="mergeModalShow"
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"
@@ -24,7 +25,7 @@
           :format="['zip']"
           :max-size="2001000"
           :action="uploadUrl">
-          <div style="padding: 120px 0">
+          <div class="upload-box">
             <Icon
               type="ios-cloud-upload"
               size="52"
@@ -110,6 +111,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
+      if (!params.projectId && !params.orchestratorMode) return
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.flowList = res.page;
       })
@@ -177,3 +179,10 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+@import "@/common/style/variables.scss";
+.upload-box {
+  padding: 120px 0;
+  @include font-color(#515a6e, $dark-text-color);
+}
+</style>

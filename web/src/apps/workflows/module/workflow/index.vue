@@ -71,6 +71,7 @@
       v-model="deleteProjectShow"
       :title="$t('message.orchestratorModes.deleteOrchestrator')"
       @on-ok="deleteProjectConfirm">{{`${$t('message.orchestratorModes.confirmDeleteOrchestrator')}${deleteProjectItem.orchestratorName} ？`}}</Modal>
+    <!--修改编排-->
     <WorkflowForm
       ref="workflowForm"
       :workflow-data="currentOrchetratorData"
@@ -108,6 +109,7 @@
       <Tabs value="form">
         <Tab-pane label="新建编排" name="form">
           <WorkflowFormNew
+            v-if="mergeModalShow"
             :workflow-data="currentOrchetratorData"
             :orchestratorModeList="orchestratorModeList"
             :selectOrchestratorList="selectOrchestratorList"
@@ -125,7 +127,7 @@
             :format="['zip']"
             :max-size="2001000"
             :action="uploadUrl">
-            <div style="padding: 120px 0">
+            <div class="upload-box">
               <Icon
                 type="ios-cloud-upload"
                 size="52"
@@ -553,12 +555,13 @@ export default {
         a.setAttribute('download', `${this.$route.query.projectName}_${orchestrator.orchestratorName}`)
         const evObj = document.createEvent('MouseEvents');
         evObj.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, true, false, 0, null);
-        const flag = a.dispatchEvent(evObj);
-        this.$nextTick(() => {
-          if (flag) {
-            this.$Message.success(this.$t('message.orchestratorModes.exportSuccess'));
-          }
-        });
+        a.dispatchEvent(evObj)
+        // const flag = a.dispatchEvent(evObj);
+        // this.$nextTick(() => {
+        //   if (flag) {
+        //     this.$Message.success(this.$t('message.orchestratorModes.exportSuccess'));
+        //   }
+        // });
       }).catch(() => {
         this.$Message.error(this.$t('message.orchestratorModes.exportFail'))
       })

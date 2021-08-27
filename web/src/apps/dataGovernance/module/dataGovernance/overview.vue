@@ -9,7 +9,6 @@
           <ICard :model="model"></ICard>
         </div>
       </div>
-
     </div>
 
     <!-- bottom -->
@@ -17,21 +16,32 @@
       <!-- bottom left -->
       <div class="overview-b-l">
         <Title :title="'表占有存储 Top10'"></Title>
-        <Table :context="tableSelf" :columns="columns1" :data="data1" width="558" size="large"></Table>
+        <Table
+          :context="tableSelf"
+          :columns="columns1"
+          :data="data1"
+          width="558"
+          size="large"
+        ></Table>
       </div>
 
       <!-- bottom right -->
       <div class="overview-b-r">
         <Title :title="'表读取次数 Top10'"></Title>
-        <Table :columns="columns2" :data="data2" width="558" size="large"></Table>
+        <Table
+          :columns="columns2"
+          :data="data2"
+          width="558"
+          size="large"
+        ></Table>
       </div>
     </div>
   </div>
 </template>
 <script>
-//import api from "@/common/service/api";
-import Title from '../common/title.vue'
-import ICard from '../common/iCard.vue'
+import { getHiveSummary } from "../../service/api";
+import Title from "../common/title.vue";
+import ICard from "../common/iCard.vue";
 export default {
   components: {
     Title,
@@ -40,102 +50,140 @@ export default {
   data() {
     return {
       models: [
-        {title: '数据库总数', iconName: 'shujukuzongshu', content: 2, unit: '个'},
-        {title: '表总数', iconName: 'biaozongshu', content: 6, unit: '个'},
-        {title: '总存容量', iconName: 'zongcunchuliang', content: 296.25, unit: 'MB'},
+        {
+          title: "数据库总数",
+          iconName: "shujukuzongshu",
+          content: 2,
+          unit: "个"
+        },
+        { title: "表总数", iconName: "biaozongshu", content: 6, unit: "个" },
+        {
+          title: "总存容量",
+          iconName: "zongcunchuliang",
+          content: 296.25,
+          unit: "MB"
+        }
       ],
       tableSelf: this,
       columns1: [
-        { title: '表名',
-          key: 'tableName',
+        {
+          title: "表名",
+          key: "tableName",
           render: (h, params) => {
-            return h('div', [
-              h('SvgIcon', {
+            return h("div", [
+              h("SvgIcon", {
                 props: {
-                  'icon-class': 'biao',
-                  'color': '#3495F7'
+                  "icon-class": "biao",
+                  color: "#3495F7"
                 },
                 style: {
-                  fontSize: '15px',
+                  fontSize: "15px"
                 }
               }),
-              h('span', {
-                style: {
-                  marginLeft: '4.8px',
-                  fontSize: '14px',
-                  color: '#3495F7'
-                }
-              },params.row.tableName)
-            ])
+              h(
+                "span",
+                {
+                  style: {
+                    marginLeft: "4.8px",
+                    fontSize: "14px",
+                    color: "#3495F7"
+                  }
+                },
+                params.row.tableName
+              )
+            ]);
           }
         },
         {
-          title: '存储量',
-          key: 'storageCapacity',
+          title: "存储量",
+          key: "storageCapacity"
         }
       ],
       columns2: [
         {
-          title: '表名',
-          key: 'tableName',
+          title: "表名",
+          key: "tableName",
           render: (h, params) => {
-            return h('div',[
-              h('SvgIcon', {
+            return h("div", [
+              h("SvgIcon", {
                 props: {
-                  'icon-class': 'biao',
-                  'color': '#3495F7'
+                  "icon-class": "biao",
+                  color: "#3495F7"
                 },
                 style: {
-                  fontSize: '15px',
+                  fontSize: "15px"
                 }
               }),
-              h('span', {
-                style: {
-                  marginLeft: '4.8px',
-                  fontSize: '14px',
-                  color: '#3495F7'
-                }
-              },params.row.tableName)
-            ])
-          }},
+              h(
+                "span",
+                {
+                  style: {
+                    marginLeft: "4.8px",
+                    fontSize: "14px",
+                    color: "#3495F7"
+                  }
+                },
+                params.row.tableName
+              )
+            ]);
+          }
+        },
         {
-          title: '读取次数',
-          key: 'readTimes',
+          title: "读取次数",
+          key: "readTimes"
         }
       ],
       data1: [
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'},
-        {tableName: 'Table2', storageCapacity: '41738kb'}
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" },
+        { tableName: "Table2", storageCapacity: "41738kb" }
       ],
       data2: [
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'},
-        {tableName: 'Table2', readTimes: '36次'}
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" },
+        { tableName: "Table2", readTimes: "36次" }
       ]
-    }
+    };
   },
   created() {
-
+    // this.getDataAssetsSummary();
   },
   methods: {
-
-  },
-}
+    // 获取 数据资产概要
+    getDataAssetsSummary() {
+      let that = this;
+      getHiveSummary()
+        .then(data => {
+          if (data.message === "ok" && data.data && data.data.result) {
+            const res = Object.values(data.data.result);
+            const models = that.models.slice(0);
+            models.forEach((model, idx) => {
+              model.content = res[idx];
+            });
+            that.models = models;
+          }
+          console.log(data);
+        })
+        .catch(err => {
+          console.log("getDataAssetsSummary", err);
+        });
+    }
+  }
+};
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
@@ -146,11 +194,11 @@ export default {
   padding-right: 3px;
   border-top: 24px solid #dee4ec;
   .overview-t {
-      &-card {
-          display: flex;
-          flex-direction: row;
-          justify-content: flex-start;
-      }
+    &-card {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
   }
   .overview-b {
     margin-top: 24px;
@@ -163,4 +211,3 @@ export default {
   }
 }
 </style>
-

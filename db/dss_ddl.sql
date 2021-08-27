@@ -1467,7 +1467,7 @@ CREATE TABLE `dss_admin_dept` (
   `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '更新者',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 COMMENT='部门表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='部门表';
 
 
 CREATE TABLE `dss_dataapi_config` (
@@ -1546,5 +1546,21 @@ CREATE TABLE `dss_dataapi_call` (
   `caller` varchar(255) DEFAULT NULL COMMENT '调用者名称',
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API调用记录'
+;
 
-
+CREATE TABLE `dss_dataapi_datasource` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',
+  `name` varchar(255) NOT NULL COMMENT '名称',
+  `note` varchar(255) DEFAULT NULL COMMENT '描述',
+  `type` varchar(255) NOT NULL COMMENT '数据库类型',
+  `url` varchar(255) NOT NULL COMMENT '连接url',
+  `username` varchar(255) NOT NULL COMMENT '用户名',
+  `pwd` varchar(255) NOT NULL COMMENT '密码',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='数据源'

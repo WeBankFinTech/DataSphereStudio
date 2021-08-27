@@ -982,7 +982,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    border: 1px solid #DEE4EC;
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -1001,7 +1001,7 @@ export default {
     height: 48px;
     margin-top: -5px;
     background: #f8f9fc;
-    border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    border: 1px solid #DEE4EC;
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -1037,7 +1037,7 @@ export default {
     overflow-y: auto;
     .cardWrap {
       padding: 20px 0;
-      border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
+      border-bottom: 1px solid #DEE4EC;
       .cardTitle {
         font-family: PingFangSC-Medium;
         font-size: 16px;

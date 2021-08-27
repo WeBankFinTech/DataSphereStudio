@@ -232,8 +232,8 @@ module.exports = {
     proxy: {
       '/api': {
         //target: 'http://192.168.10.201:8088',
-        //target: 'http://***REMOVED***:8088', //tangHan
-        target: 'http://***REMOVED***:9208/',
+        target: 'http://***REMOVED***:8088', //tangHan
+        //target: 'http://***REMOVED***:9208/',
         //target: 'http://0.0.0.0:8087',
         // target: 'http://luban.ctyun.cn:8088',
         changeOrigin: true,

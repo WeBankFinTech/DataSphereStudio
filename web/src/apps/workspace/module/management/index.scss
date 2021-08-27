@@ -44,6 +44,7 @@
       font-size: $font-size-large;
       font-weight: 600;
       padding: 10px 20px 10px 25px;
+      @include bg-color($light-base-color, $dark-workspace-background);
     }
     .ivu-menu-light{
       // background-color: rgba(242, 242, 242, 1);
@@ -70,7 +71,7 @@
     .left-mune {
       .left-menuItem {
         @include font-color($light-text-color, $dark-text-color);
-        @include bg-color($light-base-color, $dark-base-color);
+        @include bg-color($light-base-color, $dark-menu-base-color);
       }
       .ivu-menu-item-active {
         @include bg-color($active-menu-item, $dark-active-menu-item);

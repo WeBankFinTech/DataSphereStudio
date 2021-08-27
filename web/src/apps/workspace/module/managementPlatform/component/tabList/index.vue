@@ -39,7 +39,7 @@
       </div>
 
       <!-- appmain  -->
-      <div  class="management-platform-container-list-appmain" :class="{'addHeight': header == '控制台' }">
+      <div  class="management-platform-container-list-appmain">
         <router-view></router-view>
       </div>
 
@@ -116,6 +116,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .management-platform-container {
   margin-left: 304px;
   transition: margin-left .3s;
@@ -124,24 +125,27 @@ export default {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  @include bg-color($light-base-color, $dark-base-color);
   &.sidebar-fold {
     margin-left: 54px;
   }
   &-tapbar {
-    background-color: #fff;
+    // background-color: #fff;
+    @include bg-color($light-base-color, $dark-base-color);
     &-header {
       padding: 24px 24px;
-      color: rgba(0,0,0,0.65);
+      // color: rgba(0,0,0,0.65);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       font-family: PingFangSC-Medium;
       font-size: 21px;
       border-bottom: 24px solid #EDF1F6;
+      @include border-color($border-color-base, $dark-workspace-background);
     }
   }
   &-list {
     flex: 1;
     display: flex;
-    min-height: 685px;
-    background: #fff;
+    @include bg-color($light-base-color, $dark-base-color);
     flex-direction: column;
     &-breadcrumb {
       height: 30px;
@@ -151,17 +155,15 @@ export default {
       width: 100%;
       margin-left: -24px;
       padding-left: 24px;
+      @include border-color($border-color-base, $dark-border-color-base);
     }
     &-appmain {
       overflow: hidden;
+      height: 100%;
     }
   }
 }
 .consoleStyle {
-  min-height: 0px;
-  margin-left: 24px
-}
-.addHeight {
-  height: 400px;
+  margin-left: 24px;
 }
 </style>

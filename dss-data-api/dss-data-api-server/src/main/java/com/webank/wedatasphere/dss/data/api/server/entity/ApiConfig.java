@@ -33,7 +33,7 @@ public class ApiConfig {
     private String describe;
     @NotBlank(message = "datasource_id不能为空")
     @TableField(value = "datasource_id")
-    private String datasourceId;
+    private Integer datasourceId;
     private String tblName;
     private String memory;
     @TableField(value = "req_timeout")

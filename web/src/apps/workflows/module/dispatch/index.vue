@@ -12,9 +12,6 @@
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
           <template>
-            <!--<div class="scheduler-list-title">-->
-              <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
-            <!--</div>-->
             <dashboard @goToList="goToList"></dashboard>
           </template>
         </div>
@@ -61,9 +58,9 @@
                   format="yyyy-MM-dd HH:mm:ss">
                 </Date-picker>
                 <Select v-model="instanceStateType"
-                  @on-change="_changeInstanceState"
-                  :placeholder="$t('message.scheduler.selectState')"
-                  style="width: 150px;float: right;margin-right: 10px;"
+                        @on-change="_changeInstanceState"
+                        :placeholder="$t('message.scheduler.selectState')"
+                        style="width: 150px;float: right;margin-right: 10px;"
                 >
                   <Option value="" key="-">-</Option>
                   <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
@@ -1133,21 +1130,24 @@ export default {
       })
     },
     openTiming(index, isEdit) {
-      let id
+      let id, tempData = {}
       if (isEdit) {
-        this.timingData.item = index
-        this.timingData.type = ''
+        tempData.item = index
+        tempData.type = ''
         id = index.processDefinitionId
       } else {
-        this.timingData.item = this.list[index]
-        this.timingData.type = 'timing'
+        tempData.item = this.list[index]
+        tempData.type = 'timing'
         id = this.list[index].id
       }
       this.getReceiver(id, (res) => {
-        this.timingData.item.receivers = res.receivers
-        this.timingData.item.receiversCc = res.receiversCc
+        this.timingData.item = {
+          ...tempData.item,
+          receivers: res.receivers,
+          receiversCc: res.receiversCc
+        }
+        this.showTimingTaskModal = true
       })
-      this.showTimingTaskModal = true
     },
     _copy(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/copy`, {
@@ -1311,7 +1311,11 @@ export default {
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
-        console.log('运维大屏')
+        this.activeDS = 0
+        this.$nextTick(() => {
+          this.activeDS = 4
+        })
+
       } else if (this.activeDS === 5) {
         if (data) {
           if (data.startDate && data.endDate) {
@@ -1565,9 +1569,9 @@ export default {
 <style lang="scss">
   a {
     color: #2d8cf0;
-    &:hover {
-      color: #57a3f3;
-    }
+  &:hover {
+     color: #57a3f3;
+   }
   }
 </style>
 <style lang="scss" scoped>
@@ -1577,12 +1581,12 @@ export default {
   overflow: hidden;
   .scheduler-wrapper{
     padding-top: 0;
-    .scheduler-menu{
-      min-height: 80vh;
-    }
-    .scheduler-list{
-      min-height: 80vh;
-    }
+  .scheduler-menu{
+    min-height: 80vh;
+  }
+  .scheduler-list{
+    min-height: 80vh;
+  }
   }
 }
 .scheduler-wrapper{
@@ -1591,6 +1595,7 @@ export default {
   // padding-top: 16px;
   float: left;
   width: 100%;
+
   .scheduler-menu{
     float: left;
     width: 250px;
@@ -1601,6 +1606,7 @@ export default {
     border-left: 1px solid #DEE4EC;
     @include border-color($border-color-base, $dark-workspace-background);
     @include bg-color($light-base-color, $dark-base-color);
+    @include font-color($light-text-color, $dark-text-color);
     li {
     padding: 0 40px;
     cursor: pointer;
@@ -1672,7 +1678,19 @@ export default {
   .page-bar {
     margin-top: 20px;
   }
-}
+  }
+</style>
+<style lang="scss">
+  .right-menu {
+    position: fixed;
+    width: 90px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    visibility: hidden;
+    z-index: 99
+  }
 </style>
 <style lang="scss">
   .right-menu {

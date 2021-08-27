@@ -112,6 +112,11 @@ function stopDssProject(){
 	SERVER_NAME=dss-flow-execution-server
 	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
 	stopApp
+
+	SERVER_NAME=dss-data-api-server
+	SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+  stopApp
+
 	##SERVER_NAME=visualis-server
   ##SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
   ##stopApp

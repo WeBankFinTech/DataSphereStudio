@@ -3,17 +3,18 @@
     <div class="panel-title-wrap">
       <p>服务开发</p>
       <div @click="addGroup()">
-        <Icon custom="iconfont icon-plus" size="20"></Icon>
+        <Icon custom="iconfont icon-plus" size="16"></Icon>
       </div>
     </div>
+    <div style="padding-left: 10px; padding-right: 10px;">
     <Input
       size="small"
       :value="searchValue"
       prefix="ios-search"
       placeholder="请输入"
-      style="width: 230px;border:0;margin-top: 10px;"
+      style="width: 230px;border:0;margin-top: 10px;margin-bottom: 10px;"
       @on-change="handleSearch"
-    />
+    /></div>
     <Tree
       class="tree-container"
       :nodes="projectsTree"
@@ -28,7 +29,7 @@
   </div>
 </template>
 <script>
-import Tree from "@/apps/workflows/module/common/tree/tree.vue";
+import Tree from "./tree.vue";
 import api from "@/common/service/api";
 import _ from "lodash";
 
@@ -193,6 +194,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0px 10px;
   & p {
     font-family: PingFangSC-Medium;
     font-size: 14px;

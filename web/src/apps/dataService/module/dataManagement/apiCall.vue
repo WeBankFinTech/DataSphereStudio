@@ -4,7 +4,7 @@
     <div class="filter-box">
       <div class="filter-area">
         <Button type="primary" size="large" @click="addAuthorize">
-          <Icon custom="iconfont icon-xinzeng1" size="12"></Icon>
+          <SvgIcon icon-class="xinzeng" />
           {{ $t("message.dataService.apiCall.addAuthorize") }}
         </Button>
       </div>
@@ -37,8 +37,8 @@
     <Modal v-model="modelConfirm" width="480" :closable="false">
       <div class="modal-confirm-body">
         <div class="confirm-title">
-          <Icon custom="iconfont icon-project" size="26"></Icon>
-          <span>{{ $t("message.dataService.apiCall.deleteApiCallTitle") }}</span>
+          <SvgIcon class="icon" icon-class="project-workflow" />
+          <span class="text">{{ $t("message.dataService.apiCall.deleteApiCallTitle") }}</span>
         </div>
         <div class="confirm-desc">{{ $t("message.dataService.apiCall.deleteApiCallDesc") }}</div>
       </div>
@@ -118,7 +118,8 @@ export default {
         },
         {
           title: 'Token',
-          key: 'token'
+          key: 'token',
+          width: '300'
         },
         {
           title: this.$t("message.dataService.apiCall.col_expire"),
@@ -309,17 +310,19 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .manage-wrap {
   position: relative;
   padding: 0 24px;
-  background: #fff;
+  @include bg-color(#fff, $dark-base-color);
   .manage-head {
     margin-bottom: 15px;
     padding-bottom: 10px;
     font-size: 16px;
-    color: #333;
+    @include font-color(#333, $dark-text-color);
     font-weight: bold;
-    border-bottom: 1px solid #DEE4EC;
+    border-bottom: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-border-color);
   }
   .filter-box {
     margin-bottom: 20px;
@@ -337,6 +340,7 @@ export default {
     color: #2E92F7;
     padding: 0 10px;
     border-right: 1px solid #D8D8D8;
+    @include border-color(#D8D8D8, $dark-border-color);
     &:last-child {
       border-right: 0;
     }
@@ -351,14 +355,15 @@ export default {
 .modal-confirm-body {
   .confirm-title {
     margin-top: 10px;
-    display: flex;
-    align-items: center;
     color: #FF9F3A;
-    span {
+    .text {
       margin-left: 15px;
       font-size: 16px;
       line-height: 24px;
-      color: #333;
+      @include font-color(#333, $dark-text-color);
+    }
+    .icon {
+      font-size: 26px;
     }
   }
   .confirm-desc {
@@ -367,7 +372,7 @@ export default {
     margin-left: 42px;
     font-size: 14px;
     line-height: 20px;
-    color: #666;
+    @include font-color(#666, $dark-text-color);
   }
 }
 </style>

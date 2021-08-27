@@ -54,7 +54,7 @@
       <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
     </div>
     <Page
-      v-if="dataList.length > 0 && pagination.size < dataList.length "
+      v-if="dataList.length > 0"
       class="page-bar"
       :total="dataList.length"
       show-sizer
@@ -114,7 +114,7 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 30, 45, 60]
+        opts: [10, 20, 30, 40]
       },
       isToolbarShow: false,
       cardShowNum: 4,
@@ -312,7 +312,7 @@ export default {
             justify-content: flex-start;
             align-items: center;
             flex-wrap: wrap;
-            height: 22px;
+            height: 23px;
             overflow: hidden;
             width: 100%;
             .tag-item {
@@ -321,7 +321,9 @@ export default {
               padding: 2px 10px;
               margin-right: 10px;
               border-radius: 11px;
-              @include bg-color($active-menu-item, $dark-active-menu-item);
+              @include bg-color(#F3F3F3, $dark-base-color);
+              border: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
@@ -334,7 +336,7 @@ export default {
     .project-header {
       text-align: center;
       font-size: $font-size-large;
-      @include font-color($workspace-title-color, $dark-workspace-title-color);
+      @include font-color($light-text-color, $dark-text-color);
       line-height: 102px;
       border: 1px dashed  #dcdee2;
       @include border-color($border-color-base, $dark-border-color-base);

@@ -36,10 +36,18 @@ const getSelectSql = guid => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/${gui
  */
 const getSelectDdl = guid => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/${guid}/create`, {}, 'get')
 
+/**
+ * 搜索hive表
+ * @param {query}
+ * @returns
+ */
+const getHiveTbls = params => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/search?query=${params.query}`, {}, 'get')
+
 export {
   getHiveSummary,
   getHiveTblBasic,
   getHiveTblPartition,
   getSelectSql,
-  getSelectDdl
+  getSelectDdl,
+  getHiveTbls
 }

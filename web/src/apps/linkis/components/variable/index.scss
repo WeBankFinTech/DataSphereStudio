@@ -17,9 +17,12 @@
 @import '@/common/style/variables.scss';
 .we-variable{
     border: $border-width-base $border-style-base $border-color-split;
+    @include border-color($border-color-base, $dark-border-color-base);
     box-shadow: $shadow-card;
     border-radius: 10px 10px 3px 3px;
-    color: $text-color;
+    // color: $text-color;
+    @include font-color($light-text-color, $dark-text-color);
+    
     margin: 5px 0;
 
     .we-variable-header {
@@ -30,16 +33,19 @@
         justify-content: space-between;
         .we-variable-header-title {
             font-size: 14px;
-            background: $primary-color;
+            // background: $primary-color;
+            @include bg-color($primary-color, $dark-primary-color);
             padding: 2px 12px;
             border-radius: 10px 0;
             display: inline-block;
-            color: #fff;
+            // color: #fff;
+            @include font-color(#fff, $dark-workspace-title-color)
         }
         .we-variable-header-control{
             display: inline-block;
             padding: 0 6px;
-            color: #ccc;
+            // color: #ccc;
+            @include font-color($light-text-color, $dark-text-color);
             cursor: pointer;
         }
     }
@@ -75,8 +81,10 @@
                 min-width: 40%;
                 border: none;
                 border: $border-width-base $border-style-base $border-color-base;
+                @include border-color($border-color-base, $dark-border-color-base);
                 border-radius: 4px;
-                background-color: $background-color-white;
+                // background-color: $background-color-white;
+                @include bg-color($light-base-color, $dark-base-color);
                 padding: 4px 7px;
                 line-height: $line-height-base;
                 transition: border .2s ease-in-out,background .2s ease-in-out,box-shadow .2s ease-in-out;
@@ -89,10 +97,12 @@
                 }
             }
             .we-variable-content-input[disabled] {
-                background-color: #f3f3f3;
+                // background-color: #f3f3f3;
+                @include bg-color(#f3f3f3, $dark-text-desc-color);
                 opacity: 1;
                 cursor: not-allowed;
-                color: #ccc;
+                // color: #ccc;
+                @include bg-color($text-desc-color, $dark-text-desc-color);
             }
             .we-variable-content-icon {
                 cursor: pointer;
@@ -114,7 +124,8 @@
         justify-content: space-between;
         cursor: pointer;
         .we-variable-bottom-add {
-            color: $primary-color;
+            // color: $primary-color;
+            @include font-color($primary-color, $dark-primary-color);
         }
     }
 }

@@ -242,7 +242,7 @@ export default {
     },
     getResource24Hour() {
       this.loadingChart = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callCntForPast24H', {
+      api.fetch('/dss/data/api/apimonitor/callCntForPast24H', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.dataPast24Hour = res.list;
@@ -299,7 +299,7 @@ export default {
       this.echart.setOption(option);
     },
     getOnlineApiCnt() {
-      api.fetch('/dss/framework/dbapi/apimonitor/onlineApiCnt', {
+      api.fetch('/dss/data/api/apimonitor/onlineApiCnt', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.onlineCnt = res.onlineApiCnt;
@@ -308,7 +308,7 @@ export default {
       });
     },
     getOfflineApiCnt() {
-      api.fetch('/dss/framework/dbapi/apimonitor/offlineApiCnt', {
+      api.fetch('/dss/data/api/apimonitor/offlineApiCnt', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.offlineCnt = res.offlineApiCnt;
@@ -325,7 +325,7 @@ export default {
       this.getCallTotalTime(range);
     },
     getCallTotalCnt(range) {
-      api.fetch('/dss/framework/dbapi/apimonitor/callTotalCnt', {
+      api.fetch('/dss/data/api/apimonitor/callTotalCnt', {
         ...range,
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
@@ -335,7 +335,7 @@ export default {
       });
     },
     getCallTotalTime(range) {
-      api.fetch('/dss/framework/dbapi/apimonitor/callTotalTime', {
+      api.fetch('/dss/data/api/apimonitor/callTotalTime', {
         ...range,
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
@@ -346,7 +346,7 @@ export default {
     },
     getCallListByCnt() {
       this.loadingCnt = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callListByCnt', {
+      api.fetch('/dss/data/api/apimonitor/callListByCnt', {
         startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
         endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
@@ -360,7 +360,7 @@ export default {
     },
     getCallListByFailRate() {
       this.loadingRate = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callListByFailRate', {
+      api.fetch('/dss/data/api/apimonitor/callListByFailRate', {
         startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
         endTime: this.dateFormat(),
         workspaceId: this.$route.query.workspaceId
@@ -374,7 +374,7 @@ export default {
     },
     getCallListDetail() {
       this.loadingDetail = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/list', {
+      api.fetch('/dss/data/api/apimonitor/list', {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,

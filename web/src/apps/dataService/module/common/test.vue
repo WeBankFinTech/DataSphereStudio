@@ -119,7 +119,7 @@ export default {
     getApiList() {
       api
         .fetch(
-          "/dss/framework/dbapi/list",
+          "/dss/data/api/list",
           {
             workspaceId: this.$route.query.workspaceId
           },
@@ -176,7 +176,7 @@ export default {
         this.loading = true;
         api
           .fetch(
-            `/dss/framework/dbapi/test/${this.currentApi.path}`,
+            `/dss/data/api/test/${this.currentApi.path}`,
             data,
             "post"
           )

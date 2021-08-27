@@ -90,16 +90,6 @@ body {
   background: $scrollbar-color;
 }
 
-.ivu-table:after {
-  width: 0 !important;
-}
-
-.ivu-table th {
-  background-color: #FAFAFA !important;
-}
-// .ivu-table-wrapper{
-//   border: none !important;
-// }
 .ivu-modal-header {
   //   background-color: #FAFAFA !important;
   @include bg-color(#FAFAFA, $dark-base-color);

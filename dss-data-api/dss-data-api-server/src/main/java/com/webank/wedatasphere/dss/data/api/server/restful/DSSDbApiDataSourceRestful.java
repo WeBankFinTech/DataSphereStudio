@@ -31,7 +31,7 @@ import java.util.List;
  * @author lvjw
  */
 @Component
-@Path("/dss/framework/dbapi/datasource")
+@Path("/dss/data/api/datasource")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DSSDbApiDataSourceRestful {

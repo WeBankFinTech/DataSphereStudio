@@ -23,8 +23,10 @@
     height: $percent-all;
     display: flex;
     flex-direction: column;
-    background: $background-color-base;
+    // background: $background-color-base;
+    @include bg-color($light-base-color, $dark-base-color);
 
+    // 广告位样式，未使用到，暂未修改
     .ad {
         background: $body-background;
         box-shadow: $shadow-card;
@@ -51,16 +53,20 @@
             .console-page-content-title {
                 font-size: $font-size-large;
                 font-weight: bold;
+                @include font-color($workspace-title-color, $dark-workspace-title-color);
             }
         }
 
         .console-page-content-body {
             position: $relative;
+            height: 100%;
             .content-body-side-nav {
                 width: 200px;
+                height: 100%;
                 position: $absolute;
                 top: 0;
                 left: 0;
+                @include bg-color($light-base-color, $dark-menu-base-color);
                 .content-body-card {
                     margin:10px 0 10px;
                 }
@@ -71,13 +77,15 @@
                 right: 0;
                 left: 200px;
                 margin-left: 20px;
-                background: $body-background;
+                // background: $body-background;
+                @include bg-color($light-base-color, $dark-base-color);
                 border-radius: $border-radius-small;
                 padding: 10px;
                 overflow: hidden;
                 .content-body-side-right-title {
                     height: 30px;
                     border-bottom: $border-width-base $border-style-base $border-color-split;
+                    @include border-color($border-color-base, $dark-border-color-base);
                     margin-bottom: 10px
                 }
                 .content-body-side-right-content {

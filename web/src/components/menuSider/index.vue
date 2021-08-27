@@ -73,7 +73,7 @@ export default {
         position: absolute;
         top: 20px;
         font-size: 14px;
-        background: #333c;
+        @include bg-color(#333c, $dark-active-menu-item);
         @include font-color(#fff, $dark-text-color);
         line-height: 16px;
         padding: 2px;

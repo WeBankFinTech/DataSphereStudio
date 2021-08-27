@@ -16,7 +16,7 @@
         <Icon custom="iconfont icon-project" size="26"></Icon>
       </div>
     </div>
-    <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
+    <div class="ds-nav-panel ds-nav-panel-develop" v-if="currentTab == '/dataService'">
       <TreeMenu
         @showModal="showModal"
         @handleApiChoosed="handleApiChoosed"
@@ -135,6 +135,10 @@ export default {
     padding: 10px;
     overflow-y: auto;
     border-right: 1px solid #dee4ec;
+  }
+  .ds-nav-panel-develop{
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 .develop_nav {

@@ -55,7 +55,7 @@ import java.util.UUID;
  * @Created by suyc
  */
 @Component
-@Path("/dss/framework/dbapi/apiauth")
+@Path("/dss/data/api/apiauth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Slf4j

@@ -1074,7 +1074,7 @@ export default {
           params: this.convertSettingParams(this.script.params),
         };
           // this.work.code = this.script.data;
-        const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
+        const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
             if (this.work.filepath) {

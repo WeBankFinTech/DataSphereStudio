@@ -48,10 +48,14 @@
                 line-height: 44px;
                 text-align: center;
                 cursor: pointer;
+                @include font-color(#333, $dark-workflow-font-color);
                 &:hover {
                     // background: #ECEFF4;
                     @include bg-color($hover-color-base, $dark-hover-color-base);
 
+                }
+                .nav-icon {
+                    font-size: 26px;
                 }
             }
             .active {
@@ -68,17 +72,17 @@
             top: 0;
             bottom: 0;
             transition: all .3s;
-            padding: 10px;
+            padding: 10px 0;
             overflow-y: auto;
             border-right: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-menu-base-color);
+            @include border-color($border-color-base, $dark-workspace-background);
             @include bg-color($light-base-color, $dark-menu-base-color);
         }
     }
     .workflowListContainer {
         display: flex;
         margin: 0 $padding-25;
-        min-height: 685px;
+        min-height: 100%;
         padding: $padding-25;
         border: $border-width-base  $border-style-base $border-color-base;
         @include border-color($border-color-base, $dark-workspace-body-bg-color);

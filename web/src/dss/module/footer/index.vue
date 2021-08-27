@@ -1,7 +1,7 @@
 <template>
   <div class="layout-footer">
     <div class="footer-btn footer-doc" @click="toggleGuide">
-      <Icon custom="iconfont icon-wenhao"/>
+      <SvgIcon icon-class="question" />
     </div>
     <Guide :show="guideShow" @on-toggle="toggleGuide" />
 
@@ -10,7 +10,7 @@
       @update-job="updateJob">
     </resource-simple>
     <div class="footer-btn footer-channel" :title="msg" @click.prevent.stop="toast">
-      <Icon class="footer-channel-job" custom="iconfont icon-tiaodu"/>
+      <SvgIcon class="footer-channel-job" icon-class="job" />
       <span class="footer-channel-job-num">{{ num }}</span>
     </div>
   </div>

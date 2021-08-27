@@ -90,7 +90,7 @@ export default {
       //获取数据服务所有的api
       api
         .fetch(
-          `/dss/framework/dbapi/list?workspaceId=${this.$route.query.workspaceId}`,
+          `/dss/data/api/list?workspaceId=${this.$route.query.workspaceId}`,
           {},
           "get"
         )

@@ -202,7 +202,7 @@ export default {
       return `${format} 00:00:00`;
     },
     getApiGroup() {
-      api.fetch('/dss/framework/dbapi/apiauth/apigroup', {
+      api.fetch('/dss/data/api/apiauth/apigroup', {
         workspaceId: this.$route.query.workspaceId,
       }, 'get').then((res) => {
         if (res.list) {
@@ -214,7 +214,7 @@ export default {
     },
     getApiCallList() {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apiauth/list', {
+      api.fetch('/dss/data/api/apiauth/list', {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
@@ -259,7 +259,7 @@ export default {
           if (this.authFormData.id) {
             data.id = this.authFormData.id;
           }
-          api.fetch('/dss/framework/dbapi/apiauth/save', data, 'post').then((res) => {
+          api.fetch('/dss/data/api/apiauth/save', data, 'post').then((res) => {
             this.authCancel();
             this.pageData = {
               total: 0,
@@ -291,7 +291,7 @@ export default {
     },
     deleteConfirm() {
       this.modelConfirm = false;
-      api.fetch(`/dss/framework/dbapi/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
+      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
         console.error(err)

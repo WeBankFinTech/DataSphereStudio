@@ -147,7 +147,7 @@ export default {
   width: 100%;
   height: calc( 100vh - 140px );
   min-width: 600px;
-  border-top: 1px solid rgba($color: #000000, $alpha: 0.1);
+  border-top: 1px solid #DEE4EC;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -9,7 +9,7 @@
         :class="{'active': $route.path.startsWith(`/${menu.path}`) }" 
         @click="handleTabClick(menu.path)"
       >
-        <Icon custom="iconfont" :class="menu.icon" size="16"></Icon>
+        <SvgIcon :icon-class="menu.icon" />
         <span>{{menu.name}}</span>
       </div>
     </div>
@@ -21,10 +21,10 @@ export default {
   data() {
     return {
       menuList: [
-        { name: 'API管理', icon: 'icon-APIguanli', path: 'dataManagement/index'},
-        { name: 'API监控', icon: 'icon-APIjiankong', path: 'dataManagement/monitor'},
-        { name: 'API测试', icon: 'icon-APIceshi', path: 'dataManagement/test'},
-        { name: 'API调用', icon: 'icon-APItiaoyong', path: 'dataManagement/call'},
+        { name: 'API管理', icon: 'api-index', path: 'dataManagement/index'},
+        { name: 'API监控', icon: 'api-monitor', path: 'dataManagement/monitor'},
+        { name: 'API测试', icon: 'api-test', path: 'dataManagement/test'},
+        { name: 'API调用', icon: 'api-auth', path: 'dataManagement/call'},
       ]
     }
   },
@@ -39,26 +39,30 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .manage-menu-wrap {
-  background: #F8F9FC;
+  @include bg-color(#f8f9fc, $dark-menu-base-color);
   .manage-title {
     padding: 10px 12px;
     font-size: 14px;
     line-height: 20px;
-    color: #666;
+    @include font-color(#666, $dark-text-color);
     font-weight: bold;
     border-bottom: 1px solid #DEE4EC;
+    @include border-color(#DEE4EC, $dark-border-color);
   }
   .manage-menu {
     &-item {
       padding: 0 10px;
       height: 40px;
       line-height: 40px;
-      color: #666;
+      font-size: 14px;
+      @include font-color(#666, $dark-text-color);
       cursor: pointer;
       border-bottom: 1px solid #DEE4EC;
+      @include border-color(#DEE4EC, $dark-border-color);
       &:hover {
-        background: #EDF1F6;
+        @include bg-color(#EDF1F6, $dark-active-menu-item);
       }
       span {
         margin-left: 6px;

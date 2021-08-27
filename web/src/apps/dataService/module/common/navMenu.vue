@@ -6,14 +6,14 @@
         :class="{ active: currentTab == '/dataService' }"
         @click="handleTabClick('dataService')"
       >
-        <Icon custom="iconfont icon-fuwukaifa" size="26"></Icon>
+        <SvgIcon class="nav-icon" icon-class="data-develop" />
       </div>
       <div
         class="ds-nav-menu-item"
         :class="{ active: currentTab.startsWith('/dataManagement') }"
         @click="handleTabClick('dataManagement')"
       >
-        <Icon custom="iconfont icon-project" size="26"></Icon>
+        <SvgIcon class="nav-icon" icon-class="project-workflow" />
       </div>
     </div>
     <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
@@ -98,7 +98,7 @@ export default {
   top: 54px;
   bottom: 0;
   width: 304px;
-  background: #f8f9fc;
+  @include bg-color(#f8f9fc, $dark-base-color);
   transition: all 0.3s;
   &.ds-nav-menu-fold {
     width: 54px;
@@ -109,20 +109,24 @@ export default {
   .ds-nav-menu {
     z-index: 1;
     width: 54px;
-    background: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-base-color);
     border-right: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-menu-base-color);
     &-item {
       height: 44px;
       line-height: 44px;
       text-align: center;
       cursor: pointer;
+      font-size: 26px;
+      @include font-color(#333, $dark-text-color);
       &:hover {
-        background: #eceff4;
+        @include bg-color(#eceff4, $dark-menu-base-color);
       }
     }
     .active {
-      background: #eceff4;
+      @include bg-color(#eceff4, $dark-menu-base-color);
       border-left: 3px solid #2e92f7;
+      @include border-color(#2e92f7, #4B8FF3);
     }
   }
   .ds-nav-panel {
@@ -135,6 +139,8 @@ export default {
     padding: 10px;
     overflow-y: auto;
     border-right: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-menu-base-color);
+    @include bg-color(#f8f9fc, $dark-menu-base-color);
   }
 }
 .develop_nav {

@@ -19,6 +19,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
@@ -114,8 +115,14 @@ public class DSSWorkspaceRestful {
     public Response getWorkspaceHomePage(@Context HttpServletRequest request, @QueryParam("micro_module") String moduleName){
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
-        DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
-        return Message.messageToResponse(Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO));
+        try{
+            DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
+            return Message.messageToResponse(Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO));
+
+
+        }catch (Exception e){
+            return RestfulUtils.dealError(e.getMessage());
+        }
     }
 
     @GET

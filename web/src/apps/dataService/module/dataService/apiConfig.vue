@@ -122,7 +122,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   font-size: 21px;
-  color: $text-title-color;
+  @include font-color($text-title-color, $dark-text-color);
   font-family: PingFangSC-Regular;
   .divider {
     padding: 0 10px;
@@ -137,7 +137,7 @@ export default {
     display: inline-block;
     height: 40px;
     line-height: 40px;
-    color: $title-color;
+    @include font-color($title-color, $dark-text-color);
     cursor: pointer;
     min-width: 100px;
     max-width: 200px;

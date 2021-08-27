@@ -35,10 +35,9 @@
         <module>dss-framework</module>
         <module>dss-apps/dss-apiservice-server</module>
         <module>dss-data-api</module>
-        <module>plugins/azkaban/linkis-jobtype</module>
+<!--        <module>plugins/azkaban/linkis-jobtype</module>-->
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
-
     </modules>
 
     <properties>

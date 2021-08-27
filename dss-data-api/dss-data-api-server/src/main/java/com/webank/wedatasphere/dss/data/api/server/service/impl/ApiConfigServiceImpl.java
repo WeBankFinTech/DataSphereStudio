@@ -16,6 +16,7 @@ import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiExecuteInf
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
+import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.data.api.server.util.*;
 import com.webank.wedatasphere.dss.orange.SqlMeta;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     ApiCallMapper apiCallMapper;
     @Autowired
     ApiConfigMapper apiConfigMapper;
+    @Autowired
+    ApiDataSourceService apiDataSourceService;
 
     /**
      * 保存API配置信息
@@ -102,7 +105,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 throw new DataApiException("请设置pageNum参数");
             }
             int pageNum = (Integer)pageNumObject;
-            limitSent = "limit "+ ((pageNum-1) * pageSize)+","+pageSize;
+            limitSent = " limit "+ ((pageNum-1) * pageSize)+","+pageSize;
         }
         if (apiConfig != null) {
             Map<String, Object> sqlParam = this.getSqlParam(request, apiConfig,map);
@@ -114,20 +117,25 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             }else {
                 sqlText = sqlFiled;
             }
-            //不分页最多返回500条数据
+            //不分页,最多返回500条数据
             if(pageSize <= 0) {
-                sqlText = String.format("%s %s",sqlText,"limit 500");
+                sqlText = String.format("%s %s",sqlText," limit 500");
             }
 
-
-            DataSource dataSource = new DataSource();
+            Integer datasourceId = apiConfig.getDatasourceId();
+            DataSource dataSource = apiDataSourceService.getById(datasourceId);
+            //解密
+//            String pwd = String.valueOf( CryptoUtils.string2Object(dataSource.getPwd()));
+//            dataSource.setPwd(pwd);
+            String dataSourceType = dataSource.getType();
+            if("MYSQL".equals(dataSourceType)){
+                dataSource.setClassName("com.mysql.jdbc.Driver");
+            }
 //            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
-            dataSource.setUrl("jdbc:mysql://172.24.2.61:3306/dss_test?characterEncoding=UTF-8");
-
-            dataSource.setClassName("com.mysql.jdbc.Driver");
-            dataSource.setUsername("root");
-            dataSource.setPwd("123456");
-            dataSource.setDatasourceId(1);
+//            dataSource.setUrl("jdbc:mysql://172.24.2.61:3306/dss_test?characterEncoding=UTF-8");
+//            dataSource.setUsername("root");
+//            dataSource.setPwd("123456");
+//            dataSource.setDatasourceId(1);
             apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
 
         }else {
@@ -315,7 +323,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     }
                     ResultSet  countRs = countStatement.executeQuery();
                     if ((countRs.next())){
-                        int totalRecord = countRs.getInt(0);
+                        int totalRecord = countRs.getInt(1);
                         int totalPage = (totalRecord + pageSize-1) / pageSize;
                         jo.put("totalPage",totalPage);
                     }
@@ -325,19 +333,14 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 statement.executeUpdate();
             }
             apiExecuteInfo.setResList(list);
-
         } catch (Exception e){
            logBuilder.append(e.getMessage());
-
-            throw new DataApiException(logBuilder.toString());
+           throw new DataApiException(logBuilder.toString());
         }finally {
             connection.close();
         }
         apiExecuteInfo.setLog(logBuilder.toString());
         return apiExecuteInfo;
-
     }
-
-
 
 }

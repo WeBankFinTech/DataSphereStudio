@@ -1,6 +1,8 @@
 .idea
 .idea/*
 
+.DS_Store
+
 assembly/target
 assembly/dss-package/target
 

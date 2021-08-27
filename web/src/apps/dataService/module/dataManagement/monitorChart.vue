@@ -5,7 +5,7 @@
       <div class="mc-title">
         <span>API监控图表</span>
         <div class="mc-close" @click="hideMonitorModal">
-          <Icon custom="iconfont icon-huaban" size="16"></Icon>
+          <SvgIcon class="icon" icon-class="close2" />
         </div>
       </div>
       <div class="mc-body">
@@ -195,6 +195,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .monitor-chart {
   position: relative;
   .monitor-chart-mask {
@@ -217,7 +218,7 @@ export default {
     left: 0;
     right: 0;
     height: 460px;
-    background: #fff;
+    @include bg-color(#fff, $dark-base-color);
     box-shadow: -2px 0 10px 0 #DEE4EC;
     border-radius: 2px;
     &.shown {
@@ -237,14 +238,15 @@ export default {
       padding: 12px 24px;
       font-size: 16px;
       line-height: 24px;
-      color: #333;
-      background: #F8F9FC;
+      @include font-color(#333, $dark-text-color);
+      @include bg-color(#F8F9FC, $dark-active-menu-item);
       .mc-close {
         position: absolute;
         padding: 12px 24px;
         right: 0;
         top: 0;
         cursor: pointer;
+        font-size: 16px;
       }
     }
     .mc-body {
@@ -258,6 +260,7 @@ export default {
         font-size: 16px;
         line-height: 32px;
         font-weight: bold;
+        @include font-color(#666, $dark-text-color);
       }
     }
   }

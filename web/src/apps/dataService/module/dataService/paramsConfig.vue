@@ -736,7 +736,7 @@ export default {
       const { data } = this.apiData;
       this.confirmLoading = true;
       api
-        .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
+        .fetch(`/dss/data/api/save`, reqParams, "post")
         .then(res => {
           console.log(res);
           this.$emit("updateApiData", { ...data, ...reqParams });
@@ -752,7 +752,7 @@ export default {
       this.confirmLoading = true;
       api
         .fetch(
-          `/dss/framework/dbapi/apimanager/online/${this.apiData.data.id}`,
+          `/dss/data/api/apimanager/online/${this.apiData.data.id}`,
           {},
           "post"
         )
@@ -864,7 +864,7 @@ export default {
       //获取数据源
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
+          `/dss/data/api/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
           {},
           "get"
         )
@@ -887,7 +887,7 @@ export default {
       this.destoryParamsTable();
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/tables?datasourceId=${datasourceId}`,
+          `/dss/data/api/datasource/tables?datasourceId=${datasourceId}`,
           {},
           "get"
         )
@@ -907,7 +907,7 @@ export default {
       this.destoryParamsTable();
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
+          `/dss/data/api/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
           {},
           "get"
         )

@@ -45,7 +45,7 @@ import java.util.Map;
 
 
 @Component
-@Path("/dss/framework/dbapi")
+@Path("/dss/data/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Slf4j

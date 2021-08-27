@@ -27,6 +27,7 @@
         height: 30px;
         padding-right: 7px;
         .dynamic-form-header-title {
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
             display: inline-block;
         }
         .icon-add {
@@ -43,6 +44,7 @@
         }
         .tc {
             text-align: center;
+            @include font-color($light-text-color, $dark-text-color);
         }
     }
 }

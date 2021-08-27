@@ -146,6 +146,9 @@ export default {
     width: 75%;
     padding: 10px 15px;
     @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+    h3 {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
+    }
     .information-table {
       width: 100%;
       text-align: center;
@@ -162,6 +165,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       margin-left: 19px;
+      @include font-color($light-text-color, $dark-text-color);
       label{
         width: 50%;
         padding: 10px 0;

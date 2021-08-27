@@ -1,30 +1,21 @@
 <template>
   <div class="tree-item">
-    <div class="tree-content">
+    <div class="tree-content" :class="{ 'tree-content-active': currentTreeId == model.id }">
       <div class="tree-icon" :class="{ leaf: isLeaf }">
-        <Icon
-          custom="iconfont icon-open"
-          v-if="model.opened"
-          @click="handleItemToggle"
-        ></Icon>
-        <Icon
-          custom="iconfont icon-close"
-          v-else
-          @click="handleItemToggle"
-        ></Icon>
+        <SvgIcon v-if="model.opened" icon-class="open" @click="handleItemToggle"/>
+        <SvgIcon v-else icon-class="close" @click="handleItemToggle"/>
       </div>
       <div class="tree-icon" v-if="model.type == 'flow'">
-        <Icon custom="iconfont icon-flow"></Icon>
+        <SvgIcon icon-class="flow" />
       </div>
       <div class="tree-icon" v-if="model.type == 'api'">
-        <Icon custom="iconfont icon-api"></Icon>
+        <SvgIcon icon-class="api2" />
       </div>
       <div class="tree-loading" v-if="model.loading">
-        <Icon custom="iconfont icon-xingzhuang" size="16"></Icon>
+        <SvgIcon icon-class="loading" />
       </div>
       <div
         class="tree-name"
-        :class="{ 'tree-name-active': currentTreeId == model.id }"
         @click="handleItemClick"
       >
         {{ model.name }}
@@ -34,7 +25,7 @@
         @click="handleAddClick"
         v-if="model.type == 'project' && model.canWrite"
       >
-        <Icon custom="iconfont icon-plus" size="20"></Icon>
+        <SvgIcon icon-class="plus" />
       </div>
       <div class="tree-hold" v-else></div>
     </div>
@@ -127,11 +118,22 @@ export default {
 .tree-item {
   white-space: nowrap;
   outline: none;
-  @include font-color($light-text-color, $dark-text-color);
   .tree-content {
     display: flex;
     align-items: center;
     cursor: pointer;
+    padding: 0 10px;
+    @include font-color($light-text-color, $dark-text-color);
+    &:hover {
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
+      .tree-add {
+        visibility: visible;
+      }
+    }
+    &-active {
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
+      @include font-color($primary-color, $dark-primary-color);
+    }
   }
   .leaf {
     color: transparent;
@@ -142,6 +144,7 @@ export default {
   }
   .tree-loading {
     display: block;
+    font-size: 16px;
     animation: ani-demo-spin 1s linear infinite;
   }
   @keyframes ani-demo-spin {
@@ -157,6 +160,9 @@ export default {
   }
   .tree-add {
     display: block;
+    visibility: hidden;
+    font-size: 16px;
+    @include font-color($light-text-color, $dark-text-color);
   }
   .tree-hold {
     display: block;
@@ -171,24 +177,16 @@ export default {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    &:hover {
-      // background-color: #EDF1F6;
-      @include bg-color(#EDF1F6, $dark-active-menu-item);
-    }
-  }
-  .tree-name-active {
-    // background-color: #EDF1F6;
-    @include bg-color(#EDF1F6, $dark-active-menu-item);
-    // color: rgb(45, 140, 240);
-    @include font-color($primary-color, $dark-primary-color);
   }
   .tree-children {
-    margin-left: 26px;
     transition: max-height 0.3s;
     max-height: 0;
     overflow: hidden;
     .leaf {
       display: none;
+    }
+    .tree-content {
+      padding-left: 36px;
     }
   }
 }

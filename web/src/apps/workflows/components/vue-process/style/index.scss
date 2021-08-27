@@ -192,6 +192,7 @@ $mask-color: rgba(55, 55, 55, .6);
                 height: 32px;
                 line-height: 32px;
                 text-align: center;
+                font-size: 20px;
                 cursor: pointer;
                 &:hover {
                     @include font-color(#000, #fff);
@@ -234,6 +235,9 @@ $mask-color: rgba(55, 55, 55, .6);
                 font-weight: 400;
                 font-size: 14px;
                 @include bg-color(#EDF1F6, #252A35)
+                .icon {
+                    font-size: 16px;
+                }
             }
 
             .shape-content {
@@ -289,6 +293,7 @@ $mask-color: rgba(55, 55, 55, .6);
         height: 34px;
         line-height: 34px;
         text-align: center;
+        font-size: 20px;
         @include bg-color(#F8F9FC, #2A303C);
         border: 1px solid #DEE4EC;
         @include border-color(#DEE4EC, #2A303C);
@@ -336,10 +341,10 @@ $mask-color: rgba(55, 55, 55, .6);
             display: none;
             position: absolute;
             z-index: 1;
-            border-color: #ff9900;
+            @include border-color(#ff9900, #4077C9);
             border-style: solid;
             border-width: 1px;
-            background: white;
+            @include bg-color($light-base-color, $dark-base-color);
             cursor: crosshair;
         }
 

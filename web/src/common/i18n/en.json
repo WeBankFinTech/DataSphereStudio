@@ -275,7 +275,7 @@
       },
       "deleteDialog": {
         "waring": "Warning",
-        "action": "Yes {label}",
+        "action": "Need {label}",
         "isNext": "Continue or not?",
         "over": "Stop {type}",
         "overThe": "Stop this",

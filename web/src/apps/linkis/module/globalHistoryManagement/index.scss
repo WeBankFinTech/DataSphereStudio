@@ -34,6 +34,7 @@
     .progress-label {
         width: 100%;
         z-index: 1;
+        @include bg-color(#f7f7f7, $dark-menu-base-color);
     }
 }
 
@@ -61,10 +62,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 16px;
+        margin-top: 6px;
         .ivu-table th {
-            background-color: $table-thead-blue-bg;
-            color: $body-background;
+            // background-color: $table-thead-blue-bg;
+            @include bg-color($table-thead-blue-bg, $dark-header-bg-color);
+            // color: $body-background;
+            @include font-color($light-base-color, $dark-base-color);
         }
     }
     .global-history-loading {

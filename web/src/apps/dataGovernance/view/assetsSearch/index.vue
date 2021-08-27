@@ -10,7 +10,8 @@
             :enter-button="$t(`message.dataGovernance.search`)"
             :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
             size="large"
-            on-search="onSearch"
+            @on-search="onSearch"
+            v-model="queryForTbls"
           />
         </div>
       </div>
@@ -58,7 +59,7 @@
 
       <!-- right -->
       <div class="assets-index-b-r">
-        <template v-for="model in cardTabs">
+        <template v-for="model in cardTestTabs">
           <tab-card
             :model="model"
             :key="model.id"
@@ -72,6 +73,8 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
+// import { getHiveTbls } from "../../service/api";
+import { EventBus } from "../../module/common/eventBus/event-bus";
 export default {
   components: {
     tabCard
@@ -95,62 +98,64 @@ export default {
       ],
       cardTabs: [
         {
-          id: 1,
-          tableName: "table1",
+          guid: 1,
+          name: "table1",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 2,
-          tableName: "table1",
+          guid: 2,
+          name: "table2",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 3,
-          tableName: "table1",
+          guid: 3,
+          name: "table3",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 4,
-          tableName: "table1",
+          guid: 4,
+          name: "table4",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 5,
-          tableName: "table1",
+          guid: 5,
+          name: "table5",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 6,
-          tableName: "table1",
+          guid: 6,
+          name: "table6",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         },
         {
-          id: 7,
-          tableName: "table1",
+          guid: 7,
+          name: "table7",
           readCount: 36,
           userName: "xxx",
           ctime: "xxx",
           utime: "xxx"
         }
-      ]
+      ],
+      cardTestTabs: [],
+      queryForTbls: ""
     };
   },
   created() {},
@@ -161,10 +166,31 @@ export default {
     onRemoveWork() {},
 
     // 搜索
-    onSearch() {},
+    onSearch() {
+      this.cardTestTabs = this.cardTabs;
+      // const params = {
+      //   query: this.queryForTbls
+      // };
+      // getHiveTbls(params)
+      //   .then(data => {
+      //     if (data.message === "ok" && data.data && data.data.result) {
+      //       this.cardTabs = data.data.result;
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log("Search", err);
+      //   });
+    },
 
     onChooseCard(model) {
-      console.log("on-choose-card", model);
+      let that = this;
+      EventBus.$emit("on-choose-card", model);
+      that.$router.push(
+        `${that.$route.path
+          .split("/")
+          .slice(0, -1)
+          .join("/")}/info/${model.guid}`
+      );
     }
   }
 };

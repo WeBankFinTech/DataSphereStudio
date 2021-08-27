@@ -33,7 +33,7 @@ const routes = [
         },
         component: () => import('./view/assetsSearch/index.vue'),
       },{
-        path: 'info',
+        path: 'info/:guid',
         name: 'dataGovernance/assets/info',
         meta: {
           title: '数据资产详情',

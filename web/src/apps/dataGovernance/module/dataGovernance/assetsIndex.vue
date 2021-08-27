@@ -16,9 +16,9 @@
           <div class="top-r-container">
             <template v-for="(work, index) in topTapList">
               <div
-                :key="work.tabId"
+                :key="work.id"
                 :class="{
-                  active: currentTab.tabId === work.tabId && !textColor
+                  active: currentTab.guid === work.guid && !textColor
                 }"
                 class="tab-item"
                 ref="work_item"
@@ -38,13 +38,16 @@
 
     <!-- bottom  -->
     <div class="assets-index-b">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view></router-view>
+      </keep-alive>
     </div>
   </div>
 </template>
 <script>
 //import api from "@/common/service/api";
 import weTab from "../../../workflows/module/common/tabList/tabs.vue";
+import { EventBus } from "../common/eventBus/event-bus";
 export default {
   components: {
     weTab
@@ -54,15 +57,73 @@ export default {
       textColor: true,
       index: 0,
       work: {},
+      currentTab: {},
       topTapList: []
     };
   },
   created() {},
+  mounted() {
+    EventBus.$on("on-choose-card", model => {
+      let that = this;
+      that.textColor = false;
+      const topTapList = that.topTapList.slice(0);
+      const { guid } = model;
+      that.currentTab = model;
+      if (topTapList.some(model => model.guid === guid)) {
+        return false;
+      }
+      topTapList.push(model);
+      that.topTapList = topTapList;
+    });
+  },
+  beforeDestroy() {
+    // 销毁 eventBus
+    EventBus.$off("on-choose-card");
+  },
   methods: {
     // 面包屑相关
-    selectProject() {},
-    onChooseWork() {},
-    onRemoveWork() {}
+    selectProject() {
+      // 返回到 目录 即搜索页面
+      this.$router.push("/dataGovernance/assets/search");
+      this.textColor = true;
+    },
+    onChooseWork(modal) {
+      let path = "/dataGovernance/assets";
+      this.$router.push(`${path}/info/${modal.guid}`);
+      this.currentTab = modal;
+      this.textColor = false;
+    },
+    onRemoveWork(modal) {
+      let that = this;
+      let topTapList = that.topTapList.slice(0);
+      let len = topTapList.length;
+      let idx = 0;
+
+      topTapList.forEach((item, index) => {
+        if (item.guid === modal.guid) {
+          return (idx = index);
+        }
+      });
+
+      const removeAction = () => {
+        if (that.currentTab.guid === modal.guid) {
+          if (len > 1 && idx < len - 1) {
+            that.currentTab = topTapList[idx + 1];
+          } else if (len > 1 && idx == len - 1) {
+            that.currentTab = topTapList[idx - 1];
+          } else {
+            that.currentTab = {};
+            that.textColor = true;
+            that.$router.push("/dataGovernance/assets/search");
+          }
+        }
+        topTapList.splice(idx, 1);
+        that.topTapList = topTapList;
+      };
+
+      removeAction();
+    }
+    // 通过 eventBus 获取 面包屑数据
   }
 };
 </script>
@@ -110,6 +171,17 @@ export default {
       .top-r-container {
         flex: 1;
         height: 40px;
+        .tab-item {
+          display: inline-block;
+          height: 40px;
+          line-height: 40px;
+          color: rgba(0, 0, 0, 0.85);
+          cursor: pointer;
+          min-width: 100px;
+          max-width: 200px;
+          overflow: hidden;
+          margin-right: 2px;
+        }
       }
     }
   }

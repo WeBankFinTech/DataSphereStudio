@@ -31,7 +31,7 @@ import java.util.List;
  */
 
 @Component
-@Path("/dss/framework/dbapi/apimonitor")
+@Path("/dss/data/api/apimonitor")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DSSDbApiMonitorRestful {

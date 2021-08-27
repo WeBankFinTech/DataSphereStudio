@@ -1081,6 +1081,7 @@ export default {
 .workbench {
     /deep/.ivu-tabs.ivu-tabs-card {
         border-top: $border-width-base $border-style-base #dcdee2;
+        @include border-color($border-color-base, $dark-border-color-base);
         .ivu-tabs-bar .ivu-tabs-tab {
             margin-right: 0px;
             margin-left: -1px;
@@ -1135,6 +1136,12 @@ export default {
 .modal-content {
     padding: 10px 20px;
     font-size: $font-size-base;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    p {
+      @include font-color($light-text-color, $dark-text-color);
+    }
 }
 .workbench-tabs {
   position: $relative;

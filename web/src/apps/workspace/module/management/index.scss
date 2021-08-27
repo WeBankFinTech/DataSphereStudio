@@ -44,11 +44,6 @@
       font-size: $font-size-large;
       font-weight: 600;
       padding: 10px 20px 10px 25px;
-      @include bg-color($light-base-color, $dark-workspace-background);
-    }
-    .ivu-menu-light{
-      // background-color: rgba(242, 242, 242, 1);
-      @include bg-color(rgba(242, 242, 242, 1), $dark-workspace-body-bg-color);
     }
     .overview-box {
       text-align: left;

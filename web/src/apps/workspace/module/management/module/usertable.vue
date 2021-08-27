@@ -1,6 +1,6 @@
 <template>
   <div class="user-serchbar-box">
-    <h3 style="margin-bottom: 20px;">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
+    <h3 style="margin-bottom: 20px;" class="user-table-title">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
     <formserch
       v-if="hasPermission()"
       @click-serach="search"

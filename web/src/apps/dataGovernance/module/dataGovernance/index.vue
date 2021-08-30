@@ -1,12 +1,20 @@
 <template>
   <div style="height: 100%;">
-    <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
+    <navMenu
+      :menuFold="menuFold"
+      :treeNodes="projectsTree"
+      :treeCurrentId="currentTreeId"
+      @on-menu-toggle="handleMenuToggle"
+      @handleApiChoosed="onClickMenu"
+    />
     <div class="ds-main-content" :class="{ 'ds-main-content-fold': menuFold }">
       <div class="ds-main-container">
         <div class="ds-breadcumb">
-          <span>{{ $t("message.dataGovernance.dataOverview") }}</span>
+          <span>{{ title }}</span>
         </div>
-        <router-view></router-view>
+        <div class="ds-router-view">
+          <router-view></router-view>
+        </div>
       </div>
     </div>
   </div>
@@ -19,12 +27,55 @@ export default {
   },
   data() {
     return {
-      menuFold: false
+      menuFold: false,
+      projectsTree: [
+        {
+          id: 1,
+          name: "数据资产",
+          children: [
+            { id: 11, name: "数据总览", pathName: "dataGovernance/overview" },
+            { id: 12, name: "数据资产目录", pathName: "dataGovernance/assets" }
+          ]
+        },
+        {
+          id: 2,
+          name: "元数据管理",
+          children: [{ id: 21, name: "元数据采集" }]
+        },
+        {
+          id: 3,
+          name: "数据权限",
+          children: [{ id: 31, name: "数据权限管理" }]
+        },
+        {
+          id: 4,
+          name: "数仓规划",
+          children: [
+            { id: 41, name: "主题域配置" },
+            { id: 42, name: "分层配置" }
+          ]
+        },
+        { id: 5, name: "数据质量", children: [] },
+        { id: 6, name: "数据安全", children: [] }
+      ],
+      currentTreeId: 1,
+      title: this.$t("message.dataGovernance.dataOverview")
     };
   },
   methods: {
     handleMenuToggle() {
       this.menuFold = !this.menuFold;
+    },
+    onClickMenu(node) {
+      const { id, pathName, name } = node;
+      this.currentTreeId = id;
+      if (id > 10) {
+        this.title = name;
+      }
+      if (pathName) {
+        this.$router.push({ name: pathName });
+      }
+      console.log("index node", node);
     }
   }
 };
@@ -32,6 +83,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .ds-main-content {
+  height: 100%;
   min-height: 100%;
   margin-left: 250px;
   transition: margin-left 0.3s;
@@ -39,8 +91,10 @@ export default {
     margin-left: 54px;
   }
   .ds-main-container {
-    @include bg-color(#fff, $dark-base-color);
     min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    @include bg-color(#fff, $dark-base-color);
     .ds-breadcumb {
       padding: 24px;
       @include bg-color(#fff, $dark-base-color);
@@ -50,6 +104,11 @@ export default {
       .ds-breadcumb-divider {
         margin: 0 10px;
       }
+    }
+    .ds-router-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
   }
 }

@@ -23,8 +23,8 @@ import java.util.Map;
 public abstract class AbstractRequestRef implements RequestRef {
 
     private Map<String, Object> parameters = new HashMap<>();
-    private String name;
-    private String type;
+    protected String name;
+    protected String type;
 
     @Override
     public String getName() {

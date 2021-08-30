@@ -146,11 +146,12 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         {
             String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
             AppInstance appInstance = getAppInstance(appConn, label);
-            RefDeletionOperation refDeletionOperation    = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefDeletionOperation();
+            RefDeletionOperation refDeletionOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefDeletionOperation();
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
             NodeRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils.newAppConnRef(NodeRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
+                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
+                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create DeleteNodeRequestRef", e);
             }
@@ -181,7 +182,8 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
             NodeRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils.newAppConnRef(NodeRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
+                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
+                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create UpdateNodeRequestRef", e);
             }

@@ -131,6 +131,9 @@ export default {
 @import "@/common/style/variables.scss";
 
 .assets-index-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   .assets-index-t {
     .assets-index-t-t1 {
       padding: 0px $padding-25;
@@ -187,6 +190,9 @@ export default {
   }
 
   .assets-index-b {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

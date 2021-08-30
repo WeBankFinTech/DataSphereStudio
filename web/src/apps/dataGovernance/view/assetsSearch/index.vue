@@ -199,6 +199,9 @@ export default {
 @import "@/common/style/variables.scss";
 
 .assets-index-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   .assets-index-t-t1 {
     padding: 0px $padding-25;
     border-bottom: $border-width-base $border-style-base $border-color-base;
@@ -255,11 +258,13 @@ export default {
 
   .assets-index-b {
     display: flex;
+    flex: 1;
     &-l {
       min-width: 199px;
       padding-left: 16px;
       padding-right: 16px;
       padding-top: 15px;
+      border-right: 1px solid #dee4ec;
       &-title {
         font-family: PingFangSC-Medium;
         font-size: 14px;

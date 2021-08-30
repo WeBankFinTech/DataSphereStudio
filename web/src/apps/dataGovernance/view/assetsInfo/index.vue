@@ -158,6 +158,9 @@ export default {
 
 <style lang="scss" scoped>
 .assets-info-wrap {
+  flex: 1;
+  flex-direction: column;
+  display: flex;
   .assets-info-top {
     min-height: 80px;
     border-top: 24px solid #f8f9fc;
@@ -175,6 +178,7 @@ export default {
 
   .assets-info-b {
     display: flex;
+    flex: 1;
     &-l {
       min-width: 249px;
       padding-left: 16px;

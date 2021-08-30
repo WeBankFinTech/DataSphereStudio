@@ -20,6 +20,8 @@
       <TreeMenu
         @showModal="showModal"
         @handleApiChoosed="handleApiChoosed"
+        :treeNodes="treeNodes"
+        :treeCurrentId="treeCurrentId"
         ref="treeMenu"
       />
     </div>
@@ -37,14 +39,22 @@ export default {
     menuFold: {
       type: Boolean,
       default: false
+    },
+    treeNodes: {
+      type: Array,
+      default: () => []
+    },
+    treeCurrentId: {
+      type: Number,
+      default: 1
     }
   },
   data() {
     return {
       currentTab: this.$route.path,
       loadingTree: false,
-      projectsTree: [],
-      currentTreeId: +this.$route.query.projectID, // tree中active节点,
+      projectsTree: this.treeNodes,
+      currentTreeId: this.treeCurrentId, // tree中active节点,
       searchValue: 123,
       originDatas: []
     };
@@ -121,7 +131,7 @@ export default {
     .active {
       @include bg-color(#eceff4, $dark-menu-base-color);
       border-left: 3px solid #2e92f7;
-      @include border-color(#2e92f7, #4B8FF3);
+      @include border-color(#2e92f7, #4b8ff3);
     }
   }
   .ds-nav-panel {
@@ -130,7 +140,6 @@ export default {
     top: 0;
     bottom: 0;
     transition: all 0.3s;
-    padding: 10px;
     overflow-y: auto;
     border-right: 1px solid #dee4ec;
     @include border-color(#dee4ec, $dark-menu-base-color);

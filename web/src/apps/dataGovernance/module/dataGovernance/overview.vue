@@ -159,8 +159,8 @@ export default {
       ]
     };
   },
-  created() {
-    // this.getDataAssetsSummary();
+  mounted() {
+    this.getDataAssetsSummary();
   },
   methods: {
     // 获取 数据资产概要

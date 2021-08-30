@@ -45,7 +45,7 @@ export default [
       meta: {
         title: 'Global History',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     }, {
       name: 'viewHistory',
@@ -55,7 +55,7 @@ export default [
       meta: {
         title: 'viewHistory',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     }, {
       name: 'resource',
@@ -65,7 +65,7 @@ export default [
       meta: {
         title: 'resource',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     },
     {
@@ -76,7 +76,7 @@ export default [
       meta: {
         title: 'setting',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     },{
       name: 'ECM',
@@ -86,7 +86,7 @@ export default [
       meta: {
         title: 'ECM',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     },{
       name: 'EngineConnList',
@@ -96,7 +96,7 @@ export default [
       meta: {
         title: 'EngineConn',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     }, {
       name: 'globalValiable',
@@ -106,7 +106,7 @@ export default [
       meta: {
         title: 'Global Valiable',
         publicPage: true,
-        admin: true
+        // admin: true
       },
     }, {
       name: 'FAQ',

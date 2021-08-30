@@ -931,7 +931,8 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}listNodeType`, {
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
-        this.shapes = res.nodeTypes.map((item) => {
+        // 暂时隐藏数据开发以外的节点
+        this.shapes = res.nodeTypes.filter(i => i.title == '数据开发').map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
               // svg绘制的点太多，导致动画卡顿，使用图片代替

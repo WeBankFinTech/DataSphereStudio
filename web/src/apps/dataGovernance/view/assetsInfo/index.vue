@@ -61,7 +61,11 @@
             ><range-info :rangeInfo="rangeInfo"></range-info
           ></TabPane>
           <TabPane label="数据预览">标签三的内容</TabPane>
-          <TabPane label="数据血缘">标签三的内容</TabPane>
+          <TabPane label="数据血缘">
+            <div class='dagreLayout-page' v-if="lineageData">
+              <lineage class="flow-canvas" id="dag-canvas" :lineageData="lineageData"></lineage>
+            </div>
+          </TabPane>
         </Tabs>
       </div>
     </div>
@@ -71,14 +75,19 @@
 <script>
 import fieldInfo from "../fieldInfo/index.vue";
 import rangeInfo from "../rangeInfo/index.vue";
+import lineage from "./components/lineage"
+import { getLineage } from '../../service/api'
+
 export default {
   name: "assetsInfo",
   components: {
     fieldInfo,
-    rangeInfo
+    rangeInfo,
+    lineage
   },
   data() {
     return {
+      lineageData: null,
       basicData: {
         owner: "xxx",
         createTime: "xxx",
@@ -152,6 +161,12 @@ export default {
         }
       ]
     };
+  },
+  mounted() {
+    getLineage('0e822d4c-a578-4b0a-b9e6-085096fbf92f').then(res=>{
+      console.log(res.result)
+      this.lineageData = res.result
+    }).catch(()=>{})
   }
 };
 </script>

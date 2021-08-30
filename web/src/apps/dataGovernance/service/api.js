@@ -36,10 +36,18 @@ const getSelectSql = guid => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/${gui
  */
 const getSelectDdl = guid => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/${guid}/create`, {}, 'get')
 
+/**
+ * 查询hive表--血缘
+ * @param {*} guid
+ * @returnsL
+ */
+const getLineage = guid => api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/${guid}/lineage`, {}, 'get')
+
 export {
   getHiveSummary,
   getHiveTblBasic,
   getHiveTblPartition,
   getSelectSql,
-  getSelectDdl
+  getSelectDdl,
+  getLineage
 }

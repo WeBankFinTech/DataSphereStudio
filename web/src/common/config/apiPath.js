@@ -5,5 +5,5 @@ export default {
   ORCHESTRATOR_PATH: '/dss/framework/orchestrator/',
   WORKFLOW_PATH: '/dss/workflow/',
   PUBLISH_PATH: '/dss/framework/release/',
-  DATA_GOVERNANCE: '/api/rest_j/v1/dss/data/governance/asset/'
+  DATA_GOVERNANCE: '/dss/data/governance/asset/'
 }

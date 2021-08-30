@@ -7,6 +7,7 @@ const routes = [
       publicPage: true
     },
     component: () => import('./view/governance/index.vue'),
+    redirect: '/dataGovernance/overview',
     children: [{
       path: 'overview',
       name: 'dataGovernance/overview',

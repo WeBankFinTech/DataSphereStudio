@@ -29,13 +29,11 @@ import java.util.Map;
 public  class CommonRequestRefImpl extends AbstractRequestRef implements CommonRequestRef {
 
     protected String userName;
-    protected String name;
     protected Long projectId;
     protected String projectName;
     protected String orcName;
     protected Long orcId;
     protected Workspace workspace;
-    protected String type;
     protected String workspaceName;
     protected List<DSSLabel> dssLabelList;
     protected String contextID;
@@ -48,16 +46,6 @@ public  class CommonRequestRefImpl extends AbstractRequestRef implements CommonR
     @Override
     public void setUserName(String username) {
         this.userName = username;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
@@ -111,25 +99,14 @@ public  class CommonRequestRefImpl extends AbstractRequestRef implements CommonR
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
     public void setWorkspaceName(String workspaceName) {
-     this.workspaceName = workspaceName;
+        this.workspaceName = workspaceName;
     }
 
     @Override
     public String getWorkspaceName() {
         return this.workspaceName;
     }
-
 
     @Override
     public void setDSSLabels(List<DSSLabel> dssLabels) {

@@ -13,20 +13,30 @@
   </div>
 </template>
 <script>
-import Tree from "@/apps/workflows/module/common/tree/tree.vue";
+import Tree from "./tree/tree.vue";
 import api from "@/common/service/api";
 import _ from "lodash";
 
 export default {
   name: "TreeMenu",
+  props: {
+    treeNodes: {
+      type: Array,
+      default: () => []
+    },
+    treeCurrentId: {
+      type: Number,
+      default: 1
+    }
+  },
   components: {
     Tree
   },
   data() {
     return {
       loadingTree: false,
-      projectsTree: [],
-      currentTreeId: +this.$route.query.projectID, // tree中active节点
+      projectsTree: this.treeNodes,
+      currentTreeId: this.currentTreeId, // tree中active节点
       searchValue: "",
       originDatas: []
     };
@@ -67,7 +77,6 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      console.log(node);
       this.$emit("handleApiChoosed", node);
     },
     getAllApi(type = "", payload = {}) {
@@ -140,8 +149,8 @@ export default {
       if (value) {
         temp.forEach(item => {
           item.opened = true;
-          item.children = item.children.filter(
-            child => child.name.includes(value)
+          item.children = item.children.filter(child =>
+            child.name.includes(value)
           );
           if (item.children.length > 0) {
             result.push(item);

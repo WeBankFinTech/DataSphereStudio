@@ -120,6 +120,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 orchestratorExportRequestRef.setProjectName(projectName);
                 orchestratorExportRequestRef.setUserName(userName);
                 orchestratorExportRequestRef.setWorkspace(workspace);
+                orchestratorExportRequestRef.setDSSLabels(dssLabels);
                 AbstractResponseRef responseRef = (AbstractResponseRef) refExportService.getRefExportOperation().
                     exportRef(orchestratorExportRequestRef);
                 String resourceId = responseRef.getValue("resourceId").toString();

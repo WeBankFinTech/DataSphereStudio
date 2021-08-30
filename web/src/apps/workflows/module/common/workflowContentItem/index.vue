@@ -42,7 +42,7 @@
                 <!-- <li v-if="!isPercent(subitem.orchestratorId)" class="list-item" @click.stop="publish(subitem)">{{$t('message.workflow.workflowItem.publish')}}</li> -->
               </ul>
             </div>
-            <Button size="small" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
+            <Button size="small" v-if="checkEditable(subitem)" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
             <Button size="small" @click.stop="detail(currentData.id, subitem)">{{$t('message.workflow.workflowItem.viewVersion')}}</Button>
           </div>
           <div class="mid-bar" :title="subitem.description">

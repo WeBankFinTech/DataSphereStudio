@@ -144,7 +144,7 @@ export default {
         return ['search', 'refresh']
       } else {
         // return ['search', 'newFile', 'refresh', 'export']
-        return ['search', 'newFile', 'refresh']
+        return ['search', 'refresh']
       }
     }
   },

@@ -773,25 +773,25 @@ export default {
       },
       pagination: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination2: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination3: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination5: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },

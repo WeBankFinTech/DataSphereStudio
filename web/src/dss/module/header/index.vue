@@ -91,7 +91,7 @@
       <ul class="menu">
         <li v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.common.home")}}</li>
         <li class="menu-item" v-if="isAdmin && homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
-        <li class="menu-item" v-if="isAdmin && $route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
+        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
       </ul>
       <div class="icon-group">
         <Icon

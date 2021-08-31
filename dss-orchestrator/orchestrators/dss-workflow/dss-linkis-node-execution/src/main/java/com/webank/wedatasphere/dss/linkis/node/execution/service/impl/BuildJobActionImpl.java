@@ -26,7 +26,6 @@ import com.webank.wedatasphere.linkis.manager.label.constant.LabelKeyConstant;
 import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineTypeLabel;
 import com.webank.wedatasphere.linkis.manager.label.utils.EngineTypeLabelCreator;
 import com.webank.wedatasphere.linkis.protocol.utils.TaskUtils;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
 import com.webank.wedatasphere.linkis.ujes.client.request.JobExecuteAction;
 import com.webank.wedatasphere.linkis.ujes.client.request.JobSubmitAction;
 
@@ -75,7 +74,8 @@ public class BuildJobActionImpl implements BuildJobAction {
     private String parseExecutionCode(Job job) {
         String code = job.getCode();
         if (StringUtils.isEmpty(code) || code.equalsIgnoreCase("null")) {
-            code = BDPJettyServerHelper.gson().toJson(job.getParams());
+            Gson gson = new Gson();
+            code = gson.toJson(job.getParams());
             logger.info("The executable code for the job is {}", code);
         }
         return code;

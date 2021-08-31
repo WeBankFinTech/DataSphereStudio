@@ -17,13 +17,21 @@ export default {
     return {
       columns: [
         { title: "分区名", key: "partName" },
-        { title: "记录数", key: "reordCt" },
+        { title: "记录数", key: "reordCnt" },
         { title: "存储量", key: "store" },
         { title: "创建时间", key: "createTime" },
         { title: "最后更新时间", key: "lastAccessTime" }
       ],
       rangeData: this.rangeInfo
     };
+  },
+  watch: {
+    rangeInfo: {
+      handler(newVal, oldVal) {
+        this.rangeData = newVal;
+      },
+      deep: true
+    }
   }
 };
 </script>

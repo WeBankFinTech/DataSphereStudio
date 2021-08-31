@@ -59,10 +59,10 @@
 
       <!-- right -->
       <div class="assets-index-b-r">
-        <template v-for="model in cardTestTabs">
+        <template v-for="model in cardTabs">
           <tab-card
             :model="model"
-            :key="model.id"
+            :key="model.guid"
             @on-choose="onChooseCard"
           ></tab-card>
         </template>
@@ -73,8 +73,9 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
-// import { getHiveTbls } from "../../service/api";
+import { getHiveTbls } from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
+import { storage } from "../../utils/storage";
 export default {
   components: {
     tabCard
@@ -96,90 +97,40 @@ export default {
           label: "Sydney"
         }
       ],
-      cardTabs: [
-        {
-          guid: 1,
-          name: "table1",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 2,
-          name: "table2",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 3,
-          name: "table3",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 4,
-          name: "table4",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 5,
-          name: "table5",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 6,
-          name: "table6",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        },
-        {
-          guid: 7,
-          name: "table7",
-          readCount: 36,
-          userName: "xxx",
-          ctime: "xxx",
-          utime: "xxx"
-        }
-      ],
-      cardTestTabs: [],
+      cardTabs: [],
       queryForTbls: ""
     };
   },
-  created() {},
+  created() {
+    let searchParams = storage.getItem("searchTbls");
+    if (searchParams) {
+      getHiveTbls(JSON.parse(searchParams))
+        .then(data => {
+          if (data.result) {
+            this.cardTabs = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("Search", err);
+        });
+    }
+  },
   methods: {
-    // 面包屑相关
-    selectProject() {},
-    onChooseWork() {},
-    onRemoveWork() {},
-
     // 搜索
     onSearch() {
-      this.cardTestTabs = this.cardTabs;
-      // const params = {
-      //   query: this.queryForTbls
-      // };
-      // getHiveTbls(params)
-      //   .then(data => {
-      //     if (data.message === "ok" && data.data && data.data.result) {
-      //       this.cardTabs = data.data.result;
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log("Search", err);
-      //   });
+      const params = {
+        query: this.queryForTbls
+      };
+      storage.setItem("searchTbls", JSON.stringify(params));
+      getHiveTbls(params)
+        .then(data => {
+          if (data.result) {
+            this.cardTabs = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("Search", err);
+        });
     },
 
     onChooseCard(model) {

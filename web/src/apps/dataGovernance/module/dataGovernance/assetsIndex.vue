@@ -38,9 +38,7 @@
 
     <!-- bottom  -->
     <div class="assets-index-b">
-      <keep-alive>
-        <router-view></router-view>
-      </keep-alive>
+      <router-view></router-view>
     </div>
   </div>
 </template>

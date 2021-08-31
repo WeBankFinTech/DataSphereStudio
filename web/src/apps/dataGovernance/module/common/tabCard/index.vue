@@ -4,9 +4,7 @@
     <div class="tab-card-t">
       <div class="tab-card-t-l">
         <SvgIcon icon-class="biao" style="fontSize: 16px;" />
-        <span style="marginLeft: 8px; fontSize: 16px">{{
-          model.tableName
-        }}</span>
+        <span style="marginLeft: 8px; fontSize: 16px">{{ model.name }}</span>
       </div>
       <div class="tab-card-t-r">
         <span>读取次数：{{ model.readCount }}次</span>
@@ -15,9 +13,9 @@
 
     <!-- bottom -->
     <div class="tab-card-b">
-      <span>负责人：{{ model.userName }}</span>
-      <span>创建时间：{{ model.ctime }}</span>
-      <span>更新时间：{{ model.utime }}</span>
+      <span style="width: 110px">负责人：{{ model.owner }}</span>
+      <span style="width: 210px">创建时间：{{ model.createTime }}</span>
+      <span style="width: 210px">更新时间：{{ model.updateTime }}</span>
     </div>
   </div>
 </template>
@@ -84,9 +82,11 @@ export default {
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
+    display: flex;
     span {
       margin-right: 80px;
       color: rgba(0, 0, 0, 0.65);
+      display: inline-block;
     }
   }
 }

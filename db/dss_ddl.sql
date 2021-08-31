@@ -451,31 +451,6 @@ CREATE TABLE `dss_flow_schedule_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
---/*Table structure for table `dss_flow_taxonomy` */
-
---DROP TABLE IF EXISTS `dss_flow_taxonomy`;
---
---CREATE TABLE `dss_flow_taxonomy` (
---  `id` bigint(20) NOT NULL AUTO_INCREMENT,
---  `name` varchar(20) DEFAULT NULL,
---  `description` varchar(255) DEFAULT NULL,
---  `creator` varchar(32) DEFAULT NULL,
---  `create_time` datetime DEFAULT NULL,
---  `update_time` datetime DEFAULT NULL,
---  `project_id` bigint(20) DEFAULT NULL,
---  PRIMARY KEY (`id`) USING BTREE,
---  UNIQUE KEY `name` (`name`,`project_id`) USING BTREE
---) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
---/*Table structure for table `dss_flow_taxonomy_relation` */
---
---DROP TABLE IF EXISTS `dss_flow_taxonomy_relation`;
---
---CREATE TABLE `dss_flow_taxonomy_relation` (
---  `taxonomy_id` bigint(20) NOT NULL,
---  `flow_id` bigint(20) NOT NULL
---) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
 /*Table structure for table `dss_flow_user` */
 
 DROP TABLE IF EXISTS `dss_flow_user`;
@@ -1469,7 +1444,7 @@ CREATE TABLE `dss_admin_dept` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='部门表';
 
-
+DROP TABLE IF EXISTS `dss_dataapi_config`;
 CREATE TABLE `dss_dataapi_config` (
 	`id` BIGINT ( 20 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
 	`workspace_id` BIGINT ( 20 ) NOT NULL COMMENT '工作空间id',
@@ -1505,7 +1480,7 @@ CREATE TABLE `dss_dataapi_config` (
 	PRIMARY KEY ( `id` )
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API';
 
-
+DROP TABLE IF EXISTS `dss_dataapi_group`;
 CREATE TABLE `dss_dataapi_group` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',
@@ -1519,7 +1494,7 @@ CREATE TABLE `dss_dataapi_group` (
   PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT='服务组';
 
-
+DROP TABLE IF EXISTS `dss_dataapi_auth`;
 CREATE TABLE `dss_dataapi_auth` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `workspace_id` bigint(20) NOT NULL COMMENT '工作空间ID',
@@ -1535,6 +1510,7 @@ CREATE TABLE `dss_dataapi_auth` (
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API认证';
 
+DROP TABLE IF EXISTS `dss_dataapi_call`;
 CREATE TABLE `dss_dataapi_call` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `api_id` bigint(11) NOT NULL COMMENT 'API ID',
@@ -1547,7 +1523,7 @@ CREATE TABLE `dss_dataapi_call` (
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API调用记录'
 ;
-
+DROP TABLE IF EXISTS `dss_dataapi_datasource`;
 CREATE TABLE `dss_dataapi_datasource` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',

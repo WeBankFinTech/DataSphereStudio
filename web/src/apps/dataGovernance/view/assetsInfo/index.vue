@@ -54,14 +54,22 @@
           <TabPane label="字段信息"
             ><field-info
               :fieldInfo="fieldInfo"
-              :rangeInfo="rangeFieldInfo"
+              :rangeFieldInfo="rangeFieldInfo"
             ></field-info
           ></TabPane>
           <TabPane label="分区信息"
             ><range-info :rangeInfo="rangeInfo"></range-info
           ></TabPane>
           <TabPane label="数据预览">标签三的内容</TabPane>
-          <TabPane label="数据血缘">标签三的内容</TabPane>
+          <TabPane label="数据血缘">
+            <div class="dagreLayout-page" v-if="lineageData">
+              <lineage
+                class="flow-canvas"
+                id="dag-canvas"
+                :lineageData="lineageData"
+              ></lineage>
+            </div>
+          </TabPane>
         </Tabs>
       </div>
     </div>
@@ -71,87 +79,93 @@
 <script>
 import fieldInfo from "../fieldInfo/index.vue";
 import rangeInfo from "../rangeInfo/index.vue";
+import lineage from "./components/lineage";
+import {
+  getLineage,
+  getHiveTblBasic,
+  getHiveTblPartition
+} from "../../service/api";
+
 export default {
   name: "assetsInfo",
   components: {
     fieldInfo,
-    rangeInfo
+    rangeInfo,
+    lineage
   },
   data() {
     return {
-      basicData: {
-        owner: "xxx",
-        createTime: "xxx",
-        lifeCircle: "xxx",
-        store: "xxx",
-        comment: "xxx",
-        labels: ""
-      },
-      fieldInfo: [
-        { id: 1, name: "id", type: "string", comment: "xxx" },
-        { id: 2, name: "name", type: "string", comment: "xxx" },
-        { id: 3, name: "gender", type: "string", comment: "xxx" }
-      ],
-      rangeFieldInfo: [{ id: 1, name: "day", type: "string", comment: "xxx" }],
-      rangeInfo: [
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        },
-        {
-          partName: "day=20210805",
-          reordCnt: 333,
-          store: "3.24kb",
-          createTime: "2021年8月5日 08:12:36",
-          lastAccessTime: "2021年8月5日 08:12:36"
-        }
-      ]
+      lineageData: null,
+      basicData: {},
+      fieldInfo: [],
+      rangeFieldInfo: [],
+      rangeInfo: []
     };
+  },
+  watch: {
+    "$route.params.guid": {
+      handler() {
+        this.init();
+      }
+    }
+  },
+  mounted() {
+    this.init();
+  },
+  methods: {
+    init() {
+      this.getLineageData();
+      this.getTblBasic();
+      this.getTblPartition();
+    },
+    // 获取基本字段信息
+    getTblBasic() {
+      let guid = this.$route.params.guid;
+      getHiveTblBasic(guid)
+        .then(data => {
+          if (data.result) {
+            const { basic, columns, partitionKeys } = data.result;
+            this.basicData = basic;
+            columns.forEach((item, idx) => {
+              item["id"] = idx + 1;
+            });
+            this.fieldInfo = columns.slice(0);
+            partitionKeys.forEach((item, idx) => {
+              item["id"] = idx + 1;
+            });
+            this.rangeFieldInfo = partitionKeys.slice(0);
+          }
+        })
+        .catch(err => {
+          console.log("getTblBasic", err);
+        });
+    },
+    // 获取分区信息
+    getTblPartition() {
+      let guid = this.$route.params.guid;
+      getHiveTblPartition(guid)
+        .then(data => {
+          if (data.result) {
+            this.rangeInfo = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("getTblPartition", err);
+        });
+    },
+    // 获取血缘数据
+    getLineageData() {
+      let guid = this.$route.params.guid;
+      getLineage(guid)
+        .then(res => {
+          if (res.result) {
+            this.lineageData = res.result;
+          }
+        })
+        .catch(err => {
+          console.log("getLineageData", err);
+        });
+    }
   }
 };
 </script>

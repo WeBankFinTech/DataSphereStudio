@@ -161,6 +161,7 @@ export default {
   },
   mounted() {
     this.getDataAssetsSummary();
+    // getHiveSummary();
   },
   methods: {
     // 获取 数据资产概要
@@ -168,8 +169,10 @@ export default {
       let that = this;
       getHiveSummary()
         .then(data => {
-          if (data.message === "ok" && data.data && data.data.result) {
-            const res = Object.values(data.data.result);
+          if (data.result) {
+            const { hiveStore } = data.result;
+            data.result["hiveStore"] = (hiveStore / 1024 / 1024).toFixed(2);
+            const res = Object.values(data.result);
             const models = that.models.slice(0);
             models.forEach((model, idx) => {
               model.content = res[idx];

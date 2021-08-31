@@ -107,6 +107,3 @@ echo ""
 echo "step4:refresh appconn load"
 curl -H "Token-Code:BML-AUTH" -H "Token-User:hadoop" -X GET http://${GATEWAY_INSTALL_IP}:${GATEWAY_PORT}/api/rest_j/v1/dss/framework/project/appconn/${APPCONN_NAME}/load
 echo ""
-
-echo "Please restart services of DSS's and Linkis's"
-

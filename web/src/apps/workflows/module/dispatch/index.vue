@@ -1338,7 +1338,7 @@ export default {
         executeType: param.executeType
       }, {useFormQuery: true}).then(() => {
         this.list2[param.index].disabled = true
-        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.$Message.success(this.$t('message.scheduler.runTask.operationSuccess'))
         setTimeout(() => {
           this.list2[param.index].disabled = false
           this.getInstanceListData()

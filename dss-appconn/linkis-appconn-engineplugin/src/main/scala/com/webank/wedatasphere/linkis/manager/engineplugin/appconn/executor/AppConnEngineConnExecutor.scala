@@ -123,7 +123,12 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
   }
 
   private def getAppInstanceByLabels(labels: String, appConn: AppConn): Option[AppInstance] = {
-    def appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labels)));
+    var labelStr = labels
+    if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+      val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
+      labelStr = labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
+    }
+    def appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labelStr)));
     if (appInstanceList != null && appInstanceList.size() > 0) {
       return Some(appInstanceList.get(0))
     }

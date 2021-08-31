@@ -1126,6 +1126,7 @@ export default {
     },
     setTiming() {
       this.showTimingTaskModal = false
+      this.activeList(3)
     },
     closeTiming() {
       this.showTimingTaskModal = false

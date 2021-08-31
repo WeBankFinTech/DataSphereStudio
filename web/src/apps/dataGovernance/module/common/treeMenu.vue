@@ -36,10 +36,17 @@ export default {
     return {
       loadingTree: false,
       projectsTree: this.treeNodes,
-      currentTreeId: this.currentTreeId, // tree中active节点
+      currentTreeId: this.treeCurrentId, // tree中active节点
       searchValue: "",
       originDatas: []
     };
+  },
+  watch: {
+    treeCurrentId: {
+      handler(newVal, oldVal) {
+        this.currentTreeId = newVal;
+      }
+    }
   },
   mounted() {
     this.getAllApi();

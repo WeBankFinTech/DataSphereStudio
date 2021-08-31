@@ -72,6 +72,7 @@
 <script>
 import clipboard from "../../utils/clipboard";
 import { fomatSqlForShow, fomatSqlForCopy } from "../../utils/fomatSQL";
+import { getSelectSql, getSelectDdl } from "../../service/api";
 export default {
   name: "fieldInfo",
   props: {
@@ -79,7 +80,7 @@ export default {
       type: Array,
       default: () => []
     },
-    rangeInfo: {
+    rangeFieldInfo: {
       type: Array,
       default: () => []
     }
@@ -144,14 +145,28 @@ export default {
         }
       ],
       fieldInfoData: this.fieldInfo,
-      rangeInfoData: this.rangeInfo,
+      rangeInfoData: this.rangeFieldInfo,
       selectFlag: false,
       DDLflag: false,
-      selectSQL:
-        "SELECT @$ id, @$ name, @$ sex, @$ city, @$ sdate @$ from  hive_part_test",
-      DDLsql:
-        "CREATE TABLE IF NOT EXISTS hive_part_test @$ ( @$ id int,  @$ name string,  @$ sex string  @$ ) @$ PARTITIONED BY @$  ( @$ city string,  @$ sdate string  @$ )"
+      selectSQL: "",
+      DDLsql: ""
     };
+  },
+  watch: {
+    fieldInfo: {
+      handler(newVal, oldVal) {
+        this.fieldInfoData = newVal;
+        console.log("fieldInfo", this.fieldInfoData);
+      },
+      deep: true
+    },
+    rangeFieldInfo: {
+      handler(newVal, oldVal) {
+        this.rangeInfoData = newVal;
+        console.log("rangeFieldInfo", this.rangeInfoData);
+      },
+      deep: true
+    }
   },
   computed: {
     selectSql() {
@@ -176,10 +191,30 @@ export default {
     createSelect() {
       this.selectFlag = true;
       // 请求 Select语句数据
+      let guid = this.$route.params.guid;
+      getSelectSql(guid)
+        .then(data => {
+          if (data.result) {
+            this.selectSQL = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("getSelectSql", err);
+        });
     },
     createDDL() {
       this.DDLflag = true;
       // 请求 DDL语句数据
+      let guid = this.$route.params.guid;
+      getSelectDdl(guid)
+        .then(data => {
+          if (data.result) {
+            this.DDLsql = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("getSelectSql", err);
+        });
     },
     // 复制
     copy(e, sql) {

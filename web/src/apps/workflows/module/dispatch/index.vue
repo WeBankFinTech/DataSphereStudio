@@ -42,29 +42,31 @@
           <template v-if="!showGantt">
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processInstance')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
-              <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
-              </Input>
-              <template>
-                <Date-picker
-                  style="width: 350px;float: right;margin-right: 10px;"
-                  v-model="dateTime"
-                  type="datetimerange"
-                  @on-ok="_datepicker"
-                  range-separator="-"
-                  :start-placeholder="$t('message.scheduler.runTask.startDate')"
-                  :end-placeholder="$t('message.scheduler.runTask.endDate')"
-                  format="yyyy-MM-dd HH:mm:ss">
-                </Date-picker>
-                <Select v-model="instanceStateType"
-                        @on-change="_changeInstanceState"
-                        :placeholder="$t('message.scheduler.selectState')"
-                        style="width: 150px;float: right;margin-right: 10px;"
-                >
-                  <Option value="" key="-">-</Option>
-                  <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
-                </Select>
-              </template>
+              <div class="fr">
+                <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
+                <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
+                </Input>
+                <template>
+                  <Date-picker
+                    style="width: 350px;float: right;margin-right: 10px;"
+                    v-model="dateTime"
+                    type="datetimerange"
+                    @on-ok="_datepicker"
+                    range-separator="-"
+                    :start-placeholder="$t('message.scheduler.runTask.startDate')"
+                    :end-placeholder="$t('message.scheduler.runTask.endDate')"
+                    format="yyyy-MM-dd HH:mm:ss">
+                  </Date-picker>
+                  <Select v-model="instanceStateType"
+                          @on-change="_changeInstanceState"
+                          :placeholder="$t('message.scheduler.selectState')"
+                          style="width: 150px;float: right;margin-right: 10px;"
+                  >
+                    <Option value="" key="-">-</Option>
+                    <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
+                  </Select>
+                </template>
+              </div>
             </div>
             <Table class="scheduler-table" :columns="columns2" :data="list2"></Table>
             <Page

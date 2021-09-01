@@ -42,8 +42,9 @@
             <span>{{ basicData.comment }}</span>
           </div>
           <div class="assets-info-b-l-content-item">
-            <label for="labels">描述：</label>
-            <span>{{ basicData.labels }}</span>
+            <label for="labels">标签：</label>
+
+            <!-- <span>{{ basicData.labels }}</span> -->
           </div>
         </div>
       </div>
@@ -57,10 +58,10 @@
               :rangeFieldInfo="rangeFieldInfo"
             ></field-info
           ></TabPane>
-          <TabPane label="分区信息"
+          <!-- <TabPane label="分区信息" v-show="isParTbl"
             ><range-info :rangeInfo="rangeInfo"></range-info
-          ></TabPane>
-          <TabPane label="数据预览">标签三的内容</TabPane>
+          ></TabPane> -->
+          <!-- <TabPane label="数据预览">标签三的内容</TabPane> -->
           <TabPane label="数据血缘">
             <div class="dagreLayout-page" v-if="lineageData">
               <lineage
@@ -70,6 +71,9 @@
               ></lineage>
             </div>
           </TabPane>
+          <TabPane label="分区信息" v-if="isParTbl"
+            ><range-info :rangeInfo="rangeInfo"></range-info
+          ></TabPane>
         </Tabs>
       </div>
     </div>
@@ -97,6 +101,7 @@ export default {
     return {
       lineageData: null,
       basicData: {},
+      isParTbl: false,
       fieldInfo: [],
       rangeFieldInfo: [],
       rangeInfo: []
@@ -126,6 +131,7 @@ export default {
           if (data.result) {
             const { basic, columns, partitionKeys } = data.result;
             this.basicData = basic;
+            this.isParTbl = basic["isParTbl"];
             columns.forEach((item, idx) => {
               item["id"] = idx + 1;
             });

@@ -17,11 +17,13 @@
 package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor
 
 import java.util
+import java.util.Map
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel
+import com.webank.wedatasphere.dss.common.label.{EnvDSSLabel, LabelKeyConvertor}
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, CompletedExecutionResponseRef}
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
@@ -123,7 +125,12 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
   }
 
   private def getAppInstanceByLabels(labels: String, appConn: AppConn): Option[AppInstance] = {
-    def appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labels)));
+    var labelStr = labels
+    if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+      val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
+      labelStr = labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
+    }
+    val appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labelStr)));
     if (appInstanceList != null && appInstanceList.size() > 0) {
       return Some(appInstanceList.get(0))
     }

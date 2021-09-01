@@ -27,19 +27,19 @@
 
       <!-- bottom right -->
       <div class="overview-b-r">
-        <Title :title="'表读取次数 Top10'"></Title>
+        <!-- <Title :title="'表读取次数 Top10'"></Title>
         <Table
           :columns="columns2"
           :data="data2"
           width="558"
           size="large"
-        ></Table>
+        ></Table> -->
       </div>
     </div>
   </div>
 </template>
 <script>
-import { getHiveSummary } from "../../service/api";
+import { getHiveSummary, getTopStorage } from "../../service/api";
 import Title from "../common/title.vue";
 import ICard from "../common/iCard.vue";
 export default {
@@ -96,7 +96,7 @@ export default {
         },
         {
           title: "存储量",
-          key: "storageCapacity"
+          key: "storage"
         }
       ],
       columns2: [
@@ -133,18 +133,7 @@ export default {
           key: "readTimes"
         }
       ],
-      data1: [
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" },
-        { tableName: "Table2", storageCapacity: "41738kb" }
-      ],
+      data1: [],
       data2: [
         { tableName: "Table2", readTimes: "36次" },
         { tableName: "Table2", readTimes: "36次" },
@@ -160,10 +149,14 @@ export default {
     };
   },
   mounted() {
-    this.getDataAssetsSummary();
-    // getHiveSummary();
+    this.init();
   },
   methods: {
+    init() {
+      this.getDataAssetsSummary();
+      this.getTblTopStorage();
+    },
+
     // 获取 数据资产概要
     getDataAssetsSummary() {
       let that = this;
@@ -183,6 +176,18 @@ export default {
         })
         .catch(err => {
           console.log("getDataAssetsSummary", err);
+        });
+    },
+    getTblTopStorage() {
+      let that = this;
+      getTopStorage()
+        .then(data => {
+          if (data.result) {
+            that.data1 = data.result.slice(0);
+          }
+        })
+        .catch(err => {
+          that.$Message.error(err);
         });
     }
   }

@@ -72,7 +72,7 @@
 <script>
 import clipboard from "../../utils/clipboard";
 import { fomatSqlForShow, fomatSqlForCopy } from "../../utils/fomatSQL";
-import { getSelectSql, getSelectDdl } from "../../service/api";
+import { getSelectSql, getSelectDdl, putCommetBulk } from "../../service/api";
 export default {
   name: "fieldInfo",
   props: {
@@ -156,14 +156,12 @@ export default {
     fieldInfo: {
       handler(newVal, oldVal) {
         this.fieldInfoData = newVal;
-        console.log("fieldInfo", this.fieldInfoData);
       },
       deep: true
     },
     rangeFieldInfo: {
       handler(newVal, oldVal) {
         this.rangeInfoData = newVal;
-        console.log("rangeFieldInfo", this.rangeInfoData);
       },
       deep: true
     }
@@ -185,8 +183,29 @@ export default {
     },
     onSave() {
       this.isEdit = false;
-      console.log("fieldInfoData", this.fieldInfoData);
-      console.log("rangeInfoData", this.rangeInfoData);
+      let that = this;
+      let fieldInfoData = this.fieldInfoData.slice(0);
+      let rangeInfoData = this.rangeFieldInfo.slice(0);
+      let resMap = new Map();
+      if (fieldInfoData.length) {
+        fieldInfoData.forEach(item => {
+          resMap.set(item.guid, item.comment);
+        });
+      }
+      if (rangeInfoData.length) {
+        rangeInfoData.forEach(item => {
+          resMap.set(item.guid, item.comment);
+        });
+      }
+      putCommetBulk(resMap)
+        .then(data => {
+          if (data.result) {
+            that.$Message.success(data.result);
+          }
+        })
+        .catch(err => {
+          console.log("putCommetBulk", err);
+        });
     },
     createSelect() {
       this.selectFlag = true;

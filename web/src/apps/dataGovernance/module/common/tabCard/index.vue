@@ -7,7 +7,7 @@
         <span style="marginLeft: 8px; fontSize: 16px">{{ model.name }}</span>
       </div>
       <div class="tab-card-t-r">
-        <span>读取次数：{{ model.readCount }}次</span>
+        <!-- <span>读取次数：{{ model.readCount }}次</span> -->
       </div>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="tab-card-b">
       <span style="width: 110px">负责人：{{ model.owner }}</span>
       <span style="width: 210px">创建时间：{{ model.createTime }}</span>
-      <span style="width: 210px">更新时间：{{ model.updateTime }}</span>
+      <!-- <span style="width: 210px">更新时间：{{ model.updateTime }}</span> -->
     </div>
   </div>
 </template>

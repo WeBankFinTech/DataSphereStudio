@@ -66,8 +66,9 @@ const getLineage = guid =>
  * @params {Map}
  * @returns
  */
-const putCommetBulk = params =>
-  api.fetch(`${API_PATH.DATA_GOVERNANCE}comment/bulk`, params, "put");
+const putCommetBulk = params => {
+  return api.fetch(`${API_PATH.DATA_GOVERNANCE}comment/bulk`, params, "put");
+};
 
 /**
  * 存储量前10表
@@ -76,6 +77,26 @@ const putCommetBulk = params =>
  */
 const getTopStorage = () =>
   api.fetch(`${API_PATH.DATA_GOVERNANCE}hiveTbl/topStorage`, {}, "get");
+
+/**
+ * 设置标签--表或列
+ * @params {guid}
+ * @returns String
+ */
+const postSetLabel = (guid, params) =>
+  api.fetch(`${API_PATH.DATA_GOVERNANCE}label/${guid}`, params, "post");
+
+/**
+ * 修改注释--表或列
+ * @params {guid, Obiect}
+ * @returns String
+ */
+const postSetComment = (guid, comment) =>
+  api.fetch(
+    `${API_PATH.DATA_GOVERNANCE}comment/${guid}?comment=${comment}`,
+    {},
+    "put"
+  );
 
 export {
   getHiveSummary,
@@ -86,5 +107,7 @@ export {
   getHiveTbls,
   getLineage,
   putCommetBulk,
-  getTopStorage
+  getTopStorage,
+  postSetLabel,
+  postSetComment
 };

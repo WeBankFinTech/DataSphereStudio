@@ -104,6 +104,7 @@ export default {
   created() {
     let searchParams = storage.getItem("searchTbls");
     if (searchParams) {
+      this.queryForTbls = JSON.parse(searchParams).query;
       getHiveTbls(JSON.parse(searchParams))
         .then(data => {
           if (data.result) {
@@ -126,6 +127,8 @@ export default {
         .then(data => {
           if (data.result) {
             this.cardTabs = data.result;
+          } else {
+            this.cardTabs = [];
           }
         })
         .catch(err => {

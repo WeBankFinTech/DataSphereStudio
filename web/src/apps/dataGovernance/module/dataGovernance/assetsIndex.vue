@@ -107,8 +107,14 @@ export default {
         if (that.currentTab.guid === modal.guid) {
           if (len > 1 && idx < len - 1) {
             that.currentTab = topTapList[idx + 1];
+            that.$router.push(
+              `/dataGovernance/assets/info/${that.currentTab.guid}`
+            );
           } else if (len > 1 && idx == len - 1) {
             that.currentTab = topTapList[idx - 1];
+            that.$router.push(
+              `/dataGovernance/assets/info/${that.currentTab.guid}`
+            );
           } else {
             that.currentTab = {};
             that.textColor = true;

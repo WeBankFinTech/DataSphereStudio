@@ -21,6 +21,7 @@
 </template>
 <script>
 import navMenu from "../common/navMenu.vue";
+// import storage from "../../utils/storage";
 export default {
   components: {
     navMenu
@@ -62,6 +63,14 @@ export default {
       title: this.$t("message.dataGovernance.dataOverview")
     };
   },
+  mounted() {
+    let pathName = this.$route.name;
+    if (pathName !== "dataGovernance/overview") {
+      sessionStorage.removeItem("searchTbls");
+      this.$router.push({ name: "dataGovernance/overview" });
+    }
+    console.log("f5");
+  },
   methods: {
     handleMenuToggle() {
       this.menuFold = !this.menuFold;
@@ -75,7 +84,6 @@ export default {
       if (pathName) {
         this.$router.push({ name: pathName });
       }
-      console.log("index node", node);
     }
   }
 };

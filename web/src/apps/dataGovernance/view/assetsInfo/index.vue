@@ -39,12 +39,44 @@
           </div>
           <div class="assets-info-b-l-content-item">
             <label for="comment">描述：</label>
-            <span>{{ basicData.comment }}</span>
+            <Button
+              v-show="!isCommentEdit"
+              type="text"
+              size="large"
+              @click="() => (isCommentEdit = true)"
+              >{{ basicData.comment }}</Button
+            >
+            <Input
+              v-show="isCommentEdit"
+              v-model="basicData.comment"
+              size="small"
+              placeholder=""
+              @on-enter="editSingleComment"
+            />
           </div>
           <div class="assets-info-b-l-content-item">
             <label for="labels">标签：</label>
-
-            <!-- <span>{{ basicData.labels }}</span> -->
+            <Button
+              v-show="!isLabelEdit"
+              type="dashed"
+              size="large"
+              style="marginRight: 8px; marginBottom: 8px"
+              @click="() => (isLabelEdit = true)"
+              >添加标签</Button
+            >
+            <Input
+              v-show="isLabelEdit"
+              v-model="singleLabel"
+              size="small"
+              placeholder=""
+              @on-enter="editSingleLabel"
+            />
+            <span
+              v-for="label in labelOptions"
+              :key="label"
+              class="assets-info-label"
+              >{{ label }}</span
+            >
           </div>
         </div>
       </div>
@@ -87,7 +119,9 @@ import lineage from "./components/lineage";
 import {
   getLineage,
   getHiveTblBasic,
-  getHiveTblPartition
+  getHiveTblPartition,
+  postSetLabel,
+  postSetComment
 } from "../../service/api";
 
 export default {
@@ -104,7 +138,13 @@ export default {
       isParTbl: false,
       fieldInfo: [],
       rangeFieldInfo: [],
-      rangeInfo: []
+      rangeInfo: [],
+
+      isLabelEdit: false,
+      singleLabel: "",
+      labelOptions: [],
+
+      isCommentEdit: false
     };
   },
   watch: {
@@ -132,6 +172,7 @@ export default {
             const { basic, columns, partitionKeys } = data.result;
             this.basicData = basic;
             this.isParTbl = basic["isParTbl"];
+            this.labelOptions = basic["labels"];
             columns.forEach((item, idx) => {
               item["id"] = idx + 1;
             });
@@ -170,6 +211,37 @@ export default {
         })
         .catch(err => {
           console.log("getLineageData", err);
+        });
+    },
+    // 编辑标签
+    editSingleLabel() {
+      let that = this;
+      if (that.singleLabel) {
+        that.labelOptions.push(that.singleLabel);
+        let params = that.labelOptions.slice(0);
+        let guid = this.$route.params.guid;
+        postSetLabel(guid, params)
+          .then(data => {
+            console.log(data);
+            that.isLabelEdit = false;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    },
+    // 编辑描述
+    editSingleComment() {
+      let that = this;
+      let comment = that.basicData["comment"];
+      let guid = this.$route.params.guid;
+      postSetComment(guid, comment)
+        .then(data => {
+          console.log(data);
+          that.isCommentEdit = false;
+        })
+        .catch(err => {
+          console.log(err);
         });
     }
   }
@@ -232,6 +304,14 @@ export default {
       flex: 1;
       max-width: calc(100% - 250px);
     }
+  }
+
+  .assets-info-label {
+    background-color: burlywood;
+    display: inline-block;
+    min-width: 35px;
+    text-align: center;
+    margin-right: 8px;
   }
 }
 </style>

@@ -186,15 +186,15 @@ export default {
       let that = this;
       let fieldInfoData = this.fieldInfoData.slice(0);
       let rangeInfoData = this.rangeFieldInfo.slice(0);
-      let resMap = new Map();
+      let resMap = Object.create(null);
       if (fieldInfoData.length) {
         fieldInfoData.forEach(item => {
-          resMap.set(item.guid, item.comment);
+          resMap[item.guid] = item.comment;
         });
       }
       if (rangeInfoData.length) {
         rangeInfoData.forEach(item => {
-          resMap.set(item.guid, item.comment);
+          resMap[item.guid] = item.comment;
         });
       }
       putCommetBulk(resMap)

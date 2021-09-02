@@ -100,7 +100,7 @@ export default {
   methods: {
     getApiList() {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apimanager/list', {
+      api.fetch('/dss/data/api/apimanager/list', {
         workspaceId: this.$route.query.workspaceId,
         apiName: this.apiName,
         pageNow: this.pageData.pageNow,
@@ -134,7 +134,7 @@ export default {
       });
     },
     online(row) {
-      api.fetch(`/dss/framework/dbapi/apimanager/online/${row.id}`, {}, 'post').then((res) => {
+      api.fetch(`/dss/data/api/apimanager/online/${row.id}`, {}, 'post').then((res) => {
         if (res) {
           this.apiList = this.apiList.map(i => {
             if (i.id == row.id) {
@@ -149,7 +149,7 @@ export default {
       });
     },
     offline(row) {
-      api.fetch(`/dss/framework/dbapi/apimanager/offline/${row.id}`, {
+      api.fetch(`/dss/data/api/apimanager/offline/${row.id}`, {
       }, 'post').then((res) => {
         if (res) {
           this.apiList = this.apiList.map(i => {
@@ -165,7 +165,7 @@ export default {
       });
     },
     copy(row) {
-      api.fetch(`/dss/framework/dbapi/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
+      api.fetch(`/dss/data/api/apimanager/callPath/${row.id}`, {}, 'get').then((res) => {
         let inputEl = document.createElement('input');
         inputEl.value = `${res.callPathPrefix}`.replace('{protocol}:', location.protocol).replace('{host}', location.host);
         document.body.appendChild(inputEl);

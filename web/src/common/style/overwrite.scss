@@ -9,6 +9,8 @@
   }
   .ivu-notice-notice {
     background: #373F50;
+    /*scripts模块desc自定义，color继承*/
+    color: $dark-text-color;
   }
   .ivu-notice-title {
     color: $dark-workspace-title-color;
@@ -37,6 +39,10 @@
   .ivu-modal-header {
     background-color: $dark-base-color !important;
     border-color: $dark-border-color-base;
+    color: $dark-workspace-title-color; 
+    p {
+      color: $dark-workspace-title-color; 
+    }
     .ivu-modal-header-inner {
       color: $dark-workspace-title-color; 
     }
@@ -70,7 +76,12 @@
     color: $primary-color;
     background: $dark-active-menu-item;
   }
-
+  .ivu-dropdown-item-divided {
+    border-color:$dark-border-color-base;
+    &::before {
+      background: $dark-workspace-background;
+    }
+  }
   .ivu-btn-default, .ivu-dropdown-item {
     color: $dark-text-color;
     &:hover {
@@ -91,6 +102,12 @@
     color: $dark-workspace-title-color;
   }
   .el-upload__text {
+    color: $dark-text-color;
+  }
+  .el-upload__tip {
+    color: $dark-text-desc-color;
+  }
+  .el-upload__path {
     color: $dark-text-color;
   }
 
@@ -132,24 +149,25 @@
     background-color: $dark-base-color;
   }
 
+  .ivu-table-wrapper {
+    border-color: $dark-border-color-base;
+  }
   .ivu-table {
     background-color: $dark-base-color;
     color: $dark-text-color;
-    &:before {
+    &:before, &:after {
       background-color: $dark-border-color-base;
     }
   }
   .ivu-table th {
     background-color: $dark-header-bg-color;
     border-color: $dark-border-color-base;
-    border-right: none;
     color: $dark-workspace-title-color;
   }
   .ivu-table td {
     background-color: $dark-base-color;
     color: $dark-text-color;
     border-color: $dark-border-color-base;
-    border-right: none;
   }
   .ivu-table-row-highlight, .ivu-table-row-hover{
       td{
@@ -206,7 +224,6 @@
   .ivu-checkbox-disabled.ivu-checkbox-checked .ivu-checkbox-inner{
     background-color: $dark-disabled-bg-color;
   }
-
   .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
     background: $dark-menu-base-color;
   }
@@ -250,6 +267,15 @@
   }
   .ivu-card {
     background: $dark-menu-base-color;
+  }
+  .ivu-card-head {
+    border-color:$dark-border-color-base;
+    p{
+      color:$dark-workspace-title-color;
+    }
+  }
+  .ivu-card-body {
+    color: $dark-text-color;
   }
   .ivu-cell {
     color: $dark-text-color;
@@ -444,4 +470,31 @@
     background-color: $dark-primary-color !important;
   }
   
+  .table-div {
+    background: $dark-base-color;
+    border-color: $dark-border-color-base;
+  }
+  .top-td{
+    background: $dark-menu-base-color;
+    color: $dark-workspace-title-color;
+    border-color: $dark-border-color-base;
+  }
+  .bottom-td {
+    border-color:$dark-border-color-base;
+  }
+  .sort-icon  i {
+    color: $dark-text-color;
+  }
+  .trselect td {
+    background-color: $dark-active-menu-item;
+    &:hover {
+      background-color: $dark-active-menu-item;
+    }
+  }
+  .no-data-tip {
+    color:$dark-text-color;
+  }
+  .we-import-dialog-content {
+    color: $dark-workspace-title-color;
+  }
 }

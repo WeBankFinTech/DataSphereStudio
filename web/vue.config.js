@@ -23,6 +23,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 const webpack = require('webpack')
 const apps = require('./src/config.json')
 
@@ -231,10 +232,9 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        //target: 'http://192.168.10.201:8088',
-        target: 'http://127.0.0.1:8088', //tangHan
-        //target: 'http://127.0.0.1:9208/',
-        //target: 'http://0.0.0.0:8087',
+        target: 'http://127.0.0.1:8088',
+        //target: 'http://192.168.9.119:9202', //tangHan
+        //target: 'http://192.168.10.180:8088',
         // target: 'http://luban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {

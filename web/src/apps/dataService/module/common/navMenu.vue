@@ -16,7 +16,7 @@
         <SvgIcon class="nav-icon" icon-class="project-workflow" />
       </div>
     </div>
-    <div class="ds-nav-panel" v-if="currentTab == '/dataService'">
+    <div class="ds-nav-panel ds-nav-panel-develop" v-if="currentTab == '/dataService'">
       <TreeMenu
         @showModal="showModal"
         @handleApiChoosed="handleApiChoosed"
@@ -141,6 +141,10 @@ export default {
     border-right: 1px solid #dee4ec;
     @include border-color(#dee4ec, $dark-menu-base-color);
     @include bg-color(#f8f9fc, $dark-menu-base-color);
+  }
+  .ds-nav-panel-develop{
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 .develop_nav {

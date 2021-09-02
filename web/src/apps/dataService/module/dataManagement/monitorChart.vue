@@ -84,7 +84,7 @@ export default {
     },
     getTimeByApi(range) {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callTimeForSinleApi', {
+      api.fetch('/dss/data/api/apimonitor/callTimeForSinleApi', {
         ...range,
         workspaceId: this.$route.query.workspaceId,
         apiId: this.api.id
@@ -99,7 +99,7 @@ export default {
     },
     getCntByApi(range) {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callCntForSinleApi', {
+      api.fetch('/dss/data/api/apimonitor/callCntForSinleApi', {
         ...range,
         workspaceId: this.$route.query.workspaceId,
         apiId: this.api.id

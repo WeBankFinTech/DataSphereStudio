@@ -262,7 +262,7 @@ export default {
             this.confirmLoading = true;
             api
               .fetch(
-                `/dss/framework/dbapi/group/create`,
+                `/dss/data/api/group/create`,
                 {
                   workspaceId: this.$route.query.workspaceId,
                   ...this.groupForm
@@ -394,7 +394,7 @@ export default {
         }
         this.loadingData = true;
         api
-          .fetch(`/dss/framework/dbapi/detail?apiId=${id}`, {}, "get")
+          .fetch(`/dss/data/api/detail?apiId=${id}`, {}, "get")
           .then(res => {
             console.log(res);
             this.loadingData = false;

@@ -83,9 +83,11 @@
         class="user"
         @click="handleUserClick"
       >
-        <span>{{ userName || 'Null' }}</span>
-        <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
-        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        <div class="userName">
+          <span>{{ userName || 'Null' }}</span>
+          <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
+          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        </div>
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>
       </div>
       <ul class="menu">

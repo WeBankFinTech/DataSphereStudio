@@ -194,9 +194,14 @@ module.exports = {
           }
         }
       }))
+      config.performance.set("hints", false);
     }
   },
-  configureWebpack: {
+  configureWebpack: configWrap({
+    module: {
+      noParse: /^(vue|vue-router|vuex|vuex-router-sync|lodash|echarts|axios)$/
+    },
+    devtool: 'eval', // 控制source map生成方式加速build
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

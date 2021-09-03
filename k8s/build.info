@@ -3,3 +3,4 @@ dss-flow-execution-server
 dss-framework-orchestrator-server
 dss-framework-project-server
 dss-workflow-server
+dss-data-api-server

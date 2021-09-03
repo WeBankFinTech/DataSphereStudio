@@ -138,9 +138,19 @@ if (process.env.NODE_ENV !== 'dev') {
   ))
 }
 
+const smp = new SpeedMeasurePlugin();
+const configWrap = (config) => {
+  if (process.env.NODE_ENV === 'dev') {
+    return config;
+  } else {
+    return smp.wrap(config)
+  }
+}
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  lintOnSave: process.env.NODE_ENV !== 'production', // build无需eslint
+  productionSourceMap: process.env.NODE_ENV === 'dev', // 生产环境无需source map加速构建，但不如设置devtool生效
   css: {
     loaderOptions: {
       less: {
@@ -226,7 +236,7 @@ module.exports = {
     //     })
     //   ]
     // }
-  },
+  }),
   // 选项...
   pluginOptions: {
     mock: {
@@ -237,10 +247,10 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://***REMOVED***:8088',
+        // target: 'http://***REMOVED***:8088',
         //target: 'http://192.168.9.119:9202', //tangHan
         //target: 'http://192.168.10.180:8088',
-        // target: 'http://luban.ctyun.cn:8088',
+        target: 'http://luban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'

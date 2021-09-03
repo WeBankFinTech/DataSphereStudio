@@ -441,7 +441,16 @@ export default {
       this.currentProject = {};
     },
     goConsole(){
-      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+      const url =
+        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+      this.$router.push({
+        name: 'commonIframe',
+        query: {
+          workspaceId: this.$route.query.workspaceId,
+          url
+        }
+      })
+      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goRolesPath() {
       // 根据接口getWorkspaceBaseInfo渲染跳转不同路径

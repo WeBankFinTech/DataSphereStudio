@@ -81,6 +81,17 @@
       </includes>
     </fileSet>
 
+    <!--dss-data-api-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-data-api/dss-data-api-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
     <!--dss-framework-orchestrator-server-->
     <fileSet>
       <directory>

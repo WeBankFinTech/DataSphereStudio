@@ -82,12 +82,21 @@ export default {
     // 面包屑相关
     selectProject() {
       // 返回到 目录 即搜索页面
-      this.$router.push("/dataGovernance/assets/search");
+      const workspaceId = this.$route.query.workspaceId;
+      this.$router.push({
+        name: "dataGovernance/assets/search",
+        query: { workspaceId }
+      });
       this.textColor = true;
     },
     onChooseWork(modal) {
-      let path = "/dataGovernance/assets";
-      this.$router.push(`${path}/info/${modal.guid}`);
+      const workspaceId = this.$route.query.workspaceId;
+      const { guid } = modal;
+      this.$router.push({
+        name: "dataGovernance/assets/info",
+        params: { guid },
+        query: { workspaceId }
+      });
       this.currentTab = modal;
       this.textColor = false;
     },
@@ -105,20 +114,29 @@ export default {
 
       const removeAction = () => {
         if (that.currentTab.guid === modal.guid) {
+          const { guid } = that.currentTab;
+          const workspaceId = that.$route.query.workspaceId;
           if (len > 1 && idx < len - 1) {
             that.currentTab = topTapList[idx + 1];
-            that.$router.push(
-              `/dataGovernance/assets/info/${that.currentTab.guid}`
-            );
+            that.$router.push({
+              name: "dataGovernance/assets/info",
+              params: { guid },
+              query: { workspaceId }
+            });
           } else if (len > 1 && idx == len - 1) {
             that.currentTab = topTapList[idx - 1];
-            that.$router.push(
-              `/dataGovernance/assets/info/${that.currentTab.guid}`
-            );
+            that.$router.push({
+              name: "dataGovernance/assets/info",
+              params: { guid },
+              query: { workspaceId }
+            });
           } else {
             that.currentTab = {};
             that.textColor = true;
-            that.$router.push("/dataGovernance/assets/search");
+            that.$router.push({
+              name: "dataGovernance/assets/search",
+              query: { workspaceId }
+            });
           }
         }
         topTapList.splice(idx, 1);

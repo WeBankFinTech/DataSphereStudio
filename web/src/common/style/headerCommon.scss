@@ -9,7 +9,7 @@
   padding: 0 20px;
   @include bg-color($background-color-header, $dark-background-color-header);
   color: $dark-color;
-  box-shadow: $shadow-down;
+  // box-shadow: $shadow-down;
   z-index: $zindex-affix;
   user-select: none;
   clear: both;
@@ -73,7 +73,7 @@
       &.selected,
       &:hover {
         color: $body-background;
-        background: $dark-bg-dark;
+        // background: $dark-bg-dark;
       }
 
       .menu-item-beat {
@@ -109,22 +109,24 @@
     position: absolute;
     right: 5px;
     top: 0;
-
-    span {
-      display: inline-block;
-      line-height: 54px;
-      font-size: $font-size-base;
-      padding: 0 7px 0 10px;
+    .userName {
+      span {
+        display: inline-block;
+        line-height: 54px;
+        font-size: $font-size-base;
+        padding: 0 7px 0 10px;
     }
-
     .user-icon {
       padding-right: 10px;
     }
-
-    &.selected,
     &:hover {
-      background: $menu-dark-active-bg;
+      color: #fff;
     }
+    }
+    // &.selected,
+    // &:hover {
+      // background: $menu-dark-active-bg;
+    // }
 
     .user-image {
       border-radius: 50%;

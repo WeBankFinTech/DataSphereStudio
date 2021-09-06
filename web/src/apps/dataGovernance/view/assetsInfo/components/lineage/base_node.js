@@ -16,7 +16,7 @@ class BaseNode extends Node {
       .attr('id', opts.id)
       .addClass(opts.options.className);
 
-    let logoContainer = $(`<div class="logo-container">${opts.options.name}</div>`);
+    let logoContainer = $(`<div class="logo-container" title="${opts.options.name}"><span style="margin-right: 5px">${opts.options.icon}</span>${opts.options.name}</div>`);
     logoContainer.addClass(opts.options.className);
 
     container.append(logoContainer);

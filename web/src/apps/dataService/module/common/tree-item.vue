@@ -11,6 +11,9 @@
         <SvgIcon v-if="model.opened" icon-class="open" @click="handleItemToggle"/>
         <SvgIcon v-else icon-class="close" @click="handleItemToggle"/>
       </div>
+      <div class="tree-icon" v-if="model.type == 'api'">
+        <SvgIcon icon-class="api2" />
+      </div>
       <div class="tree-loading" v-if="model.loading">
         <SvgIcon icon-class="loading" />
       </div>

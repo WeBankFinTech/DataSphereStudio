@@ -23,6 +23,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 const webpack = require('webpack')
 const apps = require('./src/config.json')
 
@@ -137,9 +138,19 @@ if (process.env.NODE_ENV !== 'dev') {
   ))
 }
 
+const smp = new SpeedMeasurePlugin();
+const configWrap = (config) => {
+  if (process.env.NODE_ENV === 'dev') {
+    return config;
+  } else {
+    return smp.wrap(config)
+  }
+}
 module.exports = {
   publicPath: './',
   outputDir: 'dist/dist',
+  lintOnSave: process.env.NODE_ENV !== 'production', // build无需eslint
+  productionSourceMap: process.env.NODE_ENV === 'dev', // 生产环境无需source map加速构建，但不如设置devtool生效
   css: {
     loaderOptions: {
       less: {
@@ -193,9 +204,14 @@ module.exports = {
           }
         }
       }))
+      config.performance.set("hints", false);
     }
   },
-  configureWebpack: {
+  configureWebpack: configWrap({
+    module: {
+      noParse: /^(vue|vue-router|vuex|vuex-router-sync|lodash|echarts|axios)$/
+    },
+    devtool: 'eval', // 控制source map生成方式加速build
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
@@ -220,7 +236,7 @@ module.exports = {
     //     })
     //   ]
     // }
-  },
+  }),
   // 选项...
   pluginOptions: {
     mock: {
@@ -236,7 +252,7 @@ module.exports = {
         target: 'http://127.0.0.1:9202', //jiawei
         //target: 'http://192.168.9.119:9202', //tangHan
         //target: 'http://192.168.10.180:8088',
-        // target: 'http://luban.ctyun.cn:8088',
+        target: 'http://luban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'

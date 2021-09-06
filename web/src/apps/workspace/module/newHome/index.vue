@@ -43,7 +43,7 @@
           <ul class="card-content" ref="row" v-show="!visual">
             <!-- 新增工作空间 -->
 
-            <li class="newHome_create" @click="createWorkspace">
+            <li class="newHome_create" @click="createWorkspace" v-if="!noWorkSpace">
               <div class="newHome_create_content">
                 <SvgIcon
                   :style="{ 'font-size': '20px' }"
@@ -209,7 +209,11 @@ export default {
     });
   },
   mounted() {},
-  computed: {},
+  computed: {
+    noWorkSpace() {
+      return storage.get('noWorkSpace', 'local')
+    }
+  },
   beforeDestroy() {},
   watch: {},
   methods: {
@@ -284,14 +288,16 @@ export default {
     workspaceShowAction(val) {
       this.workspaceShow = val;
     },
-    workspaceConfirm(params) {
+    workspaceConfirm(params, callback) {
       GetWorkspaceList(params, "post")
         .then(res => {
+          typeof callback == 'function' && callback();
           this.$Message.success(this.$t("message.workspace.createdSuccess"));
           // 创建成功后跳到工作空间首页
           this.gotoWorkspace(res);
         })
         .catch(() => {
+          typeof callback == 'function' && callback();
           this.$Message.error(this.$t("message.workspace.createdFailed"));
         });
     },

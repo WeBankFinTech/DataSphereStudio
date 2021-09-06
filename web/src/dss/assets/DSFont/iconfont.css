@@ -1,0 +1,143 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2585050 */
+  src: url('iconfont.woff2?t=1625817741073') format('woff2'),
+       url('iconfont.woff?t=1625817741073') format('woff'),
+       url('iconfont.ttf?t=1625817741073') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-wenhao:before {
+  content: "\e6ac";
+}
+
+.icon-tiaodu:before {
+  content: "\e6ad";
+}
+
+.icon-huaban:before {
+  content: "\e6ae";
+}
+
+.icon-xingzhuang:before {
+  content: "\e84b";
+}
+
+.icon-file:before {
+  content: "\e693";
+}
+
+.icon-plus:before {
+  content: "\e692";
+}
+
+.icon-unfold:before {
+  content: "\e690";
+}
+
+.icon-putaway:before {
+  content: "\e691";
+}
+
+.icon-open:before {
+  content: "\e68a";
+}
+
+.icon-delete:before {
+  content: "\e68c";
+}
+
+.icon-flow:before {
+  content: "\e68d";
+}
+
+.icon-close:before {
+  content: "\e68e";
+}
+
+.icon-project:before {
+  content: "\e68f";
+}
+
+.icon-shell:before {
+  content: "\e671";
+}
+
+.icon-kill:before {
+  content: "\e667";
+}
+
+.icon-ready-stop:before {
+  content: "\e66b";
+}
+
+.icon-ready-pause:before {
+  content: "\e66d";
+}
+
+.icon-delay-execution:before {
+  content: "\e663";
+}
+
+.icon-need-fault-tolerance:before {
+  content: "\e664";
+}
+
+.icon-pause:before {
+  content: "\e665";
+}
+
+.icon-stop:before {
+  content: "\e666";
+}
+
+.icon-watting-depend:before {
+  content: "\e668";
+}
+
+.icon-forced-success:before {
+  content: "\e669";
+}
+
+.icon-success:before {
+  content: "\e66a";
+}
+
+.icon-submitted-success:before {
+  content: "\e66c";
+}
+
+.icon-failure:before {
+  content: "\e66e";
+}
+
+.icon-running-execution:before {
+  content: "\e66f";
+}
+
+.icon-waitting-thread:before {
+  content: "\e670";
+}
+
+.icon-refresh:before {
+  content: "\e65f";
+}
+
+.icon-full-screen:before {
+  content: "\e660";
+}
+
+.icon-cancel-full-screeen:before {
+  content: "\e661";
+}
+
+.icon-download:before {
+  content: "\e662";
+}
+

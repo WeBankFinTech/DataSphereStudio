@@ -40,7 +40,7 @@
           </div>
           <div
             class="content-body-side-right-content"
-            :style="{'height': contentHeight + 'px'}">
+            :style="{'min-height': contentHeight + 'px'}">
             <router-view></router-view>
           </div>
         </div>

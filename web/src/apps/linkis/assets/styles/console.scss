@@ -24,7 +24,7 @@
     display: flex;
     flex-direction: column;
     // background: $background-color-base;
-    @include bg-color($light-base-color, $dark-base-color);
+    @include bg-color($background-color-base, $dark-base-color);
 
     // 广告位样式，未使用到，暂未修改
     .ad {
@@ -59,6 +59,7 @@
 
         .console-page-content-body {
             position: $relative;
+            height: 100%;
             .content-body-side-nav {
                 width: 200px;
                 position: $absolute;

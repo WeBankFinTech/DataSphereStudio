@@ -8,25 +8,11 @@
       }"
     >
       <div class="tree-icon" :class="{ leaf: isLeaf }">
-        <Icon
-          custom="iconfont icon-open"
-          v-if="model.opened"
-          @click="handleItemToggle"
-        ></Icon>
-        <Icon
-          custom="iconfont icon-close"
-          v-else
-          @click="handleItemToggle"
-        ></Icon>
-      </div>
-      <div class="tree-icon" v-if="model.type == 'flow'">
-        <Icon custom="iconfont icon-flow"></Icon>
-      </div>
-      <div class="tree-icon" v-if="model.type == 'api'">
-        <Icon custom="iconfont icon-api"></Icon>
+        <SvgIcon v-if="model.opened" icon-class="open" @click="handleItemToggle"/>
+        <SvgIcon v-else icon-class="close" @click="handleItemToggle"/>
       </div>
       <div class="tree-loading" v-if="model.loading">
-        <Icon custom="iconfont icon-xingzhuang" size="16"></Icon>
+        <SvgIcon icon-class="loading" />
       </div>
       <div
         class="tree-name"
@@ -40,7 +26,7 @@
         @click="handleAddClick"
         v-if="model.type == 'project' && model.canWrite"
       >
-        <Icon custom="iconfont icon-plus" size="16"></Icon>
+        <SvgIcon icon-class="plus" />
       </div>
       <div class="tree-hold" v-else></div>
     </div>

@@ -118,8 +118,10 @@ export default {
         return res.workspaceHomePage.homePageUrl;
       }).catch(() => {
         storage.set('noWorkSpace', true, 'local');
-        storage.clear();
-        storage.clear('cookie');
+
+        this.$emit('clear-session');
+        storage.remove('baseInfo', 'local');
+        
         return '/'
       });
     },

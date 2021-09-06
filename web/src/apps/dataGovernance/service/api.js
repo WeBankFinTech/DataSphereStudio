@@ -48,7 +48,7 @@ const getSelectDdl = guid =>
  */
 const getHiveTbls = params =>
   api.fetch(
-    `${API_PATH.DATA_GOVERNANCE}hiveTbl/search?query=${params.query}`,
+    `${API_PATH.DATA_GOVERNANCE}hiveTbl/search?query=${params.query}&owner=${params.owner}&limit=${params.limit}&offset=${params.offset}`,
     {},
     "get"
   );
@@ -98,6 +98,18 @@ const postSetComment = (guid, comment) =>
     "put"
   );
 
+/**
+ * 负责人查询
+ * @params {workspaceId}
+ * @returns Array
+ */
+const getWorkspaceUsers = workspackId =>
+  api.fetch(
+    `${API_PATH.DATA_GOVERNANCE}getWorkspaceUsers/${workspackId}`,
+    {},
+    "get"
+  );
+
 export {
   getHiveSummary,
   getHiveTblBasic,
@@ -109,5 +121,6 @@ export {
   putCommetBulk,
   getTopStorage,
   postSetLabel,
-  postSetComment
+  postSetComment,
+  getWorkspaceUsers
 };

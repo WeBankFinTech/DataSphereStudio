@@ -364,6 +364,7 @@
                 margin-right: 5px;
                 width: 40px;
                 font-size: $font-size-base;
+                @include font-color($light-text-color, $dark-text-color);
             }
         }
     }
@@ -375,6 +376,7 @@
             flex-basis: 62px;
             font-size: 16px;
             margin-right: 20px;
+            @include font-color($light-text-color, $dark-text-color);
         }
         .engine-ul {
             flex: 1;

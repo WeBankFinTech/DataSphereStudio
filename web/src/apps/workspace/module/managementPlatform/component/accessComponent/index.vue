@@ -93,7 +93,7 @@ export default {
   display: inline-block;
   height: 40px;
   line-height: 40px;
-  color: $title-color;
+  @include font-color($title-color, $dark-text-color);
   cursor: pointer;
   min-width: 100px;
   max-width: 200px;
@@ -101,19 +101,10 @@ export default {
   margin-right: 2px;
   &.active {
     height: 40px;
-    line-height: 40px;
-    @include font-color($title-color, $dark-text-color);
-    cursor: pointer;
-    min-width: 100px;
-    max-width: 200px;
-    overflow: hidden;
-    margin-right: 2px;
-    &.active {
-        height: 40px;
-        color: $primary-color;
-        border-radius: 4px 4px 0 0;
-        border-bottom: 2px solid $primary-color;
-        line-height: 38px;
-    }
+    color: $primary-color;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid $primary-color;
+    line-height: 38px;
+  }
 }
 </style>

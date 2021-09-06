@@ -103,9 +103,9 @@ const postSetComment = (guid, comment) =>
  * @params {workspaceId}
  * @returns Array
  */
-const getWorkspaceUsers = workspackId =>
+const getWorkspaceUsers = (workspackId, search) =>
   api.fetch(
-    `${API_PATH.DATA_GOVERNANCE}getWorkspaceUsers/${workspackId}`,
+    `${API_PATH.DATA_GOVERNANCE}getWorkspaceUsers/${workspackId}/${search}`,
     {},
     "get"
   );

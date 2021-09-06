@@ -109,11 +109,12 @@ export default {
     overflow: hidden;
     margin-right: 2px;
     &.active {
-        height: 40px;
-        color: $primary-color;
-        border-radius: 4px 4px 0 0;
-        border-bottom: 2px solid $primary-color;
-        line-height: 38px;
+      height: 40px;
+      color: $primary-color;
+      border-radius: 4px 4px 0 0;
+      border-bottom: 2px solid $primary-color;
+      line-height: 38px;
     }
+  }
 }
 </style>

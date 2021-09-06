@@ -45,6 +45,7 @@ export default {
   padding-right: 24px;
   border: 1px solid #dee4ec;
   border-top: none;
+  border-left: none;
   display: flex;
   flex-direction: column;
   justify-content: center;

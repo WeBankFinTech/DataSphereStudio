@@ -7,7 +7,12 @@
       @on-menu-toggle="handleMenuToggle"
       @handleApiChoosed="onClickMenu"
     />
-    <div class="ds-main-content" :class="{ 'ds-main-content-fold': menuFold }">
+    <div
+      class="ds-main-content"
+      :class="{
+        'ds-main-content-fold': menuFold
+      }"
+    >
       <div class="ds-main-container">
         <div class="ds-breadcumb">
           <span>{{ title }}</span>
@@ -63,11 +68,20 @@ export default {
       title: this.$t("message.dataGovernance.dataOverview")
     };
   },
+  computed: {
+    searchScroll() {
+      return this.$route.name === "dataGovernance/assets/search";
+    }
+  },
   mounted() {
     let pathName = this.$route.name;
     if (pathName !== "dataGovernance/overview") {
       sessionStorage.removeItem("searchTbls");
-      this.$router.push({ name: "dataGovernance/overview" });
+      const workspaceId = this.$route.query.workspaceId;
+      this.$router.push({
+        name: "dataGovernance/overview",
+        query: { workspaceId }
+      });
     }
     console.log("f5");
   },
@@ -78,11 +92,15 @@ export default {
     onClickMenu(node) {
       const { id, pathName, name } = node;
       this.currentTreeId = id;
+      const workspaceId = this.$route.query.workspaceId;
       if (id > 10) {
         this.title = name;
       }
       if (pathName) {
-        this.$router.push({ name: pathName });
+        this.$router.push({
+          name: pathName,
+          query: { workspaceId }
+        });
       }
     }
   }
@@ -97,6 +115,9 @@ export default {
   transition: margin-left 0.3s;
   &.ds-main-content-fold {
     margin-left: 54px;
+  }
+  &.search-scroll {
+    overflow-y: hidden;
   }
   .ds-main-container {
     min-height: 100%;

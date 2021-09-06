@@ -191,7 +191,8 @@ export default {
       filterTree: [],
       // 用于延迟渲染模块，减少请求
       timeoutFlag: false,
-      navList: ['search', 'newFile', 'refresh', 'import'],
+      // navList: ['search', 'newFile', 'refresh', 'import'],
+      navList: ['search', 'newFile', 'refresh'],
       hdfsTree: [],
       hdfsPath: '',
       loadHdfsDataFn: () => {},

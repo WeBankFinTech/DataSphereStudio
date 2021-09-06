@@ -26,9 +26,9 @@
         </div>
         <div class="assets-index-b-l-user">
           <span>负责人</span>
-          <Select v-model="serachOption.user" style="width:167px">
+          <Select v-model="serachOption.owner" style="width:167px">
             <Option
-              v-for="item in userList"
+              v-for="item in ownerList"
               :value="item.value"
               :key="item.value"
               >{{ item.label }}</Option
@@ -59,13 +59,15 @@
 
       <!-- right -->
       <div class="assets-index-b-r">
-        <template v-for="model in cardTabs">
-          <tab-card
-            :model="model"
-            :key="model.guid"
-            @on-choose="onChooseCard"
-          ></tab-card>
-        </template>
+        <Scroll :on-reach-bottom="handleReachBottom" height="1000">
+          <template v-for="model in cardTabs">
+            <tab-card
+              :model="model"
+              :key="model.guid"
+              @on-choose="onChooseCard"
+            ></tab-card>
+          </template>
+        </Scroll>
       </div>
     </div>
   </div>
@@ -73,7 +75,7 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
-import { getHiveTbls } from "../../service/api";
+import { getHiveTbls, getWorkspaceUsers } from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
 export default {
@@ -82,7 +84,11 @@ export default {
   },
   data() {
     return {
-      serachOption: {},
+      serachOption: {
+        limit: 10,
+        offset: 0
+      },
+      ownerList: [],
       userList: [
         {
           value: "New York",
@@ -115,13 +121,19 @@ export default {
           console.log("Search", err);
         });
     }
+    this.getWorkspaceUsers();
   },
   methods: {
     // 搜索
     onSearch() {
       const params = {
-        query: this.queryForTbls
+        query: this.queryForTbls,
+        owner: this.serachOption.owner,
+        limit: 10,
+        offset: 0
       };
+      this.serachOption["limit"] = 10;
+      this.serachOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
       getHiveTbls(params)
         .then(data => {
@@ -145,6 +157,57 @@ export default {
           .slice(0, -1)
           .join("/")}/info/${model.guid}`
       );
+    },
+
+    // 获取负责人
+    getWorkspaceUsers() {
+      let that = this;
+      // let workspaceId = that.$route.params.workspaceId;
+      let workspaceId = 310;
+      getWorkspaceUsers(workspaceId)
+        .then(data => {
+          const { result } = data;
+          let _res = [];
+          if (result) {
+            result.forEach(item => {
+              let o = Object.create(null);
+              o["value"] = item;
+              o["label"] = item;
+              _res.push(o);
+            });
+            that.ownerList = _res;
+            console.log("ownerList", that.ownerList);
+          }
+        })
+        .catch(err => {
+          console.log("getWorkspaceUsers", err);
+        });
+    },
+
+    handleReachBottom() {
+      let that = this;
+      const res = that.cardTabs.slice(0);
+      return new Promise(resolve => {
+        const params = {
+          query: that.queryForTbls,
+          owner: that.serachOption.owner,
+          limit: that.serachOption.limit,
+          offset: that.serachOption.offset + that.serachOption.limit
+        };
+        that.serachOption.offset += that.serachOption.limit;
+        getHiveTbls(params)
+          .then(data => {
+            if (data.result) {
+              that.cardTabs = res.concat(data.result);
+            } else {
+              that.$Message.success("所有数据已加载完成");
+            }
+            resolve();
+          })
+          .catch(err => {
+            console.log("handleReachBottom", err);
+          });
+      });
     }
   }
 };

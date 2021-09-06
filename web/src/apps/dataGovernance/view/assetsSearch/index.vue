@@ -26,11 +26,19 @@
         </div>
         <div class="assets-index-b-l-user">
           <span>负责人</span>
-          <Select v-model="serachOption.owner" style="width:167px">
+          <Select
+            v-model="serachOption.owner"
+            filterable
+            clearable
+            remote
+            :remote-method="remoteSearchOwner"
+            :loading="owerSerachLoading"
+            style="width:167px"
+          >
             <Option
-              v-for="item in ownerList"
+              v-for="(item, idx) in ownerList"
               :value="item.value"
-              :key="item.value"
+              :key="idx"
               >{{ item.label }}</Option
             >
           </Select>
@@ -46,11 +54,16 @@
         </div>
         <div class="assets-index-b-l-label">
           <span>标签</span>
-          <Select v-model="serachOption.label" multiple style="width:167px">
+          <Select
+            v-model="serachOption.label"
+            multiple
+            clearable
+            style="width:167px"
+          >
             <Option
-              v-for="item in userList"
+              v-for="(item, idx) in userList"
               :value="item.value"
-              :key="item.value"
+              :key="idx"
               >{{ item.label }}</Option
             >
           </Select>
@@ -59,15 +72,13 @@
 
       <!-- right -->
       <div class="assets-index-b-r">
-        <Scroll :on-reach-bottom="handleReachBottom" height="1000">
-          <template v-for="model in cardTabs">
-            <tab-card
-              :model="model"
-              :key="model.guid"
-              @on-choose="onChooseCard"
-            ></tab-card>
-          </template>
-        </Scroll>
+        <template v-for="model in cardTabs">
+          <tab-card
+            :model="model"
+            :key="model.guid"
+            @on-choose="onChooseCard"
+          ></tab-card>
+        </template>
       </div>
     </div>
   </div>
@@ -78,6 +89,7 @@ import tabCard from "../../module/common/tabCard/index.vue";
 import { getHiveTbls, getWorkspaceUsers } from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
+import { throttle } from "lodash";
 export default {
   components: {
     tabCard
@@ -89,22 +101,11 @@ export default {
         offset: 0
       },
       ownerList: [],
-      userList: [
-        {
-          value: "New York",
-          label: "New York"
-        },
-        {
-          value: "London",
-          label: "London"
-        },
-        {
-          value: "Sydney",
-          label: "Sydney"
-        }
-      ],
+      userList: [],
       cardTabs: [],
-      queryForTbls: ""
+      queryForTbls: "",
+      owerSerachLoading: false,
+      isLoading: false
     };
   },
   created() {
@@ -121,7 +122,16 @@ export default {
           console.log("Search", err);
         });
     }
-    this.getWorkspaceUsers();
+  },
+  mounted() {
+    let _this = this;
+    this.throttleLoad = throttle(() => {
+      _this.scrollHander();
+    }, 300);
+    window.addEventListener("scroll", this.throttleLoad);
+  },
+  destroyed() {
+    window.removeEventListener("scroll", this.throttleLoad);
   },
   methods: {
     // 搜索
@@ -151,42 +161,22 @@ export default {
     onChooseCard(model) {
       let that = this;
       EventBus.$emit("on-choose-card", model);
-      that.$router.push(
-        `${that.$route.path
-          .split("/")
-          .slice(0, -1)
-          .join("/")}/info/${model.guid}`
-      );
+      const workspaceId = that.$route.query.workspaceId;
+      const { guid } = model;
+      that.$router.push({
+        name: "dataGovernance/assets/info",
+        params: { guid },
+        query: { workspaceId }
+      });
     },
 
-    // 获取负责人
-    getWorkspaceUsers() {
-      let that = this;
-      // let workspaceId = that.$route.params.workspaceId;
-      let workspaceId = 310;
-      getWorkspaceUsers(workspaceId)
-        .then(data => {
-          const { result } = data;
-          let _res = [];
-          if (result) {
-            result.forEach(item => {
-              let o = Object.create(null);
-              o["value"] = item;
-              o["label"] = item;
-              _res.push(o);
-            });
-            that.ownerList = _res;
-            console.log("ownerList", that.ownerList);
-          }
-        })
-        .catch(err => {
-          console.log("getWorkspaceUsers", err);
-        });
-    },
-
+    // 下拉到底部加载
     handleReachBottom() {
       let that = this;
       const res = that.cardTabs.slice(0);
+      if (that.isLoading) {
+        return that.$Message.success("所有数据已加载完成");
+      }
       return new Promise(resolve => {
         const params = {
           query: that.queryForTbls,
@@ -201,6 +191,7 @@ export default {
               that.cardTabs = res.concat(data.result);
             } else {
               that.$Message.success("所有数据已加载完成");
+              that.isLoading = true;
             }
             resolve();
           })
@@ -208,6 +199,77 @@ export default {
             console.log("handleReachBottom", err);
           });
       });
+    },
+
+    // 搜索负责人
+    remoteSearchOwner(query) {
+      let that = this;
+      if (query !== "") {
+        that.owerSerachLoading = true;
+        let workspaceId = that.$route.query.workspaceId;
+        getWorkspaceUsers(workspaceId, query)
+          .then(data => {
+            const { result } = data;
+            const _res = [];
+            if (result) {
+              result.forEach(item => {
+                let o = Object.create(null);
+                o["value"] = item;
+                o["label"] = item;
+                _res.push(o);
+              });
+              that.ownerList = _res;
+              that.owerSerachLoading = false;
+              console.log("ownerList", that.ownerList);
+            }
+          })
+          .catch(err => {
+            console.log("getWorkspaceUsers", err);
+          });
+      } else {
+        that.ownerList = [];
+      }
+    },
+
+    // 下拉加載
+    scrollHander() {
+      const getScrollTop = () => {
+        var scrollTop = 0;
+        if (document.documentElement && document.documentElement.scrollTop) {
+          scrollTop = document.documentElement.scrollTop;
+        } else if (document.body) {
+          scrollTop = document.body.scrollTop;
+        }
+        return scrollTop;
+      };
+      const getClientHeight = () => {
+        var clientHeight = 0;
+        if (
+          document.body.clientHeight &&
+          document.documentElement.clientHeight
+        ) {
+          clientHeight = Math.min(
+            document.body.clientHeight,
+            document.documentElement.clientHeight
+          );
+        } else {
+          clientHeight = Math.max(
+            document.body.clientHeight,
+            document.documentElement.clientHeight
+          );
+        }
+        return clientHeight;
+      };
+      const getScrollHeight = () => {
+        return Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        );
+      };
+      if (getScrollTop() + getClientHeight() === getScrollHeight()) {
+        // 拉数据
+        this.handleReachBottom();
+      }
     }
   }
 };
@@ -321,6 +383,7 @@ export default {
     }
     &-r {
       flex: 1;
+      padding-bottom: 10px;
     }
   }
 }

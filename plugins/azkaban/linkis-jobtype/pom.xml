@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2019 WeBank
-  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~  you may not use this file except in compliance with the License.
+  ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
@@ -23,12 +22,11 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>0.9.1</version>
+        <version>1.0.0</version>
     </parent>
-    <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>linkis-jobtype</artifactId>
     <properties>
-        <azkaban.version>2.5.0</azkaban.version>
+        <azkaban.version>0.6.1</azkaban.version>
     </properties>
 
     <dependencies>
@@ -40,9 +38,19 @@
         </dependency>
 
         <dependency>
-            <groupId>com.linkedin.azkaban</groupId>
-            <artifactId>azkaban</artifactId>
+            <groupId>com.webank.wedatasphere.schedulis</groupId>
+            <artifactId>azkaban-common</artifactId>
             <version>${azkaban.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.webank.azkaban</groupId>
+                    <artifactId>azkaban-spi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.webank.azkaban</groupId>
+                    <artifactId>azkaban-db</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>provided</scope>
         </dependency>
 
@@ -77,6 +85,11 @@
             </plugin>
             <plugin>
                  <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
                  <executions>
                      <execution>
                          <id>package</id>

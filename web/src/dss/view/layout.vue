@@ -4,7 +4,8 @@
       v-if="!$route.query.noHeader"
       :is="showHeader"
       @clear-session="clearSession"
-      @set-init="setInit"></component>
+      @set-init="setInit"
+      ref="layoutHeader"></component>
     <keep-alive v-if="isInit">
       <router-view
         v-if="$route.meta.keepAlive"/>
@@ -12,7 +13,7 @@
     <router-view
       v-if="!$route.meta.keepAlive"/>
     <layout-footer/>
-    <newGuidance/>
+    <newGuidance v-if="$route.path === '/workspaceHome'"/>
   </div>
 </template>
 <script>

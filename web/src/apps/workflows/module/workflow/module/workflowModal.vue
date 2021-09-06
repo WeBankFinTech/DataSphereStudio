@@ -7,6 +7,7 @@
     <Tabs value="form">
       <Tab-pane label="新建编排" name="form">
         <WorkflowFormNew
+          v-if="mergeModalShow"
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"
@@ -110,6 +111,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
+      if (!params.projectId && !params.orchestratorMode) return
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.flowList = res.page;
       })

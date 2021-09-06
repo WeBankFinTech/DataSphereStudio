@@ -38,6 +38,9 @@
         align-items: center;
         flex-wrap: nowrap;
         height: 54px;
+        &:hover {
+            color:#fff;
+        }
     }
     .proj-list {
         height: 400px;

@@ -53,7 +53,7 @@ INSERT INTO `dss_sidebar_content` VALUES (4,0,2,NULL,NULL,'知识库','Knowledge
 INSERT INTO `dss_sidebar_content` VALUES (5,0,3,NULL,NULL,'内置参数使用',NULL,'https://saas.ctyun.cn/luban/doc/docs/mindoc/mindoc-1d1i89mmjbp6n',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:16:52');
 
 
-Exchangis
+
 DELETE FROM dss_onestop_menu;
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('1','应用开发','application development','应用开发','应用开发描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('2','数据分析','data analysis','数据分析','数据分析描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
@@ -100,7 +100,6 @@ INSERT  INTO `dss_application`(`id`,`name`,`url`,`is_user_need_init`,`level`,`us
 
 INSERT INTO `dss_project_taxonomy` (`id`, `name`, `description`, `creator`, `create_time`, `update_time`) VALUES (NULL, 'My project', NULL, '-1', NULL, NULL);
 
---INSERT INTO `dss_flow_taxonomy` (`id`, `name`, `description`, `creator`, `create_time`, `update_time`, `project_id`) VALUES (NULL, 'My workflow', NULL, NULL, NULL,NULL, '-1');
 
 UPDATE `dss_application` SET url = 'http://GATEWAY_INSTALL_IP_2:GATEWAY_PORT' WHERE `name` in('linkis','workflow');
 UPDATE `dss_application` SET url = 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT' WHERE `name` in('visualis');

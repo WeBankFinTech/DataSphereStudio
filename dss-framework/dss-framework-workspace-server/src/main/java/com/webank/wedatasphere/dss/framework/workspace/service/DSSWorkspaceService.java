@@ -49,7 +49,7 @@ public interface DSSWorkspaceService {
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
-    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName);
+    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception;
 
     List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);

@@ -83,15 +83,17 @@
         class="user"
         @click="handleUserClick"
       >
-        <span>{{ userName || 'Null' }}</span>
-        <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
-        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        <div class="userName">
+          <span>{{ userName || 'Null' }}</span>
+          <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
+          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        </div>
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>
       </div>
       <ul class="menu">
         <li v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.common.home")}}</li>
-        <li class="menu-item" v-if="homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
-        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
+        <li class="menu-item" v-if="isAdmin && homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
+        <li class="menu-item" v-if="isAdmin && $route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
       </ul>
       <div class="icon-group">
         <Icon
@@ -439,7 +441,16 @@ export default {
       this.currentProject = {};
     },
     goConsole(){
-      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+      const url =
+        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+      this.$router.push({
+        name: 'commonIframe',
+        query: {
+          workspaceId: this.$route.query.workspaceId,
+          url
+        }
+      })
+      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goRolesPath() {
       // 根据接口getWorkspaceBaseInfo渲染跳转不同路径

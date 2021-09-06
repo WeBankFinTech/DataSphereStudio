@@ -387,11 +387,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/common/style/variables.scss";
-$permissions-Backgroud: #f4f7fb;
-$per-border-color: #dee4ec;
-.management-platform-wrap {
-  min-height: 100%;
+@import '@/common/style/variables.scss';
+$permissions-Backgroud: #F4F7FB;
+$per-border-color:#DEE4EC;
+.management-platform-wrap{
+  height: 100%;
   .management-platform-sidebar {
     display: flex;
     position: fixed;
@@ -448,7 +448,7 @@ $per-border-color: #dee4ec;
     }
   }
   .management-platform-tablist {
-    background-color: #fff;
+    height: 100%;
   }
   .management-platform-sidebar-tree-header {
     padding-left: 12px;

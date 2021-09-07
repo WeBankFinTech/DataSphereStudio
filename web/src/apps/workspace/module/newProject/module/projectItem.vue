@@ -2,7 +2,7 @@
   <div>
     <slot></slot>
     <Row class="content-item">
-      <i-col v-if="checkCreate()"
+      <i-col v-if="canCreateProject"
         class="project-item project-header"
         :xs="12"
         :sm="8"
@@ -78,6 +78,7 @@
 import mixin from '@/common/service/mixin';
 import storage from '@/common/helper/storage';
 import {canCreate} from '@/common/config/permissions.js';
+import eventbus from '@/common/helper/eventbus';
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -126,6 +127,7 @@ export default {
       },
       isToolbarShow: false,
       cardShowNum: 4,
+      canCreateProject: false
     };
   },
   mixins: [mixin],
@@ -149,6 +151,13 @@ export default {
       }
     }
   },
+  mounted() {
+    this.checkCreate();
+    eventbus.on('workspace.change', this.checkCreate);
+  },
+  beforeDestroy() {
+    eventbus.off('workspace.change', this.checkCreate);
+  },
   methods: {
     addProject() {
       this.$emit('addProject');
@@ -157,12 +166,13 @@ export default {
     selectAction(name) {
       console.log(name, 'name')
     },
-    checkCreate(){
-      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+    checkCreate(roles){
+      const workspaceRoles = roles || storage.get(`workspaceRoles`) || [];
       if (canCreate(workspaceRoles)) {
-        return true;
+        this.canCreateProject = true;
+      } else {
+        this.canCreateProject = false;
       }
-      return false;
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

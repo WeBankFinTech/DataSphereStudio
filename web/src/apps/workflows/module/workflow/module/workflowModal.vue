@@ -14,7 +14,7 @@
           @cancel="ProjectMergeCancel"
           @confirm="ProjectMergeConfirm"></WorkflowFormNew>
       </Tab-pane>
-      <Tab-pane label="导入编排" name="upload">
+      <!-- <Tab-pane label="导入编排" name="upload">
         <Upload
           ref="uploadJson"
           type="drag"
@@ -33,7 +33,7 @@
             <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
           </div>
         </Upload>
-      </Tab-pane>
+      </Tab-pane> -->
     </Tabs>
   </Modal>
 </template>

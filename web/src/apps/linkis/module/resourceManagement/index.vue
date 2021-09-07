@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="resource-page">
     <Spin
       v-if="loading"
       size="large"
@@ -490,6 +490,12 @@ export default {
 
 <style src="./index.scss" lang="scss" scoped></style>
 <style lang="scss" scoped>
+.resource-page {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-y: overlay;
+}
   .noData {
     position: absolute;
     top: 50%;

@@ -56,6 +56,7 @@
 
         .console-page-content-body {
             position: $relative;
+            height: calc(100% - 24px);
             .content-body-side-nav {
                 width: 200px;
                 position: $absolute;
@@ -68,6 +69,7 @@
             .content-body-side-right {
                 position: $absolute;
                 top: 10px;
+                bottom: 0;
                 right: 0;
                 left: 200px;
                 margin-left: 20px;
@@ -81,7 +83,7 @@
                     margin-bottom: 10px
                 }
                 .content-body-side-right-content {
-                    overflow: hidden;
+                    height: calc(100% - 40px);
                 }
 
             }

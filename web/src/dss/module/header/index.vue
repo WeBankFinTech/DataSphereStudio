@@ -120,6 +120,7 @@ import clickoutside from "@/common/helper/clickoutside";
 import navMenu from "./navMenu/index.vue";
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
+import eventbus from '@/common/helper/eventbus';
 import { 
   GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo,
   GetFavorites, AddFavorite, RemoveFavorite
@@ -230,6 +231,8 @@ export default {
           }).then((res) => {
             // 缓存数据，供其他页面判断使用
             storage.set(`workspaceRoles`, res.roles, 'session');
+            // roles主动触发，防止接口请求和sessionstorge之间的时间差导致角色没有及时转换
+            eventbus.emit('workspace.change', res.roles);
             // 获取顶部的快捷入口
             this.homeRoles = { name: res.topName, path: res.topUrl, id: res.workspaceId };
             // 同步改变cookies在请求中的附带

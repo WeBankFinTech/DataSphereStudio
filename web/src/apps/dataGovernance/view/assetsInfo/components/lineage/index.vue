@@ -1,7 +1,5 @@
 <template>
   <div>
-    <div>
-    </div>
   </div>
 </template>
 <script>
@@ -35,18 +33,19 @@ export default {
         const cur = this.lineageData.guidEntityMap[item]
         let icon
         if (cur.status !== 'ACTIVE') {
-          icon = '已失效表'
+          icon = 'icon-a-shanchudehivetable'
         } else if (cur.typeName === 'hive_table') {
-          icon = '生效表'
+          icon = 'icon-a-hivetable'
         } else if (cur.typeName === 'hive_process') {
-          icon = 'hp'
+          icon = 'icon-a-sparkprocess'
         } else if (cur.typeName === 'spark_process') {
-          icon = 'sp'
+          icon = 'icon-a-hiveprocess'
         }
         data.nodes.push({
           id: item,
           name: cur.displayText,
           icon: icon,
+          status: cur.status,
           Class: node,
           className: 'nodeBackground-color'
         })

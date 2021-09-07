@@ -150,13 +150,13 @@ export default {
       return flag;
     },
     initUpload() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
-      this.uploadData = {
-        projectName: this.$route.query.projectName,
-        projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
-        dssLabels: 'dev'
-      }
-      this.$refs.uploadJson.clearFiles();
+      // this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
+      // this.uploadData = {
+      //   projectName: this.$route.query.projectName,
+      //   projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
+      //   dssLabels: 'dev'
+      // }
+      // this.$refs.uploadJson.clearFiles();
     },
     // 手动上传
     handleUpload(file) {

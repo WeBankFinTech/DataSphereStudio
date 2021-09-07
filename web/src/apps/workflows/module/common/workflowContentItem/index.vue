@@ -13,7 +13,7 @@
       >
         <div class="project-add">
           <Icon :size="32" type="ios-add"></Icon>
-          <span>新建/导入编排</span>
+          <span>新建编排</span>
         </div>
       </i-col>
 

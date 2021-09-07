@@ -163,13 +163,12 @@ export default {
       getHiveSummary()
         .then(data => {
           if (data.result) {
-            const { hiveStore } = data.result;
+            const { hiveStore, hiveDb, hiveTable } = data.result;
             data.result["hiveStore"] = (hiveStore / 1024 / 1024).toFixed(2);
-            const res = Object.values(data.result);
             const models = that.models.slice(0);
-            models.forEach((model, idx) => {
-              model.content = res[idx];
-            });
+            models[0].content = hiveDb;
+            models[1].content = hiveTable;
+            models[2].content = data.result["hiveStore"];
             that.models = models;
           }
           console.log(data);

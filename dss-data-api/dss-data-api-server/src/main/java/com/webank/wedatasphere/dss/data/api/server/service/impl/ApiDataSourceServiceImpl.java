@@ -68,4 +68,20 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
     public void addDatasource(DataSource dataSource) {
         dataSourceMapper.addDatasource(dataSource);
     }
+
+    @Override
+    public List<DataSource> listAllDatasources(DataSource dataSource) {
+        return dataSourceMapper.listAllDatasources(dataSource);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        dataSourceMapper.deleteById(id);
+    }
+
+    @Override
+    public void editDatasource(DataSource dataSource) {
+        dataSourceMapper.editDatasource(dataSource);
+    }
+
 }

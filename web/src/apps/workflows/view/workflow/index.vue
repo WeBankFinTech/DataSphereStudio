@@ -253,10 +253,16 @@ export default {
     },
     // 获取工程的数据
     getProjectData() {
+
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {
         workspaceId: +this.$route.query.workspaceId,
         id: +this.$route.query.projectID
       }, 'post').then((res) => {
+        //运维中心路由且未选中任何项目
+        if (!this.$route.query.projectID && this.isScheduler) {
+          this.modeOfKey = DEVPROCESS.OPERATIONCENTER
+          return this.getAllProjects()
+        }
         const project = res.projects[0];
         setVirtualRoles(project, this.getUserName())
         this.currentProjectData = {
@@ -479,7 +485,7 @@ export default {
       }
     },
     // 确认新增工程 || 确认修改
-    ProjectConfirm(projectData) {
+    ProjectConfirm(projectData, callback) {
       const project = projectData;
       setVirtualRoles(project, this.getUserName())
       this.currentProjectData = {
@@ -505,9 +511,11 @@ export default {
         orchestratorModeList: projectData.orchestratorModeList
       }
       api.fetch(`${this.$API_PATH.PROJECT_PATH}modifyProject`, projectParams, 'post').then(() => {
+        typeof callback == 'function' && callback();
         this.getProjectData();
         this.$Message.success(this.$t('message.workflow.projectDetail.eidtorProjectSuccess', { name: projectData.name }));
       }).catch(() => {
+        typeof callback == 'function' && callback();
         this.loading = false;
         this.currentProjectData.business = this.$refs.projectForm.originBusiness;
       });
@@ -648,7 +656,7 @@ export default {
           name: 'Scheduler',
           query: this.$route.query
         })
-      } else if (item.dicValue === 'dev'){
+      } else if (item.dicValue === 'dev' && this.isScheduler){
         this.$router.replace({
           name: 'Workflow',
           query: this.$route.query

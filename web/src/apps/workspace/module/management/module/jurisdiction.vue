@@ -75,10 +75,12 @@ export default {
   methods: {
     isAdmin(){
       const currentUser = storage.get("baseInfo", 'local') || {};
-      if (currentUser.isAdmin) {
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (currentUser.isAdmin || workspaceRoles.indexOf('admin') > -1) {
         return true;
+      } else {
+        return false;
       }
-      return false;
     },
     init() {
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceMenuPrivs`, {

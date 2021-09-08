@@ -38,9 +38,7 @@
               </template>
             </Breadcrumb>
           </div>
-          <div
-            class="content-body-side-right-content"
-            :style="{'height': contentHeight + 'px'}">
+          <div class="content-body-side-right-content">
             <router-view></router-view>
           </div>
         </div>
@@ -74,7 +72,6 @@ export default {
         ],
       },
       breadcrumbSecondName: this.$t('message.linkis.sideNavList.function.children.globalHistory'),
-      contentHeight: 0,
     };
   },
   computed: {
@@ -93,19 +90,7 @@ export default {
       }
     });
   },
-  mounted() {
-    this.resize(window.innerHeight);
-    // 监听窗口变化，获取浏览器宽高
-    window.addEventListener('resize', this.getHeight);
-  },
-  beforeDestroy() {
-    // 监听窗口变化，获取浏览器宽高
-    window.removeEventListener('resize', this.getHeight);
-  },
   methods: {
-    getHeight() {
-      this.resize(window.innerHeight);
-    },
     handleCellClick(index) {
       if(index === '1-6') {
         return this.$Message.success({
@@ -122,18 +107,12 @@ export default {
       this.$router.push({
         path: activedCell.path,
         query: {
-          height: this.contentHeight,
           workspaceId: this.$route.query.workspaceId
         },
       });
     },
-    // 设置宽高
-    resize(h) {
-      this.contentHeight = h - 230;
-    },
   },
   beforeRouteEnter(to, from, next) {
-    console.log(to, from)
     if (to.name === 'FAQ' && from.name === 'Home') {
       next((vm) => {
         vm.breadcrumbFirstName = this.$t('message.linkis.sideNavList.function.name');

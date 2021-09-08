@@ -108,6 +108,14 @@ export default {
     // socket.methods.close();
   },
   methods: {
+    logout() {
+      api.fetch('/user/logout', {}).then(() => {
+        this.$emit('clear-session');
+        storage.set('need-refresh-proposals-hql', true);
+        storage.set('need-refresh-proposals-python', true);
+        this.$router.push({ path: '/login' });
+      });
+    },
     // 获取登录后的url调转
     getPageHomeUrl() {
       const currentModules = util.currentModules();
@@ -116,11 +124,10 @@ export default {
       }, 'get').then((res) => {
         storage.set('noWorkSpace', false, 'local')
         return res.workspaceHomePage.homePageUrl;
-      }).catch(() => {
+      }).catch((e) => {
         storage.set('noWorkSpace', true, 'local');
-        storage.clear();
-        storage.clear('cookie');
-        return '/'
+        this.logout();
+        throw  e;
       });
     },
     // 获取公钥接口

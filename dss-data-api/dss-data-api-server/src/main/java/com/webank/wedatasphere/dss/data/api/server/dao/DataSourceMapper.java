@@ -13,4 +13,10 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     DataSource selectById(Integer datasourceId);
 
     void addDatasource(DataSource dataSource);
+
+    List<DataSource> listAllDatasources(DataSource dataSource);
+
+    void deleteById(Integer id);
+
+    void editDatasource(DataSource dataSource);
 }

@@ -98,6 +98,7 @@ public class DSSDbApiDataSourceRestful {
     @POST
     @Path("/edit")
     public Message editDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
+        PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
         dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
         dataSource.setUpdateBy(SecurityFilter.getLoginUsername(req));
         dssDbApiDataSourceService.editDatasource(dataSource);

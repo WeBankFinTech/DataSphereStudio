@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import com.webank.wedatasphere.dss.data.api.server.util.PoolManager;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -98,11 +99,14 @@ public class DSSDbApiDataSourceRestful {
     @POST
     @Path("/edit")
     public Message editDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
-        PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
-        dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
-        dataSource.setUpdateBy(SecurityFilter.getLoginUsername(req));
-        dssDbApiDataSourceService.editDatasource(dataSource);
-        return Message.ok("修改成功");
+        if (StringUtils.isNotEmpty(dataSource.getPwd())) {
+            PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
+            dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
+            dataSource.setUpdateBy(SecurityFilter.getLoginUsername(req));
+            dssDbApiDataSourceService.editDatasource(dataSource);
+            return Message.ok("修改成功");
+        }
+        return Message.error("密码不能为空");
     }
 
     @POST

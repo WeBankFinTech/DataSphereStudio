@@ -104,7 +104,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if(pageNumObject == null){
                 throw new DataApiException("请设置pageNum参数");
             }
-            int pageNum = (Integer)pageNumObject;
+            int pageNum = Integer.valueOf(pageNumObject.toString());
+            if(pageNum < 1){
+                throw new DataApiException("pageNum参数错误");
+            }
             limitSent = " limit "+ ((pageNum-1) * pageSize)+","+pageSize;
         }
         if (apiConfig != null) {
@@ -117,7 +120,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             }else {
                 sqlText = sqlFiled;
             }
-            //不分�?,�?多返�?500条数�?
+            //不分页,最多返回500条数据
             if(pageSize <= 0) {
                 sqlText = String.format("%s %s",sqlText," limit 500");
             }
@@ -159,7 +162,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         String appKey = request.getHeader("appKey");
         String appSecret = request.getHeader("appSecret");
         if(StringUtils.isAnyBlank(appKey,appSecret)){
-            throw new DataApiException("请求header�?添加appKey,appSecret");
+            throw new DataApiException("请求header需添加appKey,appSecret");
         }
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if(apiConfig != null){
@@ -178,7 +181,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 apiCallMapper.addApiCall(apiCall);
                 return apiExecuteInfo;
             }else {
-                throw new DataApiException("token已失�?");
+                throw new DataApiException("token已失效");
             }
         }else {
             throw new DataApiException("该服务不存在,请检查服务url是否正确");

@@ -32,6 +32,8 @@
         <module>dss-framework</module>
         <module>dss-apps/dss-apiservice-server</module>
         <module>dss-apps/dss-datapipe-server</module>
+        <module>dss-apps/dss-datamodel-center</module>
+        <module>dss-apps/dss-datawarehouse-design</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>

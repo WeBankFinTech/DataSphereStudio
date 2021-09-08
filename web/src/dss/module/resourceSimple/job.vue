@@ -103,7 +103,6 @@ export default {
         this.loading = false;
         // 剔除requestApplicationName为 "nodeexecution" 的task
         let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution")
-        console.log(tasks, "===========================")
         this.dispatch('Footer:updateRunningJob', tasks.length);
         this.jobTypeList = [
           { 'en': 'IDE', 'cn': this.$t('message.common.resourceSimple.YS') },
@@ -115,7 +114,6 @@ export default {
           this.jobList.push(tmpItem);
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
-        console.log(this.jobList,"----------------------------")
         this.$emit('update-job', tasks.length);
       }).catch((err) => {
         this.loading = false;

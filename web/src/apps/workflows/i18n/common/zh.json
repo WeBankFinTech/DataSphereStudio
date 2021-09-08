@@ -626,6 +626,7 @@
                 "startNotSameAsEnd": "开始时间和结束时间不能相同",
                 "enterCrontab": "请输入crontab",
                 "success": "成功",
+                "operationSuccess": "操作成功",
                 "PleaseGoOnline": "不要忘记上线",
                 "noData": "该时间段无数据"
             },

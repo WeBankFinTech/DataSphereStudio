@@ -1,14 +1,17 @@
 <template>
-    <div>
-      <tree-item v-for="item in data" :key="item.id" :sonTree="item"
-        :currentTreeId="currentTreeId"
-        :on-item-click="handleItemClick"
-        :on-add-click="handleAddClick"
-      />
-    </div>
+  <div>
+    <tree-item
+      v-for="item in data"
+      :key="item.id"
+      :sonTree="item"
+      :currentTreeId="currentTreeId"
+      :on-item-click="handleItemClick"
+      :on-add-click="handleAddClick"
+    />
+  </div>
 </template>
 <script>
-import TreeItem from './tree-item.vue'
+import TreeItem from "./tree-item.vue";
 export default {
   name: "Tree",
   components: {
@@ -20,18 +23,18 @@ export default {
       default: () => []
     },
     currentTreeId: {
-      type: Number, default: 0
+      type: Number,
+      default: 0
     }
   },
   data() {
     return {
-      data: this.nodes,
+      data: this.nodes
     };
   },
   watch: {
     nodes: {
       handler: function(newValue) {
-        console.log('watch nodes')
         this.data = newValue;
       },
       deep: true
@@ -52,11 +55,11 @@ export default {
     // },
     // 新增
     handleAddClick(project) {
-      this.$emit('on-add-click', project)
+      this.$emit("on-add-click", project);
     },
     handleItemClick(node) {
-      this.$emit('on-item-click', node)
-    },
+      this.$emit("on-item-click", node);
+    }
 
     // 展开子树
     // handleItemToggle(node) {

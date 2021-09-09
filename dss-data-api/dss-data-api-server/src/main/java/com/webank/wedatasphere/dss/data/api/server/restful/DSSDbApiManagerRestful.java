@@ -73,6 +73,7 @@ public class DSSDbApiManagerRestful {
             throw new DataApiException("请测试通过后,再上线");
         }
         apiManagerService.onlineApi(apiId);
+        apiInfo = apiManagerService.getApiInfo(apiId);
         Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }

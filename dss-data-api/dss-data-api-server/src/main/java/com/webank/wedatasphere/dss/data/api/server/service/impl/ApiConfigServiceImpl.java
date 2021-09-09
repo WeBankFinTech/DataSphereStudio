@@ -74,6 +74,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 //        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
 //                .eq("id", id);
         if (id != null) {
+            if(apiConfig.getStatus() == 1){
+                throw new DataApiException("请先下线,测试通过后, 重新发布");
+            }
             apiConfig.setIsTest(0);
             this.updateById(apiConfig);
         } else {

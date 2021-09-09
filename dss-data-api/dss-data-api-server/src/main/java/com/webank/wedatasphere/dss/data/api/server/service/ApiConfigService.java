@@ -24,7 +24,7 @@ public interface ApiConfigService extends IService<ApiConfig> {
 
     void saveApi(ApiConfig apiConfig) throws JSONException, DataApiException;
 
-    ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest, Map<String, Object> map) throws  Exception;
+    ApiExecuteInfo apiTest(String path, HttpServletRequest httpRequest, Map<String, Object> map,boolean isTest) throws  Exception;
 
     ApiExecuteInfo apiExecute(String path, HttpServletRequest request, Map<String, Object> map) throws Exception;
 }

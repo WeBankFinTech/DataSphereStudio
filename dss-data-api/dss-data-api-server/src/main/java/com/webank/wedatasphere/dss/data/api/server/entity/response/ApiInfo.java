@@ -21,5 +21,6 @@ public class ApiInfo {
 
     private String groupName;
     private String datasourceName;
+    private int isTest;
 
 }

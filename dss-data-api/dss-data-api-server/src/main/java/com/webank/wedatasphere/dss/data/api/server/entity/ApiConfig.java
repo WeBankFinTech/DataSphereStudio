@@ -58,6 +58,9 @@ public class ApiConfig {
     @TableField(exist = false)
     private String resType;
     private Integer pageSize;
+
+    private int status;
+    private int isTest;
 }
 
 

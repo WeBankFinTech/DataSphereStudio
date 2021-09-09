@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="resource-page">
     <Spin
       v-if="loading"
       size="large"
@@ -338,7 +338,7 @@ export default {
         // 获取使用的引擎资源列表
         let enginesList = engines.userResources || [];
         enginesList.forEach((userItem, userIndex) => {
-          userItem.id = new Date().valueOf() + userIndex * 1000; // 设置唯一id,将时间多乘以2000防止运行过慢导致的id重复
+          userItem.id = Date.now() + userItem.userCreator + userIndex;
           userItem.expand = userIndex === 0 ? true : false;
           userItem.title = userItem.userCreator;
           // 统计获取使用量和未使用量的总量数据
@@ -379,7 +379,7 @@ export default {
             engineItem.percent =  max;
             engineItem.expand = false;
             engineItem.title = engineItem.engineType;
-            engineItem.id = new Date().valueOf() + (engineIndex + 1 + userIndex ) * 2000; // 设置唯一id,将时间多乘以2000防止运行过慢导致的id重复
+            engineItem.id = userItem.id + engineItem.engineType + engineIndex; // 子id = 父id + 子属性
           })
           // 计算各个总量的比例
           let usedResourceMemoryTotalPercent = leftResourceMemoryTotal === 0 ? 0 : (usedResourceMemoryTotal / (usedResourceMemoryTotal + leftResourceMemoryTotal)).toFixed(2);
@@ -491,6 +491,12 @@ export default {
 <style src="./index.scss" lang="scss" scoped></style>
 <style lang="scss" scoped>
 @import '~@/common/style/variables.scss';
+.resource-page {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-y: overlay;
+}
   .noData {
     position: absolute;
     top: 50%;

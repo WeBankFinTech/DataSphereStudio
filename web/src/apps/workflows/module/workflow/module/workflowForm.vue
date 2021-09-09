@@ -132,6 +132,7 @@ export default {
       ProjectShow: false,
       originBusiness: '',
       isPublished: false,
+      workflowDataCurrent: {},
       FORMITEMTYPE
     };
   },
@@ -163,17 +164,6 @@ export default {
     },
     selectOrchestrator() {
       return this.orchestratorModeList.list.find((item) => item.dicKey === this.workflowDataCurrent.orchestratorMode);
-    },
-    workflowDataCurrent() {
-      const currentData = this.workflowData;
-      if (this.workflowData && this.workflowData.orchestratorWays && this.orchestratorModeList.list.length > 0) {
-        if ([this.FORMITEMTYPE.RADIO, this.FORMITEMTYPE.SELECT].includes(this.orchestratorModeList.list.find((item) => item.dicKey === this.workflowData.orchestratorMode).dicValue)) {
-          currentData.orchestratorWayString = this.workflowData.orchestratorWays[0];
-        } else {
-          currentData.orchestratorWayArray = this.workflowData.orchestratorWays;
-        }
-      }
-      return currentData;
     }
   },
   watch: {
@@ -190,10 +180,23 @@ export default {
       }
       this.$emit('show', val);
     },
+    workflowData(value){
+      const currentData = value;
+      if (value && value.orchestratorWays && this.orchestratorModeList.list.length > 0) {
+        if ([this.FORMITEMTYPE.RADIO, this.FORMITEMTYPE.SELECT].includes(this.orchestratorModeList.list.find((item) => item.dicKey === value.orchestratorMode).dicValue)) {
+          currentData.orchestratorWayString = value.orchestratorWays[0];
+        } else {
+          currentData.orchestratorWayArray = value.orchestratorWays;
+        }
+      }
+      this.workflowDataCurrent = {
+        ...currentData
+      };
+    }
   },
   methods: {
     asyncGetSchedulingStatus(){
-      return getSchedulingStatus(this.workflowDataCurrent.workspaceId, this.workflowDataCurrent.orchestratorId).then(data=>{
+      return getSchedulingStatus(this.workflowData.workspaceId, this.workflowData.orchestratorId).then(data=>{
         this.isPublished = data.published;
       });
     },
@@ -235,7 +238,7 @@ export default {
       const tmpArr = this.workflowDataCurrent.uses.split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.workflowData.uses = tmpArr.toString();
+      this.workflowDataCurrent.uses = tmpArr.toString();
     }
   },
 };

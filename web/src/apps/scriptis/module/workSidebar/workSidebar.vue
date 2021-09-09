@@ -62,11 +62,11 @@
         <span>{{ $t('message.scripts.constants.delete') }}</span>
       </we-menu-item>
       <we-menu-item class="ctx-divider"/>
-      <we-menu-item
+      <!-- <we-menu-item
         v-if="currentNode.isLeaf && isVaildType"
         @select="openImportToHiveDialog">
         <span>{{ $t('message.scripts.contextMenu.importToHive') }}</span>
-      </we-menu-item>
+      </we-menu-item> -->
       <we-menu-item
         v-if="currentNode.isLeaf"
         @select="openImportDialog">
@@ -191,7 +191,8 @@ export default {
       filterTree: [],
       // 用于延迟渲染模块，减少请求
       timeoutFlag: false,
-      navList: ['search', 'newFile', 'refresh', 'import'],
+      // navList: ['search', 'newFile', 'refresh', 'import'],
+      navList: ['search', 'newFile', 'refresh'],
       hdfsTree: [],
       hdfsPath: '',
       loadHdfsDataFn: () => {},

@@ -21,6 +21,7 @@ package com.webank.wedatasphere.dss.data.api.server.restful;
 
 
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
+import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -68,7 +69,6 @@ public class DSSDbApiAuthRestful {
     @Path("/save")
     public Response saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
-//        String userName ="suyc";
         if(apiAuth.getId() ==null) {
             String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
             apiAuth.setToken(token);
@@ -107,7 +107,7 @@ public class DSSDbApiAuthRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiAuth> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
+        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
         return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
     }
 

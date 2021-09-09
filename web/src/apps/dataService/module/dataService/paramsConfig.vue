@@ -731,6 +731,7 @@ export default {
             const reqes = this.sqlList.filter(item => !!item.name);
             if (reqes.length === 0) {
               this.$Message.error("请求参数不能为空");
+              return;
             }
             reqParams = {
               ...reqParams,

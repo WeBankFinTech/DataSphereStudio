@@ -104,7 +104,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if(pageNumObject == null){
                 throw new DataApiException("请设置pageNum参数");
             }
-            int pageNum = (Integer)pageNumObject;
+            int pageNum = Integer.valueOf(pageNumObject.toString());
+            if(pageNum < 1){
+                throw new DataApiException("pageNum参数错误");
+            }
             limitSent = " limit "+ ((pageNum-1) * pageSize)+","+pageSize;
         }
         if (apiConfig != null) {

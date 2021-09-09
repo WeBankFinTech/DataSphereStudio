@@ -27,6 +27,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-datamodel-center</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>dss-datamodel-center-server</module>
+        <module>dss-datamodel-dimension-management</module>
+        <module>dss-datamodel-indicator-management</module>
+        <module>dss-datamodel-table-management</module>
+    </modules>
 
 
     <properties>

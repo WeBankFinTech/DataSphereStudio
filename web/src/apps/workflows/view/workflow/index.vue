@@ -288,7 +288,8 @@ export default {
               canWrite: n.canWrite()
             }
           })
-          this.handleTreeClick(this.projectsTree[0])
+          if (!this.$route.query.projectID)
+            this.handleTreeClick(this.projectsTree[0])
         } else {
           this.projectsTree = res.projects.map(n => {
             setVirtualRoles(n, this.getUserName())
@@ -305,7 +306,7 @@ export default {
     // 获取project下工作流
     getFlow(param, resolve) {
       if (this.isScheduler) {
-        return resolve()
+        return resolve([])
       }
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, {
         workspaceId: this.$route.query.workspaceId,

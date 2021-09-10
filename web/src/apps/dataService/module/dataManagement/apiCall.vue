@@ -34,7 +34,7 @@
     </div>
 
     <!--确认删除-->
-    <Modal v-model="modelConfirm" width="480" :closable="false">
+    <Modal v-model="modalConfirm" width="480" :closable="false">
       <div class="modal-confirm-body">
         <div class="confirm-title">
           <SvgIcon class="icon" icon-class="project-workflow" />
@@ -117,6 +117,10 @@ export default {
           key: 'caller'
         },
         {
+          title: this.$t("message.dataService.apiCall.col_group"),
+          key: 'groupName'
+        },
+        {
           title: 'Token',
           key: 'token',
           width: '300'
@@ -155,7 +159,7 @@ export default {
           return date && date.valueOf() < Date.now() - 86400000;
         }
       },
-      modelConfirm: false,
+      modalConfirm: false,
       selectedApi: null
     }
   },
@@ -284,14 +288,14 @@ export default {
     },
     deleteApi(row) {
       this.selectedApi = row;
-      this.modelConfirm = true;
+      this.modalConfirm = true;
     },
     deleteCancel() {
       this.selectedApi = null;
-      this.modelConfirm = false;
+      this.modalConfirm = false;
     },
     deleteConfirm() {
-      this.modelConfirm = false;
+      this.modalConfirm = false;
       api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
@@ -314,6 +318,7 @@ export default {
 .manage-wrap {
   position: relative;
   padding: 0 24px;
+  overflow: hidden;
   @include bg-color(#fff, $dark-base-color);
   .manage-head {
     margin-bottom: 15px;
@@ -347,7 +352,7 @@ export default {
   }
   .pagebar {
     float: right;
-    margin-top: 15px;
+    margin: 15px 0;
     padding: 10px 0;
   }
 }

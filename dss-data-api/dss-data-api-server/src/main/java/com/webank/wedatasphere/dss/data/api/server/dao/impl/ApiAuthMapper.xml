@@ -19,20 +19,21 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.webank.wedatasphere.dss.data.api.server.dao.ApiAuthMapper">
-    <resultMap id="dataapi_auth" type="com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth">
+    <resultMap id="dataapi_auth" type="com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo">
         <id property="id" column="id"/>
         <id property="caller" column="caller"/>
         <id property="token" column="token"/>
         <id property="expire" column="expire"/>
         <id property="createTime" column="create_time"/>
+        <id property="groupName" column="groupName"/>
     </resultMap>
 
 
 
     <select id="getApiAuthList" resultMap="dataapi_auth">
-        SELECT * FROM dss_dataapi_auth
+        SELECT a.*, b.name as 'groupName' FROM dss_dataapi_auth a LEFT JOIN dss_dataapi_group b ON a.group_id = b.id
         <where>
-            `is_delete` =0 AND `workspace_id` = #{workspaceId}
+            a.is_delete =0 AND a.workspace_id = #{workspaceId}
         </where>
     </select>
 

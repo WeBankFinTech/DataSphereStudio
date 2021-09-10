@@ -22,7 +22,9 @@
         "col_apiType": "API类型",
         "col_status": "状态",
         "onlined": "已上线",
-        "offlined": "已下线"
+        "offlined": "已下线",
+        "offlineApiTitle": "确认要下线API吗",
+        "offlineApiDesc": "下线API服务，将影响当前线上业务对API的正常调用"
       },
       "apiMonitor": {
         "staticsScreen": "API计量大屏",
@@ -71,6 +73,7 @@
           "long": "长期"
         },
         "col_caller": "登录名称",
+        "col_group": "业务流程",
         "col_expire": "有效期",
         "col_createTime": "创建时间"
       },

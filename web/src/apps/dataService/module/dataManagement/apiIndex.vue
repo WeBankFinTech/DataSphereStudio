@@ -39,6 +39,22 @@
           @on-page-size-change="handlePageSizeChange"
         />
       </div>
+
+      <!--确认下线-->
+      <Modal v-model="modalConfirm" width="480" :closable="false">
+        <div class="modal-confirm-body">
+          <div class="confirm-title">
+            <SvgIcon class="icon" icon-class="project-workflow" />
+            <span class="text">{{ $t("message.dataService.apiIndex.offlineApiTitle") }}</span>
+          </div>
+          <div class="confirm-desc">{{ $t("message.dataService.apiIndex.offlineApiDesc") }}</div>
+        </div>
+        <div slot="footer">
+          <Button type="default" @click="offlineCancel">{{$t('message.dataService.cancel')}}</Button>
+          <Button type="primary" @click="offlineConfirm">{{$t('message.dataService.ok')}}</Button>
+        </div>
+      </Modal>
+
     </Tab-pane>
   </Tabs>
 </template>
@@ -92,6 +108,8 @@ export default {
         pageSize: 10
       },
       apiName: '',
+      modalConfirm: false,
+      selectedApi: null
     }
   },
   created() {
@@ -149,11 +167,20 @@ export default {
       });
     },
     offline(row) {
-      api.fetch(`/dss/data/api/apimanager/offline/${row.id}`, {
+      this.selectedApi = row;
+      this.modalConfirm = true;
+    },
+    offlineCancel() {
+      this.selectedApi = null;
+      this.modalConfirm = false;
+    },
+    offlineConfirm() {
+      this.modalConfirm = false;
+      api.fetch(`/dss/data/api/apimanager/offline/${this.selectedApi.id}`, {
       }, 'post').then((res) => {
         if (res) {
           this.apiList = this.apiList.map(i => {
-            if (i.id == row.id) {
+            if (i.id == this.selectedApi.id) {
               return res.apiInfo;
             } else {
               return i;
@@ -211,6 +238,29 @@ export default {
   float: right;
   margin: 15px 0;
   padding: 10px 0;
+}
+.modal-confirm-body {
+  .confirm-title {
+    margin-top: 10px;
+    color: #FF9F3A;
+    .text {
+      margin-left: 15px;
+      font-size: 16px;
+      line-height: 24px;
+      @include font-color(#333, $dark-text-color);
+    }
+    .icon {
+      font-size: 26px;
+    }
+  }
+  .confirm-desc {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: 42px;
+    font-size: 14px;
+    line-height: 20px;
+    @include font-color(#666, $dark-text-color);
+  }
 }
 </style>
 

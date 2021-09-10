@@ -130,19 +130,15 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
             Integer datasourceId = apiConfig.getDatasourceId();
             DataSource dataSource = apiDataSourceService.getById(datasourceId);
-            //解密
-//            String pwd = String.valueOf( CryptoUtils.string2Object(dataSource.getPwd()));
-//            dataSource.setPwd(pwd);
+
             String dataSourceType = dataSource.getType();
             if("MYSQL".equals(dataSourceType)){
                 dataSource.setClassName("com.mysql.jdbc.Driver");
             }
-//            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
-//            dataSource.setUrl("jdbc:mysql://***REMOVED***:3306/dss_test?characterEncoding=UTF-8");
-//            dataSource.setUsername("root");
-//            dataSource.setPwd("123456");
-//            dataSource.setDatasourceId(1);
             apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
+            if(isTest){
+                apiConfigMapper.updateApiTestStatus(apiConfig.getId(),1);
+            }
 
         }else {
             apiExecuteInfo.setLog("该服务不存在,请检查服务url是否正确");
@@ -169,6 +165,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         }
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if(apiConfig != null){
+            int status = apiConfig.getStatus();
+            if(status == 0){
+                throw new DataApiException("该服务已下线");
+            }
             long startTime = System.currentTimeMillis();
             apiCall.setApiId(apiConfig.getId().longValue());
             apiCall.setTimeStart(new Date(startTime));
@@ -314,7 +314,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 while (rs.next()) {
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
-                        jo.put(columnName,value.toString() );
+                        jo.put(columnName,value == null ? null :value.toString() );
                     }
                     list.add(jo);
                 }

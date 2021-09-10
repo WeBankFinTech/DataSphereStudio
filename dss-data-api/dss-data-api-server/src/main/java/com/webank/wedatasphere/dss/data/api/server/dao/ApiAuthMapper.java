@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.data.api.server.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
+import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -38,7 +39,7 @@ public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
     void addApiAuth(ApiAuth dssDataApiAuth);
 
-    List<ApiAuth> getApiAuthList(Long workspaceId);
+    List<ApiAuthInfo> getApiAuthList(Long workspaceId);
 
     @Update("UPDATE dss_dataapi_auth SET `is_delete` = 1 WHERE `id` = #{id}")
     void deleteApiAuth(@Param("id") Long id);

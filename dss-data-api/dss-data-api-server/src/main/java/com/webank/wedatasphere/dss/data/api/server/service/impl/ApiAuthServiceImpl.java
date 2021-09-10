@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.data.api.server.dao.ApiAuthMapper;
 import com.webank.wedatasphere.dss.data.api.server.dao.ApiConfigMapper;
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
+import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -43,10 +44,10 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     }
 
     @Override
-    public List<ApiAuth> getApiAuthList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
+    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow, pageSize, true);
-        List<ApiAuth> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId);
-        PageInfo<ApiAuth> pageInfo = new PageInfo<>(apiAuthList);
+        List<ApiAuthInfo> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId);
+        PageInfo<ApiAuthInfo> pageInfo = new PageInfo<>(apiAuthList);
         totals.add(pageInfo.getTotal());
 
         return apiAuthList;

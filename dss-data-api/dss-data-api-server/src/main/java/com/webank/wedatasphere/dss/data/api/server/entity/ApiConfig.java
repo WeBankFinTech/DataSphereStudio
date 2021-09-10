@@ -61,6 +61,8 @@ public class ApiConfig {
 
     private int status;
     private int isTest;
+    private String createBy;
+    private String updateBy;
 }
 
 

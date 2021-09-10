@@ -19,7 +19,11 @@
           class="toolWrap"
           @click="handleToolShow(toolItem)"
         >
-          <SvgIcon class="icon" :icon-class="toolItem.iconName" verticalAlign="0px" />
+          <SvgIcon
+            class="icon"
+            :icon-class="toolItem.iconName"
+            verticalAlign="0px"
+          />
           <div>{{ toolItem.name }}</div>
           <div class="divider" :class="{ 'last-divider': index === 4 }" />
         </div>
@@ -94,7 +98,10 @@
             </Form>
           </div>
         </div>
-        <div class="cardWrap" v-if="apiData.data.apiType === 'SQL'">
+        <div
+          class="cardWrap cardTableWrap"
+          v-if="apiData.data.apiType === 'SQL'"
+        >
           <div class="cardTitle">编写查询SQL</div>
           <div style="margin-top: 10px;">
             <Alert show-icon
@@ -109,32 +116,6 @@
               placeholder="请填写SQL语句"
               rows="10"
             />
-          </div>
-          <div class="sqlPageWrap">
-            <Checkbox v-model="sqlPage" @on-change="handleSqlPageChange"
-              >返回结果分页</Checkbox
-            >
-            <div class="sqlPageTip">
-              当返回结果记录数大于500时请选择分页，不分页则最多返回500条记录。当无请求参数时，必须开启返回结果分页。
-            </div>
-          </div>
-          <div v-show="sqlPage" style="margin-top:10px;">
-            <Form
-              ref="pageForm"
-              :model="pageForm"
-              :label-width="75"
-              :rules="pageRuleValidate"
-            >
-              <FormItem label="每页条数" prop="pageSize">
-                <Input
-                  type="number"
-                  v-model="pageForm.pageSize"
-                  placeholder="请输入每页条数,不超过50条"
-                  style="width: 300px"
-                  ><span slot="append">条</span></Input
-                >
-              </FormItem>
-            </Form>
           </div>
         </div>
         <div
@@ -176,6 +157,34 @@
                 </div>
               </template>
             </Table>
+          </div>
+        </div>
+        <div class="pageWrap">
+          <div class="pageNumWrap">
+            <Checkbox v-model="pageNumChecked" @on-change="handlePageNumChange"
+              >返回结果分页</Checkbox
+            >
+            <div class="pageTip">
+              当返回结果记录数大于500时请选择分页，不分页则最多返回500条记录。当无请求参数时，必须开启返回结果分页。
+            </div>
+          </div>
+          <div v-show="pageNumChecked" style="margin-top:10px;">
+            <Form
+              ref="pageForm"
+              :model="pageForm"
+              :label-width="75"
+              :rules="pageRuleValidate"
+            >
+              <FormItem label="每页条数" prop="pageSize">
+                <Input
+                  type="number"
+                  v-model="pageForm.pageSize"
+                  placeholder="请输入每页条数,不超过50条"
+                  style="width: 300px"
+                  ><span slot="append">条</span></Input
+                >
+              </FormItem>
+            </Form>
           </div>
         </div>
         <div
@@ -233,7 +242,7 @@
                     value => changeSqlParams(value.target.value, index, column)
                   "
                   placeholder="请输入"
-                  :readonly="!!row.sqlPage && column.key === 'name'"
+                  :readonly="!!row.pageNumChecked && column.key === 'name'"
                 ></Input>
               </template>
               <template slot-scope="{ index, row, column }" slot="type">
@@ -241,7 +250,7 @@
                   :value="row.type"
                   transfer
                   @on-change="value => changeSqlParams(value, index, column)"
-                  v-if="!row.sqlPage"
+                  v-if="!row.pageNumChecked"
                 >
                   <Option
                     v-for="(item, index) in sqlTypeOptions"
@@ -254,7 +263,7 @@
                   :value="row.type"
                   transfer
                   @on-change="value => changeSqlParams(value, index, column)"
-                  v-if="!!row.sqlPage"
+                  v-if="!!row.pageNumChecked"
                 >
                   <Option value="bigint">bigint</Option>
                 </Select>
@@ -395,7 +404,7 @@ export default {
       setRequest: false,
       setResponse: false,
       hideParamTable: false,
-      sqlPage: false,
+      pageNumChecked: false,
       paramsColumns: [
         {
           title: "设为请求参数",
@@ -593,10 +602,10 @@ export default {
       memory,
       reqTimeout
     };
+    this.pageForm = { pageSize: pageSize ? pageSize : '' };
+    this.pageNumChecked = !!pageSize;
     if (apiType === "SQL") {
       this.sql = sql;
-      this.pageForm = { pageSize };
-      this.sqlPage = !!pageSize;
       const reqValues = reqFields ? JSON.parse(reqFields) : [];
       this.sqlList = reqValues.map(item => {
         return { ...item };
@@ -665,7 +674,8 @@ export default {
         ...this.dbForm,
         memory: parseFloat(memory),
         id: data.id || null,
-        workspaceId: 223
+        workspaceId: this.$route.query.workspaceId,
+        pageSize: 0
       };
       if (reqTimeout) {
         reqParams.reqTimeout = parseFloat(reqTimeout);
@@ -689,6 +699,16 @@ export default {
                 resFields.push("`" + item.columnName + "`");
               }
             });
+            if (this.pageNumChecked) {
+              reqFields.push({
+                name: "pageNum",
+                type: "bigint",
+                comment: "",
+                compare: "=",
+                pageNumChecked: true
+              });
+            }
+
             if (resFields.length === 0) {
               this.$Message.error("返回参数不能为空");
               return;
@@ -711,22 +731,22 @@ export default {
             const reqes = this.sqlList.filter(item => !!item.name);
             if (reqes.length === 0) {
               this.$Message.error("请求参数不能为空");
+              return;
             }
             reqParams = {
               ...reqParams,
               reqFields: reqes.length > 0 ? JSON.stringify(reqes) : "",
               sql: this.sql,
-              pageSize: 0
             };
-            if (this.sqlPage) {
-              this.$refs["pageForm"].validate(valid2 => {
-                if (valid2) {
-                  reqParams.pageSize = parseInt(this.pageForm.pageSize);
-                  this.executeSaveApi(reqParams);
-                }
-              });
-              return;
-            }
+          }
+          if (this.pageNumChecked) {
+            this.$refs["pageForm"].validate(valid2 => {
+              if (valid2) {
+                reqParams.pageSize = parseInt(this.pageForm.pageSize);
+                this.executeSaveApi(reqParams);
+              }
+            });
+            return;
           }
           this.executeSaveApi(reqParams);
         }
@@ -949,21 +969,24 @@ export default {
         this.hideParamTable = false;
       });
     },
-    handleSqlPageChange(e) {
-      console.log(e);
-      if (e) {
-        this.addSqlParams({
-          name: "pageNum",
-          type: "bigint",
-          demo: "1",
-          comment: "",
-          sqlPage: true
-        });
-      } else {
-        const index = this.sqlList.findIndex(
-          item => item.name === "pageNum" && item.sqlPage
-        );
-        this.deleteSqlRow(index);
+    handlePageNumChange(e) {
+      const { data } = this.apiData;
+      const { apiType } = data;
+      if (apiType === "SQL") {
+        if (e) {
+          this.addSqlParams({
+            name: "pageNum",
+            type: "bigint",
+            demo: "1",
+            comment: "",
+            pageNumChecked: true
+          });
+        } else {
+          const index = this.sqlList.findIndex(
+            item => item.name === "pageNum" && item.pageNumChecked
+          );
+          this.deleteSqlRow(index);
+        }
       }
     }
   }
@@ -983,8 +1006,11 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    border: 1px solid #DEE4EC;
-    @include border-color(rgba($color: #000000, $alpha: 0.2), $dark-border-color);
+    border: 1px solid #dee4ec;
+    @include border-color(
+      rgba($color: #000000, $alpha: 0.2),
+      $dark-border-color
+    );
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -1003,7 +1029,7 @@ export default {
     height: 48px;
     margin-top: -5px;
     @include bg-color(#f8f9fc, $dark-menu-base-color);
-    border: 1px solid #DEE4EC;
+    border: 1px solid #dee4ec;
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -1042,7 +1068,7 @@ export default {
     overflow-y: auto;
     .cardWrap {
       padding: 20px 0;
-      border-bottom: 1px solid #DEE4EC;
+      border-bottom: 1px solid #dee4ec;
       @include border-color(rgba(0, 0, 0, 0.2), $dark-border-color);
       .cardTitle {
         font-family: PingFangSC-Medium;
@@ -1098,14 +1124,17 @@ export default {
     .cardTableWrap {
       border-bottom-width: 0;
     }
-    .sqlPageWrap {
-      margin-top: 15px;
-      display: flex;
-      .sqlPageTip {
-        font-family: PingFangSC-Regular;
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.45);
-        margin-left: 10px;
+    .pageWrap {
+      border-bottom: 1px solid #dee4ec;
+      padding-bottom: 5px;
+      .pageNumWrap {
+        display: flex;
+        .pageTip {
+          font-family: PingFangSC-Regular;
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.45);
+          margin-left: 10px;
+        }
       }
     }
   }

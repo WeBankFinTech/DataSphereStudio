@@ -27,7 +27,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -94,7 +93,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
      */
 
     @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws JSONException, SQLException, DataApiException {
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map,boolean isTest) throws JSONException, SQLException, DataApiException {
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         List<Object > jdbcParamValues = new ArrayList<>();
@@ -177,7 +176,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             int groupId = apiConfig.getGroupId();
             Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
             if(expireTime != null && (expireTime * 1000) > startTime){
-                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,map);
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,map,false);
                 long endTime = System.currentTimeMillis();
                 apiCall.setTimeEnd(new Date(endTime));
                 apiCall.setTimeLength(endTime-startTime);

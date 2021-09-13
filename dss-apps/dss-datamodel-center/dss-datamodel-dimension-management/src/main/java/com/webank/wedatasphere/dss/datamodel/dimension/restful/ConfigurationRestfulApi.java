@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.datamodel.restful;
+package com.webank.wedatasphere.dss.datamodel.dimension.restful;
 
 import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.stereotype.Component;

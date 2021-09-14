@@ -32,3 +32,7 @@ logs
 
 out
 gen
+dss-apps/dss-datamodel-center/dss-datamodel-center-server/target/
+dss-apps/dss-datamodel-center/dss-datamodel-dimension-management/target/
+dss-apps/dss-datamodel-center/dss-datamodel-indicator-management/target/
+dss-apps/dss-datamodel-center/dss-datamodel-table-management/target/

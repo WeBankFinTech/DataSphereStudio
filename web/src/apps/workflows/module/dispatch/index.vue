@@ -1645,15 +1645,16 @@ export default {
   }
   .left-panel{
     height: 80vh;
-    width: calc(100vw - 250px - 65px - 250px);
+    width: calc(100vw - 250px - 250px - 60px - 300px);
     @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
-    position: absolute;
+    position: fixed;
+    bottom: 0;
     left: 100vw;
     z-index: 99;
     padding: 23px 26px 23px 0;
     transition: all 1s;
     &.partial-panel {
-      left: calc(250px + 250px + 60px);
+      left: calc(250px + 250px + 60px + 300px);
       transition: all 1s;
     }
     .dag-page{
@@ -1663,8 +1664,8 @@ export default {
       height: 100%;
     }
     &.full-panel {
-      left: 270px;
-      width: calc(100vw - 270px);
+      left: 310px;
+      width: calc(100vw - 310px);
       transition: all 1s;
     }
     .close-panel{

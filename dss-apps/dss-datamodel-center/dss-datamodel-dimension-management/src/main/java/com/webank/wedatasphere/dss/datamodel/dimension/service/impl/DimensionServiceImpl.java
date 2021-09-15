@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper;
+import com.webank.wedatasphere.dss.datamodel.dimension.dto.DimensionQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
 import com.webank.wedatasphere.dss.datamodel.dimension.service.DimensionService;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionAddVO;
@@ -16,12 +16,9 @@ import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionUpdateVO;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.sql.Wrapper;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -79,11 +76,12 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
                 .like(vo.getStatus()!=null,"is_available",vo.getStatus())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
         IPage<DssDatamodelDimension> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
+
         return Message.ok()
                 .data("list",iPage
                         .getRecords()
                         .stream()
-                        .map(dssDatamodelDimension -> modelMapper.map(dssDatamodelDimension,DimensionQueryVO.class))
+                        .map(dssDatamodelDimension -> modelMapper.map(dssDatamodelDimension, DimensionQueryDTO.class))
                         .collect(Collectors.toList()))
                 .data("total",iPage.getTotal());
     }

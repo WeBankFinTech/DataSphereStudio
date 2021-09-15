@@ -19,36 +19,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dss</artifactId>
+        <artifactId>dss-datamodel-center</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dss-datamodel-center</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>dss-datamodel-center-server</module>
-        <module>dss-datamodel-dimension-management</module>
-        <module>dss-datamodel-indicator-management</module>
-        <module>dss-datamodel-measure-management</module>
-        <module>dss-datamodel-table-management</module>
-    </modules>
+    <artifactId>dss-datamodel-measure-management</artifactId>
 
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jersey.version>2.16</jersey.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-module</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>asm</artifactId>
@@ -72,11 +58,8 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-mybatis</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-
-
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -88,6 +71,12 @@
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.5.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>0.7.5</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

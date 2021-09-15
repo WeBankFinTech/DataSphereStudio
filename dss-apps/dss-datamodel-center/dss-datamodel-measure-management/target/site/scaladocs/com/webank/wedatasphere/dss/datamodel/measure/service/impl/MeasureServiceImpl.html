@@ -1,0 +1,1577 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>MeasureServiceImpl - dss-datamodel-measure-management 1.0.0 API - com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl</title>
+          <meta name="description" content="MeasureServiceImpl - dss - datamodel - measure - management 1.0.0 API - com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl" />
+          <meta name="keywords" content="MeasureServiceImpl dss datamodel measure management 1.0.0 API com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../../../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../../../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../../../../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../../../../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../../../../../../index.html';
+            var hash = 'com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Class" src="../../../../../../../../lib/class_big.png" />
+        <p id="owner"><a href="../../../../../../../package.html" class="extype" name="com">com</a>.<a href="../../../../../../package.html" class="extype" name="com.webank">webank</a>.<a href="../../../../../package.html" class="extype" name="com.webank.wedatasphere">wedatasphere</a>.<a href="../../../../package.html" class="extype" name="com.webank.wedatasphere.dss">dss</a>.<a href="../../../package.html" class="extype" name="com.webank.wedatasphere.dss.datamodel">datamodel</a>.<a href="../../package.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure">measure</a>.<a href="../package.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service">service</a>.<a href="package.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl">impl</a></p>
+        <h1>MeasureServiceImpl</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl">package impl</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MeasureServiceImpl</span><span class="result"> extends <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl">ServiceImpl</span>[<a href="../../dao/DssDatamodelMeasureMapper.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper">DssDatamodelMeasureMapper</a>, <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>] with <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl">ServiceImpl</span>[<a href="../../dao/DssDatamodelMeasureMapper.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper">DssDatamodelMeasureMapper</a>, <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>], <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService">IService</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl"><span>MeasureServiceImpl</span></li><li class="in" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService"><span>MeasureService</span></li><li class="in" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl"><span>ServiceImpl</span></li><li class="in" name="com.baomidou.mybatisplus.extension.service.IService"><span>IService</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl"></a>
+      <a id="&lt;init&gt;:MeasureServiceImpl"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MeasureServiceImpl</span><span class="params">()</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@&lt;init&gt;():com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@##():Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#addMeasure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addMeasure(vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO):Int"></a>
+      <a id="addMeasure(MeasureAddVO):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addMeasure</span><span class="params">(<span name="vo">vo: <a href="../../vo/MeasureAddVO.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO">MeasureAddVO</a></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@addMeasure(vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO):Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl">MeasureServiceImpl</a> → <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@clone():Object" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#count" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="count(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Int"></a>
+      <a id="count(Wrapper[DssDatamodelMeasure]):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">count</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@count(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#count" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="count():Int"></a>
+      <a id="count():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">count</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@count():Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#currentMapperClass" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentMapperClass():Class[T]"></a>
+      <a id="currentMapperClass():Class[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">currentMapperClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@currentMapperClass():Class[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#currentModelClass" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentModelClass():Class[T]"></a>
+      <a id="currentModelClass():Class[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">currentModelClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@currentModelClass():Class[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd></dl></div>
+    </li><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#deleteMeasure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteMeasure(id:Long):Int"></a>
+      <a id="deleteMeasure(Long):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteMeasure</span><span class="params">(<span name="id">id: <span class="extype" name="java.lang.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@deleteMeasure(id:Long):Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl">MeasureServiceImpl</a> → <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></dd></dl></div>
+    </li><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#enableMeasure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enableMeasure(id:Long,vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO):Int"></a>
+      <a id="enableMeasure(Long,MeasureEnableVO):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enableMeasure</span><span class="params">(<span name="id">id: <span class="extype" name="java.lang.Long">Long</span></span>, <span name="vo">vo: <a href="../../vo/MeasureEnableVO.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO">MeasureEnableVO</a></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@enableMeasure(id:Long,vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO):Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl">MeasureServiceImpl</a> → <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#executeBatch" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="executeBatch[E](x$1:java.util.Collection[E],x$2:java.util.function.BiConsumer[org.apache.ibatis.session.SqlSession,E]):Boolean"></a>
+      <a id="executeBatch[E](Collection[E],BiConsumer[SqlSession,E]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">executeBatch</span><span class="tparams">[<span name="E">E</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.executeBatch.E">E</span>]</span>, <span name="arg1">arg1: <span class="extype" name="java.util.function.BiConsumer">BiConsumer</span>[<span class="extype" name="org.apache.ibatis.session.SqlSession">SqlSession</span>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.executeBatch.E">E</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@executeBatch[E](x$1:java.util.Collection[E],x$2:java.util.function.BiConsumer[org.apache.ibatis.session.SqlSession,E]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#executeBatch" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="executeBatch[E](x$1:java.util.Collection[E],x$2:Int,x$3:java.util.function.BiConsumer[org.apache.ibatis.session.SqlSession,E]):Boolean"></a>
+      <a id="executeBatch[E](Collection[E],Int,BiConsumer[SqlSession,E]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">executeBatch</span><span class="tparams">[<span name="E">E</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.executeBatch.E">E</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>, <span name="arg2">arg2: <span class="extype" name="java.util.function.BiConsumer">BiConsumer</span>[<span class="extype" name="org.apache.ibatis.session.SqlSession">SqlSession</span>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.executeBatch.E">E</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@executeBatch[E](x$1:java.util.Collection[E],x$2:Int,x$3:java.util.function.BiConsumer[org.apache.ibatis.session.SqlSession,E]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getBaseMapper" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getBaseMapper():M"></a>
+      <a id="getBaseMapper():DssDatamodelMeasureMapper"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getBaseMapper</span><span class="params">()</span><span class="result">: <a href="../../dao/DssDatamodelMeasureMapper.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper">DssDatamodelMeasureMapper</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getBaseMapper():M" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#getById" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getById(x$1:java.io.Serializable):T"></a>
+      <a id="getById(Serializable):DssDatamodelMeasure"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getById</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.io.Serializable">Serializable</span></span>)</span><span class="result">: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getById(x$1:java.io.Serializable):T" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getEntityClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getEntityClass():Class[T]"></a>
+      <a id="getEntityClass():Class[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getEntityClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getEntityClass():Class[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getMap(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.Map[String,Object]"></a>
+      <a id="getMap(Wrapper[DssDatamodelMeasure]):Map[String,AnyRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getMap</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getMap(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.Map[String,Object]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getObj" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getObj[V](x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:java.util.function.Function[_&gt;:Object,V]):V"></a>
+      <a id="getObj[V](Wrapper[DssDatamodelMeasure],Function[_&gt;:AnyRef,V]):V"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getObj</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="java.util.function.Function">Function</span>[_ &gt;: <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.getObj.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl.getObj.V">V</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getObj[V](x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:java.util.function.Function[_&gt;:Object,V]):V" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getOne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOne(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:Boolean):T"></a>
+      <a id="getOne(Wrapper[DssDatamodelMeasure],Boolean):DssDatamodelMeasure"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getOne(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:Boolean):T" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#getOne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOne(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):T"></a>
+      <a id="getOne(Wrapper[DssDatamodelMeasure]):DssDatamodelMeasure"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getOne(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):T" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#getSqlStatement" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getSqlStatement(x$1:com.baomidou.mybatisplus.core.enums.SqlMethod):String"></a>
+      <a id="getSqlStatement(SqlMethod):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getSqlStatement</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.enums.SqlMethod">SqlMethod</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@getSqlStatement(x$1:com.baomidou.mybatisplus.core.enums.SqlMethod):String" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#ktQuery" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ktQuery():com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper[T]"></a>
+      <a id="ktQuery():KtQueryChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ktQuery</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper">KtQueryChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@ktQuery():com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#ktUpdate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ktUpdate():com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper[T]"></a>
+      <a id="ktUpdate():KtUpdateChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ktUpdate</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper">KtUpdateChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@ktUpdate():com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#lambdaQuery" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lambdaQuery():com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper[T]"></a>
+      <a id="lambdaQuery():LambdaQueryChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lambdaQuery</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper">LambdaQueryChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@lambdaQuery():com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#lambdaUpdate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lambdaUpdate():com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper[T]"></a>
+      <a id="lambdaUpdate():LambdaUpdateChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lambdaUpdate</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper">LambdaUpdateChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@lambdaUpdate():com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#list" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="list():java.util.List[T]"></a>
+      <a id="list():List[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">list</span><span class="params">()</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@list():java.util.List[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#list" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="list(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[T]"></a>
+      <a id="list(Wrapper[DssDatamodelMeasure]):List[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">list</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@list(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listByIds" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listByIds(x$1:java.util.Collection[_&lt;:java.io.Serializable]):java.util.List[T]"></a>
+      <a id="listByIds(Collection[_&lt;:Serializable]):List[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listByIds</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[_ &lt;: <span class="extype" name="java.io.Serializable">Serializable</span>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listByIds(x$1:java.util.Collection[_&lt;:java.io.Serializable]):java.util.List[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listByMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listByMap(x$1:java.util.Map[String,Object]):java.util.List[T]"></a>
+      <a id="listByMap(Map[String,AnyRef]):List[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listByMap</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listByMap(x$1:java.util.Map[String,Object]):java.util.List[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listMaps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listMaps():java.util.List[java.util.Map[String,Object]]"></a>
+      <a id="listMaps():List[Map[String,AnyRef]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listMaps</span><span class="params">()</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listMaps():java.util.List[java.util.Map[String,Object]]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listMaps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listMaps(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[java.util.Map[String,Object]]"></a>
+      <a id="listMaps(Wrapper[DssDatamodelMeasure]):List[Map[String,AnyRef]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listMaps</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listMaps(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[java.util.Map[String,Object]]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listObjs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listObjs[V](x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:java.util.function.Function[_&gt;:Object,V]):java.util.List[V]"></a>
+      <a id="listObjs[V](Wrapper[DssDatamodelMeasure],Function[_&gt;:AnyRef,V]):List[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listObjs</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="java.util.function.Function">Function</span>[_ &gt;: <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.listObjs.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.listObjs.V">V</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listObjs[V](x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T],x$2:java.util.function.Function[_&gt;:Object,V]):java.util.List[V]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listObjs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listObjs(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[Object]"></a>
+      <a id="listObjs(Wrapper[DssDatamodelMeasure]):List[AnyRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listObjs</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="scala.AnyRef">AnyRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listObjs(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):java.util.List[Object]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listObjs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listObjs[V](x$1:java.util.function.Function[_&gt;:Object,V]):java.util.List[V]"></a>
+      <a id="listObjs[V](Function[_&gt;:AnyRef,V]):List[V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listObjs</span><span class="tparams">[<span name="V">V</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.function.Function">Function</span>[_ &gt;: <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.listObjs.V">V</span>]</span>)</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.listObjs.V">V</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listObjs[V](x$1:java.util.function.Function[_&gt;:Object,V]):java.util.List[V]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#listObjs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="listObjs():java.util.List[Object]"></a>
+      <a id="listObjs():List[AnyRef]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">listObjs</span><span class="params">()</span><span class="result">: <span class="extype" name="java.util.List">List</span>[<span class="extype" name="scala.AnyRef">AnyRef</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@listObjs():java.util.List[Object]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#page" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="page[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[T]](x$1:E):E"></a>
+      <a id="page[E&lt;:IPage[DssDatamodelMeasure]](E):E"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">page</span><span class="tparams">[<span name="E">E &lt;: <span class="extype" name="com.baomidou.mybatisplus.core.metadata.IPage">IPage</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.page.E">E</span></span>)</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.page.E">E</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@page[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[T]](x$1:E):E" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#page" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="page[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[T]](x$1:E,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):E"></a>
+      <a id="page[E&lt;:IPage[DssDatamodelMeasure]](E,Wrapper[DssDatamodelMeasure]):E"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">page</span><span class="tparams">[<span name="E">E &lt;: <span class="extype" name="com.baomidou.mybatisplus.core.metadata.IPage">IPage</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.page.E">E</span></span>, <span name="arg1">arg1: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.page.E">E</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@page[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[T]](x$1:E,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):E" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#pageMaps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pageMaps[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[java.util.Map[String,Object]]](x$1:E):E"></a>
+      <a id="pageMaps[E&lt;:IPage[Map[String,AnyRef]]](E):E"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pageMaps</span><span class="tparams">[<span name="E">E &lt;: <span class="extype" name="com.baomidou.mybatisplus.core.metadata.IPage">IPage</span>[<span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]]</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.pageMaps.E">E</span></span>)</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.pageMaps.E">E</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@pageMaps[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[java.util.Map[String,Object]]](x$1:E):E" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#pageMaps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pageMaps[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[java.util.Map[String,Object]]](x$1:E,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):E"></a>
+      <a id="pageMaps[E&lt;:IPage[Map[String,AnyRef]]](E,Wrapper[DssDatamodelMeasure]):E"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pageMaps</span><span class="tparams">[<span name="E">E &lt;: <span class="extype" name="com.baomidou.mybatisplus.core.metadata.IPage">IPage</span>[<span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]]</span>]</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.pageMaps.E">E</span></span>, <span name="arg1">arg1: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService.pageMaps.E">E</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@pageMaps[E&lt;:com.baomidou.mybatisplus.core.metadata.IPage[java.util.Map[String,Object]]](x$1:E,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):E" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#query" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="query():com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper[T]"></a>
+      <a id="query():QueryChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">query</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper">QueryChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@query():com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#queryMeasures" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="queryMeasures(vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO):com.webank.wedatasphere.linkis.server.Message"></a>
+      <a id="queryMeasures(MeasureQueryVO):Message"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">queryMeasures</span><span class="params">(<span name="vo">vo: <a href="../../vo/MeasureQueryVO.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO">MeasureQueryVO</a></span>)</span><span class="result">: <span class="extype" name="com.webank.wedatasphere.linkis.server.Message">Message</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@queryMeasures(vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO):com.webank.wedatasphere.linkis.server.Message" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl">MeasureServiceImpl</a> → <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#remove" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="remove(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean"></a>
+      <a id="remove(Wrapper[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">remove</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@remove(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#removeById" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="removeById(x$1:java.io.Serializable):Boolean"></a>
+      <a id="removeById(Serializable):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">removeById</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.io.Serializable">Serializable</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@removeById(x$1:java.io.Serializable):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#removeByIds" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="removeByIds(x$1:java.util.Collection[_&lt;:java.io.Serializable]):Boolean"></a>
+      <a id="removeByIds(Collection[_&lt;:Serializable]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">removeByIds</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[_ &lt;: <span class="extype" name="java.io.Serializable">Serializable</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@removeByIds(x$1:java.util.Collection[_&lt;:java.io.Serializable]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#removeByMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="removeByMap(x$1:java.util.Map[String,Object]):Boolean"></a>
+      <a id="removeByMap(Map[String,AnyRef]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">removeByMap</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Map">Map</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@removeByMap(x$1:java.util.Map[String,Object]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#save" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="save(x$1:T):Boolean"></a>
+      <a id="save(DssDatamodelMeasure):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">save</span><span class="params">(<span name="arg0">arg0: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@save(x$1:T):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#saveBatch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveBatch(x$1:java.util.Collection[T],x$2:Int):Boolean"></a>
+      <a id="saveBatch(Collection[DssDatamodelMeasure],Int):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveBatch</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveBatch(x$1:java.util.Collection[T],x$2:Int):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#saveBatch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveBatch(x$1:java.util.Collection[T]):Boolean"></a>
+      <a id="saveBatch(Collection[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveBatch</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveBatch(x$1:java.util.Collection[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#saveOrUpdate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveOrUpdate(x$1:T):Boolean"></a>
+      <a id="saveOrUpdate(DssDatamodelMeasure):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveOrUpdate</span><span class="params">(<span name="arg0">arg0: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveOrUpdate(x$1:T):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#saveOrUpdate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveOrUpdate(x$1:T,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean"></a>
+      <a id="saveOrUpdate(DssDatamodelMeasure,Wrapper[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveOrUpdate</span><span class="params">(<span name="arg0">arg0: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>, <span name="arg1">arg1: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveOrUpdate(x$1:T,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#saveOrUpdateBatch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveOrUpdateBatch(x$1:java.util.Collection[T],x$2:Int):Boolean"></a>
+      <a id="saveOrUpdateBatch(Collection[DssDatamodelMeasure],Int):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveOrUpdateBatch</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveOrUpdateBatch(x$1:java.util.Collection[T],x$2:Int):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#saveOrUpdateBatch" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="saveOrUpdateBatch(x$1:java.util.Collection[T]):Boolean"></a>
+      <a id="saveOrUpdateBatch(Collection[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">saveOrUpdateBatch</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@saveOrUpdateBatch(x$1:java.util.Collection[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@toString():String" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="update():com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper[T]"></a>
+      <a id="update():UpdateChainWrapper[DssDatamodelMeasure]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">update</span><span class="params">()</span><span class="result">: <span class="extype" name="com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper">UpdateChainWrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@update():com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper[T]" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="update(x$1:T,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean"></a>
+      <a id="update(DssDatamodelMeasure,Wrapper[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">update</span><span class="params">(<span name="arg0">arg0: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>, <span name="arg1">arg1: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@update(x$1:T,x$2:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#update" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="update(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean"></a>
+      <a id="update(Wrapper[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">update</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.conditions.Wrapper">Wrapper</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@update(x$1:com.baomidou.mybatisplus.core.conditions.Wrapper[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#updateBatchById" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateBatchById(x$1:java.util.Collection[T],x$2:Int):Boolean"></a>
+      <a id="updateBatchById(Collection[DssDatamodelMeasure],Int):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateBatchById</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@updateBatchById(x$1:java.util.Collection[T],x$2:Int):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ServiceImpl → IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#updateBatchById" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateBatchById(x$1:java.util.Collection[T]):Boolean"></a>
+      <a id="updateBatchById(Collection[DssDatamodelMeasure]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateBatchById</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.Collection">Collection</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@updateBatchById(x$1:java.util.Collection[T]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd><dt>Annotations</dt><dd>
+                <span class="name">@Transactional</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.IService#updateById" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateById(x$1:T):Boolean"></a>
+      <a id="updateById(DssDatamodelMeasure):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateById</span><span class="params">(<span name="arg0">arg0: <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@updateById(x$1:T):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>IService</dd></dl></div>
+    </li><li name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl#updateMeasure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateMeasure(id:Long,vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO):Int"></a>
+      <a id="updateMeasure(Long,MeasureUpdateVO):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateMeasure</span><span class="params">(<span name="id">id: <span class="extype" name="java.lang.Long">Long</span></span>, <span name="vo">vo: <a href="../../vo/MeasureUpdateVO.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO">MeasureUpdateVO</a></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@updateMeasure(id:Long,vo:com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO):Int" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl">MeasureServiceImpl</a> → <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Deprecated Value Members</h3>
+              <ol><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#closeSqlSession" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="closeSqlSession(x$1:org.apache.ibatis.session.SqlSession):Unit"></a>
+      <a id="closeSqlSession(SqlSession):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">closeSqlSession</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="org.apache.ibatis.session.SqlSession">SqlSession</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@closeSqlSession(x$1:org.apache.ibatis.session.SqlSession):Unit" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#executeBatch" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="executeBatch(x$1:java.util.function.Consumer[org.apache.ibatis.session.SqlSession]):Boolean"></a>
+      <a id="executeBatch(Consumer[SqlSession]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">executeBatch</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.util.function.Consumer">Consumer</span>[<span class="extype" name="org.apache.ibatis.session.SqlSession">SqlSession</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@executeBatch(x$1:java.util.function.Consumer[org.apache.ibatis.session.SqlSession]):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#retBool" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="retBool(x$1:Integer):Boolean"></a>
+      <a id="retBool(Integer):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">retBool</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="java.lang.Integer">Integer</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@retBool(x$1:Integer):Boolean" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#sqlSessionBatch" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sqlSessionBatch():org.apache.ibatis.session.SqlSession"></a>
+      <a id="sqlSessionBatch():SqlSession"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">sqlSessionBatch</span><span class="params">()</span><span class="result">: <span class="extype" name="org.apache.ibatis.session.SqlSession">SqlSession</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@sqlSessionBatch():org.apache.ibatis.session.SqlSession" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li><li name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl#sqlStatement" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sqlStatement(x$1:com.baomidou.mybatisplus.core.enums.SqlMethod):String"></a>
+      <a id="sqlStatement(SqlMethod):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">sqlStatement</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="com.baomidou.mybatisplus.core.enums.SqlMethod">SqlMethod</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../../../../index.html#com.webank.wedatasphere.dss.datamodel.measure.service.impl.MeasureServiceImpl@sqlStatement(x$1:com.baomidou.mybatisplus.core.enums.SqlMethod):String" title="Permalink" target="_top">
+        <img src="../../../../../../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../../../../baomidou$mybatisplus$extension$service$impl.html" class="extype" name="com.baomidou.mybatisplus.extension.service.impl">com.baomidou.mybatisplus.extension.service.impl</a>] </dd><dt>Definition Classes</dt><dd>ServiceImpl</dd><dt>Annotations</dt><dd>
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
+              
+        </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
+    </li></ol>
+            </div>
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">
+              <h3>Inherited from <a href="../MeasureService.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService">MeasureService</a></h3>
+            </div><div class="parent" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl">
+              <h3>Inherited from <span class="extype" name="com.baomidou.mybatisplus.extension.service.impl.ServiceImpl">ServiceImpl</span>[<a href="../../dao/DssDatamodelMeasureMapper.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper">DssDatamodelMeasureMapper</a>, <a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</h3>
+            </div><div class="parent" name="com.baomidou.mybatisplus.extension.service.IService">
+              <h3>Inherited from <span class="extype" name="com.baomidou.mybatisplus.extension.service.IService">IService</span>[<a href="../../entity/DssDatamodelMeasure.html" class="extype" name="com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure">DssDatamodelMeasure</a>]</h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

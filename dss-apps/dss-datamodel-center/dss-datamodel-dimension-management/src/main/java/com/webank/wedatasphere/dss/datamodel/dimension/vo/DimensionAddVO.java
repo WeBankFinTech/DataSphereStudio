@@ -95,5 +95,17 @@ public class DimensionAddVO {
         isAvailable = available;
     }
 
-
+    @Override
+    public String toString() {
+        return "DimensionAddVO{" +
+                "name='" + name + '\'' +
+                ", fieldIdentifier='" + fieldIdentifier + '\'' +
+                ", formula='" + formula + '\'' +
+                ", comment='" + comment + '\'' +
+                ", warehouseThemeName='" + warehouseThemeName + '\'' +
+                ", owner='" + owner + '\'' +
+                ", principalName='" + principalName + '\'' +
+                ", isAvailable=" + isAvailable +
+                '}';
+    }
 }

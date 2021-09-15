@@ -1,8 +1,12 @@
-package com.webank.wedatasphere.dss.datamodel.dimension.entity;
+package com.webank.wedatasphere.dss.datamodel.dimension.dto;
 
 import java.util.Date;
 
-public class DssDatamodelDimension {
+/**
+ * @author helong
+ * @date 2021/9/15
+ */
+public class DimensionQueryDTO {
     private Long id;
 
     private String name;

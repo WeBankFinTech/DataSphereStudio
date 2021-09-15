@@ -1,9 +1,10 @@
-package com.webank.wedatasphere.dss.datamodel.dimension.entity;
+package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 
-import java.util.Date;
-
-public class DssDatamodelDimension {
-    private Long id;
+/**
+ * @author helong
+ * @date 2021/9/15
+ */
+public class DimensionUpdateVO {
 
     private String name;
 
@@ -25,19 +26,7 @@ public class DssDatamodelDimension {
      */
     private String principalName;
 
-    private Integer isAvailable;
-
-    private Date createTime;
-
-    private Date updateTime;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Boolean isAvailable;
 
     public String getName() {
         return name;
@@ -95,27 +84,25 @@ public class DssDatamodelDimension {
         this.principalName = principalName;
     }
 
-    public Integer getIsAvailable() {
+    public Boolean getAvailable() {
         return isAvailable;
     }
 
-    public void setIsAvailable(Integer isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    @Override
+    public String toString() {
+        return "DimensionUpdateVO{" +
+                "name='" + name + '\'' +
+                ", fieldIdentifier='" + fieldIdentifier + '\'' +
+                ", formula='" + formula + '\'' +
+                ", comment='" + comment + '\'' +
+                ", warehouseThemeName='" + warehouseThemeName + '\'' +
+                ", owner='" + owner + '\'' +
+                ", principalName='" + principalName + '\'' +
+                ", isAvailable=" + isAvailable +
+                '}';
     }
 }

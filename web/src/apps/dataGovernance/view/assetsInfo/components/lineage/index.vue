@@ -37,9 +37,9 @@ export default {
         } else if (cur.typeName === 'hive_table') {
           icon = 'icon-a-hivetable'
         } else if (cur.typeName === 'hive_process') {
-          icon = 'icon-a-sparkprocess'
-        } else if (cur.typeName === 'spark_process') {
           icon = 'icon-a-hiveprocess'
+        } else if (cur.typeName === 'spark_process') {
+          icon = 'icon-a-sparkprocess'
         }
         data.nodes.push({
           id: item,

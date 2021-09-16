@@ -24,11 +24,11 @@ import java.util.Date;
 @Service
 public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicatorContentMapper, DssDatamodelIndicatorContent> implements IndicatorContentService {
 
-
     private final Gson gson = new Gson();
 
     @Resource
     private ModelMapper modelMapper;
+
 
     @Override
     @Transactional
@@ -53,6 +53,14 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
     public int updateIndicatorContent(Long indicateId, String version, IndicatorContentVO vo) throws ErrorException {
         //删除原有详细信息
         getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, indicateId));
+        //新增一条
         return addIndicatorContent(indicateId, version, vo);
+    }
+
+
+    @Override
+    public DssDatamodelIndicatorContent queryByIndicateId(Long indicateId) {
+        return getBaseMapper()
+                .selectOne(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, indicateId));
     }
 }

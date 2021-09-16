@@ -9,7 +9,10 @@ import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.IndicatorQueryMapper;
+import com.webank.wedatasphere.dss.datamodel.indicator.dto.IndicatorContentQueryDTO;
+import com.webank.wedatasphere.dss.datamodel.indicator.dto.IndicatorQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicator;
+import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorContent;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorQuery;
 import com.webank.wedatasphere.dss.datamodel.indicator.restful.IndicatorRestfulApi;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorContentService;
@@ -28,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 /**
  * @author helong
@@ -73,17 +75,21 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         }
 
         DssDatamodelIndicator org = getBaseMapper().selectById(id);
-        if (org==null){
+        if (org == null) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
         Long orgId = org.getId();
+        String verison = org.getVersion();
 
         //更新原有指标
-        DssDatamodelIndicator updateOne = modelMapper.map(vo,DssDatamodelIndicator.class);
+        DssDatamodelIndicator updateOne = modelMapper.map(vo, DssDatamodelIndicator.class);
         updateOne.setUpdateTime(new Date());
-        getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId,id));
+        int result = getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId, id));
+        if (result != 1) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
+        }
 
-        return 0;
+        return indicatorContentService.updateIndicatorContent(orgId, verison, vo.getContent());
     }
 
 
@@ -96,14 +102,33 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     public Message listIndicators(IndicatorQueryVO vo) {
         QueryWrapper<DssDatamodelIndicatorQuery> queryWrapper = new QueryWrapper<DssDatamodelIndicatorQuery>()
-                .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
-                .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
-                .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
-        IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
+                .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
+                .eq(vo.getIsAvailable() != null, "is_available", vo.getIsAvailable())
+                .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
+        IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
 
         return Message.ok()
-                .data("list",iPage
+                .data("list", iPage
                         .getRecords())
-                .data("total",iPage.getTotal());
+                .data("total", iPage.getTotal());
+    }
+
+
+    @Override
+    public Message queryById(Long id) throws DSSDatamodelCenterException {
+        DssDatamodelIndicator indicator = baseMapper.selectById(id);
+        if (indicator == null) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_QUERY_ERROR.getCode(), "indicator id " + id + " not exists");
+        }
+
+        DssDatamodelIndicatorContent content = indicatorContentService.queryByIndicateId(id);
+        if (content == null) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_QUERY_ERROR.getCode(), "indicator content id " + id + " not exists");
+        }
+
+        IndicatorQueryDTO indicatorQueryDTO = modelMapper.map(indicator, IndicatorQueryDTO.class);
+        IndicatorContentQueryDTO indicatorContentQueryDTO = modelMapper.map(content, IndicatorContentQueryDTO.class);
+        indicatorQueryDTO.setContent(indicatorContentQueryDTO);
+        return Message.ok().data("detail",indicatorQueryDTO);
     }
 }

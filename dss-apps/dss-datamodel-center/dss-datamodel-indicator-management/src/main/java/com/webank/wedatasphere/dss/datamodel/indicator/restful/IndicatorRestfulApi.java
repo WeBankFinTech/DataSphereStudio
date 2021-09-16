@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,5 +69,20 @@ public class IndicatorRestfulApi {
     public Response list(@Context HttpServletRequest req, @RequestBody IndicatorQueryVO vo){
         LOGGER.info("list vo : {}",vo);
         return Message.messageToResponse(indicatorService.listIndicators(vo));
+    }
+
+
+
+    /**
+     * 查看
+     * @param req
+     * @param id
+     * @return
+     */
+    @GET
+    @Path("/indicators/{id}")
+    public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+        LOGGER.info("query id : {}", id);
+        return Message.messageToResponse(Message.ok().data("detail",indicatorService.queryById(id)));
     }
 }

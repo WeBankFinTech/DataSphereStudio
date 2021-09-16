@@ -13,7 +13,7 @@
       >
         <div class="project-add">
           <Icon :size="32" type="ios-add"></Icon>
-          <span>新建/导入编排</span>
+          <span>新建编排</span>
         </div>
       </i-col>
 
@@ -42,7 +42,7 @@
                 <!-- <li v-if="!isPercent(subitem.orchestratorId)" class="list-item" @click.stop="publish(subitem)">{{$t('message.workflow.workflowItem.publish')}}</li> -->
               </ul>
             </div>
-            <Button size="small" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
+            <Button size="small" v-if="checkEditable(subitem)" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
             <Button size="small" @click.stop="detail(currentData.id, subitem)">{{$t('message.workflow.workflowItem.viewVersion')}}</Button>
           </div>
           <div class="mid-bar" :title="subitem.description">
@@ -119,7 +119,7 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 30, 45, 60]
+        opts: [10, 20, 30]
       },
       isToolbarShow: false,
       cardShowNum: 4,

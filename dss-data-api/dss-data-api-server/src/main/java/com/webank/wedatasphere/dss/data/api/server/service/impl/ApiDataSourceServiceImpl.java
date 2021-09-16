@@ -6,6 +6,8 @@ import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
 import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -13,13 +15,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 @Service
 public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, DataSource> implements ApiDataSourceService {
     @Resource
     private DataSourceMapper dataSourceMapper;
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiDataSourceServiceImpl.class);
 
     @Override
     public DataSource selectById(Integer datasourceId) {
@@ -48,13 +50,13 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
                 datasource.setPwd("***");
                 availableConns.add(datasource);
             } catch (Exception e) {
-                logger.warning(e.getMessage());
+                LOGGER.error(e.getMessage());
             } finally {
                 if (connection != null) {
                     try {
                         connection.close();
                     } catch (SQLException e) {
-                        logger.info(e.getMessage());
+                        LOGGER.info(e.getMessage());
                     }
                 }
             }
@@ -68,4 +70,20 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
     public void addDatasource(DataSource dataSource) {
         dataSourceMapper.addDatasource(dataSource);
     }
+
+    @Override
+    public List<DataSource> listAllDatasources(DataSource dataSource) {
+        return dataSourceMapper.listAllDatasources(dataSource);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        dataSourceMapper.deleteById(id);
+    }
+
+    @Override
+    public void editDatasource(DataSource dataSource) {
+        dataSourceMapper.editDatasource(dataSource);
+    }
+
 }

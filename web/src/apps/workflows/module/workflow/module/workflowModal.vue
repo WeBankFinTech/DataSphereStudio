@@ -14,7 +14,7 @@
           @cancel="ProjectMergeCancel"
           @confirm="ProjectMergeConfirm"></WorkflowFormNew>
       </Tab-pane>
-      <Tab-pane label="导入编排" name="upload">
+      <!-- <Tab-pane label="导入编排" name="upload">
         <Upload
           ref="uploadJson"
           type="drag"
@@ -33,7 +33,7 @@
             <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
           </div>
         </Upload>
-      </Tab-pane>
+      </Tab-pane> -->
     </Tabs>
   </Modal>
 </template>
@@ -111,7 +111,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
-      if (!params.projectId && !params.orchestratorMode) return
+      if (!params.projectId) return
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.flowList = res.page;
       })
@@ -150,13 +150,13 @@ export default {
       return flag;
     },
     initUpload() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
-      this.uploadData = {
-        projectName: this.$route.query.projectName,
-        projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
-        dssLabels: 'dev'
-      }
-      this.$refs.uploadJson.clearFiles();
+      // this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
+      // this.uploadData = {
+      //   projectName: this.$route.query.projectName,
+      //   projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
+      //   dssLabels: 'dev'
+      // }
+      // this.$refs.uploadJson.clearFiles();
     },
     // 手动上传
     handleUpload(file) {

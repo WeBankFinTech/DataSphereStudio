@@ -56,4 +56,7 @@ public interface ApiConfigMapper extends BaseMapper<ApiConfig> {
     Long getOfflineApiCnt(Long workspaceId);
 
     ApiInfo getApiInfo(Long apiId);
+
+    @Update("UPDATE dss_dataapi_config SET `is_test` = #{isTest} WHERE `id` = #{apiId}")
+    void updateApiTestStatus(@Param("apiId") int apiId,@Param("isTest") int isTest);
 }

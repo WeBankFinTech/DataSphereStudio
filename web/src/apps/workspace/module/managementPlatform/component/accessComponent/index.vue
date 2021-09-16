@@ -7,7 +7,7 @@
           <template v-for="(component, index) in topTapList">
             <div
               :key="component._id"
-              :class="{active:currentTab._id === component._id}"
+              :class="{ active: currentTab._id === component._id }"
               class="tab-item"
               ref="component_item"
             >
@@ -24,19 +24,16 @@
     </div>
     <!-- appmain -->
     <div class="access-component-appmain" v-if="topTapList.length">
-      <tab-item
-        :componentData="currentTab"
-        @on-save="saveComponent"
-      />
+      <tab-item :componentData="currentTab" @on-save="saveComponent" />
     </div>
   </div>
 </template>
 
 <script>
-import tabItem from './tab-item.vue'
-import weTab from './tabs.vue'
+import tabItem from "./tab-item.vue";
+import weTab from "./tabs.vue";
 export default {
-  name: 'accessComponent',
+  name: "accessComponent",
   components: {
     tabItem,
     weTab
@@ -49,35 +46,32 @@ export default {
     },
     currentTab: {
       type: null
-    },
+    }
   },
   data() {
-    return {
-
-    }
+    return {};
   },
   watch: {
     currentTab(newValue) {
-      console.log('watch currentTab');
       this.currentTab = newValue;
     }
   },
   methods: {
     removeComponent(tabData) {
-      this.$emit('handleTabRemove', tabData._id)
+      this.$emit("handleTabRemove", tabData._id);
     },
     onChooseComponent(tabData) {
-      this.$emit('bandleTapTab', tabData._id)
+      this.$emit("bandleTapTab", tabData._id);
     },
     saveComponent(componentItem) {
-      this.$emit('on-save', componentItem)
+      this.$emit("on-save", componentItem);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 .access-component-headers {
   padding: 0px $padding-25;
   border-bottom: $border-width-base $border-style-base $border-color-base;
@@ -96,21 +90,21 @@ export default {
   }
 }
 .tab-item {
-    display: inline-block;
+  display: inline-block;
+  height: 40px;
+  line-height: 40px;
+  @include font-color($title-color, $dark-text-color);
+  cursor: pointer;
+  min-width: 100px;
+  max-width: 200px;
+  overflow: hidden;
+  margin-right: 2px;
+  &.active {
     height: 40px;
-    line-height: 40px;
-    @include font-color($title-color, $dark-text-color);
-    cursor: pointer;
-    min-width: 100px;
-    max-width: 200px;
-    overflow: hidden;
-    margin-right: 2px;
-    &.active {
-        height: 40px;
-        color: $primary-color;
-        border-radius: 4px 4px 0 0;
-        border-bottom: 2px solid $primary-color;
-        line-height: 38px;
-    }
+    color: $primary-color;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid $primary-color;
+    line-height: 38px;
+  }
 }
 </style>

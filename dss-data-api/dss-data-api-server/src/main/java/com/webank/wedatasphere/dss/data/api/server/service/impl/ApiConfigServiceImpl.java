@@ -27,7 +27,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,6 +73,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 //        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
 //                .eq("id", id);
         if (id != null) {
+            if(apiConfig.getStatus() == 1){
+                throw new DataApiException("请先下线,测试通过后, 重新发布");
+            }
             apiConfig.setIsTest(0);
             this.updateById(apiConfig);
         } else {
@@ -133,7 +135,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if("MYSQL".equals(dataSourceType)){
                 dataSource.setClassName("com.mysql.jdbc.Driver");
             }
-
             apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
             if(isTest){
                 apiConfigMapper.updateApiTestStatus(apiConfig.getId(),1);
@@ -164,6 +165,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         }
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         if(apiConfig != null){
+            int status = apiConfig.getStatus();
+            if(status == 0){
+                throw new DataApiException("该服务已下线");
+            }
             long startTime = System.currentTimeMillis();
             apiCall.setApiId(apiConfig.getId().longValue());
             apiCall.setTimeStart(new Date(startTime));
@@ -309,7 +314,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 while (rs.next()) {
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
-                        jo.put(columnName,value == null ? null : value.toString() );
+                        jo.put(columnName,value == null ? null :value.toString() );
                     }
                     list.add(jo);
                 }
@@ -335,7 +340,6 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             }
             apiExecuteInfo.setResList(list);
         } catch (Exception e){
-            e.printStackTrace();
            logBuilder.append(e.getMessage());
            throw new DataApiException(logBuilder.toString());
         }finally {

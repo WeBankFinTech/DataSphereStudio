@@ -70,10 +70,10 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
 
     @Override
-    public Message queryDimensions(DimensionQueryVO vo) {
+    public Message listDimensions(DimensionQueryVO vo) {
         QueryWrapper<DssDatamodelDimension> queryWrapper = new QueryWrapper<DssDatamodelDimension>()
                 .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
-                .like(vo.getStatus()!=null,"is_available",vo.getStatus())
+                .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
         IPage<DssDatamodelDimension> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
 

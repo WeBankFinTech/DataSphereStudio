@@ -41,15 +41,9 @@
             <version>${linkis.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>2.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>0.7.5</version>
-            <scope>compile</scope>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-datamodel-center-common</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
     </dependencies>

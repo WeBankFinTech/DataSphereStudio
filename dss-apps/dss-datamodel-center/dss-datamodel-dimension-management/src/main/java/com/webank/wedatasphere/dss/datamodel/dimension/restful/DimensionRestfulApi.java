@@ -95,9 +95,9 @@ public class DimensionRestfulApi {
      * @return
      */
     @POST
-    @Path("/dimensions/query")
-    public Response query(@Context HttpServletRequest req,@RequestBody DimensionQueryVO vo){
-        LOGGER.info("query vo : {}",vo);
-        return Message.messageToResponse(dimensionService.queryDimensions(vo));
+    @Path("/dimensions/list")
+    public Response list(@Context HttpServletRequest req,@RequestBody DimensionQueryVO vo){
+        LOGGER.info("list vo : {}",vo);
+        return Message.messageToResponse(dimensionService.listDimensions(vo));
     }
 }

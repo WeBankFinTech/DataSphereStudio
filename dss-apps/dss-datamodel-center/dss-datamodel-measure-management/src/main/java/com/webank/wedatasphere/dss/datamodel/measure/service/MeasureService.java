@@ -51,5 +51,5 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param vo
      * @return
      */
-    Message queryMeasures(MeasureQueryVO vo);
+    Message listMeasures(MeasureQueryVO vo);
 }

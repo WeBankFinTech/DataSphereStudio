@@ -51,5 +51,5 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @param vo
      * @return
      */
-    Message queryDimensions(DimensionQueryVO vo);
+    Message listDimensions(DimensionQueryVO vo);
 }

@@ -2,7 +2,7 @@
   <div>
     <slot></slot>
     <div class="content-item">
-      <div v-if="checkCreate()"
+      <div v-if="canCreateProject"
         class="project-item project-header"
         @click="addProject">
         <Icon class="add-icon" type="md-add" size="20">
@@ -70,6 +70,7 @@
 import mixin from '@/common/service/mixin';
 import storage from '@/common/helper/storage';
 import {canCreate} from '@/common/config/permissions.js';
+import eventbus from '@/common/helper/eventbus';
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -114,10 +115,11 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 20, 30, 40]
+        opts: [10, 20, 30]
       },
       isToolbarShow: false,
       cardShowNum: 4,
+      canCreateProject: false
     };
   },
   mixins: [mixin],
@@ -141,6 +143,13 @@ export default {
       }
     }
   },
+  mounted() {
+    this.checkCreate();
+    eventbus.on('workspace.change', this.checkCreate);
+  },
+  beforeDestroy() {
+    eventbus.off('workspace.change', this.checkCreate);
+  },
   methods: {
     addProject() {
       this.$emit('addProject');
@@ -149,12 +158,13 @@ export default {
     selectAction(name) {
       console.log(name, 'name')
     },
-    checkCreate(){
-      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+    checkCreate(roles){
+      const workspaceRoles = roles || storage.get(`workspaceRoles`) || [];
       if (canCreate(workspaceRoles)) {
-        return true;
+        this.canCreateProject = true;
+      } else {
+        this.canCreateProject = false;
       }
-      return false;
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

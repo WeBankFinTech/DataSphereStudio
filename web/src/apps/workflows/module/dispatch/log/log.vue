@@ -10,19 +10,19 @@
       <div v-show="isLog || source === 'list'" class="log-pop">
         <div class="log-box" >
           <div class="title">
-            <span>{{$t('message.scheduler.viewLog')}}</span>
+            <span class="title-text">{{$t('message.scheduler.viewLog')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.downloadLog')">
-                <Icon custom="iconfont icon-download" size="20"></Icon>
+                <SvgIcon icon-class="download2" />
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.refreshLog')">
-                <Icon custom="iconfont icon-refresh" size="20"></Icon>
+                <SvgIcon icon-class="refresh" />
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.fullScreen')">
-                <Icon custom="iconfont icon-full-screen" size="20"></Icon>
+                <SvgIcon icon-class="full-screen" />
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.cancelScreen')">
-                <Icon custom="iconfont icon-cancel-full-screen" size="20"></Icon>
+                <SvgIcon icon-class="cancel-full-screen" />
               </a>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default {
      * Download log
      */
     _downloadLog () {
-      downloadFile('/dolphinscheduler/log/download-log', {
+      downloadFile('dolphinscheduler/log/download-log', {
         taskInstanceId: this.stateId || this.logId
       })
     },
@@ -251,7 +251,7 @@ export default {
         height: 50px;
         border-bottom: 1px solid #dcdedc;
         background-color: #FAFAFA;
-        span {
+        .title-text {
           font-size: 16px;
           color: #333;
           padding-left: 20px;
@@ -265,6 +265,7 @@ export default {
           a{
             color: #0097e0;
             margin-left: 15px;
+            font-size: 20px;
             em {
               font-size: 17px;
               font-weight: 400;

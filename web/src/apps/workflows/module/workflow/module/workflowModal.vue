@@ -7,13 +7,14 @@
     <Tabs value="form">
       <Tab-pane label="新建编排" name="form">
         <WorkflowFormNew
+          v-if="mergeModalShow"
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"
           @cancel="ProjectMergeCancel"
           @confirm="ProjectMergeConfirm"></WorkflowFormNew>
       </Tab-pane>
-      <Tab-pane label="导入编排" name="upload">
+      <!-- <Tab-pane label="导入编排" name="upload">
         <Upload
           ref="uploadJson"
           type="drag"
@@ -24,7 +25,7 @@
           :format="['zip']"
           :max-size="2001000"
           :action="uploadUrl">
-          <div style="padding: 120px 0">
+          <div class="upload-box">
             <Icon
               type="ios-cloud-upload"
               size="52"
@@ -32,7 +33,7 @@
             <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
           </div>
         </Upload>
-      </Tab-pane>
+      </Tab-pane> -->
     </Tabs>
   </Modal>
 </template>
@@ -110,6 +111,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
+      if (!params.projectId) return
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.flowList = res.page;
       })
@@ -148,13 +150,13 @@ export default {
       return flag;
     },
     initUpload() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
-      this.uploadData = {
-        projectName: this.$route.query.projectName,
-        projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
-        dssLabels: 'dev'
-      }
-      this.$refs.uploadJson.clearFiles();
+      // this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
+      // this.uploadData = {
+      //   projectName: this.$route.query.projectName,
+      //   projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
+      //   dssLabels: 'dev'
+      // }
+      // this.$refs.uploadJson.clearFiles();
     },
     // 手动上传
     handleUpload(file) {
@@ -177,3 +179,10 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+@import "@/common/style/variables.scss";
+.upload-box {
+  padding: 120px 0;
+  @include font-color(#515a6e, $dark-text-color);
+}
+</style>

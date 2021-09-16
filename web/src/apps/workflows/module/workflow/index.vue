@@ -116,7 +116,7 @@
             @cancel="ProjectMergeCancel"
             @confirm="ProjectMergeConfirm"></WorkflowFormNew>
         </Tab-pane>
-        <Tab-pane label="导入编排" name="upload">
+        <!-- <Tab-pane label="导入编排" name="upload">
           <Upload
             ref="uploadJson"
             type="drag"
@@ -135,7 +135,7 @@
               <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
             </div>
           </Upload>
-        </Tab-pane>
+        </Tab-pane> -->
       </Tabs>
     </Modal>
 
@@ -267,6 +267,9 @@ export default {
     });
   },
   methods: {
+    getUserName() {
+      return storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
+    },
     changeMode(val) {
       this.dataMapModule = val;
     },
@@ -284,6 +287,7 @@ export default {
     },
     // 获取所有分类和工作流
     getFlowData(params = {}) {
+      if (!params.projectId) return
       this.loading = true;
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, params, 'post').then((res) => {
         this.dataList[0].dwsFlowList = res.page;

@@ -1,0 +1,14 @@
+{
+  "message": {
+    "dataGovernance": {
+      "dataGovernance": "数据治理",
+      "dataAssets": "数据资产",
+      "dataOverview": "数据总览",
+      "dataAssetsIndex": "数据资产目录",
+      "overallMeasurement": "总体计量",
+      "menu": "目录",
+      "pleaseEnterATableName": "请输入表名/描述搜索数据库表",
+      "search": "搜索"
+    }
+  }
+}

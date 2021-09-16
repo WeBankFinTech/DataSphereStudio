@@ -264,7 +264,7 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        //target: "http://127.0.0.1:8088",
+        target: "http://127.0.0.1:8088",
         //target: 'http://127.0.0.1:9202', //yichao
         // target: "http://127.0.0.1:9202", //jiawei
         //target: 'http://192.168.9.119:9202', //tangHan

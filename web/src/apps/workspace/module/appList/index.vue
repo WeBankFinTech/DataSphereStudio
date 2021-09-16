@@ -18,7 +18,7 @@
         <div v-for="item in tabsApplication[actionIndex].appInstances" :key="item.name" class="pane-item" >
           <div class="item-main">
             <div class="app-title">
-              <SvgIcon class="app-icon" :icon-class="item.image" color="#000"/>
+              <SvgIcon class="app-icon" :icon-class="item.image"/>
               <span class="label" :title="item.title">{{item.title}}</span>
               <span class="text-button" @click="navTo(item, item.manualButtonUrl)">{{item.active ? $t('message.workspace.AppStore.demoCase') : $t('message.workspace.AppStore.comingSoon')}}</span>
             </div>
@@ -166,6 +166,7 @@ export default {
   line-height: 1;
   font-size: $font-size-large;
   margin-bottom: 20px;
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
 }
 .app-content {
   display: flex;
@@ -173,9 +174,16 @@ export default {
   .side-bar {
     flex-basis: 200px;
     border-right: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
     border-radius: $border-radius-small;
     z-index: 1;
     margin-right: 25px;
+    .left-menuItem {
+      @include bg-color($light-base-color, $dark-base-color);
+    }
+    .ivu-menu-item-active {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
   }
   .pane-wrap {
     flex: 1;
@@ -187,6 +195,7 @@ export default {
       height: 120px;
       border-radius: 2px;
       border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
       position: relative;
       padding-left: 20px;
       overflow: hidden;
@@ -200,7 +209,8 @@ export default {
         margin-top: 25px;
         font-size: 18px;
         line-height: 24px;
-        color: $text-title-color;
+        // color: $text-title-color;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         font-family: PingFangSC-Medium;
         .label {
           width: 120px;
@@ -210,7 +220,8 @@ export default {
           text-overflow: ellipsis;
           font-family: PingFangSC-Medium;
           font-size: 18px;
-          color: rgba(0,0,0,0.85);
+          // color: rgba(0,0,0,0.85);
+          @include font-color($workspace-title-color, $dark-workspace-title-color);
           line-height: 24px;
           vertical-align: middle;
         }
@@ -218,11 +229,13 @@ export default {
           font-size: 20px;
           line-height: 24px;
           vertical-align: middle;
+          @include font-color($workspace-title-color, $dark-workspace-title-color);
         }
         .text-button {
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: #2E92F7;
+          // color: #2E92F7;
+          @include font-color($primary-color, $dark-primary-color);
           line-height: 100%;
           vertical-align: middle;
           cursor: pointer;
@@ -237,10 +250,12 @@ export default {
       margin-top: 10px;
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0,0,0,0.65);
+      // color: rgba(0,0,0,0.65);
+      @include font-color($light-text-color, $dark-text-color);
       line-height: 22px;
       text-align: left;
       border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
       border-radius: 4px;
       cursor: pointer;
     }
@@ -251,12 +266,14 @@ export default {
       width: 100%;
       height: 100%;
       z-index: 3;
-      background: rgba(255,255,255,0.80);
+      // background: rgba(255,255,255,0.80);
+      @include bg-color(rgba(255,255,255,0.80), rgba(255,255,255,0.1));
       text-align: center;
       line-height: 116px;
       font-size: 21px;
       font-family: PingFangSC-Regular;
       color: rgba(0,0,0,0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
     .app-bgc {
       height: 100%;
@@ -276,6 +293,7 @@ export default {
   font-weight: bold;
   padding-left: 12px;
   border-left: 3px solid $primary-color;
+  @include border-color($primary-color, $dark-primary-color);
 }
 
 </style>

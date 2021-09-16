@@ -20,6 +20,7 @@ import api from '@/common/service/api';
 import storage from '@/common/helper/storage';
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
+import eventbus from '@/common/helper/eventbus';
 export default {
   name: 'dssMenu',
   mixins: [mixin],
@@ -87,6 +88,7 @@ export default {
       util.windowOpen(this.getFAQUrl());
     },
     clearCache() {
+      localStorage.setItem('cacheGuide', null)
       this.$Modal.confirm({
         title: this.$t('message.common.userMenu.title'),
         content: this.$t('message.common.userMenu.content'),
@@ -124,14 +126,31 @@ export default {
       window.location.reload();
     },
     changeTheme(){
+      document.querySelector('body').classList.add('notransition');
       if(localStorage.getItem('theme')==='dark'){
+        window.document.documentElement.setAttribute('data-theme', '')
         localStorage.setItem('theme', '');
-        // window.document.documentElement.setAttribute('data-theme', '')
+        eventbus.emit('monaco.change', 'light');
       }else {
+        window.document.documentElement.setAttribute('data-theme', 'dark')
         localStorage.setItem('theme', 'dark');
-        // window.document.documentElement.setAttribute('data-theme', 'dark')
+        eventbus.emit('monaco.change', 'dark');
       }
-      window.location.reload();
+      setTimeout(() => {
+        document.querySelector('body').classList.remove('notransition');
+      }, 1000);
+
+      this.menuList = this.menuList.map(i => {
+        if (i.id == 'changeTheme') {
+          return {
+            id: 'changeTheme',
+            name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
+            icon: 'md-repeat',
+          }
+        } else {
+          return i;
+        }
+      })
     }
   },
 };

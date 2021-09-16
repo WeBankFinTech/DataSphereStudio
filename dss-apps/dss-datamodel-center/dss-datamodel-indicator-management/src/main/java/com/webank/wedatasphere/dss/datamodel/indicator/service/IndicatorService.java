@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicator;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
@@ -47,4 +48,12 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @return
      */
     Message listIndicators(IndicatorQueryVO vo);
+
+
+    /**
+     * 查看
+     * @param id
+     * @return
+     */
+    Message queryById(Long id) throws DSSDatamodelCenterException;
 }

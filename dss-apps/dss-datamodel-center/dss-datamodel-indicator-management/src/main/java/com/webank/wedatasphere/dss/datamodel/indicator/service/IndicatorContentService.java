@@ -29,4 +29,12 @@ public interface IndicatorContentService extends IService<DssDatamodelIndicatorC
      * @throws ErrorException
      */
     int updateIndicatorContent(Long indicateId, String version, IndicatorContentVO vo) throws ErrorException;
+
+
+    /**
+     * 查看
+     * @param indicateId
+     * @return
+     */
+    DssDatamodelIndicatorContent queryByIndicateId(Long indicateId);
 }

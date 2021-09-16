@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.data.api.server.restful;
 
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiInfo;
+import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiManagerService;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +66,14 @@ public class DSSDbApiManagerRestful {
 
     @POST
     @Path("/online/{apiId}")
-    public Response onlineApi(@PathParam("apiId") Long apiId){
-        apiManagerService.onlineApi(apiId);
-        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
+    public Response onlineApi(@PathParam("apiId") Long apiId) throws DataApiException {
 
+        ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
+        if(apiInfo.getIsTest() == 0){
+            throw new DataApiException("请测试通过后,再上线");
+        }
+        apiManagerService.onlineApi(apiId);
+        apiInfo = apiManagerService.getApiInfo(apiId);
         Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);
         return Message.messageToResponse(message);
     }

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @program: dbApi
  * @description:
@@ -52,6 +54,9 @@ public class DataSource {
 
     @TableField(exist = false)
     String className;
+
+    @TableField
+    Date createTime;
 
     public Integer getDatasourceId() {
         return datasourceId;

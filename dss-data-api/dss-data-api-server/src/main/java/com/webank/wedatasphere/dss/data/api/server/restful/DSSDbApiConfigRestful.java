@@ -130,7 +130,7 @@ public class DSSDbApiConfigRestful {
     public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
 
         try {
-            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map);
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map,true);
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
         } catch (Exception exception) {

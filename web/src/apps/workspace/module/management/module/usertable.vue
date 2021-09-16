@@ -2,7 +2,7 @@
   <div class="user-serchbar-box">
     <h3 style="margin-bottom: 20px;" class="user-table-title">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
     <formserch
-      v-if="hasPermission()"
+      v-if="canAdd()"
       @click-serach="search"
       @click-creater="creater"
       :searchBar="searchBar"
@@ -22,9 +22,9 @@
         <span>{{row.office + '-' + row.department}}</span>
       </template>
       <template slot-scope="{ row, index }" slot="action">
-        <Button v-if="hasPermission(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
+        <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
         <Button
-          v-if="hasPermission(row)"
+          v-if="canEdit(row)"
           type="primary"
           size="small"
           style="margin-left: 10px"
@@ -144,7 +144,6 @@ export default {
       loading: true,
       row: '',
       loading1: false,
-      usernamelist: [],
       options: [],
       pageSetting: {
         total: 0,
@@ -183,7 +182,6 @@ export default {
     this.workspaceId =parseInt(this.$route.query.workspaceId);
   },
   mounted() {
-    this.username()
     this.init()
     GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
       this.workspaceData = data.workspace;
@@ -194,14 +192,40 @@ export default {
   methods: {
     isSuperAdmin(item){
       //管理+创建人才能赋权管理员权限
-      return item.roleId===1&&this.row.creator!==this.getUserName();
+      // return item.roleId===1&&this.row.creator!==this.getUserName();
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      return item.roleId===1 && !currentUser.isAdmin;
     },
-    hasPermission(row = {}){
+    canAdd(){
+      //管理员可以add
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (currentUser.isAdmin || workspaceRoles.indexOf('admin') > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    canDelete(row = {}){
       //创建者和超级管理员可以删除
       const currentUser = storage.get("baseInfo", 'local') || {};
       if (row.creator === currentUser.username || currentUser.isAdmin) {
         return true;
       } else {
+        return false;
+      }
+    },
+    canEdit(row = {}){
+      //创建者,超级管理员isAdmin,空间管理员可以edit(非isAdmin的空间管理员帐号不能修改其他空间管理员)
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      if (row.creator === currentUser.username || currentUser.isAdmin) {
+        return true;
+      } else {
+        // 非isAdmin的空间管理员帐号不能修改其他空间管理员
+        const workspaceRoles = storage.get(`workspaceRoles`) || [];
+        if (workspaceRoles.indexOf('admin') > -1 && row.roles.indexOf(1) == -1) {
+          return true;
+        }
         return false;
       }
     },
@@ -264,14 +288,6 @@ export default {
       }).catch(() => {
 
       });
-    },
-    username(){
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`,{
-      },'get').then((rst)=>{
-        rst.users.forEach(item=>{
-          this.usernamelist.push(item.username)
-        })
-      })
     },
     getColumns(){
       const column = [

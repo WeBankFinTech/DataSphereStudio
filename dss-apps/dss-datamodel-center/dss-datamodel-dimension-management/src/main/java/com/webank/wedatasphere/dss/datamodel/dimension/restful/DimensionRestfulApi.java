@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionAddVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionEnableVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionQueryVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,5 +100,19 @@ public class DimensionRestfulApi {
     public Response list(@Context HttpServletRequest req,@RequestBody DimensionQueryVO vo){
         LOGGER.info("list vo : {}",vo);
         return Message.messageToResponse(dimensionService.listDimensions(vo));
+    }
+
+
+    /**
+     * 查看
+     * @param req
+     * @param id
+     * @return
+     */
+    @GET
+    @Path("/dimensions/{id}")
+    public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+        LOGGER.info("query id : {}", id);
+        return Message.messageToResponse(Message.ok().data("detail",dimensionService.queryById(id)));
     }
 }

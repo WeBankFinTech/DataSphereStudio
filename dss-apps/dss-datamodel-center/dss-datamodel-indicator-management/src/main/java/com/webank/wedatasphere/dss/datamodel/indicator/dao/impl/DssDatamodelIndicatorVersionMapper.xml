@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorVersionMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorVersion">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_indicator_version-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="owner" jdbcType="VARCHAR" property="owner" />
+    <result column="principal_name" jdbcType="VARCHAR" property="principalName" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="version_context" jdbcType="LONGVARCHAR" property="versionContext" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `name`, `owner`, principal_name, version, version_context, create_time, update_time
+  </sql>
+</mapper>

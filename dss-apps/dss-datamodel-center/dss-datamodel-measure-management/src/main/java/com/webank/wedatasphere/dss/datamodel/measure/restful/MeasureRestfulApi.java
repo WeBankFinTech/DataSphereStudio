@@ -5,9 +5,8 @@ import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO;
-import com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService;
-import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +46,7 @@ public class MeasureRestfulApi {
     @Path("/measures")
     public Response add(@Context HttpServletRequest req, @RequestBody MeasureAddVO vo) throws IOException {
         LOGGER.info("measureAddVO : {}", vo);
+        String userName = SecurityFilter.getLoginUsername(req);
         return Message.messageToResponse(Message.ok().data("count", measureService.addMeasure(vo)));
     }
 
@@ -97,9 +97,9 @@ public class MeasureRestfulApi {
      * @return
      */
     @POST
-    @Path("/measures/query")
-    public Response query(@Context HttpServletRequest req,@RequestBody MeasureQueryVO vo){
-        LOGGER.info("query vo : {}",vo);
-        return Message.messageToResponse(measureService.queryMeasures(vo));
+    @Path("/measures/list")
+    public Response list(@Context HttpServletRequest req,@RequestBody MeasureQueryVO vo){
+        LOGGER.info("list vo : {}",vo);
+        return Message.messageToResponse(measureService.listMeasures(vo));
     }
 }

@@ -70,10 +70,10 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    public Message queryMeasures(MeasureQueryVO vo) {
+    public Message listMeasures(MeasureQueryVO vo) {
         QueryWrapper<DssDatamodelMeasure> queryWrapper = new QueryWrapper<DssDatamodelMeasure>()
                 .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
-                .like(vo.getStatus()!=null,"is_available",vo.getStatus())
+                .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
         IPage<DssDatamodelMeasure> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
 

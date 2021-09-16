@@ -1,10 +1,10 @@
-package com.webank.wedatasphere.dss.datamodel.dimension.vo;
+package com.webank.wedatasphere.dss.datamodel.indicator.vo;
 
 /**
  * @author helong
- * @date 2021/9/15
+ * @date 2021/9/16
  */
-public class DimensionQueryVO {
+public class IndicatorQueryVO {
 
     private Integer pageSize = 10;
 
@@ -54,16 +54,5 @@ public class DimensionQueryVO {
 
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    @Override
-    public String toString() {
-        return "DimensionQueryVO{" +
-                "pageSize=" + pageSize +
-                ", pageNum=" + pageNum +
-                ", name='" + name + '\'' +
-                ", isAvailable=" + isAvailable +
-                ", owner='" + owner + '\'' +
-                '}';
     }
 }

@@ -58,6 +58,7 @@
                   >
                 </Select>
               </FormItem>
+              <div class="dataSourceTip">如需新建数据源，请点击<div class="dataSourceLink" @click="gotoCreateDatasource">这里</div>创建</div>
               <FormItem
                 label="数据表名称"
                 prop="tblName"
@@ -988,6 +989,9 @@ export default {
           this.deleteSqlRow(index);
         }
       }
+    },
+    gotoCreateDatasource(){
+      this.$router.push({ name: 'dataSourceAdministration', query: { workspaceId: this.$route.query.workspaceId } })
     }
   }
 };
@@ -1135,6 +1139,20 @@ export default {
           color: rgba(0, 0, 0, 0.45);
           margin-left: 10px;
         }
+      }
+    }
+    .dataSourceTip{
+      padding-left: 90px;
+      margin-top: -12px;
+      font-size: 12px;
+      color: #515a6e;
+      padding-bottom: 10px;
+      .dataSourceLink{
+        display: inline-block;
+        cursor: pointer;
+        color:#2e92f7;
+        font-weight: 600;
+        padding: 0px 2px;
       }
     }
   }

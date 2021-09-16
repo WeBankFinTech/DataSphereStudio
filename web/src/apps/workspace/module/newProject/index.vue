@@ -189,6 +189,20 @@ export default {
     // 获取编排的数据
     GetDicSecondList(this.$route.query.workspaceId).then((res) => {
       this.orchestratorModeList = res.list
+      this.orchestratorModeList = {
+        ...this.orchestratorModeList,
+        list: this.orchestratorModeList.list.map(i => {
+          if (i.dicKey == 'pom_work_flow') {
+            // 编排模式暂时只支持工作流
+            return {
+              ...i,
+              enabled: true
+            }
+          } else {
+            return i;
+          }
+        })
+      }
     })
   },
   mounted() {
@@ -240,12 +254,13 @@ export default {
       this.init();
     },
     // 确认新增工程 || 确认修改
-    ProjectConfirm(projectData) {
+    ProjectConfirm(projectData, callback) {
       projectData.workspaceId = +this.$route.query.workspaceId;
       if (this.checkName(this.cacheData[0].dwsProjectList, projectData.name, projectData.id)) return this.$Message.warning(this.$t('message.workflow.projectDetail.nameUnrepeatable'));
       this.loading = true;
       if (this.actionType === 'add') {
         api.fetch(`${this.$API_PATH.PROJECT_PATH}createProject`, projectData, 'post').then(() => {
+          typeof callback == 'function' && callback();
           this.$Message.success(`${this.$t('message.workflow.projectDetail.createProject')}${this.$t('message.workflow.success')}`);
           this.getclassListData().then((data) => {
             // 新建完工程进到工作流页
@@ -254,13 +269,14 @@ export default {
               name: 'Workflow',
               query: {
                 ...this.$route.query,
-                projectID: currentProject.latestVersion.projectID,
+                projectID: currentProject.id,
                 projectName: currentProject.name,
                 notPublish: currentProject.notPublish
               }
             });
           });
         }).catch(() => {
+          typeof callback == 'function' && callback();
           this.loading = false;
         });
       } else {
@@ -279,9 +295,11 @@ export default {
           orchestratorModeList: projectData.orchestratorModeList
         }
         api.fetch(`${this.$API_PATH.PROJECT_PATH}modifyProject`, projectParams, 'post').then(() => {
+          typeof callback == 'function' && callback();
           this.$Message.success(this.$t('message.workflow.projectDetail.eidtorProjectSuccess', { name: projectParams.name }));
           this.getclassListData();
         }).catch(() => {
+          typeof callback == 'function' && callback();
           this.loading = false;
           this.currentProjectData.business = this.$refs.projectForm.originBusiness;
         });
@@ -388,6 +406,16 @@ export default {
       } else {
         this.dataList = storage.get('projectList', 'local');
       }
+      // 存储到storeage序列化会丢失权限canWrite等
+      this.dataList = this.dataList.map((item) => {
+        if (!id || id === item.id) {
+          item.dwsProjectList = item.dwsProjectList.map(item => {
+            setVirtualRoles(item, this.getUserName())
+            return item;
+          })
+        }
+        return item;
+      });
       this.sortTypeChange();
     },
     // 分类重名检查

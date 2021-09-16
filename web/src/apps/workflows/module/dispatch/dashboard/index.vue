@@ -2,6 +2,14 @@
   <m-list-construction :title="searchParams.projectId ? $t('message.scheduler.projectHome') : $t('message.scheduler.home')">
     <template slot="content">
       <div class="perject-home-content">
+        <!--<div class="project-select-model">
+          <Select v-model="projectId"
+                  @on-change="changeProject"
+                  style="width: 300px;float: right;margin-right: 10px;"
+          >
+            <Option v-for="item in projectList" :value="item.id" :key="item.id">{{item.name}}</Option>
+          </Select>
+        </div>-->
         <div class="time-model">
           <template>
             <Date-picker
@@ -54,7 +62,7 @@
 <script>
 import api from '@/common/service/api'
 import util from "@/common/util"
-import dayjs from 'dayjs'
+//import dayjs from 'dayjs'
 import mDefineUserCount from './source/defineUserCount'
 import mProcessStateCount from './source/processStateCount'
 import mTaskStatusCount from './source/taskStatusCount'
@@ -73,38 +81,65 @@ export default {
       projectName: this.$route.query.projectName,
       workspaceName: '',
       projectId: '',
-      dataTime: []
+      dataTime: [],
+      projectList: []
     }
   },
   props: {
 
   },
   methods: {
+    getFullName() {
+      for (let i = 0; i < this.projectList.length; i++) {
+        if (this.projectList[i].id === this.projectId) {
+          return this.projectList[i].name
+        }
+      }
+    },
+    changeProject() {
+      util.checkToken(() => {
+        this.getProjectId((id) => {
+          this.searchParams.projectId = id
+          this.searchParams.startDate = this.dataTime[0]
+          this.searchParams.endDate = this.dataTime[1]
+        })
+      })
+    },
     goToList() {
-      this.$emit('goToList', ...arguments)
+      if (this.getFullName() === `${this.workspaceName}-${this.projectName}`) {
+        this.$emit('goToList', ...arguments)
+      }
     },
     _datepicker (val) {
       this.searchParams.startDate = val[0]
       this.searchParams.endDate = val[1]
     },
     getProjectId(cb) {
-      let searchVal = `${this.workspaceName}-${this.projectName}`
-      api.fetch(`dolphinscheduler/projects/list-paging`, {
-        pageSize: 100,
-        pageNo: 1,
-        searchVal: searchVal
-      }, 'get').then(res => {
-        res.totalList.forEach(item => {
-          if (item.name === searchVal) {
-            return cb(item.id)
+      if (this.projectId) {
+        return cb(this.projectId)
+      } else {
+        let searchVal = `${this.workspaceName}-${this.projectName}`
+        api.fetch(`dolphinscheduler/projects/list-paging`, {
+          pageSize: 100,
+          pageNo: 1,
+          searchVal: ''
+        }, 'get').then(res => {
+          this.projectList = res.totalList
+          for (let i = 0; i < res.totalList.length; i++) {
+            if (res.totalList[i].name === searchVal) {
+              this.projectId = res.totalList[i].id
+              return cb(this.projectId)
+            }
           }
+          this.projectId = res.totalList.length ? res.totalList[0].id : ''
+          return cb(this.projectId)
         })
-      })
-    },
+      }
+    }
   },
   created () {
-    this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
-    this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    //this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
+    //this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
     GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
       this.workspaceName = data.workspace.name
       util.checkToken(() => {
@@ -126,10 +161,16 @@ export default {
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+@import '@/common/style/variables.scss';
   .perject-home-content {
     padding: 10px 20px;
     position: relative;
     width: 100%;
+    .project-select-model {
+      position: absolute;
+      left: 150px;
+      top: -40px;
+    }
     .time-model {
       position: absolute;
       right: 8px;
@@ -141,7 +182,8 @@ export default {
       line-height: 60px;
       span {
         font-size: 22px;
-        color: #333;
+        // color: #333;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         font-weight: bold;
       }
     }
@@ -150,6 +192,7 @@ export default {
     padding: 0 10px;
     table {
       width: 100%;
+      @include font-color($light-text-color, $dark-text-color);
       tr {
         td {
           height: 32px;

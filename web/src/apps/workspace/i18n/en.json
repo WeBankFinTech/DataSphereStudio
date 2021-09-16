@@ -84,6 +84,7 @@
       "failedNotice": "Invalid items found, please check and then retry!",
       "enterName": "Please enter the name",
       "nameLength": "The name length should not be greater than",
+      "descLength": "The description length should not be greater than",
       "validNameDesc": "Must starts with alphabetic characters, followed by only alphanumeric, underscore and Chinese characters",
       "project": "Project",
       "feedback": "Feedback",
@@ -96,7 +97,8 @@
         "demoCase": "Demo case",
         "comingSoon": "Coming soon"
       },
-      "permissions": "Department & User management"
+      "permissions": "Department & User management",
+      "managementPlatform":"Management Desk"
     },
     "workspaceManagemnet": {
       "waring": "Warning",
@@ -248,7 +250,9 @@
       "deleteTip": "Are you sure you want to delete this item?",
       "parentIdEmpty": "The parent cannot be empty",
       "deptEmpty": "The department name cannot be empty",
+      "deptTooLong": "The department name is too long and cannot exceed 50 characters",
       "invalidEmail": "Incorrect email format",
+      "invalidPhone": "Incorrect phone format",
       "noMatch": "No result matched",
       "addDeptSucess": "Add department success!",
       "addDeptFailed": "Add department failed!",
@@ -259,12 +263,15 @@
       "updateUserSucess": "Update user success!",
       "updateUserFailed": "Update user failed!",
       "nameEmpty": "The name cannot be empty",
+      "nameTooLong": "The name is too long and cannot exceed 50 characters",
       "userNameEmpty": "The userName cannot be empty",
+      "userNameTooLong": "The user name is too long and cannot exceed 50 characters",
       "passwordEmpty": "The password cannot be empty",
       "modifyPassword": "Modify user's Password",
       "inputPassword": "Please input user's new password:",
       "modifyPwdSuccess": "Modify password Success!",
-      "pwdCheckError": "Begin with a letter, must contain upper and lower case letters, numbers and special characters, and between 8 to 26 bits"
-    }
+      "pwdCheckError": "Begin with a letter, must contain upper and lower case letters, numbers and special characters, and between 8 to 26 bits",
+      "pwdKeyboardError": "The keyboard sequence cannot be three consecutive characters, such as 123,987, ABC,cba,qwe,poi, etc"
+    } 
   }
 }

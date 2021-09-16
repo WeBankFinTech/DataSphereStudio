@@ -151,7 +151,8 @@ export default {
 @import '@/common/style/variables.scss';
 .table-detail {
     height: 100%;
-    background: $table-thead-bg;
+    // background: $table-thead-bg;
+    @include bg-color($table-thead-bg, $dark-base-color);
     padding: 16px 10px 10px 16px;
     .table-detail-tabs {
         height: 100%;
@@ -200,19 +201,23 @@ export default {
                 width: 100%;
                 display: flex;
                 border: 1px solid #dcdee2;
+                @include border-color($border-color-base, $dark-border-color-base);
                 height: 46px;
                 line-height: 46px;
             }
             .field-list-header {
-                background-color: #5e9de0;
-                color: #fff;
+                // background-color: #5e9de0;
+                @include bg-color(#5e9de0, $dark-menu-base-color);
+                // color: #fff;
+                @include font-color(#fff, $dark-workspace-title-color);
                 font-weight: bold;
                 margin-top: 10px;
                 border: none;
             }
             .field-list-body {
                 border-bottom: none;
-                background: #fff;
+                // background: #fff;
+                @include bg-color($light-base-color, $dark-base-color);
             }
             .field-list-item {
                 width: 200px;

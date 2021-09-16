@@ -101,7 +101,7 @@
       </FormItem>
       <FormItem v-if="framework" :label="$t('message.workflow.projectDetail.orchestratorMode')" prop="orchestratorModeList">
         <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
-          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey">
+          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey" :disabled="!item.enabled">
             <span class="icon-bar">
               <SvgIcon class="icon-style" :icon-class="item.icon"/>
               <span style="margin-left: 10px">{{item.dicName}}</span>
@@ -135,6 +135,8 @@
       <Button
         type="primary"
         size="large"
+        :disabled="submiting"
+        :loading="submiting"
         @click="Ok">{{$t('message.workflow.ok')}}</Button>
     </div>
   </Modal>
@@ -201,6 +203,7 @@ export default {
       devProcessList: [],
       selectCompiling: [],
       projectDataCurrent: {},
+      submiting: false,
     };
   },
   computed: {
@@ -217,7 +220,7 @@ export default {
       return {
         name: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
           { validator: validateName, trigger: 'blur' }
         ],
@@ -261,17 +264,17 @@ export default {
       this.$emit('show', val);
     },
     projectData(value){
-      const handleCreateUser = (arr,createBy)=> {
-        const index = arr.indexOf(createBy);
-        if(index === -1){
-          arr.unshift(index);
-        }else {
-          arr.unshift(arr.splice(index)[0])
-        }
-      }
+      // const handleCreateUser = (arr,createBy)=> {
+      //   const index = arr.indexOf(createBy);
+      //   if(index === -1){
+      //     arr.unshift(index);
+      //   }else {
+      //     arr.unshift(arr.splice(index)[0])
+      //   }
+      // }
       const cloneObj = _.cloneDeep(value);
-      handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
-      handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
+      // handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
+      // handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
 
       this.projectDataCurrent = cloneObj;
     }
@@ -290,8 +293,11 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
-          this.$emit('confirm', this.projectDataCurrent);
-          this.ProjectShow = false;
+          this.submiting = true;
+          this.$emit('confirm', this.projectDataCurrent, () => {
+            this.ProjectShow = false;
+            this.submiting = false;
+          });
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

@@ -348,11 +348,12 @@ export default {
           }
         });
       }
+      const result = /^[a-zA-Z]+:\/\//.exec(this.currentNode.data.path) || [];
       this.$refs.upload.open({
         path: this.currentNode.data.path,
         nameList,
         apiPrefix: module.data.API_PATH,
-        type: PREFIX,
+        type: result[0] || PREFIX,
       });
     },
     handleCreate(node) {

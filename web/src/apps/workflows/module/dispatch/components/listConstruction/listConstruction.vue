@@ -43,10 +43,11 @@ export default {
 </script>
 
 <style lang="scss" rel="stylesheet/scss" scoped>
+@import '@/common/style/variables.scss';
   .content-title {
     padding-bottom: 17px;
     font-size: 16px;
-    color: rgba(0,0,0,0.65);
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
     line-height: 22px;
     font-weight: bolder;
   }

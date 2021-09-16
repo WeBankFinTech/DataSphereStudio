@@ -8,6 +8,7 @@
     .lable {
       flex-basis: 120px;
       text-align: center;
+      @include font-color($light-text-color, $dark-text-color);
     }
   }
   .search {

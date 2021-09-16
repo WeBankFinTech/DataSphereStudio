@@ -104,7 +104,7 @@ import Process from "./module.vue";
 import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
-
+import eventbus from '@/common/helper/eventbus';
 import DS from '@/apps/workflows/module/dispatch'
 
 export default {
@@ -133,7 +133,7 @@ export default {
             isChange: false,
             type: "workflow.subflow"
           },
-          key: "工作�?",
+          key: "工作流",
           isHover: false
         }
       ],
@@ -177,7 +177,7 @@ export default {
     // 判断是否有意编辑权限
     // 没有权限的和历史的都不可编辑
     checkEditable(item) {
-      // 编排权限由后台的priv字段判断�?1-查看�? 2-编辑�? 3-发布
+      // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
       if (item.editable && this.query.readonly !== 'true') {
         return true
       } else {
@@ -199,22 +199,27 @@ export default {
       this.showTip = false;
     },
     choose(index) {
+      if (index == 0) {
+        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'dev' });
+      } else {
+        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'scheduler' });
+      }
       this.active = index;
       this.updateProjectCacheByActive();
     },
     remove(index) {
-      // 如果删掉的是第一个tab，就返回上一�?
+      // 如果删掉的是第一个tab，就返回上一页
       if (index === 0) {
         this.$router.go(-1);
       }
-      // 删掉子工作流得删掉当前打�?的子节点
+      // 删掉子工作流得删掉当前打开的子节点
       const currentTab = this.tabs[index];
       // 找到当前关闭项对应的子类
       const subArray = this.openFiles[currentTab.key] || [];
       const changeList = this.tabs.filter(item => {
         return subArray.includes(item.key) && item.node.isChange;
       });
-      // 子工作流关闭时，查询是否有子节点没有保存，是否一起关�?
+      // 子工作流关闭时，查询是否有子节点没有保存，是否一起关闭
       if (changeList.length > 0 && currentTab.node.type === NODETYPE.FLOW) {
         let text = `<p>${this.$t("message.workflow.process.index.WBCSFGB")}</p>`;
         if (currentTab.node.isChange) {
@@ -226,9 +231,9 @@ export default {
           okText: this.$t("message.workflow.process.index.QRGB"),
           cancelText: this.$t("message.workflow.process.index.QX"),
           onOk: () => {
-            // 删除线先判断删除的是否是当前正在打开的tab，如果打�?到最后一个tab，如果没有打�?还是在当前的tab
+            // 删除线先判断删除的是否是当前正在打开的tab，如果打开到最后一个tab，如果没有打开还是在当前的tab
             if (this.active === index) {
-              // 删除的就是当前打�?�?
+              // 删除的就是当前打开的
               this.tabs.splice(index, 1);
               this.choose(this.tabs.length - 1);
             } else {
@@ -240,9 +245,9 @@ export default {
           onCancel: () => {}
         });
       } else {
-        // 删除线先判断删除的是否是当前正在打开的tab，如果打�?到最后一个tab，如果没有打�?还是在当前的tab
+        // 删除线先判断删除的是否是当前正在打开的tab，如果打开到最后一个tab，如果没有打开还是在当前的tab
         if (this.active === index) {
-          // 删除的就是当前打�?�?
+          // 删除的就是当前打开的
           this.tabs.splice(index, 1);
           this.choose(this.tabs.length - 1);
         } else {
@@ -283,11 +288,11 @@ export default {
         return;
       }
       const node = args[0][0];
-      // 如果节点已打�?，则选择
+      // 如果节点已打开，则选择
       for (let i = 0; i < this.tabs.length; i++) {
         if (this.tabs[i].key === node.key) return this.choose(i);
       }
-      // 目前的内部节点的supportJump为true，但是没有url,且不�?要创建弹�?
+      // 目前的内部节点的supportJump为true，但是没有url,且不需要创建弹窗
       if (node.supportJump && !node.shouldCreationBeforeNode && !node.jumpUrl) {
         const len = node.resources ? node.resources.length : 0;
         if (len && node.jobContent && node.jobContent.script) {
@@ -334,7 +339,7 @@ export default {
             });
           });
         } else {
-          // 如果节点是导入进来的，可能存在脚本内�?
+          // 如果节点是导入进来的，可能存在脚本内容
           let content = node.jobContent && node.jobContent.code ? node.jobContent.code : "";
           let params = {};
           params.variable = this.convertSettingParamsVariable({});
@@ -375,7 +380,7 @@ export default {
         });
         return;
       }
-      // iframe打开的节�?
+      // iframe打开的节点
       if (node.supportJump && node.jumpUrl) {
         let id = node.jobContent ? node.jobContent.id : "";
         this.getTabsAndChoose({
@@ -399,7 +404,7 @@ export default {
         data,
         isHover: false
       });
-      // 记录打开的tab的依赖关�?
+      // 记录打开的tab的依赖关系
       this.openFileAction(node);
       this.choose(this.tabs.length - 1);
       this.updateProjectCacheByTab();
@@ -409,7 +414,7 @@ export default {
       const currnentTab = this.tabs[this.active];
       if (Object.keys(this.openFiles).includes(currnentTab.key)) {
         Object.keys(this.openFiles).map(key => {
-          // 找到同一父节点下是否曾今已经打开�?
+          // 找到同一父节点下是否曾今已经打开过
           if (key == currnentTab.key) {
             if (!this.openFiles[key].includes(node.key)) {
               this.openFiles[key].push(node.key);
@@ -432,8 +437,8 @@ export default {
       this.saveNode(args, node, true);
     },
     saveNode(args, node, scriptisSave = true) {
-      // scriptisSave用来判断是否是脚本保存的触发和关联触�?
-      // 这个地方注意：在关联脚本、scriptis保存脚本、qualitis保存都会调用，参数不�?样，关联脚本args是对象，scriptis保存是arguments, qualitis保存过来的是空对象，�?以要处理�?
+      // scriptisSave用来判断是否是脚本保存的触发和关联触发
+      // 这个地方注意：在关联脚本、scriptis保存脚本、qualitis保存都会调用，参数不一样，关联脚本args是对象，scriptis保存是arguments, qualitis保存过来的是空对象，所以要处理下
       let resource = args;
       let currentNode = node;
       if (isArguments(args)) {
@@ -449,13 +454,13 @@ export default {
       if (!node.resources) {
         node.resources = [];
       }
-      // qualitis 过来是没有�?�的, 空对象传给后台会报错
+      // qualitis 过来是没有值的, 空对象传给后台会报错
       if (Object.keys(resource).length > 0) {
         if (
           node.resources.length > 0 &&
           node.resources[0].resourceId === resource.resourceId
         ) {
-          // 已保存过的直接替换，没有保存的首项追�?
+          // 已保存过的直接替换，没有保存的首项追加
           node.resources[0] = resource;
         } else {
           node.resources.unshift(resource);
@@ -464,7 +469,7 @@ export default {
       this.$refs.process.forEach(item => {
         item.json.nodes.forEach(subitem => {
           if (subitem.key === currentNode.key) {
-            // 在这里直接改originalData值，组件里并没有相应，所以改为触发组件事�?
+            // 在这里直接改originalData值，组件里并没有相应，所以改为触发组件事件
             item.updateOriginData(node, scriptisSave);
           }
         });
@@ -561,7 +566,7 @@ export default {
       });
     },
     changeTitle(val) {
-      // 地图模式下，名字为地图模式；�?新工作流可编辑时，名字为编辑模式；历史版本进去时，为只读模式
+      // 地图模式下，名字为地图模式；最新工作流可编辑时，名字为编辑模式；历史版本进去时，为只读模式
       if (val) {
         this.tabs[0].title = this.$t("message.workflow.process.index.DTMS");
       } else {

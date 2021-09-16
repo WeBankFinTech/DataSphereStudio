@@ -342,6 +342,9 @@ Execute.prototype.getResultList = function() {
         this.trigger('steps', 'FailedToGetResultList');
         logError(err, this);
       });
+  } else if (this.resultsetInfo) {
+    // insert等操作执行成功后返回的resultLocation为null的情况
+    this.trigger('steps', 'Completed');
   } else {
     this.trigger('notice', {
       type: 'error',

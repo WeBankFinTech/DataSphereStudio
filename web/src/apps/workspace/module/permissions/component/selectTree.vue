@@ -218,7 +218,7 @@ export default {
 .treeWrap {
   width: 300px;
   max-height: 300px;
-  background: #fff;
+  background: red;
   position: absolute;
   top: 58px;
   left: 100px;

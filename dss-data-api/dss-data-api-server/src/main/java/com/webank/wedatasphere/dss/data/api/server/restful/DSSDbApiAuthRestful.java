@@ -21,10 +21,12 @@ package com.webank.wedatasphere.dss.data.api.server.restful;
 
 
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
+import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiAuthService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +68,7 @@ public class DSSDbApiAuthRestful {
     @POST
     @Path("/save")
     public Response saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
-        //String userName = SecurityFilter.getLoginUsername(request);
-        String userName ="suyc";
+        String userName = SecurityFilter.getLoginUsername(request);
         if(apiAuth.getId() ==null) {
             String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
             apiAuth.setToken(token);
@@ -106,7 +107,7 @@ public class DSSDbApiAuthRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiAuth> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
+        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
         return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
     }
 

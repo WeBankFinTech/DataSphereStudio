@@ -132,7 +132,6 @@ export default {
     buttonText(val, old) {
       // 只有新旧值变化的时候才改变
       if (val.length > 0 && JSON.stringify(val) !== JSON.stringify(old)) {
-
         if (this.$route.name === 'Scheduler') {
           val.forEach(item => {
             if (item.dicValue === 'scheduler') {
@@ -146,7 +145,8 @@ export default {
       }
     },
     modeOfKey(val) {
-      this.currentButton = this.buttonText.find((item) => item.dicValue === val);
+      if (val)
+        this.currentButton = this.buttonText.find((item) => item.dicValue === val);
     }
   },
   methods: {

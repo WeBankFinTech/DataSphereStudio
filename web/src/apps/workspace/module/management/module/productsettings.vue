@@ -141,16 +141,23 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
   .information-box{
     width: 75%;
     padding: 10px 15px;
+    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+    h3 {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
+    }
     .information-table {
       width: 100%;
       text-align: center;
       padding: 10px 19px;
       /deep/ th.columnClass {
-        background-color: #515a6e;
-        color: #FFF;
+        // background-color: #515a6e;
+        @include bg-color(#515a6e, #f3f3f3);
+        // color: #FFF;
+        @include font-color(#FFFFFF, #000000);
       }
     };
     .information-setting,
@@ -158,6 +165,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       margin-left: 19px;
+      @include font-color($light-text-color, $dark-text-color);
       label{
         width: 50%;
         padding: 10px 0;

@@ -1,12 +1,13 @@
 @import '@/common/style/variables.scss';
 
 .page-bgc {
-  background: $workspace-background;
+  @include bg-color($workspace-background, $dark-workspace-background);
   min-height: 100%;
   .page-bgc-header {
     padding: 0px $padding-25 0;
-    background: $body-background;
+    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
     border-bottom: $border-width-base  $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-workspace-body-bg-color);
     .header-info {
       padding: 25px 0px 25px 0px;
       display: flex;
@@ -14,23 +15,25 @@
       align-items: center;
       .info-name {
         font-size: 21px;
-        color: $text-title-color;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         font-family: PingFangSC-Regular;
         &::after {
           content: '';
           border-right: 1px solid #DEE4EC;
           margin: 0 50px;
+          @include border-color(#DEE4EC, rgba(255,255,255,0.15));
         }
         .workspace-name {
           font-size: 24px;
-          color:#044B93;
+          // color:#044B93;
           font-family: PingFangSC-Medium;
+          @include font-color($workspace-name-color, $dark-workspace-name-color);
         }
       }
       p {
         font-family: PingFangSC-Regular;
         font-size: $font-size-base;
-        color: $text-desc-color;
+        @include font-color($light-text-color, $dark-text-color);
       }
     }
   }
@@ -38,6 +41,7 @@
     padding: $padding-25;
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     .workspace-main-left {
       flex: 10;
       min-height: 600px;
@@ -45,10 +49,13 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: flex-start;
+      // box-shadow: 0 1px 6px $shadow-color;
+      // border-color: #eee;
       border: $border-width-base  $border-style-base $border-color-base;
       min-height: 200px;
       width: 100%;
-      background: $body-background;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include border-color($border-color-base, $dark-workspace-body-bg-color);
       .workspace-create-search {
         padding: 0 35px;
         display: flex;
@@ -83,7 +90,10 @@
         font-weight: bold;
         padding-left: 12px;
         line-height: 1;
+        margin-bottom: 20px;
         border-left: 3px solid $primary-color;
+        @include border-color($primary-color, $dark-primary-color);
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
       }
     }
 
@@ -91,20 +101,25 @@
       flex: 3;
       min-width: 200px;
       padding: $padding-25;
+      min-height: 600px;
       margin-left: $padding-25;
-      background: $body-background;
       border: $border-width-base  $border-style-base $border-color-base;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include border-color($border-color-base, $dark-workspace-body-bg-color);
       .right-box {
         width: 100%;
         .line {
           margin: 20px 0;
           border-bottom: $border-width-base  $border-style-base $border-color-base;
+          @include border-color($border-color-base, $dark-border-color-base)
+
         }
       }
       .knowledge-list, .FAQ-list, .menu-list {
         margin-top: 10px;
         font-size: 12px;
-        color: $text-desc-color;
+        // color: $text-desc-color;
+        @include font-color($light-text-color, $dark-text-color);
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
@@ -133,11 +148,13 @@
       .title {
         font-size: $font-size-large ;
         font-weight: bold;
-        color: $text-title-color;
+        // color: $text-title-color;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         &::before {
           content: '';
           padding-right: 12px;
           border-left: 3px solid $primary-color;
+          @include border-color($primary-color, $dark-primary-color);
         }
       }
       .admin-box-video {
@@ -155,6 +172,7 @@
       }
       .video-item {
         background: #f2f2f2;
+        // margin-bottom: 20px;
         cursor: pointer;
         width: 200px;
       }
@@ -168,12 +186,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-bottom: 25px;
     .app-icon {
       font-size: 90px;
       height: 90px;
       line-height: 90px;
-      color: $primary-color;
+      // color: $primary-color;
+      @include font-color($primary-color, $dark-primary-color);
     }
     .app-item-add {
       width: 90px;
@@ -181,11 +199,14 @@
       margin: 00px 10px 10px 25px;
       cursor: pointer;
       font-size: 24px;
-      background: #F8F9FC;
+      // background: #F8F9FC;
+      @include bg-color(#F8F9FC, $dark-workspace-body-bg-color);
       border: 1px dashed #CFD7E1;
+      @include border-color(#CFD7E1, $dark-border-color-base);
       border-radius: 2px;
       line-height: 90px;
       text-align: center;
+      @include font-color($light-text-color, $dark-text-color);
     }
 
     .shadow {
@@ -196,21 +217,22 @@
     .app-item-wrap {
       display: flex;
       position: relative;
-      margin: 25px 20px 0 20px;
+      margin: 12.5px;
       cursor: pointer;
       // border: 1px solid rgb(245, 245, 245);
       border-radius: 3px;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
-      min-width: 112px;
+      width: 112px;
       height: 112px;
 
       .close-wrap {
         position: absolute;
         right: -10px;
         top: -10px;
-        color: $primary-color;
+        // color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
       }
 
       &:hover {
@@ -226,9 +248,10 @@
         height: 20px;
         font-family: PingFangSC-Regular;
         font-size: 16px;
-        color: rgba(0,0,0,0.85);
+        // color: rgba(0,0,0,0.85);
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         text-align: center;
-        max-width: 150px;
+        width: 100%;
         padding: 0 10px;
       }
     }
@@ -238,6 +261,7 @@
       height: 70px;
       line-height: 70px;
       text-align: center;
+      @include font-color($light-text-color, $dark-text-color);
     }
   }
   .setting-bt-wrap, .more-util {
@@ -247,6 +271,13 @@
     transform: translateY(-50%);
     font-size: 24px;
 
+    .ivu-btn {
+      @include border-color($border-color-base, $dark-border-color-base);
+      @include font-color($light-text-color, $dark-text-color);
+      &:hover {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
+    }
     &.ivu-btn-text {
       outline: none;
       border: none;
@@ -257,15 +288,18 @@
     width: 100%;
     .app-list-tabs {
       padding: 10px 25px 20px 25px;
-
       border-radius: $border-radius-base;
       height: 100%;
       position: relative;
       -webkit-transition: all .2s ease-in-out;
       transition: all .2s ease-in-out;
-      background-color: #fff;
+      // background-color: #fff;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      /deep/.ivu-tabs-nav {
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+      }
       .app-shop-top {
-        margin-top: 10px;
+        margin-top: 9px;
         margin-bottom: 20px;
       }
 

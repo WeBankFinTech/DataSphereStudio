@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="resource-page">
     <Spin
       v-if="loading"
       size="large"
@@ -25,11 +25,11 @@
       <!-- 应用列表标签 -->
       <div class="appListTag">
         <div class="tagName">
-          <span>{{$t('message.linkis.tableColumns.label')}}：</span>
+          <span class="tagLabel">{{$t('message.linkis.tableColumns.label')}}：</span>
           <Tag v-for="(item, index) in tagTitle" :key="index" color="primary">{{item}}</Tag>
         </div>
         <div class="resourceList">
-          <span>{{$t('message.linkis.resources')}}：</span>
+          <span class="tagLabel">{{$t('message.linkis.resources')}}：</span>
           <span v-if="applicationList.usedResource">
             <Tag color="success">{{`${calcCompany(applicationList.usedResource.cores)}vcores,${calcCompany(applicationList.usedResource.memory, true)}G`}}(used)</Tag>
             <Tag color="error">{{`${calcCompany(applicationList.maxResource.cores)}vcores,${calcCompany(applicationList.maxResource.memory, true)}G`}}(max)</Tag>
@@ -56,6 +56,10 @@
         </template>
         <template slot-scope="{row}" slot="startTime">
           <span>{{ timeFormat(row) }}</span>
+        </template>
+        <template slot-scope="{row}" slot="action">
+          <Button @click="stopEngine(row)" :disabled="row.isStop" :loading="row.isStop" type="error" size="small" style="margin-right:5px;">{{$t('message.linkis.stop')}}</Button>
+          <Button @click="editEngine(row)" type="primary" size="small">{{$t('message.linkis.tagEdit')}}</Button>
         </template>
       </Table>
       <div class="page-bar">
@@ -228,67 +232,7 @@ export default {
           width: '215',
           fixed: 'right',
           align: 'center',
-          render: (h, params) => {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'error',
-                  size: 'small',
-                  disabled: params.row.isStop
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  click: () => {
-                    this.$Modal.confirm({
-                      title: this.$t('message.linkis.stop'),
-                      content: '请问确认要停止当前引擎？',
-                      onOk: () => {
-                        let data = [];
-                        data.push({
-                          engineType: 'EngineConn', // 当期需求是写死此参数
-                          engineInstance: params.row.instance,
-                        });
-                        api.fetch(`/linkisManager/rm/enginekill`, data).then(() => {
-                          // 由于引擎关闭有延迟所以记录引擎，做前端列表筛选，刷新页面或刷新
-                          this.stopList.push(params.row.instance);
-                          this.initExpandList();
-                          this.$Message.success({
-                            background: true,
-                            content: 'Stop Success！！'
-                          });
-                        }).catch((err) => {
-                          console.err(err)
-                        });
-                      }
-                    })
-                  }
-                }
-              }, this.$t('message.linkis.stop')),
-              h('Button', {
-                props: {
-                  type: 'primary',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    return this.$Message.success({
-                      background: true,
-                      content: '暂未开放！！'
-                    });
-                    // 待开启
-                    // this.isTagEdit = true;
-                    // let obj = {};
-                    // obj.engineInstance = params.row.engineInstance;
-                    // obj.label = params.row.label;
-                    // obj.status = params.row.status;
-                    // this.formItem = Object.assign(this.formItem, obj)
-                  }
-                }
-              }, this.$t('message.linkis.tagEdit'))
-            ]);
-          }
+          slot: 'action'
         }
       ],
     }
@@ -307,6 +251,63 @@ export default {
     this.initExpandList();
   },
   methods: {
+    stopEngine(row) {
+      this.$Modal.confirm({
+        title: this.$t('message.linkis.stop'),
+        content: '请问确认要停止当前引擎？',
+        onOk: () => {
+          this.tableData = this.tableData.map(i => {
+            if (i.instance == row.instance) {
+              return {
+                ...i,
+                isStop: true
+              }
+            } else {
+              return i;
+            }
+          })
+          let data = [];
+          data.push({
+            engineType: 'EngineConn', // 当期需求是写死此参数
+            engineInstance: row.instance,
+          });
+          api.fetch(`/linkisManager/rm/enginekill`, data).then(() => {
+            // 由于引擎关闭有延迟所以记录引擎，做前端列表筛选，刷新页面或刷新
+            this.tableData = this.tableData.map(i => {
+              if (i.instance == row.instance) {
+                return {
+                  ...i,
+                  isStop: false
+                }
+              } else {
+                return i;
+              }
+            })
+            this.stopList.push(row.instance);
+            this.initExpandList();
+            this.$Message.success({
+              background: true,
+              content: 'Stop Success！！'
+            });
+          }).catch((err) => {
+            console.err(err)
+          });
+        }
+      })
+    },
+    editEngine(row) {
+      return this.$Message.success({
+        background: true,
+        content: '暂未开放！！'
+      });
+      // 待开启
+      // this.isTagEdit = true;
+      // let obj = {};
+      // obj.engineInstance = params.row.engineInstance;
+      // obj.label = params.row.label;
+      // obj.status = params.row.status;
+      // this.formItem = Object.assign(this.formItem, obj)
+    },
     // 刷新进度条
     refreshResource() {
       this.stopList = []; // 初始化停止列表，由于引擎关闭有延迟固设置此参数做判断
@@ -337,7 +338,7 @@ export default {
         // 获取使用的引擎资源列表
         let enginesList = engines.userResources || [];
         enginesList.forEach((userItem, userIndex) => {
-          userItem.id = new Date().valueOf() + userIndex * 1000; // 设置唯一id,将时间多乘以2000防止运行过慢导致的id重复
+          userItem.id = Date.now() + userItem.userCreator + userIndex;
           userItem.expand = userIndex === 0 ? true : false;
           userItem.title = userItem.userCreator;
           // 统计获取使用量和未使用量的总量数据
@@ -378,7 +379,7 @@ export default {
             engineItem.percent =  max;
             engineItem.expand = false;
             engineItem.title = engineItem.engineType;
-            engineItem.id = new Date().valueOf() + (engineIndex + 1 + userIndex ) * 2000; // 设置唯一id,将时间多乘以2000防止运行过慢导致的id重复
+            engineItem.id = userItem.id + engineItem.engineType + engineIndex; // 子id = 父id + 子属性
           })
           // 计算各个总量的比例
           let usedResourceMemoryTotalPercent = leftResourceMemoryTotal === 0 ? 0 : (usedResourceMemoryTotal / (usedResourceMemoryTotal + leftResourceMemoryTotal)).toFixed(2);
@@ -489,10 +490,18 @@ export default {
 
 <style src="./index.scss" lang="scss" scoped></style>
 <style lang="scss" scoped>
+@import '~@/common/style/variables.scss';
+.resource-page {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-y: overlay;
+}
   .noData {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%)
+    transform: translate(-50%,-50%);
+    @include font-color($light-text-color, $dark-text-color);
   }
 </style>

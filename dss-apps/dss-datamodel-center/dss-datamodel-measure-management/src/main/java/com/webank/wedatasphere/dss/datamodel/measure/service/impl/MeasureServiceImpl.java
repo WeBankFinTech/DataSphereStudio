@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper;
 import com.webank.wedatasphere.dss.datamodel.measure.dto.MeasureQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure;
@@ -84,5 +86,15 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
                         .map(dssDatamodelMeasure -> modelMapper.map(dssDatamodelMeasure, MeasureQueryDTO.class))
                         .collect(Collectors.toList()))
                 .data("total",iPage.getTotal());
+    }
+
+
+    @Override
+    public MeasureQueryDTO queryById(Long id) throws DSSDatamodelCenterException {
+        DssDatamodelMeasure dssDatamodelMeasure = getBaseMapper().selectById(id);
+        if (dssDatamodelMeasure == null){
+            throw new DSSDatamodelCenterException(ErrorCode.MEASURE_QUERY_ERROR.getCode(), "measure id " +id +" not exists");
+        }
+        return modelMapper.map(dssDatamodelMeasure,MeasureQueryDTO.class);
     }
 }

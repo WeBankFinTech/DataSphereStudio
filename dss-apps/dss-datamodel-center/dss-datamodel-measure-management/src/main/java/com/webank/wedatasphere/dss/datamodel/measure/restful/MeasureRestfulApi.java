@@ -1,10 +1,12 @@
 package com.webank.wedatasphere.dss.datamodel.measure.restful;
 
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -76,6 +78,20 @@ public class MeasureRestfulApi {
     public Response update(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody MeasureUpdateVO vo) {
         LOGGER.info("update id : {}, vo : {}", id, vo);
         return Message.messageToResponse(Message.ok().data("count",measureService.updateMeasure(id,vo)));
+    }
+
+
+    /**
+     * 查看
+     * @param req
+     * @param id
+     * @return
+     */
+    @GET
+    @Path("/measures/{id}")
+    public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+        LOGGER.info("query id : {}", id);
+        return Message.messageToResponse(Message.ok().data("detail",measureService.queryById(id)));
     }
 
     /**

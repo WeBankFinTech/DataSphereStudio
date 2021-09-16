@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper;
 import com.webank.wedatasphere.dss.datamodel.dimension.dto.DimensionQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
@@ -13,6 +15,7 @@ import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionAddVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionEnableVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionQueryVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -84,5 +87,15 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
                         .map(dssDatamodelDimension -> modelMapper.map(dssDatamodelDimension, DimensionQueryDTO.class))
                         .collect(Collectors.toList()))
                 .data("total",iPage.getTotal());
+    }
+
+
+    @Override
+    public DimensionQueryDTO queryById(Long id) throws ErrorException {
+        DssDatamodelDimension dssDatamodelDimension = getBaseMapper().selectById(id);
+        if (dssDatamodelDimension == null){
+            throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_QUERY_ERROR.getCode(), "dimension id " +id +" not exists");
+        }
+        return modelMapper.map(dssDatamodelDimension,DimensionQueryDTO.class);
     }
 }

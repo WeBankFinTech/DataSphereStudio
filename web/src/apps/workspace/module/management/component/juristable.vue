@@ -1,17 +1,17 @@
 <template>
   <div>
     <div v-for="item in tablearr" :key="item.title">
-      <h3 style="margin:20px 0px 10px;">{{item.title}}</h3>
+      <h3 class="menu-permission-title" style="margin:20px 0px 10px;">{{item.title}}</h3>
       <div style="overflow: auto;">
         <Table :style="width(item.columns)" border highlight-row  :columns="item.columns" :data="item.datalist">
           <template style="color:#4ACA6D" slot-scope="{ row, index }" slot="action">
-            <Button type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
+            <Button v-if="isAdmin()" type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagemnet.editor')}}</Button>
           </template>
         </Table>
       </div>
     </div>
     <div  v-if="homepagedata && homepagedata.datalist.length" class="hoempage-table">
-      <h3 style="margin:10px 0px;">{{$t('message.workspaceManagemnet.homeSetting')}}</h3>
+      <h3 style="margin:10px 0px;" class="menu-permission-title">{{$t('message.workspaceManagemnet.homeSetting')}}</h3>
       <Table border highlight-row :columns="homepagedata.column" :data="homepagedata.datalist">
         <template style="color:#4ACA6D"  slot="action">
           <Button type="warning" size="small" disabled>{{$t('message.workspaceManagemnet.editor')}}</Button>
@@ -28,11 +28,6 @@
         <FormItem :label="$t('message.workspaceManagemnet.menuPermissions')" :label-width="85">
           <Checkbox-group v-model="useradd.menuPrivs">
             <Checkbox v-for="item in workspaceMenu.menuPrivVOS" :key="item.id" :label="item.id">{{item.name}}</Checkbox>
-          </Checkbox-group>
-        </FormItem>
-        <FormItem v-if="workspaceMenu.componentPrivVOS.length" :label="$t('message.workspaceManagemnet.componentAccessPermissions')" :label-width="85">
-          <Checkbox-group v-model="useradd.componentPrivs">
-            <Checkbox  v-for="item in workspaceMenu.componentPrivVOS" :key="item.id" :label="item.id">{{item.name}}</Checkbox>
           </Checkbox-group>
         </FormItem>
       </Form>
@@ -63,6 +58,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
+import storage from "@/common/helper/storage";
 export default {
   props: {
     workspaceMenu: Object,
@@ -77,8 +73,7 @@ export default {
       workspaceId: '',
       useradd: {
         roleName: '',
-        menuPrivs: [],
-        componentPrivs: []
+        menuPrivs: []
       },
       originBusiness: {},
       addrule: {
@@ -94,7 +89,7 @@ export default {
     titlename(){
       let title = `${this.$t('message.workspaceManagemnet.permissionsEditor')}·${this.userlist.name}`
       return title
-    },
+    }
   },
   created(){
     this.workspaceId =parseInt(this.$route.query.workspaceId)
@@ -103,6 +98,15 @@ export default {
     this.gethomepagedata()
   },
   methods: {
+    isAdmin(){
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (currentUser.isAdmin || workspaceRoles.indexOf('admin') > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     gethomepagedata(){
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceHomepageSettings`, {
         workspaceId: this.workspaceId,
@@ -189,7 +193,6 @@ export default {
         if(valid){
           const params = {
             menuIds: this.useradd.menuPrivs,
-            componentIds: this.useradd.componentPrivs,
             workspaceId: this.workspaceId,
             roleName: this.useradd.roleName
           }
@@ -209,10 +212,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
+  .menu-permission-title {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
   .modify-model{
     display: flex;
     flex-wrap: wrap;
-    height: 64px;
     align-items: center;
     label{
       width: 100px

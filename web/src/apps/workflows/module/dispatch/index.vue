@@ -12,9 +12,6 @@
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
           <template>
-            <!--<div class="scheduler-list-title">-->
-              <!--<span>{{$t('message.scheduler.dashboard')}}</span>-->
-            <!--</div>-->
             <dashboard @goToList="goToList"></dashboard>
           </template>
         </div>
@@ -46,29 +43,31 @@
           <template v-if="!showGantt">
             <div class="scheduler-list-title">
               <span>{{$t('message.scheduler.processInstance')}}</span>
-              <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
+              <div class="fr">
+                <Input v-model="searchVal" style="width: auto;float: right" @on-enter="activeList(2)">
                 <Icon type="ios-search" slot="suffix" @click="activeList(2)" style="cursor: pointer;"/>
-              </Input>
-              <template>
-                <Date-picker
-                  style="width: 350px;float: right;margin-right: 10px;"
-                  v-model="dateTime"
-                  type="datetimerange"
-                  @on-ok="_datepicker"
-                  range-separator="-"
-                  :start-placeholder="$t('message.scheduler.runTask.startDate')"
-                  :end-placeholder="$t('message.scheduler.runTask.endDate')"
-                  format="yyyy-MM-dd HH:mm:ss">
-                </Date-picker>
-                <Select v-model="instanceStateType"
-                  @on-change="_changeInstanceState"
-                  :placeholder="$t('message.scheduler.selectState')"
-                  style="width: 150px;float: right;margin-right: 10px;"
-                >
-                  <Option value="" key="-">-</Option>
-                  <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
-                </Select>
-              </template>
+                </Input>
+                <template>
+                  <Date-picker
+                    style="width: 350px;float: right;margin-right: 10px;"
+                    v-model="dateTime"
+                    type="datetimerange"
+                    @on-ok="_datepicker"
+                    range-separator="-"
+                    :start-placeholder="$t('message.scheduler.runTask.startDate')"
+                    :end-placeholder="$t('message.scheduler.runTask.endDate')"
+                    format="yyyy-MM-dd HH:mm:ss">
+                  </Date-picker>
+                  <Select v-model="instanceStateType"
+                          @on-change="_changeInstanceState"
+                          :placeholder="$t('message.scheduler.selectState')"
+                          style="width: 150px;float: right;margin-right: 10px;"
+                  >
+                    <Option value="" key="-">-</Option>
+                    <Option v-for="item in tasksStateList" :value="item.code" :key="item.id">{{item.desc}}</Option>
+                  </Select>
+                </template>
+              </div>
             </div>
             <Table class="scheduler-table" :columns="columns2" :data="list2"></Table>
             <Page
@@ -928,25 +927,25 @@ export default {
       },
       pagination: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination2: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination3: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
       pagination5: {
         size: 10,
-        opts: [5, 10, 30, 45, 60],
+        opts: [10, 20, 30, 40],
         current: 1,
         total: 0
       },
@@ -1133,21 +1132,24 @@ export default {
       })
     },
     openTiming(index, isEdit) {
-      let id
+      let id, tempData = {}
       if (isEdit) {
-        this.timingData.item = index
-        this.timingData.type = ''
+        tempData.item = index
+        tempData.type = ''
         id = index.processDefinitionId
       } else {
-        this.timingData.item = this.list[index]
-        this.timingData.type = 'timing'
+        tempData.item = this.list[index]
+        tempData.type = 'timing'
         id = this.list[index].id
       }
       this.getReceiver(id, (res) => {
-        this.timingData.item.receivers = res.receivers
-        this.timingData.item.receiversCc = res.receiversCc
+        this.timingData.item = {
+          ...tempData.item,
+          receivers: res.receivers,
+          receiversCc: res.receiversCc
+        }
+        this.showTimingTaskModal = true
       })
-      this.showTimingTaskModal = true
     },
     _copy(index) {
       api.fetch(`dolphinscheduler/projects/${this.projectName}/process/copy`, {
@@ -1278,6 +1280,7 @@ export default {
     },
     setTiming() {
       this.showTimingTaskModal = false
+      this.activeList(3)
     },
     closeTiming() {
       this.showTimingTaskModal = false
@@ -1311,7 +1314,11 @@ export default {
       } else if (this.activeDS === 3) {
         this.getSchedulerData()
       } else if (this.activeDS === 4) {
-        console.log('运维大屏')
+        this.activeDS = 0
+        this.$nextTick(() => {
+          this.activeDS = 4
+        })
+
       } else if (this.activeDS === 5) {
         if (data) {
           if (data.startDate && data.endDate) {
@@ -1484,7 +1491,7 @@ export default {
         executeType: param.executeType
       }, {useFormQuery: true}).then(() => {
         this.list2[param.index].disabled = true
-        this.$Message.success(this.$t('message.scheduler.runTask.success'))
+        this.$Message.success(this.$t('message.scheduler.runTask.operationSuccess'))
         setTimeout(() => {
           this.list2[param.index].disabled = false
           this.getInstanceListData()
@@ -1565,60 +1572,68 @@ export default {
 <style lang="scss">
   a {
     color: #2d8cf0;
-    &:hover {
-      color: #57a3f3;
-    }
+  &:hover {
+     color: #57a3f3;
+   }
   }
 </style>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .scheduler-center{
   position: relative;
   overflow: hidden;
   .scheduler-wrapper{
     padding-top: 0;
-    .scheduler-menu{
-      min-height: 80vh;
-    }
-    .scheduler-list{
-      min-height: 80vh;
-    }
+  .scheduler-menu{
+    min-height: 80vh;
+  }
+  .scheduler-list{
+    min-height: 80vh;
+  }
   }
 }
 .scheduler-wrapper{
-  background-color: white;
+  @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
   min-height: 80vh;
-  padding-top: 16px;
+  // padding-top: 16px;
   float: left;
   width: 100%;
+
   .scheduler-menu{
     float: left;
     width: 250px;
+    padding-top: 16px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
+    border-right: 1px solid #DEE4EC;
+    border-left: 1px solid #DEE4EC;
+    @include border-color($border-color-base, $dark-workspace-background);
+    @include bg-color($light-base-color, $dark-base-color);
+    @include font-color($light-text-color, $dark-text-color);
     li {
     padding: 0 40px;
     cursor: pointer;
     line-height: 40px;
     &:hover{
-       color: #2E92F7;
+       @include font-color($primary-color, $dark-primary-color);
      }
     &.active{
-       background-color: #ECF4FF;
-       color: #2E92F7;
-       border-right: 3px solid  #2E92F7
+       @include bg-color($active-menu-item, $dark-active-menu-item);
+       border-right: 3px solid  #2E92F7;
+       @include font-color($primary-color, $dark-primary-color);
+       @include border-color($primary-color, $dark-primary-color);
      }
     }
   }
   .scheduler-list{
     float: left;
     padding: 10px 25px;
-    border-left: 1px solid #DEE4EC;
     min-height: calc(80vh - 16px);
     width: calc(100% - 250px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;
-      color: rgba(0,0,0,0.65);
+      @include font-color($light-text-color, $dark-text-color);
       line-height: 22px;
       font-weight: bolder;
     }
@@ -1631,7 +1646,7 @@ export default {
   .left-panel{
     height: 80vh;
     width: calc(100vw - 250px - 65px - 250px);
-    background: #FFFFFF;
+    @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
     position: absolute;
     left: 100vw;
     z-index: 99;
@@ -1643,6 +1658,7 @@ export default {
     }
     .dag-page{
       border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
       width: 100%;
       height: 100%;
     }
@@ -1665,7 +1681,19 @@ export default {
   .page-bar {
     margin-top: 20px;
   }
-}
+  }
+</style>
+<style lang="scss">
+  .right-menu {
+    position: fixed;
+    width: 90px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    visibility: hidden;
+    z-index: 99
+  }
 </style>
 <style lang="scss">
   .right-menu {

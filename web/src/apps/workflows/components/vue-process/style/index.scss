@@ -16,7 +16,7 @@
  */
 
 @import "normalize";
-
+@import '@/common/style/variables.scss';
 $title-color : #464c5b;
 $text-color : #657180;
 $sub-text-color : #999;
@@ -44,6 +44,9 @@ $box-shadow-base : $shadow-1-down;
 
 $mask-color: rgba(55, 55, 55, .6);
 
+::-webkit-scrollbar-thumb {
+    @include bg-color(#cdcdcd, #474E5D);
+}
 .designer {
     position: relative;
     width: 100%;
@@ -52,8 +55,8 @@ $mask-color: rgba(55, 55, 55, .6);
     user-select: none;
     outline: none;
     font-size: 12px;
-    color: $text-color;
-    background: #fff;
+    @include font-color($text-color, $dark-workflow-font-color);
+    @include bg-color(#fff, $dark-workflow-bg-color);
 
     * {
         box-sizing: border-box;
@@ -72,11 +75,12 @@ $mask-color: rgba(55, 55, 55, .6);
         line-height: 26px;
         padding: 0 8px;
         border: 1px solid $border-color-base;
+        @include border-color($border-color-base, rgba(255, 255, 255, 0.2));
         outline: 0;
         font-size: 12px;
         border-radius: 2px;
-        color: $text-color;
-        background-color: $tooltip-color;
+        @include font-color($text-color, $dark-workflow-font-color);
+        @include bg-color($tooltip-color, $dark-workflow-bg-color);
     }
 
     .designer-button {
@@ -90,16 +94,16 @@ $mask-color: rgba(55, 55, 55, .6);
         width: 100%;
         height: 36px;
         padding-left: 10px;
-        background: $background-color-base;
-        color: #000;
+        @include bg-color($background-color-base, $dark-workflow-bg-color);
         border: 1px solid $border-color-base;
+        @include border-color($border-color-base, $dark-base-color);
 
         .icon {
             display: inline-block;
             vertical-align: text-top;
             width: 18px;
             height: 18px;
-            color: $dark-color;
+            @include font-color($dark-color, rgba(255,255,255,0.65));
             text-align: center;
         }
 
@@ -119,9 +123,10 @@ $mask-color: rgba(55, 55, 55, .6);
             position: relative;
             cursor: pointer;
             line-height: 18px;
+            @include font-color($toool-button-color, rgba(255,255,255,0.65));
             .icon {
                 margin-right: 8px;
-                color: $toool-button-color;
+                @include font-color($toool-button-color, rgba(255,255,255,0.65));
                 font-size: 15px;
             }
             .stop {
@@ -129,7 +134,7 @@ $mask-color: rgba(55, 55, 55, .6);
             }
             span {
                 vertical-align: middle;
-                color: $toool-button-color;
+                @include font-color($toool-button-color, rgba(255,255,255,0.65));
                 font-size: 14px;
             }
         }
@@ -164,8 +169,9 @@ $mask-color: rgba(55, 55, 55, .6);
         width: 180px;
         overflow-x: hidden;
         overflow-y: auto;
-        background: $background-color-base;
+        @include bg-color($background-color-base, $dark-workflow-bg-color);
         border-right: 1px solid $border-color-base;
+        @include border-color($border-color-base, $dark-base-color);
         transition: all .3s;
 
         .shape-head {
@@ -176,18 +182,20 @@ $mask-color: rgba(55, 55, 55, .6);
             justify-content: space-between;
             border-top: 1px solid #DEE4EC;
             border-bottom: 1px solid #DEE4EC;
+            @include border-color(#DEE4EC, $dark-base-color);
             .head-title {
                 font-size: 14px;
-                color: #333;
+                @include font-color(#333, $dark-workflow-font-color);
             }
             .head-btn {
                 width: 32px;
                 height: 32px;
                 line-height: 32px;
                 text-align: center;
+                font-size: 20px;
                 cursor: pointer;
                 &:hover {
-                    color: #000;
+                    @include font-color(#000, #fff);
                 }
             }
         }
@@ -201,9 +209,11 @@ $mask-color: rgba(55, 55, 55, .6);
         .shape-container {
             margin-top: 1px;
             border-bottom: 1px solid $border-color-split;
+            @include border-color($border-color-split, $dark-workflow-bg-color);
 
             &.top {
                 border-top: 1px solid $border-color-split;
+                @include border-color($border-color-split, $dark-workflow-bg-color);
             }
 
             .icon {
@@ -221,10 +231,13 @@ $mask-color: rgba(55, 55, 55, .6);
                 text-overflow: ellipsis;
                 overflow: hidden;
                 cursor: pointer;
-                color: $title-color;
+                @include font-color($title-color, $dark-workflow-font-color);
                 font-weight: 400;
                 font-size: 14px;
-                background: #EDF1F6;
+                @include bg-color(#EDF1F6, #252A35)
+                .icon {
+                    font-size: 16px;
+                }
             }
 
             .shape-content {
@@ -240,7 +253,7 @@ $mask-color: rgba(55, 55, 55, .6);
             padding: 0 10px 0 20px;
             cursor: pointer;
             &:hover {
-                background: #EDF1F6;
+                @include bg-color(#EDF1F6, #252A35);
             }
         }
         .shape-title-txt {
@@ -280,11 +293,13 @@ $mask-color: rgba(55, 55, 55, .6);
         height: 34px;
         line-height: 34px;
         text-align: center;
-        background: #F8F9FC;
+        font-size: 20px;
+        @include bg-color(#F8F9FC, #2A303C);
         border: 1px solid #DEE4EC;
+        @include border-color(#DEE4EC, #2A303C);
         cursor: pointer;
         &:hover {
-            color: #000;
+            @include font-color(#000, #fff);
         }
     }
 
@@ -296,6 +311,7 @@ $mask-color: rgba(55, 55, 55, .6);
         bottom: 0;
         overflow: auto;
         transition: all .3s;
+        @include bg-color(#fff, $dark-base-color)
     }
     .designer-viewport-fold {
         left: 0;
@@ -312,7 +328,7 @@ $mask-color: rgba(55, 55, 55, .6);
         left: 0;
         top: 0;
         z-index: 2;
-        background: #fff;
+        @include bg-color(#fff, $dark-workflow-bg-color);
         cursor: move;
 
         &:hover {
@@ -325,10 +341,10 @@ $mask-color: rgba(55, 55, 55, .6);
             display: none;
             position: absolute;
             z-index: 1;
-            border-color: #ff9900;
+            @include border-color(#ff9900, #4077C9);
             border-style: solid;
             border-width: 1px;
-            background: white;
+            @include bg-color($light-base-color, $dark-base-color);
             cursor: crosshair;
         }
 
@@ -463,21 +479,22 @@ $mask-color: rgba(55, 55, 55, .6);
         z-index: 1000;
 
         .designer-control-header {
-            background: #5c5c5c;
-            background-image: linear-gradient(to top, #5c5c5c, #3e3e3e);
+            @include bg-color(#5c5c5c, #474E5D);
             height: 8px;
             border-left: 1px solid #5c5c5c;
             border-right: 1px solid #5c5c5c;
             border-top: 1px solid #646464;
             border-bottom: 1px solid #000;
+            @include border-color(#5c5c5c, #474E5D);
         }
 
         .designer-control-buttons {
-            background-color: #fff;
+            @include bg-color(#fff, #2A303C);
             padding: 10px 0px 10px;
             border-left: 1px solid #d7dde4;
             border-right: 1px solid #d7dde4;
             border-bottom: 1px solid #d7dde4;
+            @include border-color(#d7dde4, #2A303C);
             overflow: hidden;
         }
 
@@ -497,7 +514,7 @@ $mask-color: rgba(55, 55, 55, .6);
             right: 40px;
             width: 220px;
             height: 120px;
-            background: #fff;
+            @include bg-color(#fff, $dark-base-color);
             border: 2px solid rgba(0, 0, 0, 0.5);
             box-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 

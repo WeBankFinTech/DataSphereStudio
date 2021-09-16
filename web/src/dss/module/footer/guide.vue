@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="guide-mask" v-if="show" @click="toggleGuide"></div>
+    <div class="guide-mask" v-if="show" @click="flag && toggleGuide()"></div>
     <div class="guide-container" :class="{'guide-show': show}">
       <div class="guide-header">
         <span class="header-txt">帮助文档</span>
         <span class="header-close" @click="toggleGuide">
-          <Icon custom="iconfont icon-huaban"/>
+          <SvgIcon icon-class="close2" />
         </span>
       </div>
       <div class="guide-body">
@@ -19,8 +19,8 @@
                 <span class="step-divider"></span>
                 <span class="step-title">{{step.title}}</span>
                 <span class="step-arrow">
-                  <Icon custom="iconfont icon-close" v-if="step.expand" />
-                  <Icon custom="iconfont icon-open" v-else />
+                  <SvgIcon icon-class="close" v-if="step.expand" />
+                  <SvgIcon icon-class="open" v-else />
                 </span>
               </div>
               <div class="step-content">
@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="guide-footer">
-        <a>前往用户手册</a>
+        <a target="_blank" href="https://saas.ctyun.cn/luban/doc/docs/mindoc">前往用户手册</a>
       </div>
     </div>
 
@@ -73,6 +73,8 @@ export default {
       guide: this.getGuideConfig(),
       selectedImg: '',
       modalImg: false,
+      flag: true,
+      tabModMap: {}
     };
   },
   watch: {
@@ -83,9 +85,12 @@ export default {
   created() {
     // 开发中心和运维中心使用同一个route，所以使用eventbus来监听变化，从而触发产品即文档的更新
     eventbus.on('workflow.change', this.onWorkflowChange);
+    // 工作流编辑-调度中心切换
+    eventbus.on('workflow.orchestratorId', this.onWorkflowSchedulerChange);
   },
   beforeDestroy() {
     eventbus.off('workflow.change', this.onWorkflowChange);
+    eventbus.off('workflow.orchestratorId', this.onWorkflowSchedulerChange);
   },
   methods: {
     onWorkflowChange(mod) {
@@ -93,6 +98,17 @@ export default {
         this.guide = this.getGuideConfig('/workflow/scheduler')
       } else if (mod == 'dev') {
         this.guide = this.getGuideConfig();
+      }
+    },
+    onWorkflowSchedulerChange(data) {
+      if (data.mod == 'scheduler') {
+        this.guide = this.getGuideConfig('/workflow/scheduler')
+        this.tabModMap[data.orchestratorId] = data.mod;
+      } else if (data.mod == 'dev') {
+        this.guide = this.getGuideConfig();
+        this.tabModMap[data.orchestratorId] = data.mod;
+      } else if (data.mod == 'auto') {
+        this.onWorkflowChange(this.tabModMap[data.orchestratorId] || 'dev'); // 默认dev
       }
     },
     getGuideConfig(key) {
@@ -138,6 +154,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .guide-mask {
     position: fixed;
     top: 0;
@@ -151,20 +168,20 @@ export default {
     width: 400px;
     top: 54px;
     bottom: 0;
-    background: #fff;
+    @include bg-color(#fff, $dark-menu-base-color);
     transition: all .24s ease-in-out;
     transform: translateX(120%);
-    box-shadow: -2px 0 10px 0 #DEE4EC;
+    @include guide-box-shadow(#DEE4EC, #192235);
     border-radius: 2px;
     .guide-header {
       position: relative;
       height: 48px;
       padding: 0 15px;
-      background: #F8F9FC;
+      @include bg-color(#F8F9FC, #313847);
       .header-txt {
         font-size: 16px;
         line-height: 48px;
-        color: #333
+        @include font-color(#333, $dark-workspace-title-color);
       }
       .header-close {
         position: absolute;
@@ -175,6 +192,7 @@ export default {
         line-height: 48px;
         cursor: pointer;
         text-align: center;
+        @include font-color(#333, $dark-workspace-title-color);
       }
     }
     .guide-body {
@@ -183,36 +201,37 @@ export default {
       overflow-x: hidden;
       overflow-y: scroll;
       overflow-y: overlay;
-      background: #fff;
+      @include bg-color(#fff, $dark-menu-base-color);
       .guide-box {
         border-top: 1px solid #DEE4EC;
+        @include border-color(#DEE4EC, #404A5D);
         padding: 20px 15px;
-        background: #fff;
         .guide-box-title {
           padding-left: 10px;
           margin-bottom: 10px;
           border-left: 4px solid #2E92F7;
           font-size: 14px;
           line-height: 20px;
-          color: #333;
+          @include font-color(#333, $dark-workspace-title-color);
           font-weight: bold;
         }
         .guide-box-desc {
           margin: 10px 0;
           font-size: 14px;
-          color: #666;
+          @include font-color(#666, $dark-text-color);
           line-height: 20px;
         }
         .guide-steps {
           .step {
             margin-top: 10px;
-            background: #F8F9FC;
+            @include bg-color(#F8F9FC, #383F4E);
             border: 1px solid #DEE4EC;
+            @include border-color(#DEE4EC, #404A5D);
             border-radius: 4px;
             .step-head {
               display: flex;
               align-items: center;
-              color: #333;
+              @include font-color(#333, $dark-workspace-title-color);
               cursor: pointer;
               &:hover {
                 color: #2d8cf0;
@@ -228,7 +247,7 @@ export default {
                 margin: 0 20px;
                 width: 1px; 
                 height: 16px;
-                background: #979797;
+                @include bg-color(#979797, #4B576E);
               }
               .step-title {
                 display: block;
@@ -251,6 +270,7 @@ export default {
                 margin: 6px 0;
                 font-size: 14px;
                 line-height: 20px;
+                @include font-color(#333, $dark-text-color);
               }
               img {
                 max-width: 100%;
@@ -261,6 +281,7 @@ export default {
           .step-expand {
             .step-head {
               border-bottom: 1px solid #DEE4EC;
+              @include border-color(#DEE4EC, #404A5D);
             }
             .step-content {
               padding: 10px;
@@ -279,7 +300,7 @@ export default {
             a {
               font-size: 14px;
               line-height: 20px;
-              color: #333;
+              @include font-color(#333, $dark-text-color);
               text-decoration: none;
               &:hover {
                 color: #2E92F7;
@@ -295,14 +316,15 @@ export default {
       left: 0;
       right: 0;
       height: 48px;
-      background: #fff;
-      box-shadow: -2px 0 10px 0 #DEE4EC;
+      @include bg-color(#fff, #313847);
+      @include guide-box-shadow(#DEE4EC, #192235);
+
       border-radius: 2px;
       text-align: center;
       line-height: 48px;
       a {
         font-size: 14px;
-        color: #333;
+        @include font-color(#333, $dark-workspace-title-color);
         text-decoration: none;
         &:hover {
           color: #2E92F7;

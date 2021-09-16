@@ -14,88 +14,99 @@
  * limitations under the License.
  *
  */
-
 @import '@/common/style/variables.scss';
 
-.console-page{
-    position: $relative;
+.console-page {
+  position: $relative;
+  width: $percent-all;
+  height: $percent-all;
+  display: flex;
+  flex-direction: column;
+  // background: $background-color-base;
+  @include bg-color($background-color-base, $dark-base-color);
+
+  // 广告位样式，未使用到，暂未修改
+  .ad {
+    background: $body-background;
+    box-shadow: $shadow-card;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ad-top {
+    width: $percent-all;
+    height: 60px;
+
+  }
+
+  .console-page-content {
     width: $percent-all;
     height: $percent-all;
+    padding: 20px;
+
+    .console-page-content-head {
+      display: flex;
+      justify-content: space-between;
+
+      .console-page-content-title {
+        font-size: $font-size-large;
+        font-weight: bold;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+      }
+    }
+
+    .console-page-content-body {
+      position: $relative;
+      height: calc(100% - 24px);
+
+      .content-body-side-nav {
+        width: 200px;
+        position: $absolute;
+        top: 0;
+        left: 0;
+
+        .content-body-card {
+          margin: 10px 0;
+        }
+      }
+
+      .content-body-side-right {
+        position: $absolute;
+        top: 10px;
+        bottom: 0;
+        right: 0;
+        left: 200px;
+        margin-left: 20px;
+        // background: $body-background;
+        @include bg-color($light-base-color, $dark-base-color);
+        border-radius: $border-radius-small;
+        padding: 10px;
+        overflow: hidden;
+
+        .content-body-side-right-title {
+          height: 30px;
+          border-bottom: $border-width-base $border-style-base $border-color-split;
+          @include border-color($border-color-base, $dark-border-color-base);
+          margin-bottom: 10px;
+        }
+
+        .content-body-side-right-content {
+          height: calc(100% - 40px);
+        }
+
+      }
+    }
+  }
+
+  .ad-bottom {
+    width: $percent-all;
+    height: 80px;
     display: flex;
-    flex-direction: column;
-    background: $background-color-base;
 
-    .ad {
-        background: $body-background;
-        box-shadow: $shadow-card;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .ad-bottom-div {
+      width: $percent-half;
+      margin: 0 10px 10px;
     }
-
-    .ad-top {
-        width: $percent-all;
-        height: 60px;
-
-    }
-
-    .console-page-content {
-        width: $percent-all;
-        height: $percent-all;
-        padding: 20px;
-
-        .console-page-content-head {
-            display: flex;
-            justify-content: space-between;
-
-            .console-page-content-title {
-                font-size: $font-size-large;
-                font-weight: bold;
-            }
-        }
-
-        .console-page-content-body {
-            position: $relative;
-            .content-body-side-nav {
-                width: 200px;
-                position: $absolute;
-                top: 0;
-                left: 0;
-                .content-body-card {
-                    margin:10px 0 10px;
-                }
-            }
-            .content-body-side-right {
-                position: $absolute;
-                top: 10px;
-                right: 0;
-                left: 200px;
-                margin-left: 20px;
-                background: $body-background;
-                border-radius: $border-radius-small;
-                padding: 10px;
-                overflow: hidden;
-                .content-body-side-right-title {
-                    height: 30px;
-                    border-bottom: $border-width-base $border-style-base $border-color-split;
-                    margin-bottom: 10px
-                }
-                .content-body-side-right-content {
-                    overflow: hidden;
-                }
-
-            }
-        }
-    }
-
-    .ad-bottom {
-        width: $percent-all;
-        height: 80px;
-        display: flex;
-
-        .ad-bottom-div {
-            width: $percent-half;
-            margin: 0 10px 10px;
-        }
-    }
+  }
 }

@@ -34,7 +34,7 @@
               :title="$t('message.workflow.process.params')"
               ref="paramButton"
               @click.stop="showParamView">
-              <SvgIcon class="icon" icon-class="params" color="#666"/>
+              <SvgIcon class="icon" icon-class="params"/>
               <span>{{$t('message.workflow.process.params')}}</span>
             </div>
             <div class="devider" />
@@ -43,7 +43,7 @@
               ref="resourceButton"
               :title="$t('message.workflow.process.resource')"
               @click.stop="showResourceView">
-              <SvgIcon class="icon" icon-class="fi-export" color="#666"/>
+              <SvgIcon class="icon" icon-class="fi-export"/>
               <span>{{$t('message.workflow.process.resource')}}</span>
             </div>
             <div class="devider" />
@@ -52,7 +52,7 @@
               :title="$t('message.workflow.process.run')"
               class="button"
               @click="clickswitch">
-              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+              <SvgIcon class="icon" icon-class="play-2"/>
               <span>{{$t('message.workflow.process.run')}}</span>
             </div>
             <div
@@ -60,7 +60,7 @@
               :title="$t('message.workflow.process.stop')"
               class="button"
               @click="clickswitch">
-              <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
+              <SvgIcon class="icon" className='stop' icon-class="stop-2" />
               <span>{{$t('message.workflow.process.stop')}}</span>
             </div>
             <div class="devider" />
@@ -68,7 +68,7 @@
               :title="$t('message.workflow.process.save')"
               class="button"
               @click="handleSave">
-              <SvgIcon class="icon" icon-class="save-2" color="#666"/>
+              <SvgIcon class="icon" icon-class="save-2" />
               <span>{{$t('message.workflow.process.save')}}</span>
             </div>
             <div v-if="type==='flow'" class="devider" />
@@ -81,7 +81,7 @@
               class="button"
               @click="workflowPublishIsShow">
               <template v-if="!isFlowPubulish">
-                <SvgIcon class="icon" icon-class="publish" color="#666"/>
+                <SvgIcon class="icon" icon-class="publish" />
                 <span>{{$t('message.workflow.process.publish')}}</span>
               </template>
               <Spin v-else class="public_loading">
@@ -94,7 +94,7 @@
               v-if="schedulingStatus.published" 
               class="button" 
               @click.stop="linkToDispatch">
-              <SvgIcon class="icon" icon-class="ds-center" color="#666"/>
+              <SvgIcon class="icon" icon-class="ds-center" />
               <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
             </div>
         </div>
@@ -108,7 +108,7 @@
             :title="$t('message.workflow.process.run')"
             class="button"
             @click="clickswitch">
-            <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+            <SvgIcon class="icon" icon-class="play-2" />
             <span>{{$t('message.workflow.process.run')}}</span>
           </div>
           <div
@@ -116,7 +116,7 @@
             :title="$t('message.workflow.process.stop')"
             class="button"
             @click="clickswitch">
-            <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
+            <SvgIcon class="icon" className='stop' icon-class="stop-2" />
             <span>{{$t('message.workflow.process.stop')}}</span>
           </div>
           <div class="devider" />
@@ -931,7 +931,8 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}listNodeType`, {
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
-        this.shapes = res.nodeTypes.map((item) => {
+        // 暂时隐藏数据开发以外的节点
+        this.shapes = res.nodeTypes.filter(i => i.title == '数据开发').map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
               // svg绘制的点太多，导致动画卡顿，使用图片代替

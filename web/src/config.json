@@ -43,5 +43,23 @@
             "zh-CN": "apps/apiServices/i18n/zh.json"
         },
         "header": "apps/apiServices/module/header"
+    },
+    "dataService": {
+        "routes": "apps/dataService/router",
+        "module": "apps/dataService/module",
+        "i18n": {
+            "en": "apps/dataService/i18n/en.json",
+            "zh-CN": "apps/dataService/i18n/zh.json"
+        },
+        "header": "apps/dataService/module/header"
+    },
+    "dataGovernance": {
+      "routes": "apps/dataGovernance/router",
+      "module": "apps/dataGovernance/module",
+      "i18n": {
+        "en": "apps/dataGovernance/i18n/en.json",
+        "zh-CN": "apps/dataGovernance/i18n/zh.json"
+      },
+      "header": "apps/dataGovernance/module/header"
     }
 }

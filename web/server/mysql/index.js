@@ -1,11 +1,14 @@
 var mysql = require('mysql');
 var config = require('../config/default.js')
 
+var env = process.env.NODE_ENV;
+env = env ? env : 'dev';
+
 var pool  = mysql.createPool({
-  host     : config.database.HOST,
-  user     : config.database.USERNAME,
-  password : config.database.PASSWORD,
-  database : config.database.DATABASE
+  host     : config[env].database.HOST,
+  user     : config[env].database.USERNAME,
+  password : config[env].database.PASSWORD,
+  database : config[env].database.DATABASE
 });
 
 
@@ -45,6 +48,9 @@ class Mysql {
   }
   createApplication(data) {
     return new Promise((resolve, reject) => {
+      if (!data.title_en || !data.title_cn || !data.url || !data.onestop_menu_id || !data.project_url || !data.homepage_url || !data.redirect_url) {
+        throw new Error('必填字段缺损')
+      }
       if (!data.id) {
         let sql = `INSERT INTO dss_application(id,name,url,project_url,if_iframe,homepage_url,redirect_url) VALUES(0,?,?,?,?,?,?)`
         let params = [data.title_en, data.url, data.project_url, data.if_iframe, data.homepage_url, data.redirect_url]
@@ -53,8 +59,8 @@ class Mysql {
             throw error
           }
           if (result && result.insertId) {
-            let sql2 = `INSERT INTO dss_onestop_menu_application(id,application_id,onestop_menu_id,title_en,title_cn,desc_en,desc_cn,labels_en,labels_cn,is_active) VALUES(0,?,?,?,?,?,?,?,?,?)`
-            let params2 = [result.insertId, data.onestop_menu_id, data.title_en, data.title_cn, data.desc_en, data.desc_cn, data.labels_en, data.labels_cn, data.is_active]
+            let sql2 = `INSERT INTO dss_onestop_menu_application(id,application_id,onestop_menu_id,title_en,title_cn,desc_en,desc_cn,labels_en,labels_cn,is_active,access_button_en,access_button_cn) VALUES(0,?,?,?,?,?,?,?,?,?,?,?)`
+            let params2 = [result.insertId, data.onestop_menu_id, data.title_en, data.title_cn, data.desc_en, data.desc_cn, data.labels_en, data.labels_cn, data.is_active, data.access_button_en || `Enter ${data.title_en}`, data.access_button_cn || `进入 ${data.title_cn}`]
             pool.query(sql2, params2, function (error2, result2) {
               if (error2) {
                 throw error2
@@ -70,8 +76,8 @@ class Mysql {
           if (error) {
             throw error
           }
-          let sql2 = `UPDATE dss_onestop_menu_application SET onestop_menu_id=?,title_en=?,title_cn=?,desc_en=?,desc_cn=?,labels_en=?,labels_cn=?,is_active=? WHERE application_id=?`
-          let params2 = [data.onestop_menu_id, data.title_en, data.title_cn, data.desc_en, data.desc_cn, data.labels_en, data.labels_cn, data.is_active, data.id]
+          let sql2 = `UPDATE dss_onestop_menu_application SET onestop_menu_id=?,title_en=?,title_cn=?,desc_en=?,desc_cn=?,labels_en=?,labels_cn=?,is_active=?,access_button_en=?,access_button_cn=? WHERE application_id=?`
+          let params2 = [data.onestop_menu_id, data.title_en, data.title_cn, data.desc_en, data.desc_cn, data.labels_en, data.labels_cn, data.is_active, data.access_button_en || `Enter ${data.title_en}`, data.access_button_cn || `进入 ${data.title_cn}`, data.id]
           pool.query(sql2, params2, function (error2, result2) {
             if (error2) {
               throw error2

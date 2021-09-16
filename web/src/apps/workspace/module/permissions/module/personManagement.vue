@@ -87,7 +87,7 @@
               "
             />
           </div>
-          <div>{{ row.label }}</div>
+          <div class="folder-label">{{ row.label }}</div>
         </div>
       </div>
       <div class="tableWrap">
@@ -120,6 +120,7 @@
             :current="pageData.pageNum"
             show-elevator
             show-sizer
+            show-total
             @on-change="handlePageChange"
             @on-page-size-change="handlePageSizeChange"
           />
@@ -135,7 +136,7 @@
       <Form
         ref="departForm"
         :label-width="100"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem
           :label="$t('message.permissions.userDepart')"
@@ -180,7 +181,7 @@
         :model="userForm"
         :label-width="100"
         :rules="ruleValidate"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem :label="$t('message.permissions.username')" prop="name">
           <Input
@@ -227,7 +228,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.phone')">
+        <FormItem :label="$t('message.permissions.phone')" prop="phonenumber">
           <Input
             type="text"
             v-model="userForm.phonenumber"
@@ -239,7 +240,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.email')">
+        <FormItem :label="$t('message.permissions.email')" prop="email">
           <Input
             type="text"
             v-model="userForm.email"
@@ -255,16 +256,16 @@
       <Form
         ref="passwordForm"
         :model="userForm"
-        v-if="modalType === 'modifyPassword'"
+        :rules="passRuleValidate"
+        v-show="modalType === 'modifyPassword'"
       >
         <div class="newPassword">
           {{ $t("message.permissions.inputPassword") }}
         </div>
-        <FormItem prop="password" required :error="pwdErrorTip">
+        <FormItem prop="password">
           <Input
             type="password"
             v-model="userForm.password"
-            @on-change="hanldePwdChange"
             :placeholder="$t('message.permissions.pleaseInput')"
           >
           </Input>
@@ -321,9 +322,53 @@ export default {
           new Error(
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError")
+              : tag === "keyboard"
+                ? this.$t("message.permissions.pwdKeyboardError")
+                : this.$t("message.permissions.pwdCheckError")
           )
         );
+      }
+    };
+    const validateUserNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.userNameEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.userNameTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.nameEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.nameTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        const valid = /^\w+@[a-z0-9]+\.[a-z]{2,4}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidEmail")));
+        }
+      } else {
+        callback();
+      }
+    };
+    const validatePhone = (rule, value, callback) => {
+      if (value) {
+        const valid = /^1[3456789]\d{9}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidPhone")));
+        }
+      } else {
+        callback();
       }
     };
     return {
@@ -387,7 +432,6 @@ export default {
         phonenumber: "",
         email: ""
       },
-      pwdErrorTip: "",
       editingData: "",
       confirmLoading: false,
       departmentErrorTip: "",
@@ -395,15 +439,15 @@ export default {
         userName: [
           {
             required: true,
-            message: this.$t("message.permissions.userNameEmpty"),
-            trigger: "blur"
+            validator: validateUserNameCheck,
+            trigger: "change"
           }
         ],
         name: [
           {
             required: true,
-            message: this.$t("message.permissions.nameEmpty"),
-            trigger: "blur"
+            validator: validateNameCheck,
+            trigger: "change"
           }
         ],
         password: [
@@ -412,22 +456,25 @@ export default {
             validator: validatePass,
             trigger: "blur"
           }
-        ]
-      },
-      passwordRuleValidate: {
-        password: [
+        ],
+        phonenumber: [
           {
-            required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
+            validator: validatePhone,
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            validator: validateEmail,
             trigger: "blur"
           }
         ]
       },
-      passwordRuleValidate: {
+      passRuleValidate: {
         password: [
           {
             required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
+            validator: validatePass,
             trigger: "blur"
           }
         ]
@@ -608,43 +655,35 @@ export default {
         pageNum: page
       });
     },
-    hanldePwdChange() {
-      if (this.pwdErrorTip) {
-        this.pwdErrorTip = "";
-      }
-    },
     handleModalCancel() {
       this.modalVisible = false;
       this.resetUserForm();
     },
     handleModalOk() {
+      console.log(this.modalType);
       if (this.modalType === "modifyPassword") {
-        const { valid, tag } = testPassword(this.userForm.password);
-        if (!valid) {
-          this.pwdErrorTip =
-            tag === "empty"
-              ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError");
-          return;
-        }
-        const params = {
-          password: this.userForm.password,
-          id: this.editingData.id
-        };
-        this.confirmLoading = true;
-        ModifyUserPassword(params)
-          .then(data => {
-            console.log(data);
-            this.$Message.success(
-              this.$t("message.permissions.modifyPwdSuccess")
-            );
-            this.modalVisible = false;
-            this.confirmLoading = false;
-            this.resetUserForm();
-          })
-          .catch(() => {
-            this.confirmLoading = false;
-          });
+        this.$refs["passwordForm"].validate(valid => {
+          if (valid) {
+            const params = {
+              password: this.userForm.password,
+              id: this.editingData.id
+            };
+            this.confirmLoading = true;
+            ModifyUserPassword(params)
+              .then(data => {
+                console.log(data);
+                this.$Message.success(
+                  this.$t("message.permissions.modifyPwdSuccess")
+                );
+                this.modalVisible = false;
+                this.confirmLoading = false;
+                this.resetUserForm();
+              })
+              .catch(() => {
+                this.confirmLoading = false;
+              });
+          }
+        });
       } else {
         this.$refs["userForm"].validate(valid => {
           console.log(this.userForm);
@@ -658,7 +697,7 @@ export default {
             const executeMethod = isAdd ? AddNewUser : ModifyUser;
             const { userName, password, ...rest } = this.userForm;
             const params = isAdd
-              ? { ...this.userForm, userName, password }
+              ? { ...this.userForm, userName: userName.trim(), password }
               : { ...rest, id: this.editingData.id };
             this.confirmLoading = true;
             executeMethod(params)
@@ -711,19 +750,26 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .container {
   width: 100%;
-  height: 100%;
+  // height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 0;
+  @include bg-color($workspace-background, $dark-workspace-background);
 }
 .formWrap {
   width: 100%;
-  padding-left: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #dee4ec;
+  // padding-left: 20px;
+  // padding-bottom: 20px;
+  // border-bottom: 1px solid #dee4ec;
+  // @include border-color($border-color-base, $dark-border-color-base);
   display: flex;
   flex-wrap: wrap;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+  padding-bottom: 24px;
+  padding-left: 24px;
   .formItemWrap {
     display: flex;
     align-items: center;
@@ -733,7 +779,8 @@ export default {
       width: 80px;
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      // color: rgba(0, 0, 0, 0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
   }
 }
@@ -741,22 +788,22 @@ export default {
   display: flex;
   flex: 1;
   min-height: 400px;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
 }
 .deptTree {
   min-width: 230px;
   height: inherit;
-  border-right: 1px solid #dee4ec;
-  padding-top: 24px;
   .emptyTree {
     width: inherit;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.25);
+    // color: rgba(0, 0, 0, 0.25);
+    @include font-color(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25));
     text-align: center;
   }
 }
 .tableWrap {
   flex: 1;
-  padding: 0 24px;
+  margin: 0 24px 24px;
   .addWrap {
     display: flex;
     justify-content: space-between;
@@ -766,7 +813,7 @@ export default {
     & p {
       font-family: PingFangSC-Regular;
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
   }
   .page {
@@ -784,8 +831,8 @@ export default {
   font-family: PingFangSC-Medium;
 }
 .deptChoosed {
-  background: #ecf4ff;
-  color: #2e92f7;
+  @include bg-color($active-menu-item, $dark-active-menu-item);
+  @include font-color($primary-color, $dark-primary-color);
 }
 .leaf {
   cursor: pointer;
@@ -803,10 +850,14 @@ export default {
 }
 .folder {
   width: 22px;
+  @include font-color($light-text-color, $dark-text-color);
+}
+.folder-label, .foldIcon{
+  @include font-color($light-text-color, $dark-text-color);
 }
 .operation {
   font-size: 14px;
-  color: #2e92f7;
+  @include font-color($primary-color, $dark-primary-color);
   cursor: pointer;
 }
 .modalFooter {
@@ -820,5 +871,6 @@ export default {
   margin-top: 10px;
   margin-bottom: 10px;
   font-size: 14px;
+  @include font-color($light-text-color, $dark-text-color);
 }
 </style>

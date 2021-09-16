@@ -47,7 +47,7 @@
   position: relative;
   height: 100%;
   width: 100%;
-
+  
   .process-console {
     position: absolute;
     left: 250px;
@@ -72,10 +72,12 @@
   }
 
   .button[disabled] {
-    background-color: #f3f3f3;
+    // background-color: #f3f3f3;
+    @include bg-color($disabled-bg-color, $dark-disabled-bg-color);
     opacity: 1;
     cursor: not-allowed !important;
-    color: #ccc;
+    // color: #ccc;
+    @include font-color(#ccc, $dark-text-desc-color);
 
   }
 
@@ -92,13 +94,15 @@
   border-top: 0;
   box-shadow: -6px 0 6px -6px $shadow-color;
   z-index: 1008;
-  background: #fff;
+  @include bg-color(#fff, $dark-base-color);
+  @include border-color($border-color-base, $dark-background-color-header);
   overflow-y: auto;
 
   .process-module-param-modal-header {
     height: 36px;
     line-height: 36px;
     border-bottom: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
     padding-left: 10px;
     position: absolute;
     width: 100%;
@@ -110,10 +114,12 @@
     align-items: center;
 
     h3 {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       flex: 3;
     }
 
     .save-button {
+      @include font-color($light-text-color, $dark-text-color);
       flex: 2;
       text-align: right;
     }
@@ -126,9 +132,10 @@
       line-height: 20px;
       flex: 1;
       cursor: pointer;
-
+      @include font-color($light-text-color, $dark-text-color);
       &:hover {
-        background-color: #ccc;
+        // background-color: #ccc;
+        @include bg-color(#ccc, $dark-active-menu-item);
       }
     }
   }
@@ -158,6 +165,7 @@
     }
 
     .node-module-param-modal-header {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       padding-left: 10px;
     }
 
@@ -175,6 +183,7 @@
 
 .workflow-arguments {
   .workflow-arguments-title-wrap {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -186,7 +195,7 @@
   .workflow-arguments-setting {
     padding: 10px 10px 2px;
     margin: 10px;
-    background: $menu-dark-subsidiary-color;
+    @include bg-color($menu-dark-subsidiary-color, $dark-base-color);
     border-radius: $border-radius-small;
 
     .time-set-title {
@@ -215,12 +224,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: $background-color-white;
+        @include bg-color($light-base-color, $dark-base-color);
         border-radius: $border-radius-small;
         margin: 4px 0;
 
         &:hover {
           background: $background-color-select-hover;
+          @include bg-color($background-color-select-hover, $dark-active-menu-item);
         }
 
         .workflow-resource-list-name {

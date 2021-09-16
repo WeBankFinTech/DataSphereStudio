@@ -84,10 +84,11 @@
       "failedNotice": "验证项未通过，请检查后再试！",
       "enterName": "请输入名称",
       "nameLength": "名称长度不能大于",
+      "descLength": "工作空间描述长度不能大于",
       "validNameDesc": "必须以字母开头，且只支持字母、数字、下划线",
       "project": "工程",
       "feedback": "反馈",
-      "workspaceTitle": "工作空间-",
+      "workspaceTitle": "工作空间——",
       "DSSDEV": "应用开发",
       "DSSSHOP": "应用商店",
       "QuickAccess": "快捷入口",
@@ -96,7 +97,8 @@
         "demoCase": "demo案例",
         "comingSoon": "敬请期待"
       },
-      "permissions": "部门和用户管理"
+      "permissions": "部门和用户管理",
+      "managementPlatform": "管理台"
     },
     "workspaceManagemnet": {
       "waring": "警告",
@@ -143,7 +145,7 @@
       "nameLongMsg": "角色名字长度不超过8个字符",
       "ruleMsg": "仅支持中文、字符、数字、下划线",
       "nameRepeat": "用户名重复",
-      "deleteHintMsg": "删除用户将会造成不可逆的影响，除非用户离职或者更换部门，否则请慎重！",
+      "deleteHintMsg": "当前操作不可逆，若用户尚未离职或更换部门，请谨慎操作！",
       "notsupported": "不支持当前操作",
       "userManual": "用户手册",
       "NEWWORKSPACE": "新建工作空间",
@@ -206,7 +208,7 @@
     "Project": {
       "title": "项目列表",
       "AppDevProcess": "应用开发流程",
-      "createProject": "创建工程",
+      "createProject": "创建项目",
       "config": "配置",
       "deleteSuccess": "{name}删除成功"
     },
@@ -248,7 +250,9 @@
       "deleteTip": "确认删除吗？",
       "parentIdEmpty": "上级部门不能为空",
       "deptEmpty": "部门不能为空",
+      "deptTooLong": "部门名称太长，字符不能超过50位",
       "invalidEmail": "邮箱格式不正确",
+      "invalidPhone": "手机格式不正确",
       "noMatch": "没有匹配的结果",
       "addDeptSucess": "新增部门成功！",
       "addDeptFailed": "新增部门失败！",
@@ -258,13 +262,17 @@
       "addUserFailed": "新增用户失败！",
       "updateUserSucess": "更新用户成功！",
       "updateUserFailed": "跟新用户失败！",
-      "nameEmpty": "用户名称不能为空",
-      "userNameEmpty": "登录账号不能为空",
+      "nameEmpty": "姓名不能为空",
+      "userNameEmpty": "登录名称不能为空",
+      "userNameTooLong": "登录名称太长，字符不能超过50位",
+      "nameTooLong": "姓名太长，字符不能超过50位",
       "passwordEmpty": "密码不能为空",
       "modifyPassword": "修改用户密码",
       "inputPassword": "请输入用户新密码:",
       "modifyPwdSuccess": "修改密码成功！",
-      "pwdCheckError": "以字母开头，必须含有大小写字母、数字和特殊字符，且8到26位"
+      "pwdCheckError": "以字母开头，必须含有大小写字母、数字和特殊字符，且8到26位",
+      "pwdKeyboardError": "不能连续三位是键盘序，例如含有123,987,abc,cba,qwe,poi之类的字符"
+    
     }
   }
 }

@@ -1081,6 +1081,7 @@ export default {
 .workbench {
     /deep/.ivu-tabs.ivu-tabs-card {
         border-top: $border-width-base $border-style-base #dcdee2;
+        @include border-color($border-color-base, $dark-border-color-base);
         .ivu-tabs-bar .ivu-tabs-tab {
             margin-right: 0px;
             margin-left: -1px;
@@ -1135,6 +1136,12 @@ export default {
 .modal-content {
     padding: 10px 20px;
     font-size: $font-size-base;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    p {
+      @include font-color($light-text-color, $dark-text-color);
+    }
 }
 .workbench-tabs {
   position: $relative;
@@ -1142,10 +1149,13 @@ export default {
   overflow: hidden;
   box-sizing: border-box;
   z-index: 3;
+  @include font-color($light-text-color, $dark-text-color);
+  @include bg-color($light-base-color, $dark-base-color);
   .workbench-tab-wrapper {
     display: flex;
     border-top: $border-width-base $border-style-base #dcdcdc;
     border-bottom: $border-width-base $border-style-base #dcdcdc;
+    @include border-color($border-color-base, $dark-background-color-header);
     &.full-screen {
         position: fixed;
         left: 0;
@@ -1161,7 +1171,8 @@ export default {
       justify-content: flex-start;
       align-items: flex-start;
       height: 32px;
-      background-color: $body-background;
+      // background-color: $body-background;
+      @include bg-color($light-base-color, $dark-base-color);
       width: calc(100% - 45px);
       overflow: hidden;
       &.work-list-tab {
@@ -1184,50 +1195,62 @@ export default {
         display: inline-block;
         height: 32px;
         line-height: 32px;
-        background-color: $background-color-base;
-        color: $title-color;
+        @include bg-color($light-base-color, $dark-base-color);
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         cursor: pointer;
         min-width: 100px;
         max-width: 200px;
         overflow: hidden;
         margin-right: 2px;
-        border: 1px solid #eee;
+         /deep/.svg-icon {
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        }
         &.active {
           margin-top: 1px;
-          background-color: $body-background;
+          @include bg-color($active-menu-item, $dark-active-menu-item);
           color: $primary-color;
-          border-radius: 4px 4px 0 0;
-          border: 1px solid $border-color-base;
+          @include font-color($primary-color, $dark-primary-color);
           border-bottom: 2px solid $primary-color;
+          /deep/.svg-icon {
+            @include font-color($primary-color, $dark-primary-color);
+        }
         }
       }
     }
     .workbench-tab-control {
       flex: 0 0 45px;
       text-align: right;
-      background-color: $body-background;
+      @include bg-color($light-base-color, $dark-base-color);
       border-left: $border-width-base $border-style-base $border-color-split;
+      @include border-color($border-color-base, $dark-border-color-base);
       .ivu-icon {
         font-size: $font-size-base;
         margin-top: 8px;
         margin-right: 2px;
         cursor: pointer;
         &:hover {
-            color: $primary-color;
+            // color: $primary-color;
+            @include font-color($primary-color, $dark-primary-color);
         }
         &.disable {
-            color: $btn-disable-color;
+            // color: $btn-disable-color;
+            @include font-color($btn-disable-color, $dark-disable-color);
         }
       }
     }
     .workbench-tab-button {
       flex: 0 0 30px;
       text-align: center;
-      background-color: $body-background;
+      // background-color: $body-background;
+      @include bg-color($light-base-color, $dark-base-color);
+      &:hover {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
       .ivu-icon {
           font-size: $font-size-base;
           margin-top: 8px;
           cursor: pointer;
+          @include font-color($light-text-color, $dark-text-color);
       }
     }
   }

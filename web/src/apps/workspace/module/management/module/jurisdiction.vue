@@ -1,7 +1,8 @@
 <template>
   <div class="juri-serchbar-box">
-    <h3 style="width:80%;display: inline-block;" >{{$t('message.workspaceManagemnet.permissionsManagement')}}</h3>
+    <h3 class="juri-title" style="width:80%;display: inline-block;" >{{$t('message.workspaceManagemnet.permissionsManagement')}}</h3>
     <Button
+      v-if="isAdmin()"
       type="success"
       @click="creater"
     >{{$t('message.workspaceManagemnet.create')}}</Button>
@@ -16,6 +17,7 @@
 </template>
 <script>
 import api from "@/common/service/api";
+import storage from "@/common/helper/storage";
 // import formserch from "../component/formsechbar";
 import juristable from '../component/juristable'
 export default {
@@ -67,11 +69,19 @@ export default {
   created(){
     this.workspaceId = parseInt(this.$route.query.workspaceId)
   },
-
   mounted() {
     this.init();
   },
   methods: {
+    isAdmin(){
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (currentUser.isAdmin || workspaceRoles.indexOf('admin') > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     init() {
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceMenuPrivs`, {
         workspaceId: this.workspaceId,
@@ -130,7 +140,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .juri-serchbar-box {
   padding:10px 15px;
+  .juri-title {
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
 }
 </style>

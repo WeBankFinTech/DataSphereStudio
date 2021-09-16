@@ -37,15 +37,18 @@
     line-height: 40px;
     margin: 20px 0;
     cursor: pointer;
+    font-size: 16px;
 }
 .footer-doc {
-    background: #fff;
+    @include font-color(#333, #fff);
+    @include bg-color(#fff, #373F50);
+    @include border-color($border-color-base, #373F50);
 }
 .footer-channel {
-    border-color: #2E92F7;
-    background: #2E92F7;
+    border-color: #4B8FF3;
+    background: #4B8FF3;
+    color: #fff;
     .footer-channel-job {
-        color: #fff;
         font-weight: 900;
         margin-right: 5px;
     }

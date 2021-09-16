@@ -1,7 +1,6 @@
 <template>
     <Form
       :label-width="100"
-      label-position="left"
       ref="projectForm"
       :model="workflowDataCurrent"
       :rules="formValid"
@@ -11,6 +10,7 @@
         prop="orchestratorName">
         <Input
           :disabled="isPublished"
+          :maxlength=21
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>
@@ -25,21 +25,21 @@
       <!-- 不同的编排类型显示不同的编排方式， 动态接口获取 -->
       <template v-if="workflowDataCurrent.orchestratorMode">
         <FormItem v-if="selectOrchestrator.dicValue === FORMITEMTYPE.RADIO" :label="$t('message.orchestratorModes.orchestratorMethod')" prop="orchestratorWayString"
-          :rules="[{ required: true, trigger: 'blur' }]">
+          :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
           <RadioGroup v-model="workflowDataCurrent.orchestratorWayString">
             <Radio v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :label="item.dicKey">
               <span>{{item.dicName}}</span>
             </Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur' }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
           <Select v-model="workflowDataCurrent.orchestratorWayString">
             <Option v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :value="item.dicKey">
               {{ item.dicName}}
             </Option>
           </Select>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array' }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array', message: $t('message.workflow.orchestratorWayString') }]">
           <CheckboxGroup v-model="workflowDataCurrent.orchestratorWayArray">
             <Checkbox v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :label="item.dicKey" :key="item.dicKey">
               <span style="margin-left: 10px">{{item.dicName}}</span>
@@ -71,8 +71,11 @@
           size="large"
           @click="Cancel">{{$t('message.workflow.cancel')}}</Button>
         <Button
+          style="margin-left:10px;"
           type="primary"
           size="large"
+          :disabled="submiting"
+          :loading="submiting"
           @click="Ok">{{$t('message.workflow.ok')}}</Button>
       </Form-item>
     </Form>
@@ -104,6 +107,7 @@ export default {
   },
   data() {
     return {
+      submiting: false,
       originBusiness: '',
       isPublished: false,
       FORMITEMTYPE
@@ -114,15 +118,15 @@ export default {
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
         ],
         description: [
-          { required: true, trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}200`, max: 200 },
+          { required: true, message: this.$t('message.workflow.enterDesc'), trigger: 'blur' },
+          { message: `${this.$t('message.workflow.descLength')}200`, max: 200 },
         ],
         orchestratorMode: [
-          { required: true, trigger: 'blur' }
+          { required: true, trigger: 'blur', message: this.$t('message.workflow.orchestratorMode') }
         ]
       }
     },
@@ -157,8 +161,9 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
+          this.submiting = true;
           this.$emit('confirm', this.modeValueTypeChange(this.workflowDataCurrent));
-          this.ProjectShow = false;
+          // 不要设置submiting false，通过父级v-if来控制
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

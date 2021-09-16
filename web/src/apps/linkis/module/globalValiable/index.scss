@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-
+ @import '~@/common/style/variables.scss';
 .global-valiable {
     overflow: auto;
     .global-valiable-form {
@@ -39,6 +39,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        @include font-color($light-text-color, $dark-text-color);
     }
     .global-valiable-add {
         margin-top: 10px;

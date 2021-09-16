@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main-content">
     <div class="formWrap">
       <Form ref="queries" :model="queries" inline>
         <FormItem
@@ -33,7 +33,12 @@
           $t("message.permissions.add")
         }}</Button>
       </div>
-      <Table :columns="columns" :data="departmentList" :loading="loading">
+      <Table
+        :columns="columns"
+        :row-class-name="rowClassName"
+        :data="departmentList"
+        :loading="loading"
+      >
         <template slot-scope="{ row, index }" slot="deptName">
           <div
             class="deptName"
@@ -194,7 +199,7 @@
       </Form>
       <slot name="footer">
         <div class="modalFooter">
-          <Button @click="handleModalCancel()" size="large">{{
+          <Button @click="handleModalCancel()" size="large" class="cancle-btn">{{
             $t("message.workspace.cancel")
           }}</Button>
           <Button
@@ -230,7 +235,10 @@ import {
   keepTreeNLevel
 } from "../util";
 
-//构建表格所需的树形结构
+/**
+ * 构建表格所需的树形结构
+ *
+ */
 function assembleTree(level, datas, result) {
   if (level !== 0) {
     const nexts = datas.filter(item => item.level !== level);
@@ -253,6 +261,39 @@ function assembleTree(level, datas, result) {
 export default {
   components: { Treeselect },
   data() {
+    const validateDepartNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.deptEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.deptTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        const valid = /^\w+@[a-z0-9]+\.[a-z]{2,4}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidEmail")));
+        }
+      } else {
+        callback();
+      }
+    };
+    const validatePhone = (rule, value, callback) => {
+      if (value) {
+        const valid = /^1[3456789]\d{9}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidPhone")));
+        }
+      } else {
+        callback();
+      }
+    };
     return {
       queries: {
         deptName: ""
@@ -310,7 +351,19 @@ export default {
         deptName: [
           {
             required: true,
-            message: this.$t("message.permissions.deptEmpty"),
+            validator: validateDepartNameCheck,
+            trigger: "blur"
+          }
+        ],
+        phone: [
+          {
+            validator: validatePhone,
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            validator: validateEmail,
             trigger: "blur"
           }
         ]
@@ -322,11 +375,29 @@ export default {
     this.getDepartmentList();
   },
   methods: {
-    getDepartmentList(query = "") {
+    getDepartmentList(query = "", isQuery = false) {
       this.loading = true;
       GetDepartmentList(query)
         .then(data => {
+          this.loading = false;
           const depts = (data && data.deptList) || [];
+          if (isQuery && query) {
+            if(depts.length == 0){
+              this.departmentList = [];
+              return;
+            }
+            const originList = _.cloneDeep(this.departmentListOrigin);
+            const temp = expandAll(originList);
+            depts.forEach(item => {
+              const index = temp.findIndex(t => t.id === item.id);
+              if (index !== -1) {
+                temp[index].__HITED__ = true;
+              }
+            });
+            this.departmentList = temp;
+
+            return;
+          }
 
           const departs = [];
           let MAX_LEVEL = 0;
@@ -344,12 +415,10 @@ export default {
           });
           let result = {};
           assembleTree(MAX_LEVEL, departs, result);
-          console.log(result);
           const departmentList = result.data;
           departmentList.forEach(item => addIdChain(item, "id"));
           this.departmentListOrigin = [...departmentList];
           this.departmentList = expandAll(departmentList);
-          this.loading = false;
         })
         .catch(e => {
           console.log(e);
@@ -366,7 +435,7 @@ export default {
       console.log("qeuery");
       const deptName = this.queries.deptName;
       const query = deptName ? encodeURI(`?deptName=${deptName}`) : "";
-      this.getDepartmentList(query);
+      this.getDepartmentList(query, true);
     },
     handleAdd() {
       GetDepartmentTree({}).then(data => {
@@ -457,10 +526,8 @@ export default {
       this.parentErrorTip =
         value !== undefined ? "" : this.$t("message.permissions.parentIdEmpty");
     },
-    checkParentValid(node){
-
+    checkParentValid(node) {
       console.log(node);
-
     },
     getParentName(data) {
       return getParentDepartName(data, this.departTree);
@@ -482,9 +549,15 @@ export default {
           const keys = ["parentId", "deptName", "leader", "phone", "email"];
           const executeMethod = isAdd ? AddNewDepartment : ModifyDepartment;
           const params = {};
-          keys.forEach(key => (params[key] = this.departForm[key]));
+          keys.forEach(key => {
+            params[key] =
+              key !== "parentId" && this.departForm[key]
+                ? this.departForm[key].trim()
+                : this.departForm[key];
+          });
           if (!isAdd) {
             params.id = this.editingData.id;
+            params.parentId = params.parentId ? params.parentId : 0;
           }
           this.confirmLoading = true;
           executeMethod(params)
@@ -498,6 +571,9 @@ export default {
               this.resetDepartForm();
               this.confirmLoading = false;
               this.modalVisible = false;
+              this.queries = {
+                deptName: ""
+              };
             })
             .catch(() => {
               this.confirmLoading = false;
@@ -516,52 +592,87 @@ export default {
         phone: "",
         email: ""
       };
+    },
+    rowClassName(row, index) {
+      if (row.__HITED__) {
+        return "table-department-hit";
+      }
+      return "";
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-.formWrap {
-  width: 100%;
-  padding: 20px;
-  padding-bottom: 0px;
-  border-bottom: 1px solid #dee4ec;
-}
-.tableWrap {
-  width: 100%;
-  padding: 0 24px;
-  .addWrap {
+@import '@/common/style/variables.scss';
+.main-content {
+  padding-top: 20px;
+  @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+  border: 1px solid $border-color-base;
+  @include border-color($border-color-base, $dark-workspace-background);
+  .formWrap {
+    width: 100%;
+    // padding: 20px;
+    // padding-bottom: 0px;
+    border-bottom: 1px solid #dee4ec;
+    @include border-color($border-color-base, $dark-border-color-base);
+    /deep/.ivu-form-item-label {
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
+    }
+    /deep/.ivu-input {
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      border: 1px solid $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
+    }
+    .cancle-btn {
+      @include border-color($border-color-base, $dark-border-color-base);
+      @include font-color($light-text-color, #FFF);
+      &:hover {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
+    }
+  }
+  .tableWrap {
+    margin: 0 24px 24px;
+    .addWrap {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      height: 72px;
+    }
+  }
+  .deptName {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .iconWrap {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .operation {
+    font-size: 14px;
+    // color: #2e92f7;
+    @include font-color($primary-color, $dark-primary-color);
+    cursor: pointer;
+  }
+  .modalFooter {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    width: 100%;
-    height: 72px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 10px;
   }
 }
-.deptName {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-.iconWrap {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  font-size: 20px;
-  cursor: pointer;
-}
-.operation {
-  font-size: 14px;
-  color: #2e92f7;
-  cursor: pointer;
-}
-.modalFooter {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding-top: 10px;
+
+</style>
+<style>
+.ivu-table .table-department-hit td {
+  background-color: rgb(45, 183, 245, 0.1);
 }
 </style>

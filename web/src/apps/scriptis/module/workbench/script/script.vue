@@ -1074,7 +1074,7 @@ export default {
           params: this.convertSettingParams(this.script.params),
         };
           // this.work.code = this.script.data;
-        const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
+        const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
             if (this.work.filepath) {
@@ -1442,6 +1442,8 @@ export default {
         bottom: -2px;
         z-index: 3;
         border-bottom: 1px solid #dcdee2;
+        @include border-color($border-color-base, $dark-base-color);
+        @include bg-color($light-base-color, $dark-base-color);
         cursor: ns-resize;
     }
     &.full-screen {
@@ -1455,13 +1457,14 @@ export default {
         height: 100% !important;
     }
     .new-sidebar-spin {
-        background-color: rgba(255, 255, 255, .1);
+        @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
     }
   }
   .log-panel {
     margin-top: 1px;
     border-top: $border-width-base $border-style-base $border-color-base;
-    background-color: $background-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
+    @include bg-color($light-base-color, $dark-base-color);
     .workbench-tabs {
       position: $relative;
       height: 100%;
@@ -1472,6 +1475,7 @@ export default {
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
+        @include border-color($border-color-base, $dark-menu-base-color);
         &.full-screen {
             position: fixed;
             left: 0;
@@ -1487,7 +1491,7 @@ export default {
           justify-content: flex-start;
           align-items: flex-start;
           height: 32px;
-          background-color: $body-background;
+          @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
           &.work-list-tab {
@@ -1510,21 +1514,24 @@ export default {
             display: inline-block;
             height: 32px;
             line-height: 32px;
-            background-color: $background-color-base;
-            color: $title-color;
+            @include bg-color($light-base-color, $dark-submenu-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
             cursor: pointer;
             min-width: 100px;
             max-width: 200px;
             overflow: hidden;
             margin-right: 2px;
             border: 1px solid #eee;
+            @include border-color($border-color-base, $dark-border-color-base);
             &.active {
               margin-top: 1px;
-              background-color: $body-background;
-              color: $primary-color;
+              @include bg-color($light-base-color, $dark-base-color);
+              @include font-color($primary-color, $dark-primary-color);
               border-radius: 4px 4px 0 0;
-              border: 1px solid $border-color-base;
-              border-bottom: 2px solid $primary-color;
+              border-left: 1px solid $border-color-base;
+              border-right: 1px solid $border-color-base;
+              border-top: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
             }
           }
         }

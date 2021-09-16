@@ -241,7 +241,7 @@ export default {
     align-items: center;
     .we-steps-title {
       text-align: center;
-      color: $title-color;
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
     .we-steps-child-col {
       height: 50px;
@@ -264,7 +264,8 @@ export default {
               background: $subsidiary-color;
               text-align: center;
               .we-steps-circle-checkmark {
-                color: $body-background;
+                // color: $body-background;
+                @include font-color(#fff, #000);
               }
               &.loading {
                 background: orange;

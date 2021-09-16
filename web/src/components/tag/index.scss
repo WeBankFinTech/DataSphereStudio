@@ -14,16 +14,19 @@
  * limitations under the License.
  *
  */
-
+ @import '@/common/style/variables.scss';
 .we-tag {
     .we-tag-content {
-        background-color: #ecf5ff;
+        // background-color: #ecf5ff;
+        @include bg-color(#ecf5ff, $dark-workspace-body-bg-color);
         display: inline-block;
         height: 32px;
         padding: 0 10px;
         line-height: 30px;
         color: #409eff;
+        // @include font-color(#409eff, $dark-workspace-title-color);
         border: 1px solid #d9ecff;
+        @include border-color($border-color-base, $dark-border-color-base);
         border-radius: 4px;
         white-space: nowrap;
         margin-right: 10px;
@@ -51,8 +54,10 @@
             top: 8px;
             right: 2px;
             &:hover {
-                color: #fff;
+                // color: #fff;
+                @include font-color($active-menu-item, $dark-active-menu-item);
                 background-color: #409eff;
+                // @include bg-color($primary-color, $dark-active-menu-item);
             }
         }
     }
@@ -62,16 +67,22 @@
         line-height: 30px;
         padding: 0 10px;
         border: 1px solid #dcdfe6;
+        @include border-color($border-color-base, $dark-border-color-base);
         border-radius: 3px;
-        background: #fff;
+        // background: #fff;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         white-space: nowrap;
-        color: #606266;
+        // color: #606266;
+        @include font-color(#606266, $dark-workspace-title-color);
         font-weight: 500;
         cursor: pointer;
         &:hover {
-            color: #409eff;
-            border-color: #c6e2ff;
-            background-color: #ecf5ff;
+            // color: #409eff;
+            @include font-color($primary-color, $dark-primary-color);
+            // border-color: #c6e2ff;
+            @include border-color(#c6e2ff, $dark-border-color-base);
+            // background-color: #ecf5ff;
+            @include bg-color($active-menu-item, $dark-active-menu-item);
         }
     }
     .we-tag-add-input {
@@ -81,6 +92,9 @@
         width: 80px;
         border-radius: 4px;
         padding: 0 10px;
-        color: #606266;
+        // color: #606266;
+        @include font-color(#606266, $dark-text-color);
+        @include border-color($border-color-base, $dark-border-color-base);
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
     }
 }

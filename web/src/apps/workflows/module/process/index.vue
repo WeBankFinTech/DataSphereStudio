@@ -104,7 +104,7 @@ import Process from "./module.vue";
 import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
-
+import eventbus from '@/common/helper/eventbus';
 import DS from '@/apps/workflows/module/dispatch'
 
 export default {
@@ -199,6 +199,11 @@ export default {
       this.showTip = false;
     },
     choose(index) {
+      if (index == 0) {
+        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'dev' });
+      } else {
+        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'scheduler' });
+      }
       this.active = index;
       this.updateProjectCacheByActive();
     },

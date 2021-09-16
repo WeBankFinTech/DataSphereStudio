@@ -5,7 +5,6 @@
     :closable="false">
     <Form
       :label-width="100"
-      label-position="left"
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"
@@ -15,6 +14,7 @@
         prop="name">
         <Input
           v-model="projectDataCurrent.name"
+          :maxlength=21
           :placeholder="$t('message.workspace.enterName')"
           :disabled="actionType === 'modify'" />
       </FormItem>
@@ -64,6 +64,7 @@
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
+          maxlength="200"
           :placeholder="$t('message.workspace.pleaseInputWorkspaceDesc')" />
       </FormItem>
     </Form>
@@ -75,6 +76,8 @@
       <Button
         type="primary"
         size="large"
+        :disabled="submiting"
+        :loading="submiting"
         @click="Ok">{{$t('message.workspace.ok')}}</Button>
     </div>
   </Modal>
@@ -108,27 +111,25 @@ export default {
   },
   data() {
     return {
+      submiting: false,
       ProjectShow: false,
       departments: [],
-      treeDepartments: []
+      treeDepartments: [],
+      projectDataCurrent: {},
     };
   },
   computed: {
-    projectDataCurrent() {
-      if (!this.projectData.department)
-        this.projectData.department = null
-      return this.projectData;
-    },
     formValid() {
       return {
         name: [
           { required: true, message: this.$t('message.workspace.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workspace.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workspace.nameLength')}20`, max: 20 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workspace.validNameDesc'), trigger: 'blur' },
           { validator: this.checkNameExist, message: this.$t('message.workspace.validNameExist'), trigger: 'blur' },
         ],
         description: [
           { required: true, message: this.$t('message.workspace.pleaseInputWorkspaceDesc'), trigger: 'blur' },
+          { message: `${this.$t('message.workspace.nameLength')}200`, max: 200 },
         ],
         workspace_type: [
           { required: true, message: this.$t('message.workspace.selectWorkspaceType'), trigger: 'change' },
@@ -153,6 +154,12 @@ export default {
     ProjectShow(val) {
       this.$emit('show', val);
     },
+    projectData(value){
+      this.projectDataCurrent = {
+        ...value,
+        department: !value.department ? null : value.department
+      }
+    }
   },
   methods: {
     checkNameExist(rule, value, callback) {
@@ -170,8 +177,11 @@ export default {
           if (this.projectDataCurrent.workspace_type === 'department' && !this.projectDataCurrent.department) {
             return this.$Message.error(this.$t('message.workspace.selectDepartment'));
           }
-          this.$emit('confirm', this.projectDataCurrent);
-          this.ProjectShow = false;
+          this.submiting = true;
+          this.$emit('confirm', this.projectDataCurrent, () => {
+            this.ProjectShow = false;
+            this.submiting = false;
+          });
         } else {
           this.$Message.warning(this.$t('message.workspace.failedNotice'));
         }
@@ -191,7 +201,7 @@ export default {
       const tmpArr = this.projectDataCurrent.label.split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.projectData.label = tmpArr.toString();
+      this.projectDataCurrent.label = tmpArr.toString();
     }
   },
 };

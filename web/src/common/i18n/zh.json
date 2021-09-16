@@ -275,7 +275,7 @@
       },
       "deleteDialog": {
         "waring": "警告",
-        "action": "是{label}",
+        "action": "要{label}",
         "isNext": "是否继续？",
         "over": "结束{type}",
         "overThe": "结束该",

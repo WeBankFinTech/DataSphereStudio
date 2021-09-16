@@ -33,7 +33,8 @@
   position: relative;
   height: inherit;
   overflow-y: hidden;
-  color: $text-origin-color;
+  @include font-color($light-text-color, $dark-text-color);
+  @include bg-color($light-base-color, $dark-menu-base-color);
   font-size: $font-size-small;
   cursor: pointer;
   padding-left: 12px;

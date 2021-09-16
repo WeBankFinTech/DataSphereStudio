@@ -178,20 +178,6 @@ const tasksStateList = [
     icon: 'icon-watting-depend',
     code: 'WAITTING_DEPEND',
     color: '#5101be'
-  },
-  {
-    id: 12,
-    desc: i18n.$t('message.scheduler.tasksState.DELAY_EXECUTION'),
-    icon: 'icon-delay-execution',
-    code: 'DELAY_EXECUTION',
-    color: '#5102ce'
-  },
-  {
-    id: 13,
-    desc: i18n.$t('message.scheduler.tasksState.FORCED_SUCCESS'),
-    icon: 'icon-forced-success',
-    code: 'FORCED_SUCCESS',
-    color: '#5102ce'
   }
 ]
 

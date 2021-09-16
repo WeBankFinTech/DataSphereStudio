@@ -74,6 +74,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 //        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
 //                .eq("id", id);
         if (id != null) {
+            apiConfig.setIsTest(0);
             this.updateById(apiConfig);
         } else {
             this.save(apiConfig);
@@ -90,7 +91,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
      */
 
     @Override
-    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map) throws JSONException, SQLException, DataApiException {
+    public ApiExecuteInfo apiTest(String path, HttpServletRequest request,Map<String,Object> map,boolean isTest) throws JSONException, SQLException, DataApiException {
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
         ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
         List<Object > jdbcParamValues = new ArrayList<>();
@@ -104,7 +105,10 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if(pageNumObject == null){
                 throw new DataApiException("请设置pageNum参数");
             }
-            int pageNum = (Integer)pageNumObject;
+            int pageNum = Integer.valueOf(pageNumObject.toString());
+            if(pageNum < 1){
+                throw new DataApiException("pageNum参数错误");
+            }
             limitSent = " limit "+ ((pageNum-1) * pageSize)+","+pageSize;
         }
         if (apiConfig != null) {
@@ -124,19 +128,16 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
             Integer datasourceId = apiConfig.getDatasourceId();
             DataSource dataSource = apiDataSourceService.getById(datasourceId);
-            //解密
-//            String pwd = String.valueOf( CryptoUtils.string2Object(dataSource.getPwd()));
-//            dataSource.setPwd(pwd);
+
             String dataSourceType = dataSource.getType();
             if("MYSQL".equals(dataSourceType)){
                 dataSource.setClassName("com.mysql.jdbc.Driver");
             }
-//            dataSource.setUrl("jdbc:mysql://hadoop02:3306/dss_test?characterEncoding=UTF-8");
-//            dataSource.setUrl("jdbc:mysql://172.24.2.61:3306/dss_test?characterEncoding=UTF-8");
-//            dataSource.setUsername("root");
-//            dataSource.setPwd("123456");
-//            dataSource.setDatasourceId(1);
+
             apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
+            if(isTest){
+                apiConfigMapper.updateApiTestStatus(apiConfig.getId(),1);
+            }
 
         }else {
             apiExecuteInfo.setLog("该服务不存在,请检查服务url是否正确");
@@ -170,7 +171,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             int groupId = apiConfig.getGroupId();
             Long expireTime = apiAuthMapper.getToken(appKey,groupId,appSecret);
             if(expireTime != null && (expireTime * 1000) > startTime){
-                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,map);
+                ApiExecuteInfo apiExecuteInfo = apiTest(path,request,map,false);
                 long endTime = System.currentTimeMillis();
                 apiCall.setTimeEnd(new Date(endTime));
                 apiCall.setTimeLength(endTime-startTime);
@@ -308,7 +309,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                 while (rs.next()) {
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
-                        jo.put(columnName,value.toString() );
+                        jo.put(columnName,value == null ? null : value.toString() );
                     }
                     list.add(jo);
                 }
@@ -334,6 +335,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             }
             apiExecuteInfo.setResList(list);
         } catch (Exception e){
+            e.printStackTrace();
            logBuilder.append(e.getMessage());
            throw new DataApiException(logBuilder.toString());
         }finally {

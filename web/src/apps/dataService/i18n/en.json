@@ -22,7 +22,9 @@
         "col_apiType": "ApiType",
         "col_status": "Status",
         "onlined": "online",
-        "offlined": "offline"
+        "offlined": "offline",
+        "offlineApiTitle": "Are you sure offline the api?",
+        "offlineApiDesc": "you will not call the api which after offline"
       },
       "apiMonitor": {
         "staticsScreen": "API Statics Screen",
@@ -71,6 +73,7 @@
           "long": "long"
         },
         "col_caller": "caller",
+        "col_group": "groupName",
         "col_expire": "expire",
         "col_createTime": "createTime"
       },

@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.indicator.restful;
 
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
+import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorEnableVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -51,11 +52,34 @@ public class IndicatorRestfulApi {
     }
 
 
+    /**
+     * 修改
+     * @param req
+     * @param id
+     * @param vo
+     * @return
+     * @throws Exception
+     */
     @PUT
     @Path("/indicators/{id}")
     public Response update(@Context HttpServletRequest req, @PathParam("id") Long id , @RequestBody IndicatorUpdateVO vo) throws Exception {
         LOGGER.info("indicatorAddVO : {}", vo);
         return Message.messageToResponse(Message.ok().data("count",indicatorService.updateIndicator(id,vo)));
+    }
+
+
+    /**
+     * 启用/禁用
+     * @param req
+     * @param id
+     * @param vo
+     * @return
+     */
+    @PUT
+    @Path("/indicators/enable/{id}")
+    public Response enable(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody IndicatorEnableVO vo) {
+        LOGGER.info("enable id : {}, vo : {}", id, vo);
+        return null;//Message.messageToResponse(Message.ok().data("count", dimensionService.enableDimension(id, vo)));
     }
 
 

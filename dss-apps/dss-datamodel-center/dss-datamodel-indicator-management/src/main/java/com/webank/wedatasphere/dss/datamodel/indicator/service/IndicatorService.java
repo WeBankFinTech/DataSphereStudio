@@ -41,7 +41,7 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @param vo
      * @return
      */
-    int enableDimension(Long id, IndicatorEnableVO vo);
+    int enableIndicator(Long id, IndicatorEnableVO vo);
 
 
 

@@ -134,7 +134,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
     @Override
-    public int enableDimension(Long id, IndicatorEnableVO vo) {
+    public int enableIndicator(Long id, IndicatorEnableVO vo) {
         DssDatamodelIndicator updateOne =modelMapper.map(vo,DssDatamodelIndicator.class);
         updateOne.setUpdateTime(new Date());
         return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId,id));

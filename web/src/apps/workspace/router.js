@@ -57,6 +57,16 @@ export const apiServicesRoutes = [
       },
       component: () =>
         import('./module/management/module/jurisdiction.vue'),
+    },
+    {
+      path: 'dataSourceAdministration',
+      name: 'dataSourceAdministration',
+      meta: {
+        title: '鲁班',
+        publicPage: true
+      },
+      component: () =>
+        import('./module/management/module/dataSourceAdministration.vue'),
     }]
   },
   {

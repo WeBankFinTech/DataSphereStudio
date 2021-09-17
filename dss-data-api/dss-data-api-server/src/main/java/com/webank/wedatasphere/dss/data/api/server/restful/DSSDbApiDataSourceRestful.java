@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import com.webank.wedatasphere.dss.data.api.server.util.PoolManager;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -73,7 +75,7 @@ public class DSSDbApiDataSourceRestful {
 
     @POST
     @Path("/add")
-    public Message addDatasource(@RequestBody DataSource dataSource,@Context HttpServletRequest req){
+    public Message addDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
 
         dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
         dataSource.setCreateBy(SecurityFilter.getLoginUsername(req));
@@ -81,6 +83,37 @@ public class DSSDbApiDataSourceRestful {
         return Message.ok("保存成功");
     }
 
+    @GET
+    @Path("/list")
+    public Message getAllDs(@QueryParam("workspaceId") Integer workspaceId, @QueryParam("type") String type, @QueryParam("name") String name) {
 
+        DataSource dataSource = new DataSource();
+        dataSource.setWorkspaceId(workspaceId);
+        dataSource.setType(type);
+        dataSource.setName(name);
+        List<DataSource> allDatasource = dssDbApiDataSourceService.listAllDatasources(dataSource);
+
+        return Message.ok().data("allDs", allDatasource);
+    }
+
+    @POST
+    @Path("/edit")
+    public Message editDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
+        if (StringUtils.isNotEmpty(dataSource.getPwd())) {
+            PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
+            dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
+            dataSource.setUpdateBy(SecurityFilter.getLoginUsername(req));
+            dssDbApiDataSourceService.editDatasource(dataSource);
+            return Message.ok("修改成功");
+        }
+        return Message.error("密码不能为空");
+    }
+
+    @POST
+    @Path("/delete/{id}")
+    public Message deleteDatasource(@PathParam("id") Integer id) {
+        dssDbApiDataSourceService.deleteById(id);
+        return Message.ok("删除成功");
+    }
 
 }

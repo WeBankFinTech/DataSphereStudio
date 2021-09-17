@@ -145,6 +145,7 @@ export default {
 } 
 .emptyGuideWrap{
   width: 100%;
+  min-height: 400px;
   height: calc( 100vh - 140px );
   min-width: 600px;
   border-top: 1px solid #DEE4EC;

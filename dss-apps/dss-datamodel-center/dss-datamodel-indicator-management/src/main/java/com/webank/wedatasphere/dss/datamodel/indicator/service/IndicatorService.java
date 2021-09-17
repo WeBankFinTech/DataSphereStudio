@@ -3,10 +3,7 @@ package com.webank.wedatasphere.dss.datamodel.indicator.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicator;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorEnableVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
+import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 
@@ -69,4 +66,29 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @return
      */
     Message queryById(Long id) throws DSSDatamodelCenterException;
+
+
+    /**
+     * 新增版本
+     * @param id
+     * @return
+     */
+    int addIndicatorVersion(Long id, IndicatorVersionAddVO vo) throws ErrorException;
+
+
+    /**
+     * 回退到某一版本
+     * @param vo
+     * @return
+     * @throws ErrorException
+     */
+    int versionRollBack(IndicatorVersionRollBackVO vo) throws ErrorException;
+
+
+    /**
+     * 查询历史版本列表
+     * @param vo
+     * @return
+     */
+    Message listIndicatorVersions(IndicatorVersionQueryVO vo);
 }

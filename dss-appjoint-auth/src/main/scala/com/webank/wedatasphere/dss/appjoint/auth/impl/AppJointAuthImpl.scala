@@ -17,30 +17,39 @@
 
 package com.webank.wedatasphere.dss.appjoint.auth.impl
 
-import java.net.URI
-import java.util
-
 import com.webank.wedatasphere.dss.appjoint.auth.{AppJointAuth, RedirectMsg}
 import com.webank.wedatasphere.linkis.common.utils.Logging
 import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
-import javax.servlet.http.HttpServletRequest
 import org.apache.commons.io.IOUtils
 import org.apache.http.impl.cookie.BasicClientCookie
 
+import java.net.URI
+import java.util
+import java.util.regex.Pattern
+import javax.servlet.http.HttpServletRequest
 import scala.collection.JavaConversions._
 
 /**
-  * Created by enjoyyin on 2019/11/6.
-  */
+ * Created by enjoyyin on 2019/11/6.
+ */
 class AppJointAuthImpl private() extends AppJointAuth with Logging {
 
+  private val pattern = Pattern.compile("/((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}")
   private val dwsHttpClients = new util.HashMap[String, DWSHttpClient]
 
   private def getBaseUrl(dssUrl: String): String = {
     val uri = new URI(dssUrl)
-    val dssPort = if(uri.getPort != -1) uri.getPort else 80
-    uri.getScheme + "://" + uri.getHost + ":" + dssPort
+    val redirectUrl = uri.getScheme + "://" + uri.getHost
+    val port = uri.getPort
+    //ip(v4)
+    if(isContainChinese(dssUrl))
+      redirectUrl + ":" + (if(port != -1) port else 80)
+    //ip(v6) or domain
+    else{
+      if(port != -1)
+        redirectUrl + ":" + port else redirectUrl
+    }
   }
 
   protected def getDWSClient(dssUrl: String): DWSHttpClient = {
@@ -81,6 +90,14 @@ class AppJointAuthImpl private() extends AppJointAuth with Logging {
   }
 
   override def close(): Unit = dwsHttpClients.values().foreach(IOUtils.closeQuietly)
+
+  /**
+   * 字符串是否包含ip
+   *
+   * @param str 待校验字符串
+   * @return true 包含中文字符 false 不包含中文字符
+   */
+  private def isContainChinese(dssUrl: String): Boolean = pattern.matcher(dssUrl).find
 }
 
 object AppJointAuthImpl {

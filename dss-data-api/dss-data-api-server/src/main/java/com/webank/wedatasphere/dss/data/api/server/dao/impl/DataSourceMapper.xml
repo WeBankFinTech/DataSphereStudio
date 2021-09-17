@@ -21,7 +21,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper">
     <resultMap id="DataSourceResult" type="com.webank.wedatasphere.dss.data.api.server.entity.DataSource">
         <id property="datasourceId" column="id"/>
-        <result property="workspaceId" column="workspaceId"/>
+        <result property="workspaceId" column="workspace_id"/>
         <result property="name" column="name"/>
         <result property="note" column="note"/>
         <result property="url" column="url"/>
@@ -29,6 +29,7 @@
         <result property="pwd" column="pwd"/>
         <result property="type" column="type"/>
         <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
 
@@ -39,6 +40,18 @@
         WHERE  is_delete=0 AND id = #{datasourceId}
     </select>
 
+    <select id="listAllDatasources" parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource"
+            resultMap="DataSourceResult">
+        SELECT id,workspace_id,name, note,url,username,type,create_by,create_time FROM dss_dataapi_datasource
+        WHERE is_delete=0 AND workspace_id = #{workspaceId}
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        <if test="name != null and name != ''">
+            AND name like concat('%', #{name}, '%')
+        </if>
+
+    </select>
     <select id="selectByTypeAndWorkspaceId"
             parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource"
             resultMap="DataSourceResult">
@@ -48,7 +61,7 @@
     </select>
 
     <insert id="addDatasource" parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource">
-      insert into dss_dataapi_datasource(
+        insert into dss_dataapi_datasource(
         <if test="workspaceId  != null and workspaceId != ''">workspace_id,</if>
         <if test="name  != null and name != ''">name,</if>
         <if test="note  != null and note != ''">note,</if>
@@ -58,7 +71,7 @@
         <if test="pwd  != null and pwd != ''">pwd,</if>
         <if test="createBy  != null and createBy != ''">create_by,</if>
         create_time
-         )values(
+        )values(
         <if test="workspaceId != null and name != ''">#{workspaceId},</if>
         <if test="name != null and name != ''">#{name},</if>
         <if test="note != null and note != ''">#{note},</if>
@@ -67,8 +80,25 @@
         <if test="username != null and username != ''">#{username},</if>
         <if test="pwd != null and pwd != ''">#{pwd},</if>
         <if test="createBy != null and createBy != ''">#{createBy},</if>
-         sysdate()
-         )
+        sysdate()
+        )
     </insert>
+
+    <delete id="deleteById" parameterType="Integer">
+    update dss_dataapi_datasource set is_delete = '1' where id = #{id}
+	</delete>
+
+    <update id="editDatasource" parameterType="com.webank.wedatasphere.dss.data.api.server.entity.DataSource">
+        update dss_dataapi_datasource
+        <set>
+            <if test="note != null and note != ''">note = #{note},</if>
+            <if test="url != null and url != ''">url = #{url},</if>
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="pwd != null and pwd != ''">pwd = #{pwd},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{datasourceId}
+    </update>
 
 </mapper>

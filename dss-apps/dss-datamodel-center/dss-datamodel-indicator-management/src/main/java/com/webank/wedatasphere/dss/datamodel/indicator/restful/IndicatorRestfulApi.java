@@ -79,7 +79,7 @@ public class IndicatorRestfulApi {
     @Path("/indicators/enable/{id}")
     public Response enable(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody IndicatorEnableVO vo) {
         LOGGER.info("enable id : {}, vo : {}", id, vo);
-        return null;//Message.messageToResponse(Message.ok().data("count", dimensionService.enableDimension(id, vo)));
+        return Message.messageToResponse(Message.ok().data("count", indicatorService.enableIndicator(id, vo)));
     }
 
 

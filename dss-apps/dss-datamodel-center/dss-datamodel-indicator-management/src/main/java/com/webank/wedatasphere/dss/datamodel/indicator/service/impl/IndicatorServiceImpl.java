@@ -18,6 +18,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.restful.IndicatorRestfulA
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorContentService;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
+import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorEnableVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -79,7 +80,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
         Long orgId = org.getId();
-        String verison = org.getVersion();
+        String version = org.getVersion();
 
         //更新原有指标
         DssDatamodelIndicator updateOne = modelMapper.map(vo, DssDatamodelIndicator.class);
@@ -89,7 +90,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
 
-        return indicatorContentService.updateIndicatorContent(orgId, verison, vo.getContent());
+        return indicatorContentService.updateIndicatorContent(orgId, version, vo.getContent());
     }
 
 
@@ -108,8 +109,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
 
         return Message.ok()
-                .data("list", iPage
-                        .getRecords())
+                .data("list", iPage.getRecords())
                 .data("total", iPage.getTotal());
     }
 
@@ -130,5 +130,13 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         IndicatorContentQueryDTO indicatorContentQueryDTO = modelMapper.map(content, IndicatorContentQueryDTO.class);
         indicatorQueryDTO.setContent(indicatorContentQueryDTO);
         return Message.ok().data("detail",indicatorQueryDTO);
+    }
+
+
+    @Override
+    public int enableDimension(Long id, IndicatorEnableVO vo) {
+        DssDatamodelIndicator updateOne =modelMapper.map(vo,DssDatamodelIndicator.class);
+        updateOne.setUpdateTime(new Date());
+        return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId,id));
     }
 }

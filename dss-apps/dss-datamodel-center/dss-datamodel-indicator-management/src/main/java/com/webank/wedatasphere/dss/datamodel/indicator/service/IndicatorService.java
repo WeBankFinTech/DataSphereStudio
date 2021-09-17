@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicator;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
+import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorEnableVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -23,6 +24,8 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      */
     int addIndicator(IndicatorAddVO vo, String version) throws ErrorException;
 
+
+
     /**
      * 更新
      * @param vo
@@ -30,6 +33,16 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @throws ErrorException
      */
     int updateIndicator(Long id, IndicatorUpdateVO vo) throws ErrorException;
+
+
+
+    /**
+     * 启用/禁用
+     * @param vo
+     * @return
+     */
+    int enableDimension(Long id, IndicatorEnableVO vo);
+
 
 
     /**

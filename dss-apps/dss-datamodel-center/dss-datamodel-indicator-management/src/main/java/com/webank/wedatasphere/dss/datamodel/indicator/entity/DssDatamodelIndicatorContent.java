@@ -1,8 +1,15 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.util.Date;
 
 public class DssDatamodelIndicatorContent {
+
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long indicatorId;
@@ -31,8 +38,10 @@ public class DssDatamodelIndicatorContent {
 
     private String calculationOwner;
 
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     public Long getId() {

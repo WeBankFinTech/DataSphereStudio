@@ -319,26 +319,29 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         map.forEach((k,v) ->{
             DSSWorkspaceMenuPrivVO vo = new DSSWorkspaceMenuPrivVO();
             vo.setId(k);
-            vo.setName(workspaceDBHelper.getMenuNameById(k).getTitleCn());
-            Map<String, Boolean> menuPrivs = new HashMap<>();
-            workspaceRoleVOList.forEach(role->{
-                int roleId = role.getRoleId();
-                boolean isContain = false;
-                for(DSSWorkspaceMenuRolePriv dssWorkspaceMenuRolePriv:v){
-                    if(roleId == dssWorkspaceMenuRolePriv.getRoleId()){
-                        menuPrivs.put(workspaceDBHelper.getRoleNameById(dssWorkspaceMenuRolePriv.getRoleId()), dssWorkspaceMenuRolePriv.getPriv() == 1);
-                        isContain = true;
-                        break;
+            if(workspaceDBHelper.getMenuNameById(k) != null){
+                vo.setName(workspaceDBHelper.getMenuNameById(k).getTitleCn());
+                Map<String, Boolean> menuPrivs = new HashMap<>();
+                workspaceRoleVOList.forEach(role->{
+                    int roleId = role.getRoleId();
+                    boolean isContain = false;
+                    for(DSSWorkspaceMenuRolePriv dssWorkspaceMenuRolePriv:v){
+                        if(roleId == dssWorkspaceMenuRolePriv.getRoleId()){
+                            menuPrivs.put(role.getRoleName(), dssWorkspaceMenuRolePriv.getPriv() == 1);
+                            isContain = true;
+                            break;
+                        }
                     }
-                }
-                if(!isContain){
-                    menuPrivs.put(role.getRoleName(), false);
-                }
+                    if(!isContain){
+                        menuPrivs.put(role.getRoleName(), false);
+                    }
 
-            });
+                });
 
-            vo.setMenuPrivs(menuPrivs);
-            dssWorkspaceMenuPrivVOList.add(vo);
+                vo.setMenuPrivs(menuPrivs);
+                dssWorkspaceMenuPrivVOList.add(vo);
+            }
+
         });
         dssWorkspacePrivVO.setMenuPrivVOS(dssWorkspaceMenuPrivVOList);
 
@@ -365,39 +368,30 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         map1.forEach((k,v) ->{
             DSSWorkspaceComponentPrivVO vo = new DSSWorkspaceComponentPrivVO();
             vo.setId(k);
+            Map<String, Boolean> componentPrivs = new HashMap<>();
+
             if (workspaceDBHelper.getComponent(k) != null){
                 vo.setName(workspaceDBHelper.getComponent(k).getName());
-            } else {
-                vo.setName("linkis");
-            }
-            Map<String, Boolean> componentPrivs = new HashMap<>();
-            //
-
-            workspaceRoleVOList.forEach(role->{
-                int roleId = role.getRoleId();
-                boolean isContain = false;
-                for(DSSWorkspaceComponentRolePriv dssWorkspaceComponentRolePriv:v){
-                    if(roleId == dssWorkspaceComponentRolePriv.getRoleId()){
-                        componentPrivs.put(workspaceDBHelper.getRoleNameById(dssWorkspaceComponentRolePriv.getRoleId()), dssWorkspaceComponentRolePriv.getPriv() == 1);
-                        isContain = true;
-                        break;
+                workspaceRoleVOList.forEach(role->{
+                    int roleId = role.getRoleId();
+                    boolean isContain = false;
+                    for(DSSWorkspaceComponentRolePriv dssWorkspaceComponentRolePriv:v){
+                        if(roleId == dssWorkspaceComponentRolePriv.getRoleId()){
+                            componentPrivs.put(role.getRoleName(), dssWorkspaceComponentRolePriv.getPriv() == null ? false :dssWorkspaceComponentRolePriv.getPriv() == 1);
+                            isContain = true;
+                            break;
+                        }
                     }
-                }
-                if(!isContain){
-                    componentPrivs.put(role.getRoleName(), false);
-                }
+                    if(!isContain){
+                        componentPrivs.put(role.getRoleName(), false);
+                    }
 
-            });
+                });
+                vo.setComponentPrivs(componentPrivs);
+                dssWorkspaceComponentPrivVOList.add(vo);
 
-            //
-//            v.forEach(priv -> {
-//                componentPrivs.put(workspaceDBHelper.getRoleNameById(priv.getRoleId()), priv.getPriv() == 1);
-//            });
+            }
 
-
-
-            vo.setComponentPrivs(componentPrivs);
-            dssWorkspaceComponentPrivVOList.add(vo);
         });
         dssWorkspacePrivVO.setComponentPrivVOS(dssWorkspaceComponentPrivVOList);
         return dssWorkspacePrivVO;

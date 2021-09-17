@@ -37,4 +37,13 @@ public interface IndicatorContentService extends IService<DssDatamodelIndicatorC
      * @return
      */
     DssDatamodelIndicatorContent queryByIndicateId(Long indicateId);
+
+
+    /**
+     * 根据indicator 删除指标详情
+     * @param id
+     * @return
+     * @throws ErrorException
+     */
+    int deleteByIndicatorId(Long id)throws ErrorException;
 }

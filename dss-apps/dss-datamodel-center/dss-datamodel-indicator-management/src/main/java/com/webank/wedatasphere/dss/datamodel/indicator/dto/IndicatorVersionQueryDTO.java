@@ -1,15 +1,16 @@
-package com.webank.wedatasphere.dss.datamodel.indicator.entity;
+package com.webank.wedatasphere.dss.datamodel.indicator.dto;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.util.Date;
 
-public class DssDatamodelIndicatorVersion {
+/**
+ * @author helong
+ * @date 2021/9/17
+ */
+public class IndicatorVersionQueryDTO {
 
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String name;
@@ -28,10 +29,8 @@ public class DssDatamodelIndicatorVersion {
      */
     private String versionContext;
 
-    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     private String comment;

@@ -39,8 +39,6 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
         newOne.setIndicatorId(indicatorId);
         //todo 检查内容
         newOne.setIndicatorSourceInfo(gson.toJson(vo.getSourceInfo()));
-        newOne.setCreateTime(new Date());
-        newOne.setUpdateTime(new Date());
         if (!save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_CONTENT_ADD_ERROR.getCode(), "add indicator content error");
         }
@@ -62,5 +60,11 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
     public DssDatamodelIndicatorContent queryByIndicateId(Long indicateId) {
         return getBaseMapper()
                 .selectOne(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, indicateId));
+    }
+
+
+    @Override
+    public int deleteByIndicatorId(Long id) throws ErrorException {
+        return getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, id));
     }
 }

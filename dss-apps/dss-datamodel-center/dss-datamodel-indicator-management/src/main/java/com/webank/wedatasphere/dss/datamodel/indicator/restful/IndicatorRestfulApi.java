@@ -1,10 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.restful;
 
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorAddVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorEnableVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorQueryVO;
-import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorUpdateVO;
+import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.slf4j.Logger;
@@ -37,7 +34,7 @@ public class IndicatorRestfulApi {
     private IndicatorService indicatorService;
 
     /**
-     * 新增维度
+     * 新增
      *
      * @param req
      * @param vo
@@ -48,7 +45,7 @@ public class IndicatorRestfulApi {
     @Path("/indicators")
     public Response add(@Context HttpServletRequest req, @RequestBody IndicatorAddVO vo) throws Exception {
         LOGGER.info("indicatorAddVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.addIndicator(vo,"v1" )));
+        return Message.messageToResponse(Message.ok().data("count",indicatorService.addIndicator(vo,"1" )));
     }
 
 
@@ -108,5 +105,53 @@ public class IndicatorRestfulApi {
     public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
         LOGGER.info("query id : {}", id);
         return Message.messageToResponse(Message.ok().data("detail",indicatorService.queryById(id)));
+    }
+
+
+
+    /**
+     * 新增版本
+     *
+     * @param req
+     * @param vo
+     * @return
+     * @throws IOException
+     */
+    @POST
+    @Path("/indicators/versions/{id}")
+    public Response addVersion(@Context HttpServletRequest req, @PathParam("id") Long id,@RequestBody IndicatorVersionAddVO vo) throws Exception {
+        LOGGER.info("indicatorVersionAddVO : {}", vo);
+        return Message.messageToResponse(Message.ok().data("count",indicatorService.addIndicatorVersion(id,vo)));
+    }
+
+
+
+    /**
+     *
+     * 回退某个版本
+     * @param req
+     * @param vo
+     * @return
+     * @throws IOException
+     */
+    @POST
+    @Path("/indicators/versions/rollback")
+    public Response versionRollBack(@Context HttpServletRequest req,IndicatorVersionRollBackVO vo) throws Exception {
+        LOGGER.info("indicatorVersionRollBackVO : {}", vo);
+        return Message.messageToResponse(Message.ok().data("count",indicatorService.versionRollBack(vo)));
+    }
+
+
+
+    /**
+     * 搜索指标版本
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/indicators/versions/list")
+    public Response versionsList(@Context HttpServletRequest req, @RequestBody IndicatorVersionQueryVO vo){
+        LOGGER.info("version list vo : {}",vo);
+        return Message.messageToResponse(indicatorService.listIndicatorVersions(vo));
     }
 }

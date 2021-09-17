@@ -37,7 +37,7 @@ public class MeasureRestfulApi {
     private MeasureService measureService;
 
     /**
-     * 新增维度
+     * 新增
      *
      * @param req
      * @param vo

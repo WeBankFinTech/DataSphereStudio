@@ -12,9 +12,11 @@
     <result column="version_context" jdbcType="LONGVARCHAR" property="versionContext" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, `name`, `owner`, principal_name, version, version_context, create_time, update_time
+    id, `name`, `owner`, principal_name, version, version_context, create_time, update_time, 
+    `comment`
   </sql>
 </mapper>

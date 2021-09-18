@@ -136,23 +136,19 @@ export default {
         datalist: []
       },
       searchBar: {
-        type: "",
+        type: "MYSQL",
         name: ""
       },
       typeList: [
         {
           value: 'MYSQL',
           label: 'MYSQL'
-        },
-        {
-          value: 'ORACLE',
-          label: 'ORACLE'
         }
       ],
       editDataSource: {},
       delDataSource: {},
       addDataSource: {
-        type: "",
+        type: "MYSQL",
         name: "",
         note: "",
         url: "",
@@ -308,6 +304,7 @@ export default {
               this.$Message.success(this.$t('message.workspaceManagemnet.addSuccess'))
             })
             this.$refs[ref].resetFields()
+            this.addDataSource.type = "MYSQL"
             this.addshow = false
           }
         } else {

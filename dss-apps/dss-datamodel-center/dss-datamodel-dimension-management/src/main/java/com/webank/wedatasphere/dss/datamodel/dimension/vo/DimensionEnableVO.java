@@ -7,14 +7,21 @@ package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 public class DimensionEnableVO {
 
 
-    private int isAvailable;
+    private Integer isAvailable;
 
 
-    public int getIsAvailable() {
+    public Integer getIsAvailable() {
         return isAvailable;
     }
 
-    public void setIsAvailable(int isAvailable) {
+    public void setIsAvailable(Integer isAvailable) {
         this.isAvailable = isAvailable;
+    }
+
+    @Override
+    public String toString() {
+        return "DimensionEnableVO{" +
+                "isAvailable=" + isAvailable +
+                '}';
     }
 }

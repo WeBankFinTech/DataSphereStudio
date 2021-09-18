@@ -16,4 +16,11 @@ public class MeasureEnableVO {
     public void setIsAvailable(Integer isAvailable) {
         this.isAvailable = isAvailable;
     }
+
+    @Override
+    public String toString() {
+        return "MeasureEnableVO{" +
+                "isAvailable=" + isAvailable +
+                '}';
+    }
 }

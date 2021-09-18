@@ -41,6 +41,8 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
     @Transactional
     public int addDimension(DimensionAddVO vo) {
         DssDatamodelDimension newOne = modelMapper.map(vo,DssDatamodelDimension.class);
+        newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         return getBaseMapper().insert(newOne);
     }
 
@@ -50,6 +52,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
     public int enableDimension(Long id ,DimensionEnableVO vo) {
         DssDatamodelDimension enableOne = new DssDatamodelDimension();
         enableOne.setIsAvailable(vo.getIsAvailable());
+        enableOne.setUpdateTime(new Date());
         return getBaseMapper().update(enableOne, Wrappers.<DssDatamodelDimension>lambdaUpdate().eq(DssDatamodelDimension::getId,id));
     }
 
@@ -58,6 +61,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
     @Transactional
     public int updateDimension(Long id, DimensionUpdateVO vo) {
         DssDatamodelDimension updateOne =modelMapper.map(vo,DssDatamodelDimension.class);
+        updateOne.setUpdateTime(new Date());
         return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelDimension>lambdaUpdate().eq(DssDatamodelDimension::getId,id));
     }
 

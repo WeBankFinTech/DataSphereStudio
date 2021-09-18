@@ -146,7 +146,8 @@ export default {
 
       component_id: 16,
 
-      addedFlag: false
+      addedFlag: false,
+      menuOptions: []
     };
   },
   watch: {
@@ -333,7 +334,19 @@ export default {
             item.type = "component";
             item.children = [];
             item.opened = true;
+
+            const menu = Object.create(null);
+            menu.name = item.name;
+            menu.title_cn = item.title_cn;
+            menu.title_en = item.title_en;
+
+            that.menuOptions.push(menu);
           });
+          console.log("that.menuOptions", that.menuOptions);
+          sessionStorage.setItem(
+            "menuOptions",
+            JSON.stringify(that.menuOptions)
+          );
           that.getAllComponentData(data, nodes => {
             if (nodes) {
               menu[2].nodes = nodes;
@@ -374,23 +387,17 @@ export default {
   mounted() {
     this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
-      // 需要页面刷新 数据持久化
-      // const node = menu[0].nodes.slice(1);
-      // this.handleTreeClick(node);
       this.$router.push("departManagement");
     }
-  },
-  created() {
-    //拉取后端数据
   }
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
-$permissions-Backgroud: #F4F7FB;
-$per-border-color:#DEE4EC;
-.management-platform-wrap{
+@import "@/common/style/variables.scss";
+$permissions-Backgroud: #f4f7fb;
+$per-border-color: #dee4ec;
+.management-platform-wrap {
   height: 100%;
   .management-platform-sidebar {
     display: flex;

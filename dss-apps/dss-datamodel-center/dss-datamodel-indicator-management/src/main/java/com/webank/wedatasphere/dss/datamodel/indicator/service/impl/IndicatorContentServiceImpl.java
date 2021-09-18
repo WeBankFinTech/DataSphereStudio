@@ -39,6 +39,8 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
         newOne.setIndicatorId(indicatorId);
         //todo 检查内容
         newOne.setIndicatorSourceInfo(gson.toJson(vo.getSourceInfo()));
+        newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         if (!save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_CONTENT_ADD_ERROR.getCode(), "add indicator content error");
         }

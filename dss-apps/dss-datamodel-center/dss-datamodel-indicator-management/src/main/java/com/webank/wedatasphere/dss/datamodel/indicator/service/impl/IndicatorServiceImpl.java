@@ -63,12 +63,14 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     @Transactional
     public int addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
-        DssDatamodelIndicator newOne = modelMapper.map(vo, DssDatamodelIndicator.class);
-        //基本信息中设置版本号
-        newOne.setVersion(version);
         if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())) > 0) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name can not repeat");
         }
+
+        DssDatamodelIndicator newOne = modelMapper.map(vo, DssDatamodelIndicator.class);
+        //基本信息中设置版本号
+        newOne.setVersion(version);
+        newOne.setCreateTime(new Date());
         if (!save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "add indicator error");
         }
@@ -153,6 +155,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Transactional
     public int enableIndicator(Long id, IndicatorEnableVO vo) {
         DssDatamodelIndicator updateOne = modelMapper.map(vo, DssDatamodelIndicator.class);
+        updateOne.setUpdateTime(new Date());
         return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId, id));
     }
 
@@ -195,6 +198,8 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //基本信息中设置版本号,如果新增时未指定版本号则生成新版本号
         String newVersion = StringUtils.isNotBlank(assignVersion) ? assignVersion : newVersion(orgName, orgV);
         newOne.setVersion(newVersion);
+        newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         //保存新版本
         if (save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "save new version indicator");

@@ -13,6 +13,8 @@ import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 /**
  * @author helong
  * @date 2021/9/17
@@ -31,6 +33,8 @@ public class IndicatorVersionServiceImpl extends ServiceImpl<DssDatamodelIndicat
         oldVersion.setVersion(version);
         oldVersion.setVersionContext(gson.toJson(versionContext));
         oldVersion.setComment(comment);
+        oldVersion.setCreateTime(new Date());
+        oldVersion.setUpdateTime(new Date());
         if (save(oldVersion)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "old verison save error");
 

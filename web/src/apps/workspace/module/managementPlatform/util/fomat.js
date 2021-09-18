@@ -1,4 +1,4 @@
-const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions"));
+const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
 const menuOptions = [];
 menuInfo.forEach(info => {
   menuOptions.push(info.title_en);
@@ -7,7 +7,6 @@ const _menuOptions = new Map();
 menuOptions.forEach((item, idx) => {
   _menuOptions.set(item, idx);
 });
-console.log("_menuOptions", _menuOptions);
 
 /**
  *

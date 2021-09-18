@@ -7,14 +7,13 @@ package com.webank.wedatasphere.dss.datamodel.measure.vo;
 public class MeasureEnableVO {
 
 
-    private int isAvailable;
+    private Integer isAvailable;
 
-
-    public int getIsAvailable() {
+    public Integer getIsAvailable() {
         return isAvailable;
     }
 
-    public void setIsAvailable(int isAvailable) {
+    public void setIsAvailable(Integer isAvailable) {
         this.isAvailable = isAvailable;
     }
 }

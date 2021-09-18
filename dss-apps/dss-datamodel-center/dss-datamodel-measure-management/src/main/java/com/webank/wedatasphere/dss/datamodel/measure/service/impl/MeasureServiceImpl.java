@@ -40,6 +40,8 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
     @Transactional
     public int addMeasure(MeasureAddVO vo) {
         DssDatamodelMeasure newOne = modelMapper.map(vo,DssDatamodelMeasure.class);
+        newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         return getBaseMapper().insert(newOne);
     }
 

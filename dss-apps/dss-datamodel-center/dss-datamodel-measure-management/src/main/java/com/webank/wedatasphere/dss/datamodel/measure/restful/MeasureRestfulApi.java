@@ -48,7 +48,7 @@ public class MeasureRestfulApi {
     @Path("/measures")
     public Response add(@Context HttpServletRequest req, @RequestBody MeasureAddVO vo) throws IOException {
         LOGGER.info("measureAddVO : {}", vo);
-        String userName = SecurityFilter.getLoginUsername(req);
+        //String userName = SecurityFilter.getLoginUsername(req);
         return Message.messageToResponse(Message.ok().data("count", measureService.addMeasure(vo)));
     }
 

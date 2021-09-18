@@ -1,12 +1,9 @@
 package com.webank.wedatasphere.dss.datamodel.measure.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Date;
-
+@TableName("dss_datamodel_measure")
 public class DssDatamodelMeasure {
 
     @TableId(type = IdType.AUTO)

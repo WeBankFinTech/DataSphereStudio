@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.vo;
 
-/**
- * @author helong
- * @date 2021/9/17
- */
+
 public class IndicatorEnableVO {
 
     private Integer isAvailable;

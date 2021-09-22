@@ -1,10 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.vo;
 
 import java.util.Map;
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public class IndicatorContentVO {
 
     private Long indicatorId;

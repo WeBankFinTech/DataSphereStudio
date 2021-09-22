@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.vo;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public class IndicatorUpdateVO {
 
     private String name;

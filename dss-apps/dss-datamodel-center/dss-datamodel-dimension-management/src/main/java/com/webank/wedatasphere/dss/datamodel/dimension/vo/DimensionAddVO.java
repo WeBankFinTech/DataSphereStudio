@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 public class DimensionAddVO {
 
     private String name;

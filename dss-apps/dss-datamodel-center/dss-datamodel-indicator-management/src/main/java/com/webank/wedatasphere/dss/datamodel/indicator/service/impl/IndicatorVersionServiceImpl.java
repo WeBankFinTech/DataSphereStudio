@@ -15,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/17
- */
+
 @Service
 public class IndicatorVersionServiceImpl extends ServiceImpl<DssDatamodelIndicatorVersionMapper, DssDatamodelIndicatorVersion> implements IndicatorVersionService {
 

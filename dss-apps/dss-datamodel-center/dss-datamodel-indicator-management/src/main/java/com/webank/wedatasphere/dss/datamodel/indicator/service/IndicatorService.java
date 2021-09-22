@@ -7,10 +7,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public interface IndicatorService extends IService<DssDatamodelIndicator> {
 
     /**

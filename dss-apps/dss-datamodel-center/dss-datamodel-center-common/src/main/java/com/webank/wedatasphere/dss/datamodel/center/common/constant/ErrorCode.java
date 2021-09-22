@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.center.common.constant;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public enum ErrorCode {
 
     INDICATOR_VERSION_ADD_ERROR(212031),

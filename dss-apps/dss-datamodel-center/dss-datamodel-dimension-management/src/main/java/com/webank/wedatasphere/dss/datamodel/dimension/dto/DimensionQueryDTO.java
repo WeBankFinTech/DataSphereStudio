@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.dimension.dto;
 
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class DimensionQueryDTO {
     private Long id;
 

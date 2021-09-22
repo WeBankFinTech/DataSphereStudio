@@ -26,10 +26,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 @Service
 public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMapper,DssDatamodelDimension>  implements DimensionService {
 

@@ -8,10 +8,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndica
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public interface IndicatorQueryMapper extends BaseMapper<DssDatamodelIndicatorQuery> {
 
     String querySql = "SELECT a.*, b.indicator_type, b.measure_id, b.indicator_source_info, b.formula, b.business, b.business_owner, b.calculation, b.calculation_owner " +

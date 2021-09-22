@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.measure.vo;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class MeasureUpdateVO {
 
     private String name;

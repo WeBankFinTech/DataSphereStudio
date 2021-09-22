@@ -5,10 +5,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndica
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.IndicatorContentVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public interface IndicatorContentService extends IService<DssDatamodelIndicatorContent> {
 
     /**

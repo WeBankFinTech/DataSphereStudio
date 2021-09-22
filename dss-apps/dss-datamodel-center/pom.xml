@@ -27,6 +27,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-datamodel-center</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>dss-datamodel-center-server</module>
+        <module>dss-datamodel-dimension-management</module>
+        <module>dss-datamodel-indicator-management</module>
+        <module>dss-datamodel-measure-management</module>
+        <module>dss-datamodel-table-management</module>
+        <module>dss-datamodel-center-common</module>
+    </modules>
 
 
     <properties>
@@ -41,7 +50,6 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-module</artifactId>
             <version>${linkis.version}</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>asm</artifactId>
@@ -65,9 +73,13 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-mybatis</artifactId>
             <version>${linkis.version}</version>
-            <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.4.4</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

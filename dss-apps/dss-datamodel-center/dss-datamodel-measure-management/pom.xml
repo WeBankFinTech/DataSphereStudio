@@ -26,7 +26,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dss-datamodel-dimension-management</artifactId>
+    <artifactId>dss-datamodel-measure-management</artifactId>
 
 
     <dependencies>
@@ -34,11 +34,43 @@
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-module</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hk2-api</artifactId>
+                    <groupId>org.glassfish.hk2</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jersey-common</artifactId>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>linkis-common</artifactId>
+                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.linkis</groupId>
             <artifactId>linkis-mybatis</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.5.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

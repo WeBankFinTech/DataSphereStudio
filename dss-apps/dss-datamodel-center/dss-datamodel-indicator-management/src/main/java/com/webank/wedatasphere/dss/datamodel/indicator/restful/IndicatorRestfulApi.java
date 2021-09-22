@@ -28,6 +28,8 @@ import java.io.IOException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class IndicatorRestfulApi {
 
+    {System.out.println("IndicatorRestfulApi init");}
+
     private static final Logger LOGGER = LoggerFactory.getLogger(IndicatorRestfulApi.class);
 
     @Autowired
@@ -150,8 +152,57 @@ public class IndicatorRestfulApi {
      */
     @POST
     @Path("/indicators/versions/list")
-    public Response versionsList(@Context HttpServletRequest req, @RequestBody IndicatorVersionQueryVO vo){
+    public Response indicatorVersionsList(@Context HttpServletRequest req, @RequestBody IndicatorVersionQueryVO vo){
         LOGGER.info("version list vo : {}",vo);
         return Message.messageToResponse(indicatorService.listIndicatorVersions(vo));
+    }
+
+
+    /**
+     * 指标相关主题可选列表
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/indicators/themes/list")
+    public Response indicatorThemesList(@Context HttpServletRequest req){
+        //todo
+        return Message.messageToResponse(Message.ok());
+    }
+
+    /**
+     * 指标相关分成可选类别
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/indicators/layers/list")
+    public Response indicatorLayerList(@Context HttpServletRequest req){
+        //todo
+        return Message.messageToResponse(Message.ok());
+    }
+
+    /**
+     * 指标相关周期列表
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/indicators/cycles/list")
+    public Response indicatorCycleList(@Context HttpServletRequest req){
+        //todo
+        return Message.messageToResponse(Message.ok());
+    }
+
+    /**
+     * 指标相关修饰词列表
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/indicators/modifiers/list")
+    public Response indicatorModifierList(@Context HttpServletRequest req){
+        //todo
+        return Message.messageToResponse(Message.ok());
     }
 }

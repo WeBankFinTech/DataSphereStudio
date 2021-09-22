@@ -58,7 +58,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     private IndicatorQueryMapper indicatorQueryMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
         if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())) > 0) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name can not repeat");
@@ -68,6 +68,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //基本信息中设置版本号
         newOne.setVersion(version);
         newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         if (!save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "add indicator error");
         }
@@ -76,7 +77,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateIndicator(Long id, IndicatorUpdateVO vo) throws ErrorException {
         DssDatamodelIndicator org = getBaseMapper().selectById(id);
         if (org == null) {
@@ -149,7 +150,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int enableIndicator(Long id, IndicatorEnableVO vo) {
         DssDatamodelIndicator updateOne = modelMapper.map(vo, DssDatamodelIndicator.class);
         updateOne.setUpdateTime(new Date());
@@ -158,7 +159,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addIndicatorVersion(Long id, IndicatorVersionAddVO vo) throws ErrorException {
 
         //判断旧版本指标是否存在
@@ -166,14 +167,12 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         if (orgVersion == null) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator  id " + id + " not exists");
         }
-        doIndicatorVersionBackUp(id, null, vo, orgVersion);
 
-        return 1;
-    }
 
-    private void doIndicatorVersionBackUp(Long id, String assignVersion, IndicatorVersionAddVO vo, DssDatamodelIndicator orgVersion) throws ErrorException {
         String orgName = orgVersion.getName();
         String orgV = orgVersion.getVersion();
+        String assignVersion = newVersion(orgName, orgV);
+
         //指标名称不能改变
         if (!StringUtils.equals(orgName, vo.getName())) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name must be same");
@@ -185,37 +184,44 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         }
 
         //旧版本备份
-        indicatorVersionService.addOlderVersion(orgName, orgVersion.getPrincipalName(),orgV, orgVersion.getComment(), IndicatorVersionDTO.of(orgVersion, orgContent));
+        indicatorVersionService.addOlderVersion(orgName, orgVersion.getOwner(), orgVersion.getPrincipalName(), orgV, orgVersion.getComment(), IndicatorVersionDTO.of(orgVersion, orgContent));
+
 
         //删除旧版本
         getBaseMapper().deleteById(id);
+        indicatorContentService.deleteByIndicatorId(id);
 
         //填充新增版本
         DssDatamodelIndicator newOne = modelMapper.map(vo, DssDatamodelIndicator.class);
         //基本信息中设置版本号,如果新增时未指定版本号则生成新版本号
-        String newVersion = StringUtils.isNotBlank(assignVersion) ? assignVersion : newVersion(orgName, orgV);
+        String newVersion = assignVersion;
         newOne.setVersion(newVersion);
         newOne.setCreateTime(new Date());
         newOne.setUpdateTime(new Date());
         //保存新版本
-        if (save(newOne)) {
+        if (!save(newOne)) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "save new version indicator");
 
         }
         //更新指标详细信息
         indicatorContentService.updateIndicatorContent(newOne.getId(), newVersion, vo.getContent());
+
+        return 1;
     }
 
 
     private String newVersion(String orgName, String orgVersion) {
         String lastVersion = indicatorVersionService.findLastVersion(orgName);
+
         return StringUtils.isBlank(lastVersion) ?
-                Integer.parseInt(orgVersion) + 1 + "" : Integer.parseInt(lastVersion) + 1 + "";
+                (Integer.parseInt(orgVersion) + 1 + "" ):
+                (Integer.parseInt(lastVersion) > Integer.parseInt(orgVersion) )? (Integer.parseInt(lastVersion) + 1 + "") :
+                        (Integer.parseInt(orgVersion) + 1 + "");
     }
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int versionRollBack(IndicatorVersionRollBackVO vo) throws ErrorException {
 
         String name = vo.getName();
@@ -226,15 +232,15 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 getBaseMapper().selectOne(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, name));
         //判断当前使用指标
         if (current == null) {
-            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "current indicator not exists, name : " + name + " version : " +version);
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "current indicator not exists, name : " + name + " version : " + version);
         }
         //查询当前详细信息
         DssDatamodelIndicatorContent currentContent = indicatorContentService.queryByIndicateId(current.getId());
         if (currentContent == null) {
-            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "current indicator content not exists, name : " + name + " version : " +version);
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "current indicator content not exists, name : " + name + " version : " + version);
         }
         //当前版本备份
-        indicatorVersionService.addOlderVersion(current.getName(), current.getPrincipalName(),current.getVersion(), current.getComment(), IndicatorVersionDTO.of(current, currentContent));
+        indicatorVersionService.addOlderVersion(current.getName(), current.getOwner(), current.getPrincipalName(), current.getVersion(), current.getComment(), IndicatorVersionDTO.of(current, currentContent));
         //删除当前版本
         getBaseMapper().deleteById(current.getId());
         //删除当前版本详情
@@ -246,14 +252,14 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "indicator name : " + name + " version : " + version + " not exist");
         }
 
-        IndicatorVersionDTO rollBackDTO = gson.fromJson(rollBackVersion.getVersionContext(),IndicatorVersionDTO.class);
+        IndicatorVersionDTO rollBackDTO = gson.fromJson(rollBackVersion.getVersionContext(), IndicatorVersionDTO.class);
         DssDatamodelIndicator rollBackIndicator = rollBackDTO.getEssential();
         //重置id
         rollBackIndicator.setId(null);
         save(rollBackIndicator);
 
 
-        DssDatamodelIndicatorContent rollBackContent = gson.fromJson(rollBackVersion.getVersionContext(),DssDatamodelIndicatorContent.class);
+        DssDatamodelIndicatorContent rollBackContent = rollBackDTO.getContent();
         //重置id
         rollBackContent.setId(null);
         //设置新指标id
@@ -267,10 +273,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     public Message listIndicatorVersions(IndicatorVersionQueryVO vo) {
         List<IndicatorVersionQueryDTO> list = indicatorVersionService.getBaseMapper()
-                .selectList(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName,vo.getName()))
+                .selectList(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, vo.getName()))
                 .stream()
-                .map(dssDatamodelIndicatorVersion -> modelMapper.map(dssDatamodelIndicatorVersion,IndicatorVersionQueryDTO.class))
+                .map(dssDatamodelIndicatorVersion -> modelMapper.map(dssDatamodelIndicatorVersion, IndicatorVersionQueryDTO.class))
                 .collect(Collectors.toList());
-        return Message.ok().data("list",list);
+        return Message.ok().data("list", list);
     }
 }

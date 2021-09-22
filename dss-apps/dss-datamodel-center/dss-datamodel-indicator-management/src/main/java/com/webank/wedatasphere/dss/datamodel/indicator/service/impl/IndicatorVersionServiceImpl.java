@@ -23,17 +23,18 @@ public class IndicatorVersionServiceImpl extends ServiceImpl<DssDatamodelIndicat
 
     @Override
     @Transactional
-    public int addOlderVersion(String name, String principalName, String version, String comment, IndicatorVersionDTO versionContext) throws ErrorException {
+    public int addOlderVersion(String name, String owner, String principalName, String version, String comment, IndicatorVersionDTO versionContext) throws ErrorException {
         DssDatamodelIndicatorVersion oldVersion = new DssDatamodelIndicatorVersion();
         oldVersion.setName(name);
         oldVersion.setPrincipalName(principalName);
+        oldVersion.setOwner(owner);
         oldVersion.setVersion(version);
         oldVersion.setVersionContext(gson.toJson(versionContext));
         oldVersion.setComment(comment);
         oldVersion.setCreateTime(new Date());
         oldVersion.setUpdateTime(new Date());
-        if (save(oldVersion)) {
-            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "old verison save error");
+        if (!save(oldVersion)) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "old version save error");
 
         }
         return 1;

@@ -35,7 +35,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addDimension(DimensionAddVO vo) {
         DssDatamodelDimension newOne = modelMapper.map(vo,DssDatamodelDimension.class);
         newOne.setCreateTime(new Date());
@@ -45,7 +45,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int enableDimension(Long id ,DimensionEnableVO vo) {
         DssDatamodelDimension enableOne = new DssDatamodelDimension();
         enableOne.setIsAvailable(vo.getIsAvailable());
@@ -55,7 +55,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateDimension(Long id, DimensionUpdateVO vo) {
         DssDatamodelDimension updateOne =modelMapper.map(vo,DssDatamodelDimension.class);
         updateOne.setUpdateTime(new Date());
@@ -64,7 +64,7 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int deleteDimension(Long id) {
         //todo 校验引用情况
         return getBaseMapper().deleteById(id);

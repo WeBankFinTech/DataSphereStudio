@@ -33,7 +33,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addMeasure(MeasureAddVO vo) {
         DssDatamodelMeasure newOne = modelMapper.map(vo,DssDatamodelMeasure.class);
         newOne.setCreateTime(new Date());
@@ -43,7 +43,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int enableMeasure(Long id , MeasureEnableVO vo) {
         DssDatamodelMeasure enableOne = new DssDatamodelMeasure();
         enableOne.setIsAvailable(vo.getIsAvailable());
@@ -53,7 +53,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateMeasure(Long id, MeasureUpdateVO vo) {
         DssDatamodelMeasure updateOne =modelMapper.map(vo,DssDatamodelMeasure.class);
         updateOne.setUpdateTime(new Date());
@@ -62,7 +62,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int deleteMeasure(Long id) {
         //todo 校验引用情况
         return getBaseMapper().deleteById(id);

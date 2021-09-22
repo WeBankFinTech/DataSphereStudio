@@ -19,7 +19,7 @@ import java.io.IOException;
 
 
 @Component
-@Path("/datamodel/")
+@Path("/datamodel")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class IndicatorRestfulApi {

@@ -55,4 +55,15 @@ public class IndicatorQueryVO {
     public void setOwner(String owner) {
         this.owner = owner;
     }
+
+    @Override
+    public String toString() {
+        return "IndicatorQueryVO{" +
+                "pageSize=" + pageSize +
+                ", pageNum=" + pageNum +
+                ", name='" + name + '\'' +
+                ", isAvailable=" + isAvailable +
+                ", owner='" + owner + '\'' +
+                '}';
+    }
 }

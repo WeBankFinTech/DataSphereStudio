@@ -13,12 +13,13 @@ public interface IndicatorVersionService extends IService<DssDatamodelIndicatorV
      * 保存旧版本
      *
      * @param name
+     * @param owner
      * @param principalName
      * @param version
      * @param versionContext
      * @return
      */
-    int addOlderVersion(String name, String principalName, String version, String comment, IndicatorVersionDTO versionContext) throws ErrorException;
+    int addOlderVersion(String name, String owner, String principalName, String version, String comment, IndicatorVersionDTO versionContext) throws ErrorException;
 
     /**
      * 根据指标名称查找最大版本

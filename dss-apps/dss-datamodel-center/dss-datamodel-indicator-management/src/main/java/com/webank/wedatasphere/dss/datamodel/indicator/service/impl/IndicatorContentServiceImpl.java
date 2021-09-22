@@ -28,7 +28,7 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addIndicatorContent(Long indicatorId, String version, IndicatorContentVO vo) throws ErrorException {
 
         DssDatamodelIndicatorContent newOne = modelMapper.map(vo, DssDatamodelIndicatorContent.class);
@@ -46,7 +46,7 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateIndicatorContent(Long indicateId, String version, IndicatorContentVO vo) throws ErrorException {
         //删除原有详细信息
         getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, indicateId));

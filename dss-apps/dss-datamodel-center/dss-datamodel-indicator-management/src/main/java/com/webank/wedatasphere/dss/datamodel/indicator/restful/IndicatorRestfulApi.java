@@ -126,7 +126,7 @@ public class IndicatorRestfulApi {
 
     /**
      *
-     * 回退某个版本
+     * 回退指定版本
      * @param req
      * @param vo
      * @return
@@ -167,7 +167,7 @@ public class IndicatorRestfulApi {
     }
 
     /**
-     * 指标相关分成可选类别
+     * 指标相关分层
      * @param req
      * @return
      */

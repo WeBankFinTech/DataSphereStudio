@@ -227,7 +227,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         String name = vo.getName();
         String version = vo.getVersion();
 
-        //获取当前试用版本指标
+        //获取当前使用版本指标
         DssDatamodelIndicator current =
                 getBaseMapper().selectOne(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, name));
         //判断当前使用指标

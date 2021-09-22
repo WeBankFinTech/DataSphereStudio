@@ -22,10 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-/**
- * @author Dylan
- * @date 2021/9/14
- */
+
 @Component
 @Path("/datamodel/")
 @Produces(MediaType.APPLICATION_JSON)

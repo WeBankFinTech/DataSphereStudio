@@ -2,10 +2,6 @@ package com.webank.wedatasphere.dss.datamodel.measure.dto;
 
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
 public class MeasureQueryDTO {
     private Long id;
 

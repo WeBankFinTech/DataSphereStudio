@@ -11,10 +11,7 @@ import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionUpdateVO;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 public interface DimensionService extends IService<DssDatamodelDimension> {
 
     /**

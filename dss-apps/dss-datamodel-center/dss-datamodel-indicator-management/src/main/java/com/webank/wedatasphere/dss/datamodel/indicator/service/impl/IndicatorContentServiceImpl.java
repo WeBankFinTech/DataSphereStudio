@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 @Service
 public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicatorContentMapper, DssDatamodelIndicatorContent> implements IndicatorContentService {
 

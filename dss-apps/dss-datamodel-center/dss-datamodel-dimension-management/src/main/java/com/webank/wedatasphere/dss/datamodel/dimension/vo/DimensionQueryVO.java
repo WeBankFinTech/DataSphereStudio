@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class DimensionQueryVO {
 
     private Integer pageSize = 10;

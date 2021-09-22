@@ -5,10 +5,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.dto.IndicatorVersionDTO;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorVersion;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-/**
- * @author helong
- * @date 2021/9/16
- */
+
 public interface IndicatorVersionService extends IService<DssDatamodelIndicatorVersion> {
 
 

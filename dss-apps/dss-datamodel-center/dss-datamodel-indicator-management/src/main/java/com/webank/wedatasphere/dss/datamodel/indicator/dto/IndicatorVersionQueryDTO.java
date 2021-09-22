@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/17
- */
+
 public class IndicatorVersionQueryDTO {
 
     private Long id;

@@ -24,7 +24,6 @@ import java.io.IOException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class IndicatorRestfulApi {
 
-    {System.out.println("IndicatorRestfulApi init");}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IndicatorRestfulApi.class);
 

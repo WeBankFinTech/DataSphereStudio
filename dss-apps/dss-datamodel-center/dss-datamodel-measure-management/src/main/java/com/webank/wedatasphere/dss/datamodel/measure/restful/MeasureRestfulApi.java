@@ -29,7 +29,6 @@ import java.io.IOException;
 @Consumes(MediaType.APPLICATION_JSON)
 public class MeasureRestfulApi {
 
-    {System.out.println("MeasureRestfulApi init");}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasureRestfulApi.class);
 

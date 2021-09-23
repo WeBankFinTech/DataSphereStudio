@@ -42,6 +42,11 @@
             <version>1.5.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-datamodel-center-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
     </dependencies>
 

@@ -691,7 +691,6 @@ export default {
         reqParams.reqTimeout = parseFloat(reqTimeout);
       }
       this.$refs["dbForm"].validate(valid => {
-        console.log(valid);
         if (valid) {
           if (apiType === "GUIDE") {
             const reqFields = [];
@@ -768,7 +767,6 @@ export default {
       api
         .fetch(`/dss/data/api/save`, reqParams, "post")
         .then(res => {
-          console.log(res);
           this.$emit("updateApiData", { ...data, ...reqParams });
 
           this.$Message.success("保存成功");
@@ -819,16 +817,13 @@ export default {
       const datas = [...this.paramsList];
       datas[index][column.key] = value;
       this.paramsList = datas;
-      console.log(column);
     },
     changeParamCompare(value, index) {
       const datas = [...this.paramsList];
       datas[index]["compare"] = value;
       this.paramsList = datas;
-      console.log(value);
     },
     changeSort(value, rowData) {
-      console.log(value);
       this.sortList = [...this.sortList].map((item, index) => {
         const newItem = { ...item };
         if (rowData.columnName === item.columnName) {
@@ -956,7 +951,6 @@ export default {
                 return { index: index + 1, ...ov, columnName: ov.name };
               });
             }
-            console.log(resValues);
             this.paramsList = res.allCols.map(item => {
               const { columnName } = item;
               const hit = reqValues.find(re => re.name === columnName);

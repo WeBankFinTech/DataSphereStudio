@@ -270,7 +270,6 @@ export default {
                 "post"
               )
               .then(res => {
-                console.log(res);
                 this.confirmLoading = false;
                 this.$refs.navMenu.treeMethod("getApi");
                 this.handleModalCancel();
@@ -282,7 +281,6 @@ export default {
         });
       } else {
         this.$refs["apiForm"].validate(valid => {
-          console.log(valid);
           if (valid) {
             if (modalType === "api") {
               const { id, name } = this.groupData;
@@ -377,7 +375,6 @@ export default {
       this.modalTitle = "API属性";
     },
     handleApiChoosed(payload) {
-      console.log(payload);
       if (payload.type === "api") {
         const { id, tempId } = payload;
         const newApis = [...this.apiTabDatas];
@@ -396,7 +393,6 @@ export default {
         api
           .fetch(`/dss/data/api/detail?apiId=${id}`, {}, "get")
           .then(res => {
-            console.log(res);
             this.loadingData = false;
             const data = res && res.detail;
             if (data) {
@@ -424,14 +420,12 @@ export default {
               data: { ...apiData, id: data.id, path: apiData.apiPath }
             };
           }
-          console.log(tmp);
           return tmp;
         });
         this.apiTabDatas = newApis;
       }
     },
     removeTab(id) {
-      console.log(id);
       const newApis = [...this.apiTabDatas];
       const hitIndex = newApis.findIndex(item => item.id === id);
       newApis.splice(hitIndex, 1);
@@ -446,7 +440,6 @@ export default {
       });
     },
     updateApiData(data) {
-      console.log(data);
       if (data.id) {
         this.updateTab(data);
       }

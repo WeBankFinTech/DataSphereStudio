@@ -310,8 +310,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     String columnName = rs.getMetaData().getColumnLabel(i);
                     columns.add(columnName);
                 }
-                HashMap<String,Object> jo = new HashMap<>();
+//                HashMap<String,Object> jo = new HashMap<>();
                 while (rs.next()) {
+                    HashMap<String,Object> jo = new HashMap<>();
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
                         jo.put(columnName,value == null ? null :value.toString() );
@@ -331,7 +332,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     if ((countRs.next())){
                         int totalRecord = countRs.getInt(1);
                         int totalPage = (totalRecord + pageSize-1) / pageSize;
-                        jo.put("totalPage",totalPage);
+                        apiExecuteInfo.setTotalPage(totalPage);
                     }
                 }
 

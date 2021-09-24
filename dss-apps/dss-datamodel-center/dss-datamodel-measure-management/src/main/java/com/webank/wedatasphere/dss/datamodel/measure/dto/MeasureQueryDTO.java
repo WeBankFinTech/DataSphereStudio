@@ -31,6 +31,11 @@ public class MeasureQueryDTO {
 
     private Date updateTime;
 
+    /**
+     * 引用次数
+     */
+    private Integer refCount = 0;
+
     public Long getId() {
         return id;
     }
@@ -117,5 +122,13 @@ public class MeasureQueryDTO {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getRefCount() {
+        return refCount;
+    }
+
+    public void setRefCount(Integer refCount) {
+        this.refCount = refCount;
     }
 }

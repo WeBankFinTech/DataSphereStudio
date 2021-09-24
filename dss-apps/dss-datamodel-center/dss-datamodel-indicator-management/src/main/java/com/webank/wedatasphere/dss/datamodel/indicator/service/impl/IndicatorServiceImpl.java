@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
@@ -128,11 +130,14 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
                 .eq(vo.getIsAvailable() != null, "is_available", vo.getIsAvailable())
                 .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
-        IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
+        PageHelper.clearPage();
+        PageHelper.startPage(vo.getPageNum(),vo.getPageSize());
+        PageInfo<DssDatamodelIndicatorQuery> pageInfo = new PageInfo<>(indicatorQueryMapper.page(queryWrapper));
+        //IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
 
         return Message.ok()
-                .data("list", iPage.getRecords())
-                .data("total", iPage.getTotal());
+                .data("list", pageInfo.getList())
+                .data("total", pageInfo.getTotal());
     }
 
 

@@ -32,6 +32,11 @@ public class DimensionQueryDTO {
 
     private Date updateTime;
 
+    /**
+     * 被引用次数
+     */
+    private Integer refCount =0;
+
     public Long getId() {
         return id;
     }
@@ -118,5 +123,13 @@ public class DimensionQueryDTO {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getRefCount() {
+        return refCount;
+    }
+
+    public void setRefCount(Integer refCount) {
+        this.refCount = refCount;
     }
 }

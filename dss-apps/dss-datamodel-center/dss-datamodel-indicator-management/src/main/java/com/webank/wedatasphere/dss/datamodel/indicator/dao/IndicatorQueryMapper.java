@@ -8,6 +8,8 @@ import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndica
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 
 public interface IndicatorQueryMapper extends BaseMapper<DssDatamodelIndicatorQuery> {
 
@@ -16,5 +18,5 @@ public interface IndicatorQueryMapper extends BaseMapper<DssDatamodelIndicatorQu
     String wrapperSql = "SELECT * from ( " + querySql + " ) AS q ${ew.customSqlSegment}";
 
     @Select(querySql)
-    Page<DssDatamodelIndicatorQuery> page(Page page,@Param(Constants.WRAPPER) Wrapper queryWrapper);
+    List<DssDatamodelIndicatorQuery> page(@Param(Constants.WRAPPER) Wrapper queryWrapper);
 }

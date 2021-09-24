@@ -44,6 +44,11 @@ public class IndicatorQueryDTO {
 
     private String version;
 
+    /**
+     * 引用次数
+     */
+    private Integer refCount = 0;
+
     private IndicatorContentQueryDTO content;
 
     public Long getId() {
@@ -164,5 +169,13 @@ public class IndicatorQueryDTO {
 
     public void setContent(IndicatorContentQueryDTO content) {
         this.content = content;
+    }
+
+    public Integer getRefCount() {
+        return refCount;
+    }
+
+    public void setRefCount(Integer refCount) {
+        this.refCount = refCount;
     }
 }

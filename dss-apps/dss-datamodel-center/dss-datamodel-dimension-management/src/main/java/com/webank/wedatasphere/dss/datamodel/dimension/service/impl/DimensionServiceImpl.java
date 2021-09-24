@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper;
@@ -77,15 +79,18 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
                 .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
                 .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
-        IPage<DssDatamodelDimension> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
+        PageHelper.clearPage();
+        PageHelper.startPage(vo.getPageNum(),vo.getPageSize());
+        PageInfo<DssDatamodelDimension> pageInfo = new PageInfo<>(getBaseMapper().selectList(queryWrapper));
+        //IPage<DssDatamodelDimension> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
 
         return Message.ok()
-                .data("list",iPage
-                        .getRecords()
+                .data("list",pageInfo
+                        .getList()
                         .stream()
                         .map(dssDatamodelDimension -> modelMapper.map(dssDatamodelDimension, DimensionQueryDTO.class))
                         .collect(Collectors.toList()))
-                .data("total",iPage.getTotal());
+                .data("total",pageInfo.getTotal());
     }
 
 

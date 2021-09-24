@@ -46,34 +46,34 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
-            <artifactId>linkis-module</artifactId>
-            <version>${linkis.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>asm</artifactId>
-                    <groupId>org.ow2.asm</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hk2-api</artifactId>
-                    <groupId>org.glassfish.hk2</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jersey-common</artifactId>
-                    <groupId>org.glassfish.jersey.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
-            <artifactId>linkis-mybatis</artifactId>
-            <version>${linkis.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.webank.wedatasphere.linkis</groupId>-->
+<!--            <artifactId>linkis-module</artifactId>-->
+<!--            <version>${linkis.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>asm</artifactId>-->
+<!--                    <groupId>org.ow2.asm</groupId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>hk2-api</artifactId>-->
+<!--                    <groupId>org.glassfish.hk2</groupId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>jersey-common</artifactId>-->
+<!--                    <groupId>org.glassfish.jersey.core</groupId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>linkis-common</artifactId>-->
+<!--                    <groupId>com.webank.wedatasphere.linkis</groupId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.webank.wedatasphere.linkis</groupId>-->
+<!--            <artifactId>linkis-mybatis</artifactId>-->
+<!--            <version>${linkis.version}</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.modelmapper</groupId>

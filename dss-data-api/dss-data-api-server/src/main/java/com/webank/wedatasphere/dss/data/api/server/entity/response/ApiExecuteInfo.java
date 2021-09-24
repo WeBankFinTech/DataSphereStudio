@@ -8,4 +8,5 @@ import java.util.List;
 public class ApiExecuteInfo {
     private String log;
     private List<HashMap<String,Object>> resList;
+    private Integer totalPage;
 }

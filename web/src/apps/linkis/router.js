@@ -26,108 +26,109 @@ export const subAppRoutes = {
   children: []
 }
 
+// 控制台route已迁移到统一的后台管理页面
 export default [
-  {
-    path: 'console',
-    name: 'Console',
-    redirect: '/console/globalHistory',
-    meta: {
-      title: 'linkis console',
-      publicPage: true,
-    },
-    component: () =>
-      import('./view/linkis/index.vue'),
-    children: [{
-      name: 'globalHistory',
-      path: 'globalHistory',
-      component: () =>
-        import('./module/globalHistoryManagement/index.vue'),
-      meta: {
-        title: 'Global History',
-        publicPage: true,
-        // admin: true
-      },
-    }, {
-      name: 'viewHistory',
-      path: 'viewHistory',
-      component: () =>
-        import('./module/globalHistoryManagement/viewHistory.vue'),
-      meta: {
-        title: 'viewHistory',
-        publicPage: true,
-        // admin: true
-      },
-    }, {
-      name: 'resource',
-      path: 'resource',
-      component: () =>
-        import('./module/resourceManagement/index.vue'),
-      meta: {
-        title: 'resource',
-        publicPage: true,
-        // admin: true
-      },
-    },
-    {
-      name: 'setting',
-      path: 'setting',
-      component: () =>
-        import('./module/setting/setting.vue'),
-      meta: {
-        title: 'setting',
-        publicPage: true,
-        // admin: true
-      },
-    },{
-      name: 'ECM',
-      path: 'ECM',
-      component: () =>
-        import('./module/ECM/index.vue'),
-      meta: {
-        title: 'ECM',
-        publicPage: true,
-        // admin: true
-      },
-    },{
-      name: 'EngineConnList',
-      path: 'EngineConnList',
-      component: () =>
-        import('./module/ECM/engineConn.vue'),
-      meta: {
-        title: 'EngineConn',
-        publicPage: true,
-        // admin: true
-      },
-    }, {
-      name: 'globalValiable',
-      path: 'globalValiable',
-      component: () =>
-        import('./module/globalValiable/index.vue'),
-      meta: {
-        title: 'Global Valiable',
-        publicPage: true,
-        // admin: true
-      },
-    }, {
-      name: 'FAQ',
-      path: 'FAQ',
-      component: () =>
-        import('./module/FAQ/index.vue'),
-      meta: {
-        title: 'FAQ',
-        publicPage: true,
-      },
-    },
-    {
-      name: 'microService',
-      path: 'microService',
-      component: () =>
-        import('./module/microServiceManagement/index.vue'),
-      meta: {
-        title: 'microServiceManagement',
-        publicPage: true,
-      },
-    }
-    ],
-  },
+  // {
+  //   path: 'console',
+  //   name: 'Console',
+  //   redirect: '/console/globalHistory',
+  //   meta: {
+  //     title: 'linkis console',
+  //     publicPage: true,
+  //   },
+  //   component: () =>
+  //     import('./view/linkis/index.vue'),
+  //   children: [{
+  //     name: 'globalHistory',
+  //     path: 'globalHistory',
+  //     component: () =>
+  //       import('./module/globalHistoryManagement/index.vue'),
+  //     meta: {
+  //       title: 'Global History',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   }, {
+  //     name: 'viewHistory',
+  //     path: 'viewHistory',
+  //     component: () =>
+  //       import('./module/globalHistoryManagement/viewHistory.vue'),
+  //     meta: {
+  //       title: 'viewHistory',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   }, {
+  //     name: 'resource',
+  //     path: 'resource',
+  //     component: () =>
+  //       import('./module/resourceManagement/index.vue'),
+  //     meta: {
+  //       title: 'resource',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   },
+  //   {
+  //     name: 'setting',
+  //     path: 'setting',
+  //     component: () =>
+  //       import('./module/setting/setting.vue'),
+  //     meta: {
+  //       title: 'setting',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   },{
+  //     name: 'ECM',
+  //     path: 'ECM',
+  //     component: () =>
+  //       import('./module/ECM/index.vue'),
+  //     meta: {
+  //       title: 'ECM',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   },{
+  //     name: 'EngineConnList',
+  //     path: 'EngineConnList',
+  //     component: () =>
+  //       import('./module/ECM/engineConn.vue'),
+  //     meta: {
+  //       title: 'EngineConn',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   }, {
+  //     name: 'globalValiable',
+  //     path: 'globalValiable',
+  //     component: () =>
+  //       import('./module/globalValiable/index.vue'),
+  //     meta: {
+  //       title: 'Global Valiable',
+  //       publicPage: true,
+  //       // admin: true
+  //     },
+  //   }, {
+  //     name: 'FAQ',
+  //     path: 'FAQ',
+  //     component: () =>
+  //       import('./module/FAQ/index.vue'),
+  //     meta: {
+  //       title: 'FAQ',
+  //       publicPage: true,
+  //     },
+  //   },
+  //   {
+  //     name: 'microService',
+  //     path: 'microService',
+  //     component: () =>
+  //       import('./module/microServiceManagement/index.vue'),
+  //     meta: {
+  //       title: 'microServiceManagement',
+  //       publicPage: true,
+  //     },
+  //   }
+  //   ],
+  // },
 ]

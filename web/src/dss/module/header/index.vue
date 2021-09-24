@@ -328,7 +328,7 @@ export default {
       return arr;
     },
     handleOutsideClick() {
-      if(this.$parent.$children[3].currentStep !== 6){
+      if(this.$parent.$children[3] && this.$parent.$children[3].currentStep !== 6){
         this.isUserMenuShow = false;
       }
     },

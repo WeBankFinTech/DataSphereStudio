@@ -102,6 +102,7 @@ export default {
         this.workspaceData = data.workspace;
       })
       GetWorkspaceApplications(this.workspaceId).then(data=>{
+        console.log(data)
         this.applications = data.applications || [];
       })
     },

@@ -8,6 +8,15 @@
         },
         "header": ""
     },
+    "datamodelcenter": {
+      "routes": "apps/dataModelCenter/router",
+      "module": "apps/dataModelCenter/module",
+      "i18n": {
+          "en": "apps/dataModelCenter/i18n/en.json",
+          "zh-CN": "apps/dataModelCenter/i18n/zh.json"
+      },
+      "header": ""
+  },
     "scriptis": {
         "routes": "apps/scriptis/router",
         "module": "apps/scriptis/module",

@@ -1,0 +1,20 @@
+server:
+  port: 20080
+spring:
+  application:
+    name: data-warehouse-server
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:20303/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,info
+logging:
+  config: classpath:log4j2.xml
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

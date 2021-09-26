@@ -163,7 +163,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         if(StringUtils.isAnyBlank(appKey,appSecret)){
             throw new DataApiException("请求header需添加appKey,appSecret");
         }
-        ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
+        ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path).eq("is_delete",0));
         if(apiConfig != null){
             int status = apiConfig.getStatus();
             if(status == 0){

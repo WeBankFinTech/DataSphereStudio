@@ -103,6 +103,7 @@
   </div>
 </template>
 <script>
+import util from '../common/util';
 import api from "@/common/service/api";
 export default {
   data() {
@@ -121,7 +122,7 @@ export default {
           key: 'groupName'
         },
         {
-          title: 'Token',
+          title: this.$t("message.dataService.apiCall.col_token"),
           key: 'token',
           width: '300'
         },
@@ -199,13 +200,6 @@ export default {
     this.getApiCallList();
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     getApiGroup() {
       api.fetch('/dss/data/api/apiauth/apigroup', {
         workspaceId: this.$route.query.workspaceId,
@@ -256,10 +250,10 @@ export default {
             groupId: this.authFormData.groupId,
           }
           if (this.authFormData.expire == 'short') {
-            data.expire = `${this.dateFormat(this.authFormData.expireDate)} 00:00:00`;
+            data.expire = `${util.dateFormat(this.authFormData.expireDate, '23:59:59')}`;
           } else if (this.authFormData.expire == 'long') {
             const date = new Date(Date.now() + 365*86400*1000)
-            data.expire = `${this.dateFormat(date)} 00:00:00`;
+            data.expire = `${util.dateFormat(date, '23:59:59')}`;
           }
           if (this.authFormData.id) {
             data.id = this.authFormData.id;

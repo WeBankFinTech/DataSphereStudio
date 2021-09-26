@@ -35,7 +35,7 @@
         "range_week": "7天",
         "range_yesterday": "昨天",
         "range_today": "今天",
-        "resource": "服务资源分配",
+        "resource": "服务资源分配 (最近24小时)",
         "dashboard": "总体计量",
         "callCnt": "总调用次数",
         "callTime": "总调用时长",
@@ -72,9 +72,10 @@
           "short": "短期",
           "long": "长期"
         },
-        "col_caller": "登录名称",
+        "col_caller": "appKey",
         "col_group": "业务流程",
         "col_expire": "有效期",
+        "col_token": "appSecret",
         "col_createTime": "创建时间"
       },
       "apiTest": {

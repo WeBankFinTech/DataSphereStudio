@@ -35,7 +35,7 @@
         "range_week": "week",
         "range_yesterday": "yesterday",
         "range_today": "today",
-        "resource": "resource",
+        "resource": "resource (last 24 hour)",
         "dashboard": "dashboard",
         "callCnt": "call count",
         "callTime": "call time",
@@ -72,9 +72,10 @@
           "short": "short",
           "long": "long"
         },
-        "col_caller": "caller",
+        "col_caller": "appKey",
         "col_group": "groupName",
         "col_expire": "expire",
+        "col_token": "appSecret",
         "col_createTime": "createTime"
       },
       "apiTest": {

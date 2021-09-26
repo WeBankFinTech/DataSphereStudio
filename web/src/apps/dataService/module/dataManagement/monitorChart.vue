@@ -200,7 +200,7 @@ export default {
   position: relative;
   .monitor-chart-mask {
     display: none;
-    z-index: 1;
+    z-index: 10;
     position: fixed;
     left: 0;
     right: 0;
@@ -212,8 +212,8 @@ export default {
   }
   .monitor-chart-modal {
     display: none;
-    z-index: 2;
-    position: absolute;
+    z-index: 20;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;

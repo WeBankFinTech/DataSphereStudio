@@ -136,19 +136,6 @@ public class DSSDbApiConfigRestful {
 
     }
 
-    /**
-     * 服务发布/下线
-     * @param request
-     * @return
-     */
-    @POST
-    @Path("release")
-    public Response releaseApi(@Context HttpServletRequest request, JsonNode jsonNode) {
-        Integer status = jsonNode.get("status").getValueAsInt();
-        String apiId = jsonNode.get("apiId").getTextValue();
-        apiConfigService.release(status, apiId);
-        return Message.messageToResponse(Message.ok());
-    }
 
     /**
      * 第三方调用 api

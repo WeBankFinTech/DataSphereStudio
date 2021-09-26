@@ -37,8 +37,14 @@ export default {
   height: 100%;
   margin-left: 304px;
   transition: margin-left .3s;
+  /deep/ .monitor-chart-modal {
+    left: 304px;
+  }
   &.ds-main-content-fold {
     margin-left: 54px;
+    /deep/ .monitor-chart-modal {
+      left: 54px;
+    }
   }
   .ds-main-container {
     @include bg-color(#f3f5fc, $dark-base-color);

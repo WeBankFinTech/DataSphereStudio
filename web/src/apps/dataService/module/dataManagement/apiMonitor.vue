@@ -108,6 +108,7 @@ import echarts from 'echarts';
 import api from "@/common/service/api";
 import rangeGroup from '../common/rangeGroup.vue';
 import monitorChart from './monitorChart.vue';
+import util from '../common/util';
 export default {
   components: {
     rangeGroup,
@@ -227,13 +228,6 @@ export default {
     window.removeEventListener('resize', this.chartResize)
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     changeTab(tab) {
       this.currentTab = tab;
     },
@@ -318,8 +312,8 @@ export default {
     },
     getRangeScreenData(date) {
       const range = date || {
-        startTime: this.dateFormat(new Date(Date.now() - 7*86400*1000)),
-        endTime: this.dateFormat()
+        startTime: util.dateFormat(new Date(Date.now() - 7*86400*1000)),
+        endTime: util.dateFormat(new Date(), '23:59:59')
       }
       this.getCallTotalCnt(range);
       this.getCallTotalTime(range);
@@ -347,8 +341,8 @@ export default {
     getCallListByCnt() {
       this.loadingCnt = true;
       api.fetch('/dss/data/api/apimonitor/callListByCnt', {
-        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
-        endTime: this.dateFormat(),
+        startTime: util.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: util.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listCnt = res.list;
@@ -361,8 +355,8 @@ export default {
     getCallListByFailRate() {
       this.loadingRate = true;
       api.fetch('/dss/data/api/apimonitor/callListByFailRate', {
-        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
-        endTime: this.dateFormat(),
+        startTime: util.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: util.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listRate = res.list;
@@ -425,6 +419,7 @@ export default {
   margin-bottom: 24px;
   .metrics {
     flex: 1;
+    width: 100%;
     @include bg-color(#fff, $dark-menu-base-color);
     border-radius: 2px;
     .metrics-dashboard {

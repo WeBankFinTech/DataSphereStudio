@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class DimensionUpdateVO {
 
     private String name;
@@ -26,7 +23,7 @@ public class DimensionUpdateVO {
      */
     private String principalName;
 
-    private Boolean isAvailable;
+    private Integer isAvailable;
 
     public String getName() {
         return name;
@@ -84,12 +81,12 @@ public class DimensionUpdateVO {
         this.principalName = principalName;
     }
 
-    public Boolean getAvailable() {
+    public Integer getIsAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
+    public void setIsAvailable(Integer isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
     @Override

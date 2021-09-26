@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.measure.vo;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class MeasureQueryVO {
 
     private Integer pageSize = 10;
@@ -12,7 +9,7 @@ public class MeasureQueryVO {
 
     private String name;
 
-    private Integer status;
+    private Integer isAvailable;
 
     private String owner;
 
@@ -40,12 +37,12 @@ public class MeasureQueryVO {
         this.name = name;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getIsAvailable() {
+        return isAvailable;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setIsAvailable(Integer isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
     public String getOwner() {
@@ -62,7 +59,7 @@ public class MeasureQueryVO {
                 "pageSize=" + pageSize +
                 ", pageNum=" + pageNum +
                 ", name='" + name + '\'' +
-                ", status=" + status +
+                ", status=" + isAvailable +
                 ", owner='" + owner + '\'' +
                 '}';
     }

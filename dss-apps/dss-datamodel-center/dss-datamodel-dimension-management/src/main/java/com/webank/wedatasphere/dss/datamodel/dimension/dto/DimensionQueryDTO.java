@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.dimension.dto;
 
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/9/15
- */
+
 public class DimensionQueryDTO {
     private Long id;
 
@@ -34,6 +31,11 @@ public class DimensionQueryDTO {
     private Date createTime;
 
     private Date updateTime;
+
+    /**
+     * 被引用次数
+     */
+    private Integer refCount =0;
 
     public Long getId() {
         return id;
@@ -121,5 +123,13 @@ public class DimensionQueryDTO {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getRefCount() {
+        return refCount;
+    }
+
+    public void setRefCount(Integer refCount) {
+        this.refCount = refCount;
     }
 }

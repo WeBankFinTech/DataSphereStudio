@@ -1,17 +1,17 @@
 package com.webank.wedatasphere.dss.datamodel.dimension.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.dimension.dto.DimensionQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionAddVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionEnableVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionQueryVO;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 public interface DimensionService extends IService<DssDatamodelDimension> {
 
     /**
@@ -47,9 +47,17 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
 
 
     /**
+     * 查看
+     * @param id
+     * @return
+     */
+    DimensionQueryDTO queryById(Long id) throws ErrorException;
+
+
+    /**
      * 查询列表
      * @param vo
      * @return
      */
-    Message queryDimensions(DimensionQueryVO vo);
+    Message listDimensions(DimensionQueryVO vo);
 }

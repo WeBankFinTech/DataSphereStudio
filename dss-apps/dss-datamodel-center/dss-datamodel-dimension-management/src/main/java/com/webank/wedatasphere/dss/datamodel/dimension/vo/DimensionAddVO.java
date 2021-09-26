@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.dimension.vo;
 
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 public class DimensionAddVO {
 
     private String name;
@@ -28,7 +25,7 @@ public class DimensionAddVO {
      */
     private String principalName;
 
-    private Boolean isAvailable;
+    private Integer isAvailable;
 
     public String getName() {
         return name;
@@ -87,12 +84,12 @@ public class DimensionAddVO {
         this.principalName = principalName;
     }
 
-    public Boolean getAvailable() {
+    public Integer getIsAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
+    public void setIsAvailable(Integer isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
     @Override

@@ -1,19 +1,19 @@
 const routes = [
   {
-    name: "datamodelcenter",
-    path: "/datamodelcenter",
-    redirect: "/datamodelcenter/dimension",
+    name: "dataModelCenter",
+    path: "/dataModelCenter",
+    redirect: "/dataModelCenter/dimension",
+    component: () => import("./view/layout/index.vue"),
     meta: {
       title: "数据模型中心",
       publicPage: true
     },
-    component: () => import("./view/layout/index.vue"),
     children: [
       {
         name: "tableManage",
-        path: "/datamodelcenter/tableManage",
+        path: "/dataModelCenter/tableManage",
         component: () => import("./view/layout/emptylayout.vue"),
-        redirect: "/datamodelcenter/tableManage/tableSearch",
+        redirect: "/dataModelCenter/tableManage/tableSearch",
         meta: {
           title: "数据表管理",
           publicPage: true,
@@ -23,7 +23,7 @@ const routes = [
         children: [
           {
             name: "tableSearch",
-            path: "/datamodelcenter/tableManage/tableSearch",
+            path: "/dataModelCenter/tableManage/tableSearch",
             component: () => import("./view/tableManage/tableSearch/index.vue"),
             meta: {
               title: "数据表管理",
@@ -33,7 +33,7 @@ const routes = [
           },
           {
             name: "tableInfo",
-            path: "/datamodelcenter/tableManage/tableInfo/:id",
+            path: "/dataModelCenter/tableManage/tableInfo/:id",
             component: () => import("./view/tableManage/tableInfo/index.vue"),
             meta: {
               title: "表详情",
@@ -45,7 +45,7 @@ const routes = [
       },
       {
         name: "dimension",
-        path: "/datamodelcenter/dimension",
+        path: "/dataModelCenter/dimension",
         component: () => import("./view/dimension/index.vue"),
         meta: {
           title: "维度",
@@ -55,7 +55,7 @@ const routes = [
       },
       {
         name: "measure",
-        path: "/datamodelcenter/measure",
+        path: "/dataModelCenter/measure",
         component: () => import("./view/measure/index.vue"),
         meta: {
           title: "度量",
@@ -65,7 +65,7 @@ const routes = [
       },
       {
         name: "indicators",
-        path: "/datamodelcenter/indicators",
+        path: "/dataModelCenter/indicators",
         component: () => import("./view/indicators/index.vue"),
         meta: {
           title: "指标",

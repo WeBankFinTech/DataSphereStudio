@@ -5,6 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper;
 import com.webank.wedatasphere.dss.datamodel.measure.dto.MeasureQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure;
@@ -23,10 +27,6 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 
-/**
- * @author helong
- * @date 2021/9/14
- */
 @Service
 public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, DssDatamodelMeasure>  implements MeasureService {
 
@@ -35,15 +35,17 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int addMeasure(MeasureAddVO vo) {
         DssDatamodelMeasure newOne = modelMapper.map(vo,DssDatamodelMeasure.class);
+        newOne.setCreateTime(new Date());
+        newOne.setUpdateTime(new Date());
         return getBaseMapper().insert(newOne);
     }
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int enableMeasure(Long id , MeasureEnableVO vo) {
         DssDatamodelMeasure enableOne = new DssDatamodelMeasure();
         enableOne.setIsAvailable(vo.getIsAvailable());
@@ -53,7 +55,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateMeasure(Long id, MeasureUpdateVO vo) {
         DssDatamodelMeasure updateOne =modelMapper.map(vo,DssDatamodelMeasure.class);
         updateOne.setUpdateTime(new Date());
@@ -62,7 +64,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int deleteMeasure(Long id) {
         //todo 校验引用情况
         return getBaseMapper().deleteById(id);
@@ -70,19 +72,31 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
 
     @Override
-    public Message queryMeasures(MeasureQueryVO vo) {
+    public Message listMeasures(MeasureQueryVO vo) {
         QueryWrapper<DssDatamodelMeasure> queryWrapper = new QueryWrapper<DssDatamodelMeasure>()
                 .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
-                .like(vo.getStatus()!=null,"is_available",vo.getStatus())
+                .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
-        IPage<DssDatamodelMeasure> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
-
+        PageHelper.clearPage();
+        PageHelper.startPage(vo.getPageNum(),vo.getPageSize());
+        PageInfo<DssDatamodelMeasure> pageInfo = new PageInfo<>(getBaseMapper().selectList(queryWrapper));
+       //IPage<DssDatamodelMeasure> iPage = page(new Page<>(vo.getPageNum(),vo.getPageSize()),queryWrapper);
         return Message.ok()
-                .data("list",iPage
-                        .getRecords()
+                .data("list",pageInfo
+                        .getList()
                         .stream()
                         .map(dssDatamodelMeasure -> modelMapper.map(dssDatamodelMeasure, MeasureQueryDTO.class))
                         .collect(Collectors.toList()))
-                .data("total",iPage.getTotal());
+                .data("total",pageInfo.getTotal());
+    }
+
+
+    @Override
+    public MeasureQueryDTO queryById(Long id) throws DSSDatamodelCenterException {
+        DssDatamodelMeasure dssDatamodelMeasure = getBaseMapper().selectById(id);
+        if (dssDatamodelMeasure == null){
+            throw new DSSDatamodelCenterException(ErrorCode.MEASURE_QUERY_ERROR.getCode(), "measure id " +id +" not exists");
+        }
+        return modelMapper.map(dssDatamodelMeasure,MeasureQueryDTO.class);
     }
 }

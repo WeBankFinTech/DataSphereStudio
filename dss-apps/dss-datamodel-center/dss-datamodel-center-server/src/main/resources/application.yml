@@ -7,7 +7,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://124.70.31.149:20303/eureka/
-#      defaultZone: http://euk1.com:7001/eureka/
   instance:
     metadata-map:
       test: wedatasphere

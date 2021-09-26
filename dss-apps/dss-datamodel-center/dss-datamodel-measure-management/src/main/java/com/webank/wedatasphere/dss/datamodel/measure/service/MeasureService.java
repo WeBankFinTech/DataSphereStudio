@@ -1,17 +1,17 @@
 package com.webank.wedatasphere.dss.datamodel.measure.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.measure.dto.MeasureQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 
-/**
- * @author helong
- * @date 2021/9/14
- */
+
 public interface MeasureService extends IService<DssDatamodelMeasure> {
 
     /**
@@ -39,6 +39,14 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
 
 
     /**
+     * 查看
+     * @param id
+     * @return
+     */
+    MeasureQueryDTO queryById(Long id) throws ErrorException;
+
+
+    /**
      * 删除
      * @param id
      * @return
@@ -51,5 +59,5 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param vo
      * @return
      */
-    Message queryMeasures(MeasureQueryVO vo);
+    Message listMeasures(MeasureQueryVO vo);
 }

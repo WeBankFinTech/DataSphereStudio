@@ -1,8 +1,12 @@
 package com.webank.wedatasphere.dss.datamodel.measure.entity;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.*;
 
+import java.util.Date;
+@TableName("dss_datamodel_measure")
 public class DssDatamodelMeasure {
+
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String name;
@@ -27,8 +31,10 @@ public class DssDatamodelMeasure {
 
     private Integer isAvailable;
 
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     public Long getId() {

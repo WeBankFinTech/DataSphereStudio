@@ -37,6 +37,7 @@
         <module>dss-data-api</module>
 <!--        <module>plugins/azkaban/linkis-jobtype</module>-->
         <module>plugins/linkis/dss-gateway-support</module>
+        <module>plugins/dolphinscheduler/linkis-dolphinscheduler-client</module>
         <module>assembly</module>
     </modules>
 

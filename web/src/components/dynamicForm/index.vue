@@ -8,38 +8,38 @@
         <Row>
           <Col :lg="2" :md="2" class="tc">{{ index + 1 }}</Col>
           <Col :lg="8" :md="8">
-          <!-- 这里必须和上面的model挂钩，prop是以model为基础的路径
+            <!-- 这里必须和上面的model挂钩，prop是以model为基础的路径
                 例如第一个key的实际路径是formDynamic.list[0].key，他的prop就是'list.' + index + '.key'
                 当一个FormItem里面有两个需要验证表单元素时，每一个子表单元素需要用FormItem包着
             且prop和rules需要写在子FormItem上，rules可以是object或array-->
-          <FormItem
-            :prop="'list.' + index + '.key'"
-            :rules="[{required: true,message: $t('message.common.dynamicForm.rule.emptyKey'),trigger: 'blur'},{min: 1, max: 128, message: $t('message.common.dynamicForm.rule.lengthLimit'), trigger: 'blur'},{type: 'string', pattern: /^[a-zA-z][^\s\u4e00-\u9fa5]*$/, message: $t('message.common.dynamicForm.rule.nameVaild'), trigger: 'blur'},{validator:validateKey,trigger: 'blur'}]"
-          >
-            <Input
-              v-model="item.key"
-              type="text"
-              :placeholder="$t('message.common.dynamicForm.namePlaceholder', {title})"
-              @on-change="onInputChange"
-            ></Input>
-          </FormItem>
+            <FormItem
+              :prop="'list.' + index + '.key'"
+              :rules="[{required: true,message: $t('message.common.dynamicForm.rule.emptyKey'),trigger: 'blur'},{min: 1, max: 128, message: $t('message.common.dynamicForm.rule.lengthLimit'), trigger: 'blur'},{type: 'string', pattern: /^[a-zA-z][^\s\u4e00-\u9fa5]*$/, message: $t('message.common.dynamicForm.rule.nameVaild'), trigger: 'blur'},{validator:validateKey,trigger: 'blur'}]"
+            >
+              <Input
+                v-model="item.key"
+                type="text"
+                :placeholder="$t('message.common.dynamicForm.namePlaceholder', {title})"
+                @on-change="onInputChange"
+              ></Input>
+            </FormItem>
           </Col>
           <Col :lg="2" :md="2" class="tc">=</Col>
           <Col :lg="8" :md="8">
-          <FormItem
-            :prop="'list.' + index + '.value'"
-            :rules="[{required: true, message: $t('message.common.dynamicForm.rule.emptyValue'), trigger: 'blur'},{min: 1, max: 128, message: $t('message.common.dynamicForm.rule.lengthLimit'), trigger: 'blur'}]"
-          >
-            <Input
-              v-model="item.value"
-              type="text"
-              :placeholder="$t('message.common.dynamicForm.placeholderInput')"
-              @on-change="onInputChange"
-            ></Input>
-          </FormItem>
+            <FormItem
+              :prop="'list.' + index + '.value'"
+              :rules="[{required: true, message: $t('message.common.dynamicForm.rule.emptyValue'), trigger: 'blur'},{min: 1, max: 128, message: $t('message.common.dynamicForm.rule.lengthLimit'), trigger: 'blur'}]"
+            >
+              <Input
+                v-model="item.value"
+                type="text"
+                :placeholder="$t('message.common.dynamicForm.placeholderInput')"
+                @on-change="onInputChange"
+              ></Input>
+            </FormItem>
           </Col>
           <Col span="4" class="tc">
-          <SvgIcon class="dynamic-form-close" icon-class="delete" @click.stop="handleDelete(index)"/>
+            <SvgIcon class="dynamic-form-close" icon-class="delete" @click.stop="handleDelete(index)"/>
           </Col>
         </Row>
       </FormItem>

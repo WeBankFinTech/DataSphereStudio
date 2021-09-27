@@ -4,9 +4,9 @@
       style="width:250px"
       v-model="searchBar.searchText"
       :placeholder="searchBar.title">
-    <Icon
-      slot="suffix"
-      type="ios-search"/>
+      <Icon
+        slot="suffix"
+        type="ios-search"/>
     </Input>
     <FormItem v-if="optionType.engine" prop="engine" :label="$t('message.workspaceManagemnet.department') + ':'" class="user-serchbar-dep">
       <Select v-model="searchBar.engine" style="min-width:120px;">

@@ -44,8 +44,9 @@
         "col_rank": "Rank",
         "col_apiName": "ApiName",
         "col_reqCnt": "TotalCount",
+        "col_failCnt": "FailCount",
         "col_failRate": "FailRate",
-        "col_totalTime": "TotalTime",
+        "col_totalTime": "TotalTime(ms)",
         "col_avgTime": "AvgTime(ms)",
         "col_groupName": "GroupName",
         "col_label": "Label",
@@ -76,6 +77,7 @@
         "col_group": "groupName",
         "col_expire": "expire",
         "col_token": "appSecret",
+        "col_updateTime": "updateTime",
         "col_createTime": "createTime"
       },
       "apiTest": {

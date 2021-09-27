@@ -41,7 +41,7 @@ public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
     List<ApiAuthInfo> getApiAuthList(Long workspaceId);
 
-    @Update("UPDATE dss_dataapi_auth SET `is_delete` = 1 WHERE `id` = #{id}")
+    @Update("UPDATE dss_dataapi_auth SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
     void deleteApiAuth(@Param("id") Long id);
 
     @Select("select UNIX_TIMESTAMP(expire) from dss_dataapi_auth where caller = #{caller} and group_id = #{groupId} and token = #{token}")

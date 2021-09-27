@@ -199,7 +199,6 @@ export default {
   padding-left: 24px;
   padding-top: 24px;
   padding-right: 3px;
-  border-top: 24px solid #dee4ec;
   .overview-t {
     &-card {
       display: flex;

@@ -3,10 +3,12 @@ const routes = [
     name: "dataAssetManage",
     path: "/dataAssetManage",
     redirect: "/dataAssetManage/overview",
-    component: () => import("./view/governance/index.vue"),
+    component: () => import("./view/layout/index.vue"),
     meta: {
-      title: "数据治理",
-      publicPage: true
+      title: "数据资产",
+      publicPage: true,
+      icon: "ios-paper"
+
     },
     children: [
       {

@@ -210,6 +210,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .tab-publish {
+  min-height: calc(100% - 78px);
   padding: 0 24px;
   @include bg-color(#fff, $dark-base-color);
   .filter-box {

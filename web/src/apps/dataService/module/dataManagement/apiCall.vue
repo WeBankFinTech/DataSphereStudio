@@ -131,6 +131,10 @@ export default {
           key: 'expire'
         },
         {
+          title: this.$t("message.dataService.apiCall.col_updateTime"),
+          key: 'updateTime'
+        },
+        {
           title: this.$t("message.dataService.apiCall.col_createTime"),
           key: 'createTime'
         },
@@ -290,7 +294,7 @@ export default {
     },
     deleteConfirm() {
       this.modalConfirm = false;
-      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
+      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'post').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
         console.error(err)
@@ -313,6 +317,7 @@ export default {
   position: relative;
   padding: 0 24px;
   overflow: hidden;
+  min-height: calc(100% - 78px);
   @include bg-color(#fff, $dark-base-color);
   .manage-head {
     margin-bottom: 15px;

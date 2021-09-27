@@ -10,7 +10,9 @@ import com.webank.wedatasphere.linkis.common.utils.Logging
 import org.apache.commons.io.IOUtils
 
 import java.io.{FileInputStream, InputStream, InputStreamReader}
+import java.net.URL
 import java.util.{Properties, Map => JMap}
+import scala.io.{BufferedSource, Source, StdIn}
 
 object LinkisDolphinSchedulerClient extends Logging {
   val DEFAULT_PROPERTY_FILE_NAME = "linkis.properties"
@@ -26,8 +28,14 @@ object LinkisDolphinSchedulerClient extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
+    val url: URL = getClass.getClassLoader.getResource("linkis.properties")
+    val source: BufferedSource = Source.fromURL(url)
+    val gatewayUrl = source.getLines().toList.filter(_.startsWith("wds.linkis.gateway.url")).map(_.stripPrefix("wds.linkis.gateway.url=")).head
+    source.close()
+    println("gateway url is " + gatewayUrl)
+
     val jobProps: JMap[String, String] = new Gson().fromJson(args.head, classOf[JMap[String, String]])
-    jobProps.put("wds.linkis.gateway.url", LinkisJobTypeConf.GATEWAY_URL.getValue)
+    jobProps.put("wds.linkis.gateway.url", gatewayUrl)
     jobProps.put("wds.linkis.client.flow.adminuser", "hadoop")
     jobProps.put("wds.linkis.client.flow.author.user.token", "***REMOVED***")
     val job: Job = new DolphinSchedulerJobBuilder(jobProps).build()
@@ -39,9 +47,10 @@ object LinkisDolphinSchedulerClient extends Logging {
     execution.waitForComplete(job)
 
 
-    val resultSize = execution.getResultSize(job)
-    val result = LinkisNodeExecutionImpl.getLinkisNodeExecution.getResult(job, 0, resultSize)
-    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++\n执行结果：\n\n$result\n\n**************************************************")
+    //    val resultSize = execution.getResultSize(job)
+    //    val result = LinkisNodeExecutionImpl.getLinkisNodeExecution.getResult(job, 0, resultSize)
+    //    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++\n执行结果：\n\n$result\n\n**************************************************")
+    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++")
   }
 
   def parseKVMapFromArgs(args: Array[String]): JMap[String, String] = {

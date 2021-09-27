@@ -52,6 +52,9 @@
                 <template slot-scope="{ index }" slot="rank">
                   <span>{{index + 1}}</span>
                 </template>
+                <template slot-scope="{ row }" slot="failRate">
+                  <span>{{`${row.failRate}%`}}</span>
+                </template>
               </Table>
               <Spin v-show="loadingRate" size="large" fix/>
             </div>
@@ -134,8 +137,13 @@ export default {
           key: 'totalCnt'
         },
         {
+          title: this.$t("message.dataService.apiMonitor.col_failCnt"),
+          key: 'failCnt'
+        },
+        {
           title: this.$t("message.dataService.apiMonitor.col_failRate"),
-          key: 'failRate'
+          key: 'failRate',
+          slot: 'failRate'
         }
       ],
       columnsCnt: [
@@ -403,6 +411,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .monitor-wrap {
+  height: 100%;
   min-height: calc(100% - 78px);
   position: relative;
   .monitor-holder {
@@ -410,6 +419,7 @@ export default {
     @include bg-color(#fff, $dark-base-color);
   }
   .tab-wrap {
+    min-height: 100%;
     margin-top: -36px;
     padding: 0 24px;
   }

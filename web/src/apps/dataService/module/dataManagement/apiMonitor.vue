@@ -112,6 +112,7 @@ import api from "@/common/service/api";
 import rangeGroup from '../common/rangeGroup.vue';
 import monitorChart from './monitorChart.vue';
 import util from '../common/util';
+import eventbus from '@/common/helper/eventbus';
 export default {
   components: {
     rangeGroup,
@@ -231,9 +232,11 @@ export default {
     this.getRangeScreenData();
     this.getCallListDetail();
     window.addEventListener('resize', this.chartResize)
+    eventbus.on('monaco.change', this.changeTheme);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.chartResize)
+    eventbus.off('monaco.change', this.changeTheme);
   },
   methods: {
     changeTab(tab) {
@@ -242,21 +245,26 @@ export default {
     chartResize() {
       this.currentTab == 'screen' && this.echart && this.echart.resize();
     },
+    changeTheme(theme) {
+      if (this.echart) {
+        this.drawResourceChart(theme)
+      }
+    },
     getResource24Hour() {
       this.loadingChart = true;
       api.fetch('/dss/data/api/apimonitor/callCntForPast24H', {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.dataPast24Hour = res.list;
-        this.drawResourceChart();
+        this.drawResourceChart(localStorage.getItem('theme'));
         this.loadingChart = false;
       }).catch((err) => {
         console.error(err)
         this.loadingChart = false;
       });
     },
-    drawResourceChart() {
-      this.echart = echarts.init(this.$refs.resourceLine)
+    drawResourceChart(theme) {
+      this.echart = this.echart ? this.echart : echarts.init(this.$refs.resourceLine)
       var option = {
         grid: {
           left: 100,
@@ -272,6 +280,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataPast24Hour.map(i => i.key)
         },
         yAxis: {
@@ -282,10 +298,13 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
           name: "请求数目(平均QPS)",
           nameLocation: "middle",
           nameTextStyle: {
-            color: "#333",
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333",
             fontSize: 16,
             verticalAlign: "top",
           },

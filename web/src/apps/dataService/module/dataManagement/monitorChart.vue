@@ -90,7 +90,7 @@ export default {
         apiId: this.api.id
       }, 'get').then((res) => {
         this.dataApiTime = res.list;
-        this.drawApiTimeChart();
+        this.drawApiTimeChart(localStorage.getItem('theme'));
         this.loading = false;
       }).catch((err) => {
         console.error(err)
@@ -105,7 +105,7 @@ export default {
         apiId: this.api.id
       }, 'get').then((res) => {
         this.dataApiCnt = res.list;
-        this.drawApiCntChart();
+        this.drawApiCntChart(localStorage.getItem('theme'));
         this.loading = false;
       }).catch((err) => {
         console.error(err)
@@ -117,7 +117,7 @@ export default {
       this.chartCnt = null;
       this.chartTime = null;
     },
-    drawApiTimeChart() {
+    drawApiTimeChart(theme) {
       const option = {
         grid: {
           left: 60,
@@ -133,6 +133,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataApiTime.map(i => i.key)
         },
         yAxis: {
@@ -142,7 +150,10 @@ export default {
           },
           axisTick: {
             show: false
-          }
+          },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
         },
         series: [{
           data: this.dataApiTime.map(i => i.value),
@@ -154,7 +165,7 @@ export default {
       this.chartTime = echarts.init(this.$refs.chartAvgTime)
       this.chartTime.setOption(option)
     },
-    drawApiCntChart() {
+    drawApiCntChart(theme) {
       const option = {
         grid: {
           left: 60,
@@ -170,6 +181,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataApiCnt.map(i => i.key)
         },
         yAxis: {
@@ -179,7 +198,10 @@ export default {
           },
           axisTick: {
             show: false
-          }
+          },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
         },
         series: [{
           data: this.dataApiCnt.map(i => i.value),

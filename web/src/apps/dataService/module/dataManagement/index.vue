@@ -48,6 +48,7 @@ export default {
   }
   .ds-main-container {
     @include bg-color(#f3f5fc, $dark-base-color);
+    height: 100%;
     min-height: 100%;
     .ds-breadcumb {
       padding: 24px;

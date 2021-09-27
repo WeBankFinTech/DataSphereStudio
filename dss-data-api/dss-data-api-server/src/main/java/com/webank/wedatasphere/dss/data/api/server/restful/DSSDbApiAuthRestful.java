@@ -75,6 +75,7 @@ public class DSSDbApiAuthRestful {
 
             apiAuth.setCreateBy(userName);
             apiAuth.setCreateTime(new Date(System.currentTimeMillis()));
+            apiAuth.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             apiAuth.setUpdateBy(userName);
@@ -111,7 +112,7 @@ public class DSSDbApiAuthRestful {
         return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
     }
 
-    @DELETE
+    @POST
     @Path("/{id}")
     public Response deleteApiAuth(@PathParam("id") Long id){
         log.info("-------delete apiauth:    " + id + ", begin");

@@ -22,7 +22,7 @@
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %logger{36} %L %M - %msg%xEx%n"/>
         </Console>
-        <RollingFile name="RollingFile" fileName="logs/data-warehouse.log"
+        <RollingFile name="RollingFile" fileName="logs/linkis.log"
                      filePattern="logs/$${date:yyyy-MM}/linkis-log-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-40t] %c{1.} (%L) [%M] - %msg%xEx%n"/>
             <SizeBasedTriggeringPolicy size="100MB"/>

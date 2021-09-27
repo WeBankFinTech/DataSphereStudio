@@ -92,7 +92,8 @@
         "holderInput": "input",
         "holderArray": "comma separated values",
         "start": "start test",
-        "api_not_selected": "api not selected"
+        "api_not_selected": "api not selected",
+        "req_params_not_value": "request params should be valued"
       }
     }
   }

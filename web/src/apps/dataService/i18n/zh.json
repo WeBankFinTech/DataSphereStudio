@@ -92,7 +92,8 @@
         "holderInput": "请输入",
         "holderArray": "多值以逗号分隔",
         "start": "开始测试",
-        "api_not_selected": "请先选择API"
+        "api_not_selected": "请先选择API",
+        "req_params_not_value": "请求参数必须赋值"
       }
     }
   }

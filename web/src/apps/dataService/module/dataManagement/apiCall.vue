@@ -281,7 +281,9 @@ export default {
       this.authFormData = {
         id: auth.id,
         caller: auth.caller,
-        groupId: auth.groupId
+        groupId: `${auth.groupId}`,
+        expire: 'short', // 统一归属到短期
+        expireDate: auth.expire
       }
     },
     deleteApi(row) {

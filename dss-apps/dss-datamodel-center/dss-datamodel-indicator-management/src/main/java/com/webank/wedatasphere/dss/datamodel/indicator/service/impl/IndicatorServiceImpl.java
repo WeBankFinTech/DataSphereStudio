@@ -129,6 +129,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         QueryWrapper<DssDatamodelIndicatorQuery> queryWrapper = new QueryWrapper<DssDatamodelIndicatorQuery>()
                 .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
                 .eq(vo.getIsAvailable() != null, "is_available", vo.getIsAvailable())
+                .eq(vo.getIndicatorType() != null, "indicator_type", vo.getIndicatorType())
                 .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
         PageHelper.clearPage();
         PageHelper.startPage(vo.getPageNum(),vo.getPageSize());

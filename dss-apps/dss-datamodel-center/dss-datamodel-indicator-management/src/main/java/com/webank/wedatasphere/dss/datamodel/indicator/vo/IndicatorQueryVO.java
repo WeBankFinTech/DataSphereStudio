@@ -9,6 +9,8 @@ public class IndicatorQueryVO {
 
     private String name;
 
+    private Integer indicatorType;
+
     private Integer isAvailable;
 
     private String owner;
@@ -53,12 +55,21 @@ public class IndicatorQueryVO {
         this.owner = owner;
     }
 
+    public Integer getIndicatorType() {
+        return indicatorType;
+    }
+
+    public void setIndicatorType(Integer indicatorType) {
+        this.indicatorType = indicatorType;
+    }
+
     @Override
     public String toString() {
         return "IndicatorQueryVO{" +
                 "pageSize=" + pageSize +
                 ", pageNum=" + pageNum +
                 ", name='" + name + '\'' +
+                ", indicatorType=" + indicatorType +
                 ", isAvailable=" + isAvailable +
                 ", owner='" + owner + '\'' +
                 '}';

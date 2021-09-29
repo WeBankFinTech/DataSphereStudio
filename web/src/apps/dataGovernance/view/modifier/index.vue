@@ -3,30 +3,13 @@
     <div class="top-line">
       <div style="display: flex">
         <Select
-          v-model="searchParams.tokenStatus"
+          v-model="searchParams.enabled"
           placeholder="修饰词状态"
           style="width: 120px"
+          clearable
         >
-          <Option
-            v-for="item in cityList"
-            :value="item.value"
-            :key="item.value"
-          >
-            {{ item.label }}
-          </Option>
-        </Select>
-        <Select
-          v-model="searchParams.created"
-          placeholder="添加人"
-          style="width: 120px"
-        >
-          <Option
-            v-for="item in cityList"
-            :value="item.value"
-            :key="item.value"
-          >
-            {{ item.label }}
-          </Option>
+          <Option value="1"> 启用 </Option>
+          <Option value="0"> 禁用 </Option>
         </Select>
         <Input
           search
@@ -34,6 +17,7 @@
           enter-button
           placeholder="输入名称搜索"
           style="width: 300px"
+          @on-search="handleSearch"
         />
       </div>
       <Button type="primary" icon="md-add" @click="handleCreate">
@@ -46,51 +30,90 @@
       :loading="loading"
       style="margin-bottom: 16px"
     >
-      <template slot-scope="{}" slot="action">
-        <Button type="primary" size="small" style="margin-right: 5px">
-          修改
+      <template slot-scope="{ row }" slot="isAvailable">
+        {{ row.isAvailable ? '启用' : '禁用' }}
+      </template>
+      <template slot-scope="{ row }" slot="createTime">
+        {{ row.createTime | formatDate }}
+      </template>
+      <template slot-scope="{ row }" slot="updateTime">
+        {{ row.updateTime | formatDate }}
+      </template>
+      <template slot-scope="{ row }" slot="action">
+        <Button
+          size="small"
+          @click="handleEdit(row.id)"
+          style="margin-right: 5px"
+        >
+          编辑
         </Button>
-        <Button type="error" size="small" style="margin-right: 5px">
+        <Button
+          size="small"
+          @click="handleDisable(row.id)"
+          style="margin-right: 5px"
+          v-if="row.isAvailable"
+        >
+          禁用
+        </Button>
+        <Button
+          type="primary"
+          size="small"
+          @click="handleEnable(row.id)"
+          style="margin-right: 5px"
+          v-else
+        >
           启用
         </Button>
-        <Button type="error" size="small">禁用</Button>
+        <Button type="error" size="small" @click="handleDelete(row.id)">
+          删除
+        </Button>
       </template>
     </Table>
     <div class="page-line">
-      <Page :total="100" show-sizer />
+      <Page
+        :total="pageCfg.total"
+        :current="pageCfg.page"
+        :page-size="pageCfg.pageSize"
+        @on-change="changePage"
+      />
     </div>
-    <edit-modal
-      :visible.sync="modalCfg.visible"
+    <EditModal
+      v-model="modalCfg.visible"
       :id="modalCfg.id"
       :mode="modalCfg.mode"
+      @finish="handleModalFinish"
     />
   </div>
 </template>
 
 <script>
+import {
+  getModifiers,
+  deleteModifiers,
+  enableModifiers,
+  disableModifiers,
+} from '../../service/api'
+import formatDate from '../../utils/formatDate'
 import EditModal from './editModal.vue'
-const data = [
-  {
-    name: '主题域名字',
-    ename: 'cname',
-    des: '描述描述描述',
-    created: '创建人',
-    ctime: '2010-1-1',
-    authority: '权限1,权限2',
-    action: '操作',
-  },
-]
+
 export default {
   components: { EditModal },
   methods: {
-    handleModalFinish() {},
+    handleModalFinish() {
+      this.handleGetData()
+    },
     handleCreate() {
       this.modalCfg = {
         visible: true,
         mode: 'create',
       }
     },
-    handleDelete() {},
+    async handleDelete(id) {
+      this.loading = true
+      await deleteModifiers(id)
+      this.loading = false
+      this.handleGetData()
+    },
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
@@ -98,87 +121,117 @@ export default {
         id,
       }
     },
-    handleSearch() {},
+    async handleEnable(id) {
+      this.loading = true
+      await enableModifiers(id)
+      this.loading = false
+      this.handleGetData()
+    },
+    async handleDisable(id) {
+      this.loading = true
+      await disableModifiers(id)
+      this.loading = false
+      this.handleGetData()
+    },
+    handleSearch() {
+      this.pageCfg.page = 1
+      this.handleGetData()
+    },
+    async handleGetData() {
+      this.loading = true
+      let data = await getModifiers(
+        this.pageCfg.page,
+        this.pageCfg.pageSize,
+        this.searchParams.name,
+        !this.searchParams.enabled
+          ? undefined
+          : this.searchParams.enabled === '0'
+            ? false
+            : true
+      )
+      this.loading = false
+      let { current, pageSize, items, total } = data.page
+      this.pageCfg.page = current
+      this.pageCfg.pageSize = pageSize
+      this.pageCfg.total = total
+      this.datalist = items
+    },
+    changePage(page) {
+      this.pageCfg.page = page
+    },
+  },
+  filters: {
+    formatDate,
+  },
+  mounted() {
+    this.handleGetData()
+  },
+  watch: {
+    pageCfg: {
+      handler: 'handleGetData',
+      deep: true,
+    },
   },
   data() {
     return {
-      cityList: [
-        {
-          value: 'New York',
-          label: 'New York',
-        },
-        {
-          value: 'London',
-          label: 'London',
-        },
-        {
-          value: 'Sydney',
-          label: 'Sydney',
-        },
-        {
-          value: 'Ottawa',
-          label: 'Ottawa',
-        },
-        {
-          value: 'Paris',
-          label: 'Paris',
-        },
-        {
-          value: 'Canberra',
-          label: 'Canberra',
-        },
-      ],
+      searchParams: {
+        name: '',
+        enabled: '',
+      },
       columns: [
         {
-          title: '主题域名称',
-          key: 'name',
+          title: '修饰词类别',
+          key: 'modifierType',
         },
         {
-          title: '主题域英文名',
-          key: 'ename',
+          title: '主题域',
+          key: 'themeArea',
+        },
+        {
+          title: '分层',
+          key: 'layerArea',
+        },
+        {
+          title: '状态',
+          key: 'isAvailable',
+          slot: 'isAvailable',
         },
         {
           title: '描述',
-          key: 'des',
-        },
-        {
-          title: '主题域选择权限',
-          key: 'authority',
-        },
-        {
-          title: '创建人',
-          key: 'created',
+          key: 'description',
+          ellipsis: true,
         },
         {
           title: '创建时间',
-          key: 'ctime',
+          key: 'createTime',
+          slot: 'createTime',
+        },
+        {
+          title: '更新时间',
+          key: 'updateTime',
+          slot: 'updateTime',
         },
         {
           title: '操作',
-          key: 'action',
           slot: 'action',
+          minWidth: 60,
         },
       ],
-      // 搜索参数
-      searchParams: {
-        tokenStatus: '',
-        name: '',
-        created: '',
-      },
       // 数据列表
-      datalist: data,
+      datalist: [],
       // 弹窗参数
       modalCfg: {
         mode: '',
-        id: '',
+        id: NaN,
         visible: false,
       },
       // 是否加载中
       loading: false,
       // 分页配置
       pageCfg: {
-        current: 1,
+        page: 1,
         pageSize: 10,
+        total: 10,
       },
     }
   },

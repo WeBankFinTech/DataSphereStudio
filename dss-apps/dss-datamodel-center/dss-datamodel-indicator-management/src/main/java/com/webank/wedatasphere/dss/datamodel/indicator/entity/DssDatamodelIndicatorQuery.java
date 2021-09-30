@@ -67,6 +67,11 @@ public class DssDatamodelIndicatorQuery {
 
     private String calculationOwner;
 
+    /**
+     * 引用次数
+     */
+    private Integer refCount = 0;
+
     public Long getId() {
         return id;
     }
@@ -241,5 +246,13 @@ public class DssDatamodelIndicatorQuery {
 
     public void setCalculationOwner(String calculationOwner) {
         this.calculationOwner = calculationOwner;
+    }
+
+    public Integer getRefCount() {
+        return refCount;
+    }
+
+    public void setRefCount(Integer refCount) {
+        this.refCount = refCount;
     }
 }

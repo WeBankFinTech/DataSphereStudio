@@ -11,7 +11,7 @@
       size="small"
       :value="searchValue"
       prefix="ios-search"
-      placeholder="请输入"
+      placeholder="请输入API名称搜索"
       style="width: 230px;border:0;margin-top: 10px;margin-bottom: 10px;"
       @on-change="handleSearch"
     /></div>
@@ -140,7 +140,7 @@ export default {
     },
     addGroup() {
       //添加数据服务api分组
-      this.$emit("showModal", { type: "group" });
+      this.$emit("showModal", { type: "group", groupDatas: [...this.originDatas] });
     },
     addApi(groupId, apiData) {
       //添加数据服务api

@@ -24,12 +24,8 @@
       </FormItem>
       <FormItem label="主题域" prop="warehouseThemeName">
         <Select v-model="formState.warehouseThemeName" placeholder="主题域">
-          <Option
-            v-for="item in authorityList"
-            :value="item.value"
-            :key="item.value"
-          >
-            {{ item.label }}
+          <Option v-for="item in themesList" :value="item.id" :key="item.id">
+            {{ item.name }}
           </Option>
         </Select>
       </FormItem>
@@ -73,6 +69,7 @@ import {
   createDimensions,
   getDimensionsById,
   editDimensions,
+  getThemesList,
 } from "../../service/api";
 export default {
   model: {
@@ -126,14 +123,14 @@ export default {
         warehouseThemeName: "",
         principalName: [],
       },
-      usablelib: [
+      themesList: [
         {
-          value: "New York",
-          label: "New York",
+          id: "New York",
+          name: "New York",
         },
         {
-          value: "London",
-          label: "London",
+          id: "London",
+          name: "London",
         },
       ],
       authorityList: [
@@ -147,6 +144,9 @@ export default {
         },
       ],
     };
+  },
+  mounted() {
+    // this.handleGetSubjectDomainList();
   },
   methods: {
     async handleGetById(id) {
@@ -201,6 +201,12 @@ export default {
         }
       });
     },
+    // async handleGetSubjectDomainList() {
+    //   this.loading = true;
+    //   let { list } = await getThemesList();
+    //   this.loading = false;
+    //   this.themesList = list;
+    // },
   },
 };
 </script>

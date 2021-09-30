@@ -1,18 +1,11 @@
 <template>
   <Drawer
-    title="新建/编辑指标"
+    title="查看"
     v-model="visible"
     width="920"
-    :styles="styles"
     @on-cancel="cancelCallBack"
   >
-    <Form
-      ref="formRef"
-      :model="formState"
-      :rules="ruleValidate"
-      label-position="left"
-      :label-width="120"
-    >
+    <Form ref="formRef" label-position="left" :label-width="120">
       <h2 class="form-block-title">基本信息</h2>
       <FormItem label="名称" prop="name">
         <Input v-model="formState.name" placeholder="指标名"></Input>
@@ -312,21 +305,6 @@
         ></Input>
       </FormItem>
     </Form>
-    <Spin v-if="loading" fix></Spin>
-    <div class="drawer-footer">
-      <Button
-        style="margin-right: 8px"
-        type="primary"
-        v-if="mode === 'edit'"
-        @click="handleAddVersion"
-      >
-        新增版本
-      </Button>
-      <Button style="margin-right: 8px" type="primary" @click="handleOk">
-        确定
-      </Button>
-      <Button @click="handleCancel">取消</Button>
-    </div>
   </Drawer>
 </template>
 
@@ -339,10 +317,6 @@ import {
   getCyclesList,
   getModifiersList,
   getLayersList,
-  createIndicators,
-  editIndicators,
-  getIndicatorsById,
-  buildIndicatorsVersion,
 } from "../../service/api";
 import SelectPage from "../../components/selectPage";
 
@@ -376,26 +350,13 @@ export default {
       type: Boolean,
       required: true,
     },
-    mode: {
-      type: String,
-      required: true,
-    },
-    id: {
-      type: Number,
+    bodyData: {
+      type: Object,
     },
   },
-  emits: ["finish", "_changeVisible"],
-  watch: {
-    _visible(val) {
-      if (val && this.id) this.handleGetById(this.id);
-    },
-  },
+  emits: ["_changeVisible"],
   data() {
     return {
-      // 验证规则
-      ruleValidate: {},
-      // 是否加载中
-      loading: false,
       // 表单数据
       formState: {
         name: "",
@@ -427,14 +388,6 @@ export default {
           info_4: Object.assign({}, sourceInfoMap[4]),
         },
       },
-
-      // 底部样式
-      styles: {
-        height: "calc(100% - 55px)",
-        overflow: "auto",
-        paddingBottom: "53px",
-        position: "static",
-      },
       authorityList: [
         {
           value: "New York",
@@ -454,6 +407,11 @@ export default {
       // 分层
       layersList: [],
     };
+  },
+  watch: {
+    bodyData() {
+      this.formatPropsToFormState();
+    },
   },
   mounted() {
     this.handleGetCyclesList();
@@ -554,140 +512,65 @@ export default {
         },
       ];
     },
-    async handleGetById(id) {
-      this.loading = true;
-      let { detail } = await getIndicatorsById(id);
-      this.loading = false;
-      detail.content.indicatorSourceInfo = (() => {
-        try {
-          return JSON.parse(detail.content.indicatorSourceInfo);
-        } catch (error) {
-          return {};
-        }
-      })();
-
-      let newFormState = {
-        name: detail.name,
-        fieldIdentifier: detail.fieldIdentifier,
-        comment: detail.comment,
-        warehouseThemeName: detail.warehouseThemeName,
-        owner: detail.owner,
-        principalName: detail.principalName.split(","),
-        isCoreIndicator: Boolean(detail.isCoreIndicator),
-        //
-        isAvailable: detail.isAvailable,
-        themeArea: detail.themeArea,
-        layerArea: detail.layerArea,
-        content: {
-          indicatorType: detail.content.indicatorType,
-          sourceInfo: {},
-          //
-          formula: "formula",
-          business: detail.content.business,
-          businessOwner: detail.content.businessOwner,
-          calculation: detail.content.calculation,
-          calculationOwner: detail.content.calculationOwner,
-        },
-        _sourceInfo: {
-          info_0: Object.assign({}, sourceInfoMap[0]),
-          info_1: Object.assign({}, sourceInfoMap[1]),
-          info_2: Object.assign({}, sourceInfoMap[2]),
-          info_3: Object.assign({}, sourceInfoMap[3]),
-          info_4: Object.assign({}, sourceInfoMap[4]),
-        },
-      };
-      if (detail.content.indicatorType == 0) {
-        newFormState._sourceInfo.info_0 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 1) {
-        newFormState._sourceInfo.info_1 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 2) {
-        newFormState._sourceInfo.info_2 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 3) {
-        newFormState._sourceInfo.info_3 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 4) {
-        newFormState._sourceInfo.info_4 = detail.content.indicatorSourceInfo;
-      }
-      this.formState = newFormState;
-    },
     cancelCallBack() {
       this.$refs["formRef"].resetFields();
     },
-    handleCancel() {
-      this.$refs["formRef"].resetFields();
-      this.$emit("_changeVisible", false);
-    },
-    async handleAddVersion() {
-      this.$refs["formRef"].validate(async (valid) => {
-        if (valid) {
-          try {
-            this.loading = true;
-            await buildIndicatorsVersion(this.id, this.formatFormState());
-            this.loading = false;
-            this.$refs["formRef"].resetFields();
-            this.$emit("_changeVisible", false);
-            this.$emit("finish");
-          } catch (error) {
-            this.loading = false;
-            console.log(error);
-          }
+    async formatPropsToFormState() {
+      try {
+        let detail = this.bodyData.essential;
+        detail.content = this.bodyData.content;
+        detail.content.indicatorSourceInfo = JSON.parse(
+          detail.content.indicatorSourceInfo
+        );
+        let newFormState = {
+          name: detail.name,
+          fieldIdentifier: detail.fieldIdentifier,
+          comment: detail.comment,
+          warehouseThemeName: detail.warehouseThemeName,
+          owner: detail.owner,
+          principalName: detail.principalName.split(","),
+          isCoreIndicator: Boolean(detail.isCoreIndicator),
+          themeArea: detail.themeArea,
+          layerArea: detail.layerArea,
+          content: {
+            indicatorType: detail.content.indicatorType,
+            sourceInfo: {},
+            business: detail.content.business,
+            businessOwner: detail.content.businessOwner,
+            calculation: detail.content.calculation,
+            calculationOwner: detail.content.calculationOwner,
+          },
+          _sourceInfo: {
+            info_0: Object.assign({}, sourceInfoMap[0]),
+            info_1: Object.assign({}, sourceInfoMap[1]),
+            info_2: Object.assign({}, sourceInfoMap[2]),
+            info_3: Object.assign({}, sourceInfoMap[3]),
+            info_4: Object.assign({}, sourceInfoMap[4]),
+          },
+        };
+        if (detail.content.indicatorType == 0) {
+          newFormState._sourceInfo.info_0 = detail.content.indicatorSourceInfo;
         }
-      });
-    },
-    formatFormState() {
-      let key = `info_${this.formState.content.indicatorType}`;
-      this.formState.content.sourceInfo = Object.assign(
-        {},
-        this.formState._sourceInfo[key]
-      );
-      return Object.assign({}, this.formState, {
-        principalName: this.formState.principalName.join(","),
-        isCoreIndicator: Number(this.formState.isCoreIndicator),
-        _sourceInfo: undefined,
-      });
-    },
-    async handleOk() {
-      this.$refs["formRef"].validate(async (valid) => {
-        if (valid) {
-          try {
-            if (this.mode === "create") {
-              this.loading = true;
-              await createIndicators(this.formatFormState());
-              this.loading = false;
-            }
-            if (this.mode === "edit") {
-              this.loading = true;
-              await editIndicators(this.id, this.formatFormState());
-              this.loading = false;
-            }
-            this.$refs["formRef"].resetFields();
-            this.$emit("_changeVisible", false);
-            this.$emit("finish");
-          } catch (error) {
-            this.loading = false;
-            console.log(error);
-          }
+        if (detail.content.indicatorType == 1) {
+          newFormState._sourceInfo.info_1 = detail.content.indicatorSourceInfo;
         }
-      });
+        if (detail.content.indicatorType == 2) {
+          newFormState._sourceInfo.info_2 = detail.content.indicatorSourceInfo;
+        }
+        if (detail.content.indicatorType == 3) {
+          newFormState._sourceInfo.info_3 = detail.content.indicatorSourceInfo;
+        }
+        if (detail.content.indicatorType == 4) {
+          newFormState._sourceInfo.info_4 = detail.content.indicatorSourceInfo;
+        }
+        this.formState = newFormState;
+      } catch (error) {}
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-.drawer-footer {
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  border-top: 1px solid #e8e8e8;
-  padding: 10px 16px;
-  text-align: left;
-  background: #fff;
-}
 .form-block-title {
   font-size: 18px;
   font-weight: 600;

@@ -35,11 +35,10 @@
       :loading="loading"
       style="margin-bottom: 16px"
     >
-      <template slot-scope="{ row }" slot="name">
-        {{ row.name }}
+      <template slot-scope="{ row }" slot="version">
         <Tag style="display: inline" color="primary">
           <span @click="handleOpenVersionList(row.name)">
-            {{ row.version }}
+            V{{ row.version }}
           </span>
         </Tag>
       </template>
@@ -57,6 +56,14 @@
       <template slot-scope="{ row }" slot="updateTime">
         {{ row.updateTime | formatDate }}
       </template>
+      <template slot-scope="{ row }" slot="indicatorType">
+        {{ row.indicatorType === 0 ? "原子指标" : "" }}
+        {{ row.indicatorType === 1 ? "衍生指标" : "" }}
+        {{ row.indicatorType === 2 ? "派生指标" : "" }}
+        {{ row.indicatorType === 3 ? "复杂指标" : "" }}
+        {{ row.indicatorType === 4 ? "自定义指标" : "" }}
+      </template>
+
       <template slot-scope="{ row }" slot="action">
         <Button
           size="small"
@@ -104,6 +111,12 @@
      <VersionListModal
       v-model="versionListCfg.visible"
       :name="versionListCfg.name"
+      @finish="handleModalFinish"
+      @open="handleShowVersion"
+    />
+    <ShowVersionModal
+      v-model="versionCfg.visible"
+      :bodyData="versionCfg.bodyData"
     />
   </div>
 </template>
@@ -113,8 +126,10 @@ import { getIndicators, switcIndicatorsStatus } from "../../service/api";
 import formatDate from "../../utils/formatDate";
 import EditModal from "./editModal.vue";
 import VersionListModal from "./versionListModal.vue";
+import ShowVersionModal from "./showVersionModal.vue";
+
 export default {
-  components: { EditModal, VersionListModal },
+  components: { EditModal, VersionListModal, ShowVersionModal },
   methods: {
     handleModalFinish() {
       this.handleGetData();
@@ -167,6 +182,12 @@ export default {
     changePage(page) {
       this.pageCfg.page = page;
     },
+    handleShowVersion(data) {
+      this.versionCfg = {
+        visible: true,
+        bodyData: JSON.parse(data.versionContext),
+      };
+    },
     handleOpenVersionList(name) {
       this.versionListCfg = {
         visible: true,
@@ -200,6 +221,11 @@ export default {
           key: "name",
         },
         {
+          title: "版本",
+          key: "version",
+          slot: "version",
+        },
+        {
           title: "字段标识",
           key: "fieldIdentifier",
         },
@@ -209,12 +235,13 @@ export default {
           slot: "isAvailable",
         },
         {
-          title: "负责人",
-          key: "owner",
+          title: "指标类型",
+          key: "indicatorType",
+          slot: "indicatorType",
         },
         {
-          title: "所属主题",
-          key: "warehouseThemeName",
+          title: "负责人",
+          key: "owner",
         },
         {
           title: "描述",
@@ -243,7 +270,7 @@ export default {
         {
           title: "操作",
           slot: "action",
-          minWidth: 60,
+          minWidth: 80,
         },
       ],
       // 数据列表
@@ -258,6 +285,11 @@ export default {
       versionListCfg: {
         visible: false,
         name: "",
+      },
+      // 查看版本信息
+      versionCfg: {
+        visible: false,
+        bodyData: {},
       },
       // 是否加载中
       loading: false,

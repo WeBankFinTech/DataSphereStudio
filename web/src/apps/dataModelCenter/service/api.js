@@ -108,10 +108,17 @@ export const switchDimensionsStatus = (id, status) =>
  * @returns {Object.result}
  *
  */
-export const getIndicators = (pageNum, pageSize, isAvailable, owner, name) =>
+export const getIndicators = (
+  pageNum,
+  pageSize,
+  isAvailable,
+  owner,
+  name,
+  indicatorType
+) =>
   api.fetch(
     `${API_PATH.DATAMODEL_PATH}datamodel/indicators/list`,
-    { pageNum, pageSize, isAvailable, owner, name },
+    { pageNum, pageSize, isAvailable, owner, name, indicatorType },
     "post"
   );
 
@@ -150,7 +157,7 @@ export const getIndicatorsById = id =>
  */
 export const switcIndicatorsStatus = (id, status) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/${id}`,
+    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/enable/${id}`,
     { isAvailable: status },
     "put"
   );
@@ -188,5 +195,54 @@ export const rollbackIndicatorsVersion = (name, version) =>
   api.fetch(
     `${API_PATH.DATAMODEL_PATH}datamodel/indicators/versions/rollback`,
     { name, version },
+    "post"
+  );
+/////////////////////////////////////////////
+
+/**
+ * 主题域列表
+ * @returns {Object.result}
+ *
+ */
+export const getThemesList = () =>
+  api.fetch(
+    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/themes/list`,
+    {},
+    "post"
+  );
+
+/**
+ * 分层列表
+ * @returns {Object.result}
+ *
+ */
+export const getLayersList = () =>
+  api.fetch(
+    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/layers/list`,
+    {},
+    "post"
+  );
+
+/**
+ * 修饰词列表
+ * @returns {Object.result}
+ *
+ */
+export const getModifiersList = () =>
+  api.fetch(
+    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/modifiers/list`,
+    {},
+    "post"
+  );
+
+/**
+ * 周期列表
+ * @returns {Object.result}
+ *
+ */
+export const getCyclesList = () =>
+  api.fetch(
+    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/cycles/list`,
+    {},
     "post"
   );

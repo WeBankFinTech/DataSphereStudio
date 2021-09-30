@@ -340,8 +340,9 @@ export default {
           callback(new Error("每页条数不能超过50条, 不少于1条"));
         } else if (!Number.isInteger(parseFloat(value))) {
           callback(new Error("每页条数必须为整数"));
+        }else{
+          callback();
         }
-        callback();
       }
     };
     return {
@@ -353,11 +354,11 @@ export default {
           type: "property",
           iconName: "shuxing"
         },
-        {
-          name: "版本",
-          iconName: "banben",
-          type: "version"
-        },
+        // {
+        //   name: "版本",
+        //   iconName: "banben",
+        //   type: "version"
+        // },
         {
           name: "保存",
           iconName: "baocun",

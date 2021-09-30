@@ -6,7 +6,7 @@ public class IndicatorEnableVO {
     private Integer isAvailable;
 
 
-    public int getIsAvailable() {
+    public Integer getIsAvailable() {
         return isAvailable;
     }
 
@@ -14,7 +14,10 @@ public class IndicatorEnableVO {
         this.isAvailable = isAvailable;
     }
 
-    public void setIsAvailable(int isAvailable) {
-        this.isAvailable = isAvailable;
+    @Override
+    public String toString() {
+        return "IndicatorEnableVO{" +
+                "isAvailable=" + isAvailable +
+                '}';
     }
 }

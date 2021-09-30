@@ -110,7 +110,7 @@ public class IndicatorRestfulApi {
     @Path("/indicators/{id}")
     public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
         LOGGER.info("query id : {}", id);
-        return Message.messageToResponse(Message.ok().data("detail",indicatorService.queryById(id)));
+        return Message.messageToResponse(indicatorService.queryById(id));
     }
 
 

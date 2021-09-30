@@ -50,3 +50,7 @@ dss-orchestrator/dss-orchestrator-db/target/
 dss-framework/dss-framework-project-server/target/
 dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target/
 dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target/
+dss-apps/dss-dataasset-management/data-assets-server/target/
+dss-commons/dss-common/target/
+dss-standard/dss-standard-common/target/
+dss-apps/dss-datawarehouse-design/data-warehouse-server/target/

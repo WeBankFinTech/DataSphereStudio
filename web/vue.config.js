@@ -225,9 +225,6 @@ module.exports = {
     }
   },
   configureWebpack: configWrap({
-    module: {
-      noParse: /^(vue|vue-router|vuex|vuex-router-sync|lodash|echarts|axios)$/
-    },
     devtool: "eval", // 控制source map生成方式加速build
     resolve: {
       alias: {
@@ -264,12 +261,10 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        //target: "http://172.24.2.230:8088",
-        target: 'http://172.24.2.29:9209', //yichao
+        // target: "http://172.24.2.230:8088",
+        //target: 'http://172.24.2.29:9202', //yichao
         // target: "http://172.24.2.83:9202", //jiawei
-        //target: 'http://192.168.9.119:9202', //tangHan
-        //target: 'http://192.168.10.180:8088',
-        //target: 'http://luban.ctyun.cn:8088',
+        target: 'http://luban.ctyun.cn:8088',
         //target: 'http://devluban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {

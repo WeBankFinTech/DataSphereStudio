@@ -43,7 +43,7 @@
                   <Option value="MYSQL">MYSQL</Option>
                 </Select>
               </FormItem>
-              <FormItem label="数据源名称" prop="datasourceId" required>
+              <FormItem label="数据源名称" prop="datasourceId">
                 <Select
                   v-model="dbForm.datasourceId"
                   style="width:300px"
@@ -52,12 +52,19 @@
                 >
                   <Option
                     v-for="item in datasourceIds"
-                    :value="item.datasourceId"
+                    :value="item.datasourceId + ''"
                     :key="item.datasourceId"
                     >{{ item.name }}</Option
                   >
                 </Select>
               </FormItem>
+              <div class="dataSourceTip">
+                如需新建数据源，请点击
+                <div class="dataSourceLink" @click="gotoCreateDatasource">
+                  这里
+                </div>
+                创建
+              </div>
               <FormItem
                 label="数据表名称"
                 prop="tblName"
@@ -380,7 +387,7 @@ export default {
             trigger: "blur"
           }
         ],
-        datasourceIdss: [
+        datasourceId: [
           {
             required: true,
             message: "请选择数据源名称",
@@ -595,14 +602,14 @@ export default {
     }
     this.dbForm = {
       datasourceType: "MYSQL",
-      datasourceId: datasourceId ? parseFloat(datasourceId) : "",
+      datasourceId: datasourceId ? datasourceId + "" : "",
       tblName
     };
     this.envForm = {
       memory,
       reqTimeout
     };
-    this.pageForm = { pageSize: pageSize ? pageSize : '' };
+    this.pageForm = { pageSize: pageSize ? pageSize : "" };
     this.pageNumChecked = !!pageSize;
     if (apiType === "SQL") {
       this.sql = sql;
@@ -677,11 +684,13 @@ export default {
         workspaceId: this.$route.query.workspaceId,
         pageSize: 0
       };
+      if (reqParams.datasourceId) {
+        reqParams.datasourceId = parseFloat(reqParams.datasourceId);
+      }
       if (reqTimeout) {
         reqParams.reqTimeout = parseFloat(reqTimeout);
       }
       this.$refs["dbForm"].validate(valid => {
-        console.log(valid);
         if (valid) {
           if (apiType === "GUIDE") {
             const reqFields = [];
@@ -736,7 +745,7 @@ export default {
             reqParams = {
               ...reqParams,
               reqFields: reqes.length > 0 ? JSON.stringify(reqes) : "",
-              sql: this.sql,
+              sql: this.sql
             };
           }
           if (this.pageNumChecked) {
@@ -758,7 +767,6 @@ export default {
       api
         .fetch(`/dss/data/api/save`, reqParams, "post")
         .then(res => {
-          console.log(res);
           this.$emit("updateApiData", { ...data, ...reqParams });
 
           this.$Message.success("保存成功");
@@ -809,16 +817,13 @@ export default {
       const datas = [...this.paramsList];
       datas[index][column.key] = value;
       this.paramsList = datas;
-      console.log(column);
     },
     changeParamCompare(value, index) {
       const datas = [...this.paramsList];
       datas[index]["compare"] = value;
       this.paramsList = datas;
-      console.log(value);
     },
     changeSort(value, rowData) {
-      console.log(value);
       this.sortList = [...this.sortList].map((item, index) => {
         const newItem = { ...item };
         if (rowData.columnName === item.columnName) {
@@ -946,7 +951,6 @@ export default {
                 return { index: index + 1, ...ov, columnName: ov.name };
               });
             }
-            console.log(resValues);
             this.paramsList = res.allCols.map(item => {
               const { columnName } = item;
               const hit = reqValues.find(re => re.name === columnName);
@@ -988,6 +992,12 @@ export default {
           this.deleteSqlRow(index);
         }
       }
+    },
+    gotoCreateDatasource() {
+      this.$router.push({
+        name: "dataSourceAdministration",
+        query: { workspaceId: this.$route.query.workspaceId }
+      });
     }
   }
 };
@@ -1135,6 +1145,20 @@ export default {
           color: rgba(0, 0, 0, 0.45);
           margin-left: 10px;
         }
+      }
+    }
+    .dataSourceTip {
+      padding-left: 90px;
+      margin-top: -12px;
+      font-size: 12px;
+      color: #515a6e;
+      padding-bottom: 10px;
+      .dataSourceLink {
+        display: inline-block;
+        cursor: pointer;
+        color: #2e92f7;
+        font-weight: 600;
+        padding: 0px 2px;
       }
     }
   }

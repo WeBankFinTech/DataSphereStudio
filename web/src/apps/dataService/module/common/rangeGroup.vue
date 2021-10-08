@@ -19,6 +19,7 @@
   </div>
 </template>
 <script>
+import util from './util';
 export default {
   data() {
     return {
@@ -38,39 +39,32 @@ export default {
       const now = Date.now();
       if (this.currentRange == 'week') {
         return {
-          startTime: this.dateFormat(new Date(now - 7*86400*1000)),
-          endTime: this.dateFormat()
+          startTime: util.dateFormat(new Date(now - 7*86400*1000)),
+          endTime: util.dateFormat(new Date(), '23:59:59')
         }
       } else if (this.currentRange == 'yesterday') {
         return {
-          startTime: this.dateFormat(new Date(now - 86400*1000)),
-          endTime: this.dateFormat()
+          startTime: util.dateFormat(new Date(now - 86400*1000)),
+          endTime: util.dateFormat(new Date(), '23:59:59')
         }
       } else if (this.currentRange == 'today') {
         return {
-          startTime: this.dateFormat(),
-          endTime: this.dateFormat(new Date(now + 86400*1000))
+          startTime: util.dateFormat(),
+          endTime: util.dateFormat(new Date(), '23:59:59')
         }
       } else if (this.currentRange == 'picker') {
         return {
           startTime: `${this.datePickerRange[0]} 00:00:00`,
-          endTime: `${this.datePickerRange[1]} 00:00:00`
+          endTime: `${this.datePickerRange[1]} 23:59:59`
         }
       }
       return {
-        startTime: this.dateFormat(),
-        endTime: this.dateFormat()
+        startTime: util.dateFormat(),
+        endTime: util.dateFormat(new Date(), '23:59:59')
       }
     }
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     handleDateChange(option) {
       this.currentRange = option.key;
       if (option.key != 'picker') {

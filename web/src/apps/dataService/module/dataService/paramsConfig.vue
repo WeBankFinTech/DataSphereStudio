@@ -121,7 +121,7 @@
               v-model="sql"
               type="textarea"
               placeholder="请填写SQL语句"
-              rows="10"
+              :rows="10"
             />
           </div>
         </div>
@@ -867,7 +867,7 @@ export default {
     },
     changeSqlParams(value, index, column) {
       const datas = [...this.sqlList];
-      datas[index][column.key] = value;
+      datas[index][column.key] = value.trim();
       if (column.key === "type") {
         const demo = this.sqlTypeOptions.find(item => item.value === value);
         datas[index]["demo"] = demo.demo;

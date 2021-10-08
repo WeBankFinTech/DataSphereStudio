@@ -4,8 +4,7 @@
     :title="actionType === 'add' ? $t('message.workflow.projectDetail.createProject') : $t('message.workflow.projectDetail.editorProject')"
     :closable="false">
     <Form
-      :label-width="100"
-      label-position="left"
+      :label-width="80"
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"

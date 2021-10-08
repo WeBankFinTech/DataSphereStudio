@@ -67,8 +67,6 @@ export default {
       });
     },
     handleTreeModal(project) {
-      console.log(project);
-      console.log("addApi");
       this.$emit("showModal", { type: "api", data: { ...project } });
       this.treeModalShow = true;
       this.currentTreeProject = project;
@@ -84,7 +82,6 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      console.log(node);
       this.$emit("handleApiChoosed", node);
     },
     getAllApi(type = "", payload = {}) {
@@ -96,7 +93,6 @@ export default {
           "get"
         )
         .then(res => {
-          console.log(res);
           if (res && res.list) {
             const isUpdate = type === "update";
             const list = res.list.map(n => {

@@ -42,6 +42,43 @@ const routes = [
         },
         component: () => import('./view/assetsInfo/index.vue'),
       }]
+    },{
+      name: 'dataGovernance/subjectDomain',
+      path: 'subjectDomain',
+      component: () => import('./view/subjectDomain/index.vue'),
+      meta: {
+        title: '主题域配置',
+        publicPage: true,
+        icon: 'ios-paper'
+      }
+    },{
+      name: 'dataGovernance/layered',
+      path: 'layered',
+      component: () => import('./view/layered/index.vue'),
+      meta: {
+        title: '分层配置',
+        publicPage: true,
+        icon: 'ios-paper'
+      }
+    },{
+      name: 'dataGovernance/modifier',
+      path: 'modifier',
+      component: () => import('./view/modifier/index.vue'),
+      meta: {
+        title: '修饰词管理',
+        publicPage: true,
+        icon: 'ios-paper'
+      }
+    },
+    {
+      name: 'dataGovernance/statPeriod',
+      path: 'statPeriod',
+      component: () => import('./view/statPeriod/index.vue'),
+      meta: {
+        title: '统计周期管理',
+        publicPage: true,
+        icon: 'ios-paper'
+      }
     }]
   }
 ]

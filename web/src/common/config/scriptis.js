@@ -38,6 +38,22 @@ export default Object.freeze([{
   isCanBeOpen: true,
   flowType: 'hql'
 },
+{
+  rule: /\.(fql)$/i,
+  lang: 'sql',
+  executable: true,
+  application: 'flink',
+  runType: 'sql',
+  ext: '.fql',
+  scriptType: 'flink',
+  abbr: 'fql',
+  logo: 'fi-flink-sql',
+  color: '#FF9900',
+  isCanBeNew: true,
+  label: 'Flink',
+  isCanBeOpen: true,
+  flowType: 'fql'
+},
 // {
 //   rule: /\.(out)$/i,
 //   lang: 'out',

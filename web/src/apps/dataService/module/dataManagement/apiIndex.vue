@@ -35,6 +35,7 @@
           :current="pageData.pageNow"
           show-elevator
           show-sizer
+          show-total
           @on-change="handlePageChange"
           @on-page-size-change="handlePageSizeChange"
         />

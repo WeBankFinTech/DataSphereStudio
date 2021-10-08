@@ -113,7 +113,7 @@
       <!-- right -->
 
       <div class="assets-info-b-r">
-        <Tabs type="card">
+        <Tabs type="card" class="assets-tabs">
           <TabPane label="字段信息"
             ><field-info
               :fieldInfo="fieldInfo"
@@ -378,6 +378,12 @@ export default {
     &-r {
       flex: 1;
       max-width: calc(100% - 250px);
+      .assets-tabs {
+        height: 100%;
+        ::v-deep .ivu-tabs-content {
+          height: 90%;
+        }
+      }
     }
   }
 

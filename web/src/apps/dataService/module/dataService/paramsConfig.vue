@@ -340,7 +340,7 @@ export default {
           callback(new Error("每页条数不能超过50条, 不少于1条"));
         } else if (!Number.isInteger(parseFloat(value))) {
           callback(new Error("每页条数必须为整数"));
-        }else{
+        } else {
           callback();
         }
       }
@@ -419,29 +419,32 @@ export default {
           key: "setRequest",
           slot: "checkbox",
           renderHeader: (h, params) => {
-            return h("div", [
-              h(
-                "span",
-                {
-                  on: {
-                    click: () => {
-                      this.setParamsChoose(params.column);
+            return h(
+              "div",
+              {
+                style: {
+                  "margin-top": "7px"
+                }
+              },
+              [
+                h(
+                  "checkbox",
+                  {
+                    props: {
+                      value: this.setRequest
+                    },
+                    on: {
+                      "on-change": value => {
+                        console.log(value);
+                        this.setRequest = value;
+                        this.setParamsChoose(params.column, value);
+                      }
                     }
-                  }
-                },
-                [h("Checkbox")]
-              ),
-
-              h(
-                "span",
-                {
-                  style: {
-                    marginLeft: "2px"
-                  }
-                },
-                "设为请求参数"
-              )
-            ]);
+                  },
+                  "设为请求参数"
+                )
+              ]
+            );
           }
         },
         {
@@ -449,29 +452,32 @@ export default {
           key: "setResponse",
           slot: "checkbox",
           renderHeader: (h, params) => {
-            return h("div", [
-              h(
-                "span",
-                {
-                  on: {
-                    click: () => {
-                      this.setParamsChoose(params.column);
+            return h(
+              "div",
+              {
+                style: {
+                  "margin-top": "7px"
+                }
+              },
+              [
+                h(
+                  "checkbox",
+                  {
+                    props: {
+                      value: this.setResponse
+                    },
+                    on: {
+                      "on-change": value => {
+                        console.log(value);
+                        this.setResponse = value;
+                        this.setParamsChoose(params.column, value);
+                      }
                     }
-                  }
-                },
-                [h("Checkbox")]
-              ),
-
-              h(
-                "span",
-                {
-                  style: {
-                    marginLeft: "2px"
-                  }
-                },
-                "设为返回参数"
-              )
-            ]);
+                  },
+                  "设为返回参数"
+                )
+              ]
+            );
           }
         },
         {
@@ -804,20 +810,20 @@ export default {
         return { ...item, index: index + 1, type: "asc" };
       });
     },
-    setParamsChoose(column) {
+    setParamsChoose(column, checked) {
       const { key } = column;
-      const result = !this[key];
       this.paramsList = this.paramsList.map(item => {
         const tmp = { ...item };
-        tmp[key] = result;
+        tmp[key] = checked;
         return tmp;
       });
-      this[key] = result;
     },
     changeParams(value, index, column) {
+      const { key } = column;
       const datas = [...this.paramsList];
-      datas[index][column.key] = value;
+      datas[index][key] = value;
       this.paramsList = datas;
+      this[key] = datas.every(item => !!item[key]);
     },
     changeParamCompare(value, index) {
       const datas = [...this.paramsList];
@@ -963,6 +969,10 @@ export default {
               };
               return tmp;
             });
+            this.setRequest = this.paramsList.every(item => !!item.setRequest);
+            this.setResponse = this.paramsList.every(
+              item => !!item.setResponse
+            );
           }
         });
     },

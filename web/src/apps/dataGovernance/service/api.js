@@ -154,7 +154,7 @@ export const createThemedomains = body =>
  */
 export const deleteThemedomains = name =>
   api.fetch(
-    `${API_PATH.WAREHOUSE_PATH}${name}`,
+    `${API_PATH.WAREHOUSE_PATH}${name}/delete`,
     {},
     'post'
   )
@@ -278,7 +278,7 @@ export const editLayersCustom = (body) =>
  */
 export const deleteLayers = name =>
   api.fetch(
-    `${API_PATH.WAREHOUSE_PATH}${name}`,
+    `${API_PATH.WAREHOUSE_PATH}${name}/delete`,
     {},
     'post'
   )

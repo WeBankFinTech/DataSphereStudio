@@ -163,8 +163,8 @@ export default {
         if (this.groupDatas.some(item => item.name === result)) {
           callback(new Error("该名称已经存在"));
           return;
-        } else if (result.length > 30) {
-          callback(new Error("名称不能超过30个字符"));
+        } else if (result.length > 20) {
+          callback(new Error("名称不能超过20个字符"));
         } else {
           callback();
         }
@@ -179,8 +179,8 @@ export default {
         if (apis.some(item => item.name === result)) {
           callback(new Error("该名称已经存在"));
           return;
-        } else if (result.length > 30) {
-          callback(new Error("名称不能超过30个字符"));
+        } else if (result.length > 20) {
+          callback(new Error("名称不能超过20个字符"));
         } else {
           callback();
         }

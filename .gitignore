@@ -54,3 +54,4 @@ dss-apps/dss-dataasset-management/data-assets-server/target/
 dss-commons/dss-common/target/
 dss-standard/dss-standard-common/target/
 dss-apps/dss-datawarehouse-design/data-warehouse-server/target/
+web/dist.zip

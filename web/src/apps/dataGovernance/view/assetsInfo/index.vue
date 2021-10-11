@@ -216,14 +216,10 @@ export default {
       const guid = this.$route.params.guid
       let classifications = []
       if (this.classification.subject) {
-        classifications.push({
-          typeName: this.classification.subject
-        })
+        classifications.push(this.classification.subject)
       }
       if (this.classification.layer){
-        classifications.push({
-          typeName: this.classification.layer
-        })
+        classifications.push(this.classification.layer)
       }
       updateClassifications(guid, { newClassifications: classifications })
     },

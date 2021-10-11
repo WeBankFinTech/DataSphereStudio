@@ -42,8 +42,8 @@ public class AssetServiceImpl implements AssetService {
             result.put("hiveStore", metaInfoMapper.getTableStorage());
 
             return result;
-        } catch (AtlasServiceException | DAOException | SQLException exception) {
-            throw new DataGovernanceException(exception.getMessage());
+        } catch (AtlasServiceException | DAOException exception) {
+            throw new DataGovernanceException(23000,exception.getMessage());
         }
     }
 
@@ -54,7 +54,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasEntityHeaders = atlasService.searchHiveTable(classification, query, true, limit, offset);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
 
         if (atlasEntityHeaders != null) {
@@ -89,7 +89,7 @@ public class AssetServiceImpl implements AssetService {
             String dbName = db_name.split("\\.")[0];
             try {
                 storage = metaInfoMapper.getTableInfo(dbName, tableName, isPartTable);
-            } catch (SQLException e) {
+            } catch (DAOException e) {
                 e.printStackTrace();
             }
             List<String> guids = new ArrayList<>();
@@ -143,7 +143,7 @@ public class AssetServiceImpl implements AssetService {
 
             return hiveTblDetailInfo;
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -157,13 +157,13 @@ public class AssetServiceImpl implements AssetService {
             List<PartInfo> partInfo = new ArrayList<>();
             try {
                 partInfo = metaInfoMapper.getPartInfo(dbName, tableName);
-            } catch (SQLException e) {
+            } catch (DAOException e) {
                 e.printStackTrace();
             }
             return partInfo;
 
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -204,7 +204,7 @@ public class AssetServiceImpl implements AssetService {
             sql.append(fields.get(fields.size() - 1)).append(" @$ from  ").append(tableName);
             return sql.toString();
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -291,7 +291,7 @@ public class AssetServiceImpl implements AssetService {
             }
             return sql.toString();
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -300,7 +300,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasService.modifyComment(guid, commentStr);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -310,10 +310,9 @@ public class AssetServiceImpl implements AssetService {
             try {
                 atlasService.modifyComment(key, commentMap.get(key));
             } catch (AtlasServiceException ex) {
-                throw new DataGovernanceException(ex.getMessage());
+
             }
         });
-
     }
 
     @Override
@@ -321,7 +320,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasService.setLabels(guid, labels);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(ex.getMessage());
+            throw new DataGovernanceException(23000,ex.getMessage());
         }
     }
 
@@ -330,12 +329,12 @@ public class AssetServiceImpl implements AssetService {
         try {
             return atlasService.getLineageInfo(guid, direction, depth);
         } catch (AtlasServiceException exception) {
-            throw new DataGovernanceException(exception.getMessage());
+            throw new DataGovernanceException(23000,exception.getMessage());
         }
     }
 
     @Override
-    public List<TableInfo> getTop10Table() throws DataGovernanceException, SQLException {
+    public List<TableInfo> getTop10Table() throws DAOException {
             return  metaInfoMapper.getTop10Table();
     }
 

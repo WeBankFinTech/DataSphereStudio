@@ -1,18 +1,15 @@
 package com.webank.wedatasphere.dss.data.governance.exception;
 
 
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
-public class DAOException extends  RuntimeException {
-    public  DAOException(){
-        super();
+public class DAOException extends ErrorException {
+
+    public DAOException(int errCode, String desc) {
+        super(errCode, desc);
     }
-    public  DAOException (String message,Throwable cause){
-        super(message,cause);
-    }
-    public  DAOException(String message){
-        super(message);
-    }
-    public  DAOException(Throwable cause){
-        super(cause);
+
+    public DAOException(int errCode, String desc, String ip, int port, String serviceKind) {
+        super(errCode, desc, ip, port, serviceKind);
     }
 }

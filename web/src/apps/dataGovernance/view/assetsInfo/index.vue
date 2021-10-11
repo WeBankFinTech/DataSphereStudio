@@ -225,7 +225,7 @@ export default {
           typeName: this.classification.layer
         })
       }
-      updateClassifications(guid, classifications)
+      updateClassifications(guid, { newClassifications: classifications })
     },
     // 获取基本字段信息
     getTblBasic() {

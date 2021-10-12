@@ -68,8 +68,8 @@
       <Divider type="vertical" class="divider" />
       <FormItem
         :class="{'float-right': isLogModuleShow}">
+        <Button type="default" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
         <Button type="primary" @click="search" style="margin-right: 10px;" >{{ $t('message.linkis.search') }}</Button>
-        <Button type="warning" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
         <Button
           type="warning"
           @click="logRefresh"
@@ -241,9 +241,9 @@ export default {
   },
   created() {
     // 获取是否是历史管理员权限
-    api.fetch('/jobhistory/isJobhistorAdmin', 'get').then((res) => {
-      this.isLogAdmin = res.isJobhistorAdmin;
-    })
+    // api.fetch('/jobhistory/isJobhistorAdmin', 'get').then((res) => {
+    //   this.isLogAdmin = res.isJobhistorAdmin;
+    // })
   },
   mounted() {
     this.init();

@@ -22,7 +22,9 @@
         "col_apiType": "ApiType",
         "col_status": "Status",
         "onlined": "online",
-        "offlined": "offline"
+        "offlined": "offline",
+        "offlineApiTitle": "Are you sure offline the api?",
+        "offlineApiDesc": "you will not call the api which after offline"
       },
       "apiMonitor": {
         "staticsScreen": "API Statics Screen",
@@ -33,7 +35,7 @@
         "range_week": "week",
         "range_yesterday": "yesterday",
         "range_today": "today",
-        "resource": "resource",
+        "resource": "resource (last 24 hour)",
         "dashboard": "dashboard",
         "callCnt": "call count",
         "callTime": "call time",
@@ -42,8 +44,9 @@
         "col_rank": "Rank",
         "col_apiName": "ApiName",
         "col_reqCnt": "TotalCount",
+        "col_failCnt": "FailCount",
         "col_failRate": "FailRate",
-        "col_totalTime": "TotalTime",
+        "col_totalTime": "TotalTime(ms)",
         "col_avgTime": "AvgTime(ms)",
         "col_groupName": "GroupName",
         "col_label": "Label",
@@ -70,8 +73,11 @@
           "short": "short",
           "long": "long"
         },
-        "col_caller": "caller",
+        "col_caller": "appKey",
+        "col_group": "groupName",
         "col_expire": "expire",
+        "col_token": "appSecret",
+        "col_updateTime": "updateTime",
         "col_createTime": "createTime"
       },
       "apiTest": {
@@ -86,7 +92,8 @@
         "holderInput": "input",
         "holderArray": "comma separated values",
         "start": "start test",
-        "api_not_selected": "api not selected"
+        "api_not_selected": "api not selected",
+        "req_params_not_value": "request params should be valued"
       }
     }
   }

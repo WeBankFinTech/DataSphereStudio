@@ -18,7 +18,7 @@
         <div v-for="item in tabsApplication[actionIndex].appInstances" :key="item.name" class="pane-item" >
           <div class="item-main">
             <div class="app-title">
-              <SvgIcon class="app-icon" :icon-class="item.image"/>
+              <SvgIcon v-if="!!item.image" class="app-icon" :icon-class="item.image"/>
               <span class="label" :title="item.title">{{item.title}}</span>
               <span class="text-button" @click="navTo(item, item.manualButtonUrl)">{{item.active ? $t('message.workspace.AppStore.demoCase') : $t('message.workspace.AppStore.comingSoon')}}</span>
             </div>
@@ -33,7 +33,7 @@
             </div>
           </div>
           <!-- <SvgIcon class="app-bgc" :icon-class="item.image ? item.image : 'bgc-imag'"/> -->
-          <SvgIcon class="app-bgc" :icon-class="item.icon"/>
+          <SvgIcon v-if="!!item.icon" class="app-bgc" :icon-class="item.icon"/>
           <span v-if="!item.active" class="mask">
             {{$t('message.workspace.AppStore.comingSoon')}}
           </span>
@@ -88,7 +88,6 @@ export default {
   mixins: [mixin],
   methods: {
     checkout(val) {
-      console.log(val, 'val')
       this.actionIndex = val;
     },
     iconSplit(icon){
@@ -98,7 +97,6 @@ export default {
       return ['','']
     },
     init(){
-
       GetWorkspaceData(this.workspaceId).then(data=>{
         this.workspaceData = data.workspace;
       })
@@ -267,7 +265,7 @@ export default {
       height: 100%;
       z-index: 3;
       // background: rgba(255,255,255,0.80);
-      @include bg-color(rgba(255,255,255,0.80), rgba(0,0,0,0.5));
+      @include bg-color(rgba(255,255,255,0.80), rgba(255,255,255,0.1));
       text-align: center;
       line-height: 116px;
       font-size: 21px;

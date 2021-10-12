@@ -82,7 +82,6 @@
         </FormItem>
         <FormItem label="请求方式" prop="method">
           <Select v-model="apiForm.method" style="width:300px">
-            <Option value="GET">GET</Option>
             <Option value="POST">POST</Option>
           </Select>
         </FormItem>
@@ -156,6 +155,45 @@ export default {
     "we-tag": tag
   },
   data() {
+    const validateGroupName = (rule, value, callback) => {
+      const result = value && value.trim();
+      if (!result) {
+        callback(new Error("业务名称不能为空"));
+      } else {
+        if (this.groupDatas.some(item => item.name === result)) {
+          callback(new Error("该名称已经存在"));
+          return;
+        } else if (result.length > 20) {
+          callback(new Error("名称不能超过20个字符"));
+        } else {
+          callback();
+        }
+      }
+    };
+    const validateAPIName = (rule, value, callback) => {
+      const result = value && value.trim();
+      if (!result) {
+        callback(new Error("名称不能为空"));
+      } else {
+        const apis = (this.groupData && this.groupData.apis) || [];
+        if (apis.some(item => item.name === result)) {
+          callback(new Error("该名称已经存在"));
+          return;
+        } else if (result.length > 20) {
+          callback(new Error("名称不能超过20个字符"));
+        } else {
+          callback();
+        }
+      }
+    };
+    const validateAPIPath = (rule, value, callback) => {
+      const result = value && value.trim();
+      if (!result) {
+        callback(new Error("路径不能为空"));
+      } else {
+        callback();
+      }
+    };
     return {
       loadingData: false,
       navFold: false,
@@ -171,7 +209,7 @@ export default {
         name: [
           {
             required: true,
-            message: "请输入业务名称",
+            validator: validateGroupName,
             trigger: "blur"
           }
         ]
@@ -181,7 +219,7 @@ export default {
         apiName: "",
         apiPath: "",
         protocol: "HTTP",
-        method: "GET",
+        method: "POST",
         resType: "JSON",
         previlege: "WORKSPACE",
         describe: "",
@@ -191,14 +229,14 @@ export default {
         apiName: [
           {
             required: true,
-            message: "请输入名称",
+            validator: validateAPIName,
             trigger: "blur"
           }
         ],
         apiPath: [
           {
             required: true,
-            message: "请输入路径",
+            validator: validateAPIPath,
             trigger: "blur"
           }
         ],
@@ -232,7 +270,8 @@ export default {
         ]
       },
       groupData: "",
-      apiTabDatas: []
+      apiTabDatas: [],
+      groupDatas: []
     };
   },
   computed: {},
@@ -241,12 +280,14 @@ export default {
       this.navFold = !this.navFold;
     },
     showModal(pyload) {
-      const { type, data } = pyload;
+      const { type, data, groupDatas } = pyload;
       this.modalVisible = true;
       this.modalType = type;
       this.modalTitle = type === "group" ? "新增业务流程" : "生成API";
       if (type === "api") {
         this.groupData = data;
+      } else {
+        this.groupDatas = groupDatas;
       }
     },
     handleModalCancel() {
@@ -260,17 +301,14 @@ export default {
           this.$refs.navMenu.treeMethod("getApi");
           if (valid) {
             this.confirmLoading = true;
+            const params = {
+              workspaceId: this.$route.query.workspaceId,
+              ...this.groupForm
+            };
+            params.name = params.name.trim();
             api
-              .fetch(
-                `/dss/framework/dbapi/group/create`,
-                {
-                  workspaceId: this.$route.query.workspaceId,
-                  ...this.groupForm
-                },
-                "post"
-              )
+              .fetch(`/dss/data/api/group/create`, params, "post")
               .then(res => {
-                console.log(res);
                 this.confirmLoading = false;
                 this.$refs.navMenu.treeMethod("getApi");
                 this.handleModalCancel();
@@ -282,15 +320,17 @@ export default {
         });
       } else {
         this.$refs["apiForm"].validate(valid => {
-          console.log(valid);
           if (valid) {
             if (modalType === "api") {
               const { id, name } = this.groupData;
               const tempId = Date.now();
+              const params = {...this.apiForm};
+              params.apiName = params.apiName.trim();
+              params.apiPath = params.apiPath.trim();
               this.$refs.navMenu.treeMethod("addApi", {
                 id,
                 data: {
-                  name: this.apiForm.apiName,
+                  name: params.apiName,
                   projectId: id,
                   projectName: name,
                   tempId,
@@ -298,7 +338,7 @@ export default {
                 }
               });
               this.addTab({
-                ...this.apiForm,
+                ...params,
                 groupId: this.groupData.id,
                 tempId
               });
@@ -361,7 +401,7 @@ export default {
           apiName: "",
           apiPath: "",
           protocol: "HTTP",
-          method: "GET",
+          method: "POST",
           resType: "JSON",
           previlege: "WORKSPACE",
           describe: "",
@@ -377,7 +417,6 @@ export default {
       this.modalTitle = "API属性";
     },
     handleApiChoosed(payload) {
-      console.log(payload);
       if (payload.type === "api") {
         const { id, tempId } = payload;
         const newApis = [...this.apiTabDatas];
@@ -394,9 +433,8 @@ export default {
         }
         this.loadingData = true;
         api
-          .fetch(`/dss/framework/dbapi/detail?apiId=${id}`, {}, "get")
+          .fetch(`/dss/data/api/detail?apiId=${id}`, {}, "get")
           .then(res => {
-            console.log(res);
             this.loadingData = false;
             const data = res && res.detail;
             if (data) {
@@ -424,14 +462,12 @@ export default {
               data: { ...apiData, id: data.id, path: apiData.apiPath }
             };
           }
-          console.log(tmp);
           return tmp;
         });
         this.apiTabDatas = newApis;
       }
     },
     removeTab(id) {
-      console.log(id);
       const newApis = [...this.apiTabDatas];
       const hitIndex = newApis.findIndex(item => item.id === id);
       newApis.splice(hitIndex, 1);
@@ -446,7 +482,6 @@ export default {
       });
     },
     updateApiData(data) {
-      console.log(data);
       if (data.id) {
         this.updateTab(data);
       }

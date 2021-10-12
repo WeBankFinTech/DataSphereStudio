@@ -5,7 +5,10 @@
       <div class="divider">/</div>
       <p class="header-subTitle">服务开发</p>
     </div>
-    <div class="tabWrap">
+    <div class="emptyGuideWrap" v-if="tabDatas.length === 0">
+      <empty-guide />
+    </div>
+    <div class="tabWrap" v-if="tabDatas.length > 0">
       <template v-for="(work, index) in tabDatas">
         <div
           :key="index"
@@ -23,17 +26,26 @@
       </template>
     </div>
 
-    <params-config v-for="(configData, index) in tabDatas" :key="index" v-show="configData.isActive" :apiData="configData" @showApiForm="showApiModel"        @updateApiData="updateApiData" />
+    <params-config
+      v-for="(configData, index) in tabDatas"
+      :key="index"
+      v-show="configData.isActive"
+      :apiData="configData"
+      @showApiForm="showApiModel"
+      @updateApiData="updateApiData"
+    />
   </div>
 </template>
 <script>
 import webTab from "@/apps/workflows/module/common/tabList/tabs.vue";
 import paramsConfig from "./paramsConfig.vue";
+import emptyGuide from "./emptyGuide.vue";
 // import api from "@/common/service/api";
 export default {
   components: {
     webTab,
-    paramsConfig
+    paramsConfig,
+    emptyGuide
   },
   props: {
     tabDatas: {
@@ -46,38 +58,6 @@ export default {
   },
   data() {
     return {
-      // apiItems: [
-      //   { name: "sdfsaf", id: 1 },
-      //   { name: "fdj89", id: 3 }
-      // ],
-      //apiItems: this.tabDatas,
-      toolItems: [
-        {
-          name: "属性",
-          iconSrc: require("../../assets/images/property.svg"),
-          type: "property"
-        },
-        {
-          name: "版本",
-          iconSrc: require("../../assets/images/version.svg"),
-          type: "version"
-        },
-        {
-          name: "保存",
-          iconSrc: require("../../assets/images/save.svg"),
-          type: "save"
-        },
-        {
-          name: "测试",
-          iconSrc: require("../../assets/images/test.svg"),
-          type: "test"
-        },
-        {
-          name: "发布",
-          iconSrc: require("../../assets/images/release.svg"),
-          type: "release"
-        }
-      ],
       currentTab: { name: "sdfsaf", id: 1 },
       navFold: false,
       confirmLoading: false,
@@ -106,10 +86,10 @@ export default {
       console.log(apiData);
       this.$emit("showApiForm", apiData);
     },
-    updateApiData(data){
+    updateApiData(data) {
       console.log(data);
       this.$emit("updateApiData", data);
-    },
+    }
   }
 };
 </script>
@@ -130,6 +110,17 @@ export default {
   .header-subTitle {
     font-family: PingFangSC-Medium;
   }
+} 
+.emptyGuideWrap{
+  width: 100%;
+  min-height: 400px;
+  height: calc( 100vh - 140px );
+  min-width: 600px;
+  border-top: 1px solid #DEE4EC;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
 }
 .tabWrap {
   padding-left: 10px;
@@ -137,7 +128,7 @@ export default {
     display: inline-block;
     height: 40px;
     line-height: 40px;
-    color: $title-color;
+    @include font-color($title-color, $dark-text-color);
     cursor: pointer;
     min-width: 100px;
     max-width: 200px;

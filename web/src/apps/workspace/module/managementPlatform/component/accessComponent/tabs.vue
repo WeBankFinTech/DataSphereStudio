@@ -73,7 +73,7 @@ export default {
         font-size: $font-size-large;
         margin-top: -1px;
         .close-icon {
-          color: rgba(0,0,0,0.45);
+          @include font-color(rgba(0,0,0,0.45), $dark-text-color);
         }
     }
 }

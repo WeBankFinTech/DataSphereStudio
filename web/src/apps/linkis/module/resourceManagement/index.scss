@@ -3,6 +3,7 @@
 .resource-title {
   font-size: 16px;
   margin: 10px 0;
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
   .title-text {
     margin-right: 15px;
     @include font-color($workspace-title-color, $dark-workspace-title-color);
@@ -53,9 +54,13 @@ td.table-project-column {
   .tagName {
     flex: none;
     margin-right: 20px;
+    .tagLabel {
+      @include font-color(#515a6e, $dark-workspace-title-color);
+    }
   }
   .instanceNum {
-    flex: 1
+    flex: 1;
+    @include font-color(#515a6e, $dark-workspace-title-color);
   }
 }
 /deep/.addTagClass {

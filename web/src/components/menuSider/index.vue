@@ -64,15 +64,17 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+@import '@/common/style/variables.scss';
     .menuSiderWrap {
         position: relative;
+        @include bg-color($light-base-color, $dark-menu-base-color);
     }
     .triggerIcon {
         position: absolute;
         top: 20px;
         font-size: 14px;
-        background: #333c;
-        color: #fff;
+        @include bg-color(#333c, $dark-active-menu-item);
+        @include font-color(#fff, $dark-text-color);
         line-height: 16px;
         padding: 2px;
         border-radius: 2px;

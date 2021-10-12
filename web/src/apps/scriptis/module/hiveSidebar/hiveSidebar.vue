@@ -48,9 +48,9 @@
           @select="openDeleteDialog"
           v-if="!model">{{ $t('message.scripts.database.contextMenu.tb.deleteTable') }}</we-menu-item>
         <we-menu-item v-show="nodekeyshow" @select="describeTable">{{ $t('message.scripts.database.contextMenu.tb.viewTable') }}</we-menu-item>
-        <we-menu-item
+        <!-- <we-menu-item
           v-if="isAllowToExport && !model"
-          @select="openExportDialog">{{ $t('message.scripts.database.contextMenu.tb.exportTable') }}</we-menu-item>
+          @select="openExportDialog">{{ $t('message.scripts.database.contextMenu.tb.exportTable') }}</we-menu-item> -->
         <we-menu-item class="ctx-divider"/>
         <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.tb.copyName') }}</we-menu-item>
         <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.tb.pasteName') }}</we-menu-item>
@@ -143,7 +143,8 @@ export default {
       if (this.node && Object.keys(this.node)) {
         return ['search', 'refresh']
       } else {
-        return ['search', 'newFile', 'refresh', 'export']
+        // return ['search', 'newFile', 'refresh', 'export']
+        return ['search', 'refresh']
       }
     }
   },

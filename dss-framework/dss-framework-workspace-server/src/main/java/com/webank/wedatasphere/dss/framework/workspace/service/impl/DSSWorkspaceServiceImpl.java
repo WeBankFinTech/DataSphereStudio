@@ -195,11 +195,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) {
+    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception {
         //根据用户名 拿到用户ID
         //根据用户id 和工作空间id 拿到 角色id
         //根据role id 和工作空间id 拿到 重定向的 url
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
+        if(tempWorkspaceIds == null || tempWorkspaceIds.isEmpty()){
+            throw  new Exception("该账号尚未加入工作空间，请联系管理员分配工作空间及用户角色");
+        }
         List<Integer> workspaceIds = new ArrayList<>();
         tempWorkspaceIds.stream().
                 map(dssWorkspaceInfoMapper::getWorkspaceNameById).
@@ -299,7 +302,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public DSSWorkspacePrivVO getWorkspaceMenuPrivs(String workspaceId) {
         DSSWorkspacePrivVO dssWorkspacePrivVO = new DSSWorkspacePrivVO();
         dssWorkspacePrivVO.setWorkspaceId(Integer.parseInt(workspaceId));
-        dssWorkspacePrivVO.setRoleVOS(workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId)));
+        List<DSSWorkspaceRoleVO>   workspaceRoleVOList = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
+        dssWorkspacePrivVO.setRoleVOS(workspaceRoleVOList);
         List<DSSWorkspaceMenuPrivVO> dssWorkspaceMenuPrivVOList = new ArrayList<>();
         List<DSSWorkspaceMenuRolePriv> dssWorkspaceMenuRolePrivList = dssWorkspaceMapper.getDSSWorkspaceMenuPriv(workspaceId);
         Map<Integer, List<DSSWorkspaceMenuRolePriv>> map = new HashMap<>();
@@ -315,20 +319,36 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         map.forEach((k,v) ->{
             DSSWorkspaceMenuPrivVO vo = new DSSWorkspaceMenuPrivVO();
             vo.setId(k);
-            vo.setName(workspaceDBHelper.getMenuNameById(k).getTitleCn());
-            Map<String, Boolean> menuPrivs = new HashMap<>();
-            v.forEach(priv -> {
-                menuPrivs.put(workspaceDBHelper.getRoleNameById(priv.getRoleId()), priv.getPriv() == 1);
-            });
-            vo.setMenuPrivs(menuPrivs);
-            dssWorkspaceMenuPrivVOList.add(vo);
+            if(workspaceDBHelper.getMenuNameById(k) != null){
+                vo.setName(workspaceDBHelper.getMenuNameById(k).getTitleCn());
+                Map<String, Boolean> menuPrivs = new HashMap<>();
+                workspaceRoleVOList.forEach(role->{
+                    int roleId = role.getRoleId();
+                    boolean isContain = false;
+                    for(DSSWorkspaceMenuRolePriv dssWorkspaceMenuRolePriv:v){
+                        if(roleId == dssWorkspaceMenuRolePriv.getRoleId()){
+                            menuPrivs.put(role.getRoleName(), dssWorkspaceMenuRolePriv.getPriv() == 1);
+                            isContain = true;
+                            break;
+                        }
+                    }
+                    if(!isContain){
+                        menuPrivs.put(role.getRoleName(), false);
+                    }
+
+                });
+
+                vo.setMenuPrivs(menuPrivs);
+                dssWorkspaceMenuPrivVOList.add(vo);
+            }
+
         });
         dssWorkspacePrivVO.setMenuPrivVOS(dssWorkspaceMenuPrivVOList);
 
         List<DSSWorkspaceComponentPrivVO> dssWorkspaceComponentPrivVOList = new ArrayList<>();
         List<DSSWorkspaceComponentRolePriv> dssWorkspaceComponentRolePrivList =
                 dssWorkspaceMenuMapper.getComponentRolePriv(Integer.parseInt(workspaceId));
-        List<DSSWorkspaceComponentRolePriv> defaultDssWorkspaceComponentRolePrivList = dssWorkspaceMenuMapper.getDefaultComponentRolePriv();
+        List<DSSWorkspaceComponentRolePriv> defaultDssWorkspaceComponentRolePrivList = dssWorkspaceMenuMapper.getDefaultComponentRolePriv01();
         for (DSSWorkspaceComponentRolePriv p : defaultDssWorkspaceComponentRolePrivList){
             if (!dssWorkspaceComponentRolePrivList.contains(p)) {
                 dssWorkspaceComponentRolePrivList.add(p);
@@ -348,17 +368,30 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         map1.forEach((k,v) ->{
             DSSWorkspaceComponentPrivVO vo = new DSSWorkspaceComponentPrivVO();
             vo.setId(k);
+            Map<String, Boolean> componentPrivs = new HashMap<>();
+
             if (workspaceDBHelper.getComponent(k) != null){
                 vo.setName(workspaceDBHelper.getComponent(k).getName());
-            } else {
-                vo.setName("linkis");
+                workspaceRoleVOList.forEach(role->{
+                    int roleId = role.getRoleId();
+                    boolean isContain = false;
+                    for(DSSWorkspaceComponentRolePriv dssWorkspaceComponentRolePriv:v){
+                        if(roleId == dssWorkspaceComponentRolePriv.getRoleId()){
+                            componentPrivs.put(role.getRoleName(), dssWorkspaceComponentRolePriv.getPriv() == null ? false :dssWorkspaceComponentRolePriv.getPriv() == 1);
+                            isContain = true;
+                            break;
+                        }
+                    }
+                    if(!isContain){
+                        componentPrivs.put(role.getRoleName(), false);
+                    }
+
+                });
+                vo.setComponentPrivs(componentPrivs);
+                dssWorkspaceComponentPrivVOList.add(vo);
+
             }
-            Map<String, Boolean> componentPrivs = new HashMap<>();
-            v.forEach(priv -> {
-                componentPrivs.put(workspaceDBHelper.getRoleNameById(priv.getRoleId()), priv.getPriv() == 1);
-            });
-            vo.setComponentPrivs(componentPrivs);
-            dssWorkspaceComponentPrivVOList.add(vo);
+
         });
         dssWorkspacePrivVO.setComponentPrivVOS(dssWorkspaceComponentPrivVOList);
         return dssWorkspacePrivVO;

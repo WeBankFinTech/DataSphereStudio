@@ -17,7 +17,8 @@
           :favorites="favorites" 
           @menu-click="handleMenuClick"
           @favorite-remove="removeFavorite" 
-          @favorite-add="addFavorite">
+          @favorite-add="addFavorite"
+          ref="vueLubanMenu">
           <div class="luban-menu-trigger">
             <img src="../../assets/images/luban-menu-trigger.png">
           </div>
@@ -323,7 +324,7 @@ export default {
       return arr;
     },
     handleOutsideClick() {
-      if(this.$parent.$children[3].currentStep !== 6){
+      if(this.$parent.$refs.newGuidance.currentStep !== 6){
         this.isUserMenuShow = false;
       }
     },

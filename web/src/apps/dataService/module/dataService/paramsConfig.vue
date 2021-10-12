@@ -19,7 +19,11 @@
           class="toolWrap"
           @click="handleToolShow(toolItem)"
         >
-          <SvgIcon class="icon" :icon-class="toolItem.iconName" verticalAlign="0px" />
+          <SvgIcon
+            class="icon"
+            :icon-class="toolItem.iconName"
+            verticalAlign="0px"
+          />
           <div>{{ toolItem.name }}</div>
           <div class="divider" :class="{ 'last-divider': index === 4 }" />
         </div>
@@ -39,7 +43,7 @@
                   <Option value="MYSQL">MYSQL</Option>
                 </Select>
               </FormItem>
-              <FormItem label="数据源名称" prop="datasourceId" required>
+              <FormItem label="数据源名称" prop="datasourceId">
                 <Select
                   v-model="dbForm.datasourceId"
                   style="width:300px"
@@ -48,12 +52,19 @@
                 >
                   <Option
                     v-for="item in datasourceIds"
-                    :value="item.datasourceId"
+                    :value="item.datasourceId + ''"
                     :key="item.datasourceId"
                     >{{ item.name }}</Option
                   >
                 </Select>
               </FormItem>
+              <div class="dataSourceTip">
+                如需新建数据源，请点击
+                <div class="dataSourceLink" @click="gotoCreateDatasource">
+                  这里
+                </div>
+                创建
+              </div>
               <FormItem
                 label="数据表名称"
                 prop="tblName"
@@ -94,7 +105,10 @@
             </Form>
           </div>
         </div>
-        <div class="cardWrap" v-if="apiData.data.apiType === 'SQL'">
+        <div
+          class="cardWrap cardTableWrap"
+          v-if="apiData.data.apiType === 'SQL'"
+        >
           <div class="cardTitle">编写查询SQL</div>
           <div style="margin-top: 10px;">
             <Alert show-icon
@@ -107,7 +121,7 @@
               v-model="sql"
               type="textarea"
               placeholder="请填写SQL语句"
-              rows="10"
+              :rows="10"
             />
           </div>
         </div>
@@ -133,7 +147,6 @@
                 <Select
                   :value="row.compare"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeParamCompare(value, index)"
                   v-if="row.setRequest"
                 >
@@ -153,6 +166,34 @@
             </Table>
           </div>
         </div>
+        <div class="pageWrap">
+          <div class="pageNumWrap">
+            <Checkbox v-model="pageNumChecked" @on-change="handlePageNumChange"
+              >返回结果分页</Checkbox
+            >
+            <div class="pageTip">
+              当返回结果记录数大于500时请选择分页，不分页则最多返回500条记录。当无请求参数时，必须开启返回结果分页。
+            </div>
+          </div>
+          <div v-show="pageNumChecked" style="margin-top:10px;">
+            <Form
+              ref="pageForm"
+              :model="pageForm"
+              :label-width="75"
+              :rules="pageRuleValidate"
+            >
+              <FormItem label="每页条数" prop="pageSize">
+                <Input
+                  type="number"
+                  v-model="pageForm.pageSize"
+                  placeholder="请输入每页条数,不超过50条"
+                  style="width: 300px"
+                  ><span slot="append">条</span></Input
+                >
+              </FormItem>
+            </Form>
+          </div>
+        </div>
         <div
           class="cardWrap cardTableWrap"
           v-if="apiData.data.apiType === 'GUIDE'"
@@ -169,7 +210,6 @@
                 <Select
                   :value="row.type"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeSort(value, row)"
                 >
                   <Option value="asc">升序</Option>
@@ -209,14 +249,15 @@
                     value => changeSqlParams(value.target.value, index, column)
                   "
                   placeholder="请输入"
+                  :readonly="!!row.pageNumChecked && column.key === 'name'"
                 ></Input>
               </template>
               <template slot-scope="{ index, row, column }" slot="type">
                 <Select
                   :value="row.type"
                   transfer
-                  style="width:200px"
                   @on-change="value => changeSqlParams(value, index, column)"
+                  v-if="!row.pageNumChecked"
                 >
                   <Option
                     v-for="(item, index) in sqlTypeOptions"
@@ -224,6 +265,14 @@
                     :key="index"
                     >{{ item.label }}</Option
                   >
+                </Select>
+                <Select
+                  :value="row.type"
+                  transfer
+                  @on-change="value => changeSqlParams(value, index, column)"
+                  v-if="!!row.pageNumChecked"
+                >
+                  <Option value="bigint">bigint</Option>
                 </Select>
               </template>
               <template slot-scope="{ index }" slot="operation">
@@ -283,6 +332,19 @@ export default {
     }
   },
   data() {
+    const validatePageSize = (rule, value, callback) => {
+      if (!value && value !== 0) {
+        callback(new Error("每页条数不能为空"));
+      } else {
+        if (value > 50 || value < 1) {
+          callback(new Error("每页条数不能超过50条, 不少于1条"));
+        } else if (!Number.isInteger(parseFloat(value))) {
+          callback(new Error("每页条数必须为整数"));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       confirmLoading: false,
       showTestPanel: false,
@@ -292,11 +354,11 @@ export default {
           type: "property",
           iconName: "shuxing"
         },
-        {
-          name: "版本",
-          iconName: "banben",
-          type: "version"
-        },
+        // {
+        //   name: "版本",
+        //   iconName: "banben",
+        //   type: "version"
+        // },
         {
           name: "保存",
           iconName: "baocun",
@@ -326,7 +388,7 @@ export default {
             trigger: "blur"
           }
         ],
-        datasourceIdss: [
+        datasourceId: [
           {
             required: true,
             message: "请选择数据源名称",
@@ -350,35 +412,39 @@ export default {
       setRequest: false,
       setResponse: false,
       hideParamTable: false,
+      pageNumChecked: false,
       paramsColumns: [
         {
           title: "设为请求参数",
           key: "setRequest",
           slot: "checkbox",
           renderHeader: (h, params) => {
-            return h("div", [
-              h(
-                "span",
-                {
-                  on: {
-                    click: () => {
-                      this.setParamsChoose(params.column);
+            return h(
+              "div",
+              {
+                style: {
+                  "margin-top": "7px"
+                }
+              },
+              [
+                h(
+                  "checkbox",
+                  {
+                    props: {
+                      value: this.setRequest
+                    },
+                    on: {
+                      "on-change": value => {
+                        console.log(value);
+                        this.setRequest = value;
+                        this.setParamsChoose(params.column, value);
+                      }
                     }
-                  }
-                },
-                [h("Checkbox")]
-              ),
-
-              h(
-                "span",
-                {
-                  style: {
-                    marginLeft: "2px"
-                  }
-                },
-                "设为请求参数"
-              )
-            ]);
+                  },
+                  "设为请求参数"
+                )
+              ]
+            );
           }
         },
         {
@@ -386,29 +452,32 @@ export default {
           key: "setResponse",
           slot: "checkbox",
           renderHeader: (h, params) => {
-            return h("div", [
-              h(
-                "span",
-                {
-                  on: {
-                    click: () => {
-                      this.setParamsChoose(params.column);
+            return h(
+              "div",
+              {
+                style: {
+                  "margin-top": "7px"
+                }
+              },
+              [
+                h(
+                  "checkbox",
+                  {
+                    props: {
+                      value: this.setResponse
+                    },
+                    on: {
+                      "on-change": value => {
+                        console.log(value);
+                        this.setResponse = value;
+                        this.setParamsChoose(params.column, value);
+                      }
                     }
-                  }
-                },
-                [h("Checkbox")]
-              ),
-
-              h(
-                "span",
-                {
-                  style: {
-                    marginLeft: "2px"
-                  }
-                },
-                "设为返回参数"
-              )
-            ]);
+                  },
+                  "设为返回参数"
+                )
+              ]
+            );
           }
         },
         {
@@ -459,6 +528,18 @@ export default {
       ],
       sortList: [],
       sql: "",
+      pageForm: {
+        pageSize: ""
+      },
+      pageRuleValidate: {
+        pageSize: [
+          {
+            required: true,
+            validator: validatePageSize,
+            trigger: "change"
+          }
+        ]
+      },
       sqlColumns: [
         {
           title: "参数名称",
@@ -519,7 +600,8 @@ export default {
       memory,
       reqTimeout,
       sql,
-      reqFields
+      reqFields,
+      pageSize
     } = data;
     this.getDataSourceIds(this.dbForm.datasourceType);
     if (!id) {
@@ -527,13 +609,15 @@ export default {
     }
     this.dbForm = {
       datasourceType: "MYSQL",
-      datasourceId: datasourceId ? parseFloat(datasourceId) : "",
+      datasourceId: datasourceId ? datasourceId + "" : "",
       tblName
     };
     this.envForm = {
       memory,
       reqTimeout
     };
+    this.pageForm = { pageSize: pageSize ? pageSize : "" };
+    this.pageNumChecked = !!pageSize;
     if (apiType === "SQL") {
       this.sql = sql;
       const reqValues = reqFields ? JSON.parse(reqFields) : [];
@@ -604,13 +688,16 @@ export default {
         ...this.dbForm,
         memory: parseFloat(memory),
         id: data.id || null,
-        workspaceId: 223
+        workspaceId: this.$route.query.workspaceId,
+        pageSize: 0
       };
+      if (reqParams.datasourceId) {
+        reqParams.datasourceId = parseFloat(reqParams.datasourceId);
+      }
       if (reqTimeout) {
         reqParams.reqTimeout = parseFloat(reqTimeout);
       }
       this.$refs["dbForm"].validate(valid => {
-        console.log(valid);
         if (valid) {
           if (apiType === "GUIDE") {
             const reqFields = [];
@@ -628,14 +715,20 @@ export default {
                 resFields.push("`" + item.columnName + "`");
               }
             });
+            if (this.pageNumChecked) {
+              reqFields.push({
+                name: "pageNum",
+                type: "bigint",
+                comment: "",
+                compare: "=",
+                pageNumChecked: true
+              });
+            }
+
             if (resFields.length === 0) {
               this.$Message.error("返回参数不能为空");
               return;
             }
-            // if (this.sortList.length === 0) {
-            //   this.$Message.error("排序字段不能为空");
-            //   return;
-            // }
             const orderFields = this.sortList.map(item => {
               return { name: item.columnName, type: item.type };
             });
@@ -649,12 +742,12 @@ export default {
           } else {
             if (!this.sql) {
               this.$Message.error("SQL语句不能为空");
-
               return;
             }
             const reqes = this.sqlList.filter(item => !!item.name);
             if (reqes.length === 0) {
               this.$Message.error("请求参数不能为空");
+              return;
             }
             reqParams = {
               ...reqParams,
@@ -662,27 +755,39 @@ export default {
               sql: this.sql
             };
           }
-          this.confirmLoading = true;
-          api
-            .fetch(`/dss/framework/dbapi/save`, reqParams, "post")
-            .then(res => {
-              console.log(res);
-              this.$emit("updateApiData", { ...data, ...reqParams });
-
-              this.$Message.success("保存成功");
-              this.confirmLoading = false;
-            })
-            .catch(() => {
-              this.confirmLoading = false;
+          if (this.pageNumChecked) {
+            this.$refs["pageForm"].validate(valid2 => {
+              if (valid2) {
+                reqParams.pageSize = parseInt(this.pageForm.pageSize);
+                this.executeSaveApi(reqParams);
+              }
             });
+            return;
+          }
+          this.executeSaveApi(reqParams);
         }
       });
+    },
+    executeSaveApi(reqParams) {
+      const { data } = this.apiData;
+      this.confirmLoading = true;
+      api
+        .fetch(`/dss/data/api/save`, reqParams, "post")
+        .then(res => {
+          this.$emit("updateApiData", { ...data, ...reqParams });
+
+          this.$Message.success("保存成功");
+          this.confirmLoading = false;
+        })
+        .catch(() => {
+          this.confirmLoading = false;
+        });
     },
     releaseApi() {
       this.confirmLoading = true;
       api
         .fetch(
-          `/dss/framework/dbapi/apimanager/online/${this.apiData.data.id}`,
+          `/dss/data/api/apimanager/online/${this.apiData.data.id}`,
           {},
           "post"
         )
@@ -705,30 +810,27 @@ export default {
         return { ...item, index: index + 1, type: "asc" };
       });
     },
-    setParamsChoose(column) {
+    setParamsChoose(column, checked) {
       const { key } = column;
-      const result = !this[key];
       this.paramsList = this.paramsList.map(item => {
         const tmp = { ...item };
-        tmp[key] = result;
+        tmp[key] = checked;
         return tmp;
       });
-      this[key] = result;
     },
     changeParams(value, index, column) {
+      const { key } = column;
       const datas = [...this.paramsList];
-      datas[index][column.key] = value;
+      datas[index][key] = value;
       this.paramsList = datas;
-      console.log(column);
+      this[key] = datas.every(item => !!item[key]);
     },
     changeParamCompare(value, index) {
       const datas = [...this.paramsList];
       datas[index]["compare"] = value;
       this.paramsList = datas;
-      console.log(value);
     },
     changeSort(value, rowData) {
-      console.log(value);
       this.sortList = [...this.sortList].map((item, index) => {
         const newItem = { ...item };
         if (rowData.columnName === item.columnName) {
@@ -772,20 +874,21 @@ export default {
     },
     changeSqlParams(value, index, column) {
       const datas = [...this.sqlList];
-      datas[index][column.key] = value;
+      datas[index][column.key] = value.trim();
       if (column.key === "type") {
         const demo = this.sqlTypeOptions.find(item => item.value === value);
         datas[index]["demo"] = demo.demo;
       }
       this.sqlList = datas;
     },
-    addSqlParams() {
+    addSqlParams(data = {}) {
       const datas = [...this.sqlList];
       datas.push({
         name: "",
         type: "string",
         demo: "liming",
-        comment: ""
+        comment: "",
+        ...data
       });
       this.sqlList = datas;
     },
@@ -793,7 +896,7 @@ export default {
       //获取数据源
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
+          `/dss/data/api/datasource/connections?workspaceId=${this.$route.query.workspaceId}&type=${datasourceType}`,
           {},
           "get"
         )
@@ -816,7 +919,7 @@ export default {
       this.destoryParamsTable();
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/tables?datasourceId=${datasourceId}`,
+          `/dss/data/api/datasource/tables?datasourceId=${datasourceId}`,
           {},
           "get"
         )
@@ -836,7 +939,7 @@ export default {
       this.destoryParamsTable();
       api
         .fetch(
-          `/dss/framework/dbapi/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
+          `/dss/data/api/datasource/cols?datasourceId=${this.dbForm.datasourceId}&tableName=${tableName}`,
           {},
           "get"
         )
@@ -855,7 +958,6 @@ export default {
                 return { index: index + 1, ...ov, columnName: ov.name };
               });
             }
-            console.log(resValues);
             this.paramsList = res.allCols.map(item => {
               const { columnName } = item;
               const hit = reqValues.find(re => re.name === columnName);
@@ -867,6 +969,10 @@ export default {
               };
               return tmp;
             });
+            this.setRequest = this.paramsList.every(item => !!item.setRequest);
+            this.setResponse = this.paramsList.every(
+              item => !!item.setResponse
+            );
           }
         });
     },
@@ -876,6 +982,32 @@ export default {
       this.hideParamTable = true;
       this.$nextTick(() => {
         this.hideParamTable = false;
+      });
+    },
+    handlePageNumChange(e) {
+      const { data } = this.apiData;
+      const { apiType } = data;
+      if (apiType === "SQL") {
+        if (e) {
+          this.addSqlParams({
+            name: "pageNum",
+            type: "bigint",
+            demo: "1",
+            comment: "",
+            pageNumChecked: true
+          });
+        } else {
+          const index = this.sqlList.findIndex(
+            item => item.name === "pageNum" && item.pageNumChecked
+          );
+          this.deleteSqlRow(index);
+        }
+      }
+    },
+    gotoCreateDatasource() {
+      this.$router.push({
+        name: "dataSourceAdministration",
+        query: { workspaceId: this.$route.query.workspaceId }
       });
     }
   }
@@ -895,8 +1027,11 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    border: 1px solid rgba($color: #000000, $alpha: 0.2);
-    @include border-color(rgba($color: #000000, $alpha: 0.2), $dark-border-color);
+    border: 1px solid #dee4ec;
+    @include border-color(
+      rgba($color: #000000, $alpha: 0.2),
+      $dark-border-color
+    );
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -915,7 +1050,7 @@ export default {
     height: 48px;
     margin-top: -5px;
     @include bg-color(#f8f9fc, $dark-menu-base-color);
-    border: 1px solid rgba($color: #000000, $alpha: 0.2);
+    border: 1px solid #dee4ec;
     border-left-width: 0;
     border-right-width: 0;
     box-sizing: border-box;
@@ -954,7 +1089,7 @@ export default {
     overflow-y: auto;
     .cardWrap {
       padding: 20px 0;
-      border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
+      border-bottom: 1px solid #dee4ec;
       @include border-color(rgba(0, 0, 0, 0.2), $dark-border-color);
       .cardTitle {
         font-family: PingFangSC-Medium;
@@ -1009,6 +1144,33 @@ export default {
     }
     .cardTableWrap {
       border-bottom-width: 0;
+    }
+    .pageWrap {
+      border-bottom: 1px solid #dee4ec;
+      padding-bottom: 5px;
+      .pageNumWrap {
+        display: flex;
+        .pageTip {
+          font-family: PingFangSC-Regular;
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.45);
+          margin-left: 10px;
+        }
+      }
+    }
+    .dataSourceTip {
+      padding-left: 90px;
+      margin-top: -12px;
+      font-size: 12px;
+      color: #515a6e;
+      padding-bottom: 10px;
+      .dataSourceLink {
+        display: inline-block;
+        cursor: pointer;
+        color: #2e92f7;
+        font-weight: 600;
+        padding: 0px 2px;
+      }
     }
   }
 }

@@ -334,11 +334,11 @@ export default {
           img5.setAttribute("style", "right: " + ((user.clientWidth / 2) + 5) + "px")
         })
       } else if (this.currentStep === 4) {
-        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu();
         this.currentStep -= 1;
       } else if (this.currentStep === 5) {
-        this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
-        this.$parent.$refs.layoutHeader.$children[0].showRight();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.handleTriggerClick();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.showRight();
         setTimeout(() => {
           this.currentStep -= 1;
         }, 250);
@@ -359,7 +359,7 @@ export default {
           select6.style.width = userMenu.clientWidth + "px"
         })
       } else if (this.currentStep === 8) {
-        this.$parent.$children[2].toggleGuide();
+        this.$parent.$refs.layoutFooter.toggleGuide();
         this.currentStep -= 1;
       } else {
         this.currentStep -= 1;
@@ -392,17 +392,17 @@ export default {
         foot.setAttribute("style", "z-index: 1000");
         this.currentStep += 1;
       } else if (this.currentStep === 3) {
-        this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
-        this.$parent.$refs.layoutHeader.$children[0].showRight();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.handleTriggerClick();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.showRight();
         setTimeout(() => {
           this.currentStep += 1;
           navM.removeEventListener(
             "click",
-            this.$parent.$refs.layoutHeader.$children[0].hideMenu
+            this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu
           );
         }, 250);
       } else if (this.currentStep === 4) {
-        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu();
         this.currentStep += 1;
         Vue.nextTick(()=>{
           let select5 = document.querySelector("#mask5 .selected")
@@ -415,6 +415,7 @@ export default {
           let select6 = document.querySelector("#mask6 .selected")
           let userMenu = document.querySelector(".user-menu")
           select6.style.width = userMenu.clientWidth + "px"
+          select6.style.height = userMenu.clientHeight + "px"
         })
       } else if (this.currentStep === 6) {
         head.setAttribute("style", "z-index: 1000");
@@ -422,18 +423,18 @@ export default {
         this.currentStep += 1;
       } else if (this.currentStep === 7) {
         this.currentStep += 1;
-        this.$parent.$children[2].toggleGuide();
-        this.$parent.$children[2].$children[1].flag = false;
+        this.$parent.$refs.layoutFooter.toggleGuide();
+        this.$parent.$refs.layoutFooter.$refs.Guide.flag = false;
       } else if (this.currentStep === 8) {
         foot.setAttribute("style", "z-index: 1000");
-        this.$parent.$children[2].toggleGuide();
+        this.$parent.$refs.layoutFooter.toggleGuide();
         this.currentStep += 1;
       } else if (this.currentStep === 9) {
         navM.addEventListener(
           "click",
-          this.$parent.$refs.layoutHeader.$children[0].hideMenu
+          this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu
         );
-        this.$parent.$children[2].$children[1].flag = true;
+        this.$parent.$refs.layoutFooter.$refs.Guide.flag = true;
         overlay.parentNode.removeChild(overlay);
         this.currentStep += 1;
       } else {
@@ -447,33 +448,33 @@ export default {
       overlay.parentNode.removeChild(overlay);
       navM.addEventListener(
         "click",
-        this.$parent.$refs.layoutHeader.$children[0].hideMenu
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu
       );
       if (this.currentStep === 4) {
-        this.$parent.$refs.layoutHeader.$children[0].hideMenu();
+        this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu();
       }
       if (this.currentStep === 8) {
-        this.$parent.$children[2].toggleGuide();
+        this.$parent.$refs.layoutFooter.toggleGuide();
       }
       this.currentStep = 0;
-      if (!this.$parent.$children[2].$children[1].flag) {
-        this.$parent.$children[2].$children[1].flag = true;
+      if (!this.$parent.$refs.layoutFooter.$refs.Guide.flag) {
+        this.$parent.$refs.layoutFooter.$refs.Guide.flag = true;
       }
     },
     maskFooterClick() {
       // 点击右下角帮助，展开帮助文档，并且设置点击其他区域无法取消弹框
       this.currentStep += 1;
-      this.$parent.$children[2].toggleGuide();
-      this.$parent.$children[2].$children[1].flag = false;
+      this.$parent.$refs.layoutFooter.toggleGuide();
+      this.$parent.$refs.layoutFooter.$refs.Guide.flag = false;
     },
     navMenuClick() {
       // 点击导航菜单，打开弹出框，并移除对.luban-nav-mask元素的监听
-      this.$parent.$refs.layoutHeader.$children[0].handleTriggerClick();
-      this.$parent.$refs.layoutHeader.$children[0].showRight();
+      this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.handleTriggerClick();
+      this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.showRight();
       setTimeout(() => {
         this.currentStep += 1;
         let navM = document.querySelector(".luban-nav-mask");
-        navM.removeEventListener("click", this.$parent.$refs.layoutHeader.$children[0].hideMenu);
+        navM.removeEventListener("click", this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu);
       }, 300);
     },
   },

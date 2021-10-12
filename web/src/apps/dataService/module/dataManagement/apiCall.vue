@@ -28,13 +28,14 @@
         :current="pageData.pageNow"
         show-elevator
         show-sizer
+        show-total
         @on-change="handlePageChange"
         @on-page-size-change="handlePageSizeChange"
       />
     </div>
 
     <!--确认删除-->
-    <Modal v-model="modelConfirm" width="480" :closable="false">
+    <Modal v-model="modalConfirm" width="480" :closable="false">
       <div class="modal-confirm-body">
         <div class="confirm-title">
           <SvgIcon class="icon" icon-class="project-workflow" />
@@ -88,7 +89,7 @@
             v-model="authFormData.expireDate"></Date-picker>
         </Form-item>
         <Form-item :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
-          <Select v-model="authFormData.groupId">
+          <Select v-model="authFormData.groupId" :disabled="!!authFormData.id">
             <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">
               {{ item.groupName}}
             </Option>
@@ -103,6 +104,7 @@
   </div>
 </template>
 <script>
+import util from '../common/util';
 import api from "@/common/service/api";
 export default {
   data() {
@@ -117,13 +119,21 @@ export default {
           key: 'caller'
         },
         {
-          title: 'Token',
+          title: this.$t("message.dataService.apiCall.col_group"),
+          key: 'groupName'
+        },
+        {
+          title: this.$t("message.dataService.apiCall.col_token"),
           key: 'token',
           width: '300'
         },
         {
           title: this.$t("message.dataService.apiCall.col_expire"),
           key: 'expire'
+        },
+        {
+          title: this.$t("message.dataService.apiCall.col_updateTime"),
+          key: 'updateTime'
         },
         {
           title: this.$t("message.dataService.apiCall.col_createTime"),
@@ -155,7 +165,7 @@ export default {
           return date && date.valueOf() < Date.now() - 86400000;
         }
       },
-      modelConfirm: false,
+      modalConfirm: false,
       selectedApi: null
     }
   },
@@ -195,15 +205,8 @@ export default {
     this.getApiCallList();
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     getApiGroup() {
-      api.fetch('/dss/framework/dbapi/apiauth/apigroup', {
+      api.fetch('/dss/data/api/apiauth/apigroup', {
         workspaceId: this.$route.query.workspaceId,
       }, 'get').then((res) => {
         if (res.list) {
@@ -215,7 +218,7 @@ export default {
     },
     getApiCallList() {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apiauth/list', {
+      api.fetch('/dss/data/api/apiauth/list', {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
@@ -252,15 +255,15 @@ export default {
             groupId: this.authFormData.groupId,
           }
           if (this.authFormData.expire == 'short') {
-            data.expire = `${this.dateFormat(this.authFormData.expireDate)} 00:00:00`;
+            data.expire = `${util.dateFormat(this.authFormData.expireDate, '23:59:59')}`;
           } else if (this.authFormData.expire == 'long') {
             const date = new Date(Date.now() + 365*86400*1000)
-            data.expire = `${this.dateFormat(date)} 00:00:00`;
+            data.expire = `${util.dateFormat(date, '23:59:59')}`;
           }
           if (this.authFormData.id) {
             data.id = this.authFormData.id;
           }
-          api.fetch('/dss/framework/dbapi/apiauth/save', data, 'post').then((res) => {
+          api.fetch('/dss/data/api/apiauth/save', data, 'post').then((res) => {
             this.authCancel();
             this.pageData = {
               total: 0,
@@ -279,20 +282,22 @@ export default {
       this.authFormData = {
         id: auth.id,
         caller: auth.caller,
-        groupId: auth.groupId
+        groupId: `${auth.groupId}`,
+        expire: 'short', // 统一归属到短期
+        expireDate: auth.expire
       }
     },
     deleteApi(row) {
       this.selectedApi = row;
-      this.modelConfirm = true;
+      this.modalConfirm = true;
     },
     deleteCancel() {
       this.selectedApi = null;
-      this.modelConfirm = false;
+      this.modalConfirm = false;
     },
     deleteConfirm() {
-      this.modelConfirm = false;
-      api.fetch(`/dss/framework/dbapi/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
+      this.modalConfirm = false;
+      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'post').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
         console.error(err)
@@ -314,6 +319,8 @@ export default {
 .manage-wrap {
   position: relative;
   padding: 0 24px;
+  overflow: hidden;
+  min-height: calc(100% - 78px);
   @include bg-color(#fff, $dark-base-color);
   .manage-head {
     margin-bottom: 15px;
@@ -347,7 +354,7 @@ export default {
   }
   .pagebar {
     float: right;
-    margin-top: 15px;
+    margin: 15px 0;
     padding: 10px 0;
   }
 }

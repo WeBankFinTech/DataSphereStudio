@@ -120,6 +120,7 @@
             :current="pageData.pageNum"
             show-elevator
             show-sizer
+            show-total
             @on-change="handlePageChange"
             @on-page-size-change="handlePageSizeChange"
           />
@@ -135,7 +136,7 @@
       <Form
         ref="departForm"
         :label-width="100"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem
           :label="$t('message.permissions.userDepart')"
@@ -180,7 +181,7 @@
         :model="userForm"
         :label-width="100"
         :rules="ruleValidate"
-        v-if="modalType !== 'modifyPassword'"
+        v-show="modalType !== 'modifyPassword'"
       >
         <FormItem :label="$t('message.permissions.username')" prop="name">
           <Input
@@ -227,7 +228,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.phone')">
+        <FormItem :label="$t('message.permissions.phone')" prop="phonenumber">
           <Input
             type="text"
             v-model="userForm.phonenumber"
@@ -239,7 +240,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem :label="$t('message.permissions.email')">
+        <FormItem :label="$t('message.permissions.email')" prop="email">
           <Input
             type="text"
             v-model="userForm.email"
@@ -255,16 +256,16 @@
       <Form
         ref="passwordForm"
         :model="userForm"
-        v-if="modalType === 'modifyPassword'"
+        :rules="passRuleValidate"
+        v-show="modalType === 'modifyPassword'"
       >
         <div class="newPassword">
           {{ $t("message.permissions.inputPassword") }}
         </div>
-        <FormItem prop="password" required :error="pwdErrorTip">
+        <FormItem prop="password">
           <Input
             type="password"
             v-model="userForm.password"
-            @on-change="hanldePwdChange"
             :placeholder="$t('message.permissions.pleaseInput')"
           >
           </Input>
@@ -321,9 +322,53 @@ export default {
           new Error(
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError")
+              : tag === "keyboard"
+                ? this.$t("message.permissions.pwdKeyboardError")
+                : this.$t("message.permissions.pwdCheckError")
           )
         );
+      }
+    };
+    const validateUserNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.userNameEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.userNameTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateNameCheck = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t("message.permissions.nameEmpty")));
+      } else if (value.length > 50) {
+        callback(new Error(this.$t("message.permissions.nameTooLong")));
+      } else {
+        callback();
+      }
+    };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        const valid = /^\w+@[a-z0-9]+\.[a-z]{2,4}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidEmail")));
+        }
+      } else {
+        callback();
+      }
+    };
+    const validatePhone = (rule, value, callback) => {
+      if (value) {
+        const valid = /^1[3456789]\d{9}$/.test(value);
+        if (valid) {
+          callback();
+        } else {
+          callback(new Error(this.$t("message.permissions.invalidPhone")));
+        }
+      } else {
+        callback();
       }
     };
     return {
@@ -387,7 +432,6 @@ export default {
         phonenumber: "",
         email: ""
       },
-      pwdErrorTip: "",
       editingData: "",
       confirmLoading: false,
       departmentErrorTip: "",
@@ -395,15 +439,15 @@ export default {
         userName: [
           {
             required: true,
-            message: this.$t("message.permissions.userNameEmpty"),
-            trigger: "blur"
+            validator: validateUserNameCheck,
+            trigger: "change"
           }
         ],
         name: [
           {
             required: true,
-            message: this.$t("message.permissions.nameEmpty"),
-            trigger: "blur"
+            validator: validateNameCheck,
+            trigger: "change"
           }
         ],
         password: [
@@ -412,13 +456,25 @@ export default {
             validator: validatePass,
             trigger: "blur"
           }
+        ],
+        phonenumber: [
+          {
+            validator: validatePhone,
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            validator: validateEmail,
+            trigger: "blur"
+          }
         ]
       },
-      passwordRuleValidate: {
+      passRuleValidate: {
         password: [
           {
             required: true,
-            message: this.$t("message.permissions.passwordEmpty"),
+            validator: validatePass,
             trigger: "blur"
           }
         ]
@@ -599,43 +655,35 @@ export default {
         pageNum: page
       });
     },
-    hanldePwdChange() {
-      if (this.pwdErrorTip) {
-        this.pwdErrorTip = "";
-      }
-    },
     handleModalCancel() {
       this.modalVisible = false;
       this.resetUserForm();
     },
     handleModalOk() {
+      console.log(this.modalType);
       if (this.modalType === "modifyPassword") {
-        const { valid, tag } = testPassword(this.userForm.password);
-        if (!valid) {
-          this.pwdErrorTip =
-            tag === "empty"
-              ? this.$t("message.permissions.passwordEmpty")
-              : this.$t("message.permissions.pwdCheckError");
-          return;
-        }
-        const params = {
-          password: this.userForm.password,
-          id: this.editingData.id
-        };
-        this.confirmLoading = true;
-        ModifyUserPassword(params)
-          .then(data => {
-            console.log(data);
-            this.$Message.success(
-              this.$t("message.permissions.modifyPwdSuccess")
-            );
-            this.modalVisible = false;
-            this.confirmLoading = false;
-            this.resetUserForm();
-          })
-          .catch(() => {
-            this.confirmLoading = false;
-          });
+        this.$refs["passwordForm"].validate(valid => {
+          if (valid) {
+            const params = {
+              password: this.userForm.password,
+              id: this.editingData.id
+            };
+            this.confirmLoading = true;
+            ModifyUserPassword(params)
+              .then(data => {
+                console.log(data);
+                this.$Message.success(
+                  this.$t("message.permissions.modifyPwdSuccess")
+                );
+                this.modalVisible = false;
+                this.confirmLoading = false;
+                this.resetUserForm();
+              })
+              .catch(() => {
+                this.confirmLoading = false;
+              });
+          }
+        });
       } else {
         this.$refs["userForm"].validate(valid => {
           console.log(this.userForm);
@@ -649,7 +697,7 @@ export default {
             const executeMethod = isAdd ? AddNewUser : ModifyUser;
             const { userName, password, ...rest } = this.userForm;
             const params = isAdd
-              ? { ...this.userForm, userName, password }
+              ? { ...this.userForm, userName: userName.trim(), password }
               : { ...rest, id: this.editingData.id };
             this.confirmLoading = true;
             executeMethod(params)
@@ -755,7 +803,7 @@ export default {
 }
 .tableWrap {
   flex: 1;
-  margin: 0 24px;
+  margin: 0 24px 24px;
   .addWrap {
     display: flex;
     justify-content: space-between;

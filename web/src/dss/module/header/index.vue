@@ -84,14 +84,16 @@
         class="user"
         @click="handleUserClick"
       >
-        <span>{{ userName || 'Null' }}</span>
-        <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
-        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        <div class="userName">
+          <span>{{ userName || 'Null' }}</span>
+          <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
+          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
+        </div>
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>
       </div>
       <ul class="menu">
         <li v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.common.home")}}</li>
-        <li class="menu-item" v-if="homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
+        <li class="menu-item" v-if="isAdmin && homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
         <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
       </ul>
       <div class="icon-group">
@@ -121,6 +123,7 @@ import clickoutside from "@/common/helper/clickoutside";
 import navMenu from "./navMenu/index.vue";
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
+import eventbus from '@/common/helper/eventbus';
 import { 
   GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo,
   GetFavorites, AddFavorite, RemoveFavorite
@@ -190,7 +193,10 @@ export default {
       return moudleName;
     },
     showWorkspaceNav() {
-      return (this.$route.path.indexOf("/workspaceHome") !== -1) || this.$route.path === '/project' || this.$route.path === '/workspace'
+      return (this.$route.path.indexOf("/workspaceHome") !== -1) 
+        || (this.$route.path.indexOf("/dataService") !== -1) 
+        || (this.$route.path.indexOf("/dataManagement") !== -1) 
+        || this.$route.path === '/project' || this.$route.path === '/workspace'
     }
   },
   watch: {
@@ -206,7 +212,6 @@ export default {
         this.getWorkspacesRoles().then(res => {
           // cookies改变最新后再执行其他方法
           if(res) {
-            
             this.getApplications();
             this.getWorkspaces();
             this.getWorkspaceFavorites();
@@ -231,6 +236,8 @@ export default {
           }).then((res) => {
             // 缓存数据，供其他页面判断使用
             storage.set(`workspaceRoles`, res.roles, 'session');
+            // roles主动触发，防止接口请求和sessionstorge之间的时间差导致角色没有及时转换
+            eventbus.emit('workspace.change', res.roles);
             // 获取顶部的快捷入口
             this.homeRoles = { name: res.topName, path: res.topUrl, id: res.workspaceId };
             // 同步改变cookies在请求中的附带
@@ -379,6 +386,17 @@ export default {
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
       if (["/process"].includes(this.$route.path)) {
         this.$router.replace({ path: "/workspace" });
+      } else if ((this.$route.path.indexOf("/dataService") !== -1) || (this.$route.path.indexOf("/dataManagement") !== -1)) {
+        // 数据服务切换workspace通过一个redirect路由来实现页面的刷新，避免在每个页面都watch route
+        this.currentWorkspace = workspace;
+        storage.set("currentWorkspace", workspace);
+        this.$router.replace({
+          path: '/redirect' + this.$route.path,
+          query: {
+            ...this.$route.query,
+            workspaceId: workspace.id
+          }
+        });
       } else {
         this.$router.replace({
           path: this.$route.path,
@@ -440,7 +458,16 @@ export default {
       this.currentProject = {};
     },
     goConsole(){
-      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+      const url =
+        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+      this.$router.push({
+        name: 'commonIframe',
+        query: {
+          workspaceId: this.$route.query.workspaceId,
+          url
+        }
+      })
+      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goRolesPath() {
       // 根据接口getWorkspaceBaseInfo渲染跳转不同路径

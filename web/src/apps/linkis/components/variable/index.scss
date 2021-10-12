@@ -39,7 +39,7 @@
             border-radius: 10px 0;
             display: inline-block;
             // color: #fff;
-            @include font-color($workspace-title-color, $dark-workspace-title-color)
+            @include font-color(#fff, $dark-workspace-title-color)
         }
         .we-variable-header-control{
             display: inline-block;

@@ -62,6 +62,9 @@ DSS_FLOW_EXECUTION_SERVER_PORT=9007
 ### visualis server
 VISUALIS_SERVER_INSTALL_IP=127.0.0.1
 VISUALIS_SERVER_SERVER_PORT=9008
+### dss-data-api
+DSS_DATA_API_SERVER_INSTALL_IP=127.0.0.1
+DSS_DATA_API_SERVER_PORT=9028
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
 

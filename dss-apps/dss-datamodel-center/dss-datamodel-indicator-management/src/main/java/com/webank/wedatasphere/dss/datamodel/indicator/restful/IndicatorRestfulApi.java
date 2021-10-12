@@ -66,7 +66,7 @@ public class IndicatorRestfulApi {
     @PUT
     @Path("/indicators/{id}")
     public Response update(@Context HttpServletRequest req, @PathParam("id") Long id , @RequestBody IndicatorUpdateVO vo) throws Exception {
-        LOGGER.info("indicatorAddVO : {}", vo);
+        LOGGER.info("update id : {}, indicatorUpdateVO : {}", id, vo);
         return Message.messageToResponse(Message.ok().data("count",indicatorService.updateIndicator(id,vo)));
     }
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_table-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="database" jdbcType="VARCHAR" property="database" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="alias" jdbcType="VARCHAR" property="alias" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="warehouse_layer_name" jdbcType="VARCHAR" property="warehouseLayerName" />
+    <result column="warehouse_theme_name" jdbcType="VARCHAR" property="warehouseThemeName" />
+    <result column="lifecycle" jdbcType="VARCHAR" property="lifecycle" />
+    <result column="is_partition_table" jdbcType="INTEGER" property="isPartitionTable" />
+    <result column="is_available" jdbcType="INTEGER" property="isAvailable" />
+    <result column="storage_type" jdbcType="VARCHAR" property="storageType" />
+    <result column="principal_name" jdbcType="VARCHAR" property="principalName" />
+    <result column="compress" jdbcType="VARCHAR" property="compress" />
+    <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `database`, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
+    warehouse_theme_name, lifecycle, is_partition_table, is_available, storage_type, 
+    principal_name, `compress`, file_type, version
+  </sql>
+</mapper>

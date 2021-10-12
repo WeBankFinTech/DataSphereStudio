@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableColumnsMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_table_columns-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="table_id" jdbcType="BIGINT" property="tableId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="alias" jdbcType="VARCHAR" property="alias" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="is_partition_field" jdbcType="INTEGER" property="isPartitionField" />
+    <result column="is_primary" jdbcType="INTEGER" property="isPrimary" />
+    <result column="length" jdbcType="INTEGER" property="length" />
+    <result column="rule" jdbcType="VARCHAR" property="rule" />
+    <result column="model_type" jdbcType="INTEGER" property="modelType" />
+    <result column="model_id" jdbcType="BIGINT" property="modelId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, table_id, `name`, `alias`, `type`, `comment`, is_partition_field, is_primary, 
+    `length`, `rule`, model_type, model_id, create_time, update_time
+  </sql>
+</mapper>

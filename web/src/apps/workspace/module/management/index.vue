@@ -41,6 +41,12 @@ const manageMenus = [
     path: 'jurisdiction',
     children: [],
   },
+  {
+    icon: 'add',
+    name: i18n.t('message.workspaceManagemnet.dataSourceAdministration'),
+    path: 'dataSourceAdministration',
+    children: [],
+  },
 ];
 export default {
   data() {

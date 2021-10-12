@@ -2,7 +2,7 @@
   <div class="input-number-model">
     <template>
       <Button type="primary" size="small" @click="onReduce()" :disabled="(value < (min + 1))"><span>-</span></Button>
-      <Input v-model="value" placeholder=" " @blur="onBlur" />
+      <Input v-model="value" placeholder="" readonly />
       <Button type="primary" size="small" @click="onIncrease()" :disabled="(value > (max - 1))"><span>+</span></Button>
     </template>
   </div>
@@ -30,6 +30,7 @@ export default {
   },
   methods: {
     onBlur () {
+      console.log(this.value)
       let $reg = /^\+?[1-9][0-9]*$/　　// eslint-disable-line
       let $val = this.value
       // Verify integer

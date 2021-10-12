@@ -8,12 +8,12 @@
   margin: 2px 10px 2px 20px;
   position: $relative;
   cursor: pointer;
-  background: $background-color-base;
+  @include bg-color($subsidiary-color, $dark-menu-base-color);
   border: $border-width-base $border-style-base $tooltip-color ;
-  background-color: $subsidiary-color;
+  @include border-color($tooltip-color, $dark-border-color-base);
   border-radius: 8px;
   overflow: hidden;
-  color: #fff;
+  @include font-color(#fff, $dark-workspace-title-color);
 
   .item-progress {
     display: inline-block;
@@ -29,6 +29,7 @@
     top: 0;
     left: 0;
     width: 100%;
+    @include bg-color(#cdcdcd, $dark-menu-base-color);
     .item-icon {
       padding-left: 10px;
       &::before {

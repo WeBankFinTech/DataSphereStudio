@@ -180,6 +180,8 @@
 
             .name {
               flex: 1;
+              max-width: 172px;
+              white-space: nowrap;
               font-weight: 600;
               overflow: hidden;
               text-overflow: ellipsis;

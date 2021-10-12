@@ -297,7 +297,7 @@ export default {
       if (!this.dbList.length) {
         return;
       }
-      const list = this.info[0].map[0].opt = this.dbList.filter((item) => /(_ind|_qml)$/.test(item.name)).map((item) => {
+      const list = this.info[0].map[0].opt = this.dbList.filter((item) => /(_ind|_qml|_default)$/.test(item.name)).map((item) => {
         return {
           label: item.name,
           value: item.name,

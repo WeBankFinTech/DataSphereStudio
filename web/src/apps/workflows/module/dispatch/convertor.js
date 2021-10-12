@@ -57,16 +57,16 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode, conte
             prePoint = 'right-' + preId
             curPoint = 'left-' + curId
           } else {
-            prePoint = 'top-' + preId
-            curPoint = 'bottom-' + curId
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
           }
         } else {
           if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
             prePoint = 'right-' + preId
             curPoint = 'left-' + curId
           } else {
-            prePoint = 'bottom-' + preId
-            curPoint = 'top-' + curId
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
           }
         }
       } else {
@@ -75,16 +75,16 @@ export function ds2butterfly(tasks, connects, locations, taskList, isNode, conte
             prePoint = 'left-' + preId
             curPoint = 'right-' + curId
           } else {
-            prePoint = 'top-' + preId
-            curPoint = 'bottom-' + curId
+            prePoint = 'bottom-' + preId
+            curPoint = 'top-' + curId
           }
         } else {
           if (Math.abs(curNode.top - preNode.top) < Math.abs(curNode.left - preNode.left)) {
             prePoint = 'left-' + preId
             curPoint = 'right-' + curId
           } else {
-            prePoint = 'bottom-' + preId
-            curPoint = 'top-' + curId
+            prePoint = 'top-' + preId
+            curPoint = 'bottom-' + curId
           }
         }
       }

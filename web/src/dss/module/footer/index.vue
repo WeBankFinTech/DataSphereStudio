@@ -3,7 +3,7 @@
     <div class="footer-btn footer-doc" @click="toggleGuide">
       <SvgIcon icon-class="question" />
     </div>
-    <Guide :show="guideShow" @on-toggle="toggleGuide" />
+    <Guide :show="guideShow" @on-toggle="toggleGuide" ref="Guide"/>
 
     <resource-simple
       ref="resourceSimple"

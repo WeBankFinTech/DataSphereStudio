@@ -180,7 +180,7 @@ export default {
     currentVal(val, oldVal) {
       this.lastVal = oldVal;
       this.currentVal = val;
-      if(this.modeOfKey === 'dev') this.updateProjectCache();
+      if(this.modeOfKey === 'dev' || this.modeOfKey === 'scheduler') this.updateProjectCache();
     },
     "$route.query.projectID"() {
       this.tabList = [];
@@ -202,6 +202,9 @@ export default {
   created() {
     this.getAreaMap();
     this.getDicSecondList();
+    if (this.isScheduler) {
+      this.modeOfKey = DEVPROCESS.OPERATIONCENTER
+    }
     // 获取所有project展示tree
     this.getAllProjects();
   },
@@ -213,6 +216,9 @@ export default {
   computed: {
     currentWorkdapceData() {
       return storage.get('currentWorkspace')
+    },
+    isScheduler() {
+      return this.$route.name === 'Scheduler'
     }
   },
   methods: {
@@ -247,10 +253,16 @@ export default {
     },
     // 获取工程的数据
     getProjectData() {
+
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {
         workspaceId: +this.$route.query.workspaceId,
         id: +this.$route.query.projectID
       }, 'post').then((res) => {
+        //运维中心路由且未选中任何项目
+        if (!this.$route.query.projectID && this.isScheduler) {
+          this.modeOfKey = DEVPROCESS.OPERATIONCENTER
+          return this.getAllProjects()
+        }
         const project = res.projects[0];
         setVirtualRoles(project, this.getUserName())
         this.currentProjectData = {
@@ -269,19 +281,39 @@ export default {
         workspaceId: +this.$route.query.workspaceId
       }, 'post').then((res) => {
         this.loadingTree = false;
-        this.projectsTree = res.projects.map(n => {
-          setVirtualRoles(n, this.getUserName())
-          return {
-            id: n.id,
-            name: n.name,
-            type: 'project',
-            canWrite: n.canWrite()
-          }
-        });
+        if (this.isScheduler) {
+          this.projectsTree = res.projects.filter(n => {
+            return n.devProcessList && n.devProcessList.includes('scheduler')
+               && n.releaseUsers && n.releaseUsers.indexOf(this.getUserName()) !== -1
+          }).map(n => {
+            setVirtualRoles(n, this.getUserName())
+            return {
+              id: n.id,
+              name: n.name,
+              type: 'scheduler',
+              canWrite: n.canWrite()
+            }
+          })
+          if (!this.$route.query.projectID)
+            this.handleTreeClick(this.projectsTree[0])
+        } else {
+          this.projectsTree = res.projects.map(n => {
+            setVirtualRoles(n, this.getUserName())
+            return {
+              id: n.id,
+              name: n.name,
+              type: 'project',
+              canWrite: n.canWrite()
+            }
+          })
+        }
       })
     },
     // 获取project下工作流
     getFlow(param, resolve) {
+      if (this.isScheduler) {
+        return resolve([])
+      }
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`, {
         workspaceId: this.$route.query.workspaceId,
         // orchestratorMode: "pom_work_flow",
@@ -352,7 +384,13 @@ export default {
     handleTreeClick(node) {
       // 切换到开发模式
       this.modeOfKey = this.selectDevprocess && this.selectDevprocess.length ? this.selectDevprocess[0].dicValue : DEVPROCESS.DEVELOPMENTCENTER;
+      if (this.isScheduler) {
+        this.modeOfKey = DEVPROCESS.OPERATIONCENTER
+      }
       if (node.type == 'flow') {
+        if (this.isScheduler) {
+          return this.$Message.warning("运维中心暂只支持项目级别");
+        }
         this.currentTreeId = node.orchestratorId;
         // 如果点击其它project的flow，应该切换project
         if (node.projectId != this.$route.query.projectID) {
@@ -389,7 +427,7 @@ export default {
             this.openWorkflow(param)
           }
         }
-      } else if (node.type == 'project') {
+      } else if (node.type === 'project' || node.type === 'scheduler') {
         this.currentTreeId = node.id;
         if (node.id == this.$route.query.projectID) {
           this.selectProject();
@@ -400,10 +438,15 @@ export default {
             projectID: node.id,
             projectName: node.name,
           }
-          this.$router.replace({
-            name: 'Workflow',
-            query,
-          });
+          node.type === 'scheduler' ?
+            this.$router.replace({
+              name: 'Scheduler',
+              query,
+            }) :
+            this.$router.replace({
+              name: 'Workflow',
+              query,
+            })
           this.updateBread();
         }
       }
@@ -443,7 +486,7 @@ export default {
       }
     },
     // 确认新增工程 || 确认修改
-    ProjectConfirm(projectData) {
+    ProjectConfirm(projectData, callback) {
       const project = projectData;
       setVirtualRoles(project, this.getUserName())
       this.currentProjectData = {
@@ -469,9 +512,11 @@ export default {
         orchestratorModeList: projectData.orchestratorModeList
       }
       api.fetch(`${this.$API_PATH.PROJECT_PATH}modifyProject`, projectParams, 'post').then(() => {
+        typeof callback == 'function' && callback();
         this.getProjectData();
         this.$Message.success(this.$t('message.workflow.projectDetail.eidtorProjectSuccess', { name: projectData.name }));
       }).catch(() => {
+        typeof callback == 'function' && callback();
         this.loading = false;
         this.currentProjectData.business = this.$refs.projectForm.originBusiness;
       });
@@ -591,7 +636,7 @@ export default {
     },
     // 切换开发流程
     handleChangeButton(item) {
-      if(item.dicValue === DEVPROCESS.OPERATIONCENTER && (!this.currentProjectData.releaseUsers
+      if(item.dicValue === DEVPROCESS.OPERATIONCENTER && this.currentProjectData.id == this.$route.query.projectID && (!this.currentProjectData.releaseUsers
       || this.currentProjectData.releaseUsers.indexOf(this.getUserName()) === -1)) {
         return this.$Message.warning("无运维权限");
       }
@@ -607,6 +652,18 @@ export default {
       this.currentVal = {};
       this.current = null;
       this.tabId = '';
+      if (item.dicValue === 'scheduler' && !this.isScheduler) {
+        this.$router.replace({
+          name: 'Scheduler',
+          query: this.$route.query
+        })
+      } else if (item.dicValue === 'dev' && this.isScheduler){
+        this.$router.replace({
+          name: 'Workflow',
+          query: this.$route.query
+        })
+      }
+      this.getAllProjects()
     },
     // 选择列表
     selectProject() {

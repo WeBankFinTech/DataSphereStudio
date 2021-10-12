@@ -341,10 +341,10 @@ $mask-color: rgba(55, 55, 55, .6);
             display: none;
             position: absolute;
             z-index: 1;
-            border-color: #ff9900;
+            @include border-color(#ff9900, #4077C9);
             border-style: solid;
             border-width: 1px;
-            background: white;
+            @include bg-color($light-base-color, $dark-base-color);
             cursor: crosshair;
         }
 

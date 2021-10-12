@@ -34,8 +34,10 @@
         <module>dss-appconn</module>
         <module>dss-framework</module>
         <module>dss-apps/dss-apiservice-server</module>
-        <module>plugins/azkaban/linkis-jobtype</module>
+        <module>dss-data-api</module>
+<!--        <module>plugins/azkaban/linkis-jobtype</module>-->
         <module>plugins/linkis/dss-gateway-support</module>
+        <module>plugins/dolphinscheduler/linkis-dolphinscheduler-client</module>
         <module>assembly</module>
     </modules>
 
@@ -126,6 +128,19 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>https://***REMOVED***:8083/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshot</name>
+            <url>https://***REMOVED***:8083/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -213,8 +228,7 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <recompileMode>incremental</recompileMode>
-                        <useZincServer>true</useZincServer>
+                        <recompileMode>all</recompileMode>
                     </configuration>
                 </plugin>
                 <plugin>

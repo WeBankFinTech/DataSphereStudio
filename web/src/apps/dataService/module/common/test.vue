@@ -23,10 +23,10 @@
     <div class="apiTest-main">
       <div class="apiTest-panel">
         <template v-if="currentApi">
-          <div class="panel-title">
+          <div class="panel-title" v-if="currentApi.reqFields">
             {{ $t("message.dataService.apiTest.requestParam") }}
           </div>
-          <Table :columns="columns" :data="currentApi.reqFields">
+          <Table :columns="columns" :data="currentApi.reqFields" v-if="currentApi.reqFields">
             <template slot-scope="{ row }" slot="value">
               <Input
                 v-model="currentParams[row.name]"
@@ -119,7 +119,7 @@ export default {
     getApiList() {
       api
         .fetch(
-          "/dss/framework/dbapi/list",
+          "/dss/data/api/list",
           {
             workspaceId: this.$route.query.workspaceId
           },
@@ -143,16 +143,26 @@ export default {
         ? this.apiData
         : this.apiList.find(i => i.id == val);
       if (currentApi) {
-        this.currentApi = {
-          ...currentApi,
-          reqFields: JSON.parse(currentApi.reqFields)
-        };
-        // 构造请求参数
-        const params = {};
-        this.currentApi.reqFields.forEach(row => {
-          params[row.name] = "";
-        });
-        this.currentParams = params;
+        try {
+          const reqFields = JSON.parse(currentApi.reqFields);
+          this.currentApi = {
+            ...currentApi,
+            reqFields: reqFields
+          };
+          // 构造请求参数
+          const params = {};
+          this.currentApi.reqFields.forEach(row => {
+            params[row.name] = "";
+          });
+          this.currentParams = params;
+        } catch (error) {
+          // reqFields为空,不传参数的类型
+          this.currentApi = currentApi;
+          this.currentParams = {};
+        }
+        // 重置请求log和response
+        this.logs = [];
+        this.response = "";
       }
     },
     test() {
@@ -161,22 +171,35 @@ export default {
           this.$t("message.dataService.apiTest.api_not_selected")
         );
       } else {
-        const data = this.currentParams;
-        this.currentApi.reqFields.forEach(row => {
-          if (row.type.includes("Array")) {
-            // 如果是数组类型，逗号分隔且trim，并过滤掉无效参数
-            data[row.name] = this.currentParams[row.name]
-              .split(",")
-              .map(i => i.trim())
-              .filter(i => !!`${i}`);
-          } else {
-            data[row.name] = this.currentParams[row.name];
-          }
-        });
+        const data = {};
+        this.valid = true;
+        // 存在reqFields为空,不传参数的类型
+        if (this.currentApi.reqFields) {
+          this.currentApi.reqFields.forEach(row => {
+            // 检查输入值是否为空
+            if (!this.currentParams[row.name] || !this.currentParams[row.name].trim()) {
+              this.valid = false;
+            }
+            if (row.type.includes("Array")) {
+              // 如果是数组类型，逗号分隔且trim，并过滤掉无效参数
+              data[row.name] = this.currentParams[row.name]
+                .split(",")
+                .map(i => i.trim())
+                .filter(i => !!`${i}`);
+            } else {
+              data[row.name] = this.currentParams[row.name];
+            }
+          });
+        }
+        if (!this.valid) {
+          return this.$Message.warning(
+            this.$t("message.dataService.apiTest.req_params_not_value")
+          );
+        }
         this.loading = true;
         api
           .fetch(
-            `/dss/framework/dbapi/test/${this.currentApi.path}`,
+            `/dss/data/api/test/${this.currentApi.path}`,
             data,
             "post"
           )

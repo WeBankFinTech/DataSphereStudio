@@ -15,7 +15,7 @@
       <div
         class="field-table-item"
         style="min-width:60px;"
-        v-if="canBeDelete">{{$t('message.action.action')}}</div>
+        v-if="canBeDelete">{{$t('message.common.action')}}</div>
     </div>
     <virtual-list
       ref="vsl"
@@ -86,7 +86,7 @@
           <Button
             type="error"
             size="small"
-            @click="handleDelete(item, index)">{{$t('message.action.delete')}}</Button>
+            @click="handleDelete(item, index)">{{$t('message.common.delete')}}</Button>
         </div>
       </li>
     </virtual-list>

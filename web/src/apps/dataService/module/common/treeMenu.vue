@@ -6,14 +6,15 @@
         <SvgIcon icon-class="plus" />
       </div>
     </div>
+    <div style="padding-left: 10px; padding-right: 10px;">
     <Input
       size="small"
       :value="searchValue"
       prefix="ios-search"
-      placeholder="请输入"
-      style="width: 230px;border:0;margin-top: 10px;"
+      placeholder="请输入API名称搜索"
+      style="width: 230px;border:0;margin-top: 10px;margin-bottom: 10px;"
       @on-change="handleSearch"
-    />
+    /></div>
     <Tree
       class="tree-container"
       :nodes="projectsTree"
@@ -28,7 +29,7 @@
   </div>
 </template>
 <script>
-import Tree from "@/apps/workflows/module/common/tree/tree.vue";
+import Tree from "./tree.vue";
 import api from "@/common/service/api";
 import _ from "lodash";
 
@@ -66,8 +67,6 @@ export default {
       });
     },
     handleTreeModal(project) {
-      console.log(project);
-      console.log("addApi");
       this.$emit("showModal", { type: "api", data: { ...project } });
       this.treeModalShow = true;
       this.currentTreeProject = project;
@@ -83,19 +82,17 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      console.log(node);
       this.$emit("handleApiChoosed", node);
     },
     getAllApi(type = "", payload = {}) {
       //获取数据服务所有的api
       api
         .fetch(
-          `/dss/framework/dbapi/list?workspaceId=${this.$route.query.workspaceId}`,
+          `/dss/data/api/list?workspaceId=${this.$route.query.workspaceId}`,
           {},
           "get"
         )
         .then(res => {
-          console.log(res);
           if (res && res.list) {
             const isUpdate = type === "update";
             const list = res.list.map(n => {
@@ -143,7 +140,7 @@ export default {
     },
     addGroup() {
       //添加数据服务api分组
-      this.$emit("showModal", { type: "group" });
+      this.$emit("showModal", { type: "group", groupDatas: [...this.originDatas] });
     },
     addApi(groupId, apiData) {
       //添加数据服务api
@@ -194,6 +191,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0px 10px;
   & p {
     font-family: PingFangSC-Medium;
     font-size: 14px;

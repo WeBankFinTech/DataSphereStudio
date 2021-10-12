@@ -84,13 +84,13 @@ export default {
     },
     getTimeByApi(range) {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callTimeForSinleApi', {
+      api.fetch('/dss/data/api/apimonitor/callTimeForSinleApi', {
         ...range,
         workspaceId: this.$route.query.workspaceId,
         apiId: this.api.id
       }, 'get').then((res) => {
         this.dataApiTime = res.list;
-        this.drawApiTimeChart();
+        this.drawApiTimeChart(localStorage.getItem('theme'));
         this.loading = false;
       }).catch((err) => {
         console.error(err)
@@ -99,13 +99,13 @@ export default {
     },
     getCntByApi(range) {
       this.loading = true;
-      api.fetch('/dss/framework/dbapi/apimonitor/callCntForSinleApi', {
+      api.fetch('/dss/data/api/apimonitor/callCntForSinleApi', {
         ...range,
         workspaceId: this.$route.query.workspaceId,
         apiId: this.api.id
       }, 'get').then((res) => {
         this.dataApiCnt = res.list;
-        this.drawApiCntChart();
+        this.drawApiCntChart(localStorage.getItem('theme'));
         this.loading = false;
       }).catch((err) => {
         console.error(err)
@@ -117,7 +117,7 @@ export default {
       this.chartCnt = null;
       this.chartTime = null;
     },
-    drawApiTimeChart() {
+    drawApiTimeChart(theme) {
       const option = {
         grid: {
           left: 60,
@@ -133,6 +133,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataApiTime.map(i => i.key)
         },
         yAxis: {
@@ -142,7 +150,10 @@ export default {
           },
           axisTick: {
             show: false
-          }
+          },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
         },
         series: [{
           data: this.dataApiTime.map(i => i.value),
@@ -154,7 +165,7 @@ export default {
       this.chartTime = echarts.init(this.$refs.chartAvgTime)
       this.chartTime.setOption(option)
     },
-    drawApiCntChart() {
+    drawApiCntChart(theme) {
       const option = {
         grid: {
           left: 60,
@@ -170,6 +181,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataApiCnt.map(i => i.key)
         },
         yAxis: {
@@ -179,7 +198,10 @@ export default {
           },
           axisTick: {
             show: false
-          }
+          },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
         },
         series: [{
           data: this.dataApiCnt.map(i => i.value),
@@ -200,7 +222,7 @@ export default {
   position: relative;
   .monitor-chart-mask {
     display: none;
-    z-index: 1;
+    z-index: 10;
     position: fixed;
     left: 0;
     right: 0;
@@ -212,8 +234,8 @@ export default {
   }
   .monitor-chart-modal {
     display: none;
-    z-index: 2;
-    position: absolute;
+    z-index: 20;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;

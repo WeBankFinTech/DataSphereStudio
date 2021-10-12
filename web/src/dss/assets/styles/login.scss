@@ -22,8 +22,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    // background-color: $body-background;
-    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+    background-color: $body-background;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -40,8 +39,7 @@
     .login-main {
         width: 450px;
         height: 427px;
-        // background-color: $body-background;
-        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+        background-color: $body-background;
         margin-right: 9.5%;
         padding: 50px;
         border-radius: 6px;
@@ -53,12 +51,11 @@
             display: block;
             text-align: center;
             color:  #044B93;
-            @include font-color(#044B93, $dark-primary-color);
             font-weight: 600;
         }
         .label {
             font-size: 14px;
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
+            color: #333;
         }
         input {
             border: none;
@@ -66,22 +63,19 @@
             border-radius: 4px;
             padding-left: 15px;
             color: $input-color;
-            @include font-color($light-text-desc-color, $dark-text-desc-color);
             border: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-border-color-base);
+            background-color: $body-background !important;
         }
         button {
             height: 45px;
-            // background-color: $btn-primary-bg;
-            @include bg-color($primary-color, $dark-primary-color);
+            background-color: $btn-primary-bg;
             box-shadow: 0px 5px 10px 0px $shadow-color;
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
-            // border-color: $btn-primary-bg;
-            @include border-color($primary-color, $dark-primary-color);
+            border-color: $btn-primary-bg;
         }
     }
     .remember-user-name {
         margin: 5px 0 0 10px;
+        color: #333;
     }
     .ivu-form-item {
         margin-bottom: 20px;

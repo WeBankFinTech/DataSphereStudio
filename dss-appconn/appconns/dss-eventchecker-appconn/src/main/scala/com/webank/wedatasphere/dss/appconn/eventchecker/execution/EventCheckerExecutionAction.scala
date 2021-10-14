@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,11 +18,8 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
-import com.webank.wedatasphere.dss.standard.app.development.execution.common.{AbstractRefExecutionAction, LongTermRefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, LongTermRefExecutionAction, RefExecutionState}
 
-/**
-  * Created by allenlliu on 2019/11/12.
-  */
 class EventCheckerExecutionAction extends AbstractRefExecutionAction with LongTermRefExecutionAction {
   private[this] var _state: RefExecutionState = _
   private var schedulerId: Int = _

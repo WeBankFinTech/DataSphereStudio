@@ -1,55 +1,37 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.standard;
 
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.orchestrator.service.*;
-import com.webank.wedatasphere.dss.standard.app.development.AbstractLabelDevelopmentIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.app.development.RefOperationService;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.webank.wedatasphere.dss.appconn.orchestrator.service.OrchestratorCRUDService;
+import com.webank.wedatasphere.dss.appconn.orchestrator.service.OrchestratorExportProcessService;
+import com.webank.wedatasphere.dss.appconn.orchestrator.service.OrchestratorImportProcessService;
+import com.webank.wedatasphere.dss.appconn.orchestrator.service.OrchestratorQueryService;
+import com.webank.wedatasphere.dss.standard.app.development.service.*;
+import com.webank.wedatasphere.dss.standard.app.development.standard.AbstractDevelopmentIntegrationStandard;
 
-
-/**
- * @author allenlliu
- */
-public class OrchestratorFrameworkStandard extends AbstractLabelDevelopmentIntegrationStandard {
+public class OrchestratorFrameworkStandard extends AbstractDevelopmentIntegrationStandard {
 
     private volatile static OrchestratorFrameworkStandard instance;
 
-    private AppConn appConn;
-
-    List<RefOperationService> refOperationServices = new ArrayList<>();
-
-
-
-    private OrchestratorFrameworkStandard(AppConn appConn){
-        this.appConn = appConn;
-    }
-
-    public static OrchestratorFrameworkStandard getInstance(AppConn appConn){
+    public static OrchestratorFrameworkStandard getInstance(){
         if (instance == null){
             synchronized (OrchestratorFrameworkStandard.class){
                 if (instance == null){
-                    instance = new OrchestratorFrameworkStandard(appConn);
+                    instance = new OrchestratorFrameworkStandard();
                 }
             }
         }
@@ -57,54 +39,35 @@ public class OrchestratorFrameworkStandard extends AbstractLabelDevelopmentInteg
     }
 
     @Override
-    public AppDesc getAppDesc() {
-        return appConn != null ? appConn.getAppDesc() : null;
+    protected RefCRUDService createRefCRUDService() {
+        return  new OrchestratorCRUDService();
     }
 
     @Override
-    public void setAppDesc(AppDesc appDesc){
-
+    protected RefExecutionService createRefExecutionService() {
+        return null;
     }
 
     @Override
-    public void init() {
-        refOperationServices.add(new OrchestratorCRUDService());
-        refOperationServices.add(new OrchestratorExportProcessService());
-        refOperationServices.add(new OrchestratorImportProcessService());
-        refOperationServices.add(new OrchestratorPublishToSchedulerService());
-        refOperationServices.add(new OrchestratorQueryService());
-        refOperationServices.add(new OrchestratorVisibleService());
+    protected RefExportService createRefExportService() {
+        return  new OrchestratorExportProcessService();
     }
 
     @Override
-    public void close() throws IOException {
-
+    protected RefImportService createRefImportService() {
+        return  new OrchestratorImportProcessService();
     }
+
+    @Override
+    protected RefQueryService createRefQueryService() {
+        return new OrchestratorQueryService();
+    }
+
 
     @Override
     public String getStandardName() {
         return "OrchestratorFrameworkStandard";
     }
 
-    @Override
-    public int getGrade() {
-        return 0;
-    }
 
-    @Override
-    public boolean isNecessary() {
-        return false;
-    }
-
-    @Override
-    protected List<RefOperationService> getRefOperationService() {
-        synchronized (this){
-            if (refOperationServices.size() == 0){
-                synchronized (this){
-                    init();
-                }
-            }
-        }
-        return refOperationServices;
-    }
 }

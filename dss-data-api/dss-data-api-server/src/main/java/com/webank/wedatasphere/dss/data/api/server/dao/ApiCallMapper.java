@@ -55,7 +55,7 @@ public interface ApiCallMapper {
     /**
      * 出错排行TOP10
      */
-    @Select("SELECT a.id, a.api_name, COUNT(b.id) total_cnt, SUM(CASE WHEN b.status =2 THEN 1 ELSE 0 END) fail_cnt, SUM(CASE WHEN b.status =2 THEN 1 ELSE 0 END) / COUNT(b.id) fail_rate\n" +
+    @Select("SELECT a.id, a.api_name, COUNT(b.id) total_cnt, SUM(CASE WHEN b.status =2 THEN 1 ELSE 0 END) fail_cnt, ROUND(100 * SUM(CASE WHEN b.status =2 THEN 1 ELSE 0 END) / COUNT(b.id),2) fail_rate\n" +
             "FROM dss_dataapi_config a\n" +
             "LEFT JOIN dss_dataapi_call b ON a.id = b.api_id\n" +
             "WHERE a.workspace_id = #{callMonitorResquest.workspaceId}\n" +

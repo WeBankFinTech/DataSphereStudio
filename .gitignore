@@ -69,7 +69,7 @@ dss-standard/development-standard/development-process-standard/target
 dss-standard/development-standard/development-process-standard-execution/target
 dss-standard/structure-standard/dss-project-plugin/target
 dss-standard/structure-standard/dss-role-plugin/target
-dss-standard/structure-standard/dss-structure-integration-standard
+dss-standard/structure-standard/dss-structure-integration-standard/target
 dss-standard/structure-standard/spring-origin-dss-project-plugin/target
 #dss-data-api
 dss-data-api/dss-api-sql-template/target

@@ -56,7 +56,6 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     @Override
     public void deleteApiAuth(Long id){
         apiAuthMapper.deleteApiAuth(id);
-        log.info("-------delete apiauth:    " + id + ", ok");
     }
 
     @Override

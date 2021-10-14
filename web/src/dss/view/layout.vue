@@ -12,8 +12,8 @@
     </keep-alive>
     <router-view
       v-if="!$route.meta.keepAlive"/>
-    <layout-footer/>
-    <newGuidance v-if="$route.path === '/workspaceHome'"/>
+    <layout-footer ref="layoutFooter"/>
+    <newGuidance v-if="$route.path === '/workspaceHome'" ref="newGuidance"/>
   </div>
 </template>
 <script>

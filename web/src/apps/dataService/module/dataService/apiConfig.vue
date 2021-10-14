@@ -58,38 +58,6 @@ export default {
   },
   data() {
     return {
-      // apiItems: [
-      //   { name: "sdfsaf", id: 1 },
-      //   { name: "fdj89", id: 3 }
-      // ],
-      //apiItems: this.tabDatas,
-      toolItems: [
-        {
-          name: "属性",
-          iconSrc: require("../../assets/images/property.svg"),
-          type: "property"
-        },
-        {
-          name: "版本",
-          iconSrc: require("../../assets/images/version.svg"),
-          type: "version"
-        },
-        {
-          name: "保存",
-          iconSrc: require("../../assets/images/save.svg"),
-          type: "save"
-        },
-        {
-          name: "测试",
-          iconSrc: require("../../assets/images/test.svg"),
-          type: "test"
-        },
-        {
-          name: "发布",
-          iconSrc: require("../../assets/images/release.svg"),
-          type: "release"
-        }
-      ],
       currentTab: { name: "sdfsaf", id: 1 },
       navFold: false,
       confirmLoading: false,

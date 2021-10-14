@@ -16,6 +16,15 @@ export const subAppRoutes = {
     },
     component: () =>
       import('./view/commonIframe/index.vue'),
+  },
+  // 新增一个redirect路由mock路由刷新效果，放在这里共享layout可保持header不会unmount，减少ajax
+  {
+    path: '/redirect/:path(.*)',
+    meta: {
+      title: '鲁班组件',
+      publicPage: true,
+    },
+    component: () => import('./view/redirect/index.vue')
   }]
 }
 

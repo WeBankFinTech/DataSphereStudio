@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -46,11 +44,10 @@ public class HttpUtils {
         httpPost.addHeader("Token-User",user);
         httpPost.addHeader("Token-Code", "172.0.0.1");
         CookieStore cookieStore = new BasicCookieStore();
-//        cookieStore.addCookie(session.getCookies()[0]);
         logger.info("Http request params is :"+params);
         StringEntity entity = entity = new StringEntity(params);
         entity.setContentEncoding("UTF-8");
-        entity.setContentType("application/json");//发送json数据需要设置contentType
+        entity.setContentType("application/json");
         httpPost.setEntity(entity);
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
@@ -73,7 +70,6 @@ public class HttpUtils {
     public static String sendHttpDelete(String url,String user) throws Exception {
         String resultString = "{}";
         HttpDelete httpdelete = new HttpDelete(url);
-        //设置header
         logger.info("sendDeleteReq url is: "+url);
         httpdelete.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
         httpdelete.addHeader("Token-User",user);
@@ -106,7 +102,6 @@ public class HttpUtils {
         httpPut.addHeader("Token-User",user);
         httpPut.addHeader("Token-Code","172.0.0.1");
         CookieStore cookieStore = new BasicCookieStore();
-//        cookieStore.addCookie(session.getCookies()[0]);
         logger.info("Http put params is :"+params);
         StringEntity entity = null;
         try {
@@ -115,7 +110,7 @@ public class HttpUtils {
             throw e;
         }
         entity.setContentEncoding("UTF-8");
-        entity.setContentType("application/json");//发送json数据需要设置contentType
+        entity.setContentType("application/json");
         httpPut.setEntity(entity);
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;

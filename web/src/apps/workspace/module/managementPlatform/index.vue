@@ -57,7 +57,9 @@ import {
   CreateData
 } from "@/common/service/componentAccess";
 import { formatComponentDataForPost } from "./util/fomat";
-import storage from "./util/cache";
+import api from "../../../../common/service/api";
+import storage from "@/common/helper/storage";
+import API_PATH from "@/common/config/apiPath.js";
 const menu = [
   {
     title: "部门和用户管理",
@@ -146,7 +148,8 @@ export default {
 
       component_id: 16,
 
-      addedFlag: false
+      addedFlag: false,
+      menuOptions: []
     };
   },
   watch: {
@@ -170,7 +173,6 @@ export default {
     },
     // 点击 子树
     handleTreeClick(node) {
-      storage.node = node;
       const { id, pathName, name, type } = node;
       const { title } = this.defaultMenu;
 
@@ -210,13 +212,14 @@ export default {
         this.current = componentData;
         this.tabList.push(componentData);
         this.addedFlag = true;
+        this.header = "组件接入";
         return this.$router.push({ name: "accessComponents" });
       } else {
         const component_data = this.tabList.filter(tab => tab.isAdded)[0];
         component_data.onestop_menu_id = node.id;
         this.current = JSON.parse(JSON.stringify(component_data));
+        this.header = "组件接入";
       }
-      this.header = "组件接入";
     },
 
     //关闭tab页
@@ -279,19 +282,9 @@ export default {
         const updateData = formatComponentDataForPost(componentItem);
         UpdateDataFromId(componentItem.id, updateData)
           .then(data => {
-            let idx = _this.currentTreeId;
-            _this.defaultMenu.nodes.forEach(node => {
-              if (node.id == updateData.onestop_menu_id) {
-                node.children.forEach(child => {
-                  if (child._id == idx) {
-                    child = updateData;
-                  }
-                });
-              }
-            });
-
+            _this.getMenuForcomponentAccess();
+            _this.updateBaseInfo();
             _this.$Message.success("更新成功");
-            _this.$;
           })
           .catch(err => {
             _this.$Message.fail("更新失败");
@@ -299,20 +292,11 @@ export default {
       }
       //新增
       if (componentItem.isAdded) {
-        // this.tabList.forEach(tab => {
-        //   if( tab._id == componentItem._id ) {
-        //     Object.assign(tab, componentItem)
-        //   }
-        // })
         const postData = formatComponentDataForPost(componentItem);
         CreateData(postData)
           .then(data => {
-            // _this.defaultMenu.nodes.forEach( node => {
-            //   if( node.id == postData.onestop_menu_id ) {
-            //     node.children.push(postData);
-            //   }
-            // });
-            this.getMenuForcomponentAccess();
+            _this.getMenuForcomponentAccess();
+            _this.updateBaseInfo();
             _this.$Message.success("新增成功");
           })
           .catch(err => {
@@ -329,11 +313,25 @@ export default {
       let that = this;
       GetMenu()
         .then(data => {
+          const _menuOptions = [];
           data.forEach(item => {
             item.type = "component";
             item.children = [];
             item.opened = true;
+
+            const menu = Object.create(null);
+            menu.name = item.name;
+            menu.title_cn = item.title_cn;
+            menu.title_en = item.title_en;
+
+            _menuOptions.push(menu);
           });
+          that.menuOptions = _menuOptions;
+          console.log("that.menuOptions", that.menuOptions);
+          sessionStorage.setItem(
+            "menuOptions",
+            JSON.stringify(that.menuOptions)
+          );
           that.getAllComponentData(data, nodes => {
             if (nodes) {
               menu[2].nodes = nodes;
@@ -342,7 +340,6 @@ export default {
           });
         })
         .catch(err => {
-          // that.$Message.fail(err);
           console.log("err", err);
         });
     },
@@ -369,28 +366,32 @@ export default {
           console.log("getAllComponentData error!", err);
           callback(false);
         });
+    },
+
+    // 更新 baseInfo
+    updateBaseInfo() {
+      api
+        .fetch(`${API_PATH.WORKSPACE_PATH}getBaseInfo`, "get")
+        .then(res => {
+          storage.set("baseInfo", res, "local");
+        })
+        .catch(err => console.log("getBaseInfo", err));
     }
   },
   mounted() {
     this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
-      // 需要页面刷新 数据持久化
-      // const node = menu[0].nodes.slice(1);
-      // this.handleTreeClick(node);
       this.$router.push("departManagement");
     }
-  },
-  created() {
-    //拉取后端数据
   }
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
-$permissions-Backgroud: #F4F7FB;
-$per-border-color:#DEE4EC;
-.management-platform-wrap{
+@import "@/common/style/variables.scss";
+$permissions-Backgroud: #f4f7fb;
+$per-border-color: #dee4ec;
+.management-platform-wrap {
   height: 100%;
   .management-platform-sidebar {
     display: flex;

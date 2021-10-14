@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -44,12 +42,17 @@ public class ZipHelper {
     private static final String UN_ZIP_CMD = "unzip";
     private static final String RECURSIVE = "-r";
     private static final String ZIP_TYPE = ".zip";
+
+    public static String zip(String dirPath) throws DSSErrorException {
+        return zip(dirPath, true);
+    }
+
     /**
      *  ZipHelper可以将传入的path进行打包
      * @param dirPath 需要打包的project路径,绝对路径
      * @return 打包之后的zip包全路径
      */
-    public static String zip(String dirPath)throws DSSErrorException {
+    public static String zip(String dirPath, boolean deleteOriginDir)throws DSSErrorException {
         if(!FileHelper.checkDirExists(dirPath)){
             logger.error("{} 不存在, 不能创建zip文件", dirPath);
             throw new DSSErrorException(90001,dirPath + " does not exist, can not zip");
@@ -97,16 +100,18 @@ public class ZipHelper {
             throw exception;
         } finally {
             //删掉整个目录
-            File file = new File(dirPath);
-            logger.info("生成zip文件{}",longZipFilePath);
-            logger.info("开始删除目录 {}", dirPath);
-            if (deleteDir(file)){
-                logger.info("结束删除目录 {} 成功", dirPath);
-            }else{
-                logger.info("删除目录 {} 失败", dirPath);
-            }
             IOUtils.closeQuietly(infoReader);
             IOUtils.closeQuietly(errorReader);
+            if(deleteOriginDir) {
+                File file = new File(dirPath);
+                logger.info("生成zip文件{}",longZipFilePath);
+                logger.info("开始删除目录 {}", dirPath);
+                if (deleteDir(file)){
+                    logger.info("结束删除目录 {} 成功", dirPath);
+                }else{
+                    logger.info("删除目录 {} 失败", dirPath);
+                }
+            }
         }
         return longZipFilePath;
     }

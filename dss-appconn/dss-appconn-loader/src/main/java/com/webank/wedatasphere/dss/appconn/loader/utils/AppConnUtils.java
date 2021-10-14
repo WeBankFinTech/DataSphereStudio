@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,11 +18,8 @@ package com.webank.wedatasphere.dss.appconn.loader.utils;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnException;
-import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoader;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -35,31 +30,38 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.commons.lang.StringUtils;
 
 public class AppConnUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppConnUtils.class);
+    public static final String JAR_SUF_NAME = ".jar";
 
-    private static Class PARENT_CLASS = AppConn.class;
+    public static final String APPCONN_DIR_NAME = "dss-appconns";
 
+    public static final CommonVars<String> APPCONN_HOME_PATH = CommonVars.apply("wds.dss.appconn.home.path",
+        new File(DSSCommonUtils.DSS_HOME.getValue(), APPCONN_DIR_NAME).getPath());
+
+    public static String getAppConnHomePath() {
+       return APPCONN_HOME_PATH.acquireNew();
+    }
 
     /**
-     * 获得需要实例化的AppConn的全限定名
+     * Obtain the fully qualified name of the appconn to be instantiated.
      * */
     public static String getAppConnClassName(String appConnName, String libPath,
-                                             ClassLoader classLoader) throws NoSuchAppConnException {
-        //1.获取目录下面所有的jar包
+                                             ClassLoader classLoader) throws NoSuchAppConnException, IOException {
+        //1.Get all the jar packages under the directory
         List<String> jars = getJarsOfPath(libPath);
-        //2.从所有的jar中获取到AppConn的子类
+        //2.Get the subclass of appconn from all jars
         for (String jar : jars) {
             for (String clazzName : getClassNameFrom(jar)) {
-                //3. 再在对应的jar包中寻找是AppConn的子类
-                if (isChildClass(clazzName, PARENT_CLASS, classLoader)) {
+                //3.Then find the subclass of appconn in the corresponding jar package
+                if (isChildClass(clazzName, AppConn.class, classLoader)) {
                     return clazzName;
                 }
             }
         }
-        throw new NoSuchAppConnException(appConnName + " does not exist");
+        throw new NoSuchAppConnException("Cannot find a appConn instance for AppConn " + appConnName + " in lib path " + libPath);
     }
 
     public static List<String> getJarsOfPath(String path) {
@@ -67,8 +69,8 @@ public class AppConnUtils {
         List<String> jars = new ArrayList<>();
         if (file.listFiles() != null) {
             for (File f : file.listFiles()) {
-                // dss-xxxxx.jar
-                if (!f.isDirectory() && f.getName().endsWith(AppConnLoader.JAR_SUF_NAME) && f.getName().startsWith("dss")) {
+                // only search from dss-xxxxx.jar.
+                if (!f.isDirectory() && f.getName().endsWith(JAR_SUF_NAME) && f.getName().startsWith("dss-")) {
                     jars.add(f.getPath());
                 }
             }
@@ -77,17 +79,13 @@ public class AppConnUtils {
     }
 
 
-    public static List<URL> getJarsUrlsOfPath(String path) {
+    public static List<URL> getJarsUrlsOfPath(String path) throws MalformedURLException {
         File file = new File(path);
         List<URL> jars = new ArrayList<>();
         if (file.listFiles() != null) {
             for (File f : file.listFiles()) {
-                if (!f.isDirectory() && f.getName().endsWith(AppConnLoader.JAR_SUF_NAME)) {
-                    try {
-                        jars.add(f.toURI().toURL());
-                    } catch (MalformedURLException e) {
-                        logger.warn("url {} cannot be added", AppConnLoader.FILE_SCHEMA + f.getPath());
-                    }
+                if (!f.isDirectory() && f.getName().endsWith(JAR_SUF_NAME)) {
+                    jars.add(f.toURI().toURL());
                 }
             }
         }
@@ -96,26 +94,22 @@ public class AppConnUtils {
 
 
     /**
-     * 从jar包读取所有的class文件名
+     * Then look for the subclass of appconn in the corresponding jar package,
+     * and read all the class file names from the jar package.
      */
-    private static List<String> getClassNameFrom(String jarName) {
+    private static List<String> getClassNameFrom(String jarName) throws IOException {
         List<String> fileList = new ArrayList<>();
-        try {
-            JarFile jarFile = new JarFile(new File(jarName));
-            Enumeration<JarEntry> en = jarFile.entries();
-            while (en.hasMoreElements()) {
-                String name1 = en.nextElement().getName();
-                if (!name1.endsWith(".class")) {
-                    continue;
-                }
-                String name2 = name1.substring(0, name1.lastIndexOf(".class"));
-                String name3 = name2.replaceAll("/", ".");
-                fileList.add(name3);
+        JarFile jarFile = new JarFile(new File(jarName));
+        Enumeration<JarEntry> en = jarFile.entries();
+        while (en.hasMoreElements()) {
+            String name1 = en.nextElement().getName();
+            if (!name1.endsWith(".class")) {
+                continue;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            String name2 = name1.substring(0, name1.lastIndexOf(".class"));
+            String name3 = name2.replaceAll("/", ".");
+            fileList.add(name3);
         }
-
         return fileList;
     }
 
@@ -135,7 +129,6 @@ public class AppConnUtils {
                 return false;
             }
         } catch (Throwable t) {
-            logger.error("className {} can not be instanced", className, t);
             return false;
         }
         return parentClazz.isAssignableFrom(clazz);

@@ -1,61 +1,42 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype;
 
 
-
 import azkaban.jobExecutor.AbstractJob;
 import azkaban.utils.Props;
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job.JobBuilder;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppConnLog;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 
-
-/**
- * Created by johnnwang on 2019/9/19.
- */
 public class AzkabanDssJobType extends AbstractJob {
-
 
 
     private static final String SENSITIVE_JOB_PROP_NAME_SUFFIX = "_X";
@@ -106,6 +87,10 @@ public class AzkabanDssJobType extends AbstractJob {
 
         info("Start to execute job");
         logJobProperties();
+        String runDate = getRunDate();
+        if (StringUtils.isNotBlank(runDate)){
+            this.jobPropsMap.put("run_date", runDate);
+        }
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
         this.job.setLogObj(new AzkabanAppConnLog(this.log));
         if(JobTypeEnum.EmptyJob == ((LinkisJob)this.job).getJobType()){
@@ -121,8 +106,8 @@ public class AzkabanDssJobType extends AbstractJob {
             LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
         } catch (Exception e) {
             this.log.warn("Failed to execute job", e);
-            String reason = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
-            this.log.error("Reason for failure: " + reason);
+            //String reason = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
+            //this.log.error("Reason for failure: " + reason);
             throw e;
         }
         try {
@@ -189,6 +174,39 @@ public class AzkabanDssJobType extends AbstractJob {
                 this.log.error("failed to log job properties ", ex);
             }
         }
+    }
+
+    private String getRunDate(){
+        this.info("begin to get run date");
+        if (this.jobProps != null &&
+                this.jobProps.getBoolean(JOB_DUMP_PROPERTIES_IN_LOG, true)) {
+            try {
+                for (final Map.Entry<String, String> entry : this.jobPropsMap.entrySet()) {
+                    final String key = entry.getKey();
+                    final String value = key.endsWith(SENSITIVE_JOB_PROP_NAME_SUFFIX) ?
+                            SENSITIVE_JOB_PROP_VALUE_PLACEHOLDER :
+                            entry.getValue();
+                    if ("azkaban.flow.start.timestamp".equals(key)){
+                        this.info("run time is " + value);
+                        String runDateNow = value.substring(0, 10).replaceAll("-", "");
+                        this.info("run date now is " + runDateNow);
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                        try {
+                            Date date = simpleDateFormat.parse(runDateNow);
+                            //因为date已经当天的00:00:00 减掉12小时 就是昨天的时间
+                            String runDate = simpleDateFormat.format(new Date(date.getTime() - 24 * 60 * 60 * 1000));
+                            this.info("runDate is " + runDate);
+                            return runDate;
+                        } catch (ParseException e) {
+                            this.log.error("failed to parse run date " + runDateNow, e);
+                        }
+                    }
+                }
+            } catch (final Exception ex) {
+                this.log.error("failed to log job properties ", ex);
+            }
+        }
+        return null;
     }
 
 }

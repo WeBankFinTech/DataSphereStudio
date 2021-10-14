@@ -1,24 +1,23 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.common.log.LogUtils;
 import com.webank.wedatasphere.linkis.entrance.EntranceServer;
@@ -26,9 +25,8 @@ import com.webank.wedatasphere.linkis.entrance.annotation.EntranceServerBeanAnno
 import com.webank.wedatasphere.linkis.entrance.execute.EntranceJob;
 import com.webank.wedatasphere.linkis.entrance.restful.EntranceRestfulApi;
 import com.webank.wedatasphere.linkis.entrance.utils.JobHistoryHelper;
-import com.webank.wedatasphere.linkis.governance.common.entity.task.RequestPersistTask;
+import com.webank.wedatasphere.linkis.governance.common.entity.job.JobRequest;
 import com.webank.wedatasphere.linkis.protocol.constants.TaskConstant;
-import com.webank.wedatasphere.linkis.protocol.task.Task;
 import com.webank.wedatasphere.linkis.protocol.utils.ZuulEntranceUtils;
 import com.webank.wedatasphere.linkis.rpc.Sender;
 import com.webank.wedatasphere.linkis.scheduler.queue.Job;
@@ -74,19 +72,22 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         Message message = null;
 //        try{
         logger.info("Begin to get an execID");
-        Workspace workspace = SSOHelper.getWorkspace(req);
+        DSSWorkspace workspace = SSOHelper.getWorkspace(req);
         json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         params.put("workspace", workspace);
-        String label = ((Map<String, Object>) json.get("labels")).get("route").toString();
-        params.put("labels", label);
+        //
+//        String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
+        String label = "dev";
+
+        params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();
-        Task task = ((EntranceJob) job).getTask();
-        Long taskID = ((RequestPersistTask) task).getTaskID();
+        JobRequest task = ((EntranceJob) job).getJobRequest();
+        Long taskID = task.getId();
         pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
         pushLog("************************************SCRIPT CODE************************************", job);
-        pushLog(((RequestPersistTask) task).getCode(), job);
+        pushLog(task.getExecutionCode(), job);
         pushLog("************************************SCRIPT CODE************************************", job);
         pushLog(LogUtils.generateInfo("Your job is accepted,  jobID is " + execID + " and taskID is " + taskID + ". Please wait it to be scheduled"), job);
         execID = ZuulEntranceUtils.generateExecID(execID, Sender.getThisServiceInstance().getApplicationName(), new String[]{Sender.getThisInstance()});

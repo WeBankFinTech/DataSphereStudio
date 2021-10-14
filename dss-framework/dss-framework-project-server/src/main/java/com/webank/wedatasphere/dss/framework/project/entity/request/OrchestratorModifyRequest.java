@@ -1,31 +1,28 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.framework.project.entity.request;
 
+import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/10/16
- * Description:
- */
+
 @XmlRootElement
 public class OrchestratorModifyRequest {
 
@@ -61,10 +58,21 @@ public class OrchestratorModifyRequest {
     @NotNull(message = "描述不能为空")
     private String description;
 
-    /**
-     * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
-     */
+
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
+
     private List<String> dssLabels;
+
+    /**
+     * labels是通过前端进行传入的，主要是用来进行当前的环境信息
+     */
+    private LabelRouteVo labels;
 
     public Long getId() {
         return id;
@@ -130,11 +138,26 @@ public class OrchestratorModifyRequest {
         this.description = description;
     }
 
-    public List<String> getDssLabels() {
-        return dssLabels;
+    public LabelRouteVo getLabels() {
+        return labels;
     }
 
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
+    public void setLabels(LabelRouteVo labels) {
+        this.labels = labels;
+    }
+
+    @Override
+    public String toString() {
+        return "OrchestratorModifyRequest{" +
+                "id=" + id +
+                ", workspaceId=" + workspaceId +
+                ", projectId=" + projectId +
+                ", orchestratorName='" + orchestratorName + '\'' +
+                ", orchestratorMode='" + orchestratorMode + '\'' +
+                ", orchestratorWays=" + orchestratorWays +
+                ", uses='" + uses + '\'' +
+                ", description='" + description + '\'' +
+                ", labels=" + labels +
+                '}';
     }
 }

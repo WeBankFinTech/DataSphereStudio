@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -39,9 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
-  * Created by johnnwang on 2019/2/25.
-  */
+
 @Service
 class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
   @Autowired
@@ -115,7 +111,7 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
     persist
   }
 
-  override def query(requestQueryTask: RequestQueryTask): ResponsePersist = {
+  def query(requestQueryTask: RequestQueryTask): ResponsePersist = {
     info("查询历史task：" + requestQueryTask.toString)
     val persist = new ResponsePersist
     Utils.tryCatch {
@@ -161,14 +157,14 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
     task
   }
 
-  override def getTaskByID(taskID: Long, userName: String): WorkflowQueryTaskVO = {
-    val task = new WorkflowQueryTask
-    task.setTaskID(taskID)
-    task.setUmUser(userName)
-    val taskR = taskMapper.selectTask(task)
-    import scala.collection.JavaConversions._
-    if (taskR.isEmpty) null else queryTask2QueryTaskVO(taskR(0))
-  }
+//  override def getTaskByID(taskID: Long, userName: String): WorkflowQueryTaskVO = {
+//    val task = new WorkflowQueryTask
+//    task.setTaskID(taskID)
+//    task.setUmUser(userName)
+//    val taskR = taskMapper.selectTask(task)
+//    import scala.collection.JavaConversions._
+//    if (taskR.isEmpty) null else queryTask2QueryTaskVO(taskR(0))
+//  }
 
 
   def queryTask2QueryTaskVO(queryTask: WorkflowQueryTask): WorkflowQueryTaskVO = {
@@ -206,11 +202,11 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
       TaskStatus.Timeout.toString.equals(status)
   }
 
-  override def search(taskID: Long, username: String, status: String, sDate: Date, eDate: Date, executeApplicationName: String): util.List[WorkflowQueryTask] = {
-    import scala.collection.JavaConversions._
-    val split: util.List[String] = if (status != null) status.split(",").toList else null
-    taskMapper.search(taskID, username, split, sDate, eDate, executeApplicationName, null, null)
-  }
+//  override def search(taskID: Long, username: String, status: String, sDate: Date, eDate: Date, executeApplicationName: String): util.List[WorkflowQueryTask] = {
+//    import scala.collection.JavaConversions._
+//    val split: util.List[String] = if (status != null) status.split(",").toList else null
+//    taskMapper.search(taskID, username, split, sDate, eDate, executeApplicationName, null, null)
+//  }
 
   def getQueryVOList(list: java.util.List[WorkflowQueryTask]): java.util.List[WorkflowQueryTaskVO] = {
     val ovs = new util.ArrayList[WorkflowQueryTaskVO]
@@ -223,18 +219,18 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
 
   private def shouldUpdate(oldStatus: String, newStatus: String): Boolean = TaskStatus.valueOf(oldStatus).ordinal <= TaskStatus.valueOf(newStatus).ordinal
 
-  override def searchOne(instance: String, execId: String, sDate: Date, eDate: Date, executeApplicationName: String): RequestPersistTask = {
-    Iterables.getFirst(
-      queryTaskList2RequestPersistTaskList(taskMapper.search(null, null, null, sDate, eDate, executeApplicationName, instance, execId)),
-      {
-        val requestPersistTask = new RequestPersistTask
-        requestPersistTask.setInstance(instance)
-        requestPersistTask.setExecId(execId)
-        requestPersistTask.setStatus(TaskStatus.Inited.toString)
-        requestPersistTask.setProgress(0.0f)
-        requestPersistTask.setTaskID(0l)
-        requestPersistTask
-      })
-  }
+//  override def searchOne(instance: String, execId: String, sDate: Date, eDate: Date, executeApplicationName: String): RequestPersistTask = {
+//    Iterables.getFirst(
+//      queryTaskList2RequestPersistTaskList(taskMapper.search(null, null, null, sDate, eDate, executeApplicationName, instance, execId)),
+//      {
+//        val requestPersistTask = new RequestPersistTask
+//        requestPersistTask.setInstance(instance)
+//        requestPersistTask.setExecId(execId)
+//        requestPersistTask.setStatus(TaskStatus.Inited.toString)
+//        requestPersistTask.setProgress(0.0f)
+//        requestPersistTask.setTaskID(0l)
+//        requestPersistTask
+//      })
+//  }
 }
 

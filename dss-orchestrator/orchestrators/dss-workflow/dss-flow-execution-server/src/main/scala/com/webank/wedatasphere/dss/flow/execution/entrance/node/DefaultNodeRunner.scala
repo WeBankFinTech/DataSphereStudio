@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,23 +18,22 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.node
 
 import java.util
 
-import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
-import com.webank.wedatasphere.dss.linkis.node.execution.job.{JobTypeEnum, LinkisJob}
 import com.webank.wedatasphere.dss.flow.execution.entrance.listener.NodeRunnerListener
 import com.webank.wedatasphere.dss.flow.execution.entrance.log.FlowExecutionLog
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeExecutionState.NodeExecutionState
+import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl
+import com.webank.wedatasphere.dss.linkis.node.execution.job.{JobTypeEnum, LinkisJob}
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
 import com.webank.wedatasphere.linkis.common.exception.ErrorException
 import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
 
-/**
-  * Created by johnnwang on 2019/11/5.
-  */
+
 class DefaultNodeRunner extends NodeRunner with Logging {
 
-  private var node: SchedulerNode = _
+  private var node: WorkflowNode = _
 
   private var linkisJob: LinkisJob = _
 
@@ -54,9 +51,9 @@ class DefaultNodeRunner extends NodeRunner with Logging {
 
   private var lastGetStatusTime: Long = 0
 
-  override def getNode: SchedulerNode = this.node
+  override def getNode: WorkflowNode = this.node
 
-  def setNode(schedulerNode: SchedulerNode): Unit = {
+  def setNode(schedulerNode: WorkflowNode): Unit = {
     this.node = schedulerNode
   }
 
@@ -117,15 +114,9 @@ class DefaultNodeRunner extends NodeRunner with Logging {
         this.transitionState(NodeExecutionState.Succeed)
         return
       }
-
+      this.linkisJob.getJobProps.put(LinkisJobExecutionConfiguration.LINKIS_VERSION_KEY, LinkisJobExecutionConfiguration.LINKIS_DEFAULT_VERSION.getValue)
       LinkisNodeExecutionImpl.getLinkisNodeExecution.runJob(this.linkisJob)
       info(s"Finished to run node of ${node.getName}")
-      /*LinkisNodeExecutionImpl.getLinkisNodeExecution.waitForComplete(this.linkisJob)
-      val listener = LinkisNodeExecutionImpl.getLinkisNodeExecution.asInstanceOf[LinkisExecutionListener]
-      val toState = LinkisNodeExecutionImpl.getLinkisNodeExecution.getState(this.linkisJob)
-      listener.onStatusChanged(getStatus.toString, toState, this.linkisJob)
-      this.transitionState(NodeExecutionState.withName(toState))
-      info(s"Finished to execute node of ${node.getName}")*/
     } catch {
       case t: Throwable =>
         warn(s"Failed to execute node of ${node.getName}", t)

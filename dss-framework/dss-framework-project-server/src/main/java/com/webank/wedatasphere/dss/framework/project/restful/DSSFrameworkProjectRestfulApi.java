@@ -1,58 +1,28 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.google.common.collect.Lists;
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.ProcessNode;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
@@ -63,11 +33,26 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/**
- * created by cooperyang on 2020/9/22
- * Description:
- */
+
 @Component
 @Path("/dss/framework/project")
 @Produces(MediaType.APPLICATION_JSON)
@@ -78,8 +63,6 @@ public class DSSFrameworkProjectRestfulApi {
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
     private DSSProjectService projectService;
-    @Autowired
-    private AppConnService appConnService;
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
     @Autowired
@@ -125,11 +108,10 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         String workspaceName =
-            dssWorkspaceService.getWorkspaceName(String.valueOf(projectCreateRequest.getWorkspaceId()));
+                dssWorkspaceService.getWorkspaceName(String.valueOf(projectCreateRequest.getWorkspaceId()));
         projectCreateRequest.setWorkspaceName(workspaceName);
         try {
-            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username,
-                workspace);
+            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
             if (dssProjectVo != null) {
                 return Message.messageToResponse(Message.ok("创建工程成功").data("project", dssProjectVo));
             } else {
@@ -153,7 +135,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Response modifyProject(@Context HttpServletRequest request, @Valid ProjectModifyRequest projectModifyRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         String workspaceName =
-            dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
+                dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
         projectModifyRequest.setWorkspaceName(workspaceName);
         try {
             dssFrameworkProjectService.modifyProject(projectModifyRequest, username);
@@ -175,44 +157,15 @@ public class DSSFrameworkProjectRestfulApi {
     @Path("deleteProject")
     public Response deleteProject(@Context HttpServletRequest request, @Valid ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
         try{
-            // 检查是否具有删除项目权限
             projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
-            dssFrameworkProjectService.deleteProject(projectDeleteRequest, username);
+
+            projectService.deleteProject(username, projectDeleteRequest, workspace);
             return RestfulUtils.dealOk("删除工程成功");
-        } catch (Exception e) {
-            LOGGER.error("Failed to delete project {} for user {}", projectDeleteRequest, username, e);
-            return RestfulUtils.dealError("删除工程失败" + e.getMessage());
-        }
-    }
-
-    @POST
-    @Path("/getAppConnProjectID")
-    public Response getAppConnProjectID(@Context HttpServletRequest req, Map<String, Object> json) {
-        Long projectID = (Long) json.get("projectID");
-        String nodeType = json.get("nodeType").toString();
-        AppConn appConn = appConnService.getAppConnByNodeType(nodeType);
-        String label = ((Map<String, Object>) json.get("labels")).get("route").toString();
-        try {
-            Long appConnProjectID = projectService.getAppConnProjectId(projectID, appConn.getAppDesc().getAppName(), Lists.newArrayList(new DSSLabel(label)));
-            return Message.messageToResponse(Message.ok().data("appConnProjectID",appConnProjectID));
-        } catch (Exception e) {
-            return RestfulUtils.dealError("获取AppConn Project ID失败");
-        }
-    }
-
-    @GET
-    @Path("getProcessNodes")
-    public Response getProcessNodes(@Context HttpServletRequest request,
-                                    @QueryParam("workspaceID") Long workspaceId,
-                                    @QueryParam("projectId") Long projectId) {
-        String username = SecurityFilter.getLoginUsername(request);
-        try {
-            List<ProcessNode> processNodes = dssFrameworkProjectService.getProcessNodes(username, workspaceId, projectId);
-            return RestfulUtils.dealOk("获取开发流程节点成功", new Pair<>("processNodes", processNodes));
-        } catch (Exception e) {
-            LOGGER.error("Failed to get process nodes for user {}", username);
-            return RestfulUtils.dealError("获取开发流程节点失败");
+        }catch(final Throwable t){
+            LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);
+            return RestfulUtils.dealError("删除工程失败");
         }
     }
 
@@ -246,6 +199,4 @@ public class DSSFrameworkProjectRestfulApi {
             return RestfulUtils.dealError("获取工程能力失败");
         }
     }
-
-
 }

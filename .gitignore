@@ -2,7 +2,6 @@
 .idea/*
 
 .DS_Store
-
 assembly/target
 assembly/dss-package/target
 
@@ -20,6 +19,15 @@ dss-appconn/dss-appconn-loader/target
 dss-appconn/dss-schedule-appconn-core/target
 dss-appconn/linkis-appconn-engineplugin/target
 dss-appconn/appconns/dss-dolphinscheduler-appconn/target
+dss-appconn/dss-appconn-manager/dss-appconn-manager-client/target
+dss-appconn/dss-appconn-manager/dss-appconn-manager-core/target
+dss-appconn/dss-scheduler-appconn/target/
+dss-apps/dss-datapipe-server/target/
+dss-commons/dss-sender-service/target/
+
+dss-orchestrator/dss-orchestrator-conversion-standard/target/
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-conversion-standard/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-sdk/target
 
 
 # dss-apps
@@ -79,3 +87,19 @@ logs/*
 /plugins/dolphinscheduler/linkis-dolphinscheduler-client/target/
 
 web/yarn.lock
+
+plugins/azkaban/linkis-jobtype/target/
+plugins/linkis/linkis-appjoint-entrance/target/
+
+sendemail-appjoint/sendemail-core/target/
+visualis-appjoint/appjoint/target/
+
+dss-user-manager/target/
+logs
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+
+out
+gen

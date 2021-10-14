@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -37,13 +35,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-/**
- * @author georgeqiao
- * @Title: AbstractEventCheck
- * @ProjectName Azkaban-EventChecker
- * @date 2019/9/1822:10
- * @Description: TODO
- */
 public abstract class AbstractEventCheck implements EventCheckAdapter {
     static DataSource msgDS;
     String topic;
@@ -78,7 +69,6 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         userTime = props.getProperty(EventChecker.USER_TIME);
         waitTime = props.getProperty(EventChecker.WAIT_TIME, "1");
         query_frequency = props.getProperty(EventChecker.QUERY_FREQUENCY, "30000");
-//        wait_for_time = props.getProperty(EventChecker.WAIT_FOR_TIME);
         afterSend = props.getProperty(EventChecker.AFTERSEND);
     }
 
@@ -168,34 +158,4 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         log.info("Send IP:" + ip);
         return ip;
     }
-
-//    static void AzkabanStatusMonitor() {
-//        String name = ManagementFactory.getRuntimeMXBean().getName();
-//        System.out.println(name);
-//        String pid = name.split("@")[0];
-//        Process process = null;
-//        List<String> processList = new ArrayList<String>();
-//        InputStream in = null;
-//        String[] cmds = {"/bin/sh", "-c", "ps -ef | grep " + pid + " | grep -v 'grep' | awk '{print $3}'"};
-//        try {
-//            process = Runtime.getRuntime().exec(cmds);
-//            process.waitFor();
-//            in = process.getInputStream();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                processList.add(line);
-//            }
-//            reader.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        for (String ppid : processList) {
-//            System.out.println(ppid);
-//
-//        }
-//    }
 }

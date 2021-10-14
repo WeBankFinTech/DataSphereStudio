@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -27,9 +25,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
-/**
- * Created by johnnwang on 2019/9/21.
- */
+
 public class LinkisJobExecutionUtils {
 
 
@@ -52,11 +48,13 @@ public class LinkisJobExecutionUtils {
     }
 
 
-    public static Boolean isCommonAppjointJob(String engineType){
+    public static Boolean isCommonAppConnJob(String engineType){
 
-        return  LinkisJobExecutionConfiguration.APPJOINT.equalsIgnoreCase(engineType);
+        return  LinkisJobExecutionConfiguration.APPCONN.equalsIgnoreCase(engineType);
 
     }
+
+    public static final Integer IDX_FOR_LOG_TYPE_ALL = 3;// 0: Error 1: WARN 2:INFO 3: ALL
 
 
 

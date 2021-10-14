@@ -6,5 +6,5 @@ export default {
   PUBLISH_PATH: "/dss/framework/release/",
   DATAMODEL_PATH: "/",
   WAREHOUSE_PATH: "/",
-  DATA_GOVERNANCE: "/"
+  DATA_GOVERNANCE: "/data-assets/asset/"
 };

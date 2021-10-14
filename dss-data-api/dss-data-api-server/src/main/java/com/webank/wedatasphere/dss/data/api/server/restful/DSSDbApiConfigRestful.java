@@ -131,6 +131,7 @@ public class DSSDbApiConfigRestful {
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 
@@ -151,8 +152,8 @@ public class DSSDbApiConfigRestful {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
-
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 

@@ -45,7 +45,7 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
         for (DataSource datasource : allConnections) {
             try {
                 datasource.setPwd(CryptoUtils.string2Object(datasource.getPwd()).toString());
-                System.out.println(datasource.getPwd());
+
                 connection = JdbcUtil.getConnection(datasource);
                 datasource.setPwd("***");
                 availableConns.add(datasource);

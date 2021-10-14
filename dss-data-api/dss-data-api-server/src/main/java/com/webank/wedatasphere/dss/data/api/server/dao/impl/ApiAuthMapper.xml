@@ -35,6 +35,7 @@
         <where>
             a.is_delete =0 AND a.workspace_id = #{workspaceId}
         </where>
+        ORDER BY update_time desc
     </select>
 
 

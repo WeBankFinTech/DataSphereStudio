@@ -1,13 +1,11 @@
-package com.webank.wedatasphere.dss.datamodel.table.vo;
+package com.webank.wedatasphere.dss.datamodel.table.dto;
 
 
 import java.util.Date;
 
-public class TableCollectVO {
+public class TableCollectionDTO {
 
-    private Long tableId;
-
-    private String user;
+    private Long id;
 
     private String database;
 
@@ -62,20 +60,18 @@ public class TableCollectVO {
      */
     private String fileType;
 
-    public String getUser() {
-        return user;
+    /**
+     * 收藏人
+     */
+    private String user;
+
+
+    public Long getId() {
+        return id;
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public Long getTableId() {
-        return tableId;
-    }
-
-    public void setTableId(Long tableId) {
-        this.tableId = tableId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDatabase() {
@@ -206,12 +202,18 @@ public class TableCollectVO {
         this.fileType = fileType;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
 
     @Override
     public String toString() {
-        return "TableCollectVO{" +
-                "tableId=" + tableId +
-                ", user='" + user + '\'' +
+        return "TableCollectionDTO{" +
+                "id=" + id +
                 ", database='" + database + '\'' +
                 ", name='" + name + '\'' +
                 ", alias='" + alias + '\'' +
@@ -228,6 +230,7 @@ public class TableCollectVO {
                 ", principalName='" + principalName + '\'' +
                 ", compress='" + compress + '\'' +
                 ", fileType='" + fileType + '\'' +
+                ", user='" + user + '\'' +
                 '}';
     }
 }

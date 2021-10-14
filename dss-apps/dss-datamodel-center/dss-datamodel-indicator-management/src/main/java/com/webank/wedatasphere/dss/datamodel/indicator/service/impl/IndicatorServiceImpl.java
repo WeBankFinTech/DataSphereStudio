@@ -175,6 +175,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int addIndicatorVersion(Long id, IndicatorVersionAddVO vo) throws ErrorException {
+        //todo 生成新版本 则旧版本是否判断存在 关联其他表信息
 
         //判断旧版本指标是否存在
         DssDatamodelIndicator orgVersion = getBaseMapper().selectById(id);

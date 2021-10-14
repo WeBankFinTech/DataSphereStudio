@@ -45,4 +45,18 @@ public class TableColumnsServiceImpl extends ServiceImpl<DssDatamodelTableColumn
     public List<DssDatamodelTableColumns> listByTableId(Long tableId) {
         return getBaseMapper().selectList(Wrappers.<DssDatamodelTableColumns>lambdaQuery().eq(DssDatamodelTableColumns::getTableId,tableId));
     }
+
+
+    @Override
+    public Integer deleteByTableId(Long tableId) throws ErrorException {
+        return getBaseMapper().delete(Wrappers.<DssDatamodelTableColumns>lambdaQuery().eq(DssDatamodelTableColumns::getTableId,tableId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer addColumn(DssDatamodelTableColumns column) {
+        column.setCreateTime(new Date());
+        column.setUpdateTime(new Date());
+        return getBaseMapper().insert(column);
+    }
 }

@@ -34,4 +34,21 @@ public interface TableColumnsService extends IService<DssDatamodelTableColumns> 
      * @throws ErrorException
      */
     List<DssDatamodelTableColumns> listByTableId(Long tableId);
+
+
+    /**
+     * 根据表id删除字段
+     * @param tableId
+     * @return
+     * @throws ErrorException
+     */
+    Integer deleteByTableId(Long tableId)throws ErrorException;
+
+
+    /**
+     * 新增数据表字段
+     * @param column
+     * @return
+     */
+    Integer addColumn(DssDatamodelTableColumns column);
 }

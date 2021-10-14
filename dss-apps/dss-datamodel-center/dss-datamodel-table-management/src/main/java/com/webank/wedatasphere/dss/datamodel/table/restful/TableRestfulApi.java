@@ -130,7 +130,7 @@ public class TableRestfulApi {
     @Path("/tables/versions/{id}")
     public Response addVersion(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody TableVersionAddVO vo) throws Exception {
         LOGGER.info("tableVersionAddVO : {}", vo);
-        return null;
+        return Message.messageToResponse(Message.ok().data("count",tableService.addTableVersion(id,vo)));
     }
 
 
@@ -146,7 +146,7 @@ public class TableRestfulApi {
     @Path("/tables/versions/rollback")
     public Response versionRollBack(@Context HttpServletRequest req, TableVersionRollBackVO vo) throws Exception {
         LOGGER.info("tableVersionRollBackVO : {}", vo);
-        return null;
+        return Message.messageToResponse(Message.ok().data("count",tableService.versionRollBack(vo)));
     }
 
 
@@ -158,9 +158,9 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/versions/list")
-    public Response tableVersionsList(@Context HttpServletRequest req, @RequestBody TableVersionRollBackVO vo) {
+    public Response tableVersionsList(@Context HttpServletRequest req, @RequestBody TableVersionQueryVO vo) {
         LOGGER.info("version list vo : {}", vo);
-        return null;
+        return Message.messageToResponse(tableService.listTableVersions(vo));
     }
 
 
@@ -212,9 +212,11 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/collect/")
-    public Response tableCollect(@Context HttpServletRequest req, TableCollectVO vo) {
-        //todo
-        return null;
+    public Response tableCollect(@Context HttpServletRequest req, TableCollectVO vo) throws ErrorException {
+        LOGGER.info("table collection vo : {}", vo);
+        String userName = SecurityFilter.getLoginUsername(req);
+        vo.setUser(userName);
+        return Message.messageToResponse(Message.ok().data("count",tableService.tableCollect(vo)));
     }
 
     /**
@@ -224,10 +226,28 @@ public class TableRestfulApi {
      * @return
      */
     @POST
-    @Path("/tables/collect/")
-    public Response tableCancelCollect(@Context HttpServletRequest req, TableCollectVO vo) {
-        //todo
-        return null;
+    @Path("/tables/collect/cancel")
+    public Response tableCancelCollect(@Context HttpServletRequest req, TableCollectCancelVO vo) throws ErrorException {
+        LOGGER.info("table collection cancel vo : {}", vo);
+        String userName = SecurityFilter.getLoginUsername(req);
+        vo.setUser(userName);
+        return Message.messageToResponse(Message.ok().data("count",tableService.tableCancel(vo)));
+    }
+
+
+    /**
+     * 我的收藏列表
+     *
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/tables/collect/list")
+    public Response tableCancelList(@Context HttpServletRequest req, TableCollectQueryVO vo) throws ErrorException {
+        LOGGER.info("table collection list vo : {}", vo);
+        String userName = SecurityFilter.getLoginUsername(req);
+        vo.setUser(userName);
+        return Message.messageToResponse(tableService.tableCollections(vo));
     }
 
     /**
@@ -268,7 +288,8 @@ public class TableRestfulApi {
     @POST
     @Path("/tables/dictionaries/list")
     public Response tableDictionaryList(@Context HttpServletRequest req, TableDictionaryListVO vo){
-        return null;
+        LOGGER.info("table dictionaries list vo : {}", vo);
+        return Message.messageToResponse(tableService.dictionaryList(vo));
     }
 
 
@@ -280,8 +301,9 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/columns/add")
-    public Response tableColumnsAdd(@Context HttpServletRequest req, TableColumnsAddVO vo){
-        return null;
+    public Response tableColumnsAdd(@Context HttpServletRequest req, TableColumnsAddVO vo) throws ErrorException {
+        LOGGER.info("table column add vo : {}", vo);
+        return Message.messageToResponse(Message.ok().data("count",tableService.addTableColumn(vo)));
     }
 
 }

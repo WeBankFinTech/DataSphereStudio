@@ -24,14 +24,19 @@ public class DssDatamodelTableColumns {
     private String rule;
 
     /**
-    * 0 维度，1 指标 2 度量
-    */
+     * 0 维度，1 指标 2 度量
+     */
     private Integer modelType;
 
     /**
-    * 关联具体模型id信息
-    */
+     * 关联具体模型id信息（因为有版本数据表id不可靠，暂时不用）
+     */
     private Long modelId;
+
+    /**
+     * 模型信息名称
+     */
+    private String modelName;
 
     private Date createTime;
 
@@ -131,6 +136,14 @@ public class DssDatamodelTableColumns {
 
     public void setModelId(Long modelId) {
         this.modelId = modelId;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     public Date getCreateTime() {

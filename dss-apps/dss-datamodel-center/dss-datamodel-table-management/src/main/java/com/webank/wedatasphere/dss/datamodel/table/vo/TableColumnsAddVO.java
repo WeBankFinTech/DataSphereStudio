@@ -27,9 +27,9 @@ public class TableColumnsAddVO {
     private Integer modelType;
 
     /**
-     * 关联具体模型id信息
+     * 模型信息名称
      */
-    private Long modelId;
+    private String modelName;
 
     public Long getTableId() {
         return tableId;
@@ -111,11 +111,11 @@ public class TableColumnsAddVO {
         this.modelType = modelType;
     }
 
-    public Long getModelId() {
-        return modelId;
+    public String getModelName() {
+        return modelName;
     }
 
-    public void setModelId(Long modelId) {
-        this.modelId = modelId;
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 }

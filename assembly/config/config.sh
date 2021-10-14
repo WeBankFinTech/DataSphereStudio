@@ -1,12 +1,12 @@
 ### deploy user
-deployUser=hadoop
+deployUser=root
 
-##微服务的最大内存使用量
+##微服务的�?大内存使用量
 SERVER_HEAP_SIZE="512M"
 
 
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/appcom/Install/dss-dev
+DSS_INSTALL_HOME=/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2
 
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
@@ -17,7 +17,10 @@ EUREKA_PORT=20303
 #WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
 #### Path to store job ResultSet：file or hdfs path
 #RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
-
+WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
+### Path to store job ResultSet�file or hdfs path
+#RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
+RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 ### Linkis Gateway  information
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001

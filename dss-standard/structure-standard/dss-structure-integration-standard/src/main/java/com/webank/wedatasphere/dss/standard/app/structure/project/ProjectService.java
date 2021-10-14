@@ -1,51 +1,60 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureService;
 
-/**
- * Created by enjoyyin on 2020/8/10.
- */
-public interface ProjectService extends StructureService {
+
+public abstract class ProjectService extends AbstractStructureService {
 
     /**
      * 是否支持DSS与各集成接入系统的协同开发能力
      * @return 默认为false
      */
-    default boolean isCooperationSupported() {
+    public boolean isCooperationSupported() {
         return false;
     }
 
-    default boolean isProjectNameUnique() {
+    public boolean isProjectNameUnique() {
         return true;
     }
 
-    ProjectCreationOperation createProjectCreationOperation();
+   public ProjectCreationOperation getProjectCreationOperation() {
+       return getOrCreate(this::createProjectCreationOperation, ProjectCreationOperation.class);
+   }
 
-    ProjectUpdateOperation createProjectUpdateOperation();
+   protected abstract ProjectCreationOperation createProjectCreationOperation();
 
-    ProjectDeletionOperation createProjectDeletionOperation();
+   public ProjectUpdateOperation getProjectUpdateOperation() {
+       return getOrCreate(this::createProjectUpdateOperation, ProjectUpdateOperation.class);
+   }
 
-    ProjectUrlOperation createProjectUrlOperation();
+   protected abstract ProjectUpdateOperation createProjectUpdateOperation();
 
+   public ProjectDeletionOperation getProjectDeletionOperation() {
+       return getOrCreate(this::createProjectDeletionOperation, ProjectDeletionOperation.class);
+   }
+
+   protected abstract ProjectDeletionOperation createProjectDeletionOperation();
+
+   public ProjectUrlOperation getProjectUrlOperation() {
+       return getOrCreate(this::createProjectUrlOperation, ProjectUrlOperation.class);
+   }
+
+   protected abstract ProjectUrlOperation createProjectUrlOperation();
 
 }

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -21,11 +19,8 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 import java.util.Date;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/10/16
- * Description:
- */
-public class DSSOrchestratorInfo {
+
+public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private Long id;
 
@@ -41,10 +36,6 @@ public class DSSOrchestratorInfo {
 
     private String uses;
 
-    private Boolean editable;
-
-    private Boolean releasable;
-
     private String appConnName;
 
     private Long projectId;
@@ -52,7 +43,6 @@ public class DSSOrchestratorInfo {
     private String uuid;
 
     private String secondaryType;
-
 
     public DSSOrchestratorInfo() {
 
@@ -134,22 +124,7 @@ public class DSSOrchestratorInfo {
         this.appConnName = appConnName;
     }
 
-    public Boolean getEditable() {
-        return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
-    }
-
-    public Boolean getReleasable() {
-        return releasable;
-    }
-
-    public void setReleasable(Boolean releasable) {
-        this.releasable = releasable;
-    }
-
+    @Override
     public Long getId() {
         return id;
     }
@@ -158,6 +133,7 @@ public class DSSOrchestratorInfo {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -175,6 +151,11 @@ public class DSSOrchestratorInfo {
     }
 
     public String getDesc() {
+        return desc;
+    }
+
+    @Override
+    public String getDescription() {
         return desc;
     }
 
@@ -204,5 +185,24 @@ public class DSSOrchestratorInfo {
 
     public void setProjectId(long projectId) {
         this.projectId = projectId;
+    }
+
+    @Override
+    public String toString() {
+        return "DSSOrchestratorInfo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", desc='" + desc + '\'' +
+                ", creator='" + creator + '\'' +
+                ", createTime=" + createTime +
+                ", uses='" + uses + '\'' +
+                ", appConnName='" + appConnName + '\'' +
+                ", projectId=" + projectId +
+                ", uuid='" + uuid + '\'' +
+                ", secondaryType='" + secondaryType + '\'' +
+                ", linkedAppConnNames=" + linkedAppConnNames +
+                ", comment='" + comment + '\'' +
+                '}';
     }
 }

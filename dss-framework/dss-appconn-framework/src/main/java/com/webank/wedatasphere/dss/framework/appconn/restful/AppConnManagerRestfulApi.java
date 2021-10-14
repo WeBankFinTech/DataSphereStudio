@@ -51,15 +51,15 @@ public class AppConnManagerRestfulApi {
     @Autowired
     private AppConnResourceUploadService appConnResourceUploadService;
 
-    @PostConstruct
-    public void init() {
-        LOGGER.info("Try to scan AppConn plugins...");
-        appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
-            LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
-            appConnResourceUploadService.upload(appConnInfo.getAppConnName());
-        }));
-        LOGGER.info("All AppConn plugins has scanned.");
-    }
+//    @PostConstruct
+//    public void init() {
+//        LOGGER.info("Try to scan AppConn plugins...");
+//        appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
+//            LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
+//            appConnResourceUploadService.upload(appConnInfo.getAppConnName());
+//        }));
+//        LOGGER.info("All AppConn plugins has scanned.");
+//    }
 
     @GET
     @Path("listAppConnInfos")

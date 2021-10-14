@@ -164,7 +164,7 @@ export default {
       const workspaceId = that.$route.query.workspaceId;
       const { guid } = model;
       that.$router.push({
-        name: "dataAssetManage/assets/info",
+        name: "assetsInfo",
         params: { guid },
         query: { workspaceId }
       });

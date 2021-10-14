@@ -1,48 +1,39 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
-import com.webank.wedatasphere.dss.appconn.orchestrator.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.appconn.orchestrator.ref.DefaultOrchestratorQueryResponseRef;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseQueryOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorQueryRequestRef;
-import com.webank.wedatasphere.dss.orchestrator.core.ref.OrchestratorQueryResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryRequestRef;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryResponseRef;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * @author allenlliu
- * @date 2020/12/14 20:36
- */
-public class OrchestratorFrameworkQueryOperation implements RefQueryOperation<OrchestratorQueryRequestRef, OrchestratorQueryResponseRef> {
-
-    private final Sender sender = Sender.getSender(OrchestratorConf.ORCHESTRATOR_SERVER_DEV_NAME.getValue());
-
+public class OrchestratorFrameworkQueryOperation implements RefQueryOperation<OrchestratorQueryRequestRef> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkQueryOperation.class);
 
+    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
     private DevelopmentService developmentService;
 
     @Override

@@ -48,8 +48,7 @@
       <div class="modify-model">
         <Checkbox v-for="item in userlist.namesign"
           :key="item" style="display:block"
-          v-model="userlist[item]"
-          :disabled="item==='admin'">
+          v-model="userlist[item]">
           {{username(item)}}
         </Checkbox>
       </div>

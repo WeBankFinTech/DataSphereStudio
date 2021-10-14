@@ -27,7 +27,7 @@
         <div class="assets-index-b-l-user">
           <span>负责人</span>
           <Select
-            v-model="serachOption.owner"
+            v-model="searchOption.owner"
             filterable
             clearable
             remote
@@ -43,29 +43,36 @@
             >
           </Select>
         </div>
-        <div class="assets-index-b-l-env">
+        <!--<div class="assets-index-b-l-env">
           <span>环境</span>
-          <Radio v-model="serachOption.env"
+          <Radio v-model="searchOption.env"
             ><label
               style="color: rgba(0,0,0,0.65; fontSize: 14px; fontWeight: normal;"
               >生产环境</label
             ></Radio
           >
-        </div>
+        </div>-->
         <div class="assets-index-b-l-label">
-          <span>标签</span>
+          <span>主题域/分层</span>
           <Select
-            v-model="serachOption.label"
-            multiple
+            v-model="searchOption.classification"
             clearable
             style="width:167px"
           >
-            <Option
-              v-for="(item, idx) in userList"
-              :value="item.value"
-              :key="idx"
-              >{{ item.label }}</Option
-            >
+            <OptionGroup label="主题域">
+              <Option
+                v-for="(item, idx) in subjectList"
+                :value="item.name"
+                :key="idx"
+              >{{ item.name }}</Option>
+            </OptionGroup>
+            <OptionGroup label="分层">
+              <Option
+                v-for="(item, idx) in layerList"
+                :value="item.name"
+                :key="idx"
+              >{{ item.name }}</Option>
+            </OptionGroup>
           </Select>
         </div>
       </div>
@@ -86,7 +93,7 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
-import { getHiveTbls, getWorkspaceUsers } from "../../service/api";
+import { getHiveTbls, getWorkspaceUsers, getLayersAll, getThemedomains } from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
 import { throttle } from "lodash";
@@ -96,7 +103,7 @@ export default {
   },
   data() {
     return {
-      serachOption: {
+      searchOption: {
         limit: 10,
         offset: 0
       },
@@ -105,7 +112,9 @@ export default {
       cardTabs: [],
       queryForTbls: "",
       owerSerachLoading: false,
-      isLoading: false
+      isLoading: false,
+      subjectList: [],
+      layerList: []
     };
   },
   created() {
@@ -129,6 +138,14 @@ export default {
       _this.scrollHander();
     }, 300);
     window.addEventListener("scroll", this.throttleLoad);
+    getThemedomains().then(res => {
+      let { result } = res
+      this.subjectList = result
+    })
+    getLayersAll().then(res => {
+      let { result } = res
+      this.layerList = result
+    })
   },
   destroyed() {
     window.removeEventListener("scroll", this.throttleLoad);
@@ -138,12 +155,13 @@ export default {
     onSearch() {
       const params = {
         query: this.queryForTbls,
-        owner: this.serachOption.owner,
+        owner: this.searchOption.owner,
+        classification: this.searchOption.classification,
         limit: 10,
         offset: 0
       };
-      this.serachOption["limit"] = 10;
-      this.serachOption["offset"] = 0;
+      this.searchOption["limit"] = 10;
+      this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
       getHiveTbls(params)
         .then(data => {
@@ -180,11 +198,12 @@ export default {
       return new Promise(resolve => {
         const params = {
           query: that.queryForTbls,
-          owner: that.serachOption.owner,
-          limit: that.serachOption.limit,
-          offset: that.serachOption.offset + that.serachOption.limit
+          owner: that.searchOption.owner,
+          limit: that.searchOption.limit,
+          offset: that.searchOption.offset + that.searchOption.limit,
+          classification: that.classification
         };
-        that.serachOption.offset += that.serachOption.limit;
+        that.searchOption.offset += that.searchOption.limit;
         getHiveTbls(params)
           .then(data => {
             if (data.result) {

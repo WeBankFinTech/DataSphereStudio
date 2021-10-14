@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MetaInfoMapperImpl implements MetaInfoMapper {
@@ -80,7 +81,8 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
         }catch (SQLException e){
             throw  new DAOException(23001,e.getMessage());
         }
-        return tableInfos.subList(0,10);
+
+        return tableInfos.stream().limit(10).collect(Collectors.toList());
     }
 
     @Override

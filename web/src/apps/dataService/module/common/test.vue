@@ -171,10 +171,15 @@ export default {
           this.$t("message.dataService.apiTest.api_not_selected")
         );
       } else {
-        const data = this.currentParams;
+        const data = {};
+        this.valid = true;
         // 存在reqFields为空,不传参数的类型
         if (this.currentApi.reqFields) {
           this.currentApi.reqFields.forEach(row => {
+            // 检查输入值是否为空
+            if (!this.currentParams[row.name] || !this.currentParams[row.name].trim()) {
+              this.valid = false;
+            }
             if (row.type.includes("Array")) {
               // 如果是数组类型，逗号分隔且trim，并过滤掉无效参数
               data[row.name] = this.currentParams[row.name]
@@ -185,6 +190,11 @@ export default {
               data[row.name] = this.currentParams[row.name];
             }
           });
+        }
+        if (!this.valid) {
+          return this.$Message.warning(
+            this.$t("message.dataService.apiTest.req_params_not_value")
+          );
         }
         this.loading = true;
         api

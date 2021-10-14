@@ -24,7 +24,6 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars
  * Created by peacewong on 2019/11/3.
  */
 object LinkisJobTypeConf {
-  val GATEWAY_URL: CommonVars[String] = CommonVars.apply("wds.linkis.gateway.url", "http://192.168.10.201:9001")
 
   val JOB_TYPE = "type"
   val LINKIS_TYPE = "linkistype"

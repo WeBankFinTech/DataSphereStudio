@@ -112,8 +112,12 @@ public class DSSDbApiDataSourceRestful {
     @POST
     @Path("/delete/{id}")
     public Message deleteDatasource(@PathParam("id") Integer id) {
-        dssDbApiDataSourceService.deleteById(id);
-        return Message.ok("删除成功");
+        if (dssDbApiDataSourceService.isDataSourceUsing(id)){
+            return Message.error("该数据源正在被使用,请下线与此数据源相关的api后再删除");
+        } else {
+            dssDbApiDataSourceService.deleteById(id);
+            return Message.ok("删除成功");
+        }
     }
 
     @POST

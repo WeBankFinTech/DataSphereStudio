@@ -85,4 +85,12 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
         dataSourceMapper.editDatasource(dataSource);
     }
 
+    @Override
+    public boolean isDataSourceUsing(Integer id) {
+        if (dataSourceMapper.dataSourceUsingCount(id) > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

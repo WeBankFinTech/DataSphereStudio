@@ -59,4 +59,14 @@ public class TableColumnsServiceImpl extends ServiceImpl<DssDatamodelTableColumn
         column.setUpdateTime(new Date());
         return getBaseMapper().insert(column);
     }
+
+
+    @Override
+    public Integer tableColumnBind(Long id, Integer modelType, String modelName) throws ErrorException{
+        DssDatamodelTableColumns updateOne = new DssDatamodelTableColumns();
+        updateOne.setModelType(modelType);
+        updateOne.setModelName(modelName);
+        updateOne.setUpdateTime(new Date());
+        return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelTableColumns>lambdaUpdate().eq(DssDatamodelTableColumns::getId,id));
+    }
 }

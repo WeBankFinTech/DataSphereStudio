@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
 import com.webank.wedatasphere.warehouse.client.action.ListDwLayerAction;
 import com.webank.wedatasphere.warehouse.client.action.ListDwModifierAction;
@@ -170,7 +171,6 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/themes/list")
     public Response indicatorThemesList(@Context HttpServletRequest req){
-        //todo
         return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listThemeDomains(new ListDwThemeDomainAction()).getAll()));
     }
 
@@ -182,7 +182,6 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/layers/list")
     public Response indicatorLayerList(@Context HttpServletRequest req){
-        //todo
         return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listLayers(new ListDwLayerAction()).getAll()));
     }
 
@@ -194,7 +193,6 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/cycles/list")
     public Response indicatorCycleList(@Context HttpServletRequest req){
-        //todo
         return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listStatisticalPeriods(new ListDwStatisticalPeriodAction()).getAll()));
     }
 
@@ -206,7 +204,14 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/modifiers/list")
     public Response indicatorModifierList(@Context HttpServletRequest req){
-        //todo
         return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listModifiers(new ListDwModifierAction()).getAll()));
+    }
+
+
+    @POST
+    @Path("/current/user")
+    public Response currentUser(@Context HttpServletRequest req){
+        String userName = SecurityFilter.getLoginUsername(req);
+        return Message.messageToResponse(Message.ok().data("usser",userName));
     }
 }

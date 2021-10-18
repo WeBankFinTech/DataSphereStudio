@@ -108,4 +108,13 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @return
      */
     Integer addTableColumn(TableColumnsAddVO vo) throws ErrorException;
+
+
+    /**
+     * 字段绑定模型信息
+     * @param columnId
+     * @param vo
+     * @return
+     */
+    Integer tableColumnBind(Long columnId, TableColumnBindVO vo)throws ErrorException;
 }

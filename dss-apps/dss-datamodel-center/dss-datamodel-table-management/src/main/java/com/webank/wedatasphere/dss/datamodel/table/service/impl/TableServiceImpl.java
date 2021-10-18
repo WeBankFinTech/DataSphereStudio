@@ -337,4 +337,11 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         DssDatamodelTableColumns newColumn = modelMapper.map(vo,DssDatamodelTableColumns.class);
         return tableColumnsService.addColumn(newColumn);
     }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer tableColumnBind(Long columnId, TableColumnBindVO vo) throws ErrorException {
+        return tableColumnsService.tableColumnBind(columnId,vo.getModelType(),vo.getModelName());
+    }
 }

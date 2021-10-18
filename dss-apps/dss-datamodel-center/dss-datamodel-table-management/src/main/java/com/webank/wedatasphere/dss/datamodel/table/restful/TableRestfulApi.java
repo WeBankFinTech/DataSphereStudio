@@ -31,6 +31,7 @@ public class TableRestfulApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableRestfulApi.class);
 
+
     @Autowired
     private TableService tableService;
 
@@ -144,7 +145,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/versions/rollback")
-    public Response versionRollBack(@Context HttpServletRequest req, TableVersionRollBackVO vo) throws Exception {
+    public Response versionRollBack(@Context HttpServletRequest req, @RequestBody TableVersionRollBackVO vo) throws Exception {
         LOGGER.info("tableVersionRollBackVO : {}", vo);
         return Message.messageToResponse(Message.ok().data("count",tableService.versionRollBack(vo)));
     }
@@ -212,7 +213,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/collect/")
-    public Response tableCollect(@Context HttpServletRequest req, TableCollectVO vo) throws ErrorException {
+    public Response tableCollect(@Context HttpServletRequest req,@RequestBody TableCollectVO vo) throws ErrorException {
         LOGGER.info("table collection vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
@@ -227,7 +228,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/collect/cancel")
-    public Response tableCancelCollect(@Context HttpServletRequest req, TableCollectCancelVO vo) throws ErrorException {
+    public Response tableCancelCollect(@Context HttpServletRequest req, @RequestBody TableCollectCancelVO vo) throws ErrorException {
         LOGGER.info("table collection cancel vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
@@ -243,7 +244,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/collect/list")
-    public Response tableCancelList(@Context HttpServletRequest req, TableCollectQueryVO vo) throws ErrorException {
+    public Response tableCancelList(@Context HttpServletRequest req, @RequestBody TableCollectQueryVO vo) throws ErrorException {
         LOGGER.info("table collection list vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
@@ -259,7 +260,8 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/data/preview/")
-    public Response tableDataPreview(@Context HttpServletRequest req, TableDataPreviewVO vo) {
+    public Response tableDataPreview(@Context HttpServletRequest req, @RequestBody TableDataPreviewVO vo) {
+        //todo
         return null;
     }
 
@@ -273,7 +275,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/create/")
-    public Response tableCreate(@Context HttpServletRequest req, TableCreateVO vo) {
+    public Response tableCreate(@Context HttpServletRequest req, @RequestBody TableCreateVO vo) {
         return null;
     }
 
@@ -287,7 +289,7 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/dictionaries/list")
-    public Response tableDictionaryList(@Context HttpServletRequest req, TableDictionaryListVO vo){
+    public Response tableDictionaryList(@Context HttpServletRequest req,@RequestBody TableDictionaryListVO vo){
         LOGGER.info("table dictionaries list vo : {}", vo);
         return Message.messageToResponse(tableService.dictionaryList(vo));
     }
@@ -301,9 +303,22 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/columns/add")
-    public Response tableColumnsAdd(@Context HttpServletRequest req, TableColumnsAddVO vo) throws ErrorException {
+    public Response tableColumnsAdd(@Context HttpServletRequest req,@RequestBody TableColumnsAddVO vo) throws ErrorException {
         LOGGER.info("table column add vo : {}", vo);
         return Message.messageToResponse(Message.ok().data("count",tableService.addTableColumn(vo)));
+    }
+
+    /**
+     * 字段绑定模型
+     * @param req
+     * @param vo
+     * @return
+     */
+    @POST
+    @Path("/tables/columns/bind/{columnId}")
+    public Response tableColumnBind(@Context HttpServletRequest req, @PathParam("columnId") Long columnId, @RequestBody TableColumnBindVO vo) throws ErrorException {
+        LOGGER.info("table column bind model columnId : {}, vo : {}",columnId, vo);
+        return Message.messageToResponse(Message.ok().data("count",tableService.tableColumnBind(columnId,vo)));
     }
 
 }

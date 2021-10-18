@@ -1,15 +1,12 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
 
-
-public class TableCollectQueryVO {
+public class TableListVO {
 
     private Integer pageSize = 20;
 
     private Integer pageNum = 1;
 
-
-    private String dataBase;
 
 
     private String name;
@@ -25,15 +22,20 @@ public class TableCollectQueryVO {
     private String warehouseThemeName;
 
 
-    private String user;
-
-
-    public String getDataBase() {
-        return dataBase;
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setDataBase(String dataBase) {
-        this.dataBase = dataBase;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
     }
 
     public String getName() {
@@ -60,40 +62,14 @@ public class TableCollectQueryVO {
         this.warehouseThemeName = warehouseThemeName;
     }
 
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public Integer getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
-    }
-
     @Override
     public String toString() {
-        return "TableCollectQueryVO{" +
+        return "TableListVO{" +
                 "pageSize=" + pageSize +
                 ", pageNum=" + pageNum +
-                ", dataBase='" + dataBase + '\'' +
                 ", name='" + name + '\'' +
                 ", warehouseLayerName='" + warehouseLayerName + '\'' +
                 ", warehouseThemeName='" + warehouseThemeName + '\'' +
-                ", user='" + user + '\'' +
                 '}';
     }
 }

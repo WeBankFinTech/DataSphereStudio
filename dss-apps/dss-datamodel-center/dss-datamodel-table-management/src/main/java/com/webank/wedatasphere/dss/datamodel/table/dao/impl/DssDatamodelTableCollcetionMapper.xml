@@ -5,7 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_table_collcetion-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="database" jdbcType="VARCHAR" property="database" />
+    <result column="data_base" jdbcType="VARCHAR" property="dataBase" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="alias" jdbcType="VARCHAR" property="alias" />
     <result column="creator" jdbcType="VARCHAR" property="creator" />
@@ -23,11 +23,13 @@
     <result column="file_type" jdbcType="VARCHAR" property="fileType" />
     <result column="user" jdbcType="VARCHAR" property="user" />
     <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="is_external" jdbcType="INTEGER" property="isExternal" />
+    <result column="location" jdbcType="VARCHAR" property="location" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, `database`, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
+    id, data_base, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
     warehouse_theme_name, lifecycle, is_partition_table, is_available, storage_type, 
-    principal_name, `compress`, file_type, `user`, version
+    principal_name, `compress`, file_type, `user`, version, is_external, `location`
   </sql>
 </mapper>

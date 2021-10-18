@@ -5,7 +5,7 @@ import java.util.Date;
 public class DssDatamodelTable {
     private Long id;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -63,6 +63,16 @@ public class DssDatamodelTable {
      */
     private String version;
 
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
+
+    /**
+     * 外部表时 location
+     */
+    private String location;
+
     public Long getId() {
         return id;
     }
@@ -71,12 +81,12 @@ public class DssDatamodelTable {
         this.id = id;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -205,5 +215,21 @@ public class DssDatamodelTable {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

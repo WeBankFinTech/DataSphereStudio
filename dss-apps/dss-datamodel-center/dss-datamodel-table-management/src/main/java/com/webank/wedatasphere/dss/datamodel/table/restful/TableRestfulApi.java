@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.table.restful;
 
+import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.datamodel.table.service.TableService;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -113,9 +114,9 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/list")
-    public Response list(@Context HttpServletRequest req, @RequestBody TableQueryVO vo) {
+    public Response list(@Context HttpServletRequest req, @RequestBody TableListVO vo) {
         LOGGER.info("list vo : {}", vo);
-        return null;
+        return Message.messageToResponse(tableService.list(vo));
     }
 
 
@@ -200,8 +201,8 @@ public class TableRestfulApi {
     @POST
     @Path("/tables/databases/list")
     public Response tableDataBasesList(@Context HttpServletRequest req) {
-        //todo
-        return null;
+
+        return Message.messageToResponse(Message.ok().data("list", Lists.newArrayList("test1","test2")));
     }
 
 
@@ -262,7 +263,7 @@ public class TableRestfulApi {
     @Path("/tables/data/preview/")
     public Response tableDataPreview(@Context HttpServletRequest req, @RequestBody TableDataPreviewVO vo) {
         //todo
-        return null;
+        return Message.messageToResponse(Message.ok());
     }
 
 
@@ -275,8 +276,23 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/create/")
-    public Response tableCreate(@Context HttpServletRequest req, @RequestBody TableCreateVO vo) {
-        return null;
+    public Response tableCreate(@Context HttpServletRequest req, @RequestBody TableCreateVO vo) throws ErrorException {
+        LOGGER.info("table create vo : {}", vo);
+        return Message.messageToResponse(Message.ok().data("count",tableService.tableCreate(vo)));
+    }
+
+    /**
+     * 生成建表语句
+     *
+     * @param req
+     * @param vo
+     * @return
+     */
+    @POST
+    @Path("/tables/create/sql")
+    public Response tableCreateSql(@Context HttpServletRequest req, @RequestBody TableCreateSqlVO vo) throws ErrorException {
+        LOGGER.info("table create sql vo : {}", vo);
+        return Message.messageToResponse(Message.ok().data("count",tableService.tableCreateSql(vo)));
     }
 
 
@@ -320,5 +336,8 @@ public class TableRestfulApi {
         LOGGER.info("table column bind model columnId : {}, vo : {}",columnId, vo);
         return Message.messageToResponse(Message.ok().data("count",tableService.tableColumnBind(columnId,vo)));
     }
+
+
+
 
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class TableAddVO {
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -19,6 +19,11 @@ public class TableAddVO {
     private Date createTime;
 
     private Date updateTime;
+
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
 
     /**
      * 数仓层级
@@ -59,15 +64,35 @@ public class TableAddVO {
      */
     private String fileType;
 
+    /**
+     * 外部表时 location
+     */
+    private String location;
 
     private List<TableColumnVO> columns;
 
-    public String getDatabase() {
-        return database;
+    public String getLocation() {
+        return location;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
+    public String getDataBase() {
+        return dataBase;
+    }
+
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -201,13 +226,14 @@ public class TableAddVO {
     @Override
     public String toString() {
         return "TableAddVO{" +
-                "database='" + database + '\'' +
+                "dataBase='" + dataBase + '\'' +
                 ", name='" + name + '\'' +
                 ", alias='" + alias + '\'' +
                 ", creator='" + creator + '\'' +
                 ", comment='" + comment + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
+                ", isExternal=" + isExternal +
                 ", warehouseLayerName='" + warehouseLayerName + '\'' +
                 ", warehouseThemeName='" + warehouseThemeName + '\'' +
                 ", lifecycle='" + lifecycle + '\'' +
@@ -217,6 +243,7 @@ public class TableAddVO {
                 ", principalName='" + principalName + '\'' +
                 ", compress='" + compress + '\'' +
                 ", fileType='" + fileType + '\'' +
+                ", location='" + location + '\'' +
                 ", columns=" + columns +
                 '}';
     }

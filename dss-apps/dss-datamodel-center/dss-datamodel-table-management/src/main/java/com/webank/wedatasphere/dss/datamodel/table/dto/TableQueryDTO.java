@@ -8,7 +8,7 @@ public class TableQueryDTO {
 
     private Long id;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -67,6 +67,16 @@ public class TableQueryDTO {
     private String version;
 
 
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
+
+    /**
+     * 外部表时 location
+     */
+    private String location;
+
     private List<TableColumnQueryDTO> columns;
 
 
@@ -88,12 +98,12 @@ public class TableQueryDTO {
         this.id = id;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -230,5 +240,21 @@ public class TableQueryDTO {
 
     public void setColumns(List<TableColumnQueryDTO> columns) {
         this.columns = columns;
+    }
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

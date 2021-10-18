@@ -9,7 +9,7 @@ public class TableCollectVO {
 
     private String user;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -62,6 +62,20 @@ public class TableCollectVO {
      */
     private String fileType;
 
+
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
     public String getUser() {
         return user;
     }
@@ -78,12 +92,12 @@ public class TableCollectVO {
         this.tableId = tableId;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -206,13 +220,12 @@ public class TableCollectVO {
         this.fileType = fileType;
     }
 
-
     @Override
     public String toString() {
         return "TableCollectVO{" +
                 "tableId=" + tableId +
                 ", user='" + user + '\'' +
-                ", database='" + database + '\'' +
+                ", dataBase='" + dataBase + '\'' +
                 ", name='" + name + '\'' +
                 ", alias='" + alias + '\'' +
                 ", creator='" + creator + '\'' +
@@ -228,6 +241,7 @@ public class TableCollectVO {
                 ", principalName='" + principalName + '\'' +
                 ", compress='" + compress + '\'' +
                 ", fileType='" + fileType + '\'' +
+                ", isExternal=" + isExternal +
                 '}';
     }
 }

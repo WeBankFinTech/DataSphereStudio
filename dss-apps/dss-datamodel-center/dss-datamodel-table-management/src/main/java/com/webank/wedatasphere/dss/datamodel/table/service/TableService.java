@@ -34,7 +34,7 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @param vo
      * @return
      */
-    TableQueryDTO queryByName(TableQueryOneVO vo);
+    TableQueryDTO queryByName(TableQueryOneVO vo)throws ErrorException;
 
 
     /**
@@ -42,7 +42,7 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @param id
      * @return
      */
-    TableQueryDTO queryById(Long id);
+    TableQueryDTO queryById(Long id)throws ErrorException;
 
 
     /**
@@ -117,4 +117,32 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @return
      */
     Integer tableColumnBind(Long columnId, TableColumnBindVO vo)throws ErrorException;
+
+
+    /**
+     * 执行建表
+     * @param vo
+     * @return
+     * @throws ErrorException
+     */
+    Integer tableCreate(TableCreateVO vo) throws ErrorException;
+
+
+
+    /**
+     * 生成建表语句
+     * @param vo
+     * @return
+     * @throws ErrorException
+     */
+    String tableCreateSql(TableCreateSqlVO vo) throws ErrorException;
+
+
+    /**
+     * table 列表
+     * @param vo
+     * @return
+     * @throws ErrorException
+     */
+    Message list(TableListVO vo);
 }

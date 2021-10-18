@@ -7,7 +7,7 @@ public class TableCollectionDTO {
 
     private Long id;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -66,6 +66,24 @@ public class TableCollectionDTO {
     private String user;
 
 
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
+
+    /**
+     * 外部表时 location
+     */
+    private String location;
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
     public Long getId() {
         return id;
     }
@@ -74,12 +92,12 @@ public class TableCollectionDTO {
         this.id = id;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -210,11 +228,20 @@ public class TableCollectionDTO {
         this.user = user;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+
     @Override
     public String toString() {
         return "TableCollectionDTO{" +
                 "id=" + id +
-                ", database='" + database + '\'' +
+                ", dataBase='" + dataBase + '\'' +
                 ", name='" + name + '\'' +
                 ", alias='" + alias + '\'' +
                 ", creator='" + creator + '\'' +
@@ -231,6 +258,8 @@ public class TableCollectionDTO {
                 ", compress='" + compress + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", user='" + user + '\'' +
+                ", isExternal=" + isExternal +
+                ", location='" + location + '\'' +
                 '}';
     }
 }

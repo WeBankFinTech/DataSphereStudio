@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public class TableVersionAddVO {
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -59,14 +59,24 @@ public class TableVersionAddVO {
     private String fileType;
 
 
+    /**
+     * 是否外部表 0 内部表 1外部表
+     */
+    private Integer isExternal;
+
+    /**
+     * 外部表时 location
+     */
+    private String location;
+
     private List<TableColumnVO> columns;
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {
@@ -195,5 +205,46 @@ public class TableVersionAddVO {
 
     public void setColumns(List<TableColumnVO> columns) {
         this.columns = columns;
+    }
+
+    public Integer getIsExternal() {
+        return isExternal;
+    }
+
+    public void setIsExternal(Integer isExternal) {
+        this.isExternal = isExternal;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "TableVersionAddVO{" +
+                "dataBase='" + dataBase + '\'' +
+                ", name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                ", creator='" + creator + '\'' +
+                ", comment='" + comment + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", warehouseLayerName='" + warehouseLayerName + '\'' +
+                ", warehouseThemeName='" + warehouseThemeName + '\'' +
+                ", lifecycle='" + lifecycle + '\'' +
+                ", isPartitionTable=" + isPartitionTable +
+                ", isAvailable=" + isAvailable +
+                ", storageType='" + storageType + '\'' +
+                ", principalName='" + principalName + '\'' +
+                ", compress='" + compress + '\'' +
+                ", fileType='" + fileType + '\'' +
+                ", isExternal=" + isExternal +
+                ", location='" + location + '\'' +
+                ", columns=" + columns +
+                '}';
     }
 }

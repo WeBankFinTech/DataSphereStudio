@@ -11,7 +11,7 @@
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
-    <result column="task_id" jdbcType="BIGINT" property="taskId" />
+    <result column="task_id" jdbcType="VARCHAR" property="taskId" />
     <result column="error_msg" jdbcType="VARCHAR" property="errorMsg" />
     <result column="tableName" jdbcType="VARCHAR" property="tablename" />
     <result column="database" jdbcType="VARCHAR" property="database" />

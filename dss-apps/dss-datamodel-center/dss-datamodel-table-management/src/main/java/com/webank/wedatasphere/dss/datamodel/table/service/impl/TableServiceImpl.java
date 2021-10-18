@@ -12,6 +12,7 @@ import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.TableColumnQueryDTO;
+import com.webank.wedatasphere.dss.datamodel.table.dto.TableListDTO;
 import com.webank.wedatasphere.dss.datamodel.table.dto.TableQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.table.dto.TableStatsDTO;
 import com.webank.wedatasphere.dss.datamodel.table.entity.*;
@@ -55,6 +56,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Resource
     private TableDictionaryService tableDictionaryService;
 
+    @Resource
+    private TableMaterializedHistoryService tableMaterializedHistoryService;
+
     private Gson gson = new Gson();
 
     @Override
@@ -93,7 +97,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Transactional(rollbackFor = Exception.class)
     public int updateTable(Long id, TableUpdateVO vo) throws ErrorException {
 
-        //todo 判断数据表是否有数据，是否已经物化
+        //todo 判断数据表是否有数据
 
         DssDatamodelTable org = getBaseMapper().selectById(id);
         if (org == null) {
@@ -132,10 +136,11 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
 
     @Override
-    public TableQueryDTO queryByName(TableQueryOneVO vo) {
+    public TableQueryDTO queryByName(TableQueryOneVO vo) throws ErrorException{
         DssDatamodelTable table = getBaseMapper().selectOne(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getName, vo.getName()));
         if (table == null) {
-            return null;
+            LOGGER.error("errorCode : {}, table name : {} not exists", ErrorCode.TABLE_QUERY_ERROR.getCode(), vo.getName());
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_QUERY_ERROR.getCode(), "table  name " + vo.getName() + " not exists");
         }
         return queryTable(table);
     }
@@ -157,10 +162,11 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
 
     @Override
-    public TableQueryDTO queryById(Long id) {
+    public TableQueryDTO queryById(Long id) throws ErrorException{
         DssDatamodelTable table = getBaseMapper().selectOne(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getId, id));
         if (table == null) {
-            return null;
+            LOGGER.error("errorCode : {}, table id : {} not exists", ErrorCode.TABLE_QUERY_ERROR.getCode(), id);
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_QUERY_ERROR.getCode(), "table  id " + id + " not exists");
         }
         return queryTable(table);
     }
@@ -178,12 +184,12 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         String orgName = orgVersion.getName();
-        String orgDatabase = orgVersion.getDatabase();
+        String orgDatabase = orgVersion.getDataBase();
         String orgV = orgVersion.getVersion();
         String assignVersion = newVersion(orgName, orgV);
 
         //表名称和数据库不能改变
-        if (!StringUtils.equals(orgName, vo.getName()) || !StringUtils.equals(orgDatabase, vo.getDatabase())) {
+        if (!StringUtils.equals(orgName, vo.getName()) || !StringUtils.equals(orgDatabase, vo.getDataBase())) {
             LOGGER.error("errorCode : {}, table name must be same", ErrorCode.TABLE_VERSION_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_VERSION_ADD_ERROR.getCode(), "table name must be same");
         }
@@ -307,7 +313,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     public Message tableCollections(TableCollectQueryVO vo) throws ErrorException {
         QueryWrapper<DssDatamodelTableCollcetion> queryWrapper = new QueryWrapper<DssDatamodelTableCollcetion>()
                 .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
-                .like(StringUtils.isNotBlank(vo.getDatabase()), "database", vo.getName())
+                .like(StringUtils.isNotBlank(vo.getDataBase()), "database", vo.getName())
                 .eq(StringUtils.isNotBlank(vo.getUser()), "user", vo.getUser())
                 .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), "warehouse_layer_name", vo.getWarehouseLayerName())
                 .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), "warehouse_theme_name", vo.getWarehouseThemeName());
@@ -323,18 +329,18 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     public Message dictionaryList(TableDictionaryListVO vo) {
-        return Message.ok().data("list",tableDictionaryService.listByType(vo.getType()));
+        return Message.ok().data("list", tableDictionaryService.listByType(vo.getType()));
     }
 
 
     @Override
-    public Integer addTableColumn(TableColumnsAddVO vo) throws ErrorException{
-        int count = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getId,vo.getTableId()));
-        if (count < 1){
+    public Integer addTableColumn(TableColumnsAddVO vo) throws ErrorException {
+        int count = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getId, vo.getTableId()));
+        if (count < 1) {
             LOGGER.error("errorCode : {},  table not exists id : {} ", ErrorCode.TABLE_COLUMN_ADD_ERROR.getCode(), vo.getTableId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_COLUMN_ADD_ERROR.getCode(), " table not exists id : " + vo.getTableId());
         }
-        DssDatamodelTableColumns newColumn = modelMapper.map(vo,DssDatamodelTableColumns.class);
+        DssDatamodelTableColumns newColumn = modelMapper.map(vo, DssDatamodelTableColumns.class);
         return tableColumnsService.addColumn(newColumn);
     }
 
@@ -342,6 +348,50 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer tableColumnBind(Long columnId, TableColumnBindVO vo) throws ErrorException {
-        return tableColumnsService.tableColumnBind(columnId,vo.getModelType(),vo.getModelName());
+        return tableColumnsService.tableColumnBind(columnId, vo.getModelType(), vo.getModelName());
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer tableCreate(TableCreateVO vo) throws ErrorException {
+        DssDatamodelTable current = getBaseMapper().selectById(vo.getTableId());
+        if (current == null) {
+            LOGGER.error("errorCode : {},  table not exists id : {} ", ErrorCode.TABLE_CREATE_ERROR.getCode(), vo.getTableId());
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table not exists id : " + vo.getTableId());
+        }
+        return tableMaterializedHistoryService.materializedTable(current);
+    }
+
+
+    @Override
+    public String tableCreateSql(TableCreateSqlVO vo) throws ErrorException {
+
+        //todo 首先查询资产已存在表生成的sql
+
+        DssDatamodelTable current = getBaseMapper().selectById(vo.getTableId());
+        if (current == null) {
+            LOGGER.error("errorCode : {},  table not exists id : {} ", ErrorCode.TABLE_CREATE_SQL_ERROR.getCode(), vo.getTableId());
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_SQL_ERROR.getCode(), " table not exists id : " + vo.getTableId());
+        }
+        return tableMaterializedHistoryService.generateSql(current);
+    }
+
+    @Override
+    public Message list(TableListVO vo) {
+
+        if (StringUtils.isNotBlank(vo.getWarehouseLayerName())||StringUtils.isNotBlank(vo.getWarehouseThemeName())){
+            PageHelper.clearPage();
+            PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
+            PageInfo<DssDatamodelTable> pageInfo = new PageInfo<>(getBaseMapper().selectList(Wrappers.<DssDatamodelTable>lambdaQuery()
+                    .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTable::getWarehouseThemeName, vo.getWarehouseThemeName())
+                    .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTable::getWarehouseLayerName, vo.getWarehouseLayerName())
+                    .like(StringUtils.isNotBlank(vo.getName()), DssDatamodelTable::getName, vo.getName())));
+            return Message.ok().data("list", pageInfo.getList().stream().map(entity->modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
+                               .data("total",pageInfo.getTotal());
+        }
+
+        //todo 搜索资产
+        return Message.ok();
     }
 }

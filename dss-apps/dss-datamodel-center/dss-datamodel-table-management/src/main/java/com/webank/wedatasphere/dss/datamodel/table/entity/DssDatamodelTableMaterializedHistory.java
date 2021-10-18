@@ -29,7 +29,7 @@ public class DssDatamodelTableMaterializedHistory {
 
     private Date lastUpdateTime;
 
-    private Long taskId;
+    private String taskId;
 
     private String errorMsg;
 
@@ -101,11 +101,11 @@ public class DssDatamodelTableMaterializedHistory {
         this.lastUpdateTime = lastUpdateTime;
     }
 
-    public Long getTaskId() {
+    public String getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(Long taskId) {
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 

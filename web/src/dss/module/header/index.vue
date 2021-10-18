@@ -331,7 +331,7 @@ export default {
       return arr;
     },
     handleOutsideClick() {
-      if(this.$parent.$refs.newGuidance.currentStep !== 6){
+      if(this.$parent.$refs.newGuidance && this.$parent.$refs.newGuidance.currentStep !== 6){
         this.isUserMenuShow = false;
       }
     },

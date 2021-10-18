@@ -309,7 +309,8 @@ export default {
         Vue.nextTick(()=>{
           let select6 = document.querySelector("#mask6 .selected")
           let userMenu = document.querySelector(".user-menu")
-          select6.style.width = userMenu.clientWidth + "px"
+          select6.style.width = userMenu.clientWidth - 10 + "px"
+          select6.style.height = userMenu.clientHeight + "px"
         })
       }
     },
@@ -356,7 +357,8 @@ export default {
         Vue.nextTick(()=>{
           let select6 = document.querySelector("#mask6 .selected")
           let userMenu = document.querySelector(".user-menu")
-          select6.style.width = userMenu.clientWidth + "px"
+          select6.style.width = userMenu.clientWidth - 10 + "px"
+          select6.style.height = userMenu.clientHeight + "px"
         })
       } else if (this.currentStep === 8) {
         this.$parent.$refs.layoutFooter.toggleGuide();
@@ -414,7 +416,7 @@ export default {
         Vue.nextTick(()=>{
           let select6 = document.querySelector("#mask6 .selected")
           let userMenu = document.querySelector(".user-menu")
-          select6.style.width = userMenu.clientWidth + "px"
+          select6.style.width = userMenu.clientWidth - 10 + "px"
           select6.style.height = userMenu.clientHeight + "px"
         })
       } else if (this.currentStep === 6) {

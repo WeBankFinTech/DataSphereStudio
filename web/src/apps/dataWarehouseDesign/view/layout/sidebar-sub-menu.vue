@@ -3,7 +3,7 @@
     <Menu-item v-if="coverRoute" :name="coverRoute.path">
       <Icon :type="coverRoute.meta.icon" v-if="coverRoute.meta.icon"></Icon>
       {{ coverRoute.meta.title }}
-      <router-link :to="coverRoute.path" class="menu-item"> </router-link>
+      <router-link :to="`${coverRoute.path}?workspaceId=${$route.query.workspaceId}`" class="menu-item"> </router-link>
     </Menu-item>
     <Submenu
       v-else-if="menu.children && menu.children.length >= 1"
@@ -22,7 +22,7 @@
     <Menu-item v-else :name="menu.path">
       <Icon :type="menu.meta.icon" v-if="menu.meta.icon"></Icon>
       {{ menu.meta.title }}
-      <router-link :to="menu.path" class="menu-item"> </router-link>
+      <router-link :to="`${menu.path}?workspaceId=${$route.query.workspaceId}`" class="menu-item"> </router-link>
     </Menu-item>
   </div>
 </template>

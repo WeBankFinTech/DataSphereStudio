@@ -65,6 +65,7 @@
           prop="caller">
           <Input
             v-model="authFormData.caller"
+            @on-change="changeCaller"
             :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
@@ -235,6 +236,11 @@ export default {
     },
     addAuthorize() {
       this.modalAuthShow = true;
+    },
+    changeCaller(e) {
+      this.$nextTick(() => {
+        this.authFormData.caller = this.authFormData.caller.replace(/[\u4e00-\u9fa5]/g,''); // 登录用户名不允许中文
+      })
     },
     authCancel() {
       this.modalAuthShow = false;

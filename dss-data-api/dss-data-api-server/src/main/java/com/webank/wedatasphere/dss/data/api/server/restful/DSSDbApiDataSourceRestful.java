@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +115,26 @@ public class DSSDbApiDataSourceRestful {
     public Message deleteDatasource(@PathParam("id") Integer id) {
         dssDbApiDataSourceService.deleteById(id);
         return Message.ok("删除成功");
+    }
+
+    @POST
+    @Path("/test")
+    public Message testDatasource(@RequestBody DataSource dataSource) {
+        Connection connection = null;
+        try {
+            connection = JdbcUtil.getConnection(dataSource);
+        } catch (Exception e) {
+            return Message.error(e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    return Message.error(e.getMessage());
+                }
+            }
+        }
+        return Message.ok("测试连接成功");
     }
 
 }

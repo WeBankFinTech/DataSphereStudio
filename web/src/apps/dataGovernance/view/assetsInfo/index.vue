@@ -83,6 +83,7 @@
             <Select
               @on-change="changeClassifications"
               v-model="classification.subject"
+              :disabled="isChangingClassifications"
               clearable
               style="width:167px"
             >
@@ -98,6 +99,7 @@
             <Select
               @on-change="changeClassifications"
               v-model="classification.layer"
+              :disabled="isChangingClassifications"
               clearable
               style="width:167px"
             >
@@ -185,6 +187,7 @@ export default {
       },
       subjectList: [],
       layerList: [],
+      isChangingClassifications: false
 
     };
   },
@@ -221,7 +224,14 @@ export default {
       if (this.classification.layer){
         classifications.push(this.classification.layer)
       }
-      updateClassifications(guid, { newClassifications: classifications })
+      this.isChangingClassifications = true
+      updateClassifications(guid, { newClassifications: classifications }).then(res => {
+        this.isChangingClassifications = false
+        this.$Message.success(res.result)
+      }).catch(err => {
+        console.log(err)
+        this.isChangingClassifications = false
+      })
     },
     // 获取基本字段信息
     getTblBasic() {

@@ -26,7 +26,7 @@ body {
   font-size: $font-size-small;
   color: $text-color;
   line-height: $line-height-base;
-  @include bg-color($workspace-background, $dark-base-color);
+  background-color: $workspace-background !important;
 }
 
 .layout {

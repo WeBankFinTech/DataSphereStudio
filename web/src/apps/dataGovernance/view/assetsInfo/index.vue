@@ -78,12 +78,44 @@
               >{{ label }}</span
             >
           </div>
+          <div class="assets-info-b-l-content-item">
+            <label>主题域：</label>
+            <Select
+              @on-change="changeClassifications"
+              v-model="classification.subject"
+              :disabled="isChangingClassifications"
+              clearable
+              style="width:167px"
+            >
+              <Option
+                v-for="(item, idx) in subjectList"
+                :value="item.name"
+                :key="idx"
+              >{{ item.name }}</Option>
+            </Select>
+          </div>
+          <div class="assets-info-b-l-content-item">
+            <label>分层：</label>
+            <Select
+              @on-change="changeClassifications"
+              v-model="classification.layer"
+              :disabled="isChangingClassifications"
+              clearable
+              style="width:167px"
+            >
+              <Option
+                v-for="(item, idx) in layerList"
+                :value="item.name"
+                :key="idx"
+              >{{ item.name }}</Option>
+            </Select>
+          </div>
         </div>
       </div>
       <!-- right -->
 
       <div class="assets-info-b-r">
-        <Tabs type="card">
+        <Tabs type="card" class="assets-tabs">
           <TabPane label="字段信息"
             ><field-info
               :fieldInfo="fieldInfo"
@@ -121,7 +153,10 @@ import {
   getHiveTblBasic,
   getHiveTblPartition,
   postSetLabel,
-  postSetComment
+  postSetComment,
+  getThemedomains,
+  getLayersAll,
+  updateClassifications
 } from "../../service/api";
 
 export default {
@@ -144,7 +179,16 @@ export default {
       singleLabel: "",
       labelOptions: [],
 
-      isCommentEdit: false
+      isCommentEdit: false,
+
+      classification: {
+        subject: '',
+        layer: ''
+      },
+      subjectList: [],
+      layerList: [],
+      isChangingClassifications: false
+
     };
   },
   watch: {
@@ -156,6 +200,14 @@ export default {
   },
   mounted() {
     this.init();
+    getThemedomains().then(res => {
+      let { result } = res
+      this.subjectList = result
+    })
+    getLayersAll().then(res => {
+      let { result } = res
+      this.layerList = result
+    })
   },
   methods: {
     init() {
@@ -163,13 +215,31 @@ export default {
       this.getTblBasic();
       this.getTblPartition();
     },
+    changeClassifications() {
+      const guid = this.$route.params.guid
+      let classifications = []
+      if (this.classification.subject) {
+        classifications.push(this.classification.subject)
+      }
+      if (this.classification.layer){
+        classifications.push(this.classification.layer)
+      }
+      this.isChangingClassifications = true
+      updateClassifications(guid, { newClassifications: classifications }).then(res => {
+        this.isChangingClassifications = false
+        this.$Message.success(res.result)
+      }).catch(err => {
+        console.log(err)
+        this.isChangingClassifications = false
+      })
+    },
     // 获取基本字段信息
     getTblBasic() {
       let guid = this.$route.params.guid;
       getHiveTblBasic(guid)
         .then(data => {
           if (data.result) {
-            const { basic, columns, partitionKeys } = data.result;
+            const { basic, columns, partitionKeys, classifications } = data.result;
             this.basicData = basic;
             this.isParTbl = basic["isParTbl"];
             this.labelOptions = basic["labels"];
@@ -181,6 +251,17 @@ export default {
               item["id"] = idx + 1;
             });
             this.rangeFieldInfo = partitionKeys.slice(0);
+            if(classifications && classifications.length) {
+              classifications.forEach(classification => {
+                if (classification.superTypeNames && classification.superTypeNames.length) {
+                  if (classification.superTypeNames[0] === 'subject') {
+                    this.classification.subject = classification.typeName
+                  } else if (classification.superTypeNames[0] === 'layer' || classification.superTypeNames[0] === 'layer_system') {
+                    this.classification.layer = classification.typeName
+                  }
+                }
+              })
+            }
           }
         })
         .catch(err => {
@@ -303,6 +384,12 @@ export default {
     &-r {
       flex: 1;
       max-width: calc(100% - 250px);
+      .assets-tabs {
+        height: 100%;
+        ::v-deep .ivu-tabs-content {
+          height: 90%;
+        }
+      }
     }
   }
 

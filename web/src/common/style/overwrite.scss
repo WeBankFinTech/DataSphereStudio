@@ -1,5 +1,8 @@
 /*对于iview组件中固定颜色值，无法通过less覆盖，只能添加样式通过deep深度覆盖，统一写在这里*/
 [data-theme="dark"] {
+  body {
+    background-color: $dark-base-color !important;
+  }
   .ivu-tabs-bar {
     border-color: $dark-border-color-base;
   }

@@ -14,6 +14,7 @@ import com.webank.wedatasphere.dss.data.api.server.entity.ApiGroup;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
+import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiResDataInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
@@ -27,7 +28,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -74,6 +74,9 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 //        UpdateWrapper<ApiConfig> apiConfigUpdateWrapper = new UpdateWrapper<ApiConfig>()
 //                .eq("id", id);
         if (id != null) {
+            if(apiConfig.getStatus() == 1){
+                throw new DataApiException("请先下线,测试通过后, 重新发布");
+            }
             apiConfig.setIsTest(0);
             this.updateById(apiConfig);
         } else {
@@ -98,6 +101,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         int pageSize = apiConfig.getPageSize();
         String limitSent = "";
         String sqlText = "";
+        int pageNum = 0;
 
         //组装分页limit
         if(pageSize > 0 ){
@@ -105,7 +109,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if(pageNumObject == null){
                 throw new DataApiException("请设置pageNum参数");
             }
-            int pageNum = Integer.valueOf(pageNumObject.toString());
+            pageNum = Integer.valueOf(pageNumObject.toString());
             if(pageNum < 1){
                 throw new DataApiException("pageNum参数错误");
             }
@@ -133,8 +137,11 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
             if("MYSQL".equals(dataSourceType)){
                 dataSource.setClassName("com.mysql.jdbc.Driver");
             }
-
-            apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize);
+            if(sqlText.toLowerCase().contains("select")){
+                apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize,pageNum);
+            }else {
+                apiExecuteInfo = this.executeSql(2, dataSource, sqlText,limitSent, jdbcParamValues,pageSize,pageNum);
+            }
             if(isTest){
                 apiConfigMapper.updateApiTestStatus(apiConfig.getId(),1);
             }
@@ -162,8 +169,12 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
         if(StringUtils.isAnyBlank(appKey,appSecret)){
             throw new DataApiException("请求header需添加appKey,appSecret");
         }
-        ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path));
+        ApiConfig apiConfig = this.getOne(new QueryWrapper<ApiConfig>().eq("api_path", path).eq("is_delete",0));
         if(apiConfig != null){
+            int status = apiConfig.getStatus();
+            if(status == 0){
+                throw new DataApiException("该服务已下线");
+            }
             long startTime = System.currentTimeMillis();
             apiCall.setApiId(apiConfig.getId().longValue());
             apiCall.setTimeStart(new Date(startTime));
@@ -284,10 +295,11 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
     }
 
 
-    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql,String pageSent, List<Object> jdbcParamValues,int pageSize) throws DataApiException, SQLException {
+    public ApiExecuteInfo executeSql(int isSelect, DataSource datasource, String sql,String pageSent, List<Object> jdbcParamValues,int pageSize,int  pageNum) throws DataApiException, SQLException {
         DruidPooledConnection connection = null;
         StringBuilder logBuilder = new StringBuilder();
         ApiExecuteInfo apiExecuteInfo = new ApiExecuteInfo();
+        ApiResDataInfo apiResDataInfo = new ApiResDataInfo();
         ArrayList<HashMap<String,Object>> list = new ArrayList<>();
         try {
             connection = PoolManager.getPooledConnection(datasource);
@@ -305,11 +317,11 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     String columnName = rs.getMetaData().getColumnLabel(i);
                     columns.add(columnName);
                 }
-                HashMap<String,Object> jo = new HashMap<>();
                 while (rs.next()) {
+                    HashMap<String,Object> jo = new HashMap<>();
                     for (String columnName : columns) {
                         Object value = rs.getObject(columnName);
-                        jo.put(columnName,value == null ? null : value.toString() );
+                        jo.put(columnName,value == null ? null :value.toString() );
                     }
                     list.add(jo);
                 }
@@ -326,22 +338,26 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
                     if ((countRs.next())){
                         int totalRecord = countRs.getInt(1);
                         int totalPage = (totalRecord + pageSize-1) / pageSize;
-                        jo.put("totalPage",totalPage);
+                        apiResDataInfo.setTotalPage(totalPage);
+                        apiResDataInfo.setTotal(totalRecord);
+                        apiResDataInfo.setPageSize(pageSize);
+                        apiResDataInfo.setCurrentPageNum(pageNum);
                     }
                 }
 
             } else {
                 statement.executeUpdate();
             }
-            apiExecuteInfo.setResList(list);
+            apiResDataInfo.setData(list);
         } catch (Exception e){
-            e.printStackTrace();
-           logBuilder.append(e.getMessage());
+            log.error("ERROR", "Error found: ", e);
+            logBuilder.append(e.getMessage());
            throw new DataApiException(logBuilder.toString());
         }finally {
             connection.close();
         }
         apiExecuteInfo.setLog(logBuilder.toString());
+        apiExecuteInfo.setResList(apiResDataInfo);
         return apiExecuteInfo;
     }
 

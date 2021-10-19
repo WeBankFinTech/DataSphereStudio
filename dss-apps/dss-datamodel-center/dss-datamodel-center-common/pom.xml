@@ -64,6 +64,12 @@
             <version>1.0.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>data-assets-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
 
     </dependencies>
 

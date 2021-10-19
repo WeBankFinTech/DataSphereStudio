@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.datamodel.center.common.config;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
 import com.webank.wedatasphere.linkis.httpclient.config.ClientConfig;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
@@ -47,5 +48,23 @@ public class CommonConfig {
         return new GovernanceDwRemoteClient(clientConfig);
     }
 
+    @Bean
+    public LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient(){
+        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
+                .addServerUrl(DataWarehouseAssetsRemoteConfig.SERVER_URL.getValue())
+                .connectionTimeout(DataWarehouseAssetsRemoteConfig.CONNECTION_TIMEOUT.getValue())
+                .discoveryEnabled(DataWarehouseAssetsRemoteConfig.DISCOVERY_ENABLED.getValue())
+                .discoveryFrequency(DataWarehouseAssetsRemoteConfig.DISCOVERY_FREQUENCY_PERIOD.getValue(), TimeUnit.MINUTES)
+                .loadbalancerEnabled(DataWarehouseAssetsRemoteConfig.LOAD_BALANCER_ENABLED.getValue())
+                .maxConnectionSize(DataWarehouseAssetsRemoteConfig.MAX_CONNECTION_SIZE.getValue())
+                .retryEnabled(DataWarehouseAssetsRemoteConfig.RETRY_ENABLED.getValue())
+                .readTimeout(DataWarehouseAssetsRemoteConfig.READ_TIMEOUT.getValue())
+                .setAuthenticationStrategy(new StaticAuthenticationStrategy())
+                .setAuthTokenKey(DataWarehouseAssetsRemoteConfig.AUTHTOKEN_KEY.getValue())
+                .setAuthTokenValue(DataWarehouseAssetsRemoteConfig.AUTHTOKEN_VALUE.getValue())
+        ).setDWSVersion(DataWarehouseAssetsRemoteConfig.DWS_VERSION.getValue())
+                .build();
+        return  new LinkisDataAssetsRemoteClient(clientConfig);
+    }
 
 }

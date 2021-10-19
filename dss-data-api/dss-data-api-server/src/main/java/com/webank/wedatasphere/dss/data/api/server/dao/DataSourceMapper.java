@@ -19,4 +19,6 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     void deleteById(Integer id);
 
     void editDatasource(DataSource dataSource);
+
+    int dataSourceUsingCount(Integer id);
 }

@@ -23,4 +23,6 @@ public interface ApiDataSourceService extends IService<DataSource> {
     void deleteById(Integer datasourceId);
 
     void editDatasource(DataSource dataSource);
+
+    boolean isDataSourceUsing(Integer id);
 }

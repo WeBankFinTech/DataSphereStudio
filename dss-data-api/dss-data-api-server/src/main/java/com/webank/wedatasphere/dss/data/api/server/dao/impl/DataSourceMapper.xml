@@ -100,5 +100,8 @@
         </set>
         where id = #{datasourceId}
     </update>
+    <select id="dataSourceUsingCount" parameterType="Integer" resultType="int">
+    SELECT COUNT(1) FROM  dss_dataapi_config WHERE is_delete=0 AND datasource_id=#{datasourceId}
+    </select>
 
 </mapper>

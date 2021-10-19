@@ -17,7 +17,8 @@
           :favorites="favorites" 
           @menu-click="handleMenuClick"
           @favorite-remove="removeFavorite" 
-          @favorite-add="addFavorite">
+          @favorite-add="addFavorite"
+          ref="vueLubanMenu">
           <div class="luban-menu-trigger">
             <img src="../../assets/images/luban-menu-trigger.png">
           </div>
@@ -192,7 +193,10 @@ export default {
       return moudleName;
     },
     showWorkspaceNav() {
-      return (this.$route.path.indexOf("/workspaceHome") !== -1) || this.$route.path === '/project' || this.$route.path === '/workspace'
+      return (this.$route.path.indexOf("/workspaceHome") !== -1) 
+        || (this.$route.path.indexOf("/dataService") !== -1) 
+        || (this.$route.path.indexOf("/dataManagement") !== -1) 
+        || this.$route.path === '/project' || this.$route.path === '/workspace'
     }
   },
   watch: {
@@ -208,7 +212,6 @@ export default {
         this.getWorkspacesRoles().then(res => {
           // cookies改变最新后再执行其他方法
           if(res) {
-            
             this.getApplications();
             this.getWorkspaces();
             this.getWorkspaceFavorites();
@@ -328,7 +331,7 @@ export default {
       return arr;
     },
     handleOutsideClick() {
-      if(this.$parent.$children[3].currentStep !== 6){
+      if(this.$parent.$refs.newGuidance && this.$parent.$refs.newGuidance.currentStep !== 6){
         this.isUserMenuShow = false;
       }
     },
@@ -383,6 +386,17 @@ export default {
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
       if (["/process"].includes(this.$route.path)) {
         this.$router.replace({ path: "/workspace" });
+      } else if ((this.$route.path.indexOf("/dataService") !== -1) || (this.$route.path.indexOf("/dataManagement") !== -1)) {
+        // 数据服务切换workspace通过一个redirect路由来实现页面的刷新，避免在每个页面都watch route
+        this.currentWorkspace = workspace;
+        storage.set("currentWorkspace", workspace);
+        this.$router.replace({
+          path: '/redirect' + this.$route.path,
+          query: {
+            ...this.$route.query,
+            workspaceId: workspace.id
+          }
+        });
       } else {
         this.$router.replace({
           path: this.$route.path,

@@ -28,6 +28,7 @@
         :current="pageData.pageNow"
         show-elevator
         show-sizer
+        show-total
         @on-change="handlePageChange"
         @on-page-size-change="handlePageSizeChange"
       />
@@ -64,6 +65,7 @@
           prop="caller">
           <Input
             v-model="authFormData.caller"
+            @on-change="changeCaller"
             :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
@@ -88,7 +90,7 @@
             v-model="authFormData.expireDate"></Date-picker>
         </Form-item>
         <Form-item :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
-          <Select v-model="authFormData.groupId">
+          <Select v-model="authFormData.groupId" :disabled="!!authFormData.id">
             <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">
               {{ item.groupName}}
             </Option>
@@ -103,6 +105,7 @@
   </div>
 </template>
 <script>
+import util from '../common/util';
 import api from "@/common/service/api";
 export default {
   data() {
@@ -121,13 +124,17 @@ export default {
           key: 'groupName'
         },
         {
-          title: 'Token',
+          title: this.$t("message.dataService.apiCall.col_token"),
           key: 'token',
           width: '300'
         },
         {
           title: this.$t("message.dataService.apiCall.col_expire"),
           key: 'expire'
+        },
+        {
+          title: this.$t("message.dataService.apiCall.col_updateTime"),
+          key: 'updateTime'
         },
         {
           title: this.$t("message.dataService.apiCall.col_createTime"),
@@ -199,13 +206,6 @@ export default {
     this.getApiCallList();
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     getApiGroup() {
       api.fetch('/dss/data/api/apiauth/apigroup', {
         workspaceId: this.$route.query.workspaceId,
@@ -237,6 +237,11 @@ export default {
     addAuthorize() {
       this.modalAuthShow = true;
     },
+    changeCaller(e) {
+      this.$nextTick(() => {
+        this.authFormData.caller = this.authFormData.caller.replace(/[\u4e00-\u9fa5]/g,''); // 登录用户名不允许中文
+      })
+    },
     authCancel() {
       this.modalAuthShow = false;
       this.authFormData = {
@@ -256,10 +261,10 @@ export default {
             groupId: this.authFormData.groupId,
           }
           if (this.authFormData.expire == 'short') {
-            data.expire = `${this.dateFormat(this.authFormData.expireDate)} 00:00:00`;
+            data.expire = `${util.dateFormat(this.authFormData.expireDate, '23:59:59')}`;
           } else if (this.authFormData.expire == 'long') {
             const date = new Date(Date.now() + 365*86400*1000)
-            data.expire = `${this.dateFormat(date)} 00:00:00`;
+            data.expire = `${util.dateFormat(date, '23:59:59')}`;
           }
           if (this.authFormData.id) {
             data.id = this.authFormData.id;
@@ -283,7 +288,9 @@ export default {
       this.authFormData = {
         id: auth.id,
         caller: auth.caller,
-        groupId: auth.groupId
+        groupId: `${auth.groupId}`,
+        expire: 'short', // 统一归属到短期
+        expireDate: auth.expire
       }
     },
     deleteApi(row) {
@@ -296,7 +303,7 @@ export default {
     },
     deleteConfirm() {
       this.modalConfirm = false;
-      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'delete').then((res) => {
+      api.fetch(`/dss/data/api/apiauth/${this.selectedApi.id}`, {}, 'post').then((res) => {
         this.getApiCallList();
       }).catch((err) => {
         console.error(err)
@@ -319,6 +326,7 @@ export default {
   position: relative;
   padding: 0 24px;
   overflow: hidden;
+  min-height: calc(100% - 78px);
   @include bg-color(#fff, $dark-base-color);
   .manage-head {
     margin-bottom: 15px;

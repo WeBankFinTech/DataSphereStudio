@@ -52,6 +52,9 @@
                 <template slot-scope="{ index }" slot="rank">
                   <span>{{index + 1}}</span>
                 </template>
+                <template slot-scope="{ row }" slot="failRate">
+                  <span>{{`${row.failRate}%`}}</span>
+                </template>
               </Table>
               <Spin v-show="loadingRate" size="large" fix/>
             </div>
@@ -90,6 +93,7 @@
                   :current="pageData.pageNow"
                   show-elevator
                   show-sizer
+                  show-total
                   @on-change="handlePageChange"
                   @on-page-size-change="handlePageSizeChange"
                 />
@@ -108,6 +112,8 @@ import echarts from 'echarts';
 import api from "@/common/service/api";
 import rangeGroup from '../common/rangeGroup.vue';
 import monitorChart from './monitorChart.vue';
+import util from '../common/util';
+import eventbus from '@/common/helper/eventbus';
 export default {
   components: {
     rangeGroup,
@@ -133,8 +139,13 @@ export default {
           key: 'totalCnt'
         },
         {
+          title: this.$t("message.dataService.apiMonitor.col_failCnt"),
+          key: 'failCnt'
+        },
+        {
           title: this.$t("message.dataService.apiMonitor.col_failRate"),
-          key: 'failRate'
+          key: 'failRate',
+          slot: 'failRate'
         }
       ],
       columnsCnt: [
@@ -222,23 +233,23 @@ export default {
     this.getRangeScreenData();
     this.getCallListDetail();
     window.addEventListener('resize', this.chartResize)
+    eventbus.on('monaco.change', this.changeTheme);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.chartResize)
+    eventbus.off('monaco.change', this.changeTheme);
   },
   methods: {
-    dateFormat(date) {
-      const dt = date ? date : new Date();
-      const format = [
-        dt.getFullYear(), dt.getMonth() + 1, dt.getDate()
-      ].join('-').replace(/(?=\b\d\b)/g, '0'); // 正则补零
-      return `${format} 00:00:00`;
-    },
     changeTab(tab) {
       this.currentTab = tab;
     },
     chartResize() {
       this.currentTab == 'screen' && this.echart && this.echart.resize();
+    },
+    changeTheme(theme) {
+      if (this.echart) {
+        this.drawResourceChart(theme)
+      }
     },
     getResource24Hour() {
       this.loadingChart = true;
@@ -246,15 +257,15 @@ export default {
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.dataPast24Hour = res.list;
-        this.drawResourceChart();
+        this.drawResourceChart(localStorage.getItem('theme'));
         this.loadingChart = false;
       }).catch((err) => {
         console.error(err)
         this.loadingChart = false;
       });
     },
-    drawResourceChart() {
-      this.echart = echarts.init(this.$refs.resourceLine)
+    drawResourceChart(theme) {
+      this.echart = this.echart ? this.echart : echarts.init(this.$refs.resourceLine)
       var option = {
         grid: {
           left: 100,
@@ -270,6 +281,14 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
+          axisLine: {
+            lineStyle: {
+              color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#ccc"
+            }
+          },
           data: this.dataPast24Hour.map(i => i.key)
         },
         yAxis: {
@@ -280,10 +299,13 @@ export default {
           axisTick: {
             show: false
           },
+          axisLabel: {
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333"
+          },
           name: "请求数目(平均QPS)",
           nameLocation: "middle",
           nameTextStyle: {
-            color: "#333",
+            color: theme == 'dark' ? "rgba(255,255,255,0.85)" : "#333",
             fontSize: 16,
             verticalAlign: "top",
           },
@@ -318,8 +340,8 @@ export default {
     },
     getRangeScreenData(date) {
       const range = date || {
-        startTime: this.dateFormat(new Date(Date.now() - 7*86400*1000)),
-        endTime: this.dateFormat()
+        startTime: util.dateFormat(new Date(Date.now() - 7*86400*1000)),
+        endTime: util.dateFormat(new Date(), '23:59:59')
       }
       this.getCallTotalCnt(range);
       this.getCallTotalTime(range);
@@ -347,8 +369,8 @@ export default {
     getCallListByCnt() {
       this.loadingCnt = true;
       api.fetch('/dss/data/api/apimonitor/callListByCnt', {
-        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
-        endTime: this.dateFormat(),
+        startTime: util.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: util.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listCnt = res.list;
@@ -361,8 +383,8 @@ export default {
     getCallListByFailRate() {
       this.loadingRate = true;
       api.fetch('/dss/data/api/apimonitor/callListByFailRate', {
-        startTime: this.dateFormat(new Date(Date.now() - 86400*1000)),
-        endTime: this.dateFormat(),
+        startTime: util.dateFormat(new Date(Date.now() - 86400*1000)),
+        endTime: util.dateFormat(),
         workspaceId: this.$route.query.workspaceId
       }, 'get').then((res) => {
         this.listRate = res.list;
@@ -409,6 +431,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .monitor-wrap {
+  height: 100%;
   min-height: calc(100% - 78px);
   position: relative;
   .monitor-holder {
@@ -416,6 +439,7 @@ export default {
     @include bg-color(#fff, $dark-base-color);
   }
   .tab-wrap {
+    min-height: 100%;
     margin-top: -36px;
     padding: 0 24px;
   }
@@ -425,6 +449,7 @@ export default {
   margin-bottom: 24px;
   .metrics {
     flex: 1;
+    width: 100%;
     @include bg-color(#fff, $dark-menu-base-color);
     border-radius: 2px;
     .metrics-dashboard {

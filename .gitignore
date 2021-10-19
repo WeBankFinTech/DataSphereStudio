@@ -77,3 +77,5 @@ logs/*
 
 *.iml
 /plugins/dolphinscheduler/linkis-dolphinscheduler-client/target/
+
+web/yarn.lock

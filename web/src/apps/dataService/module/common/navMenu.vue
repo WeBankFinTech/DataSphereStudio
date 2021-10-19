@@ -71,7 +71,6 @@ export default {
     },
 
     showModal(pyload) {
-      console.log("addApi");
       this.$emit("showModal", pyload);
     },
     handleApiChoosed(pyload) {

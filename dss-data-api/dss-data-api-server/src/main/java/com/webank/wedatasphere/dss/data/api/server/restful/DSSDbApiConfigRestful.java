@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
 import com.webank.wedatasphere.dss.data.api.server.util.RestfulUtils;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
@@ -56,7 +57,6 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 保存api配置信息
-     *
      * @param request
      * @param apiConfig
      * @return
@@ -64,7 +64,9 @@ public class DSSDbApiConfigRestful {
     @POST
     @Path("save")
     public Response saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
-//        String username = SecurityFilter.getLoginUsername(request);
+        String username = SecurityFilter.getLoginUsername(request);
+        apiConfig.setCreateBy(username);
+        apiConfig.setUpdateBy(username);
         apiConfigService.saveApi(apiConfig);
         Message message = Message.ok();
         return Message.messageToResponse(message);
@@ -72,16 +74,14 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 创建API 组
-     *
      * @param apiGroup
      * @return
      */
     @POST
     @Path("/group/create")
-    public Response saveGroup(@Valid @RequestBody ApiGroup apiGroup) {
-//        String username = SecurityFilter.getLoginUsername(request);
-        String userName = "demo";
-        apiGroup.setCreateBy(userName);
+    public Response saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
+        String username = SecurityFilter.getLoginUsername(request);
+        apiGroup.setCreateBy(username);
         apiConfigService.addGroup(apiGroup);
         Message message = Message.ok().data("groupId", apiGroup.getId());
         return Message.messageToResponse(message);
@@ -89,7 +89,6 @@ public class DSSDbApiConfigRestful {
 
     /**
      * API list
-     *
      * @param workspaceId
      * @return
      */
@@ -103,7 +102,6 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 查询api详情
-     *
      * @param apiId
      * @return
      */
@@ -118,7 +116,6 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 测试 API
-     *
      * @param request
      * @param path
      * @param map
@@ -134,29 +131,15 @@ public class DSSDbApiConfigRestful {
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 
     }
 
-    /**
-     * 服务发布/下线
-     *
-     * @param request
-     * @return
-     */
-    @POST
-    @Path("release")
-    public Response releaseApi(@Context HttpServletRequest request, JsonNode jsonNode) {
-        Integer status = jsonNode.get("status").getValueAsInt();
-        String apiId = jsonNode.get("apiId").getTextValue();
-        apiConfigService.release(status, apiId);
-        return Message.messageToResponse(Message.ok());
-    }
 
     /**
      * 第三方调用 api
-     *
      * @param request
      * @param path
      * @param map
@@ -169,8 +152,8 @@ public class DSSDbApiConfigRestful {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
-
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 

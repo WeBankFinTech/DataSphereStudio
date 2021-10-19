@@ -126,6 +126,7 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
             false
           })
           if(killTag)
+            killTag = false
             return RefExecutionState.Killed
         }
         action.state

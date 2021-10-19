@@ -57,8 +57,8 @@ export default {
           id: 4,
           name: "数仓规划",
           children: [
-            { id: 41, name: "主题域配置" },
-            { id: 42, name: "分层配置" }
+            { id: 41, name: "主题域配置", pathName: "dataGovernance/subjectDomain" },
+            { id: 42, name: "分层配置", pathName: "dataGovernance/layered" }
           ]
         },
         { id: 5, name: "数据质量", children: [] },

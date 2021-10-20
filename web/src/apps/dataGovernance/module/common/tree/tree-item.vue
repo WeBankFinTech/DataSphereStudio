@@ -1,16 +1,17 @@
 <template>
   <div class="tree-item">
-    <div class="tree-content">
+    <div class="tree-content" @click="handleItemToggle">
       <div class="tree-icon" v-if="model.id < 10">
-        <SvgIcon
-          v-if="model.opened"
-          icon-class="open"
-          @click="handleItemToggle"
-        />
-        <SvgIcon v-else icon-class="close" @click="handleItemToggle" />
+        <SvgIcon v-if="model.opened" icon-class="open" />
+        <SvgIcon v-else icon-class="close" />
       </div>
       <div class="tree-icon tree-children-icon" v-if="model.id > 10">
-        <SvgIcon icon-class="flow" />
+        <!-- <SvgIcon icon-class="flow" :color="'#2e92f7'" /> -->
+        <SvgIcon
+          icon-class="flow"
+          :class="{ 'tree-icon-active': currentTreeId == model.id }"
+          :color="currentTreeId == model.id ? '#2e92f7' : ''"
+        />
       </div>
       <div
         class="tree-name"
@@ -52,7 +53,8 @@ export default {
   data() {
     return {
       model: this.data,
-      maxHeight: 0
+      maxHeight: 0,
+      itemClickid: 0
     };
   },
   computed: {
@@ -73,6 +75,8 @@ export default {
   },
   methods: {
     handleItemClick(e) {
+      const { id } = this.model;
+      this.itemClickid = id;
       this.onItemClick(this.model);
     },
     handleItemToggle(e) {
@@ -155,6 +159,10 @@ export default {
     // @include bg-color(#edf1f6, $dark-active-menu-item);
     // color: rgb(45, 140, 240);
     @include font-color($primary-color, $dark-primary-color);
+  }
+
+  .tree-icon-active {
+    color: #2e92f7;
   }
   .tree-children {
     transition: max-height 0.3s;

@@ -42,7 +42,13 @@
       <Modal v-model="DDLflag" title="生成DDL语句" width="576">
         <template v-slot:footer>
           <div>
-            <Button data-name="ddl" type="primary" @click="e => copy(e, DDLsql)"
+            <Button
+              data-name="ddl"
+              type="primary"
+              id="copy-button"
+              data-clipboard-action="copy"
+              data-clipboard-target="#copy-button"
+              @click="e => copy(e, DDLsql)"
               >复制</Button
             >
           </div>
@@ -108,6 +114,11 @@ export default {
                     that.fieldInfoData[params.index].comment =
                       event.target.value;
                   }
+                },
+                style: {
+                  border: "1px solid #dee4ec",
+                  "border-radius": "4px",
+                  "padding-left": "12px"
                 }
               });
             } else {
@@ -136,6 +147,11 @@ export default {
                     that.rangeInfoData[params.index].comment =
                       event.target.value;
                   }
+                },
+                style: {
+                  border: "1px solid #dee4ec",
+                  "border-radius": "4px",
+                  "padding-left": "12px"
                 }
               });
             } else {
@@ -291,5 +307,35 @@ export default {
       margin-right: 6px;
     }
   }
+}
+
+::v-deep .ivu-table-wrapper {
+  border: none;
+}
+::v-deep .ivu-table:after {
+  width: 0;
+}
+
+::v-deep .ivu-table-large th {
+  height: 0px;
+}
+
+::v-deep .ivu-table-large td {
+  height: 0px;
+}
+
+::v-deep .ivu-table th {
+  height: 0px;
+}
+
+::v-deep .ivu-table td {
+  height: 0px;
+}
+
+::v-deep .ivu-table-cell {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 </style>

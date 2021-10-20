@@ -15,7 +15,11 @@
     <div class="tab-card-b">
       <span style="width: 110px">负责人：{{ model.owner }}</span>
       <span style="width: 210px">创建时间：{{ model.createTime }}</span>
-      <!-- <span style="width: 210px">更新时间：{{ model.updateTime }}</span> -->
+      <span style="width: 110px">数据库：{{ model.dbName }}</span>
+      <div>
+        <span style="width: 110px">主题域：{{ subject }}</span>
+        <span style="width: 110px">分层：{{ layer }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -29,9 +33,53 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      modal: []
+    };
+  },
   methods: {
     onChoose() {
       this.$emit("on-choose", this.model);
+    }
+  },
+  computed: {
+    subject: function() {
+      let classifications = this.model.classifications;
+      let subject = "";
+      if (classifications && classifications.length) {
+        classifications.forEach(classification => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (classification.superTypeNames[0] === "subject") {
+              subject = classification.typeName;
+            }
+          }
+        });
+      }
+      return subject;
+    },
+    layer: function() {
+      let classifications = this.model.classifications;
+      let layer = "";
+      if (classifications && classifications.length) {
+        classifications.forEach(classification => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (
+              classification.superTypeNames[0] === "layer" ||
+              classification.superTypeNames[0] === "layer_system"
+            ) {
+              layer = classification.typeName;
+            }
+          }
+        });
+      }
+      return layer;
     }
   }
 };
@@ -83,7 +131,7 @@ export default {
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
-    display: flex;
+    overflow: hidden;
     span {
       margin-right: 80px;
       color: rgba(0, 0, 0, 0.65);

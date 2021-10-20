@@ -6,7 +6,7 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars;
 public class DataWarehouseGovernanceConfig {
     public static final CommonVars<String> SERVER_URL = CommonVars.apply("wds.wedatasphere.warehouse.client.serverurl", "");
     public static final CommonVars<Long> CONNECTION_TIMEOUT = CommonVars.apply("wds.wedatasphere.warehouse.client.connection.timeout", 30000L);
-    public static final CommonVars<Boolean> DISCOVERY_ENABLED = CommonVars.apply("wds.wedatasphere.warehouse.client.discovery.enabled", true);
+    public static final CommonVars<Boolean> DISCOVERY_ENABLED = CommonVars.apply("wds.wedatasphere.warehouse.client.discovery.enabled", false);
     public static final CommonVars<Long> DISCOVERY_FREQUENCY_PERIOD = CommonVars.apply("wds.wedatasphere.warehouse.client.discoveryfrequency.period", 1L);
     public static final CommonVars<Boolean> LOAD_BALANCER_ENABLED = CommonVars.apply("wds.wedatasphere.warehouse.client.loadbalancer.enabled", true);
     public static final CommonVars<Integer> MAX_CONNECTION_SIZE = CommonVars.apply("wds.wedatasphere.warehouse.client.maxconnection.size", 5);

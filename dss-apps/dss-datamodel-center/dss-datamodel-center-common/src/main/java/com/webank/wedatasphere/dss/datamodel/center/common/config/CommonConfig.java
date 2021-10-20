@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.datamodel.center.common.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
-import com.webank.wedatasphere.linkis.datasource.client.impl.LinkisDataSourceRemoteClient;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;

@@ -40,5 +40,35 @@ export default {
 .range-info-wrap {
   padding-left: 24px;
   padding-top: 24px;
+  padding-right: 24px;
+}
+::v-deep .ivu-table-wrapper {
+  border: none;
+}
+::v-deep .ivu-table:after {
+  width: 0;
+}
+
+::v-deep .ivu-table-large th {
+  height: 0px;
+}
+
+::v-deep .ivu-table-large td {
+  height: 0px;
+}
+
+::v-deep .ivu-table th {
+  height: 0px;
+}
+
+::v-deep .ivu-table td {
+  height: 0px;
+}
+
+::v-deep .ivu-table-cell {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 </style>

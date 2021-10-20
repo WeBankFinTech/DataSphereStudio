@@ -3,8 +3,7 @@ package com.webank.wedatasphere.dss.data.governance.request
 import com.webank.wedatasphere.dss.data.governance.exception.DataAssetsClientBuilderException
 import com.webank.wedatasphere.linkis.httpclient.request.GetAction
 
-class GetHiveTblPartitionAction extends GetAction with DataAssetsAction{
-
+class GetHiveTblCreateAction extends GetAction with DataAssetsAction{
   private var guid:String=_
 
   private var user:String = _
@@ -13,12 +12,11 @@ class GetHiveTblPartitionAction extends GetAction with DataAssetsAction{
 
   override def getUser: String = this.user
 
-  override def suffixURLs: Array[String] = Array("data-assets", "asset", "hiveTbl",guid,"partition")
+  override def suffixURLs: Array[String] = Array("data-assets", "asset", "hiveTbl",guid,"create")
 }
-object GetHiveTblPartitionAction{
+object GetHiveTblCreateAction{
   def builder(): Builder = new Builder
-
-  class Builder private[GetHiveTblPartitionAction]() {
+  class Builder private[GetHiveTblCreateAction]() {
     private var guid:String = _
     private var user: String = _
 
@@ -32,8 +30,8 @@ object GetHiveTblPartitionAction{
       this
     }
 
-    def build(): GetHiveTblPartitionAction = {
-      val action = new GetHiveTblPartitionAction
+    def build(): GetHiveTblCreateAction = {
+      val action = new GetHiveTblCreateAction
       if(guid == null) throw new DataAssetsClientBuilderException("guid is needed!")
       action.guid = guid
       action.setUser(user)

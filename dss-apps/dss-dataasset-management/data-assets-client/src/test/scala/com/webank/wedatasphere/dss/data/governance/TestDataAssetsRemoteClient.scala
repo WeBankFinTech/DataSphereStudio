@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.data.governance
 
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
-import com.webank.wedatasphere.dss.data.governance.request.{GetHiveTblBasicAction, GetHiveTblPartitionAction, SearchHiveTblAction}
+import com.webank.wedatasphere.dss.data.governance.request.{GetHiveTblBasicAction, GetHiveTblCreateAction, GetHiveTblPartitionAction, SearchHiveTblAction}
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
 
@@ -34,5 +34,8 @@ object TestDataAssetsRemoteClient {
 
     val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
     println(hiveTblPartitionResult)
+
+    val hiveTblCreateResult = dataAssetsClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
+    println(hiveTblCreateResult)
   }
 }

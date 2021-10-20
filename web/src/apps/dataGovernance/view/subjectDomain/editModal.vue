@@ -7,7 +7,7 @@
       label-position="top"
     >
       <FormItem label="名称" prop="name">
-        <Input v-model="formState.name" placeholder="名称"></Input>
+        <Input v-model="formState.name" placeholder="名称" :disabled="mode === 'edit'"></Input>
       </FormItem>
       <!--<FormItem label="英文名" prop="enName">
         <Input v-model="formState.enName" placeholder="英文名"></Input>

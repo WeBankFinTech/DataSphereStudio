@@ -96,8 +96,11 @@ export default {
     },
     async handleDelete(id) {
       this.loading = true
-      await deleteThemedomains(id)
-      this.loading = false
+      await deleteThemedomains(id).then(res => {
+        this.loading = false
+      }).catch(err => {
+        this.loading = false
+      })
       this.handleGetData()
     },
     handleEdit(name) {

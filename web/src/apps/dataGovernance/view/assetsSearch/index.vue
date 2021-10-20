@@ -34,6 +34,7 @@
             :remote-method="remoteSearchOwner"
             :loading="owerSerachLoading"
             style="width:167px"
+            @on-change="selectOwner"
           >
             <Option
               v-for="(item, idx) in ownerList"
@@ -58,20 +59,23 @@
             v-model="searchOption.classification"
             clearable
             style="width:167px"
+            @on-select="selectSubject"
           >
             <OptionGroup label="主题域">
               <Option
                 v-for="(item, idx) in subjectList"
                 :value="item.name"
                 :key="idx"
-              >{{ item.name }}</Option>
+                >{{ item.name }}</Option
+              >
             </OptionGroup>
             <OptionGroup label="分层">
               <Option
                 v-for="(item, idx) in layerList"
                 :value="item.name"
                 :key="idx"
-              >{{ item.name }}</Option>
+                >{{ item.name }}</Option
+              >
             </OptionGroup>
           </Select>
         </div>
@@ -93,7 +97,12 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
-import { getHiveTbls, getWorkspaceUsers, getLayersAll, getThemedomains } from "../../service/api";
+import {
+  getHiveTbls,
+  getWorkspaceUsers,
+  getLayersAll,
+  getThemedomains
+} from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
 import { throttle } from "lodash";
@@ -130,6 +139,16 @@ export default {
         .catch(err => {
           console.log("Search", err);
         });
+    } else {
+      getHiveTbls({})
+        .then(data => {
+          if (data.result) {
+            this.cardTabs = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("Search", err);
+        });
     }
   },
   mounted() {
@@ -139,13 +158,13 @@ export default {
     }, 300);
     window.addEventListener("scroll", this.throttleLoad);
     getThemedomains().then(res => {
-      let { result } = res
-      this.subjectList = result
-    })
+      let { result } = res;
+      this.subjectList = result;
+    });
     getLayersAll().then(res => {
-      let { result } = res
-      this.layerList = result
-    })
+      let { result } = res;
+      this.layerList = result;
+    });
   },
   destroyed() {
     window.removeEventListener("scroll", this.throttleLoad);
@@ -289,6 +308,18 @@ export default {
         // 拉数据
         this.handleReachBottom();
       }
+    },
+
+    // 搜索負責人
+    selectOwner(value) {
+      this.searchOption.owner = value;
+      this.onSearch();
+    },
+
+    // 搜索主題域/分層
+    selectSubject(value) {
+      this.searchOption.classification = value;
+      this.onSearch();
     }
   }
 };

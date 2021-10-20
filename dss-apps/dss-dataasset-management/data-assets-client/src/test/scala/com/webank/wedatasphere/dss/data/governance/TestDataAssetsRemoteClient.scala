@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 object TestDataAssetsRemoteClient {
   def main(args: Array[String]): Unit = {
     val clientConfig = DWSClientConfigBuilder.newBuilder()
-      .addServerUrl("http://121.36.12.247:8088")
+      .addServerUrl("http://localhost:8088")
       .connectionTimeout(30000)
       .discoveryEnabled(false)
       .discoveryFrequency(1,TimeUnit.MINUTES)

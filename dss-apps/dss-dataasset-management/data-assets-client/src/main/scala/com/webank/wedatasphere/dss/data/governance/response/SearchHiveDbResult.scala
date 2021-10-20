@@ -8,8 +8,8 @@ import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
 import java.util
 import scala.beans.BeanProperty
 
-@DWSHttpMessageResult("/api/rest_j/v\\d+/data-assets/asset/hiveTbl/search")
-class SearchHiveTblResult extends DWSResult{
+@DWSHttpMessageResult("/api/rest_j/v\\d+/data-assets/asset/hiveDb/search")
+class SearchHiveDbResult extends DWSResult{
   @BeanProperty var result:util.List[java.util.Map[String, Any]] = _
 
   def getHiveList: util.List[HiveSimpleInfo] ={

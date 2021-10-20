@@ -174,4 +174,14 @@ public class AtlasService {
 
         return result;
     }
+    /**
+     * 获取hive db对象
+     */
+    public List<AtlasEntityHeader> searchHiveDb(String classification, String query,
+                                                boolean excludeDeletedEntities, int limit, int offset) throws AtlasServiceException{
+        String jsonStr =atlasClient.basicSearchForString("hive_db",classification,query,excludeDeletedEntities,limit,offset);
+        AtlasSearchResult atlasSearchResult = gson.fromJson(jsonStr, AtlasSearchResult.class);
+
+        return atlasSearchResult.getEntities();
+    }
 }

@@ -2,8 +2,8 @@ package com.webank.wedatasphere.dss.data.governance.request
 
 import com.webank.wedatasphere.linkis.httpclient.request.GetAction
 
-class SearchHiveTblAction extends GetAction with DataAssetsAction{
-  override def suffixURLs: Array[String] = Array("data-assets", "asset", "hiveTbl","search")
+class SearchHiveDbAction extends GetAction with DataAssetsAction{
+  override def suffixURLs: Array[String] = Array("data-assets", "asset", "hiveDb","search")
 
   private var user:String = _
 
@@ -12,10 +12,10 @@ class SearchHiveTblAction extends GetAction with DataAssetsAction{
   override def getUser: String = this.user
 
 }
-object SearchHiveTblAction{
+object SearchHiveDbAction{
   def builder(): Builder = new Builder
 
-  class Builder private[SearchHiveTblAction]() {
+  class Builder private[SearchHiveDbAction]() {
     private var classification:String=_
     private var query:String=_
     private var owner:String=_
@@ -53,8 +53,8 @@ object SearchHiveTblAction{
       this
     }
 
-    def build(): SearchHiveTblAction = {
-      val action = new SearchHiveTblAction
+    def build(): SearchHiveDbAction = {
+      val action = new SearchHiveDbAction
 
       if(classification != null) action.setParameter("classification",classification)
       if(query!=null) action.setParameter("query",query)
@@ -69,3 +69,4 @@ object SearchHiveTblAction{
     }
   }
 }
+

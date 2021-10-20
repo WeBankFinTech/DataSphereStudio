@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.data.governance.service;
 
 import com.webank.wedatasphere.dss.data.governance.entity.*;
+import com.webank.wedatasphere.dss.data.governance.exception.DAOException;
 import com.webank.wedatasphere.dss.data.governance.exception.DataGovernanceException;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 
@@ -14,6 +15,9 @@ public interface AssetService {
     public Map<String,Integer> getHiveSummary() throws DataGovernanceException;
 
     public List<HiveTblSimpleInfo> searchHiveTable(String classification, String query,
+                                                   int limit, int offset) throws DataGovernanceException;
+
+    public List<HiveTblSimpleInfo> searchHiveDb(String classification, String query,
                                                    int limit, int offset) throws DataGovernanceException;
 
     public HiveTblDetailInfo getHiveTblDetail(String guid) throws DataGovernanceException ;
@@ -36,6 +40,6 @@ public interface AssetService {
      */
     public AtlasLineageInfo getHiveTblLineage(final String guid, final AtlasLineageInfo.LineageDirection direction, final int depth) throws DataGovernanceException;
 
-    public List<TableInfo> getTop10Table () throws DataGovernanceException, SQLException;
+    public List<TableInfo> getTop10Table () throws DataGovernanceException, SQLException, DAOException;
 
 }

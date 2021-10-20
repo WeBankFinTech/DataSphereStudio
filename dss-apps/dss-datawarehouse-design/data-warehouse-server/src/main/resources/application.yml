@@ -6,7 +6,10 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka:20303/eureka/
+      defaultZone: http://localhost:20303/eureka/
+  instance:
+    metadata-map:
+      test: wedatasphere
 
 management:
   endpoints:
@@ -15,6 +18,3 @@ management:
         include: refresh,info
 logging:
   config: classpath:log4j2.xml
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

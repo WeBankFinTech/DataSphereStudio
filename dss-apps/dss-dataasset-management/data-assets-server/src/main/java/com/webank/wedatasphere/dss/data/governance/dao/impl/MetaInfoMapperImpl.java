@@ -16,18 +16,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class MetaInfoMapperImpl implements MetaInfoMapper {
     @Override
-    public Integer getTableStorage() throws SQLException {
+    public Integer getTableStorage() throws DAOException {
         DataSource dataSource = DataSourceUtil.getDataSource();
 
-        Connection con =dataSource.getConnection();
         int num=0;
         PreparedStatement ps=null;
         ResultSet rs=null;
-        try {
+        try(Connection con=dataSource.getConnection()) {
             String sql="select SUM(PARAM_VALUE) from TABLE_PARAMS WHERE PARAM_KEY='totalSize'";
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
@@ -40,25 +40,20 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             while (rs.next()){
                 num= num+rs.getInt(1);
             }
-
-        } catch (DAOException | SQLException e){
-            throw  new DAOException(e.getMessage(),e);
+        }catch (SQLException e){
+            throw new DAOException(23001,e.getMessage());
         }
-        finally {
-            con.close();
-        }
-
         return num;
     }
 
     @Override
-    public List<TableInfo> getTop10Table()  throws  SQLException{
+    public List<TableInfo> getTop10Table()  throws  DAOException{
         DataSource dataSource = DataSourceUtil.getDataSource();
-        Connection con =dataSource.getConnection();
+
         PreparedStatement ps=null;
         ResultSet rs=null;
         List<TableInfo> tableInfos= new ArrayList<>();
-        try {
+        try(Connection con =dataSource.getConnection();){
             String sql="select DBS.NAME ,TBLS.TBL_NAME,TABLE_PARAMS.PARAM_VALUE as totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize'  order by totalSize DESC limit 10";
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
@@ -83,23 +78,20 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                     return (int) (Long.valueOf(o2.getStorage())-Long.valueOf(o1.getStorage()));
                 }
             });
-        } catch (DAOException | SQLException e){
-            throw  new DAOException(e.getMessage(),e);
+        }catch (SQLException e){
+            throw  new DAOException(23001,e.getMessage());
         }
-        finally {
-            con.close();
-        }
-        return tableInfos.subList(0,10);
+
+        return tableInfos.stream().limit(10).collect(Collectors.toList());
     }
 
     @Override
-    public int getTableInfo(String dbName, String tableName, Boolean isPartTable) throws SQLException {
+    public int getTableInfo(String dbName, String tableName, Boolean isPartTable) throws DAOException {
         DataSource dataSource = DataSourceUtil.getDataSource();
-        Connection con =dataSource.getConnection();
         PreparedStatement ps=null;
         ResultSet rs=null;
         int res = 0;
-        try {
+        try(Connection con =dataSource.getConnection()){
             String sql=null;
             if(isPartTable==false){
                 sql="select TABLE_PARAMS.PARAM_VALUE as totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize' AND  DBS.NAME="+"'"+dbName+"' AND  TBLS.TBL_NAME="+"'"+tableName+"'";
@@ -111,26 +103,22 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
-               res=rs.getInt(1);
+                res=rs.getInt(1);
             }
-
-        } catch (DAOException | SQLException e){
-            throw  new DAOException(e.getMessage(),e);
-        }
-        finally {
-            con.close();
+        }catch (SQLException e){
+            throw  new DAOException(23001,e.getMessage());
         }
         return res;
     }
 
     @Override
-    public List<PartInfo> getPartInfo(String dbName,String tableName)throws  SQLException {
+    public List<PartInfo> getPartInfo(String dbName,String tableName)throws  DAOException {
         DataSource dataSource = DataSourceUtil.getDataSource();
-        Connection con =dataSource.getConnection();
+
         PreparedStatement ps=null;
         ResultSet rs=null;
         List<PartInfo> PartInfos = new ArrayList<>();
-        try {
+        try(Connection con =dataSource.getConnection()) {
             String sql="select b.PART_NAME,b.CREATE_TIME,MAX(CASE c.PARAM_KEY WHEN 'transient_lastDdlTime' THEN c.PARAM_VALUE ELSE null END) transient_lastDdlTime ,MAX(CASE c.PARAM_KEY WHEN 'numRows' THEN c.PARAM_VALUE ELSE null END) numRows,MAX(CASE c.PARAM_KEY WHEN 'totalSize' THEN c.PARAM_VALUE ELSE null END) totalSize   from TBLS a,PARTITIONS b,PARTITION_PARAMS c,DBS d where  a.TBL_NAME="+"'"+tableName+"'"+"AND d.NAME="+"'"+dbName+"'" +"AND a.TBL_ID=b.TBL_ID AND a.DB_ID=d.DB_ID AND b.PART_ID=c.PART_ID  GROUP BY c.PART_ID";
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
@@ -144,12 +132,10 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                 PartInfos.add(part);
             }
 
-        } catch (DAOException | SQLException e){
-            throw  new DAOException(e.getMessage(),e);
+        } catch (SQLException e){
+            throw  new DAOException(23001,e.getMessage());
         }
-        finally {
-           con.close();
-        }
+
         return PartInfos;
     }
 }

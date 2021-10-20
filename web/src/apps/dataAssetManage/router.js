@@ -44,11 +44,12 @@ const routes = [
           },
           {
             name: "assetsInfo",
-            path: "dataAssetManage/assets/info",
+            path: "/dataAssetManage/assets/info",
             component: () => import("./view/assetsInfo/index.vue"),
             meta: {
               title: "数据资产详情",
-              publicPage: false
+              publicPage: true,
+              cover: "assetsInfo"
             }
           }
         ]

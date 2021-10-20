@@ -84,7 +84,7 @@ export default {
       // 返回到 目录 即搜索页面
       const workspaceId = this.$route.query.workspaceId;
       this.$router.push({
-        name: "dataAssetManage/assets/search",
+        name: "assetsSearch",
         query: { workspaceId }
       });
       this.textColor = true;
@@ -93,7 +93,7 @@ export default {
       const workspaceId = this.$route.query.workspaceId;
       const { guid } = modal;
       this.$router.push({
-        name: "dataAssetManage/assets/info",
+        name: "assetsInfo",
         params: { guid },
         query: { workspaceId }
       });
@@ -119,14 +119,14 @@ export default {
           if (len > 1 && idx < len - 1) {
             that.currentTab = topTapList[idx + 1];
             that.$router.push({
-              name: "dataAssetManage/assets/info",
+              name: "assetsInfo",
               params: { guid },
               query: { workspaceId }
             });
           } else if (len > 1 && idx == len - 1) {
             that.currentTab = topTapList[idx - 1];
             that.$router.push({
-              name: "dataAssetManage/assets/info",
+              name: "assetsInfo",
               params: { guid },
               query: { workspaceId }
             });
@@ -134,7 +134,7 @@ export default {
             that.currentTab = {};
             that.textColor = true;
             that.$router.push({
-              name: "dataAssetManage/assets/search",
+              name: "assetsSearch",
               query: { workspaceId }
             });
           }

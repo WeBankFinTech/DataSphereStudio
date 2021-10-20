@@ -5,7 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_table_stats-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="database" jdbcType="VARCHAR" property="database" />
+    <result column="data_base" jdbcType="VARCHAR" property="dataBase" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -20,7 +20,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, `database`, `name`, create_time, update_time, column_count, storage_size, file_count, 
+    id, data_base, `name`, create_time, update_time, column_count, storage_size, file_count, 
     partition_count, access_count, collect_count, ref_count, version
   </sql>
 </mapper>

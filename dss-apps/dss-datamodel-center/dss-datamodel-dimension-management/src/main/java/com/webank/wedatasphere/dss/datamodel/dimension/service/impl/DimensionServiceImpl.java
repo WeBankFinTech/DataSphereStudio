@@ -9,6 +9,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.DimensionIndicatorCheckService;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.DimensionTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper;
 import com.webank.wedatasphere.dss.datamodel.dimension.dto.DimensionQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
@@ -24,6 +26,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -35,6 +38,11 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     private final ModelMapper modelMapper = new ModelMapper();
 
+    @Resource
+    private DimensionIndicatorCheckService dimensionIndicatorCheckService;
+
+    @Resource
+    private DimensionTableCheckService dimensionTableCheckService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -67,8 +75,17 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteDimension(Long id) {
-        //todo 校验引用情况
+    public int deleteDimension(Long id) throws ErrorException{
+
+        DssDatamodelDimension dssDatamodelDimension = getBaseMapper().selectById(id);
+        if (dssDatamodelDimension == null){
+            throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_DELETE_ERROR.getCode(), "dimension id " +id +" not exists");
+        }
+        //校验引用情况
+        if (dimensionIndicatorCheckService.referenceCase(dssDatamodelDimension.getName())
+        ||dimensionTableCheckService.referenceCase(dssDatamodelDimension.getName())){
+            throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_DELETE_ERROR.getCode(), "dimension id " +id +" has referenced");
+        }
         return getBaseMapper().deleteById(id);
     }
 

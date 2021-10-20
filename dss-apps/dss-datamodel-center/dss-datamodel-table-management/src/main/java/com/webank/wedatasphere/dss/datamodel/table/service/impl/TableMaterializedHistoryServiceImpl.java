@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.CommonExchangisJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataExistsExchangisJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.ExchangisJobTask;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.ExchangisJobTaskBuilder;
+import com.webank.wedatasphere.dss.datamodel.center.common.launcher.CommonDataModelJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataExistsDataModelJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataModelJobTaskBuilder;
+import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataModelJobTask;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMaterializedHistoryMapper;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
@@ -69,48 +69,48 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         return 1;
     }
 
-    private void checkData(DssDatamodelTable current) throws DSSDatamodelCenterException {
+    public void checkData(DssDatamodelTable current) throws ErrorException {
         //校验是否已数据
-        ExchangisJobTaskBuilder exchangisJobTaskBuilder = new ExchangisJobTaskBuilder();
-        ExchangisJobTask task = exchangisJobTaskBuilder.withDataExistsExchangisJobTask()
+        DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
+        DataModelJobTask task = dataModELJobTaskBuilder.withDataExistsExchangisJobTask()
                 .code(current.getName())
                 .creator(current.getCreator())
                 .executeUser("hdfs")
                 .engineType("hive")
                 .runType("hive")
                 .build();
-        DataExistsExchangisJobLauncher launcher = new DataExistsExchangisJobLauncher();
+        DataExistsDataModelJobLauncher launcher = new DataExistsDataModelJobLauncher();
         Integer result = launcher.launch(task);
         if (result > 0) {
-            LOGGER.error("errorCode : {},  table  id : {} has data", ErrorCode.TABLE_CREATE_ERROR.getCode(), current.getId());
+            LOGGER.error("errorCode : {}, table id : {} has data", ErrorCode.TABLE_CREATE_ERROR.getCode(), current.getId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table id : " + current.getId() + " has data");
         }
 
     }
 
     private SubmittableInteractiveJob createTable(DssDatamodelTable current, String sql) {
-        ExchangisJobTaskBuilder exchangisJobTaskBuilder = new ExchangisJobTaskBuilder();
-        ExchangisJobTask commonTask = exchangisJobTaskBuilder.withCommonExchangisJobTask()
+        DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
+        DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(sql)
                 .creator(current.getCreator())
                 .executeUser("hdfs")
                 .engineType("hive")
                 .runType("hive")
                 .build();
-        CommonExchangisJobLauncher commonExchangisJobLauncher = new CommonExchangisJobLauncher();
+        CommonDataModelJobLauncher commonExchangisJobLauncher = new CommonDataModelJobLauncher();
         return commonExchangisJobLauncher.launch(commonTask);
     }
 
     private void dropTable(DssDatamodelTable current) {
-        ExchangisJobTaskBuilder exchangisJobTaskBuilder = new ExchangisJobTaskBuilder();
-        ExchangisJobTask commonTask = exchangisJobTaskBuilder.withCommonExchangisJobTask()
+        DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
+        DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(String.format("drop table if exists %s", current.getName()))
                 .creator(current.getCreator())
                 .executeUser("hdfs")
                 .engineType("hive")
                 .runType("hive")
                 .build();
-        CommonExchangisJobLauncher commonExchangisJobLauncher = new CommonExchangisJobLauncher();
+        CommonDataModelJobLauncher commonExchangisJobLauncher = new CommonDataModelJobLauncher();
         commonExchangisJobLauncher.launch(commonTask);
     }
 
@@ -127,6 +127,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         columns.forEach(column -> {
             builder.addColumn(column.getName(), column.getType(), column.getIsPartitionField() != 0, column.getComment());
         });
+        builder.storedType(current.getFileType());
         return builder.createTableString();
     }
 

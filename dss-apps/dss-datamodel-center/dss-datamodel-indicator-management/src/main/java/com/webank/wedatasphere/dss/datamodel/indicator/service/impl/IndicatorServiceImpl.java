@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.IndicatorTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.IndicatorQueryMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dto.IndicatorContentQueryDTO;
@@ -60,11 +61,14 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Resource
     private IndicatorQueryMapper indicatorQueryMapper;
 
+    @Resource
+    private IndicatorTableCheckService indicatorTableCheckService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
         if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())) > 0) {
-            LOGGER.error("errorCode : {}, indicator name can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(),vo.getName());
+            LOGGER.error("errorCode : {}, indicator name can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(), vo.getName());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name can not repeat");
         }
 
@@ -74,7 +78,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         newOne.setCreateTime(new Date());
         newOne.setUpdateTime(new Date());
         if (!save(newOne)) {
-            LOGGER.error("errorCode : {}, add indicator error",ErrorCode.INDICATOR_ADD_ERROR.getCode());
+            LOGGER.error("errorCode : {}, add indicator error", ErrorCode.INDICATOR_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "add indicator error");
         }
         return indicatorContentService.addIndicatorContent(newOne.getId(), version, vo.getContent());
@@ -86,7 +90,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     public int updateIndicator(Long id, IndicatorUpdateVO vo) throws ErrorException {
         DssDatamodelIndicator org = getBaseMapper().selectById(id);
         if (org == null) {
-            LOGGER.error("errorCode : {}, update indicator error not exists",ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+            LOGGER.error("errorCode : {}, update indicator error not exists", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
 
@@ -96,7 +100,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName()));
             String lastVersion = indicatorVersionService.findLastVersion(org.getName());
             if (repeat > 0 || StringUtils.isNotBlank(lastVersion)) {
-                LOGGER.error("errorCode : {}, indicator name can not repeat",ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+                LOGGER.error("errorCode : {}, indicator name can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
                 throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator name can not repeat");
             }
         }
@@ -110,7 +114,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         updateOne.setUpdateTime(new Date());
         int result = getBaseMapper().update(updateOne, Wrappers.<DssDatamodelIndicator>lambdaUpdate().eq(DssDatamodelIndicator::getId, id));
         if (result != 1) {
-            LOGGER.error("errorCode : {}, update indicator error not exists",ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+            LOGGER.error("errorCode : {}, update indicator error not exists", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
 
@@ -120,7 +124,21 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
     @Override
     public int deleteIndicator(Long id) throws ErrorException {
-        return 0;
+        DssDatamodelIndicator dssDatamodelIndicator = getBaseMapper().selectById(id);
+        if (dssDatamodelIndicator == null) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " not exists");
+        }
+
+        //有版本不能删除 待商讨
+        if (indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, dssDatamodelIndicator.getName())) > 0) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has version");
+        }
+
+        //校验引用情况
+        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())) {
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has referenced");
+        }
+        return getBaseMapper().deleteById(id);
     }
 
 
@@ -132,7 +150,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 .eq(vo.getIndicatorType() != null, "indicator_type", vo.getIndicatorType())
                 .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
         PageHelper.clearPage();
-        PageHelper.startPage(vo.getPageNum(),vo.getPageSize());
+        PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
         PageInfo<DssDatamodelIndicatorQuery> pageInfo = new PageInfo<>(indicatorQueryMapper.page(queryWrapper));
         //IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
 
@@ -152,7 +170,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
         DssDatamodelIndicatorContent content = indicatorContentService.queryByIndicateId(id);
         if (content == null) {
-            LOGGER.error("errorCode : {}, indicator content indicatorId : {} not exists",ErrorCode.INDICATOR_QUERY_ERROR.getCode(), id);
+            LOGGER.error("errorCode : {}, indicator content indicatorId : {} not exists", ErrorCode.INDICATOR_QUERY_ERROR.getCode(), id);
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_QUERY_ERROR.getCode(), "indicator content id " + id + " not exists");
         }
 
@@ -180,7 +198,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //判断旧版本指标是否存在
         DssDatamodelIndicator orgVersion = getBaseMapper().selectById(id);
         if (orgVersion == null) {
-            LOGGER.error("errorCode : {}, indicator id : {} not exists",ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), id);
+            LOGGER.error("errorCode : {}, indicator id : {} not exists", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), id);
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator  id " + id + " not exists");
         }
 
@@ -272,6 +290,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             LOGGER.error("errorCode : {}, indicator name : {} version : {}", ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), name, version);
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ROLL_BACK_ERROR.getCode(), "indicator name : " + name + " version : " + version + " not exist");
         }
+        Long rollBackId = rollBackVersion.getId();
 
         IndicatorVersionDTO rollBackDTO = gson.fromJson(rollBackVersion.getVersionContext(), IndicatorVersionDTO.class);
         DssDatamodelIndicator rollBackIndicator = rollBackDTO.getEssential();
@@ -286,7 +305,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //设置新指标id
         rollBackContent.setIndicatorId(rollBackIndicator.getId());
         indicatorContentService.save(rollBackContent);
-        indicatorVersionService.getBaseMapper().deleteById(rollBackVersion.getId());
+        indicatorVersionService.getBaseMapper().deleteById(rollBackId);
         return 1;
     }
 

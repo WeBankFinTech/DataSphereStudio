@@ -1,20 +1,16 @@
 package com.webank.wedatasphere.dss.datamodel.center.common.config;
 
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
-import com.webank.wedatasphere.linkis.httpclient.config.ClientConfig;
+import com.webank.wedatasphere.linkis.datasource.client.impl.LinkisDataSourceRemoteClient;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
-import com.webank.wedatasphere.warehouse.client.*;
-import org.apache.ibatis.reflection.MetaObject;
+import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 

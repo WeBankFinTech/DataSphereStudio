@@ -9,6 +9,7 @@ import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
 import com.webank.wedatasphere.warehouse.client.action.ListDwLayerAction;
 import com.webank.wedatasphere.warehouse.client.action.ListDwThemeDomainAction;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -54,6 +56,7 @@ public class TableRestfulApi {
         LOGGER.info("tablesAddVO : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setCreator(userName);
+        //vo.setCreator("hdfs");
         return Message.messageToResponse(Message.ok().data("count",tableService.addTable(vo)));
     }
 
@@ -72,6 +75,7 @@ public class TableRestfulApi {
         LOGGER.info("update id : {}, tableUpdateVO : {}", id, vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setCreator(userName);
+        //vo.setCreator("hdfs");
         return Message.messageToResponse(Message.ok().data("count",tableService.updateTable(id,vo)));
     }
 
@@ -132,6 +136,9 @@ public class TableRestfulApi {
     @Path("/tables/versions/{id}")
     public Response addVersion(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody TableVersionAddVO vo) throws Exception {
         LOGGER.info("tableVersionAddVO : {}", vo);
+        String userName = SecurityFilter.getLoginUsername(req);
+        vo.setCreator(userName);
+        //vo.setCreator("hdfs");
         return Message.messageToResponse(Message.ok().data("count",tableService.addTableVersion(id,vo)));
     }
 
@@ -200,9 +207,9 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/databases/list")
-    public Response tableDataBasesList(@Context HttpServletRequest req) {
-
-        return Message.messageToResponse(Message.ok().data("list", Lists.newArrayList("test1","test2")));
+    public Response tableDataBasesList(@Context HttpServletRequest req,TableDatabasesQueryVO vo) {
+        LOGGER.info("table databases vo : {}",vo);
+        return Message.messageToResponse(tableService.listDataBases(vo));
     }
 
 
@@ -218,6 +225,7 @@ public class TableRestfulApi {
         LOGGER.info("table collection vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
+        //vo.setUser("hdfs");
         return Message.messageToResponse(Message.ok().data("count",tableService.tableCollect(vo)));
     }
 
@@ -233,6 +241,7 @@ public class TableRestfulApi {
         LOGGER.info("table collection cancel vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
+        //vo.setUser("hdfs");
         return Message.messageToResponse(Message.ok().data("count",tableService.tableCancel(vo)));
     }
 
@@ -245,10 +254,11 @@ public class TableRestfulApi {
      */
     @POST
     @Path("/tables/collect/list")
-    public Response tableCancelList(@Context HttpServletRequest req, @RequestBody TableCollectQueryVO vo) throws ErrorException {
+    public Response tableCollectList(@Context HttpServletRequest req, @RequestBody TableCollectQueryVO vo) throws ErrorException {
         LOGGER.info("table collection list vo : {}", vo);
         String userName = SecurityFilter.getLoginUsername(req);
         vo.setUser(userName);
+        //vo.setUser("hdfs");
         return Message.messageToResponse(tableService.tableCollections(vo));
     }
 
@@ -292,7 +302,10 @@ public class TableRestfulApi {
     @Path("/tables/create/sql")
     public Response tableCreateSql(@Context HttpServletRequest req, @RequestBody TableCreateSqlVO vo) throws ErrorException {
         LOGGER.info("table create sql vo : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",tableService.tableCreateSql(vo)));
+        String userName = SecurityFilter.getLoginUsername(req);
+        vo.setUser(userName);
+//        vo.setUser("hdfs");
+        return Message.messageToResponse(Message.ok().data("detail",tableService.tableCreateSql(vo)));
     }
 
 
@@ -337,7 +350,30 @@ public class TableRestfulApi {
         return Message.messageToResponse(Message.ok().data("count",tableService.tableColumnBind(columnId,vo)));
     }
 
+    /**
+     * 分区统计信息
+     * @param vo
+     * @return
+     */
+    @POST
+    @Path("/tables/partition/stats/")
+    public Response tblPartitionStats(@Context HttpServletRequest req, TblPartitionStatsVO vo){
+        LOGGER.info("table partition stats vo : {}",vo);
+        return Message.messageToResponse(tableService.listTablePartitionStats(vo));
+    }
 
 
+
+    /**
+     * 获取当前用户
+     * @param req
+     * @return
+     */
+    @GET
+    @Path("/current/user")
+    public Response currentUser(@Context HttpServletRequest req){
+        String userName = SecurityFilter.getLoginUsername(req);
+        return Message.messageToResponse(Message.ok().data("user",userName));
+    }
 
 }

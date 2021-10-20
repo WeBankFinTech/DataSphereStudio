@@ -81,7 +81,7 @@ public class DimensionRestfulApi {
      */
     @DELETE
     @Path("/dimensions/{id}")
-    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) {
+    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
         LOGGER.info("delete id : {}", id);
         return Message.messageToResponse(Message.ok().data("count",dimensionService.deleteDimension(id)));
     }

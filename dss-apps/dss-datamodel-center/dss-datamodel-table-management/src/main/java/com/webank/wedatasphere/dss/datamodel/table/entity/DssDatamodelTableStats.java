@@ -5,7 +5,7 @@ import java.util.Date;
 public class DssDatamodelTableStats {
     private Long id;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 
@@ -61,12 +61,12 @@ public class DssDatamodelTableStats {
         this.id = id;
     }
 
-    public String getDatabase() {
-        return database;
+    public String getDataBase() {
+        return dataBase;
     }
 
-    public void setDatabase(String database) {
-        this.database = database;
+    public void setDataBase(String dataBase) {
+        this.dataBase = dataBase;
     }
 
     public String getName() {

@@ -7,7 +7,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="tbl_id" jdbcType="BIGINT" property="tblId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="is_materialized" jdbcType="BOOLEAN" property="isMaterialized" />
+    <result column="is_materialized" jdbcType="INTEGER" property="isMaterialized" />
     <result column="table_code" jdbcType="LONGVARCHAR" property="tableCode" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="version" jdbcType="VARCHAR" property="version" />
@@ -16,10 +16,11 @@
     <result column="source_type" jdbcType="VARCHAR" property="sourceType" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, tbl_id, `name`, is_materialized, table_code, `comment`, version, table_params, 
-    `columns`, source_type, create_time, update_time
+    `columns`, source_type, create_time, update_time, creator
   </sql>
 </mapper>

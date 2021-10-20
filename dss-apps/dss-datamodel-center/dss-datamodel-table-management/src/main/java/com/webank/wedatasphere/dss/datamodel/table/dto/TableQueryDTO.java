@@ -1,9 +1,16 @@
 package com.webank.wedatasphere.dss.datamodel.table.dto;
 
 
+import com.google.common.collect.Lists;
+import lombok.Data;
+import lombok.ToString;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
+
 import java.util.Date;
 import java.util.List;
-
+@Data
+@ToString
 public class TableQueryDTO {
 
     private Long id;
@@ -77,184 +84,53 @@ public class TableQueryDTO {
      */
     private String location;
 
-    private List<TableColumnQueryDTO> columns;
+    private List<TableColumnQueryDTO> columns = Lists.newArrayList();
+
+    /**
+     * 标签
+     */
+    private String label;
 
 
-    private TableStatsDTO stats;
+    private TableStatsDTO stats = new TableStatsDTO();
 
-    public TableStatsDTO getStats() {
-        return stats;
-    }
+    public static TableQueryDTO toTableStatsDTO(HiveTblDetailInfoDTO hiveTblDTO,String name){
+        TableQueryDTO dto = new TableQueryDTO();
+        dto.setName(name);
+        dto.setCreateTime(hiveTblDTO.getBasic().getCreateTime());
+        dto.setCreator(hiveTblDTO.getBasic().getOwner());
+        dto.setComment(hiveTblDTO.getBasic().getComment());
+        if (!CollectionUtils.isEmpty(hiveTblDTO.getBasic().getLabels())){
+            StringBuilder sb = new StringBuilder();
+            for (String label:hiveTblDTO.getBasic().getLabels()){
+                sb.append(label).append(";");
+            }
+           dto.setLabel(StringUtils.substringBeforeLast(sb.toString(),";"));
+        }
+        dto.setIsPartitionTable(hiveTblDTO.getBasic().getIsParTbl()?0:1);
 
-    public void setStats(TableStatsDTO stats) {
-        this.stats = stats;
-    }
+        if (!CollectionUtils.isEmpty(hiveTblDTO.getColumns())){
+            hiveTblDTO.getColumns().forEach(hiveColumn->{
+                TableColumnQueryDTO columnQueryDTO = new TableColumnQueryDTO();
+                columnQueryDTO.setComment(hiveColumn.getComment());
+                columnQueryDTO.setName(hiveColumn.getName());
+                columnQueryDTO.setType(hiveColumn.getType());
+                columnQueryDTO.setIsPartitionField(1);
+                dto.columns.add(columnQueryDTO);
+            });
+        }
 
-    public Long getId() {
-        return id;
-    }
+        if (!CollectionUtils.isEmpty(hiveTblDTO.getPartitionKeys())){
+            hiveTblDTO.getPartitionKeys().forEach(hiveColumn->{
+                TableColumnQueryDTO columnQueryDTO = new TableColumnQueryDTO();
+                columnQueryDTO.setComment(hiveColumn.getComment());
+                columnQueryDTO.setName(hiveColumn.getName());
+                columnQueryDTO.setType(hiveColumn.getType());
+                columnQueryDTO.setIsPartitionField(0);
+                dto.columns.add(columnQueryDTO);
+            });
+        }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDataBase() {
-        return dataBase;
-    }
-
-    public void setDataBase(String dataBase) {
-        this.dataBase = dataBase;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getWarehouseLayerName() {
-        return warehouseLayerName;
-    }
-
-    public void setWarehouseLayerName(String warehouseLayerName) {
-        this.warehouseLayerName = warehouseLayerName;
-    }
-
-    public String getWarehouseThemeName() {
-        return warehouseThemeName;
-    }
-
-    public void setWarehouseThemeName(String warehouseThemeName) {
-        this.warehouseThemeName = warehouseThemeName;
-    }
-
-    public String getLifecycle() {
-        return lifecycle;
-    }
-
-    public void setLifecycle(String lifecycle) {
-        this.lifecycle = lifecycle;
-    }
-
-    public Integer getIsPartitionTable() {
-        return isPartitionTable;
-    }
-
-    public void setIsPartitionTable(Integer isPartitionTable) {
-        this.isPartitionTable = isPartitionTable;
-    }
-
-    public Integer getIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(Integer isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-
-    public String getStorageType() {
-        return storageType;
-    }
-
-    public void setStorageType(String storageType) {
-        this.storageType = storageType;
-    }
-
-    public String getPrincipalName() {
-        return principalName;
-    }
-
-    public void setPrincipalName(String principalName) {
-        this.principalName = principalName;
-    }
-
-    public String getCompress() {
-        return compress;
-    }
-
-    public void setCompress(String compress) {
-        this.compress = compress;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public List<TableColumnQueryDTO> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(List<TableColumnQueryDTO> columns) {
-        this.columns = columns;
-    }
-
-    public Integer getIsExternal() {
-        return isExternal;
-    }
-
-    public void setIsExternal(Integer isExternal) {
-        this.isExternal = isExternal;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+        return dto;
     }
 }

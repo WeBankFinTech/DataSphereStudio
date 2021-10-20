@@ -1,18 +1,13 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
-
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
-public class TableQueryOneVO {
+public class TblPartitionStatsVO {
 
     private String name;
 
-    /**
-     * atlas标识
-     */
     private String guid;
-
 }

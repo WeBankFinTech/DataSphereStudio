@@ -1,6 +1,11 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
 
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+@ToString
 public class TableListVO {
 
     private Integer pageSize = 20;
@@ -21,55 +26,4 @@ public class TableListVO {
      */
     private String warehouseThemeName;
 
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public Integer getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getWarehouseLayerName() {
-        return warehouseLayerName;
-    }
-
-    public void setWarehouseLayerName(String warehouseLayerName) {
-        this.warehouseLayerName = warehouseLayerName;
-    }
-
-    public String getWarehouseThemeName() {
-        return warehouseThemeName;
-    }
-
-    public void setWarehouseThemeName(String warehouseThemeName) {
-        this.warehouseThemeName = warehouseThemeName;
-    }
-
-    @Override
-    public String toString() {
-        return "TableListVO{" +
-                "pageSize=" + pageSize +
-                ", pageNum=" + pageNum +
-                ", name='" + name + '\'' +
-                ", warehouseLayerName='" + warehouseLayerName + '\'' +
-                ", warehouseThemeName='" + warehouseThemeName + '\'' +
-                '}';
-    }
 }

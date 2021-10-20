@@ -1,9 +1,12 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
 
-import java.util.Date;
-import java.util.List;
+import lombok.Data;
+import lombok.ToString;
 
+import java.util.List;
+@Data
+@ToString
 public class TableAddVO {
 
     private String dataBase;
@@ -16,9 +19,6 @@ public class TableAddVO {
 
     private String comment;
 
-    private Date createTime;
-
-    private Date updateTime;
 
     /**
      * 是否外部表 0 内部表 1外部表
@@ -68,6 +68,11 @@ public class TableAddVO {
      * 外部表时 location
      */
     private String location;
+
+    /**
+     * 标签
+     */
+    private String label;
 
     private List<TableColumnVO> columns;
 
@@ -127,21 +132,7 @@ public class TableAddVO {
         this.comment = comment;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 
     public String getWarehouseLayerName() {
         return warehouseLayerName;
@@ -223,28 +214,4 @@ public class TableAddVO {
         this.columns = columns;
     }
 
-    @Override
-    public String toString() {
-        return "TableAddVO{" +
-                "dataBase='" + dataBase + '\'' +
-                ", name='" + name + '\'' +
-                ", alias='" + alias + '\'' +
-                ", creator='" + creator + '\'' +
-                ", comment='" + comment + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", isExternal=" + isExternal +
-                ", warehouseLayerName='" + warehouseLayerName + '\'' +
-                ", warehouseThemeName='" + warehouseThemeName + '\'' +
-                ", lifecycle='" + lifecycle + '\'' +
-                ", isPartitionTable=" + isPartitionTable +
-                ", isAvailable=" + isAvailable +
-                ", storageType='" + storageType + '\'' +
-                ", principalName='" + principalName + '\'' +
-                ", compress='" + compress + '\'' +
-                ", fileType='" + fileType + '\'' +
-                ", location='" + location + '\'' +
-                ", columns=" + columns +
-                '}';
-    }
 }

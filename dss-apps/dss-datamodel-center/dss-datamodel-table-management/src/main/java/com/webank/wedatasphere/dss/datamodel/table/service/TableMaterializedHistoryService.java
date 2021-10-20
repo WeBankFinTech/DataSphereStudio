@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.table.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableMaterializedHistory;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -22,4 +23,12 @@ public interface TableMaterializedHistoryService extends IService<DssDatamodelTa
      * @return
      */
     String generateSql(DssDatamodelTable current);
+
+
+    /**
+     * 检查是否有数据
+     * @param current
+     * @throws ErrorException
+     */
+    void checkData(DssDatamodelTable current) throws ErrorException;
 }

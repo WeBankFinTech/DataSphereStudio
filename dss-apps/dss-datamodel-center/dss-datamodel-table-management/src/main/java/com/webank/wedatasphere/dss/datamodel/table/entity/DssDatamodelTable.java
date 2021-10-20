@@ -73,6 +73,11 @@ public class DssDatamodelTable {
      */
     private String location;
 
+    /**
+     * 标签
+     */
+    private String label;
+
     public Long getId() {
         return id;
     }
@@ -231,5 +236,13 @@ public class DssDatamodelTable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

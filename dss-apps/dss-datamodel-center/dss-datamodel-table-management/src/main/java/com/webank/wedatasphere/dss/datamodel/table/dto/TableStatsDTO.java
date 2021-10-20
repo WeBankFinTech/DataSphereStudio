@@ -1,16 +1,17 @@
 package com.webank.wedatasphere.dss.datamodel.table.dto;
 
+import lombok.Data;
+import lombok.ToString;
+
 import java.util.Date;
 
-/**
- * @author helong
- * @date 2021/10/12
- */
+@Data
+@ToString
 public class TableStatsDTO {
 
     private Long id;
 
-    private String database;
+    private String dataBase;
 
     private String name;
 

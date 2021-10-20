@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.data.governance.restful;
 
-import com.webank.wedatasphere.dss.data.governance.entity.*;
+import com.webank.wedatasphere.dss.data.governance.entity.HiveTblSimpleInfo;
+import com.webank.wedatasphere.dss.data.governance.entity.PartInfo;
+import com.webank.wedatasphere.dss.data.governance.entity.TableInfo;
 import com.webank.wedatasphere.dss.data.governance.service.AssetService;
 import com.webank.wedatasphere.dss.data.governance.service.WorkspaceInfoService;
 import com.webank.wedatasphere.linkis.server.Message;

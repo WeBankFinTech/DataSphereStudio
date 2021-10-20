@@ -2,7 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.center.common.launcher;
 
 
 
-public abstract class ExchangisJobTask {
+public abstract class DataModelJobTask {
 
      private String engineType;
 

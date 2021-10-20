@@ -78,6 +78,16 @@ public class DssDatamodelTableCollcetion {
      */
     private String location;
 
+    /**
+     * 标签
+     */
+    private String label;
+
+    /**
+     * atlas标识
+     */
+    private String guid;
+
     public Long getId() {
         return id;
     }
@@ -244,5 +254,21 @@ public class DssDatamodelTableCollcetion {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

@@ -114,6 +114,18 @@ public class IndicatorRestfulApi {
         return Message.messageToResponse(indicatorService.queryById(id));
     }
 
+    /**
+     * 删除
+     * @param req
+     * @param id
+     * @return
+     */
+    @DELETE
+    @Path("/indicators/{id}")
+    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+        LOGGER.info("delete id : {}", id);
+        return Message.messageToResponse(Message.ok().data("count",indicatorService.deleteIndicator(id)));
+    }
 
 
     /**

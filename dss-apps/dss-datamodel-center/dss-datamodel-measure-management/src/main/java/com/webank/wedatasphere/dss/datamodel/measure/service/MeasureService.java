@@ -51,7 +51,7 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param id
      * @return
      */
-    int deleteMeasure(Long id);
+    int deleteMeasure(Long id) throws ErrorException;
 
 
     /**

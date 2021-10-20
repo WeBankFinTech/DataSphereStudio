@@ -10,23 +10,23 @@ public class DssDatamodelTableVersion {
     private String name;
 
     /**
-    * 是否物化
-    */
+     * 是否物化
+     */
     private Integer isMaterialized;
 
     /**
-    * 创建table的sql
-    */
+     * 创建table的sql
+     */
     private String tableCode;
 
     /**
-    * 版本注释
-    */
+     * 版本注释
+     */
     private String comment;
 
     /**
-    * 版本信息：默认 1
-    */
+     * 版本信息：默认version0002
+     */
     private String version;
 
     private String tableParams;
@@ -34,13 +34,15 @@ public class DssDatamodelTableVersion {
     private String columns;
 
     /**
-    * rollback,update,add
-    */
+     * rollback,update,add
+     */
     private String sourceType;
 
     private Date createTime;
 
     private Date updateTime;
+
+    private String creator;
 
     public Long getId() {
         return id;
@@ -136,5 +138,13 @@ public class DssDatamodelTableVersion {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }

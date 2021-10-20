@@ -8,12 +8,14 @@ import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableVersionM
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableVersion;
+import com.webank.wedatasphere.dss.datamodel.table.service.TableMaterializedHistoryService;
 import com.webank.wedatasphere.dss.datamodel.table.service.TableVersionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +25,10 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
     private static final Logger LOGGER = LoggerFactory.getLogger(TableVersionServiceImpl.class);
 
     private Gson gson = new Gson();
+
+    @Resource
+    private TableMaterializedHistoryService tableMaterializedHistoryService;
+
 
     @Override
     public String findLastVersion(String name) {
@@ -36,6 +42,7 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
     }
 
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long addOlderVersion(DssDatamodelTable orgTable, List<DssDatamodelTableColumns> orgColumns) {
@@ -43,13 +50,14 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
         version.setTblId(orgTable.getId());
         version.setName(orgTable.getName());
         version.setComment(orgTable.getComment());
-        version.setTableCode("sql");//todo 生成建表脚本
+        version.setTableCode(tableMaterializedHistoryService.generateSql(orgTable));//todo 生成建表脚本
         version.setIsMaterialized(1);//todo 判断是否物化
         version.setColumns(gson.toJson(orgColumns));
         version.setTableParams(gson.toJson(orgTable));
         version.setSourceType("add");//todo 此字段的意义
         version.setCreateTime(new Date());
         version.setUpdateTime(new Date());
+        version.setVersion(orgTable.getVersion());
         getBaseMapper().insert(version);
         return version.getId();
     }

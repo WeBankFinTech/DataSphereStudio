@@ -4,7 +4,7 @@ package com.webank.wedatasphere.dss.datamodel.center.common.launcher;
 import com.webank.wedatasphere.linkis.computation.client.ResultSetIterator;
 import com.webank.wedatasphere.linkis.computation.client.interactive.SubmittableInteractiveJob;
 
-public class DataExistsExchangisJobLauncher implements ExchangisJobLauncher<Integer>{
+public class DataExistsDataModelJobLauncher implements DataModelJobLauncher<Integer> {
     @Override
     public Integer callBack(SubmittableInteractiveJob job) {
         ResultSetIterator<?, ?> iterator = job.getResultSetIterables()[0].iterator();

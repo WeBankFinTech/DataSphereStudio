@@ -145,4 +145,20 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @throws ErrorException
      */
     Message list(TableListVO vo);
+
+
+    /**
+     * 分区统计信息
+     * @param vo
+     * @return
+     */
+    Message listTablePartitionStats(TblPartitionStatsVO vo);
+
+
+    /**
+     * 库列表
+     * @return
+     * @param vo
+     */
+    Message listDataBases(TableDatabasesQueryVO vo);
 }

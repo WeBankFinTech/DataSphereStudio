@@ -24,11 +24,12 @@
     <result column="version" jdbcType="VARCHAR" property="version" />
     <result column="is_external" jdbcType="INTEGER" property="isExternal" />
     <result column="location" jdbcType="VARCHAR" property="location" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, data_base, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
     warehouse_theme_name, lifecycle, is_partition_table, is_available, storage_type, 
-    principal_name, `compress`, file_type, version, is_external, `location`
+    principal_name, `compress`, file_type, version, is_external, `location`, `label`
   </sql>
 </mapper>

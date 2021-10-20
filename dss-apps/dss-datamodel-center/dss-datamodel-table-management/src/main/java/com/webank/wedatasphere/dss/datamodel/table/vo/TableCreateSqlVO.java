@@ -1,14 +1,15 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
 
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+@ToString
 public class TableCreateSqlVO {
     private Long tableId;
 
-    public Long getTableId() {
-        return tableId;
-    }
+    private String guid;
 
-    public void setTableId(Long tableId) {
-        this.tableId = tableId;
-    }
+    private String user;
 }

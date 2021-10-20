@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.datamodel.center.common.launcher;
 
 
-public class CommonExistsExchangisJobTask extends ExchangisJobTask{
-
+public class DataExistsDataModelJobTask extends DataModelJobTask {
     @Override
     public void formatCode(String orgCode) {
-        setCode(orgCode);
+        setCode(String.format("select * from %s limit 1",orgCode));
     }
+
 }

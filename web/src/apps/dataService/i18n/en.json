@@ -62,10 +62,12 @@
         "addAuthorize": "Add Authorize",
         "authForm": {
           "modalAuthTile": "API Authorize",
-          "labelName": "authorize name",
+          "labelName": "appKey name",
           "labelFlow": "authorize flow",
           "labelExpire": "authorize expire",
           "enterName": "name is required",
+          "enterNameLength": "The name length should not be greater than",
+          "enterNameDesc": "Must starts with alphabetic characters, followed by only alphanumeric, underscore and Chinese characters",
           "enterFlow": "flow is required",
           "enterExpire": "expire is required",
           "holderName": "input name",

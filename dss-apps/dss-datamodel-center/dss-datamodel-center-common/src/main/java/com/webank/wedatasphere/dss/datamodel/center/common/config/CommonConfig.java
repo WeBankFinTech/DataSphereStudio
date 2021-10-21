@@ -7,6 +7,8 @@ import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthen
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
+import com.webank.wedatasphere.linkis.ujes.client.UJESClientImpl;
 import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +29,7 @@ public class CommonConfig {
     @Bean
     public GovernanceDwRemoteClient getGovernanceDwRemoteClient() throws Exception {
         System.out.println("url: " + DataWarehouseGovernanceConfig.SERVER_URL.getValue());
-        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy)Class.forName(DataWarehouseGovernanceConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
+        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy) Class.forName(DataWarehouseGovernanceConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(DataWarehouseGovernanceConfig.SERVER_URL.getValue())
                 .connectionTimeout(DataWarehouseGovernanceConfig.CONNECTION_TIMEOUT.getValue())
@@ -46,8 +48,8 @@ public class CommonConfig {
     }
 
     @Bean
-    public LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient() throws Exception{
-        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy)Class.forName(DataWarehouseAssetsRemoteConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
+    public LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient() throws Exception {
+        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy) Class.forName(DataWarehouseAssetsRemoteConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(DataWarehouseAssetsRemoteConfig.SERVER_URL.getValue())
                 .connectionTimeout(DataWarehouseAssetsRemoteConfig.CONNECTION_TIMEOUT.getValue())
@@ -62,7 +64,19 @@ public class CommonConfig {
                 .setAuthTokenValue(DataWarehouseAssetsRemoteConfig.AUTHTOKEN_VALUE.getValue())
         ).setDWSVersion(DataWarehouseAssetsRemoteConfig.DWS_VERSION.getValue())
                 .build();
-        return  new LinkisDataAssetsRemoteClient(clientConfig);
+        return new LinkisDataAssetsRemoteClient(clientConfig);
+    }
+
+    @Bean
+    public UJESClient ujesClient() {
+        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder().addServerUrl(LinkisJobConfiguration.LINKIS_SERVER_URL.getValue())
+                .connectionTimeout(30000).discoveryEnabled(true)
+                .discoveryFrequency(1, TimeUnit.MINUTES)
+                .loadbalancerEnabled(true).maxConnectionSize(5)
+                .retryEnabled(false).readTimeout(30000)
+                .setAuthenticationStrategy(new StaticAuthenticationStrategy()).setAuthTokenKey("hdfs")
+                .setAuthTokenValue("hdfs"))).setDWSVersion("v1").build();
+        return new UJESClientImpl(clientConfig);
     }
 
 }

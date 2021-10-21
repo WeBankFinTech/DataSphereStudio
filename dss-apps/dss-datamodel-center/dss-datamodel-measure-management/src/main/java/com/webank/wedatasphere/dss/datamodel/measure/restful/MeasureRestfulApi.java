@@ -116,7 +116,6 @@ public class MeasureRestfulApi {
     @Path("/measures/list")
     public Response list(@Context HttpServletRequest req,@RequestBody MeasureQueryVO vo){
         LOGGER.info("list vo : {}",vo);
-        //return Message.messageToResponse(measureService.listMeasures(vo));
-        return Message.messageToResponse(Message.ok().data("list", Lists.newArrayList("default","dm_group","linkis_db")));
+        return Message.messageToResponse(measureService.listMeasures(vo));
     }
 }

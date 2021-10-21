@@ -2,13 +2,20 @@ package com.webank.wedatasphere.dss.datamodel.table.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
+import com.webank.wedatasphere.dss.data.governance.request.SearchHiveTblAction;
+import com.webank.wedatasphere.dss.data.governance.response.SearchHiveTblResult;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.CommonDataModelJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataExistsDataModelJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataModelJobTaskBuilder;
-import com.webank.wedatasphere.dss.datamodel.center.common.launcher.DataModelJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.launcher.*;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataExistsDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataExistsDataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMaterializedHistoryMapper;
+import com.webank.wedatasphere.dss.datamodel.table.dto.HiveTblSimpleInfoDTO;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableMaterializedHistory;
@@ -23,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -38,6 +46,15 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
 
     @Resource
     private TableColumnsService tableColumnsService;
+
+    @Resource
+    private LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient;
+
+    @Resource
+    private DataExistsDataModelUJESJobLauncher dataExistsDataModelUJESJobLauncher;
+
+
+    private final Gson assertsGson= new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -70,6 +87,28 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     }
 
     public void checkData(DssDatamodelTable current) throws ErrorException {
+        //linkisJobCheck(current);
+        //如果表存在且存在数据
+        if(tableExists(current.getName())&& hasData(current.getName())){
+            LOGGER.error("errorCode : {}, table id : {} has data", ErrorCode.TABLE_CHECK_ERROR.getCode(), current.getId());
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_CHECK_ERROR.getCode(), " table id : " + current.getId() + " has data");
+        }
+    }
+
+    @Override
+    public boolean hasData(String tableName) {
+        DataModelUJESJobTask dataModelUJESJobTask =  DataExistsDataModelUJESJobTask.newBuilder().code(tableName).build();
+        return dataExistsDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
+    }
+
+    @Override
+    public boolean tableExists(String tableName) throws ErrorException {
+        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery(tableName).setOffset(0).setLimit(1).build());
+        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
+        return !CollectionUtils.isEmpty(dtos);
+    }
+
+    private void linkisJobCheck(DssDatamodelTable current) throws DSSDatamodelCenterException {
         //校验是否已数据
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask task = dataModELJobTaskBuilder.withDataExistsExchangisJobTask()
@@ -85,7 +124,6 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
             LOGGER.error("errorCode : {}, table id : {} has data", ErrorCode.TABLE_CREATE_ERROR.getCode(), current.getId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table id : " + current.getId() + " has data");
         }
-
     }
 
     private SubmittableInteractiveJob createTable(DssDatamodelTable current, String sql) {

@@ -161,4 +161,12 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @param vo
      */
     Message listDataBases(TableDatabasesQueryVO vo);
+
+
+    /**
+     * 数据预览
+     * @param vo
+     * @return
+     */
+    Message previewData(TableDataPreviewVO vo);
 }

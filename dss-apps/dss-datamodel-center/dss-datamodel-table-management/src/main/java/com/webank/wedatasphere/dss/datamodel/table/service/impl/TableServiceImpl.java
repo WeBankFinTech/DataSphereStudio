@@ -14,6 +14,9 @@ import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.PreviewDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.PreviewDataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.*;
 import com.webank.wedatasphere.dss.datamodel.table.entity.*;
@@ -64,11 +67,12 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Resource
     private LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient;
 
-
+    @Resource
+    private PreviewDataModelUJESJobLauncher previewDataModelUJESJobLauncher;
 
     private Gson gson = new Gson();
 
-    private final Gson assertsGson= new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
+    private final Gson assertsGson = new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -112,7 +116,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_UPDATE_ERROR.getCode(), "update table error not exists");
         }
         //判断数据表是否有数据
-        //tableMaterializedHistoryService.checkData(org);
+        tableMaterializedHistoryService.checkData(org);
 
         //当更新表名称时,存在其他指标名称同名或者当前指标名称已经存在版本信息，则不允许修改指标名称
         if (!StringUtils.equals(vo.getName(), org.getName())) {
@@ -145,14 +149,14 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
 
     @Override
-    public TableQueryDTO queryByName(TableQueryOneVO vo) throws ErrorException{
+    public TableQueryDTO queryByName(TableQueryOneVO vo) throws ErrorException {
         DssDatamodelTable table = getBaseMapper().selectOne(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getName, vo.getName()));
         //如果查询不到则查询资产
         if (table == null) {
             //查资产 guid 086c5785-8bda-4756-8ba6-46f9c3d597f1  a3be4a97-6465-4c3d-adee-76dfa662e531  ef09c10a-e156-4d09-96af-af30eb3af26a
             GetHiveTblBasicResult result = linkisDataAssetsRemoteClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setUser(vo.getUser()).setGuid(vo.getGuid()).build());
-            HiveTblDetailInfoDTO dto = assertsGson.fromJson(assertsGson.toJson(result.getResult()),HiveTblDetailInfoDTO.class);
-            return TableQueryDTO.toTableStatsDTO(dto,vo.getName());
+            HiveTblDetailInfoDTO dto = assertsGson.fromJson(assertsGson.toJson(result.getResult()), HiveTblDetailInfoDTO.class);
+            return TableQueryDTO.toTableStatsDTO(dto, vo.getName());
         }
         return queryTable(table);
     }
@@ -174,7 +178,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
 
     @Override
-    public TableQueryDTO queryById(Long id) throws ErrorException{
+    public TableQueryDTO queryById(Long id) throws ErrorException {
         DssDatamodelTable table = getBaseMapper().selectOne(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getId, id));
         if (table == null) {
             LOGGER.error("errorCode : {}, table id : {} not exists", ErrorCode.TABLE_QUERY_ERROR.getCode(), id);
@@ -196,7 +200,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         //判断旧版本是否有数据
-        //tableMaterializedHistoryService.checkData(orgVersion);
+        tableMaterializedHistoryService.checkData(orgVersion);
 
         String orgName = orgVersion.getName();
         String orgDatabase = orgVersion.getDataBase();
@@ -260,7 +264,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         //判断当前版本是否有数据
-        //tableMaterializedHistoryService.checkData(current);
+        tableMaterializedHistoryService.checkData(current);
 
         //查询字段信息
         List<DssDatamodelTableColumns> currentColumns = tableColumnsService.listByTableId(current.getId());
@@ -391,7 +395,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         if (StringUtils.isNotBlank(vo.getGuid())) {
             GetHiveTblCreateResult result = linkisDataAssetsRemoteClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser(vo.getUser()).setGuid(vo.getGuid()).build());
             if (StringUtils.isNotBlank(result.getResult())) {
-                LOGGER.info("sql : {}",result.getResult());
+                LOGGER.info("sql : {}", result.getResult());
                 return result.getResult();
             }
         }
@@ -407,26 +411,29 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     }
 
 
-
-
     @Override
     public Message list(TableListVO vo) {
 
-        if (StringUtils.isNotBlank(vo.getWarehouseLayerName())||StringUtils.isNotBlank(vo.getWarehouseThemeName())){
+        if (StringUtils.isNotBlank(vo.getWarehouseLayerName()) || StringUtils.isNotBlank(vo.getWarehouseThemeName())) {
             PageHelper.clearPage();
             PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
             PageInfo<DssDatamodelTable> pageInfo = new PageInfo<>(getBaseMapper().selectList(Wrappers.<DssDatamodelTable>lambdaQuery()
                     .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTable::getWarehouseThemeName, vo.getWarehouseThemeName())
                     .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTable::getWarehouseLayerName, vo.getWarehouseLayerName())
                     .like(StringUtils.isNotBlank(vo.getName()), DssDatamodelTable::getName, vo.getName())));
-            return Message.ok().data("list", pageInfo.getList().stream().map(entity->modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
-                               .data("total",pageInfo.getTotal());
+            return Message.ok().data("list", pageInfo.getList().stream().map(entity -> modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
+                    .data("total", pageInfo.getTotal());
         }
 
-        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser(vo.getUser()).setQuery(vo.getName()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
-        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
-        if (CollectionUtils.isEmpty(dtos)){
-            return Message.ok().data("list",Lists.newArrayList());
+        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder()
+                .setUser(vo.getUser())
+                .setQuery(vo.getName())
+                .setOffset((vo.getPageNum() - 1) * vo.getPageSize())
+                .setLimit(vo.getPageSize()).build());
+        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {
+        }.getType());
+        if (CollectionUtils.isEmpty(dtos)) {
+            return Message.ok().data("list", Lists.newArrayList());
         }
         List<TableListDTO> tableListDTOS = Lists.newArrayList();
         dtos.forEach(hiveTblSimpleInfoDTO -> {
@@ -434,40 +441,49 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             tableListDTO.setGuid(hiveTblSimpleInfoDTO.getGuid());
             tableListDTO.setCreator(hiveTblSimpleInfoDTO.getOwner());
             tableListDTO.setCreateTime(hiveTblSimpleInfoDTO.getCreateTime());
-            tableListDTO.setName(StringUtils.substringBefore(hiveTblSimpleInfoDTO.getQualifiedName(),"@"));
+            tableListDTO.setName(StringUtils.substringBefore(hiveTblSimpleInfoDTO.getQualifiedName(), "@"));
             tableListDTOS.add(tableListDTO);
         });
 
-        return Message.ok().data("list",tableListDTOS)
-                           .data("total",tableListDTOS.size());
+        return Message.ok().data("list", tableListDTOS)
+                .data("total", tableListDTOS.size());
     }
 
     @Override
     public Message listTablePartitionStats(TblPartitionStatsVO vo) {
-        if (StringUtils.isNotBlank(vo.getGuid())){
-            return queryByGuid(vo.getGuid(),vo.getUser());
+        if (StringUtils.isNotBlank(vo.getGuid())) {
+            return queryByGuid(vo.getGuid(), vo.getUser());
         }
         SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser(vo.getUser()).setQuery(vo.getName()).setOffset(0).setLimit(1).build());
-        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
-        if (CollectionUtils.isEmpty(dtos)){
-            return Message.ok().data("list",Lists.newArrayList());
+        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {
+        }.getType());
+        if (CollectionUtils.isEmpty(dtos)) {
+            return Message.ok().data("list", Lists.newArrayList());
         }
-        return queryByGuid(dtos.get(0).getGuid(),vo.getUser());
+        return queryByGuid(dtos.get(0).getGuid(), vo.getUser());
     }
 
     @Override
     public Message listDataBases(TableDatabasesQueryVO vo) {
-        SearchHiveDbResult result =linkisDataAssetsRemoteClient.searchHiveDb(
-                SearchHiveDbAction.builder().setQuery(vo.getName()).setUser(vo.getUser()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
-        return Message.ok().data("list",result.getResult());
+        SearchHiveDbResult result = linkisDataAssetsRemoteClient.searchHiveDb(
+                SearchHiveDbAction.builder().setQuery(vo.getName()).setUser(vo.getUser()).setOffset(vo.getPageNum() - 1).setLimit(vo.getPageSize() * (vo.getPageNum() - 1)).build());
+        return Message.ok().data("list", result.getResult());
     }
 
-    private Message queryByGuid(String guid,String user) {
+
+    @Override
+    public Message previewData(TableDataPreviewVO vo) {
+        DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().code(vo.getTableName()).count(10).build();
+        return Message.ok().data("detail",previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask));
+    }
+
+    private Message queryByGuid(String guid, String user) {
         GetHiveTblPartitionResult result = linkisDataAssetsRemoteClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser(user).setGuid(guid).build());
-        if (result.getResult()==null){
-            return Message.ok().data("list",Lists.newArrayList());
+        if (result.getResult() == null) {
+            return Message.ok().data("list", Lists.newArrayList());
         }
-        List<PartInfoDTO> partInfoDTOS = assertsGson.fromJson(assertsGson.toJson(result.getResult()),new TypeToken<List<PartInfoDTO>>() {}.getType());
-        return Message.ok().data("list",partInfoDTOS);
+        List<PartInfoDTO> partInfoDTOS = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<PartInfoDTO>>() {
+        }.getType());
+        return Message.ok().data("list", partInfoDTOS);
     }
 }

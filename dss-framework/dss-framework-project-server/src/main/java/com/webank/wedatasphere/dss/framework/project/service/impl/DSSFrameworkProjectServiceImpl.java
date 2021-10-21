@@ -113,17 +113,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws Exception {
-       /* DSSProjectDO dbProject = projectService.getProjectById(projectModifyRequest.getId());
-        //如果不是工程的创建人，则校验是否管理员
-        if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
-            boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
-            //非管理员
-            if (!isAdmin) {
-                DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getMsg(), DSSProjectErrorException.class);
-            }
-        }
-        //工程不存在
-        if (dbProject == null) {
+
+        DSSProjectDO dbProject = projectService.getProjectById(projectModifyRequest.getId());
+        if (dbProject == null) {//工程不存在
             LOGGER.error("{} project id is null, can not modify", projectModifyRequest.getName());
             DSSExceptionUtils.dealErrorException(60021,
                     String.format("%s project id is null, can not modify", projectModifyRequest.getName()), DSSProjectErrorException.class);
@@ -133,16 +125,18 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
         //1.统一修改各个接入的第三方的系统的工程状态信息
-        //todo 第三方的工程修改接口还是没有调试通过
 //        modifyThirdProject(projectModifyRequest, username);
         //2.修改dss_project DSS基本工程信息
+
         projectService.modifyProject(username, projectModifyRequest);
         try {
             //todo 3.修改dss_project_user 工程与用户关系 这一步还没有调试通过
-            projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username);
+            projectUserService.modifyProjectUser(dbProject, projectModifyRequest,username);
         } catch (Exception e) {
             LOGGER.error("modifyProjectUserError:", e);
         }
+
+
     }
 
     //统一修改各个接入的第三方的系统的工程状态信息   修改dss_project调用
@@ -165,27 +159,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     }
                 }
             }
-        }*/
-
-        //校验当前登录用户是否含有修改权限
-        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
-        DSSProjectDO project = new DSSProjectDO();
-        //修改的字段
-        project.setDescription(projectModifyRequest.getDescription());
-        project.setUpdateTime(new Date());
-        project.setUpdateByStr(username);
-        project.setDevProcess(ProjectStringUtils.getModeStr(projectModifyRequest.getDevProcessList()));
-        if (StringUtils.isNotBlank(projectModifyRequest.getApplicationArea())) {
-            project.setApplicationArea(Integer.valueOf(projectModifyRequest.getApplicationArea()));
         }
-        project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectModifyRequest.getOrchestratorModeList()));
-        project.setBusiness(projectModifyRequest.getBusiness());
-        project.setProduct(projectModifyRequest.getProduct());
-
-        UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<DSSProjectDO>();
-        updateWrapper.eq("id", projectModifyRequest.getId());
-        updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
-        projectMapper.update(project, updateWrapper);
     }
 
     //1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程  新增dss_project调用

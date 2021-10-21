@@ -74,10 +74,10 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask task = dataModELJobTaskBuilder.withDataExistsExchangisJobTask()
                 .code(current.getName())
-                .creator(current.getCreator())
+                .creator("hdfs")
                 .executeUser("hdfs")
-                .engineType("hive")
-                .runType("hive")
+                .engineType("hive-2.3.3")
+                .runType("hql")
                 .build();
         DataExistsDataModelJobLauncher launcher = new DataExistsDataModelJobLauncher();
         Integer result = launcher.launch(task);
@@ -92,10 +92,10 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(sql)
-                .creator(current.getCreator())
+                .creator("hdfs")
                 .executeUser("hdfs")
-                .engineType("hive")
-                .runType("hive")
+                .engineType("hive-2.3.3")
+                .runType("hql")
                 .build();
         CommonDataModelJobLauncher commonExchangisJobLauncher = new CommonDataModelJobLauncher();
         return commonExchangisJobLauncher.launch(commonTask);
@@ -105,10 +105,10 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(String.format("drop table if exists %s", current.getName()))
-                .creator(current.getCreator())
+                .creator("hdfs")
                 .executeUser("hdfs")
-                .engineType("hive")
-                .runType("hive")
+                .engineType("hive-2.3.3")
+                .runType("hql")
                 .build();
         CommonDataModelJobLauncher commonExchangisJobLauncher = new CommonDataModelJobLauncher();
         commonExchangisJobLauncher.launch(commonTask);

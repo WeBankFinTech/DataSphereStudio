@@ -26,4 +26,7 @@ public class TableListVO {
      */
     private String warehouseThemeName;
 
+
+    private String user;
+
 }

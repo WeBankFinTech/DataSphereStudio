@@ -2,7 +2,9 @@ package com.webank.wedatasphere.dss.datamodel.center.common.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
+import com.webank.wedatasphere.linkis.httpclient.authentication.AuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy;
+import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
@@ -23,8 +25,9 @@ public class CommonConfig {
     }
 
     @Bean
-    public GovernanceDwRemoteClient getGovernanceDwRemoteClient() {
+    public GovernanceDwRemoteClient getGovernanceDwRemoteClient() throws Exception {
         System.out.println("url: " + DataWarehouseGovernanceConfig.SERVER_URL.getValue());
+        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy)Class.forName(DataWarehouseGovernanceConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(DataWarehouseGovernanceConfig.SERVER_URL.getValue())
                 .connectionTimeout(DataWarehouseGovernanceConfig.CONNECTION_TIMEOUT.getValue())
@@ -34,7 +37,7 @@ public class CommonConfig {
                 .maxConnectionSize(DataWarehouseGovernanceConfig.MAX_CONNECTION_SIZE.getValue())
                 .retryEnabled(DataWarehouseGovernanceConfig.RETRY_ENABLED.getValue())
                 .readTimeout(DataWarehouseGovernanceConfig.READ_TIMEOUT.getValue())
-                .setAuthenticationStrategy(new StaticAuthenticationStrategy())
+                .setAuthenticationStrategy(authenticationStrategy)
                 .setAuthTokenKey(DataWarehouseGovernanceConfig.AUTHTOKEN_KEY.getValue())
                 .setAuthTokenValue(DataWarehouseGovernanceConfig.AUTHTOKEN_VALUE.getValue())
         ).setDWSVersion(DataWarehouseGovernanceConfig.DWS_VERSION.getValue())
@@ -43,7 +46,8 @@ public class CommonConfig {
     }
 
     @Bean
-    public LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient(){
+    public LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient() throws Exception{
+        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy)Class.forName(DataWarehouseAssetsRemoteConfig.AUTHENTICATION_STRATEGY.getValue()).newInstance();
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(DataWarehouseAssetsRemoteConfig.SERVER_URL.getValue())
                 .connectionTimeout(DataWarehouseAssetsRemoteConfig.CONNECTION_TIMEOUT.getValue())
@@ -53,7 +57,7 @@ public class CommonConfig {
                 .maxConnectionSize(DataWarehouseAssetsRemoteConfig.MAX_CONNECTION_SIZE.getValue())
                 .retryEnabled(DataWarehouseAssetsRemoteConfig.RETRY_ENABLED.getValue())
                 .readTimeout(DataWarehouseAssetsRemoteConfig.READ_TIMEOUT.getValue())
-                .setAuthenticationStrategy(new StaticAuthenticationStrategy())
+                .setAuthenticationStrategy(authenticationStrategy)
                 .setAuthTokenKey(DataWarehouseAssetsRemoteConfig.AUTHTOKEN_KEY.getValue())
                 .setAuthTokenValue(DataWarehouseAssetsRemoteConfig.AUTHTOKEN_VALUE.getValue())
         ).setDWSVersion(DataWarehouseAssetsRemoteConfig.DWS_VERSION.getValue())

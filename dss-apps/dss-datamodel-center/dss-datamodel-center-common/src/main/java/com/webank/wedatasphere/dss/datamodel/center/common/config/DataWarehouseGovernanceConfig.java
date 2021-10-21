@@ -12,6 +12,7 @@ public class DataWarehouseGovernanceConfig {
     public static final CommonVars<Integer> MAX_CONNECTION_SIZE = CommonVars.apply("wds.wedatasphere.warehouse.client.maxconnection.size", 5);
     public static final CommonVars<Boolean> RETRY_ENABLED = CommonVars.apply("wds.wedatasphere.warehouse.client.retryenabled", false);
     public static final CommonVars<Long> READ_TIMEOUT = CommonVars.apply("wds.wedatasphere.warehouse.client.readtimeout", 30000L);
+    public static final CommonVars<String> AUTHENTICATION_STRATEGY = CommonVars.apply("wds.wedatasphere.warehouse.client.authenticationStrategy", "com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy");
 
     public static final CommonVars<String> AUTHTOKEN_KEY = CommonVars.apply("wds.wedatasphere.warehouse.client.authtoken.key", "");
     public static final CommonVars<String> AUTHTOKEN_VALUE = CommonVars.apply("wds.wedatasphere.warehouse.client.authtoken.value", "");

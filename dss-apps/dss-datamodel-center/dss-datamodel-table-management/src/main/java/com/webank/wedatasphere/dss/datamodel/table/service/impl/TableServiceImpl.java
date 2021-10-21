@@ -150,7 +150,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         //如果查询不到则查询资产
         if (table == null) {
             //查资产 guid 086c5785-8bda-4756-8ba6-46f9c3d597f1  a3be4a97-6465-4c3d-adee-76dfa662e531  ef09c10a-e156-4d09-96af-af30eb3af26a
-            GetHiveTblBasicResult result = linkisDataAssetsRemoteClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setGuid(vo.getGuid()).build());
+            GetHiveTblBasicResult result = linkisDataAssetsRemoteClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setUser(vo.getUser()).setGuid(vo.getGuid()).build());
             HiveTblDetailInfoDTO dto = assertsGson.fromJson(assertsGson.toJson(result.getResult()),HiveTblDetailInfoDTO.class);
             return TableQueryDTO.toTableStatsDTO(dto,vo.getName());
         }
@@ -423,7 +423,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
                                .data("total",pageInfo.getTotal());
         }
 
-        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setQuery(vo.getName()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
+        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser(vo.getUser()).setQuery(vo.getName()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
         List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
         if (CollectionUtils.isEmpty(dtos)){
             return Message.ok().data("list",Lists.newArrayList());
@@ -445,25 +445,25 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public Message listTablePartitionStats(TblPartitionStatsVO vo) {
         if (StringUtils.isNotBlank(vo.getGuid())){
-            return queryByGuid(vo.getGuid());
+            return queryByGuid(vo.getGuid(),vo.getUser());
         }
-        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setQuery(vo.getName()).setOffset(0).setLimit(1).build());
+        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser(vo.getUser()).setQuery(vo.getName()).setOffset(0).setLimit(1).build());
         List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
         if (CollectionUtils.isEmpty(dtos)){
             return Message.ok().data("list",Lists.newArrayList());
         }
-        return queryByGuid(dtos.get(0).getGuid());
+        return queryByGuid(dtos.get(0).getGuid(),vo.getUser());
     }
 
     @Override
     public Message listDataBases(TableDatabasesQueryVO vo) {
         SearchHiveDbResult result =linkisDataAssetsRemoteClient.searchHiveDb(
-                SearchHiveDbAction.builder().setQuery(vo.getName()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
+                SearchHiveDbAction.builder().setQuery(vo.getName()).setUser(vo.getUser()).setOffset(vo.getPageNum()-1).setLimit(vo.getPageSize()*(vo.getPageNum()-1)).build());
         return Message.ok().data("list",result.getResult());
     }
 
-    private Message queryByGuid(String guid) {
-        GetHiveTblPartitionResult result = linkisDataAssetsRemoteClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setGuid(guid).build());
+    private Message queryByGuid(String guid,String user) {
+        GetHiveTblPartitionResult result = linkisDataAssetsRemoteClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser(user).setGuid(guid).build());
         if (result.getResult()==null){
             return Message.ok().data("list",Lists.newArrayList());
         }

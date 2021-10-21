@@ -58,6 +58,7 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
         version.setCreateTime(new Date());
         version.setUpdateTime(new Date());
         version.setVersion(orgTable.getVersion());
+        version.setCreator(orgTable.getCreator());
         getBaseMapper().insert(version);
         return version.getId();
     }

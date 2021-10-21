@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.restful;
 
+import com.webank.wedatasphere.dss.datamodel.center.common.service.AuthenticationClientStrategy;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -29,7 +29,7 @@ import java.io.IOException;
 @Path("/datamodel")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class IndicatorRestfulApi {
+public class IndicatorRestfulApi implements AuthenticationClientStrategy {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IndicatorRestfulApi.class);
@@ -183,7 +183,9 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/themes/list")
     public Response indicatorThemesList(@Context HttpServletRequest req){
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listThemeDomains(new ListDwThemeDomainAction()).getAll()));
+        ListDwThemeDomainAction action = new ListDwThemeDomainAction();
+        action.setUser(getStrategyUser(req));
+        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listThemeDomains(action).getAll()));
     }
 
     /**
@@ -194,7 +196,9 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/layers/list")
     public Response indicatorLayerList(@Context HttpServletRequest req){
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listLayers(new ListDwLayerAction()).getAll()));
+        ListDwLayerAction action = new ListDwLayerAction();
+        action.setUser(getStrategyUser(req));
+        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listLayers(action).getAll()));
     }
 
     /**
@@ -205,7 +209,9 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/cycles/list")
     public Response indicatorCycleList(@Context HttpServletRequest req){
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listStatisticalPeriods(new ListDwStatisticalPeriodAction()).getAll()));
+        ListDwStatisticalPeriodAction action = new ListDwStatisticalPeriodAction();
+        action.setUser(getStrategyUser(req));
+        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listStatisticalPeriods(action).getAll()));
     }
 
     /**
@@ -216,14 +222,15 @@ public class IndicatorRestfulApi {
     @POST
     @Path("/indicators/modifiers/list")
     public Response indicatorModifierList(@Context HttpServletRequest req){
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listModifiers(new ListDwModifierAction()).getAll()));
+        ListDwModifierAction action = new ListDwModifierAction();
+        action.setUser(getStrategyUser(req));
+        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listModifiers(action).getAll()));
     }
 
 
     @POST
     @Path("/current/user")
     public Response currentUser(@Context HttpServletRequest req){
-        String userName = SecurityFilter.getLoginUsername(req);
-        return Message.messageToResponse(Message.ok().data("usser",userName));
+        return Message.messageToResponse(Message.ok().data("user",getStrategyUser(req)));
     }
 }

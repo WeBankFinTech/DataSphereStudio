@@ -12,4 +12,6 @@ public class TableDatabasesQueryVO {
     private Integer pageSize = 20;
 
     private Integer pageNum = 1;
+
+    private String user;
 }

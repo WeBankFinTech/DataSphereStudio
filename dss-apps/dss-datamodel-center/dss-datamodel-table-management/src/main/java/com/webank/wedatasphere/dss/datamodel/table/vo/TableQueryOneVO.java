@@ -15,4 +15,7 @@ public class TableQueryOneVO {
      */
     private String guid;
 
+
+    private String user;
+
 }

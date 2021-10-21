@@ -3,18 +3,16 @@ package com.webank.wedatasphere.dss.datamodel.center.common.launcher;
 
 import com.webank.wedatasphere.linkis.computation.client.ResultSetIterator;
 import com.webank.wedatasphere.linkis.computation.client.interactive.SubmittableInteractiveJob;
+import scala.collection.Map;
 
-public class DataExistsDataModelJobLauncher implements DataModelJobLauncher<Integer> {
+import java.util.List;
+
+public class PreviewDataModelJobLauncher implements DataModelJobLauncher<List<Map<String,Object>>>{
+
     @Override
-    public Integer callBack(SubmittableInteractiveJob job) {
+    public List<Map<String, Object>> callBack(SubmittableInteractiveJob job) {
         ResultSetIterator<?, ?> iterator = job.getResultSetIterables()[0].iterator();
 
-        System.out.println(iterator.getMetadata());
-
-        // 如果已数据返回1
-        if (iterator.hasNext()) {
-            return 1;
-        }
-        return 0;
+        return null;
     }
 }

@@ -65,7 +65,7 @@
           prop="caller">
           <Input
             v-model="authFormData.caller"
-            @on-change="changeCaller"
+            :maxlength=21
             :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
@@ -175,6 +175,8 @@ export default {
       return {
         caller: [
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterName'), trigger: 'blur' },
+          { message: `${this.$t('message.dataService.apiCall.authForm.enterNameLength')}20`, max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.dataService.apiCall.authForm.enterNameDesc'), trigger: 'blur' }
         ],
         groupId: [
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterFlow'), trigger: 'change' }
@@ -236,11 +238,6 @@ export default {
     },
     addAuthorize() {
       this.modalAuthShow = true;
-    },
-    changeCaller(e) {
-      this.$nextTick(() => {
-        this.authFormData.caller = this.authFormData.caller.replace(/[\u4e00-\u9fa5]/g,''); // 登录用户名不允许中文
-      })
     },
     authCancel() {
       this.modalAuthShow = false;

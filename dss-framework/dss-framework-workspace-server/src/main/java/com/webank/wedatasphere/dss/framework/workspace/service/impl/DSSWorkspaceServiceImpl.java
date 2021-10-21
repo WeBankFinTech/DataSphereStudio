@@ -46,6 +46,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SecondaryWorkspaceMenuVO;
+import com.webank.wedatasphere.dss.framework.workspace.conf.LdapConf;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSComponentRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper;
@@ -60,20 +61,11 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
-import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
-import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
-import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
-import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.framework.workspace.util.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +101,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private DSSWorkspaceMenuService dssWorkspaceMenuService;
     @Autowired
     private WorkspaceMapper workspaceMapper;
+    @Autowired
+    private LdapServerHelper ldapServerHelper;
 
     //创建工作空间
     @Override
@@ -157,7 +151,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         for (Integer roleId : roleIds) {
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator);
         }
+
+        //创建ldap用户
+        ldapServerHelper.addUser(userName,userName);
+
+        //分配ldap角色
+        String roleName = workspaceDBHelper.getRoleNameById(roleIds.get(0));
+        ldapServerHelper.modifyUserToGroup(userName, roleName);
+
+        //设置密码
+        ldapServerHelper.updateUserPassword(userName, LdapConf.DEFAULT_USER_PASSWORD.getValue());
     }
+
 
     //获取所有的工作空间
     @Override

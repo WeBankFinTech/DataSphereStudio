@@ -10,4 +10,6 @@ public class TblPartitionStatsVO {
     private String name;
 
     private String guid;
+
+    private String user;
 }

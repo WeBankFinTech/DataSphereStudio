@@ -51,12 +51,12 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.math3.util.Pair;
 
 
 @Component

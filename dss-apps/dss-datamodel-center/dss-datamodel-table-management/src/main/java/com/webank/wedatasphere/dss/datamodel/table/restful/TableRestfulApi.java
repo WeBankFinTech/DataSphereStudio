@@ -263,8 +263,8 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
     @POST
     @Path("/tables/data/preview/")
     public Response tableDataPreview(@Context HttpServletRequest req, @RequestBody TableDataPreviewVO vo) {
-        //todo
-        return Message.messageToResponse(Message.ok());
+        LOGGER.info("table data preview : {}",vo);
+        return Message.messageToResponse(tableService.previewData(vo));
     }
 
 

@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.datamodel.center.common.ujes;
+package com.webank.wedatasphere.dss.datamodel.center.common.ujes.task;
 
 
 import lombok.Data;
@@ -10,5 +10,5 @@ public abstract class DataModelUJESJobTask {
 
     private Integer count = 10;
 
-    abstract void formatCode(String code);
+    public abstract void formatCode(String code);
 }

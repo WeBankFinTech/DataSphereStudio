@@ -9,11 +9,16 @@ import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteCl
 import com.webank.wedatasphere.dss.data.governance.request.SearchHiveTblAction;
 import com.webank.wedatasphere.dss.data.governance.response.SearchHiveTblResult;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.dto.CreateTableDTO;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.center.common.launcher.*;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataExistsDataModelUJESJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataExistsDataModelUJESJobTask;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.CreateTableDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.DataExistsDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.DropTableDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.CreateTableDataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataExistsDataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DropTableDataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMaterializedHistoryMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.HiveTblSimpleInfoDTO;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
@@ -53,6 +58,11 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     @Resource
     private DataExistsDataModelUJESJobLauncher dataExistsDataModelUJESJobLauncher;
 
+    @Resource
+    private DropTableDataModelUJESJobLauncher dropTableDataModelUJESJobLauncher;
+
+    @Resource
+    private CreateTableDataModelUJESJobLauncher createTableDataModelUJESJobLauncher;
 
     private final Gson assertsGson= new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
 
@@ -63,25 +73,27 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         //判断是否有数据
         checkData(current);
         //不存在数据删除表
-        dropTable(current);
-        String sql = buildSql(current);
-        LOGGER.info("table id : {}, sql : {}", current.getId(), sql);
-        //创建表
-        SubmittableInteractiveJob job = createTable(current, sql);
+        dropTable(current.getName());
 
-        if (!job.isSucceed()) {
-            LOGGER.error("errorCode : {},  table  id : {} create table error job : {}, sql : {}", ErrorCode.TABLE_CREATE_ERROR.getCode(), current.getId(), job.getId(), sql);
-            //throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table id : " + current.getId() + " create table error job : " + job.getId() + ", sql : " + sql);
-        }
+        CreateTableDTO dto = createTable(current);
+
+        //创建表
+//        SubmittableInteractiveJob job = linkisCreateTable(current, sql);
+//
+//        if (!job.isSucceed()) {
+//            LOGGER.error("errorCode : {},  table  id : {} create table error job : {}, sql : {}", ErrorCode.TABLE_CREATE_ERROR.getCode(), current.getId(), job.getId(), sql);
+//            //throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table id : " + current.getId() + " create table error job : " + job.getId() + ", sql : " + sql);
+//        }
+
 
         DssDatamodelTableMaterializedHistory newOne = modelMapper.map(current, DssDatamodelTableMaterializedHistory.class);
         newOne.setId(null);
-        newOne.setMaterializedCode(sql);
+        newOne.setMaterializedCode(dto.getSql());
         newOne.setCreateTime(new Date());
-        newOne.setStatus(job.isSucceed() ? 0 : 1);//
+        newOne.setStatus(dto.getStatus()==0 ? 0 : 1);//
         newOne.setLastUpdateTime(new Date());
         newOne.setReason("reason");
-        newOne.setTaskId(job.getId());
+        newOne.setTaskId(dto.getTaskId());
         getBaseMapper().insert(newOne);
         return 1;
     }
@@ -108,6 +120,27 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         return !CollectionUtils.isEmpty(dtos);
     }
 
+
+    @Override
+    public boolean dropTable(String tableName) throws ErrorException {
+        if(!tableExists(tableName)){
+            return true;
+        }
+        DataModelUJESJobTask dataModelUJESJobTask = DropTableDataModelUJESJobTask.newBuilder().code(tableName).build();
+        return dropTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
+    }
+
+    @Override
+    public CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException {
+        String sql = buildSql(current);
+        LOGGER.info("table id : {}, sql : {}", current.getId(), sql);
+
+        DataModelUJESJobTask dataModelUJESJobTask = CreateTableDataModelUJESJobTask.newBuilder().code(sql).build();
+        CreateTableDTO createTableDTO = createTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
+        createTableDTO.setSql(sql);
+        return createTableDTO;
+    }
+
     private void linkisJobCheck(DssDatamodelTable current) throws DSSDatamodelCenterException {
         //校验是否已数据
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
@@ -126,7 +159,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         }
     }
 
-    private SubmittableInteractiveJob createTable(DssDatamodelTable current, String sql) {
+    private SubmittableInteractiveJob linkisCreateTable(DssDatamodelTable current, String sql) {
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(sql)
@@ -139,7 +172,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         return commonExchangisJobLauncher.launch(commonTask);
     }
 
-    private void dropTable(DssDatamodelTable current) {
+    private void linkisDropTable(DssDatamodelTable current) {
         DataModelJobTaskBuilder dataModELJobTaskBuilder = new DataModelJobTaskBuilder();
         DataModelJobTask commonTask = dataModELJobTaskBuilder.withCommonExchangisJobTask()
                 .code(String.format("drop table if exists %s", current.getName()))

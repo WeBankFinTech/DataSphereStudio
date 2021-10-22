@@ -14,10 +14,11 @@ import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataModelUJESJobTask;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.PreviewDataModelUJESJobLauncher;
-import com.webank.wedatasphere.dss.datamodel.center.common.ujes.PreviewDataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.PreviewDataModelUJESJobLauncher;
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.PreviewDataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMapper;
+import com.webank.wedatasphere.dss.datamodel.table.dao.TableQueryMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.*;
 import com.webank.wedatasphere.dss.datamodel.table.entity.*;
 import com.webank.wedatasphere.dss.datamodel.table.service.*;
@@ -69,6 +70,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Resource
     private PreviewDataModelUJESJobLauncher previewDataModelUJESJobLauncher;
+
+    @Resource
+    private TableQueryMapper tableQueryMapper;
 
     private Gson gson = new Gson();
 
@@ -201,6 +205,8 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
         //判断旧版本是否有数据
         tableMaterializedHistoryService.checkData(orgVersion);
+        //没有数据删除表
+        tableMaterializedHistoryService.dropTable(orgVersion.getName());
 
         String orgName = orgVersion.getName();
         String orgDatabase = orgVersion.getDataBase();
@@ -265,6 +271,8 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
         //判断当前版本是否有数据
         tableMaterializedHistoryService.checkData(current);
+        //没有数据删除表
+        tableMaterializedHistoryService.dropTable(current.getName());
 
         //查询字段信息
         List<DssDatamodelTableColumns> currentColumns = tableColumnsService.listByTableId(current.getId());
@@ -413,18 +421,31 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     public Message list(TableListVO vo) {
-
-        if (StringUtils.isNotBlank(vo.getWarehouseLayerName()) || StringUtils.isNotBlank(vo.getWarehouseThemeName())) {
-            PageHelper.clearPage();
-            PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
-            PageInfo<DssDatamodelTable> pageInfo = new PageInfo<>(getBaseMapper().selectList(Wrappers.<DssDatamodelTable>lambdaQuery()
-                    .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTable::getWarehouseThemeName, vo.getWarehouseThemeName())
-                    .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTable::getWarehouseLayerName, vo.getWarehouseLayerName())
-                    .like(StringUtils.isNotBlank(vo.getName()), DssDatamodelTable::getName, vo.getName())));
-            return Message.ok().data("list", pageInfo.getList().stream().map(entity -> modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
-                    .data("total", pageInfo.getTotal());
+        if (vo.getModelType() > 0) {
+            return listByIndicator(vo);
         }
 
+        if (StringUtils.isNotBlank(vo.getWarehouseLayerName()) || StringUtils.isNotBlank(vo.getWarehouseThemeName())) {
+            return listDataModel(vo);
+        }
+        return listAssets(vo);
+    }
+
+    private Message listByIndicator(TableListVO vo) {
+        PageHelper.clearPage();
+        PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
+
+        PageInfo<DssDatamodelTabelQuery> pageInfo = new PageInfo<>(tableQueryMapper.page(Wrappers.<DssDatamodelTabelQuery>lambdaQuery()
+                .eq(DssDatamodelTabelQuery::getModelType, vo.getModelType())
+                .like(StringUtils.isNotBlank(vo.getModelName()), DssDatamodelTabelQuery::getModelName, vo.getModelName())
+                .like(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTabelQuery::getWarehouseLayerName, vo.getWarehouseLayerName())
+                .like(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTabelQuery::getWarehouseThemeName, vo.getWarehouseThemeName())
+                .groupBy(DssDatamodelTabelQuery::getId)));
+        return Message.ok().data("list", pageInfo.getList().stream().map(entity -> modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
+                .data("total", pageInfo.getTotal());
+    }
+
+    private Message listAssets(TableListVO vo) {
         SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder()
                 .setUser(vo.getUser())
                 .setQuery(vo.getName())
@@ -447,6 +468,17 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
         return Message.ok().data("list", tableListDTOS)
                 .data("total", tableListDTOS.size());
+    }
+
+    private Message listDataModel(TableListVO vo) {
+        PageHelper.clearPage();
+        PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
+        PageInfo<DssDatamodelTable> pageInfo = new PageInfo<>(getBaseMapper().selectList(Wrappers.<DssDatamodelTable>lambdaQuery()
+                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTable::getWarehouseThemeName, vo.getWarehouseThemeName())
+                .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTable::getWarehouseLayerName, vo.getWarehouseLayerName())
+                .like(StringUtils.isNotBlank(vo.getName()), DssDatamodelTable::getName, vo.getName())));
+        return Message.ok().data("list", pageInfo.getList().stream().map(entity -> modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
+                .data("total", pageInfo.getTotal());
     }
 
     @Override
@@ -474,7 +506,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public Message previewData(TableDataPreviewVO vo) {
         DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().code(vo.getTableName()).count(10).build();
-        return Message.ok().data("detail",previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask));
+        return Message.ok().data("detail", previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask));
     }
 
     private Message queryByGuid(String guid, String user) {

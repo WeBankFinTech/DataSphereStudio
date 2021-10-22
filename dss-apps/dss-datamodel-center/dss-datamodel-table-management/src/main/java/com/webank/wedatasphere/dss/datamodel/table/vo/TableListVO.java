@@ -29,4 +29,12 @@ public class TableListVO {
 
     private String user;
 
+    /**
+     * 0 维度 1 指标 2 度量  -1 按照表名查询
+     */
+    private Integer modelType = -1;
+
+
+    private String modelName;
+
 }

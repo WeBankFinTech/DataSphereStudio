@@ -46,8 +46,9 @@ public class UJESClientImplTestJ{
         UJESClient client = new UJESClientImpl(clientConfig);
 
         JobExecuteResult jobExecuteResult = client.execute(JobExecuteAction.builder().setCreator("hdfs")
-                .addExecuteCode("select * from linkis_db.linkis_partitions limit 1")
+                //.addExecuteCode("select * from linkis_db.linkis_test01 limit 10")
                 //.addExecuteCode("show tables")
+                .addExecuteCode(String.format("drop table if exists %s","linkis_db.linkis_test01"))
                 .setEngineType((JobExecuteAction.EngineType)JobExecuteAction.EngineType$.MODULE$.HIVE()).setEngineTypeStr("hql")
                 .setUser("hdfs").build());
         System.out.println("execId: " + jobExecuteResult.getExecID() + ", taskId: " + jobExecuteResult.taskID());
@@ -59,6 +60,7 @@ public class UJESClientImplTestJ{
             status = client.status(jobExecuteResult);
         }
         JobInfoResult jobInfo = client.getJobInfo(jobExecuteResult);
+        System.out.println(jobInfo.getStatus());
         String resultSet = jobInfo.getResultSetList(client)[0];
         ResultSetResult resultSetResult =client.resultSet(ResultSetAction.builder().setPath(resultSet).setUser(jobExecuteResult.getUser()).build());
         Object fileContents = resultSetResult.getFileContent();

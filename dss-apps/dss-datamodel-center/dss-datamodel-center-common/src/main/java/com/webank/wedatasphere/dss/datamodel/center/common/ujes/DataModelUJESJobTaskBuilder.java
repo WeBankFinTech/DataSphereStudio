@@ -1,11 +1,13 @@
 package com.webank.wedatasphere.dss.datamodel.center.common.ujes;
 
 
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
+
 public class DataModelUJESJobTaskBuilder {
 
     private DataModelUJESJobTask dataModelUJESJobTask;
 
-    DataModelUJESJobTaskBuilder(DataModelUJESJobTask dataModelUJESJobTask){
+    public DataModelUJESJobTaskBuilder(DataModelUJESJobTask dataModelUJESJobTask){
         this.dataModelUJESJobTask = dataModelUJESJobTask;
     }
 

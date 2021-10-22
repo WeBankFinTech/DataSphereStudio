@@ -1,10 +1,10 @@
-package com.webank.wedatasphere.dss.datamodel.center.common.ujes;
+package com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher;
 
 
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
 import com.webank.wedatasphere.linkis.common.utils.Utils;
 import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
 import com.webank.wedatasphere.linkis.ujes.client.request.JobExecuteAction;
-import com.webank.wedatasphere.linkis.ujes.client.request.ResultSetAction;
 import com.webank.wedatasphere.linkis.ujes.client.response.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -20,12 +20,8 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
     protected UJESClient client;
 
 
-    protected ResultSetResult launch0(DataModelUJESJobTask task){
+    protected void launch0(DataModelUJESJobTask task, JobExecuteResult jobExecuteResult){
             LOGGER.info("exec code : {}", task.getCode());
-            JobExecuteResult jobExecuteResult = client.execute(JobExecuteAction.builder().setCreator("hdfs")
-                    .addExecuteCode(task.getCode())
-                    .setEngineType((JobExecuteAction.EngineType) JobExecuteAction.EngineType$.MODULE$.HIVE()).setEngineTypeStr("hql")
-                    .setUser("hdfs").build());
             System.out.println("execId: " + jobExecuteResult.getExecID() + ", taskId: " + jobExecuteResult.taskID());
             LOGGER.info("execId : {}, taskId : {}",jobExecuteResult.getExecID(),jobExecuteResult.taskID());
             JobStatusResult status = client.status(jobExecuteResult);
@@ -36,16 +32,18 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
                 Utils.sleepQuietly(500);
                 status = client.status(jobExecuteResult);
             }
-            JobInfoResult jobInfo = client.getJobInfo(jobExecuteResult);
-            String resultSet = jobInfo.getResultSetList(client)[0];
-            return client.resultSet(ResultSetAction.builder().setPath(resultSet).setUser(jobExecuteResult.getUser()).build());
 
     }
 
     @Override
     public E launch(DataModelUJESJobTask task) {
         try {
-            return callBack(launch0(task));
+            JobExecuteResult jobExecuteResult = client.execute(JobExecuteAction.builder().setCreator("hdfs")
+                    .addExecuteCode(task.getCode())
+                    .setEngineType((JobExecuteAction.EngineType) JobExecuteAction.EngineType$.MODULE$.HIVE()).setEngineTypeStr("hql")
+                    .setUser("hdfs").build());
+            launch0(task,jobExecuteResult);
+            return callBack(jobExecuteResult);
         }catch (Exception e){
             LOGGER.error(e.getMessage(),e);
             throw e;
@@ -54,5 +52,5 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
         }
     }
 
-    abstract E callBack(ResultSetResult resultSetResult);
+    abstract E callBack(JobExecuteResult jobExecuteResult);
 }

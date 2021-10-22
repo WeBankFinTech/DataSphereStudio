@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.table.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.datamodel.center.common.dto.CreateTableDTO;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableMaterializedHistory;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -47,4 +48,22 @@ public interface TableMaterializedHistoryService extends IService<DssDatamodelTa
      * @return
      */
     boolean tableExists(String tableName) throws ErrorException;
+
+
+    /**
+     * 删除表
+     * @param tableName
+     * @return
+     * @throws ErrorException
+     */
+    boolean dropTable(String tableName) throws ErrorException;
+
+
+    /**
+     * 创建表
+     * @param current
+     * @return
+     * @throws ErrorException
+     */
+    CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException;
 }

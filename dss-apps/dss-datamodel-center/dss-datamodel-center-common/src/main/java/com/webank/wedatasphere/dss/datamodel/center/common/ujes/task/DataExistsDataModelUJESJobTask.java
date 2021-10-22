@@ -1,5 +1,7 @@
-package com.webank.wedatasphere.dss.datamodel.center.common.ujes;
+package com.webank.wedatasphere.dss.datamodel.center.common.ujes.task;
 
+
+import com.webank.wedatasphere.dss.datamodel.center.common.ujes.DataModelUJESJobTaskBuilder;
 
 public class DataExistsDataModelUJESJobTask extends DataModelUJESJobTask{
 
@@ -10,7 +12,7 @@ public class DataExistsDataModelUJESJobTask extends DataModelUJESJobTask{
     DataExistsDataModelUJESJobTask(){};
 
     @Override
-    void formatCode(String code) {
+    public void formatCode(String code) {
         setCode( String.format("select * from %s limit 1",code));
     }
 }

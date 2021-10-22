@@ -94,6 +94,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         newOne.setLastUpdateTime(new Date());
         newOne.setReason("reason");
         newOne.setTaskId(dto.getTaskId());
+        newOne.setTablename(current.getName());
         getBaseMapper().insert(newOne);
         return 1;
     }
@@ -123,9 +124,9 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
 
     @Override
     public boolean dropTable(String tableName) throws ErrorException {
-        if(!tableExists(tableName)){
-            return true;
-        }
+//        if(!tableExists(tableName)){
+//            return true;
+//        }
         DataModelUJESJobTask dataModelUJESJobTask = DropTableDataModelUJESJobTask.newBuilder().code(tableName).build();
         return dropTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
     }
@@ -134,7 +135,6 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     public CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException {
         String sql = buildSql(current);
         LOGGER.info("table id : {}, sql : {}", current.getId(), sql);
-
         DataModelUJESJobTask dataModelUJESJobTask = CreateTableDataModelUJESJobTask.newBuilder().code(sql).build();
         CreateTableDTO createTableDTO = createTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
         createTableDTO.setSql(sql);

@@ -22,12 +22,12 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
 
     protected void launch0(DataModelUJESJobTask task, JobExecuteResult jobExecuteResult){
             LOGGER.info("exec code : {}", task.getCode());
-            System.out.println("execId: " + jobExecuteResult.getExecID() + ", taskId: " + jobExecuteResult.taskID());
+            //System.out.println("execId: " + jobExecuteResult.getExecID() + ", taskId: " + jobExecuteResult.taskID());
             LOGGER.info("execId : {}, taskId : {}",jobExecuteResult.getExecID(),jobExecuteResult.taskID());
             JobStatusResult status = client.status(jobExecuteResult);
             while (!status.isCompleted()) {
                 JobProgressResult progress = client.progress(jobExecuteResult);
-                System.out.println("progress: " + progress.getProgress());
+                //System.out.println("progress: " + progress.getProgress());
                 LOGGER.info("progress : {}",progress.getProgress());
                 Utils.sleepQuietly(500);
                 status = client.status(jobExecuteResult);
@@ -48,7 +48,7 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
             LOGGER.error(e.getMessage(),e);
             throw e;
         }finally {
-            IOUtils.closeQuietly(client);
+            //IOUtils.closeQuietly(client);
         }
     }
 

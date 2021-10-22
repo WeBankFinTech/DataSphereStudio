@@ -20,6 +20,6 @@ public class DataExistsDataModelUJESJobLauncher extends AbstractDataModelUJESJob
         ResultSetResult resultSetResult = client.resultSet(ResultSetAction.builder().setPath(resultSet).setUser(jobExecuteResult.getUser()).build());
 
         Object fileContents = resultSetResult.getFileContent();
-        return CollectionUtils.isEmpty((List)fileContents);
+        return !CollectionUtils.isEmpty((List)fileContents);
     }
 }

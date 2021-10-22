@@ -46,7 +46,7 @@ public class UJESClientImplTestJ{
         UJESClient client = new UJESClientImpl(clientConfig);
 
         JobExecuteResult jobExecuteResult = client.execute(JobExecuteAction.builder().setCreator("hdfs")
-                .addExecuteCode("select * from default.testTable limit 1")
+                .addExecuteCode("select * from default.testTable3 limit 1")
                 //.addExecuteCode("show tables")
                 //.addExecuteCode(String.format("drop table if exists %s","linkis_db.linkis_test01"))
                 .setEngineType((JobExecuteAction.EngineType)JobExecuteAction.EngineType$.MODULE$.HIVE()).setEngineTypeStr("hql")

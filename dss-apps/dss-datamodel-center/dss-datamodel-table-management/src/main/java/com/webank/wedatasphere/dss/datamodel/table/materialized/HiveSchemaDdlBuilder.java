@@ -95,7 +95,7 @@ public class HiveSchemaDdlBuilder {
                     builder.append(",");
                 }
                 builder.append(lineSeparator);
-                builder.append(" ").append(c.getName()).append("\t").append(c.getType());
+                builder.append(" ").append(c.getName()).append(" ").append(c.getType());
                 if (c.getComment() != null && !c.getComment().equals("")) {
                     builder.append(" ").append("COMMENT '").append(c.getComment()).append("'");
                 }
@@ -117,7 +117,7 @@ public class HiveSchemaDdlBuilder {
                 if (isFirstColumn) {
                     isFirstColumn = false;
                 } else {
-                    builder.append(",");
+                    builder.append(", ");
                 }
                 builder.append(c.getName()).append(" ").append(c.getType());
             }

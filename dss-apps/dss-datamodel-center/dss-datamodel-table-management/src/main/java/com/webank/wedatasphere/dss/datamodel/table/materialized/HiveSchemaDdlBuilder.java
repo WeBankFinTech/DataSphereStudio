@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.table.materialized;
 
 import com.webank.wedatasphere.dss.datamodel.table.materialized.HiveSchema.Column;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class HiveSchemaDdlBuilder {
         return this;
     }
 
-    public HiveSchemaDdlBuilder withExternal(String location) {
+
+    public HiveSchemaDdlBuilder withExternal() {
         hiveSchema.setExternal(true);
-        hiveSchema.setLocation(location);
         return this;
     }
 
@@ -129,7 +130,7 @@ public class HiveSchemaDdlBuilder {
             builder.append("STORED AS ").append(hiveSchema.getStoredType()).append(lineSeparator);
         }
 
-        if (hiveSchema.isExternal()) {
+        if (StringUtils.isNotBlank(hiveSchema.getLocation())) {
             builder.append("LOCATION ").append("'").append(hiveSchema.getLocation()).append("'");
         }
 

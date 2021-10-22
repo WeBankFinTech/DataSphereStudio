@@ -192,8 +192,11 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         if (StringUtils.isNotBlank(current.getComment())) {
             builder.comment(current.getComment());
         }
-        if (current.getIsExternal() == 1 && StringUtils.isNotBlank(current.getLocation())) {
-            builder.withExternal(current.getLocation());
+        if (current.getIsExternal() == 1) {
+            builder.withExternal();
+        }
+        if (StringUtils.isNotBlank(current.getLocation())){
+            builder.location(current.getLocation());
         }
         columns.forEach(column -> {
             builder.addColumn(column.getName(), column.getType(), column.getIsPartitionField() != 0, column.getComment());

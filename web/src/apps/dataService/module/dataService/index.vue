@@ -160,7 +160,7 @@ export default {
       if (!result) {
         callback(new Error("业务名称不能为空"));
       } else {
-        if (this.groupDatas.some(item => item.name === result)) {
+        if (this.groupDatas.some(item => item.name.trim() === result)) {
           callback(new Error("该名称已经存在"));
           return;
         } else if (result.length > 20) {
@@ -176,7 +176,26 @@ export default {
         callback(new Error("名称不能为空"));
       } else {
         const apis = (this.groupData && this.groupData.apis) || [];
-        if (apis.some(item => item.name === result)) {
+        const isUpdate = this.modalType === "updateApi";
+        let isHad = apis.some(item => item.name.trim() === result);
+        if (isUpdate) {
+          isHad = false;
+          const groupData = this.allProjectTree.find(item => {
+            return item.id + "" === this.apiForm.groupId + "";
+          });
+          if (groupData) {
+            const apis2 = groupData.apis || [];
+            apis2.forEach(item => {
+              if (
+                item.name.trim() === result &&
+                item.id + "" !== this.apiForm.id + ""
+              ) {
+                isHad = true;
+              }
+            });
+          }
+        }
+        if (isHad) {
           callback(new Error("该名称已经存在"));
           return;
         } else if (result.length > 20) {
@@ -271,7 +290,8 @@ export default {
       },
       groupData: "",
       apiTabDatas: [],
-      groupDatas: []
+      groupDatas: [],
+      allProjectTree: []
     };
   },
   computed: {},
@@ -324,7 +344,7 @@ export default {
             if (modalType === "api") {
               const { id, name } = this.groupData;
               const tempId = Date.now();
-              const params = {...this.apiForm};
+              const params = { ...this.apiForm };
               params.apiName = params.apiName.trim();
               params.apiPath = params.apiPath.trim();
               this.$refs.navMenu.treeMethod("addApi", {
@@ -411,6 +431,8 @@ export default {
     },
     showApiForm(apiData) {
       const { data } = apiData;
+      console.log(apiData);
+      console.log(this.groupData);
       this.apiForm = { ...data };
       this.modalVisible = true;
       this.modalType = "updateApi";
@@ -418,11 +440,12 @@ export default {
     },
     handleApiChoosed(payload) {
       if (payload.type === "api") {
-        const { id, tempId } = payload;
+        const { id, tempId, allProjectTree } = payload;
         const newApis = [...this.apiTabDatas];
         const hitIndex = newApis.findIndex(
           item => item.id === id || item.id === tempId
         );
+        this.allProjectTree = allProjectTree;
         if (hitIndex !== -1) {
           this.apiTabDatas = newApis.map((item, index) => {
             const tmp = { ...item };

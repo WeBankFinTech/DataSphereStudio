@@ -431,8 +431,6 @@ export default {
     },
     showApiForm(apiData) {
       const { data } = apiData;
-      console.log(apiData);
-      console.log(this.groupData);
       this.apiForm = { ...data };
       this.modalVisible = true;
       this.modalType = "updateApi";

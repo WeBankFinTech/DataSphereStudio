@@ -82,8 +82,6 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      console.log(this.originDatas);
-      console.log(node);
       this.$emit("handleApiChoosed", {...node, allProjectTree: this.originDatas});
     },
     getAllApi(type = "", payload = {}) {

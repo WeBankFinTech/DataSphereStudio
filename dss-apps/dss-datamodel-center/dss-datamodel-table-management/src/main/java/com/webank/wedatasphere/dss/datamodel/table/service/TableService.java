@@ -168,5 +168,5 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @param vo
      * @return
      */
-    Message previewData(TableDataPreviewVO vo);
+    Message previewData(TableDataPreviewVO vo) throws ErrorException;
 }

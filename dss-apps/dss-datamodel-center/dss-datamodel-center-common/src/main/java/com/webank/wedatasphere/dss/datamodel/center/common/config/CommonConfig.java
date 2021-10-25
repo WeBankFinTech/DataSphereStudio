@@ -68,14 +68,20 @@ public class CommonConfig {
     }
 
     @Bean
-    public UJESClient ujesClient() {
+    public UJESClient ujesClient()throws Exception {
+        AuthenticationStrategy authenticationStrategy = (AuthenticationStrategy) Class.forName(LinkisJobConfiguration.AUTHENTICATION_STRATEGY.getValue()).newInstance();
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder().addServerUrl(LinkisJobConfiguration.LINKIS_SERVER_URL.getValue())
-                .connectionTimeout(30000).discoveryEnabled(true)
-                .discoveryFrequency(1, TimeUnit.MINUTES)
-                .loadbalancerEnabled(true).maxConnectionSize(5)
-                .retryEnabled(false).readTimeout(30000)
-                .setAuthenticationStrategy(new StaticAuthenticationStrategy()).setAuthTokenKey("hdfs")
-                .setAuthTokenValue("hdfs"))).setDWSVersion("v1").build();
+                .connectionTimeout(LinkisJobConfiguration.CONNECTION_TIMEOUT.getValue())
+                .discoveryEnabled(LinkisJobConfiguration.DISCOVERY_ENABLED.getValue())
+                .discoveryFrequency(LinkisJobConfiguration.DISCOVERY_FREQUENCY_PERIOD.getValue(), TimeUnit.MINUTES)
+                .loadbalancerEnabled(LinkisJobConfiguration.LOAD_BALANCER_ENABLED.getValue())
+                .maxConnectionSize(LinkisJobConfiguration.MAX_CONNECTION_SIZE.getValue())
+                .retryEnabled(LinkisJobConfiguration.RETRY_ENABLED.getValue())
+                .readTimeout(LinkisJobConfiguration.READ_TIMEOUT.getValue())
+                .setAuthenticationStrategy(authenticationStrategy)
+                .setAuthTokenKey(LinkisJobConfiguration.AUTHTOKEN_KEY.getValue())
+                .setAuthTokenValue(LinkisJobConfiguration.AUTHTOKEN_VALUE.getValue())))
+                .setDWSVersion(LinkisJobConfiguration.DWS_VERSION.getValue()).build();
         return new UJESClientImpl(clientConfig);
     }
 

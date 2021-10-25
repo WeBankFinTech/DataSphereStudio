@@ -13,6 +13,7 @@ import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteCl
 import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.dto.PreviewDataDTO;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.PreviewDataModelUJESJobLauncher;
@@ -25,6 +26,7 @@ import com.webank.wedatasphere.dss.datamodel.table.service.*;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.ujes.client.exception.UJESJobException;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -438,8 +440,8 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         PageInfo<DssDatamodelTabelQuery> pageInfo = new PageInfo<>(tableQueryMapper.page(Wrappers.<DssDatamodelTabelQuery>lambdaQuery()
                 .eq(DssDatamodelTabelQuery::getModelType, vo.getModelType())
                 .like(StringUtils.isNotBlank(vo.getModelName()), DssDatamodelTabelQuery::getModelName, vo.getModelName())
-                .like(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTabelQuery::getWarehouseLayerName, vo.getWarehouseLayerName())
-                .like(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTabelQuery::getWarehouseThemeName, vo.getWarehouseThemeName())
+                .eq(StringUtils.isNotBlank(vo.getWarehouseLayerName()), DssDatamodelTabelQuery::getWarehouseLayerName, vo.getWarehouseLayerName())
+                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelTabelQuery::getWarehouseThemeName, vo.getWarehouseThemeName())
                 .groupBy(DssDatamodelTabelQuery::getId)));
         return Message.ok().data("list", pageInfo.getList().stream().map(entity -> modelMapper.map(entity, TableListDTO.class)).collect(Collectors.toList()))
                 .data("total", pageInfo.getTotal());
@@ -504,9 +506,26 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
 
     @Override
-    public Message previewData(TableDataPreviewVO vo) {
+    public Message previewData(TableDataPreviewVO vo) throws ErrorException {
+        if (!tableMaterializedHistoryService.tableExists(vo.getTableName())) {
+            return Message.ok();
+        }
         DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().code(vo.getTableName()).count(10).build();
-        return Message.ok().data("detail", previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask));
+        PreviewDataDTO previewDataDTO = null;
+        try {
+            previewDataDTO = previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
+        } catch (Exception e) {
+            if (e instanceof UJESJobException) {
+                UJESJobException ujesJobException = (UJESJobException)e;
+                //表不存在错误忽略
+                if (ujesJobException.getErrCode()==40002) {
+                    LOGGER.error(e.getMessage(), e);
+                    return Message.ok();
+                }
+            }
+            throw e;
+        }
+        return Message.ok().data("detail", previewDataDTO);
     }
 
     private Message queryByGuid(String guid, String user) {

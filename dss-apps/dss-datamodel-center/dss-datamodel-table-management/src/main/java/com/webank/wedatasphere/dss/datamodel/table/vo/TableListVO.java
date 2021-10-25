@@ -1,18 +1,13 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
 
+import com.webank.wedatasphere.dss.datamodel.center.common.vo.PageVO;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
-public class TableListVO {
-
-    private Integer pageSize = 20;
-
-    private Integer pageNum = 1;
-
-
+public class TableListVO extends PageVO {
 
     private String name;
 

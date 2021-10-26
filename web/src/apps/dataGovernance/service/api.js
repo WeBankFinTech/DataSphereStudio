@@ -100,6 +100,14 @@ export const postSetLabel = (guid, params) =>
   api.fetch(`${API_PATH.DATA_GOVERNANCE}label/${guid}`, params, 'post')
 
 /**
+ * 删除标签
+ * @params {guid}
+ * @returns String
+ */
+export const putRemoveLabel = (guid, params) =>
+  api.fetch(`${API_PATH.DATA_GOVERNANCE}label/${guid}`, params, 'put')
+
+/**
  * 修改注释--表或列
  * @params {guid, Obiect}
  * @returns String

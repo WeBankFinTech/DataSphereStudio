@@ -64,7 +64,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     @Resource
     private CreateTableDataModelUJESJobLauncher createTableDataModelUJESJobLauncher;
 
-    private final Gson assertsGson= new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
+    private final Gson assertsGson = new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -90,7 +90,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         newOne.setId(null);
         newOne.setMaterializedCode(dto.getSql());
         newOne.setCreateTime(new Date());
-        newOne.setStatus(dto.getStatus()==0 ? 0 : 1);//
+        newOne.setStatus(dto.getStatus() == 0 ? 0 : 1);//
         newOne.setLastUpdateTime(new Date());
         newOne.setReason("reason");
         newOne.setTaskId(dto.getTaskId());
@@ -102,7 +102,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     public void checkData(DssDatamodelTable current) throws ErrorException {
         //linkisJobCheck(current);
         //如果表存在且存在数据
-        if(tableExists(current.getName())&& hasData(current.getName())){
+        if (tableExists(current.getName()) && hasData(current.getName())) {
             LOGGER.error("errorCode : {}, table id : {} has data", ErrorCode.TABLE_CHECK_ERROR.getCode(), current.getId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_CHECK_ERROR.getCode(), " table id : " + current.getId() + " has data");
         }
@@ -110,15 +110,24 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
 
     @Override
     public boolean hasData(String tableName) {
-        DataModelUJESJobTask dataModelUJESJobTask =  DataExistsDataModelUJESJobTask.newBuilder().code(tableName).build();
+        DataModelUJESJobTask dataModelUJESJobTask = DataExistsDataModelUJESJobTask.newBuilder().code(tableName).build();
         return dataExistsDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
     }
 
     @Override
     public boolean tableExists(String tableName) throws ErrorException {
         SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery(tableName).setOffset(0).setLimit(1).build());
-        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {}.getType());
-        return !CollectionUtils.isEmpty(dtos);
+        List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {
+        }.getType());
+        if (CollectionUtils.isEmpty(dtos)){
+            return false;
+        }
+        for(HiveTblSimpleInfoDTO dto : dtos){
+            if (StringUtils.equals(dto.getName(),tableName)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -195,7 +204,7 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         if (current.getIsExternal() == 1) {
             builder.withExternal();
         }
-        if (StringUtils.isNotBlank(current.getLocation())){
+        if (StringUtils.isNotBlank(current.getLocation())) {
             builder.location(current.getLocation());
         }
         columns.forEach(column -> {
@@ -208,5 +217,17 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
     @Override
     public String generateSql(DssDatamodelTable current) {
         return buildSql(current);
+    }
+
+
+    @Override
+    public boolean isMaterialized(String tableName, String version){
+
+        return getBaseMapper().selectCount(Wrappers.<DssDatamodelTableMaterializedHistory>lambdaQuery()
+                .eq(DssDatamodelTableMaterializedHistory::getTablename, tableName)
+                .eq(DssDatamodelTableMaterializedHistory::getVersion, version)
+                .eq(DssDatamodelTableMaterializedHistory::getStatus, 0)) > 0;
+
+
     }
 }

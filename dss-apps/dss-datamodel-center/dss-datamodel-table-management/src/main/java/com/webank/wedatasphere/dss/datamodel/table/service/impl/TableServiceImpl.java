@@ -167,7 +167,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         return queryTable(table);
     }
 
-    private TableQueryDTO queryTable(DssDatamodelTable table) {
+    private TableQueryDTO queryTable(DssDatamodelTable table) throws ErrorException {
         TableQueryDTO tableQueryDTO = modelMapper.map(table, TableQueryDTO.class);
 
         List<TableColumnQueryDTO> columnQueryDTOS = tableColumnsService.listByTableId(table.getId())
@@ -178,7 +178,12 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         if (tableStats != null) {
             tableQueryDTO.setStats(modelMapper.map(tableStats, TableStatsDTO.class));
         }
-
+        TableHeadlineDTO headlineDTO = new TableHeadlineDTO();
+        headlineDTO.setStorageType(0);
+        headlineDTO.setTableType(0);
+        headlineDTO.setEntityType(
+               tableMaterializedHistoryService.isMaterialized(table.getName(),table.getVersion())?1:0);
+        tableQueryDTO.setHeadline(headlineDTO);
         return tableQueryDTO;
     }
 

@@ -94,6 +94,9 @@ public class TableQueryDTO {
 
     private TableStatsDTO stats = new TableStatsDTO();
 
+
+    private TableHeadlineDTO headline;
+
     public static TableQueryDTO toTableStatsDTO(HiveTblDetailInfoDTO hiveTblDTO,String name){
         TableQueryDTO dto = new TableQueryDTO();
         dto.setName(name);
@@ -130,7 +133,11 @@ public class TableQueryDTO {
                 dto.columns.add(columnQueryDTO);
             });
         }
-
+        TableHeadlineDTO headlineDTO = new TableHeadlineDTO();
+        headlineDTO.setStorageType(0);
+        headlineDTO.setTableType(0);
+        headlineDTO.setEntityType(1);
+        dto.setHeadline(headlineDTO);
         return dto;
     }
 }

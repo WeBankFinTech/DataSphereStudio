@@ -66,4 +66,14 @@ public interface TableMaterializedHistoryService extends IService<DssDatamodelTa
      * @throws ErrorException
      */
     CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException;
+
+
+    /**
+     * 查看是否物化
+     * @param tableName
+     * @param version
+     * @return
+     * @throws ErrorException
+     */
+    boolean isMaterialized(String tableName, String version);
 }

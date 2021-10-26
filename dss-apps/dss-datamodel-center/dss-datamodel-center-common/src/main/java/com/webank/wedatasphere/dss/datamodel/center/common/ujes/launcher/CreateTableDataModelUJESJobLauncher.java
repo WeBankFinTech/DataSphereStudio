@@ -14,9 +14,11 @@ public class CreateTableDataModelUJESJobLauncher extends AbstractDataModelUJESJo
     @Override
     CreateTableDTO callBack(JobExecuteResult jobExecuteResult) {
         JobInfoResult jobInfo = client.getJobInfo(jobExecuteResult);
+
         CreateTableDTO createTableDTO = new CreateTableDTO();
         createTableDTO.setStatus(jobInfo.getStatus());
         createTableDTO.setTaskId(jobExecuteResult.getTaskID());
+        LOGGER.info("create table status : {}, info : {}",createTableDTO,jobInfo);
         return createTableDTO;
     }
 }

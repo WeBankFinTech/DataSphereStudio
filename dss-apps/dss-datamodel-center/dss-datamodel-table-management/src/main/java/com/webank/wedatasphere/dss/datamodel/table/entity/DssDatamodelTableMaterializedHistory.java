@@ -1,5 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.table.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.ToString;
 
@@ -8,6 +10,7 @@ import java.util.Date;
 @Data
 @ToString
 public class DssDatamodelTableMaterializedHistory {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

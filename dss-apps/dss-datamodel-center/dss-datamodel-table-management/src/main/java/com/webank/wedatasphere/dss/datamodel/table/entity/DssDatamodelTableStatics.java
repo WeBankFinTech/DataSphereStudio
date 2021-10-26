@@ -1,6 +1,10 @@
 package com.webank.wedatasphere.dss.datamodel.table.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 public class DssDatamodelTableStatics {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String originTables;

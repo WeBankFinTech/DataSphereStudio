@@ -1,8 +1,12 @@
 package com.webank.wedatasphere.dss.datamodel.table.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.util.Date;
 
 public class DssDatamodelTable {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String dataBase;

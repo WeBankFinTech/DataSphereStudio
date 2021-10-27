@@ -41,7 +41,7 @@ public abstract class AbstractDataModelUJESJobLauncher<E> implements DataModelUJ
             JobExecuteResult jobExecuteResult = client.execute(JobExecuteAction.builder().setCreator("hdfs")
                     .addExecuteCode(task.getCode())
                     .setEngineType((JobExecuteAction.EngineType) JobExecuteAction.EngineType$.MODULE$.HIVE()).setEngineTypeStr("hql")
-                    .setUser("hdfs").build());
+                    .setUser(task.getUser()).build());
             launch0(task,jobExecuteResult);
             return callBack(jobExecuteResult);
         }catch (Exception e){

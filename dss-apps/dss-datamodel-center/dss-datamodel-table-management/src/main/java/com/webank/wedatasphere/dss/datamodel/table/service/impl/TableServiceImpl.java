@@ -122,7 +122,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_UPDATE_ERROR.getCode(), "update table error not exists");
         }
         //判断数据表是否有数据
-        tableMaterializedHistoryService.checkData(org);
+        tableMaterializedHistoryService.checkData(org, vo.getCreator());
 
         //当更新表名称时,存在其他指标名称同名或者当前指标名称已经存在版本信息，则不允许修改指标名称
         if (!StringUtils.equals(vo.getName(), org.getName())) {
@@ -211,9 +211,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         //判断旧版本是否有数据
-        tableMaterializedHistoryService.checkData(orgVersion);
+        tableMaterializedHistoryService.checkData(orgVersion,vo.getCreator());
         //没有数据删除表
-        tableMaterializedHistoryService.dropTable(orgVersion.getName());
+        //tableMaterializedHistoryService.dropTable(orgVersion.getName(),vo.getCreator());
 
         String orgName = orgVersion.getName();
         String orgDatabase = orgVersion.getDataBase();
@@ -277,9 +277,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         //判断当前版本是否有数据
-        tableMaterializedHistoryService.checkData(current);
+        tableMaterializedHistoryService.checkData(current, vo.getUser());
         //没有数据删除表
-        tableMaterializedHistoryService.dropTable(current.getName());
+        //tableMaterializedHistoryService.dropTable(current.getName(),vo.getUser());
 
         //查询字段信息
         List<DssDatamodelTableColumns> currentColumns = tableColumnsService.listByTableId(current.getId());
@@ -399,7 +399,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             LOGGER.error("errorCode : {},  table not exists id : {} ", ErrorCode.TABLE_CREATE_ERROR.getCode(), vo.getTableId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_CREATE_ERROR.getCode(), " table not exists id : " + vo.getTableId());
         }
-        return tableMaterializedHistoryService.materializedTable(current);
+        return tableMaterializedHistoryService.materializedTable(current, vo.getUser());
     }
 
 
@@ -512,7 +512,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     public Message previewData(TableDataPreviewVO vo) throws ErrorException {
-        if (!tableMaterializedHistoryService.tableExists(vo.getTableName())) {
+        if (!tableMaterializedHistoryService.tableExists(vo.getTableName(),vo.getUser())) {
             return Message.ok();
         }
         DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().code(vo.getTableName()).count(10).build();
@@ -531,6 +531,13 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             throw e;
         }
         return Message.ok().data("detail", previewDataDTO);
+    }
+
+
+    @Override
+    public Integer tableCheckData(TableCheckDataVO vo) throws ErrorException {
+        return ((tableMaterializedHistoryService.tableExists(vo.getTableName(), vo.getUser())
+                &&tableMaterializedHistoryService.hasData(vo.getTableName(),vo.getUser()))?1:0);
     }
 
     private Message queryByGuid(String guid, String user) {

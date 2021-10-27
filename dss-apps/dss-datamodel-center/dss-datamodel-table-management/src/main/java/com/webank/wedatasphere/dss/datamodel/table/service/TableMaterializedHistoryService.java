@@ -12,9 +12,10 @@ public interface TableMaterializedHistoryService extends IService<DssDatamodelTa
     /**
      * 物化表结构
      * @param current
+     * @param user
      * @return
      */
-    Integer materializedTable(DssDatamodelTable current) throws ErrorException;
+    Integer materializedTable(DssDatamodelTable current, String user) throws ErrorException;
 
 
     /**
@@ -28,44 +29,49 @@ public interface TableMaterializedHistoryService extends IService<DssDatamodelTa
     /**
      * 检查是否有数据
      * @param current
+     * @param user
      * @throws ErrorException
      */
-    void checkData(DssDatamodelTable current) throws ErrorException;
+    void checkData(DssDatamodelTable current, String user) throws ErrorException;
 
 
     /**
      * 判断是否有数据
      *
-     * @param tableName@return
+     * @param tableName @return
+     * @param user
      */
-    boolean hasData(String tableName);
+    boolean hasData(String tableName, String user);
 
 
     /**
      *
      * @param tableName
+     * @param user
      * @throws ErrorException
      * @return
      */
-    boolean tableExists(String tableName) throws ErrorException;
+    boolean tableExists(String tableName, String user) throws ErrorException;
 
 
     /**
      * 删除表
      * @param tableName
+     * @param user
      * @return
      * @throws ErrorException
      */
-    boolean dropTable(String tableName) throws ErrorException;
+    boolean dropTable(String tableName, String user) throws ErrorException;
 
 
     /**
      * 创建表
      * @param current
+     * @param user
      * @return
      * @throws ErrorException
      */
-    CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException;
+    CreateTableDTO createTable(DssDatamodelTable current, String user) throws ErrorException;
 
 
     /**

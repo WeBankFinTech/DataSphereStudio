@@ -6,8 +6,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class TableCreateVO {
-    private Long tableId;
-
-    private String user;
+public class TableCheckDataVO {
+    String tableName;
+    String user;
 }

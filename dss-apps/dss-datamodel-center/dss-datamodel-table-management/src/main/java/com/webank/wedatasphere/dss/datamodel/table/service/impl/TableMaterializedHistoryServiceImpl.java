@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamodelTableMaterializedHistoryMapper, DssDatamodelTableMaterializedHistory> implements TableMaterializedHistoryService {
+public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamodelTableMaterializedHistoryMapper, DssDatamodelTableMaterializedHistory> implements TableMaterializedHistoryService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableMaterializedHistoryServiceImpl.class);
 
@@ -68,14 +68,14 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer materializedTable(DssDatamodelTable current) throws ErrorException {
+    public Integer materializedTable(DssDatamodelTable current, String user) throws ErrorException {
 
         //判断是否有数据
-        checkData(current);
+        checkData(current, user);
         //不存在数据删除表
-        dropTable(current.getName());
+        dropTable(current.getName(),user);
 
-        CreateTableDTO dto = createTable(current);
+        CreateTableDTO dto = createTable(current, user);
 
         //创建表
 //        SubmittableInteractiveJob job = linkisCreateTable(current, sql);
@@ -99,31 +99,31 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
         return 1;
     }
 
-    public void checkData(DssDatamodelTable current) throws ErrorException {
+    public void checkData(DssDatamodelTable current, String user) throws ErrorException {
         //linkisJobCheck(current);
         //如果表存在且存在数据
-        if (tableExists(current.getName()) && hasData(current.getName())) {
+        if (tableExists(current.getName(),user ) && hasData(current.getName(), user)) {
             LOGGER.error("errorCode : {}, table id : {} has data", ErrorCode.TABLE_CHECK_ERROR.getCode(), current.getId());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_CHECK_ERROR.getCode(), " table id : " + current.getId() + " has data");
         }
     }
 
     @Override
-    public boolean hasData(String tableName) {
-        DataModelUJESJobTask dataModelUJESJobTask = DataExistsDataModelUJESJobTask.newBuilder().code(tableName).build();
+    public boolean hasData(String tableName, String user) {
+        DataModelUJESJobTask dataModelUJESJobTask = DataExistsDataModelUJESJobTask.newBuilder().user(user).code(tableName).build();
         return dataExistsDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
     }
 
     @Override
-    public boolean tableExists(String tableName) throws ErrorException {
-        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery(tableName).setOffset(0).setLimit(1).build());
+    public boolean tableExists(String tableName, String user) throws ErrorException {
+        SearchHiveTblResult result = linkisDataAssetsRemoteClient.searchHiveTbl(SearchHiveTblAction.builder().setUser(user).setQuery(tableName).setOffset(0).setLimit(1).build());
         List<HiveTblSimpleInfoDTO> dtos = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<HiveTblSimpleInfoDTO>>() {
         }.getType());
         if (CollectionUtils.isEmpty(dtos)){
             return false;
         }
         for(HiveTblSimpleInfoDTO dto : dtos){
-            if (StringUtils.equals(dto.getName(),tableName)){
+            if (StringUtils.equals(StringUtils.substringBeforeLast(dto.getQualifiedName(),"@"),tableName)){
                 return true;
             }
         }
@@ -132,19 +132,19 @@ public class TableMaterializedHistoryServiceImpl extends ServiceImpl<DssDatamode
 
 
     @Override
-    public boolean dropTable(String tableName) throws ErrorException {
+    public boolean dropTable(String tableName, String user) throws ErrorException {
 //        if(!tableExists(tableName)){
 //            return true;
 //        }
-        DataModelUJESJobTask dataModelUJESJobTask = DropTableDataModelUJESJobTask.newBuilder().code(tableName).build();
+        DataModelUJESJobTask dataModelUJESJobTask = DropTableDataModelUJESJobTask.newBuilder().user(user).code(tableName).build();
         return dropTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
     }
 
     @Override
-    public CreateTableDTO createTable(DssDatamodelTable current) throws ErrorException {
+    public CreateTableDTO createTable(DssDatamodelTable current, String user) throws ErrorException {
         String sql = buildSql(current);
         LOGGER.info("table id : {}, sql : {}", current.getId(), sql);
-        DataModelUJESJobTask dataModelUJESJobTask = CreateTableDataModelUJESJobTask.newBuilder().code(sql).build();
+        DataModelUJESJobTask dataModelUJESJobTask = CreateTableDataModelUJESJobTask.newBuilder().user(user).code(sql).build();
         CreateTableDTO createTableDTO = createTableDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
         createTableDTO.setSql(sql);
         return createTableDTO;

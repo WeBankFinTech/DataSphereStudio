@@ -148,6 +148,7 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
     @POST
     @Path("/tables/versions/rollback")
     public Response versionRollBack(@Context HttpServletRequest req, @RequestBody TableVersionRollBackVO vo) throws Exception {
+        vo.setUser(getStrategyUser(req));
         LOGGER.info("tableVersionRollBackVO : {}", vo);
         return Message.messageToResponse(Message.ok().data("count",tableService.versionRollBack(vo)));
     }
@@ -278,6 +279,7 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
     @POST
     @Path("/tables/create/")
     public Response tableCreate(@Context HttpServletRequest req, @RequestBody TableCreateVO vo) throws ErrorException {
+        vo.setUser(getStrategyUser(req));
         LOGGER.info("table create vo : {}", vo);
         return Message.messageToResponse(Message.ok().data("count",tableService.tableCreate(vo)));
     }
@@ -365,4 +367,17 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
         return Message.messageToResponse(Message.ok().data("user",getStrategyUser(req)));
     }
 
+
+    /**
+     * 检测表是否有数据
+     * @param req
+     * @return
+     */
+    @POST
+    @Path("/tables/check/data")
+    public Response tableCheckData(@Context HttpServletRequest req,@RequestBody TableCheckDataVO vo) throws ErrorException {
+        vo.setUser(getStrategyUser(req));
+        LOGGER.info("table partition stats vo : {}",vo);
+        return Message.messageToResponse(Message.ok().data("status",tableService.tableCheckData(vo)));
+    }
 }

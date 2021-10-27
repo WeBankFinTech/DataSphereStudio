@@ -21,6 +21,11 @@ public class DataModelUJESJobTaskBuilder {
         return this;
     }
 
+    public DataModelUJESJobTaskBuilder user(String user){
+        dataModelUJESJobTask.setUser(user);
+        return this;
+    }
+
     public DataModelUJESJobTask build(){
         return dataModelUJESJobTask;
     }

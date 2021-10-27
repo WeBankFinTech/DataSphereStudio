@@ -169,4 +169,12 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @return
      */
     Message previewData(TableDataPreviewVO vo) throws ErrorException;
+
+
+    /**
+     * 检测表状态
+     * @param vo
+     * @return
+     */
+    Integer tableCheckData(TableCheckDataVO vo) throws ErrorException;
 }

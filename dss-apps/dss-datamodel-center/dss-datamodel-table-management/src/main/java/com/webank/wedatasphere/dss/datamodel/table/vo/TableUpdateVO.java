@@ -84,5 +84,4 @@ public class TableUpdateVO {
 
     private List<TableColumnVO> columns;
 
-
 }

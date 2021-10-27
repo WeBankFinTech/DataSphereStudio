@@ -10,5 +10,7 @@ public abstract class DataModelUJESJobTask {
 
     private Integer count = 10;
 
+    private String user;
+
     public abstract void formatCode(String code);
 }

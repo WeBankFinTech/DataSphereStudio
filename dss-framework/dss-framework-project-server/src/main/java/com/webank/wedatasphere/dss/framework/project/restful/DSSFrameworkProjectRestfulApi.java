@@ -16,6 +16,27 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
@@ -33,24 +54,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.apache.commons.math3.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 
 @Component
@@ -158,10 +161,13 @@ public class DSSFrameworkProjectRestfulApi {
     public Response deleteProject(@Context HttpServletRequest request, @Valid ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        // 删除第三方系统中的项目
+        projectDeleteRequest.setIfDelOtherSys(true);
         try{
+            // 检查是否具有删除项目权限
             projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
 
-            projectService.deleteProject(username, projectDeleteRequest, workspace);
+            dssFrameworkProjectService.deleteProject(username, projectDeleteRequest, workspace);
             return RestfulUtils.dealOk("删除工程成功");
         }catch(final Throwable t){
             LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);

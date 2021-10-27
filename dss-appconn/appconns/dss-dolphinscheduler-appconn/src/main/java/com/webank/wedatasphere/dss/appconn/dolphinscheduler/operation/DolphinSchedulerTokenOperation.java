@@ -28,9 +28,9 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinScheduler
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DateUtil;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
@@ -88,23 +88,25 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         return instance;
     }
 
+    private DolphinSchedulerTokenOperation(String baseUrl) {
+        init(baseUrl);
+    }
+
     public DolphinSchedulerTokenOperation(AppDesc appDesc) {
         this.appDesc = appDesc;
         String baseUrl = this.appDesc.getAppInstances().get(0).getBaseUrl();
         init(baseUrl);
     }
 
-    public DolphinSchedulerTokenOperation(String baseUrl) {
-        init(baseUrl);
-    }
-
     private void init(String baseUrl) {
         this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
         this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
+
         this.verifyUserNameUrl =
             baseUrl.endsWith("/") ? baseUrl + "users/verify-user-name" : baseUrl + "/users/verify-user-name";
         this.createUserUrl = baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
         this.queryUserPageUrl = baseUrl.endsWith("/") ? baseUrl + "users/list-paging" : baseUrl + "/users/list-paging";
+
         this.queryAccessTokenListUrl =
             baseUrl.endsWith("/") ? baseUrl + "access-token/list-paging" : baseUrl + "/access-token/list-paging";
         this.generateTokenUrl =

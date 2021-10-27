@@ -1,78 +1,38 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard.DolphinSchedulerStructureStandard;
-import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandard;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard.DolphinSchedulerWorkflowStandard;
+import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerAppConn;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
 /**
  * The type Dolphin scheduler app conn.
  *
  * @author yuxin.yuan
- * @date 2021/04/23
+ * @date 2021/10/18
  */
-public class DolphinSchedulerAppConn implements SchedulerAppConn {
+public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerAppConn.class);
+    public static final String DOLPHINSCHEDULER_APPCONN_NAME = "dolphinscheduler";
 
-    private final List<AppStandard> standards = new ArrayList<>();
+    private DolphinSchedulerWorkflowStandard dolphinSchedulerWorkflowStandard;
 
-    private AppDesc appDesc;
-
-    public DolphinSchedulerAppConn() {
-        init();
-    }
-
-    public void init() {
-        //        standards.add(OriginSSOIntegrationStandard.getSSOIntegrationStandard());
-        standards.add(DolphinSchedulerStructureStandard.getInstance(this));
+    @Override
+    protected void initialize() {
+        dolphinSchedulerWorkflowStandard = new DolphinSchedulerWorkflowStandard();
     }
 
     @Override
-    public StructureIntegrationStandard getStructureIntegrationStandard() {
-        for (AppStandard appStandard : standards) {
-            if (appStandard instanceof DolphinSchedulerStructureStandard) {
-                return (StructureIntegrationStandard)appStandard;
-            }
-        }
-        return null;
+    public WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard() {
+        dolphinSchedulerWorkflowStandard.setSSORequestService(this.getOrCreateSSOStandard().getSSORequestService());
+        dolphinSchedulerWorkflowStandard.setAppConnName(getAppDesc().getAppName());
+        return dolphinSchedulerWorkflowStandard;
     }
 
     @Override
-    public OriginSSOIntegrationStandard getOriginSSOIntegrationStandard() {
-        for (AppStandard appStandard : standards) {
-            if (appStandard instanceof OriginSSOIntegrationStandard) {
-                return (OriginSSOIntegrationStandard)appStandard;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<AppStandard> getAppStandards() {
-        return this.standards;
-    }
-
-    @Override
-    public AppDesc getAppDesc() {
-        return this.appDesc;
-    }
-
-    @Override
-    public void setAppDesc(AppDesc appDesc) {
-        this.appDesc = appDesc;
-    }
-
-    @Override
-    public boolean supportFlowSchedule() {
-        return true;
+    public StructureIntegrationStandard getOrCreateStructureStandard() {
+        return DolphinSchedulerStructureStandard.getInstance();
     }
 
 }

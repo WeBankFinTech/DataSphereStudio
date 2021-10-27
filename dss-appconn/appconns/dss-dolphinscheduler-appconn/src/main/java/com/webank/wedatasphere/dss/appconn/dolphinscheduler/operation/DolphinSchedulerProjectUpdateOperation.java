@@ -48,19 +48,26 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
 
     private String baseUrl;
 
-    private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
-
     private String projectUpdateUrl;
 
-    public DolphinSchedulerProjectUpdateOperation(DolphinSchedulerProjectService dolphinSchedulerProjectService) {
-        this.dolphinSchedulerProjectService = dolphinSchedulerProjectService;
-        init();
+    private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
+
+    public DolphinSchedulerProjectUpdateOperation() {
     }
 
-    private void init() {
+    @Override
+    public void init() {
         this.baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
-        this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
         this.projectUpdateUrl = baseUrl.endsWith("/") ? baseUrl + "projects/update" : baseUrl + "/projects/update";
+
+        this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
+    }
+
+    @Override
+    public void setStructureService(StructureService service) {
+        if (service instanceof DolphinSchedulerProjectService) {
+            this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
+        }
     }
 
     @Override
@@ -68,7 +75,7 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
         // Dolphin Scheduler项目名
         String dsProjectName =
             ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
-        logger.info("begin to update project in Dolphin Scheduler, project is {}", dsProjectName);
+        logger.info("begin to update project in DolphinScheduler, project is {}", dsProjectName);
 
         DolphinSchedulerProjectQueryOperation projectQueryOperation =
             new DolphinSchedulerProjectQueryOperation(this.baseUrl);
@@ -92,7 +99,7 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
 
             if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
                 && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
-                logger.info("Dolphin Scheduler更新项目 {} 成功, 返回的信息是 {}", dsProjectName,
+                logger.info("DolphinScheduler更新项目 {} 成功, 返回的信息是 {}", dsProjectName,
                     DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
             } else {
                 throw new ExternalOperationFailedException(90026, "调度中心更新工程失败, 原因:" + entString);
@@ -121,10 +128,4 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
         return responseRef;
     }
 
-    @Override
-    public void setStructureService(StructureService service) {
-        if (service instanceof DolphinSchedulerProjectService) {
-            this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
-        }
-    }
 }

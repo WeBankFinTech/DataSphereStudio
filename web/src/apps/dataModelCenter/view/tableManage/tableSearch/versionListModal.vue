@@ -3,11 +3,14 @@
     title="版本列表"
     :value="_visible"
     @input="$emit('_changeVisible', $event)"
-    :width="700"
+    :width="800"
   >
     <Table :columns="columns" :data="data">
       <template slot-scope="{ row }" slot="version">
         V{{ row.version }}
+      </template>
+      <template slot-scope="{ row }" slot="isMaterialized">
+        {{ row.isMaterialized ? "以执行建表" : "未执行建表" }}
       </template>
       <template slot-scope="{ row }" slot="createTime">
         {{ row.createTime | formatDate }}
@@ -26,24 +29,23 @@
       </template>
     </Table>
     <Spin v-if="loading" fix></Spin>
+    <div slot="footer"></div>
   </Modal>
 </template>
 
 <script>
 import {
-  getIndicatorsVersionList,
-  rollbackIndicatorsVersion,
-} from "../../service/api";
-import formatDate from "../../utils/formatDate";
+  getVersionListByName,
+  tableVersionRollback,
+} from "../../../service/tableManageApi";
+import formatDate from "../../../utils/formatDate";
 
 export default {
   model: {
     prop: "_visible",
     event: "_changeVisible",
   },
-  filters: {
-    formatDate,
-  },
+  filters: { formatDate },
   props: {
     _visible: {
       type: Boolean,
@@ -68,8 +70,13 @@ export default {
           slot: "version",
         },
         {
+          title: "状态",
+          key: "isMaterialized",
+          slot: "isMaterialized",
+        },
+        {
           title: "创建者",
-          key: "owner",
+          key: "creator",
         },
         {
           title: "版本注释",
@@ -91,16 +98,18 @@ export default {
     };
   },
   methods: {
+    // 根据表名获取版本列表
     async handleGetByName(name) {
       this.loading = true;
-      let { list } = await getIndicatorsVersionList(name);
+      let { list } = await getVersionListByName(name);
       this.loading = false;
       this.data = list;
     },
+    // 表版本回退
     async handleGoBackVersion(version) {
       this.loading = true;
       try {
-        await rollbackIndicatorsVersion(this.name, version);
+        await tableVersionRollback(this.name, version);
         this.loading = false;
         this.$emit("_changeVisible", false);
         this.$emit("finish");
@@ -108,6 +117,7 @@ export default {
         this.loading = false;
       }
     },
+    // 版本
     async handleOpenVersion(data) {
       this.$emit("_changeVisible", false);
       this.$emit("open", data);

@@ -34,11 +34,6 @@ router.beforeEach((to, from, next) => {
       to.query.showHeader = to.meta.header;
     }
     if (to.meta.publicPage) {
-      if (!to.query.workspaceId && from.query.workspaceId) {
-        to.query.workspaceId = from.query.workspaceId;
-        next(to);
-        return;
-      }
       next();
     } else if (to.path != "/workspace") {
       next("/workspace");

@@ -97,23 +97,25 @@
     <div class="page-line">
       <Page
         :total="pageCfg.total"
-        :current="pageCfg.page"
+        :current.sync="pageCfg.page"
         :page-size="pageCfg.pageSize"
-        @on-change="changePage"
       />
     </div>
+    <!-- 编辑弹窗 -->
     <EditModal
       v-model="modalCfg.visible"
       :id="modalCfg.id"
       :mode="modalCfg.mode"
       @finish="handleModalFinish"
     />
+    <!-- 版本列表 -->
      <VersionListModal
       v-model="versionListCfg.visible"
       :name="versionListCfg.name"
       @finish="handleModalFinish"
       @open="handleShowVersion"
     />
+    <!-- 某个版本查看弹窗 -->
     <ShowVersionModal
       v-model="versionCfg.visible"
       :bodyData="versionCfg.bodyData"
@@ -130,64 +132,83 @@ import ShowVersionModal from "./showVersionModal.vue";
 
 export default {
   components: { EditModal, VersionListModal, ShowVersionModal },
+  filters: { formatDate },
   methods: {
+    // 表单完成回调
     handleModalFinish() {
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
         mode: "create",
       };
     },
-    async handleDelete(id) {
-      alert("删除" + id);
+    // 删除操作 // 开发中
+    handleDelete(id) {
+      this.$Modal.confirm({
+        title: "警告",
+        content: "确定删除此项吗？" + id,
+        onOk: () => {
+          this.$Message.info("删除");
+        },
+        onCancel: () => {
+          this.$Message.info("取消");
+        },
+      });
     },
+    // 编辑操作
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
         mode: "edit",
-        id,
+        id: id,
       };
     },
+    // 启用
     async handleEnable(id) {
       this.loading = true;
       await switcIndicatorsStatus(id, 1);
       this.loading = false;
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 禁用
     async handleDisable(id) {
       this.loading = true;
       await switcIndicatorsStatus(id, 0);
       this.loading = false;
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 搜索
     handleSearch() {
-      this.pageCfg.page = 1;
       this.handleGetData();
     },
-    async handleGetData() {
+    // 获取数据
+    async handleGetData(changePage = false) {
+      if (changePage === false && this.pageCfg.page !== 1) {
+        return (this.pageCfg.page = 1);
+      }
       this.loading = true;
-      const { list, total } = await getIndicators(
-        this.pageCfg.page,
-        this.pageCfg.pageSize,
-        this.searchParams.isAvailable,
-        this.searchParams.owner,
-        this.searchParams.name
-      );
+      const { list, total } = await getIndicators({
+        pageNum: this.pageCfg.page,
+        pageSize: this.pageCfg.pageSize,
+        isAvailable: this.searchParams.isAvailable,
+        owner: this.searchParams.owner,
+        name: this.searchParams.name,
+      });
       this.loading = false;
       this.datalist = list;
       this.pageCfg.total = total;
     },
-    changePage(page) {
-      this.pageCfg.page = page;
-    },
+    // 查看单个版本详细信息
     handleShowVersion(data) {
       this.versionCfg = {
         visible: true,
         bodyData: JSON.parse(data.versionContext),
       };
     },
+    // 打开版本列表
     handleOpenVersionList(name) {
       this.versionListCfg = {
         visible: true,
@@ -195,19 +216,15 @@ export default {
       };
     },
   },
-  filters: {
-    formatDate,
-  },
+
   mounted() {
     this.handleGetData();
   },
   watch: {
-    pageCfg: {
-      handler: "handleGetData",
-      deep: true,
+    "pageCfg.page"() {
+      this.handleGetData(true);
     },
   },
-
   data() {
     return {
       searchParams: {
@@ -275,18 +292,18 @@ export default {
       ],
       // 数据列表
       datalist: [],
-      // 弹窗参数
+      // 编辑弹窗参数
       modalCfg: {
         mode: "",
         id: NaN,
         visible: false,
       },
-      // 弹窗参数
+      // 版本列表参数
       versionListCfg: {
         visible: false,
         name: "",
       },
-      // 查看版本信息
+      // 某个版本详情弹框
       versionCfg: {
         visible: false,
         bodyData: {},

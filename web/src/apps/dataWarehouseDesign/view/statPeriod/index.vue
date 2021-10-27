@@ -8,8 +8,8 @@
           style="width: 120px"
           clearable
         >
-          <Option value="1"> 启用 </Option>
-          <Option value="0"> 禁用 </Option>
+          <Option :value="1"> 启用 </Option>
+          <Option :value="0"> 禁用 </Option>
         </Select>
         <Input
           search
@@ -36,7 +36,7 @@
         </Tag>
       </template>
       <template slot-scope="{ row }" slot="isAvailable">
-        {{ row.isAvailable ? '启用' : '禁用' }}
+        {{ row.isAvailable ? "启用" : "禁用" }}
       </template>
       <template slot-scope="{ row }" slot="createTime">
         {{ row.createTime | formatDate }}
@@ -77,9 +77,8 @@
     <div class="page-line">
       <Page
         :total="pageCfg.total"
-        :current="pageCfg.page"
+        :current.sync="pageCfg.page"
         :page-size="pageCfg.pageSize"
-        @on-change="changePage"
       />
     </div>
     <EditModal
@@ -97,142 +96,159 @@ import {
   deleteStatisticalPeriods,
   enableStatisticalPeriods,
   disableStatisticalPeriods,
-} from '../../service/api'
-import formatDate from '../../utils/formatDate'
-import EditModal from './editModal.vue'
+} from "../../service/api";
+import formatDate from "../../utils/formatDate";
+import EditModal from "./editModal.vue";
+
+/**
+ *  @param (Number)
+ *  @return (String)
+ */
+function number2boolean(num) {
+  if (typeof num === "undefined") {
+    return undefined;
+  } else {
+    return Boolean(num);
+  }
+}
 
 export default {
   components: { EditModal },
+  filters: { formatDate },
   methods: {
+    // 弹框回调
     handleModalFinish() {
-      this.handleGetData()
+      this.handleGetData();
     },
+    // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
-        mode: 'create',
-      }
+        mode: "create",
+      };
     },
+    // 删除操作
     async handleDelete(id) {
-      this.loading = true
-      await deleteStatisticalPeriods(id)
-      this.loading = false
-      this.handleGetData()
+      this.$Modal.confirm({
+        title: "警告",
+        content: "确定删除此项吗？",
+        onOk: async () => {
+          this.loading = true;
+          await deleteStatisticalPeriods(id);
+          this.loading = false;
+          this.handleGetData(true);
+        },
+      });
     },
+    // 编辑操作
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
-        mode: 'edit',
+        mode: "edit",
         id: id,
-      }
+      };
     },
+    // 启用
     async handleEnable(id) {
-      this.loading = true
-      await enableStatisticalPeriods(id)
-      this.loading = false
-      this.handleGetData()
+      this.loading = true;
+      await enableStatisticalPeriods(id);
+      this.loading = false;
+      this.handleGetData(true);
     },
+    // 禁用
     async handleDisable(id) {
-      this.loading = true
-      await disableStatisticalPeriods(id)
-      this.loading = false
-      this.handleGetData()
+      this.loading = true;
+      await disableStatisticalPeriods(id);
+      this.loading = false;
+      this.handleGetData(true);
     },
+    // 搜索
     handleSearch() {
-      this.pageCfg.page = 1
-      this.handleGetData()
+      this.handleGetData();
     },
-    async handleGetData() {
-      console.log(this.searchParams.enabled)
-      this.loading = true
-      let data = await getStatisticalPeriods(
-        this.pageCfg.page,
-        this.pageCfg.pageSize,
-        this.searchParams.name,
-        !this.searchParams.enabled
-          ? undefined
-          : this.searchParams.enabled === '0'
-            ? false
-            : true
-      )
-      this.loading = false
-      let { current, pageSize, items, total } = data.page
-      this.pageCfg.page = current
-      this.pageCfg.pageSize = pageSize
-      this.pageCfg.total = total
-      this.datalist = items
+    // 获取数据
+    async handleGetData(changePage = false) {
+      if (changePage === false && this.pageCfg.page !== 1) {
+        return (this.pageCfg.page = 1);
+      }
+      this.loading = true;
+      let data = await getStatisticalPeriods({
+        page: this.pageCfg.page,
+        size: this.pageCfg.pageSize,
+        name: this.searchParams.name,
+        enabled: number2boolean(this.searchParams.enabled),
+      });
+      this.loading = false;
+      let { items, total } = data.page;
+      this.pageCfg.total = total;
+      this.datalist = items;
     },
-    changePage(page) {
-      this.pageCfg.page = page
-    },
-  },
-  filters: {
-    formatDate,
   },
   mounted() {
-    this.handleGetData()
+    this.handleGetData();
   },
   watch: {
-    pageCfg: {
-      handler: 'handleGetData',
-      deep: true,
+    "pageCfg.page"() {
+      this.handleGetData(true);
     },
   },
   data() {
     return {
+      // 搜索参数
       searchParams: {
-        name: '',
-        enabled: '',
+        name: "",
+        enabled: undefined,
       },
+      // 表格列
       columns: [
         {
-          title: '名称',
-          key: 'name',
+          title: "名称",
+          key: "name",
         },
         {
-          title: '英文名',
-          key: 'name',
+          title: "英文名",
+          key: "name",
         },
         {
-          title: '负责人',
-          key: 'name',
+          title: "负责人",
+          key: "name",
         },
         {
-          title: '主题域',
-          key: 'themeArea',
+          title: "主题域",
+          key: "themeArea",
         },
         {
-          title: '分层',
-          key: 'layerArea',
+          title: "分层",
+          key: "layerArea",
         },
         {
-          title: '选择权限',
-          key: 'principalName',
-          slot: 'principalName',
+          title: "选择权限",
+          key: "principalName",
+          slot: "principalName",
         },
         {
-          title: '状态',
-          key: 'isAvailable',
-          slot: 'isAvailable',
+          title: "状态",
+          key: "isAvailable",
+          slot: "isAvailable",
         },
         {
-          title: '描述',
-          key: 'description',
+          title: "描述",
+          key: "description",
           ellipsis: true,
         },
         {
-          title: '创建时间',
-          key: 'createTime',
-          slot: 'createTime',
+          title: "创建时间",
+          key: "createTime",
+          slot: "createTime",
         },
         {
-          title: '更新时间',
-          key: 'updateTime',
-          slot: 'updateTime',
+          title: "更新时间",
+          key: "updateTime",
+          slot: "updateTime",
         },
         {
-          title: '操作',
-          slot: 'action',
+          title: "操作",
+          slot: "action",
           minWidth: 80,
         },
       ],
@@ -240,7 +256,7 @@ export default {
       datalist: [],
       // 弹窗参数
       modalCfg: {
-        mode: '',
+        mode: "",
         id: NaN,
         visible: false,
       },
@@ -252,9 +268,9 @@ export default {
         pageSize: 10,
         total: 10,
       },
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

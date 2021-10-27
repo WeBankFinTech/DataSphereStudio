@@ -41,6 +41,7 @@
     "highlight.js": "9.18.3",
     "iview": "3.5.4",
     "jquery": "^3.6.0",
+    "json-bigint": "^1.0.0",
     "lodash": "4.17.20",
     "md5": "2.3.0",
     "mitt": "1.2.0",

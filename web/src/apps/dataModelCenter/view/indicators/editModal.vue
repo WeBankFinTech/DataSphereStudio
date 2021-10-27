@@ -1,7 +1,8 @@
 <template>
   <Drawer
     title="新建/编辑指标"
-    v-model="visible"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
     width="920"
     :styles="styles"
     @on-cancel="cancelCallBack"
@@ -28,6 +29,8 @@
         <Select
           v-model="formState.principalName"
           multiple
+          :value="(formState.principalName || '').split(',')"
+          @input="formState.principalName = $event.join()"
           placeholder="可用角色"
         >
           <Option
@@ -45,9 +48,12 @@
           <span slot="close">否</span>
         </i-switch>
       </FormItem>
-      <FormItem label="主题" prop="warehouseThemeName">
-        <Input v-model="formState.warehouseThemeName" placeholder="主题">
-        </Input>
+      <FormItem label="主题域" prop="warehouseThemeName">
+        <SelectPage
+          v-model="formState.warehouseThemeName"
+          placeholder="请选择主题域和主题"
+          :fetch="handleGetThemesList"
+        />
       </FormItem>
       <FormItem label="描述" prop="comment">
         <Input type="textarea" v-model="formState.comment" placeholder="描述">
@@ -55,26 +61,18 @@
       </FormItem>
       <h2 class="form-block-title">作用范围</h2>
       <FormItem label="主题域" prop="themeArea">
-        <Select v-model="formState.themeArea" placeholder="主题域">
-          <Option
-            v-for="item in themesList"
-            :value="item.value"
-            :key="item.value"
-          >
-            {{ item.label }}
-          </Option>
-        </Select>
+        <SelectPage
+          v-model="formState.themeArea"
+          placeholder="主题域"
+          :fetch="handleGetThemesList"
+        />
       </FormItem>
       <FormItem label="分层" prop="layerArea">
-        <Select v-model="formState.layerArea" placeholder="分层">
-          <Option
-            v-for="item in layersList"
-            :value="item.value"
-            :key="item.value"
-          >
-            {{ item.label }}
-          </Option>
-        </Select>
+        <SelectPage
+          v-model="formState.layerArea"
+          placeholder="分层"
+          :fetch="handleGetLayersList"
+        />
       </FormItem>
       <h2 class="form-block-title">指标内容</h2>
       <FormItem label="指标类型" prop="content.indicatorType">
@@ -87,50 +85,32 @@
         </RadioGroup>
       </FormItem>
       <!-- 原子指标 -->
-      <Row v-show="formState.content.indicatorType === 0">
+      <Row v-if="formState.content.indicatorType === 0">
         <Col :span="24">
-          <FormItem label="关联度量" prop="_sourceInfo.info_0.depends">
+          <FormItem label="关联度量" prop="_sourceInfo.info_0.measure">
             <SelectPage
-              v-model="formState._sourceInfo.info_0.depends"
+              v-model="formState._sourceInfo.info_0.measure"
+              searchMode
               placeholder="关联度量"
               :fetch="handleGetMeasures"
             />
           </FormItem>
         </Col>
         <Col :span="24">
-          <FormItem label="时间周期" prop="_sourceInfo.info_0.cycle">
-            <Select
-              v-model="formState._sourceInfo.info_0.cycle"
-              placeholder="时间周期"
+          <FormItem label="计算公式" prop="_sourceInfo.info_0.formula">
+            <Input
+              v-model="formState._sourceInfo.info_0.formula"
+              placeholder="计算公式"
             >
-              <Option
-                v-for="item in cyclesList"
-                :value="item.value"
-                :key="item.value"
-                :label="item.label"
-              />
-            </Select>
-          </FormItem>
-        </Col>
-        <Col :span="24">
-          <FormItem label="修饰词" prop="_sourceInfo.info_0.modifier">
-            <Select
-              v-model="formState._sourceInfo.info_0.modifier"
-              placeholder="修饰词"
-            >
-              <Option
-                v-for="item in modifiersList"
-                :value="item.value"
-                :key="item.value"
-                :label="item.label"
-              />
-            </Select>
+            </Input>
           </FormItem>
         </Col>
         <Col :span="24">
           <FormItem label="指定维度" prop="_sourceInfo.info_0.dimension">
             <SelectPage
-              v-model="formState._sourceInfo.info_0.dimension"
+              multiple
+              :value="(formState._sourceInfo.info_0.dimension || '').split(',')"
+              @input="formState._sourceInfo.info_0.dimension = $event.join()"
               placeholder="指定维度"
               :fetch="handleGetDimensions"
             />
@@ -138,15 +118,22 @@
         </Col>
       </Row>
       <!-- 衍生指标 -->
-      <Row v-show="formState.content.indicatorType === 1">
+      <Row v-if="formState.content.indicatorType === 1">
         <Col :span="24">
           <FormItem
             label="依赖的原子指标"
             prop="_sourceInfo.info_1.indicatorName"
           >
             <SelectPage
-              v-model="formState._sourceInfo.info_1.indicatorName"
-              placeholder="依赖的原子指标"
+              searchMode
+              multiple
+              :value="
+                (formState._sourceInfo.info_1.indicatorName || '').split(',')
+              "
+              @input="
+                formState._sourceInfo.info_1.indicatorName = $event.join()
+              "
+              placeholder="请选择一个或多个原子指标"
               :fetch="handleGetIndicatorsTypeOne"
             />
           </FormItem>
@@ -163,6 +150,7 @@
           <FormItem label="指定维度" prop="_sourceInfo.info_1.dimension">
             <SelectPage
               v-model="formState._sourceInfo.info_1.dimension"
+              searchMode
               placeholder="指定维度"
               :fetch="handleGetDimensions"
             />
@@ -170,11 +158,12 @@
         </Col>
       </Row>
       <!-- 派生指标 -->
-      <Row v-show="formState.content.indicatorType === 2">
+      <Row v-if="formState.content.indicatorType === 2">
         <Col :span="24">
           <FormItem label="依赖的指标" prop="_sourceInfo.info_2.indicatorName">
             <SelectPage
               v-model="formState._sourceInfo.info_2.indicatorName"
+              searchMode
               placeholder="依赖的指标"
               :fetch="handleGetIndicators"
             />
@@ -182,38 +171,27 @@
         </Col>
         <Col :span="24">
           <FormItem label="时间周期" prop="_sourceInfo.info_2.cycle">
-            <Select
+            <SelectPage
               v-model="formState._sourceInfo.info_2.cycle"
               placeholder="时间周期"
-            >
-              <Option
-                v-for="item in cyclesList"
-                :value="item.value"
-                :key="item.value"
-                :label="item.label"
-              />
-            </Select>
+              :fetch="handleGetCyclesList"
+            />
           </FormItem>
         </Col>
         <Col :span="24">
           <FormItem label="修饰词" prop="_sourceInfo.info_2.modifier">
-            <Select
+            <SelectPage
               v-model="formState._sourceInfo.info_2.modifier"
               placeholder="修饰词"
-            >
-              <Option
-                v-for="item in modifiersList"
-                :value="item.value"
-                :key="item.value"
-                :label="item.label"
-              />
-            </Select>
+              :fetch="handleGetModifiersList"
+            />
           </FormItem>
         </Col>
         <Col :span="24">
           <FormItem label="指定维度" prop="_sourceInfo.info_2.dimension">
             <SelectPage
               v-model="formState._sourceInfo.info_2.dimension"
+              searchMode
               placeholder="指定维度"
               :fetch="handleGetDimensions"
             />
@@ -221,11 +199,12 @@
         </Col>
       </Row>
       <!-- 复杂指标 -->
-      <Row v-show="formState.content.indicatorType === 3">
+      <Row v-if="formState.content.indicatorType === 3">
         <Col :span="24">
           <FormItem label="依赖的指标" prop="_sourceInfo.info_3.indicatorName">
             <SelectPage
               v-model="formState._sourceInfo.info_3.indicatorName"
+              searchMode
               placeholder="依赖的指标"
               :fetch="handleGetIndicators"
             />
@@ -233,17 +212,11 @@
         </Col>
         <Col :span="24">
           <FormItem label="修饰词" prop="_sourceInfo.info_3.modifier">
-            <Select
+            <SelectPage
               v-model="formState._sourceInfo.info_3.modifier"
               placeholder="修饰词"
-            >
-              <Option
-                v-for="item in modifiersList"
-                :value="item.value"
-                :key="item.value"
-                :label="item.label"
-              />
-            </Select>
+              :fetch="handleGetModifiersList"
+            />
           </FormItem>
         </Col>
         <Col :span="24">
@@ -259,6 +232,7 @@
           <FormItem label="指定维度" prop="_sourceInfo.info_3.dimension">
             <SelectPage
               v-model="formState._sourceInfo.info_3.dimension"
+              searchMode
               placeholder="指定维度"
               :fetch="handleGetDimensions"
             />
@@ -266,7 +240,7 @@
         </Col>
       </Row>
       <!-- 自定义指标 -->
-      <Row v-show="formState.content.indicatorType === 4">
+      <Row v-if="formState.content.indicatorType === 4">
         <Col :span="24">
           <FormItem label="计算公式" prop="_sourceInfo.info_4.formula">
             <Input
@@ -280,6 +254,7 @@
           <FormItem label="指定维度" prop="_sourceInfo.info_4.dimension">
             <SelectPage
               v-model="formState._sourceInfo.info_4.dimension"
+              searchMode
               placeholder="指定维度"
               :fetch="handleGetDimensions"
             />
@@ -288,28 +263,26 @@
       </Row>
       <h2 class="form-block-title">口径定义</h2>
       <FormItem label="业务口径" prop="content.business">
-        <Input
-          v-model="formState.content.business"
-          placeholder="业务口径"
-        ></Input>
+        <Input v-model="formState.content.business" placeholder="业务口径">
+        </Input>
       </FormItem>
       <FormItem label="业务负责人" prop="content.businessOwner">
         <Input
           v-model="formState.content.businessOwner"
           placeholder="业务负责人"
-        ></Input>
+        >
+        </Input>
       </FormItem>
       <FormItem label="技术口径" prop="content.calculation">
-        <Input
-          v-model="formState.content.calculation"
-          placeholder="技术口径"
-        ></Input>
+        <Input v-model="formState.content.calculation" placeholder="技术口径">
+        </Input>
       </FormItem>
       <FormItem label="技术负责人" prop="content.calculationOwner">
         <Input
           v-model="formState.content.calculationOwner"
           placeholder="技术负责人"
-        ></Input>
+        >
+        </Input>
       </FormItem>
     </Form>
     <Spin v-if="loading" fix></Spin>
@@ -345,31 +318,35 @@ import {
   buildIndicatorsVersion,
 } from "../../service/api";
 import SelectPage from "../../components/selectPage";
+import storage from "@/common/helper/storage";
+let userName = storage.get("baseInfo", "local").username;
+
+/**
+ * 根据现有key合并对象
+ *  @param (Number)
+ *  @return (String)
+ */
+function merge(obj, source) {
+  let keys = Object.keys(obj);
+  for (let i = 0; i < keys.length; i++) {
+    let key = keys[i];
+    if (source[key] !== undefined) obj[key] = source[key];
+  }
+  return obj;
+}
 
 let sourceInfoMap = {
-  0: { depends: "", cycle: "", modifier: "", dimension: "" },
+  0: { measure: "", formula: "", dimension: "" },
   1: { indicatorName: "", formula: "", dimension: "" },
   2: { indicatorName: "", cycle: "", modifier: "", dimension: "" },
   3: { indicatorName: "", formula: "", modifier: "", dimension: "" },
   4: { formula: "", dimension: "" },
 };
 export default {
-  components: {
-    SelectPage,
-  },
+  components: { SelectPage },
   model: {
     prop: "_visible",
     event: "_changeVisible",
-  },
-  computed: {
-    visible: {
-      get() {
-        return this._visible;
-      },
-      set(val) {
-        this.$emit("_changeVisible", val);
-      },
-    },
   },
   props: {
     _visible: {
@@ -392,8 +369,6 @@ export default {
   },
   data() {
     return {
-      // 验证规则
-      ruleValidate: {},
       // 是否加载中
       loading: false,
       // 表单数据
@@ -402,10 +377,9 @@ export default {
         fieldIdentifier: "",
         comment: "",
         warehouseThemeName: "",
-        owner: "",
-        principalName: [],
+        owner: userName,
+        principalName: ["ALL"],
         isCoreIndicator: false,
-        //
         isAvailable: 1,
         themeArea: "",
         layerArea: "",
@@ -427,7 +401,51 @@ export default {
           info_4: Object.assign({}, sourceInfoMap[4]),
         },
       },
-
+      // 验证规则
+      ruleValidate: {
+        name: [
+          {
+            required: true,
+            message: "指标名必填",
+            trigger: "submit",
+          },
+        ],
+        fieldIdentifier: [
+          {
+            required: true,
+            message: "标识符必填",
+            trigger: "submit",
+          },
+        ],
+        warehouseThemeName: [
+          {
+            required: true,
+            message: "主题域必选",
+            trigger: "submit",
+          },
+        ],
+        owner: [
+          {
+            required: true,
+            message: "负责人必填",
+            trigger: "submit",
+          },
+        ],
+        business: [
+          {
+            required: true,
+            message: "业务口径必填",
+            trigger: "submit",
+          },
+        ],
+        businessOwner: [
+          {
+            required: true,
+            message: "业务口径负责人必填",
+            trigger: "submit",
+          },
+        ],
+      },
       // 底部样式
       styles: {
         height: "calc(100% - 55px)",
@@ -435,7 +453,12 @@ export default {
         paddingBottom: "53px",
         position: "static",
       },
+      // 角色列表
       authorityList: [
+        {
+          value: "ALL",
+          label: "ALL",
+        },
         {
           value: "New York",
           label: "New York",
@@ -445,115 +468,115 @@ export default {
           label: "London",
         },
       ],
-      // 主题
-      themesList: [],
-      // 周期
-      cyclesList: [],
-      // 修饰词
-      modifiersList: [],
-      // 分层
-      layersList: [],
     };
-  },
-  mounted() {
-    this.handleGetCyclesList();
-    this.handleGetThemesList();
-    this.handleGetLayersList();
-    this.handleGetModifiersList();
   },
   methods: {
     // 获取维度列表
-    handleGetDimensions(name, page, pageSize) {
-      return getDimensions(page, pageSize, undefined, undefined, name).then(
-        (res) => {
-          return {
-            list: res.list.map((item) => ({
-              label: item.name,
-              value: item.id,
-            })),
-            total: res.total,
-          };
-        }
-      );
+    handleGetDimensions(name) {
+      return getDimensions({
+        name: name,
+        pageNum: 1,
+        pageSize: 30,
+      }).then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
     // 获取度量列表
-    handleGetMeasures(name, page, pageSize) {
-      return getMeasures(page, pageSize, undefined, undefined, name).then(
-        (res) => {
-          return {
-            list: res.list.map((item) => ({
-              label: item.name,
-              value: item.id,
-            })),
-            total: res.total,
-          };
-        }
-      );
+    handleGetMeasures(name) {
+      return getMeasures({
+        name: name,
+        pageNum: 1,
+        pageSize: 30,
+      }).then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
     // 获取指标列表
-    handleGetIndicators(name, page, pageSize) {
-      return getIndicators(page, pageSize, undefined, undefined, name).then(
-        (res) => {
-          return {
-            list: res.list.map((item) => ({
-              label: item.name,
-              value: item.name,
-            })),
-            total: res.total,
-          };
-        }
-      );
+    handleGetIndicators(name) {
+      return getIndicators({
+        name: name,
+        pageNum: 1,
+        pageSize: 30,
+      }).then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
-    // 获取指标列表
-    handleGetIndicatorsTypeOne(name, page, pageSize) {
-      return getIndicators(page, pageSize, undefined, undefined, name, 0).then(
-        (res) => {
-          return {
-            list: res.list.map((item) => ({
-              label: item.name,
-              value: item.name,
-            })),
-            total: res.total,
-          };
-        }
-      );
+    // 获取原子指标列表
+    handleGetIndicatorsTypeOne(name) {
+      return getIndicators({
+        name: name,
+        pageNum: 1,
+        pageSize: 30,
+        indicatorType: 0,
+      }).then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
     // 获取修饰词列表
     handleGetModifiersList() {
-      this.modifiersList = [
-        {
-          label: "修饰词",
-          value: "suishici",
-        },
-      ];
+      return getModifiersList().then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.modifierType,
+            value: item.modifierType,
+          })),
+        };
+      });
     },
     // 获取分层列表
     handleGetLayersList() {
-      this.layersList = [
-        {
-          label: "分层",
-          value: "fenceng",
-        },
-      ];
+      return getLayersList().then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
     // 获取主题列表
     handleGetThemesList() {
-      this.themesList = [
-        {
-          label: "主题",
-          value: "zhuti",
-        },
-      ];
+      return getThemesList().then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
     // 获取周期列表
     handleGetCyclesList() {
-      this.cyclesList = [
-        {
-          label: "周期",
-          value: "zhouqi",
-        },
-      ];
+      return getCyclesList().then((res) => {
+        return {
+          list: res.list.map((item) => ({
+            label: item.name,
+            value: item.name,
+          })),
+        };
+      });
     },
+    // 根据id获取数据
     async handleGetById(id) {
       this.loading = true;
       let { detail } = await getIndicatorsById(id);
@@ -565,7 +588,6 @@ export default {
           return {};
         }
       })();
-
       let newFormState = {
         name: detail.name,
         fieldIdentifier: detail.fieldIdentifier,
@@ -574,7 +596,6 @@ export default {
         owner: detail.owner,
         principalName: detail.principalName.split(","),
         isCoreIndicator: Boolean(detail.isCoreIndicator),
-        //
         isAvailable: detail.isAvailable,
         themeArea: detail.themeArea,
         layerArea: detail.layerArea,
@@ -596,21 +617,10 @@ export default {
           info_4: Object.assign({}, sourceInfoMap[4]),
         },
       };
-      if (detail.content.indicatorType == 0) {
-        newFormState._sourceInfo.info_0 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 1) {
-        newFormState._sourceInfo.info_1 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 2) {
-        newFormState._sourceInfo.info_2 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 3) {
-        newFormState._sourceInfo.info_3 = detail.content.indicatorSourceInfo;
-      }
-      if (detail.content.indicatorType == 4) {
-        newFormState._sourceInfo.info_4 = detail.content.indicatorSourceInfo;
-      }
+      merge(
+        newFormState._sourceInfo[`info_${detail.content.indicatorType}`],
+        detail.content.indicatorSourceInfo
+      );
       this.formState = newFormState;
     },
     cancelCallBack() {
@@ -639,10 +649,7 @@ export default {
     },
     formatFormState() {
       let key = `info_${this.formState.content.indicatorType}`;
-      this.formState.content.sourceInfo = Object.assign(
-        {},
-        this.formState._sourceInfo[key]
-      );
+      this.formState.content.sourceInfo = this.formState._sourceInfo[key];
       return Object.assign({}, this.formState, {
         principalName: this.formState.principalName.join(","),
         isCoreIndicator: Number(this.formState.isCoreIndicator),
@@ -652,15 +659,15 @@ export default {
     async handleOk() {
       this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
+          this.loading = true;
+          let data = this.formatFormState();
           try {
             if (this.mode === "create") {
-              this.loading = true;
-              await createIndicators(this.formatFormState());
+              await createIndicators(data);
               this.loading = false;
             }
             if (this.mode === "edit") {
-              this.loading = true;
-              await editIndicators(this.id, this.formatFormState());
+              await editIndicators(this.id, data);
               this.loading = false;
             }
             this.$refs["formRef"].resetFields();

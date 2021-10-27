@@ -1,15 +1,16 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
 
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
+import java.util.ArrayList;
+
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 
-import java.util.ArrayList;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 
 /**
  * The type Dolphin scheduler get request operation.
@@ -25,7 +26,6 @@ public class DolphinSchedulerGetRequestOperation
     private CloseableHttpClient httpClient;
 
     public DolphinSchedulerGetRequestOperation(String baseUrl) {
-        super();
         this.dolphinSchedulerSecurityService = DolphinSchedulerSecurityService.getInstance(baseUrl);
     }
 
@@ -43,9 +43,4 @@ public class DolphinSchedulerGetRequestOperation
         }
     }
 
-    @Override
-    public CloseableHttpResponse requestWithSSO(String url, DolphinSchedulerHttpGet req)
-        throws AppStandardErrorException {
-        return null;
-    }
 }

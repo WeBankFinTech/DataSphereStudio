@@ -22,6 +22,6 @@ public class TableDictionaryServiceImpl extends ServiceImpl<DssDatamodelDictiona
 
     @Override
     public List<DssDatamodelDictionary> listByType(String type) {
-        return getBaseMapper().selectList(Wrappers.<DssDatamodelDictionary>lambdaQuery().eq(DssDatamodelDictionary::getType,type));
+        return getBaseMapper().selectList(Wrappers.<DssDatamodelDictionary>lambdaQuery().eq(StringUtils.isNotBlank(type),DssDatamodelDictionary::getType,type));
     }
 }

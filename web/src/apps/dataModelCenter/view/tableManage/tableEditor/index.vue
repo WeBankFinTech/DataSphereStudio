@@ -426,8 +426,10 @@ export default {
   methods: {
     // 检查当前是否有数据
     async handleCheckTableData() {
-      let { status } = await checkTableData(this.config.name);
-      this.checkTableData = !!status;
+      try {
+        let { status } = await checkTableData(this.config.name).catch(() => {});
+        this.checkTableData = !!status;
+      } catch (error) {}
     },
     // 获取数据
     async handleGetData() {

@@ -43,7 +43,7 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @param id
      * @return
      */
-    int deleteDimension(Long id);
+    int deleteDimension(Long id) throws ErrorException;
 
 
     /**

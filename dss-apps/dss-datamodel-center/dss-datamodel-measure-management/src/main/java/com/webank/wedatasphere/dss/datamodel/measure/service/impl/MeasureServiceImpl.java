@@ -9,6 +9,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.MeasureIndicatorCheckService;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.MeasuredTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.measure.dao.DssDatamodelMeasureMapper;
 import com.webank.wedatasphere.dss.datamodel.measure.dto.MeasureQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure;
@@ -17,12 +19,14 @@ import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -33,6 +37,11 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
     private final ModelMapper modelMapper = new ModelMapper();
 
+    @Resource
+    private MeasureIndicatorCheckService measureIndicatorCheckService;
+
+    @Resource
+    private MeasuredTableCheckService measuredTableCheckService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,8 +74,16 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteMeasure(Long id) {
-        //todo 校验引用情况
+    public int deleteMeasure(Long id) throws ErrorException {
+        DssDatamodelMeasure dssDatamodelMeasure = getBaseMapper().selectById(id);
+        if (dssDatamodelMeasure == null){
+            throw new DSSDatamodelCenterException(ErrorCode.MEASURE_DELETE_ERROR.getCode(), "measure id " +id +" not exists");
+        }
+        //校验引用情况
+        if (measuredTableCheckService.referenceCase(dssDatamodelMeasure.getName())
+                ||measureIndicatorCheckService.referenceCase(dssDatamodelMeasure.getName())){
+            throw new DSSDatamodelCenterException(ErrorCode.MEASURE_DELETE_ERROR.getCode(), "measure id " +id +" has referenced");
+        }
         return getBaseMapper().deleteById(id);
     }
 
@@ -76,6 +93,7 @@ public class MeasureServiceImpl extends ServiceImpl<DssDatamodelMeasureMapper, D
         QueryWrapper<DssDatamodelMeasure> queryWrapper = new QueryWrapper<DssDatamodelMeasure>()
                 .like(StringUtils.isNotBlank(vo.getName()),"name",vo.getName())
                 .eq(vo.getIsAvailable()!=null,"is_available",vo.getIsAvailable())
+                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()),"warehouse_theme_name",vo.getWarehouseThemeName())
                 .like(StringUtils.isNotBlank(vo.getOwner()),"owner",vo.getOwner());
         PageHelper.clearPage();
         PageHelper.startPage(vo.getPageNum(),vo.getPageSize());

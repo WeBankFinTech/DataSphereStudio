@@ -76,6 +76,33 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
+    public List<HiveTblSimpleInfo> searchHiveDb(String classification, String query, int limit, int offset) throws DataGovernanceException {
+        List<AtlasEntityHeader> atlasEntityHeaders = null;
+        try {
+            atlasEntityHeaders = atlasService.searchHiveDb(classification, query, true, limit, offset);
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000,ex.getMessage());
+        }
+
+        if (atlasEntityHeaders != null) {
+            return atlasEntityHeaders.parallelStream().map(atlasEntityHeader -> {
+                HiveTblSimpleInfo hiveTblBasic = new HiveTblSimpleInfo();
+                hiveTblBasic.setGuid(atlasEntityHeader.getGuid());
+                hiveTblBasic.setName(atlasEntityHeader.getAttribute("name").toString());
+                hiveTblBasic.setQualifiedName(atlasEntityHeader.getAttribute("qualifiedName").toString());
+                hiveTblBasic.setOwner(atlasEntityHeader.getAttribute("owner").toString());
+                Object createTime = atlasEntityHeader.getAttribute("createTime");
+                if (createTime != null) {
+                    hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
+                }
+
+                return hiveTblBasic;
+            }).collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    @Override
     public HiveTblDetailInfo getHiveTblDetail(String guid) throws DataGovernanceException {
         try {
             HiveTblDetailInfo hiveTblDetailInfo = new HiveTblDetailInfo();

@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.measure.restful;
 
+import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
@@ -101,7 +102,7 @@ public class MeasureRestfulApi {
      */
     @DELETE
     @Path("/measures/{id}")
-    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) {
+    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
         LOGGER.info("delete id : {}", id);
         return Message.messageToResponse(Message.ok().data("count",measureService.deleteMeasure(id)));
     }

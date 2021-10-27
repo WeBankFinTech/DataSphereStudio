@@ -17,6 +17,9 @@ public interface AssetService {
     public List<HiveTblSimpleInfo> searchHiveTable(String classification, String query,
                                                    int limit, int offset) throws DataGovernanceException;
 
+    public List<HiveTblSimpleInfo> searchHiveDb(String classification, String query,
+                                                   int limit, int offset) throws DataGovernanceException;
+
     public HiveTblDetailInfo getHiveTblDetail(String guid) throws DataGovernanceException ;
 
     public List<PartInfo> getHiveTblPartition(String guid) throws  DataGovernanceException;

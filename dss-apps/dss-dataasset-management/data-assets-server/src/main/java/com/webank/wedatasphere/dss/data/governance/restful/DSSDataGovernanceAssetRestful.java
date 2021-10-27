@@ -1,10 +1,13 @@
 package com.webank.wedatasphere.dss.data.governance.restful;
 
-import com.webank.wedatasphere.dss.data.governance.entity.*;
+import com.webank.wedatasphere.dss.data.governance.entity.HiveTblSimpleInfo;
+import com.webank.wedatasphere.dss.data.governance.entity.PartInfo;
+import com.webank.wedatasphere.dss.data.governance.entity.TableInfo;
 import com.webank.wedatasphere.dss.data.governance.service.AssetService;
 import com.webank.wedatasphere.dss.data.governance.service.WorkspaceInfoService;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +63,32 @@ public class DSSDataGovernanceAssetRestful {
                                   @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) int limit,
                                   @QueryParam("offset") @DefaultValue(DEFAULT_OFFSET) int offset) throws Exception {
         List<HiveTblSimpleInfo> hiveTblBasicList = assetService.searchHiveTable(classification,'*'+query+'*',limit,offset);
-        if(owner.equals(null)||owner.equals("")||owner.equals(" ")||owner.equals("undefined")){
+        if(StringUtils.isBlank(owner) || owner.equals("undefined")){
+            return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList));
+        }
+        else {
+            List<HiveTblSimpleInfo> res=new ArrayList<>();
+            for (HiveTblSimpleInfo hiveTblSimpleInfo : hiveTblBasicList) {
+                if(hiveTblSimpleInfo.getOwner().equals(owner)){
+                    res.add(hiveTblSimpleInfo);
+                }
+            }
+            return Message.messageToResponse(Message.ok().data("result",res));
+        }
+    }
+
+    /**
+     * 搜索hive库
+     */
+    @GET
+    @Path("/hiveDb/search")
+    public Response searchHiveDb(@QueryParam("classification") String classification,
+                                  @QueryParam("query")  String query,
+                                  @QueryParam("owner") @DefaultValue("")  String owner,
+                                  @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) int limit,
+                                  @QueryParam("offset") @DefaultValue(DEFAULT_OFFSET) int offset) throws Exception {
+        List<HiveTblSimpleInfo> hiveTblBasicList = assetService.searchHiveDb(classification,'*'+query+'*',limit,offset);
+        if(StringUtils.isBlank(owner) || owner.equals("undefined")){
             return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList));
         }
         else {

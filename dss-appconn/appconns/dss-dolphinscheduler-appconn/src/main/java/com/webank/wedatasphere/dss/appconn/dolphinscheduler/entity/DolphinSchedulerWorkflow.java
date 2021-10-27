@@ -1,11 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity;
 
-import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerFlow;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 
 /**
  * The type Dolphin scheduler flow.
@@ -13,7 +14,7 @@ import java.util.Map;
  * @author yuxin.yuan
  * @date 2021/04/29
  */
-public class DolphinSchedulerFlow extends SchedulerFlow {
+public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
     private ProcessDefinitionJson processDefinitionJson;
 
     private Map<String, LocationInfo> locations;
@@ -69,7 +70,7 @@ public class DolphinSchedulerFlow extends SchedulerFlow {
         private String targetarr;
 
         // 后继节点数
-        //        private String nodenumber;
+        // private String nodenumber;
 
         private int x;
 

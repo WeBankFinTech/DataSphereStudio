@@ -15,7 +15,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpGet;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
@@ -29,16 +28,14 @@ public class DolphinSchedulerProjectQueryOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectQueryOperation.class);
 
-    private SSOUrlBuilderOperation ssoUrlBuilderOperation;
+    private String listPagingUrl;
 
     private SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> getOperation;
 
-    private String listPagingUrl;
-
     public DolphinSchedulerProjectQueryOperation(String baseUrl) {
-        this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
         this.listPagingUrl =
             baseUrl.endsWith("/") ? baseUrl + "projects/list-paging" : baseUrl + "/projects/list-paging";
+        this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
 
     }
 
@@ -48,7 +45,7 @@ public class DolphinSchedulerProjectQueryOperation {
             String url = this.listPagingUrl + "?pageNo=" + i + "&pageSize=10&searchVal=" + projectName;
             DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, userName);
             try (CloseableHttpResponse httpResponse =
-                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);) {
+                this.getOperation.requestWithSSO(null, httpGet);) {
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
@@ -69,7 +66,7 @@ public class DolphinSchedulerProjectQueryOperation {
                     }
                     i++;
                 } else {
-                    logger.error("Dolphin Scheduler获取项目列表失败，返回的信息是 {}", entString);
+                    logger.error("DolphinScheduler获取项目列表失败，返回的信息是 {}", entString);
                     throw new ExternalOperationFailedException(90024, "调度中心获取项目列表失败");
                 }
             } catch (ExternalOperationFailedException e) {

@@ -20,9 +20,9 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinScheduler
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.SchedulisExceptionUtils;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;

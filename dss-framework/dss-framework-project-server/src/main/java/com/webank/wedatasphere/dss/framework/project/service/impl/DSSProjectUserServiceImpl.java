@@ -16,6 +16,16 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
@@ -30,14 +40,6 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
@@ -208,6 +210,13 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         queryWrapper.eq("id", projectId);
         queryWrapper.eq("create_by", username);
         return dssProjectMapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
+    public List<DSSProjectUser> listByPriv(Long projectId, ProjectUserPrivEnum privEnum) {
+        QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("username").eq("project_id", projectId).ge("priv", privEnum.getRank());
+        return projectUserMapper.selectList(queryWrapper);
     }
 
 }

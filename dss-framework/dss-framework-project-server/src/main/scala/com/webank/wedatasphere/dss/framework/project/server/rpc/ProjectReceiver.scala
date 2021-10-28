@@ -21,9 +21,9 @@ import java.util
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
 import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest, ProjectRelationResponse}
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
+import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator
 import com.webank.wedatasphere.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace, ResponseUserWorkspace, ResponseWorkspaceUserList}
 import com.webank.wedatasphere.linkis.rpc.{Receiver, Sender}
@@ -64,8 +64,10 @@ class ProjectReceiver(projectService: DSSProjectService) extends Receiver {
 
       case projectInfoRequest: ProjectInfoRequest =>
         val dssProjectDO: DSSProjectDO = projectService.getProjectById(projectInfoRequest.getProjectId)
+        val projectInfoVo: ProjectInfoVo = projectService.getProjectInfoById(projectInfoRequest.getProjectId)
         val DSSProject = new DSSProject()
         BeanUtils.copyProperties(dssProjectDO, DSSProject)
+        DSSProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
         DSSProject
 
       case projectImportOrchestrator: RequestProjectImportOrchestrator =>

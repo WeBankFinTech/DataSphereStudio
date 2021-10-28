@@ -1,30 +1,20 @@
 <template>
   <Select
-    v-model="value"
-    filterable
-    remote
-    @on-query-change="handleSearch"
-    :remote-method="() => {}"
+    :value="_value"
+    @input="$emit('_change', $event)"
     :loading="loading"
     :placeholder="placeholder"
+    :multiple="multiple"
+    :filterable="searchMode"
+    :remote="searchMode"
+    :remote-method="handleGetData"
   >
     <Option
       v-for="(item, index) in dataList"
-      :value="String(item.value)"
+      :value="item.value"
       :label="item.label"
       :key="index"
     >
-    </Option>
-    <Option :value="searchVal || ''">
-      <div @click.stop>
-        <Page
-          :total="total"
-          size="small"
-          show-total
-          :page-size="10"
-          :current.sync="page"
-        />
-      </div>
     </Option>
   </Select>
 </template>
@@ -37,60 +27,115 @@ export default {
   },
   props: {
     _value: {
-      type: [String, Number, Array],
-      require: true,
+      type: String,
     },
+    // 请求方法
     fetch: {
       type: Function,
       require: true,
     },
+    // 是否多选
+    multiple: {},
+    // 是否远程搜索
+    searchMode: {
+      type: Boolean,
+    },
+    // 提示
     placeholder: {
       type: String,
     },
   },
-  watch: {},
+  watch: {
+    _value: {
+      handler(value) {
+        if (value === undefined) return;
+        let nowData = [];
+        if (this.multiple) {
+          nowData.push(...value);
+        } else {
+          nowData.push(value);
+        }
+        if (nowData.length) {
+          for (let i = 0; i < nowData.length; i++) {
+            const element = nowData[i];
+            if (element !== "") {
+              let isExist = this.dataList.find(
+                (item) => item.value === element
+              );
+              if (isExist === undefined) {
+                this.dataList.unshift({
+                  label: element,
+                  value: element,
+                });
+              }
+            }
+          }
+        }
+      },
+      immediate: true,
+    },
+  },
   data() {
     return {
-      searchVal: "",
-      total: 0,
-      page: 1,
+      // 时间标记
+      sign: null,
+      // 数据
       dataList: [],
+      // 是否加载中
       loading: false,
-      value: "",
     };
   },
-  watch: {
-    page() {
-      this.handleGetData();
-    },
-    _value(value) {
-      if (this.value !== value) {
-        this.value = String(value);
-      }
-    },
-    value(value) {
-      this.$emit("_change", value);
-    },
-  },
   mounted() {
-    this.handleGetData();
+    this.loading = true;
+    this.fetch("")
+      .then((data) => {
+        this.loading = false;
+        this.dataList = data.list;
+      })
+      .catch(() => {
+        this.loading = false;
+      });
   },
   methods: {
-    handleGetData() {
-      this.loading = true;
-      try {
-        this.fetch(this.searchVal, this.page, 10).then((data) => {
-          this.loading = false;
-          this.dataList = data.list;
-          this.total = data.total;
-        });
-      } catch (error) {
-        this.loading = false;
-      }
-    },
-    handleSearch(query) {
-      this.searchVal = query;
-      this.handleGetData();
+    // 搜索方法
+    handleGetData(query = "") {
+      // 结束之前的任务
+      if (this.sign) clearTimeout(this.sign);
+      // 创建新任务
+      this.sign = setTimeout(() => {
+        clearTimeout(this.sign);
+        this.loading = true;
+        this.fetch(query)
+          .then((data) => {
+            let nowData = [];
+            if (this.multiple) {
+              nowData.push(...this._value);
+            } else {
+              nowData.push(this._value);
+            }
+            if (nowData.length) {
+              for (let i = 0; i < nowData.length; i++) {
+                const element = nowData[i];
+                if (element !== "") {
+                  let isExist = data.list.find(
+                    (item) => item.value === element
+                  );
+                  if (isExist === undefined) {
+                    data.list.unshift({
+                      label: element,
+                      value: element,
+                    });
+                  }
+                }
+              }
+            }
+            this.loading = false;
+            this.dataList = data.list;
+          })
+          .catch(() => {
+            this.loading = false;
+          });
+      }, 300);
     },
   },
 };

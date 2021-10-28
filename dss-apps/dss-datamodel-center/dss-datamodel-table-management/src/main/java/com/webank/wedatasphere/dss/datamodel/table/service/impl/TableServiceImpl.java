@@ -515,7 +515,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         if (!tableMaterializedHistoryService.tableExists(vo.getTableName(),vo.getUser())) {
             return Message.ok();
         }
-        DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().code(vo.getTableName()).count(10).build();
+        DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().user(vo.getUser()).code(vo.getTableName()).count(10).build();
         PreviewDataDTO previewDataDTO = null;
         try {
             previewDataDTO = previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask);

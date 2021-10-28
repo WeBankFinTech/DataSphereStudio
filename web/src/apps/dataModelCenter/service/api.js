@@ -6,10 +6,17 @@ import api from "@/common/service/api";
  * @returns {Object.result}
  *
  */
-export const getMeasures = (pageNum, pageSize, isAvailable, owner, name) =>
+export const getMeasures = ({
+  pageNum,
+  pageSize,
+  isAvailable,
+  owner,
+  name,
+  warehouseThemeName
+}) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/measures/list`,
-    { pageNum, pageSize, isAvailable, owner, name },
+    `${API_PATH.DATAMODEL_PATH}measures/list`,
+    { pageNum, pageSize, isAvailable, owner, name, warehouseThemeName },
     "post"
   );
 
@@ -19,7 +26,7 @@ export const getMeasures = (pageNum, pageSize, isAvailable, owner, name) =>
  *
  */
 export const createMeasures = body =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/measures`, body, "post");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}measures`, body, "post");
 
 /**
  * 修改度量
@@ -27,7 +34,7 @@ export const createMeasures = body =>
  *
  */
 export const editMeasures = (id, body) =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/measures/${id}`, body, "put");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}measures/${id}`, body, "put");
 
 /**
  * 根据id获取度量
@@ -35,7 +42,7 @@ export const editMeasures = (id, body) =>
  *
  */
 export const getMeasuresById = id =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/measures/${id}`, {}, "get");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}measures/${id}`, {}, "get");
 
 /**
  * 启用禁用度量
@@ -44,7 +51,7 @@ export const getMeasuresById = id =>
  */
 export const switchMeasuresStatus = (id, status) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/measures/${id}`,
+    `${API_PATH.DATAMODEL_PATH}measures/${id}`,
     { isAvailable: status },
     "put"
   );
@@ -54,10 +61,17 @@ export const switchMeasuresStatus = (id, status) =>
  * @returns {Object.result}
  *
  */
-export const getDimensions = (pageNum, pageSize, isAvailable, owner, name) =>
+export const getDimensions = ({
+  pageNum,
+  pageSize,
+  isAvailable,
+  owner,
+  name,
+  warehouseThemeName
+}) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/dimensions/list`,
-    { pageNum, pageSize, isAvailable, owner, name },
+    `${API_PATH.DATAMODEL_PATH}dimensions/list`,
+    { pageNum, pageSize, isAvailable, owner, name, warehouseThemeName },
     "post"
   );
 
@@ -67,7 +81,7 @@ export const getDimensions = (pageNum, pageSize, isAvailable, owner, name) =>
  *
  */
 export const createDimensions = body =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/dimensions`, body, "post");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}dimensions`, body, "post");
 
 /**
  * 修改维度
@@ -75,11 +89,7 @@ export const createDimensions = body =>
  *
  */
 export const editDimensions = (id, body) =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/dimensions/${id}`,
-    body,
-    "put"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}dimensions/${id}`, body, "put");
 
 /**
  * 根据id获取维度
@@ -87,7 +97,7 @@ export const editDimensions = (id, body) =>
  *
  */
 export const getDimensionsById = id =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/dimensions/${id}`, {}, "get");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}dimensions/${id}`, {}, "get");
 
 /**
  * 启用禁用维度
@@ -96,7 +106,7 @@ export const getDimensionsById = id =>
  */
 export const switchDimensionsStatus = (id, status) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/dimensions/${id}`,
+    `${API_PATH.DATAMODEL_PATH}dimensions/${id}`,
     { isAvailable: status },
     "put"
   );
@@ -108,17 +118,26 @@ export const switchDimensionsStatus = (id, status) =>
  * @returns {Object.result}
  *
  */
-export const getIndicators = (
+export const getIndicators = ({
   pageNum,
   pageSize,
   isAvailable,
   owner,
   name,
-  indicatorType
-) =>
+  indicatorType,
+  warehouseThemeName
+}) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/list`,
-    { pageNum, pageSize, isAvailable, owner, name, indicatorType },
+    `${API_PATH.DATAMODEL_PATH}indicators/list`,
+    {
+      pageNum,
+      pageSize,
+      isAvailable,
+      owner,
+      name,
+      indicatorType,
+      warehouseThemeName
+    },
     "post"
   );
 
@@ -128,7 +147,7 @@ export const getIndicators = (
  *
  */
 export const createIndicators = body =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/indicators`, body, "post");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators`, body, "post");
 
 /**
  * 修改指标
@@ -136,11 +155,7 @@ export const createIndicators = body =>
  *
  */
 export const editIndicators = (id, body) =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/${id}`,
-    body,
-    "put"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/${id}`, body, "put");
 
 /**
  * 根据id获取指标
@@ -148,7 +163,7 @@ export const editIndicators = (id, body) =>
  *
  */
 export const getIndicatorsById = id =>
-  api.fetch(`${API_PATH.DATAMODEL_PATH}datamodel/indicators/${id}`, {}, "get");
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/${id}`, {}, "get");
 
 /**
  * 启用禁用指标
@@ -157,7 +172,7 @@ export const getIndicatorsById = id =>
  */
 export const switcIndicatorsStatus = (id, status) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/enable/${id}`,
+    `${API_PATH.DATAMODEL_PATH}indicators/enable/${id}`,
     { isAvailable: status },
     "put"
   );
@@ -169,7 +184,7 @@ export const switcIndicatorsStatus = (id, status) =>
  */
 export const getIndicatorsVersionList = name =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/versions/list`,
+    `${API_PATH.DATAMODEL_PATH}indicators/versions/list`,
     { name },
     "post"
   );
@@ -181,7 +196,7 @@ export const getIndicatorsVersionList = name =>
  */
 export const buildIndicatorsVersion = (id, body) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/versions/${id}`,
+    `${API_PATH.DATAMODEL_PATH}indicators/versions/${id}`,
     body,
     "post"
   );
@@ -193,7 +208,7 @@ export const buildIndicatorsVersion = (id, body) =>
  */
 export const rollbackIndicatorsVersion = (name, version) =>
   api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/versions/rollback`,
+    `${API_PATH.DATAMODEL_PATH}indicators/versions/rollback`,
     { name, version },
     "post"
   );
@@ -205,11 +220,7 @@ export const rollbackIndicatorsVersion = (name, version) =>
  *
  */
 export const getThemesList = () =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/themes/list`,
-    {},
-    "post"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/themes/list`, {}, "post");
 
 /**
  * 分层列表
@@ -217,11 +228,7 @@ export const getThemesList = () =>
  *
  */
 export const getLayersList = () =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/layers/list`,
-    {},
-    "post"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/layers/list`, {}, "post");
 
 /**
  * 修饰词列表
@@ -229,11 +236,7 @@ export const getLayersList = () =>
  *
  */
 export const getModifiersList = () =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/modifiers/list`,
-    {},
-    "post"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/modifiers/list`, {}, "post");
 
 /**
  * 周期列表
@@ -241,8 +244,4 @@ export const getModifiersList = () =>
  *
  */
 export const getCyclesList = () =>
-  api.fetch(
-    `${API_PATH.DATAMODEL_PATH}datamodel/indicators/cycles/list`,
-    {},
-    "post"
-  );
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/cycles/list`, {}, "post");

@@ -1,5 +1,10 @@
 <template>
-  <Modal title="新建/编辑分层" v-model="visible" @on-cancel="cancelCallBack">
+  <Modal
+    title="新建/编辑分层"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
+    @on-cancel="cancelCallBack"
+  >
     <Form
       ref="formRef"
       :rules="ruleValidate"
@@ -40,7 +45,7 @@
       <FormItem label="可用库" prop="databases">
         <Select v-model="formState.databases" multiple placeholder="可用库">
           <Option
-            v-for="item in databasesList"
+            v-for="item in dataBasesList"
             :value="item.value"
             :key="item.value"
           >
@@ -69,21 +74,13 @@ import {
   createLayersCustom,
   getLayersById,
   editLayersCustom,
-} from '../../service/api'
+} from "../../service/api";
+import storage from "@/common/helper/storage";
+let userName = storage.get("baseInfo", "local").username;
 export default {
   model: {
-    prop: '_visible',
-    event: '_changeVisible',
-  },
-  computed: {
-    visible: {
-      get() {
-        return this._visible
-      },
-      set(val) {
-        this.$emit('_changeVisible', val)
-      },
-    },
+    prop: "_visible",
+    event: "_changeVisible",
   },
   props: {
     // 是否可见
@@ -100,123 +97,133 @@ export default {
       type: Number,
     },
   },
-  emits: ['finish', '_changeVisible'],
+  emits: ["finish", "_changeVisible"],
+  watch: {
+    _visible(val) {
+      if (val && this.id) this.handleGetById(this.id);
+    },
+  },
   data() {
     return {
+      // 表单数据
+      formState: {
+        name: "",
+        enName: "",
+        owner: userName,
+        principalName: ["ALL"],
+        databases: [],
+        description: "",
+        order: 0,
+      },
       // 验证规则
       ruleValidate: {
         name: [
           {
             required: true,
+            message: "分层名称必填",
+            trigger: "submit",
           },
         ],
         enName: [
           {
             required: true,
+            message: "分层英文名必填",
+            trigger: "submit",
           },
         ],
         owner: [
           {
             required: true,
+            message: "负责人必填",
+            trigger: "submit",
           },
         ],
       },
       // 是否加载中
       loading: false,
-      // 表单数据
-      formState: {
-        name: '',
-        enName: '',
-        owner: '',
-        principalName: [],
-        databases: [],
-        description: '',
-        order: 0,
-      },
-      databasesList: [
+      // 库列表
+      dataBasesList: [
         {
-          value: 'New York',
-          label: 'New York',
+          value: "New York",
+          label: "New York",
         },
         {
-          value: 'London',
-          label: 'London',
+          value: "London",
+          label: "London",
         },
       ],
       principalNameList: [
         {
-          value: 'New York',
-          label: 'New York',
+          value: "ALL",
+          label: "ALL",
         },
         {
-          value: 'London',
-          label: 'London',
+          value: "New York",
+          label: "New York",
+        },
+        {
+          value: "London",
+          label: "London",
         },
       ],
-    }
-  },
-  watch: {
-    _visible(val) {
-      if (val && this.id) this.handleGetById(this.id)
-    },
+    };
   },
   methods: {
     async handleGetById(id) {
-      this.loading = true
-      let { item } = await getLayersById(id)
-      this.loading = false
-      this.formState.name = item.name
-      this.formState.owner = item.owner
-      this.formState.enName = item.enName
-      this.formState.principalName = item.principalName.split(',')
-      this.formState.databases = item.dbs.split(',')
-      this.formState.description = item.description
-      this.formState.order = item.sort
+      this.loading = true;
+      let { item } = await getLayersById(id);
+      this.loading = false;
+      this.formState.name = item.name;
+      this.formState.owner = item.owner;
+      this.formState.enName = item.enName;
+      this.formState.principalName = item.principalName.split(",");
+      this.formState.databases = item.dbs.split(",");
+      this.formState.description = item.description;
+      this.formState.order = item.sort;
     },
     cancelCallBack() {
-      this.$refs['formRef'].resetFields()
+      this.$refs["formRef"].resetFields();
     },
     handleCancel() {
-      this.$refs['formRef'].resetFields()
-      this.$emit('_changeVisible', false)
+      this.$refs["formRef"].resetFields();
+      this.$emit("_changeVisible", false);
     },
     async handleOk() {
-      this.$refs['formRef'].validate(async (valid) => {
+      this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
           try {
-            if (this.mode === 'create') {
-              this.loading = true
+            this.loading = true;
+            if (this.mode === "create") {
               await createLayersCustom(
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
-                  databases: this.formState.databases.join(','),
+                  principalName: this.formState.principalName.join(","),
+                  databases: this.formState.databases.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            if (this.mode === 'edit') {
-              this.loading = true
+            if (this.mode === "edit") {
               await editLayersCustom(
                 this.id,
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
-                  databases: this.formState.databases.join(','),
+                  principalName: this.formState.principalName.join(","),
+                  databases: this.formState.databases.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            this.$refs['formRef'].resetFields()
-            this.$emit('_changeVisible', false)
-            this.$emit('finish')
+            this.$refs["formRef"].resetFields();
+            this.$emit("_changeVisible", false);
+            this.$emit("finish");
           } catch (error) {
-            this.loading = false
-            console.log(error)
+            this.loading = false;
+            console.log(error);
           }
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <style scoped lang="less"></style>

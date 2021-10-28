@@ -2,7 +2,7 @@ const routes = [
   {
     name: "dataModelCenter",
     path: "/dataModelCenter",
-    redirect: "/dataModelCenter/dimension",
+    redirect: "/dataModelCenter/tableManage",
     component: () => import("./view/layout/index.vue"),
     meta: {
       title: "数据模型中心",
@@ -33,10 +33,20 @@ const routes = [
           },
           {
             name: "tableInfo",
-            path: "/dataModelCenter/tableManage/tableInfo/:id",
+            path: "/dataModelCenter/tableManage/tableInfo",
             component: () => import("./view/tableManage/tableInfo/index.vue"),
             meta: {
               title: "表详情",
+              publicPage: true,
+              icon: "ios-paper"
+            }
+          },
+          {
+            name: "tableEditor",
+            path: "/dataModelCenter/tableManage/tableEditor",
+            component: () => import("./view/tableManage/tableEditor/index.vue"),
+            meta: {
+              title: "表编辑",
               publicPage: true,
               icon: "ios-paper"
             }

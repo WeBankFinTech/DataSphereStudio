@@ -1,5 +1,10 @@
 <template>
-  <Modal title="新建/编辑" v-model="visible" @on-cancel="cancelCallBack">
+  <Modal
+    title="新建/编辑"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
+    @on-cancel="cancelCallBack"
+  >
     <Form
       :model="formState"
       ref="formRef"
@@ -7,30 +12,32 @@
       label-position="top"
     >
       <FormItem label="名称" prop="name">
-        <Input v-model="formState.name" placeholder="名称"></Input>
+        <Input v-model="formState.name" placeholder="建议为中文名"></Input>
       </FormItem>
-      <FormItem label="字段标识" prop="formula">
-        <Input
-          v-model="formState.fieldIdentifier"
-          placeholder="字段标识"
-        ></Input>
+      <FormItem label="字段标识" prop="fieldIdentifier">
+        <Input v-model="formState.fieldIdentifier" placeholder="必须英文字段名">
+        </Input>
       </FormItem>
       <FormItem label="计算公式" prop="formula">
         <Input
           type="textarea"
           v-model="formState.formula"
-          placeholder="计算公式"
-        ></Input>
+          placeholder="请输入计算公式，如 substring(字段名)"
+        >
+        </Input>
       </FormItem>
       <FormItem label="主题域" prop="warehouseThemeName">
-        <Select v-model="formState.warehouseThemeName" placeholder="主题域">
-          <Option v-for="item in themesList" :value="item.id" :key="item.id">
+        <Select
+          v-model="formState.warehouseThemeName"
+          placeholder="请选择主题域和主题"
+        >
+          <Option v-for="item in themesList" :value="item.name" :key="item.id">
             {{ item.name }}
           </Option>
         </Select>
       </FormItem>
-      <FormItem label="负责人">
-        <Input v-model="formState.owner" placeholder="负责人"></Input>
+      <FormItem label="负责人" prop="owner">
+        <Input v-model="formState.owner" placeholder="默认为创建用户"></Input>
       </FormItem>
 
       <FormItem label="可用角色" prop="principalName">
@@ -49,11 +56,8 @@
         </Select>
       </FormItem>
       <FormItem label="描述" prop="comment">
-        <Input
-          type="textarea"
-          v-model="formState.comment"
-          placeholder="描述"
-        ></Input>
+        <Input type="textarea" v-model="formState.comment" placeholder="描述">
+        </Input>
       </FormItem>
     </Form>
     <Spin v-if="loading" fix></Spin>
@@ -71,26 +75,18 @@ import {
   editDimensions,
   getThemesList,
 } from "../../service/api";
+import storage from "@/common/helper/storage";
+let userName = storage.get("baseInfo", "local").username;
+
 export default {
   model: {
     prop: "_visible",
     event: "_changeVisible",
   },
-  computed: {
-    visible: {
-      get() {
-        return this._visible;
-      },
-      set(val) {
-        this.$emit("_changeVisible", val);
-      },
-    },
-  },
   props: {
     // 是否可见
     _visible: {
       type: Boolean,
-      required: true,
     },
     // 模式
     mode: {
@@ -109,51 +105,66 @@ export default {
   },
   data() {
     return {
-      // 验证规则
-      ruleValidate: {},
-      // 是否加载中
-      loading: false,
       // 表单数据
       formState: {
         name: "",
         fieldIdentifier: "",
-        owner: "",
+        owner: userName,
         comment: "",
         formula: "",
         warehouseThemeName: "",
-        principalName: [],
+        principalName: ["ALL"],
+        isAvailable: 1,
       },
-      themesList: [
-        {
-          id: "New York",
-          name: "New York",
-        },
-        {
-          id: "London",
-          name: "London",
-        },
-      ],
+      // 验证规则
+      ruleValidate: {
+        name: [
+          {
+            required: true,
+            message: "维度名称必填",
+            trigger: "submit",
+          },
+        ],
+        fieldIdentifier: [
+          {
+            required: true,
+            message: "标识符必填",
+            trigger: "submit",
+          },
+        ],
+      },
+      // 是否加载中
+      loading: false,
+      // 主题列表
+      themesList: [],
+      // 角色列表
       authorityList: [
         {
-          value: "New York",
-          label: "New York",
+          value: "ALL",
+          label: "ALL",
         },
         {
-          value: "London",
-          label: "London",
+          value: "角色1",
+          label: "角色1",
+        },
+        {
+          value: "角色2",
+          label: "角色2",
         },
       ],
     };
   },
   mounted() {
-    // this.handleGetSubjectDomainList();
+    this.handleGetSubjectDomainList();
   },
   methods: {
+    // 编辑的时候获取现有数据
     async handleGetById(id) {
       this.loading = true;
       let { detail } = await getDimensionsById(id);
       this.loading = false;
       this.formState.name = detail.name;
+      this.formState.isAvailable = detail.isAvailable;
       this.formState.owner = detail.owner;
       this.formState.principalName = detail.principalName.split(",");
       this.formState.comment = detail.comment;
@@ -161,19 +172,24 @@ export default {
       this.formState.warehouseThemeName = detail.warehouseThemeName;
       this.formState.formula = detail.formula;
     },
+    // 取消清空表单
     cancelCallBack() {
       this.$refs["formRef"].resetFields();
     },
+    // 点击取消按钮清空表单并关闭
     handleCancel() {
       this.$refs["formRef"].resetFields();
       this.$emit("_changeVisible", false);
     },
+    // 点击确定
     async handleOk() {
+      // 触发表单验证
       this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
+          // 验证完成
+          this.loading = true;
           try {
             if (this.mode === "create") {
-              this.loading = true;
               await createDimensions(
                 Object.assign({}, this.formState, {
                   principalName: this.formState.principalName.join(","),
@@ -182,7 +198,6 @@ export default {
               this.loading = false;
             }
             if (this.mode === "edit") {
-              this.loading = true;
               await editDimensions(
                 this.id,
                 Object.assign({}, this.formState, {
@@ -191,6 +206,7 @@ export default {
               );
               this.loading = false;
             }
+            // 完成之后，清空表单，关闭弹窗，触发回调
             this.$refs["formRef"].resetFields();
             this.$emit("_changeVisible", false);
             this.$emit("finish");
@@ -201,12 +217,12 @@ export default {
         }
       });
     },
-    // async handleGetSubjectDomainList() {
-    //   this.loading = true;
-    //   let { list } = await getThemesList();
-    //   this.loading = false;
-    //   this.themesList = list;
-    // },
+    async handleGetSubjectDomainList() {
+      this.loading = true;
+      let { list } = await getThemesList();
+      this.loading = false;
+      this.themesList = list;
+    },
   },
 };
 </script>

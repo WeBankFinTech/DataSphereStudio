@@ -61,7 +61,7 @@
           size="small"
           @click="handleDisable(row.id)"
           style="margin-right: 5px"
-          v-if="row.isAvailable"
+          v-show="row.isAvailable"
         >
           禁用
         </Button>
@@ -70,7 +70,7 @@
           size="small"
           @click="handleEnable(row.id)"
           style="margin-right: 5px"
-          v-else
+          v-show="!row.isAvailable"
         >
           启用
         </Button>
@@ -82,9 +82,8 @@
     <div class="page-line">
       <Page
         :total="pageCfg.total"
-        :current="pageCfg.page"
+        :current.sync="pageCfg.page"
         :page-size="pageCfg.pageSize"
-        @on-change="changePage"
       />
     </div>
     <EditModal
@@ -103,68 +102,81 @@ import EditModal from "./editModal.vue";
 export default {
   components: { EditModal },
   methods: {
+    // modal 完成回调
     handleModalFinish() {
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
         mode: "create",
       };
     },
-    async handleDelete(id) {
-      alert("删除" + id);
+    // 删除操作
+    handleDelete(id) {
+      this.$Modal.confirm({
+        title: "警告",
+        content: "确定删除此项吗？" + id,
+        onOk: () => {
+          this.$Message.info("删除");
+        },
+        onCancel: () => {
+          this.$Message.info("取消");
+        },
+      });
     },
+    // 编辑操作
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
         mode: "edit",
-        id,
+        id: id,
       };
     },
+    // 启用
     async handleEnable(id) {
       this.loading = true;
       await switchDimensionsStatus(id, 1);
       this.loading = false;
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 禁用
     async handleDisable(id) {
       this.loading = true;
       await switchDimensionsStatus(id, 0);
       this.loading = false;
-      this.handleGetData();
+      this.handleGetData(true);
     },
+    // 搜索
     handleSearch() {
-      this.pageCfg.page = 1;
       this.handleGetData();
     },
-    async handleGetData() {
+    // 获取数据
+    async handleGetData(changePage = false) {
+      if (changePage === false && this.pageCfg.page !== 1) {
+        return (this.pageCfg.page = 1);
+      }
       this.loading = true;
-      const { list, total } = await getDimensions(
-        this.pageCfg.page,
-        this.pageCfg.pageSize,
-        this.searchParams.isAvailable,
-        this.searchParams.owner,
-        this.searchParams.name
-      );
+      const { list, total } = await getDimensions({
+        pageNum: this.pageCfg.page,
+        pageSize: this.pageCfg.pageSize,
+        isAvailable: this.searchParams.isAvailable,
+        owner: this.searchParams.owner,
+        name: this.searchParams.name,
+      });
       this.loading = false;
       this.datalist = list;
       this.pageCfg.total = total;
     },
-    changePage(page) {
-      this.pageCfg.page = page;
-    },
   },
-  filters: {
-    formatDate,
-  },
+  filters: { formatDate },
   mounted() {
     this.handleGetData();
   },
   watch: {
-    pageCfg: {
-      handler: "handleGetData",
-      deep: true,
+    "pageCfg.page"() {
+      this.handleGetData(true);
     },
   },
 
@@ -250,7 +262,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/styles/common.scss";
-
 .top-line {
   margin-bottom: 16px;
   display: flex;

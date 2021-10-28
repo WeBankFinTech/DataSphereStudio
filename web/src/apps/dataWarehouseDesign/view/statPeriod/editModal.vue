@@ -1,5 +1,10 @@
 <template>
-  <Modal title="新建/编辑" @on-cancel="cancelCallBack" v-model="visible">
+  <Modal
+    title="新建/编辑"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
+    @on-cancel="cancelCallBack"
+  >
     <Form
       ref="formRef"
       :rules="ruleValidate"
@@ -106,21 +111,13 @@ import {
   editStatisticalPeriods,
   getThemedomains,
   getLayersAll,
-} from '../../service/api'
+} from "../../service/api";
+import storage from "@/common/helper/storage";
+let userName = storage.get("baseInfo", "local").username;
 export default {
   model: {
-    prop: '_visible',
-    event: '_changeVisible',
-  },
-  computed: {
-    visible: {
-      get() {
-        return this._visible
-      },
-      set(val) {
-        this.$emit('_changeVisible', val)
-      },
-    },
+    prop: "_visible",
+    event: "_changeVisible",
   },
   props: {
     // 是否可见
@@ -138,112 +135,147 @@ export default {
       default: 0,
     },
   },
-  emits: ['finish', '_changeVisible'],
+  emits: ["finish", "_changeVisible"],
   watch: {
     _visible(val) {
-      if (val && this.id) this.handleGetById(this.id)
+      if (val && this.id) this.handleGetById(this.id);
     },
   },
   data() {
     return {
       // 验证规则
-      ruleValidate: {},
+      ruleValidate: {
+        name: [
+          {
+            required: true,
+            message: "统计周期名称必填",
+            trigger: "submit",
+          },
+        ],
+        enName: [
+          {
+            required: true,
+            message: "英文缩写必填",
+            trigger: "submit",
+          },
+        ],
+        statStartFormula: [
+          {
+            required: true,
+            message: "此项必填",
+            trigger: "submit",
+          },
+        ],
+        statEndFormula: [
+          {
+            required: true,
+            message: "此项必填",
+            trigger: "submit",
+          },
+        ],
+      },
       // 是否加载中
       loading: false,
       // 表单数据
       formState: {
-        name: '',
-        enName: '',
-        statStartFormula: '',
-        statEndFormula: '',
-        principalName: [],
-        description: '',
-        owner: '',
-        layerId: '',
-        themeDomainId: '',
+        name: "",
+        enName: "",
+        statStartFormula: "",
+        statEndFormula: "",
+        principalName: ["ALL"],
+        description: "",
+        owner: userName,
+        layerId: "",
+        themeDomainId: "",
       },
+      // 主题列表
       subjectDomainList: [],
+      // 分层列表
       layeredList: [],
+      // 可用角色列表
       authorityList: [
         {
-          value: 'New York',
-          label: 'New York',
+          value: "ALL",
+          label: "ALL",
         },
         {
-          value: 'London',
-          label: 'London',
+          value: "New York",
+          label: "New York",
+        },
+        {
+          value: "London",
+          label: "London",
         },
       ],
-    }
+    };
   },
   mounted() {
-    this.handleGetLayerListAndSubjectDomainList()
+    this.handleGetLayerListAndSubjectDomainList();
   },
   methods: {
     async handleGetById(id) {
-      this.loading = true
-      let { item } = await getStatisticalPeriodsById(id)
-      this.loading = false
-      this.formState.name = item.name
-      this.formState.enName = item.enName
-      this.formState.owner = item.owner
-      this.formState.principalName = item.principalName.split(',')
-      this.formState.statStartFormula = item.startTimeFormula
-      this.formState.statEndFormula = item.endTimeFormula
-      this.formState.layerId = item.layerId
-      this.formState.themeDomainId = item.themeDomainId
-      this.formState.description = item.description
+      this.loading = true;
+      let { item } = await getStatisticalPeriodsById(id);
+      this.loading = false;
+      this.formState.name = item.name;
+      this.formState.enName = item.enName;
+      this.formState.owner = item.owner;
+      this.formState.principalName = item.principalName.split(",");
+      this.formState.statStartFormula = item.startTimeFormula;
+      this.formState.statEndFormula = item.endTimeFormula;
+      this.formState.layerId = item.layerId;
+      this.formState.themeDomainId = item.themeDomainId;
+      this.formState.description = item.description;
     },
     cancelCallBack() {
-      this.$refs['formRef'].resetFields()
+      this.$refs["formRef"].resetFields();
     },
     handleCancel() {
-      this.$refs['formRef'].resetFields()
-      this.$emit('_changeVisible', false)
+      this.$refs["formRef"].resetFields();
+      this.$emit("_changeVisible", false);
     },
     async handleOk() {
-      this.$refs['formRef'].validate(async (valid) => {
+      this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
           try {
-            if (this.mode === 'create') {
-              this.loading = true
+            this.loading = true;
+            if (this.mode === "create") {
               await createStatisticalPeriods(
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
+                  principalName: this.formState.principalName.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            if (this.mode === 'edit') {
-              this.loading = true
+            if (this.mode === "edit") {
               await editStatisticalPeriods(
                 this.id,
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
+                  principalName: this.formState.principalName.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            this.$refs['formRef'].resetFields()
-            this.$emit('_changeVisible', false)
-            this.$emit('finish')
+            this.$refs["formRef"].resetFields();
+            this.$emit("_changeVisible", false);
+            this.$emit("finish");
           } catch (error) {
-            this.loading = false
-            console.log(error)
+            this.loading = false;
+            console.log(error);
           }
         }
-      })
+      });
     },
     async handleGetLayerListAndSubjectDomainList() {
-      this.loading = true
-      let { page } = await getThemedomains()
-      let { list } = await getLayersAll()
-      this.subjectDomainList = page.items
-      this.layeredList = list
-      this.loading = false
+      this.loading = true;
+      let { page } = await getThemedomains();
+      let { list } = await getLayersAll();
+      this.loading = false;
+      this.subjectDomainList = page.items;
+      this.layeredList = list;
     },
   },
-}
+};
 </script>
 
 <style scoped lang="less"></style>

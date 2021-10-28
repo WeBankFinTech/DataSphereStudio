@@ -21,8 +21,8 @@ public class MeasureIndicatorCheckServiceImpl implements MeasureIndicatorCheckSe
 
     @Override
     public Boolean referenceCase(String name) {
-        int versionCount = indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, name));
-        int contentCount = indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, name));
+        int versionCount = indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, "\""+name + "\""));
+        int contentCount = indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, "\""+name + "\""));
         return versionCount > 0 || contentCount > 0;
     }
 }

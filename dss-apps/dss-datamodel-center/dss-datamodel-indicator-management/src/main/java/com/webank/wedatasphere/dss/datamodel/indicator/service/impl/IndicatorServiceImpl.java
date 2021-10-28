@@ -129,8 +129,8 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " not exists");
         }
 
-        //有版本不能删除 待商讨
-        if (indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, dssDatamodelIndicator.getName())) > 0) {
+        //有版本不能删除
+        if (indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, dssDatamodelIndicator.getName())) > 0) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has version");
         }
 

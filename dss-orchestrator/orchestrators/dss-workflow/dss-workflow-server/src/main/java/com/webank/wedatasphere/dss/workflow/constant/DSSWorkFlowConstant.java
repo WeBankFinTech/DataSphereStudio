@@ -30,4 +30,7 @@ public class DSSWorkFlowConstant {
     public static final CommonVars CACHE_TIMEOUT = CommonVars$.MODULE$.apply("wds.dss.server.cache.timeout",1000 * 60 * 60);
     public static final CommonVars PUBLISH_TIMEOUT = CommonVars$.MODULE$.apply("wds.dss.server.publish.timeout",60 * 10);
 
+    public static final CommonVars<String> DSS_SCHEDULER_APPCONN_NAME =
+        CommonVars.apply("wds.dss.scheduler.appconn.name", "dolphinscheduler");
+
 }

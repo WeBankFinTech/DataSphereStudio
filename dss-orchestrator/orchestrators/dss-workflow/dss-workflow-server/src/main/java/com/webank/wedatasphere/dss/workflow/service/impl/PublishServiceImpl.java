@@ -16,6 +16,11 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -26,11 +31,9 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertO
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import com.webank.wedatasphere.linkis.rpc.Sender;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PublishServiceImpl implements PublishService {
 
@@ -44,15 +47,19 @@ public class PublishServiceImpl implements PublishService {
     public String submitPublish(String convertUser, Long workflowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception {
         LOGGER.info("User {} begins to convert workflow {}", convertUser, workflowId);
-        //1 获取对应的orcId 和 orcVersionId
-        //2.进行提交
+
         try {
             RequestFrameworkConvertOrchestration requestFrameworkConvertOrchestration = new RequestFrameworkConvertOrchestration();
             requestFrameworkConvertOrchestration.setComment(comment);
             requestFrameworkConvertOrchestration.setOrcAppId(workflowId);
             requestFrameworkConvertOrchestration.setUserName(convertUser);
             requestFrameworkConvertOrchestration.setWorkspace(workspace);
-            SchedulerAppConn schedulerAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+
+            SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
+                .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+            if (schedulerAppConn == null) {
+                schedulerAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+            }
             // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
             requestFrameworkConvertOrchestration.setConvertAllOrcs(schedulerAppConn.getOrCreateWorkflowConversionStandard().getDSSToRelConversionService(appInstance).isConvertAllOrcs());

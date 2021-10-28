@@ -24,10 +24,10 @@ public class IndicatorTableCheckServiceImpl implements IndicatorTableCheckServic
         int columnCount = tableColumnsService.getBaseMapper().selectCount(
                 Wrappers.<DssDatamodelTableColumns>lambdaQuery()
                         .eq(DssDatamodelTableColumns::getModelType, 1)
-                        .like(DssDatamodelTableColumns::getModelName, name));
+                        .eq(DssDatamodelTableColumns::getModelName, name));
         int columnVersionCount = tableVersionService.getBaseMapper().selectCount(
                 Wrappers.<DssDatamodelTableVersion>lambdaQuery()
-                        .like(DssDatamodelTableVersion::getColumns,name));
+                        .like(DssDatamodelTableVersion::getColumns,"\""+name + "\""));
         return columnCount > 0 || columnVersionCount>0 ;
     }
 }

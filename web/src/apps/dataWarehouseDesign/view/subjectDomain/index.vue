@@ -15,7 +15,7 @@
     </div>
     <Table
       :columns="columns"
-      :data="datalist"
+      :data="dataList"
       :loading="loading"
       style="margin-bottom: 16px"
     >
@@ -25,7 +25,7 @@
         </Tag>
       </template>
       <template slot-scope="{ row }" slot="isAvailable">
-        {{ row.isAvailable ? '启用' : '禁用' }}
+        {{ row.isAvailable ? "启用" : "禁用" }}
       </template>
       <template slot-scope="{ row }" slot="createTime">
         {{ row.createTime | formatDate }}
@@ -67,9 +67,8 @@
     <div class="page-line">
       <Page
         :total="pageCfg.total"
-        :current="pageCfg.page"
+        :current.sync="pageCfg.page"
         :page-size="pageCfg.pageSize"
-        @on-change="changePage"
       />
     </div>
     <EditModal
@@ -82,137 +81,146 @@
 </template>
 
 <script>
-import EditModal from './editModal.vue'
-import formatDate from '../../utils/formatDate'
+import EditModal from "./editModal.vue";
+import formatDate from "../../utils/formatDate";
 import {
   getThemedomains,
   deleteThemedomains,
   enableThemedomains,
   disableThemedomains,
-} from '../../service/api'
+} from "../../service/api";
+
 export default {
   components: { EditModal },
+  filters: { formatDate },
   methods: {
+    // 弹框回调
     handleModalFinish() {
-      this.handleGetData()
+      this.handleGetData(true);
     },
+    // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
-        mode: 'create',
-      }
+        mode: "create",
+      };
     },
+    // 删除操作
     async handleDelete(id) {
-      this.loading = true
-      await deleteThemedomains(id)
-      this.loading = false
-      this.handleGetData()
+      this.$Modal.confirm({
+        title: "警告",
+        content: "确定删除此项吗？",
+        onOk: async () => {
+          this.loading = true;
+          await deleteThemedomains(id);
+          this.loading = false;
+          this.handleGetData(true);
+        },
+      });
     },
+    // 编辑操作
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
-        mode: 'edit',
+        mode: "edit",
         id,
-      }
+      };
     },
+    // 启用
     async handleEnable(id) {
-      this.loading = true
-      await enableThemedomains(id)
-      this.loading = false
-      this.handleGetData()
+      this.loading = true;
+      await enableThemedomains(id);
+      this.loading = false;
+      this.handleGetData(true);
     },
+    // 禁用
     async handleDisable(id) {
-      this.loading = true
-      await disableThemedomains(id)
-      this.loading = false
-      this.handleGetData()
+      this.loading = true;
+      await disableThemedomains(id);
+      this.loading = false;
+      this.handleGetData(true);
     },
+    // 搜索
     handleSearch() {
-      this.pageCfg.page = 1
-      this.handleGetData()
+      this.handleGetData();
     },
-    async handleGetData() {
-      this.loading = true
-      let data = await getThemedomains(
-        this.pageCfg.page,
-        this.pageCfg.pageSize,
-        this.searchVal
-      )
-      this.loading = false
-      let { current, pageSize, items, total } = data.page
-      this.pageCfg.page = current
-      this.pageCfg.pageSize = pageSize
-      this.pageCfg.total = total
-      this.datalist = items
+    // 获取数据
+    async handleGetData(changePage = false) {
+      if (changePage === false && this.pageCfg.page !== 1) {
+        return (this.pageCfg.page = 1);
+      }
+      let data = await getThemedomains({
+        page: this.pageCfg.page,
+        size: this.pageCfg.pageSize,
+        name: this.searchVal,
+      });
+      this.loading = false;
+      let { items, total } = data.page;
+      this.pageCfg.total = total;
+      this.dataList = items;
     },
-    changePage(page) {
-      this.pageCfg.page = page
-    },
-  },
-  filters: {
-    formatDate,
   },
   mounted() {
-    this.handleGetData()
+    this.handleGetData();
   },
   watch: {
-    pageCfg: {
-      handler: 'handleGetData',
-      deep: true,
+    "pageCfg.page"() {
+      this.handleGetData(true);
     },
   },
 
   data() {
     return {
-      searchVal: '',
+      // 搜索
+      searchVal: "",
       columns: [
         {
-          title: '名称',
-          key: 'name',
+          title: "名称",
+          key: "name",
         },
         {
-          title: '英文名',
-          key: 'enName',
+          title: "英文名",
+          key: "enName",
         },
         {
-          title: '状态',
-          key: 'isAvailable',
-          slot: 'isAvailable',
+          title: "状态",
+          key: "isAvailable",
+          slot: "isAvailable",
         },
         {
-          title: '描述',
-          key: 'description',
+          title: "描述",
+          key: "description",
           ellipsis: true,
         },
         {
-          title: '选择权限',
-          key: 'principalName',
-          slot: 'principalName',
+          title: "选择权限",
+          key: "principalName",
+          slot: "principalName",
         },
         {
-          title: '负责人',
-          key: 'owner',
+          title: "负责人",
+          key: "owner",
         },
         {
-          title: '创建时间',
-          key: 'createTime',
-          slot: 'createTime',
+          title: "创建时间",
+          key: "createTime",
+          slot: "createTime",
         },
         {
-          title: '更新时间',
-          key: 'updateTime',
-          slot: 'updateTime',
+          title: "更新时间",
+          key: "updateTime",
+          slot: "updateTime",
         },
         {
-          title: '操作',
-          slot: 'action',
+          title: "操作",
+          slot: "action",
           minWidth: 60,
         },
       ],
-      datalist: [],
+      dataList: [],
       // 弹窗参数
       modalCfg: {
-        mode: '',
+        mode: "",
         id: NaN,
         visible: false,
       },
@@ -224,9 +232,9 @@ export default {
         pageSize: 10,
         total: 10,
       },
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

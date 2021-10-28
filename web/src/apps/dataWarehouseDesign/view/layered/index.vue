@@ -13,7 +13,7 @@
         style="margin-bottom: 16px"
       >
         <template slot-scope="{ row }" slot="isAvailable">
-          {{ row.isAvailable ? '启用' : '禁用' }}
+          {{ row.isAvailable ? "启用" : "禁用" }}
         </template>
         <template slot-scope="{ row }" slot="createTime">
           {{ row.createTime | formatDate }}
@@ -75,7 +75,7 @@
         style="margin-bottom: 16px"
       >
         <template slot-scope="{ row }" slot="isAvailable">
-          {{ row.isAvailable ? '启用' : '禁用' }}
+          {{ row.isAvailable ? "启用" : "禁用" }}
         </template>
         <template slot-scope="{ row }" slot="createTime">
           {{ row.createTime | formatDate }}
@@ -126,9 +126,8 @@
       <div class="page-line">
         <Page
           :total="pageCfg.total"
-          :current="pageCfg.page"
+          :current.sync="pageCfg.page"
           :page-size="pageCfg.pageSize"
-          @on-change="changePage"
         />
       </div>
     </div>
@@ -148,134 +147,150 @@ import {
   deleteLayers,
   enableLayers,
   disableLayers,
-} from '../../service/api'
-import EditModal from './editModal.vue'
-import formatDate from '../../utils/formatDate'
+} from "../../service/api";
+import EditModal from "./editModal.vue";
+import formatDate from "../../utils/formatDate";
 export default {
   components: { EditModal },
-  filters: {
-    formatDate,
-  },
+  filters: { formatDate },
   methods: {
+    // 弹窗回调
     handleModalFinish() {
-      this.handleGetLayersCustom()
+      this.handleGetLayersCustom(true);
     },
+    // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
-        mode: 'create',
-      }
+        mode: "create",
+      };
     },
-    async handleDelete(id) {
-      this.customloading = true
-      await deleteLayers(id)
-      this.customloading = false
-      this.handleGetLayersCustom()
+    // 删除操作
+    handleDelete(id) {
+      this.$Modal.confirm({
+        title: "警告",
+        content: "确定删除此项吗？",
+        onOk: async () => {
+          this.customloading = true;
+          await deleteLayers(id);
+          this.customloading = false;
+          this.handleGetLayersCustom(true);
+        },
+      });
     },
+    // 编辑弹窗
     handleEdit(id) {
       this.modalCfg = {
         visible: true,
-        mode: 'edit',
+        mode: "edit",
         id: id,
-      }
+      };
     },
+    // 启用
     async handleEnable(id) {
-      this.loading = true
-      await enableLayers(id)
-      this.loading = false
-      this.handleGetLayersCustom()
+      this.loading = true;
+      await enableLayers(id);
+      this.loading = false;
+      this.handleGetLayersCustom(true);
     },
+    // 停用
     async handleDisable(id) {
-      this.loading = true
-      await disableLayers(id)
-      this.loading = false
-      this.handleGetLayersCustom()
+      this.loading = true;
+      await disableLayers(id);
+      this.loading = false;
+      this.handleGetLayersCustom(true);
     },
+    // 获取预设分层
     async handleGetLayersPreset() {
-      this.preSetloading = true
-      let { list } = await getLayersPreset()
-      this.preSetloading = false
-      this.presetDataList = list
+      this.preSetloading = true;
+      let { list } = await getLayersPreset();
+      this.preSetloading = false;
+      this.presetDataList = list;
     },
-    async handleGetLayersCustom() {
-      this.customloading = true
-      let data = await getLayersCustom(this.pageCfg.page, this.pageCfg.pageSize)
-      this.customloading = false
-      let { current, pageSize, items, total } = data.page
-      this.pageCfg.page = current
-      this.pageCfg.pageSize = pageSize
-      this.pageCfg.total = total
-      this.customDataList = items
-    },
-    changePage(page) {
-      this.pageCfg.page = page
+    // 获取自定义分层
+    async handleGetLayersCustom(changePage = false) {
+      if (changePage === false && this.pageCfg.page !== 1) {
+        return (this.pageCfg.page = 1);
+      }
+      this.customloading = true;
+      let data = await getLayersCustom(
+        this.pageCfg.page,
+        this.pageCfg.pageSize
+      );
+      this.customloading = false;
+      let { items, total } = data.page;
+      this.pageCfg.total = total;
+      this.customDataList = items;
     },
   },
   mounted() {
-    this.handleGetLayersPreset()
-    this.handleGetLayersCustom()
+    this.handleGetLayersPreset();
+    this.handleGetLayersCustom();
   },
   watch: {
-    pageCfg: {
-      handler: 'handleGetLayersCustom',
-      deep: true,
+    "pageCfg.page"() {
+      this.handleGetLayersCustom(true);
     },
   },
   data() {
     return {
       columns: [
         {
-          title: '分层名称',
-          key: 'name',
+          title: "分层名称",
+          key: "name",
         },
         {
-          title: '英文名',
-          key: 'enName',
+          title: "英文名",
+          key: "enName",
         },
         {
-          title: '状态',
-          key: 'isAvailable',
-          slot: 'isAvailable',
+          title: "状态",
+          key: "isAvailable",
+          slot: "isAvailable",
         },
         {
-          title: '描述',
-          key: 'description',
+          title: "描述",
+          key: "description",
           ellipsis: true,
         },
         {
-          title: '分层选择权限',
-          key: 'principalName',
-          slot: 'principalName',
+          title: "分层选择权限",
+          key: "principalName",
+          slot: "principalName",
         },
         {
-          title: '可用库',
-          key: 'dbs',
-          slot: 'dbs',
+          title: "可用库",
+          key: "dbs",
+          slot: "dbs",
         },
         {
-          title: '创建时间',
-          key: 'createTime',
-          slot: 'createTime',
+          title: "创建时间",
+          key: "createTime",
+          slot: "createTime",
         },
         {
-          title: '更新时间',
-          key: 'updateTime',
-          slot: 'updateTime',
+          title: "更新时间",
+          key: "updateTime",
+          slot: "updateTime",
         },
         {
-          title: '操作',
-          key: 'action',
-          slot: 'action',
+          title: "操作",
+          key: "action",
+          slot: "action",
           minWidth: 60,
         },
       ],
+      // 自定义分层列表
       customloading: false,
+      // 自定义分数据
       customDataList: [],
+      // 预设分层加载中
       preSetloading: false,
+      // 预设分层数据
       presetDataList: [],
       // 弹窗参数
       modalCfg: {
-        mode: '',
+        mode: "",
         id: NaN,
         visible: false,
       },
@@ -285,9 +300,9 @@ export default {
         pageSize: 10,
         total: 10,
       },
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -6,7 +6,7 @@ import api from "@/common/service/api";
  * @params {workspaceId}
  * @returns Array
  */
-export const getThemedomains = (page, size, name) =>
+export const getThemedomains = ({ page, size, name } = {}) =>
   api.fetch(
     `${API_PATH.WAREHOUSE_PATH}data-warehouse/themedomains`,
     { page, size, name },
@@ -135,11 +135,7 @@ export const createLayersCustom = body =>
  * @returns Array
  */
 export const getLayersById = id =>
-  api.fetch(
-    `${API_PATH.WAREHOUSE_PATH}data-warehouse/layers/${id}`,
-    {},
-    "get"
-  );
+  api.fetch(`${API_PATH.WAREHOUSE_PATH}data-warehouse/layers/${id}`, {}, "get");
 
 /**
  * 编辑分层
@@ -195,11 +191,7 @@ export const enableLayers = id =>
  * @returns Array
  */
 export const createModifiers = body =>
-  api.fetch(
-    `${API_PATH.WAREHOUSE_PATH}data-warehouse/modifiers`,
-    body,
-    "post"
-  );
+  api.fetch(`${API_PATH.WAREHOUSE_PATH}data-warehouse/modifiers`, body, "post");
 
 /**
  *  删除修饰词
@@ -230,7 +222,7 @@ export const editModifiers = (id, body) =>
  * @params {workspaceId}
  * @returns Array
  */
-export const getModifiers = (page, size, name, enabled) =>
+export const getModifiers = ({ page, size, name, enabled } = {}) =>
   api.fetch(
     `${API_PATH.WAREHOUSE_PATH}data-warehouse/modifiers`,
     { page, size, name, enabled },
@@ -316,7 +308,7 @@ export const editStatisticalPeriods = (id, body) =>
  * @params {workspaceId}
  * @returns Array
  */
-export const getStatisticalPeriods = (page, size, name, enabled) =>
+export const getStatisticalPeriods = ({ page, size, name, enabled } = {}) =>
   api.fetch(
     `${API_PATH.WAREHOUSE_PATH}data-warehouse/statistical_periods`,
     { page, size, name, enabled },

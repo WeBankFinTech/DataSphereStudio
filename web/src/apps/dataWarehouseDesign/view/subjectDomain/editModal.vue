@@ -1,5 +1,10 @@
 <template>
-  <Modal title="新建/编辑主题域" v-model="visible" @on-cancel="cancelCallBack">
+  <Modal
+    title="新建/编辑主题域"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
+    @on-cancel="cancelCallBack"
+  >
     <Form
       ref="formRef"
       :rules="ruleValidate"
@@ -15,7 +20,7 @@
       <FormItem label="负责人" prop="owner">
         <Input v-model="formState.owner" placeholder="负责人"></Input>
       </FormItem>
-      <FormItem label="可用角色" prop="owner">
+      <FormItem label="可用角色" prop="principalName">
         <Select
           v-model="formState.principalName"
           multiple
@@ -51,21 +56,13 @@ import {
   createThemedomains,
   getThemedomainsById,
   editThemedomains,
-} from '../../service/api'
+} from "../../service/api";
+import storage from "@/common/helper/storage";
+let userName = storage.get("baseInfo", "local").username;
 export default {
   model: {
-    prop: '_visible',
-    event: '_changeVisible',
-  },
-  computed: {
-    visible: {
-      get() {
-        return this._visible
-      },
-      set(val) {
-        this.$emit('_changeVisible', val)
-      },
-    },
+    prop: "_visible",
+    event: "_changeVisible",
   },
   props: {
     // 是否可见
@@ -82,10 +79,10 @@ export default {
       type: Number,
     },
   },
-  emits: ['finish', '_changeVisible'],
+  emits: ["finish", "_changeVisible"],
   watch: {
     _visible(val) {
-      if (val && this.id) this.handleGetById(this.id)
+      if (val && this.id) this.handleGetById(this.id);
     },
   },
   data() {
@@ -95,16 +92,22 @@ export default {
         name: [
           {
             required: true,
+            message: "主题域名称必填",
+            trigger: "submit",
           },
         ],
         enName: [
           {
             required: true,
+            message: "英文名必填",
+            trigger: "submit",
           },
         ],
         owner: [
           {
             required: true,
+            message: "负责人必填",
+            trigger: "submit",
           },
         ],
       },
@@ -112,77 +115,76 @@ export default {
       loading: false,
       // 表单数据
       formState: {
-        name: '',
-        enName: '',
-        owner: '',
-        principalName: [],
-        description: '',
+        name: "",
+        enName: "",
+        owner: userName,
+        principalName: ["ALL"],
+        description: "",
       },
       authorityList: [
         {
-          value: 'New York',
-          label: 'New York',
+          value: "ALL",
+          label: "ALL",
         },
         {
-          value: 'London',
-          label: 'London',
+          value: "London",
+          label: "London",
         },
       ],
-    }
+    };
   },
   methods: {
     async handleGetById(id) {
-      this.loading = true
-      let { item } = await getThemedomainsById(id)
-      this.loading = false
-      this.formState.name = item.name
-      this.formState.enName = item.enName
-      this.formState.owner = item.owner
-      this.formState.principalName = item.principalName.split(',')
-      this.formState.description = item.description
+      this.loading = true;
+      let { item } = await getThemedomainsById(id);
+      this.loading = false;
+      this.formState.name = item.name;
+      this.formState.enName = item.enName;
+      this.formState.owner = item.owner;
+      this.formState.principalName = item.principalName.split(",");
+      this.formState.description = item.description;
     },
     cancelCallBack() {
-      this.$refs['formRef'].resetFields()
+      this.$refs["formRef"].resetFields();
     },
     handleCancel() {
-      this.$refs['formRef'].resetFields()
-      this.$emit('_changeVisible', false)
+      this.$refs["formRef"].resetFields();
+      this.$emit("_changeVisible", false);
     },
     handleOk() {
-      this.$refs['formRef'].validate(async (valid) => {
+      this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
           try {
-            if (this.mode === 'create') {
-              this.loading = true
+            this.loading = true;
+            if (this.mode === "create") {
               await createThemedomains(
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
+                  principalName: this.formState.principalName.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            if (this.mode === 'edit') {
-              this.loading = true
+            if (this.mode === "edit") {
               await editThemedomains(
                 this.id,
                 Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(','),
+                  principalName: this.formState.principalName.join(","),
                 })
-              )
-              this.loading = false
+              );
+              this.loading = false;
             }
-            this.$refs['formRef'].resetFields()
-            this.$emit('_changeVisible', false)
-            this.$emit('finish')
+            this.$refs["formRef"].resetFields();
+            this.$emit("_changeVisible", false);
+            this.$emit("finish");
           } catch (error) {
-            this.loading = false
-            console.log(error)
+            this.loading = false;
+            console.log(error);
           }
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <style scoped lang="less"></style>

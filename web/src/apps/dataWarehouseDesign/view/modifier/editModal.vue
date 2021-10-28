@@ -1,5 +1,10 @@
 <template>
-  <Modal title="新建/编辑" v-model="visible" @on-cancel="cancelCallBack">
+  <Modal
+    title="新建/编辑"
+    :value="_visible"
+    @input="$emit('_changeVisible', $event)"
+    @on-cancel="cancelCallBack"
+  >
     <Form
       ref="formRef"
       :rules="ruleValidate"
@@ -100,42 +105,32 @@ import {
   createModifiers,
   editModifiers,
   getModifiersById,
-} from '../../service/api'
+} from "../../service/api";
 const tokenListColumns = [
   {
-    title: '修饰词名称',
-    key: 'name',
-    slot: 'name',
+    title: "修饰词名称",
+    key: "name",
+    slot: "name",
   },
   {
-    title: '字段标识',
-    key: 'identifier',
-    slot: 'identifier',
+    title: "字段标识",
+    key: "identifier",
+    slot: "identifier",
   },
   {
-    title: '计算公式',
-    key: 'formula',
-    slot: 'formula',
+    title: "计算公式",
+    key: "formula",
+    slot: "formula",
   },
   {
-    title: '操作',
-    slot: 'action',
+    title: "操作",
+    slot: "action",
   },
-]
+];
 export default {
   model: {
-    prop: '_visible',
-    event: '_changeVisible',
-  },
-  computed: {
-    visible: {
-      get() {
-        return this._visible
-      },
-      set(val) {
-        this.$emit('_changeVisible', val)
-      },
-    },
+    prop: "_visible",
+    event: "_changeVisible",
   },
   props: {
     // 是否可见
@@ -148,112 +143,118 @@ export default {
       type: String,
       required: true,
     },
+    // id
     id: {
       type: Number,
       default: 0,
     },
   },
-  emits: ['finish', '_changeVisible'],
+  emits: ["finish", "_changeVisible"],
   watch: {
     _visible(val) {
-      if (val && this.id) this.handleGetById(this.id)
+      if (val && this.id) this.handleGetById(this.id);
     },
   },
   data() {
     return {
+      // 词列表列
       tokenListColumns,
       // 是否加载中
       loading: false,
       // 主题域列表
       subjectDomainList: [],
-      // 分层
+      // 分层列表
       layeredList: [],
       // 验证规则
-      ruleValidate: {},
+      ruleValidate: {
+        typeName: [
+          {
+            required: true,
+            message: "修饰词类别必填",
+            trigger: "submit",
+          },
+        ],
+      },
       // 表单数据
       formState: {
-        typeName: '',
-        description: '',
-        layerId: '',
-        themeDomainId: '',
+        typeName: "",
+        description: "",
+        layerId: "",
+        themeDomainId: "",
         list: [],
       },
-    }
+    };
   },
   mounted() {
-    this.handleGetLayerListAndSubjectDomainList()
+    this.handleGetLayerListAndSubjectDomainList();
   },
   methods: {
     async handleGetById(id) {
-      this.loading = true
-      let { item } = await getModifiersById(id)
-      this.loading = false
-      this.formState.description = item.description
-      this.formState.typeName = item.modifierType
+      this.loading = true;
+      let { item } = await getModifiersById(id);
+      this.loading = false;
+      this.formState.description = item.description;
+      this.formState.typeName = item.modifierType;
       this.formState.list = item.list.map((item) => {
         return {
           name: item.name,
           identifier: item.identifier,
           formula: item.formula,
-        }
-      })
-      this.formState.layerId = item.layerId
-      this.formState.themeDomainId = item.themeDomainId
+        };
+      });
+      this.formState.layerId = item.layerId;
+      this.formState.themeDomainId = item.themeDomainId;
     },
     cancelCallBack() {
-      this.$refs['formRef'].resetFields()
+      this.$refs["formRef"].resetFields();
     },
     handleCancel() {
-      this.$refs['formRef'].resetFields()
-      this.$emit('_changeVisible', false)
+      this.$refs["formRef"].resetFields();
+      this.$emit("_changeVisible", false);
     },
     async handleOk() {
-      this.$refs['formRef'].validate(async (valid) => {
+      this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
           try {
-            if (this.mode === 'create') {
-              this.loading = true
-              await createModifiers(Object.assign({}, this.formState, {}))
-              this.loading = false
+            this.loading = true;
+            if (this.mode === "create") {
+              await createModifiers(Object.assign({}, this.formState));
+              this.loading = false;
             }
-            if (this.mode === 'edit') {
-              this.loading = true
-              await editModifiers(
-                this.id,
-                Object.assign({}, this.formState, {})
-              )
-              this.loading = false
+            if (this.mode === "edit") {
+              await editModifiers(this.id, Object.assign({}, this.formState));
+              this.loading = false;
             }
-            this.$refs['formRef'].resetFields()
-            this.$emit('_changeVisible', false)
-            this.$emit('finish')
+            this.$refs["formRef"].resetFields();
+            this.$emit("_changeVisible", false);
+            this.$emit("finish");
           } catch (error) {
-            this.loading = false
-            console.log(error)
+            this.loading = false;
+            console.log(error);
           }
         }
-      })
+      });
     },
     handleDeleteOneToken(index) {
-      this.formState.list.splice(index, 1)
+      this.formState.list.splice(index, 1);
     },
     handleAddToken() {
       this.formState.list.push({
-        name: '',
-        identifier: '',
-        formula: '',
-      })
+        name: "",
+        identifier: "",
+        formula: "",
+      });
     },
     async handleGetLayerListAndSubjectDomainList() {
-      this.loading = true
-      let { page } = await getThemedomains()
-      let { list } = await getLayersAll()
-      this.subjectDomainList = page.items
-      this.layeredList = list
-      this.loading = false
+      this.loading = true;
+      let { page } = await getThemedomains();
+      let { list } = await getLayersAll();
+      this.loading = false;
+      this.subjectDomainList = page.items;
+      this.layeredList = list;
     },
   },
-}
+};
 </script>
 
 <style scoped lang="less"></style>

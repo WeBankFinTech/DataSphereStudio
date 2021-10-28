@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       menuActiveName: "hive",
-      menuList: routers,
+      menuList: routers[0].children,
     };
   },
   computed: {

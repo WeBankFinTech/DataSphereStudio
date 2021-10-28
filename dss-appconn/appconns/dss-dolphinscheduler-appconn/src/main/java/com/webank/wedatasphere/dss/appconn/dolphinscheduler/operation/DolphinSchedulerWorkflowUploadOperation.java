@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -21,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -39,7 +41,6 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.CommonResponseRef;
@@ -57,6 +58,7 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.AbstractJsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
+import com.webank.wedatasphere.linkis.common.utils.JsonUtils;
 
 /**
  * The type Dolphin scheduler workflow upload operation.
@@ -69,8 +71,6 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerWorkflowUploadOperation.class);
 
     private List<WorkflowToRelConverter> workflowToRelConverters;
-
-    private Long processDefinitionId;
 
     private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
 
@@ -116,36 +116,36 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
             : baseUrl + "/projects/${projectName}/process/update";
     }
 
-    public Long getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(Long processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
     @Override
     public ResponseRef convert(DSSToRelConversionRequestRef ref) {
         List<Workflow> workflows;
         if (ref instanceof ProjectToRelConversionRequestRef) {
             ProjectToRelConversionRequestRef projectRef = (ProjectToRelConversionRequestRef)ref;
-            workflows = projectRef.getDSSOrcList().stream()
+            // 一次只发布一个工作流
+            workflows = projectRef.getDSSOrcList().stream().limit(1)
                 .map(flow -> WorkflowFactory.INSTANCE.getJsonToFlowParser().parse((DSSFlow)flow))
                 .collect(Collectors.toList());
         } else {
             return CommonResponseRef.error("Not support ref " + ref.getClass().getSimpleName());
         }
+
         ConvertedRel convertedRel = tryConvert(workflows, ref);
-        int newProcessDefinitionId = 0;
+
+        Map<Long, Long> publishResult;
         try {
-            newProcessDefinitionId = publish(convertedRel);
+            publishResult = publish(convertedRel);
         } catch (ExternalOperationFailedException e) {
             return CommonResponseRef.error(e.getMessage());
         }
 
-        return new DolphinSchedulerInstanceResponseRef(String.valueOf(newProcessDefinitionId), 0);
+        try {
+            return new DolphinSchedulerInstanceResponseRef(JsonUtils.jackson().writeValueAsString(publishResult), 0);
+        } catch (JsonProcessingException e) {
+            return CommonResponseRef.error("发布工作流失败，" + e.getMessage());
+        }
     }
 
+    @Override
     protected ConvertedRel tryConvert(List<Workflow> workflows, DSSToRelConversionRequestRef ref) {
         PreConversionRelImpl rel = new PreConversionRelImpl();
         rel.setWorkflows(workflows);
@@ -161,48 +161,47 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         return convertedRel;
     }
 
-    public int publish(ConvertedRel convertedRel) throws ExternalOperationFailedException {
+    public Map<Long, Long> publish(ConvertedRel convertedRel) throws ExternalOperationFailedException {
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)convertedRel;
-        DSSToRelConversionRequestRef requestRef = convertedRel.getDSSToRelConversionRequestRef();
+        ProjectToRelConversionRequestRef requestRef = dolphinSchedulerConvertedRel.getDSSToRelConversionRequestRef();
 
-        int newProcessDefinitionId = publishDssWorkflow(requestRef.getWorkspace(), requestRef.getUserName(),
-            dolphinSchedulerConvertedRel.getDSSToRelConversionRequestRef().getDSSProject(), convertedRel.getWorkflows(),
-            this.processDefinitionId);
+        List<Workflow> workflows = convertedRel.getWorkflows();
+        Map<Long, Long> schedulerWorkflowIdMap = (Map<Long, Long>)requestRef.getParameter("schedulerWorkflowIdMap");
 
-        return newProcessDefinitionId;
+        for (Workflow workflow : workflows) {
+            Long newProcessDefinitionId = publishDssWorkflow(requestRef.getUserName(), requestRef.getDSSProject(),
+                workflow, schedulerWorkflowIdMap.get(workflow.getId()));
+            schedulerWorkflowIdMap.put(workflow.getId(), newProcessDefinitionId);
+        }
+
+        return schedulerWorkflowIdMap;
     }
 
-    private int publishDssWorkflow(Workspace workspace, String publishUser, DSSProject dssProject,
-        List<Workflow> dssFlowList, Long processDefinitionId) throws ExternalOperationFailedException {
-        checkSchedulerProject(dssFlowList);
+    private Long publishDssWorkflow(String publishUser, DSSProject dssProject, Workflow workflow,
+        Long processDefinitionId) throws ExternalOperationFailedException {
+        checkSchedulerProject(workflow);
 
         // 未发布过，则执行发布
         if (processDefinitionId == null) {
-            processDefinitionId = publish(dssProject, dssFlowList, publishUser);
+            return publish(dssProject, workflow, publishUser);
         } else {
-            processDefinitionId = update(dssProject, dssFlowList, processDefinitionId, publishUser);
+            return update(dssProject, workflow, processDefinitionId, publishUser);
         }
-        return processDefinitionId.intValue();
     }
 
-    private void checkSchedulerProject(List<Workflow> dssFlowList) throws ExternalOperationFailedException {
-        for (Workflow flow : dssFlowList) {
-            List<WorkflowNode> nodes = flow.getWorkflowNodes();
-            for (WorkflowNode node : nodes) {
-                DSSNode dssNode = node.getDSSNode();
-                if (CollectionUtils.isEmpty(dssNode.getResources())) {
-                    throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
-                }
+    private void checkSchedulerProject(Workflow flow) throws ExternalOperationFailedException {
+        List<WorkflowNode> nodes = flow.getWorkflowNodes();
+        for (WorkflowNode node : nodes) {
+            DSSNode dssNode = node.getDSSNode();
+            if (CollectionUtils.isEmpty(dssNode.getResources())) {
+                throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
             }
         }
     }
 
-    private Long publish(DSSProject dssProject, List<Workflow> dssFlowList, String publishUser)
+    private Long publish(DSSProject dssProject, Workflow workflow, String publishUser)
         throws ExternalOperationFailedException {
-        if (dssFlowList.size() != 1) {
-            throw new ExternalOperationFailedException(90011, "发布的工作流数目不为1");
-        }
-        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)dssFlowList.get(0);
+        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)workflow;
 
         Gson gson = new Gson();
         List<NameValuePair> params = new ArrayList<>();
@@ -236,9 +235,15 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
 
         try {
             if (HttpStatus.SC_CREATED == httpStatusCode && DolphinAppConnUtils.getCodeFromEntity(entString) == 0) {
-                logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} 成功，返回的信息是 {}", schedulerFlow.getName(), projectName,
+                logger.info("DSS发布工作流 {} 到DolphinScheduler项目 {} 成功，返回的信息是 {}", schedulerFlow.getName(), projectName,
                     entString);
-                return Long.valueOf(getProcessDefinitionIdByName(dssProject, dssFlowList));
+                return Long.valueOf(getProcessDefinitionIdByName(dssProject, workflow));
+            } else if (HttpStatus.SC_OK == httpStatusCode
+                && DolphinAppConnUtils.getCodeFromEntity(entString) == 10105) {
+                logger.info("DSS发布工作流 {} 到DolphinScheduler项目 {} 失败，该工作流已存在，返回的信息是 {}，执行更新操作", schedulerFlow.getName(),
+                    projectName, entString);
+                long schedulerWorkflowId = getProcessDefinitionIdByName(dssProject, workflow);
+                return update(dssProject, workflow, schedulerWorkflowId, publishUser);
             } else {
                 throw new ExternalOperationFailedException(90012,
                     "发布工作流失败，" + DolphinAppConnUtils.getValueFromJsonString(entString, "msg"));
@@ -248,12 +253,9 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         }
     }
 
-    private int getProcessDefinitionIdByName(DSSProject dssProject, List<Workflow> dssFlowList)
+    private long getProcessDefinitionIdByName(DSSProject dssProject, Workflow workflow)
         throws ExternalOperationFailedException {
-        if (dssFlowList.size() != 1) {
-            throw new ExternalOperationFailedException(90011, "发布的工作流数目不为1");
-        }
-        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)dssFlowList.get(0);
+        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)workflow;
 
         String projectName = ProjectUtils.generateDolphinProjectName(
             dssProject.getWorkspaceName(), dssProject.getName());
@@ -273,7 +275,7 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
                 JsonNode dataNode = jsonNode.get("data");
                 for (JsonNode node : dataNode) {
                     if (schedulerFlow.getName().equals(node.get("name").asText())) {
-                        return node.get("id").asInt();
+                        return node.get("id").asLong();
                     }
                 }
             } else {
@@ -291,12 +293,10 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         throw new ExternalOperationFailedException(90014, "从调度中心获取工作流信息失败");
     }
 
-    private Long update(DSSProject dssProject, List<Workflow> dssFlowList, Long processDefinitionId, String publishUser)
+    private Long update(DSSProject dssProject, Workflow workflow, Long processDefinitionId, String publishUser)
         throws ExternalOperationFailedException {
-        if (dssFlowList.size() != 1) {
-            throw new ExternalOperationFailedException(90011, "发布的工作流数目不为1");
-        }
-        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)dssFlowList.get(0);
+
+        DolphinSchedulerWorkflow schedulerFlow = (DolphinSchedulerWorkflow)workflow;
 
         Gson gson = new Gson();
         List<NameValuePair> params = new ArrayList<>();
@@ -334,15 +334,15 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         try {
             if (HttpStatus.SC_OK == httpStatusCode) {
                 if (DolphinAppConnUtils.getCodeFromEntity(entString) == 0) {
-                    logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} ，更新成功，返回的信息是：{}", schedulerFlow.getName(),
+                    logger.info("DSS发布工作流 {} 到DolphinScheduler项目 {} ，更新成功，返回的信息是：{}", schedulerFlow.getName(),
                         projectName, entString);
                     return processDefinitionId;
                 } else if (DolphinAppConnUtils.getCodeFromEntity(entString) == 50003) {
-                    logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} ，更新失败：{}，执行创建操作", schedulerFlow.getName(),
+                    logger.info("DSS发布工作流 {} 到DolphinScheduler项目 {} ，更新失败：{}，执行创建操作", schedulerFlow.getName(),
                         projectName, entString);
-                    return publish(dssProject, dssFlowList, publishUser);
+                    return publish(dssProject, workflow, publishUser);
                 } else if (DolphinAppConnUtils.getCodeFromEntity(entString) == 50008) {
-                    logger.info("DSS发布工作流 {} 到Dolphin Scheduler项目 {} ，更新失败：{}，项目处于上线状态", schedulerFlow.getName(),
+                    logger.info("DSS发布工作流 {} 到DolphinScheduler项目 {} ，更新失败：{}，项目处于上线状态", schedulerFlow.getName(),
                         projectName, entString);
                     throw new ExternalOperationFailedException(90012, "该工作流在调度中心处于上线状态");
                 }

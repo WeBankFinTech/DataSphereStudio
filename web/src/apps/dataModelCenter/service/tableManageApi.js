@@ -33,12 +33,8 @@ export const getCollectList = userName => {
  * 添加收藏
  * @returns {Object.result}
  */
-export const addCollect = tableId => {
-  return api.fetch(
-    `${API_PATH.DATAMODEL_PATH}tables/collect`,
-    { tableId },
-    "post"
-  );
+export const addCollect = body => {
+  return api.fetch(`${API_PATH.DATAMODEL_PATH}tables/collect`, body, "post");
 };
 /**
  * 取消收藏

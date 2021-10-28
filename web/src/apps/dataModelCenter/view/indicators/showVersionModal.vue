@@ -342,7 +342,7 @@ export default {
         comment: "",
         warehouseThemeName: "",
         owner: "",
-        principalName: [],
+        principalName: "",
         isCoreIndicator: false,
         isAvailable: 1,
         themeArea: "",

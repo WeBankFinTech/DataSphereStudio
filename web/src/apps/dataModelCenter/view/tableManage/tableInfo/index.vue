@@ -61,6 +61,18 @@
             </Col>
             <Col span="12">
               <Row>
+                <Col span="7">创建人：</Col>
+                <Col span="17">{{ baseicData.creator }}</Col>
+              </Row>
+            </Col>
+            <Col span="12">
+              <Row>
+                <Col span="7">路径：</Col>
+                <Col span="17">{{ baseicData.location }}</Col>
+              </Row>
+            </Col>
+            <Col span="12">
+              <Row>
                 <Col span="7">所属库：</Col>
                 <Col span="17">{{ baseicData.dataBase }}</Col>
               </Row>
@@ -122,13 +134,21 @@
             <Col span="12">
               <Row>
                 <Col span="7">表类型：</Col>
-                <Col span="17">{{ baseicData.fileType }}</Col>
+                <Col span="17">
+                  {{ baseicData.isExternal ? "外部表" : "内部表" }}
+                </Col>
               </Row>
             </Col>
             <Col span="12">
               <Row>
                 <Col span="7">生命周期：</Col>
                 <Col span="17">{{ baseicData.lifecycle }}</Col>
+              </Row>
+            </Col>
+            <Col span="12">
+              <Row>
+                <Col span="7">文件格式：</Col>
+                <Col span="17">{{ baseicData.fileType }}</Col>
               </Row>
             </Col>
             <Col span="12">
@@ -454,7 +474,28 @@ export default {
           this.handleGetCollectionData();
         });
       } else {
-        addCollect(id).then((res) => {
+        let collectData = {
+          tableId: this.config.id,
+          dataBase: this.baseicData.dataBase,
+          name: this.baseicData.name,
+          alias: this.baseicData.alias,
+          creator: this.baseicData.creator,
+          comment: this.baseicData.comment,
+          warehouseLayerName: this.baseicData.warehouseLayerName,
+          warehouseThemeName: this.baseicData.warehouseThemeName,
+          lifecycle: this.baseicData.lifecycle,
+          isPartitionTable: this.baseicData.isPartitionTable,
+          isAvailable: this.baseicData.isAvailable,
+          storageType: this.baseicData.storageType,
+          principalName: this.baseicData.principalName,
+          compress: this.baseicData.compress,
+          fileType: this.baseicData.fileType,
+          isExternal: this.baseicData.isExternal,
+          label: this.baseicData.label.join(";"),
+          guid: this.config.guid,
+        };
+
+        addCollect(collectData).then((res) => {
           this.handleGetCollectionData();
         });
       }
@@ -486,6 +527,8 @@ export default {
         name: detail.name,
         // 别名
         alias: detail.alias,
+        // 路径
+        location: detail.location,
         // 所属库
         dataBase: detail.dataBase,
         // 所属分层
@@ -500,10 +543,16 @@ export default {
         updateTime: detail.updateTime,
         // 描述
         comment: detail.comment,
+        // 创建人
+        creator: detail.creator,
+        // 是否启用
+        isAvailable: detail.isAvailable,
 
         // 是否分区表
         isPartitionTable: detail.isPartitionTable,
-        // 表类型
+        // 是否外部表
+        isExternal: detail.isExternal,
+        // 文件格式
         fileType: detail.fileType,
         // 生命周期
         lifecycle: detail.lifecycle,

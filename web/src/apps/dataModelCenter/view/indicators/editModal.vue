@@ -27,7 +27,6 @@
       </FormItem>
       <FormItem label="可用角色" prop="principalName">
         <Select
-          v-model="formState.principalName"
           multiple
           :value="(formState.principalName || '').split(',')"
           @input="formState.principalName = $event.join()"
@@ -378,7 +377,7 @@ export default {
         comment: "",
         warehouseThemeName: "",
         owner: userName,
-        principalName: ["ALL"],
+        principalName: "ALL",
         isCoreIndicator: false,
         isAvailable: 1,
         themeArea: "",

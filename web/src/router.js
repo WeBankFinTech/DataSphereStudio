@@ -34,10 +34,19 @@ router.beforeEach((to, from, next) => {
       to.query.showHeader = to.meta.header;
     }
     if (to.meta.publicPage) {
+      if (from.query.workspaceId && to.query.workspaceId === undefined) {
+        to.query.workspaceId = from.query.workspaceId;
+        next(to);
+      }
+      // 公共页面不需要权限控制（404，500）
       next();
     } else if (to.path != "/workspace") {
       next("/workspace");
     } else {
+      if (from.query.workspaceId && to.query.workspaceId === undefined) {
+        to.query.workspaceId = from.query.workspaceId;
+        next(to);
+      }
       next();
     }
   }

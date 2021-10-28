@@ -456,7 +456,7 @@ export default {
         // 备注
         comment: detail.comment,
         // 是否外部表
-        isExternal: 0,
+        isExternal: detail.isExternal,
         // 分层
         warehouseLayerName: detail.warehouseLayerName,
         // 主题

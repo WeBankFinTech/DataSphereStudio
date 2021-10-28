@@ -313,10 +313,10 @@ export default {
           title: "描述",
           align: "center",
           key: "comment",
+          width: 200,
         },
         {
           title: "操作",
-          key: "action",
           slot: "action",
           align: "center",
           width: 140,

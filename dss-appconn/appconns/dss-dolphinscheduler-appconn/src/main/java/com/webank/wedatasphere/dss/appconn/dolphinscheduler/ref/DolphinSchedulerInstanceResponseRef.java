@@ -1,8 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref;
 
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-
+import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
 
 public class DolphinSchedulerInstanceResponseRef extends AbstractResponseRef {
 
@@ -12,7 +16,12 @@ public class DolphinSchedulerInstanceResponseRef extends AbstractResponseRef {
 
     @Override
     public Map<String, Object> toMap() {
-        return null;
+        if (StringUtils.isNotBlank(responseBody)) {
+            responseMap = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
+        } else {
+            responseMap = new HashMap<>();
+        }
+        return responseMap;
     }
 
     @Override

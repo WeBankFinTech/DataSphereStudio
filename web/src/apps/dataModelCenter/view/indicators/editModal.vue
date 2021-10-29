@@ -5,7 +5,7 @@
     @input="$emit('_changeVisible', $event)"
     width="920"
     :styles="styles"
-    @on-cancel="cancelCallBack"
+    @on-close="cancelCallBack"
   >
     <Form
       ref="formRef"

@@ -166,8 +166,6 @@
       @finish="handleModalFinish"
       @open="handleShowVersion"
     />
-    <!-- 某个版本查看弹窗 -->
-    <ShowVersion v-model="versionCfg.visible" :bodyData="versionCfg.bodyData" />
   </div>
 </template>
 
@@ -182,21 +180,15 @@ import {
 import formatDate from "../../../utils/formatDate";
 import storage from "@/common/helper/storage";
 import VersionListModal from "./versionListModal.vue";
-import ShowVersion from "./showVersion.vue";
 export default {
   filters: { formatDate },
-  components: { VersionListModal, ShowVersion },
+  components: { VersionListModal },
   data() {
     return {
       // 版本列表
       versionListCfg: {
         visible: false,
         name: "",
-      },
-      // 查看版本
-      versionCfg: {
-        visible: false,
-        bodyData: {},
       },
       // 搜索类型列表
       searchTypeOption: [
@@ -439,10 +431,8 @@ export default {
     },
     // 打开查看版本信息
     handleShowVersion(data) {
-      this.versionCfg = {
-        visible: true,
-        bodyData: data,
-      };
+      window.sessionStorage.setItem("_tableVersionInfo", JSON.stringify(data));
+      this.$router.push("/datamodelcenter/tableManage/tableVersionInfo");
     },
     // 创建表
     handleToCreate() {

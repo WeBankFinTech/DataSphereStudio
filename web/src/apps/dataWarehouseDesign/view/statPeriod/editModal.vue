@@ -75,8 +75,9 @@
       </FormItem>
       <FormItem label="可用角色" prop="principalName">
         <Select
-          v-model="formState.principalName"
           multiple
+          :value="(formState.principalName || '').split(',')"
+          @input="formState.principalName = $event.join()"
           placeholder="可用角色"
         >
           <Option
@@ -182,7 +183,7 @@ export default {
         enName: "",
         statStartFormula: "",
         statEndFormula: "",
-        principalName: ["ALL"],
+        principalName: "ALL",
         description: "",
         owner: userName,
         layerId: "",
@@ -220,7 +221,7 @@ export default {
       this.formState.name = item.name;
       this.formState.enName = item.enName;
       this.formState.owner = item.owner;
-      this.formState.principalName = item.principalName.split(",");
+      this.formState.principalName = item.principalName;
       this.formState.statStartFormula = item.startTimeFormula;
       this.formState.statEndFormula = item.endTimeFormula;
       this.formState.layerId = item.layerId;
@@ -240,20 +241,11 @@ export default {
           try {
             this.loading = true;
             if (this.mode === "create") {
-              await createStatisticalPeriods(
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                })
-              );
+              await createStatisticalPeriods(this.formState);
               this.loading = false;
             }
             if (this.mode === "edit") {
-              await editStatisticalPeriods(
-                this.id,
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                })
-              );
+              await editStatisticalPeriods(this.id, this.formState);
               this.loading = false;
             }
             this.$refs["formRef"].resetFields();

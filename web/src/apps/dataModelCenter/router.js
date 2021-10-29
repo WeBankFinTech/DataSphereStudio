@@ -50,6 +50,16 @@ const routes = [
               publicPage: true,
               icon: "ios-paper"
             }
+          },
+          {
+            name: "tableVersionInfo",
+            path: "/dataModelCenter/tableManage/tableVersionInfo",
+            component: () => import("./view/tableManage/tableVersionInfo/index.vue"),
+            meta: {
+              title: "历史版本信息",
+              publicPage: true,
+              icon: "ios-paper"
+            }
           }
         ]
       },

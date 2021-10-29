@@ -2,6 +2,9 @@
   <div class="manage-wrap">
     <div class="manage-head">{{ $t("message.dataService.apiCall.apiCall") }}</div>
     <div class="filter-box">
+      <div class="filter-input">
+        <Input v-model="apiCaller" icon="ios-search" :placeholder='$t("message.dataService.apiCall.col_caller")' @on-click="handleSearch" @on-enter="handleSearch" />
+      </div>
       <div class="filter-area">
         <Button type="primary" size="large" @click="addAuthorize">
           <SvgIcon icon-class="xinzeng" />
@@ -82,7 +85,7 @@
           v-if="authFormData.expire == 'short'"
           prop="expireDate"
         >
-          <Date-picker 
+          <Date-picker
             type="date"
             format="yyyy-MM-dd"
             :options="dateOptions"
@@ -147,6 +150,7 @@ export default {
         }
       ],
       loading: true,
+      apiCaller: '',
       apiCallList: [],
       pageData: {
         total: 0,
@@ -185,7 +189,7 @@ export default {
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterExpire'), trigger: 'change' }
         ],
         expireDate: [
-          { 
+          {
             validator: (rule, value, callback) => {
               if (this.authFormData.expire === 'short') {
                 if (!value) {
@@ -196,8 +200,8 @@ export default {
               } else {
                 callback();
               }
-            }, 
-            trigger: 'blur' 
+            },
+            trigger: 'blur'
           }
         ]
       }
@@ -225,6 +229,7 @@ export default {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
+        caller: this.apiCaller
       }, 'get').then((res) => {
         if (res.list) {
           this.loading = false;
@@ -290,6 +295,10 @@ export default {
         expireDate: auth.expire
       }
     },
+    handleSearch() {
+      this.pageData.pageNow = 1;
+      this.getApiCallList();
+    },
     deleteApi(row) {
       this.selectedApi = row;
       this.modalConfirm = true;
@@ -337,6 +346,10 @@ export default {
   .filter-box {
     margin-bottom: 20px;
     overflow: hidden;
+    .filter-input{
+      width: 200px;
+      float: left;
+    }
     .filter-area {
       float: right;
     }

@@ -36,7 +36,7 @@
     </select>
 
     <select id="getApiInfoList" resultType="com.webank.wedatasphere.dss.data.api.server.entity.response.ApiInfo">
-        SELECT a.id,a.api_name,a.api_path,a.api_type,a.status,a.label,a.create_by,b.name AS 'groupName', c.name AS 'datasourceName'
+        SELECT a.id,a.api_name,a.api_path,a.api_type,a.status,a.label,a.create_by,a.create_time,a.update_by,a.update_time,b.name AS 'groupName', c.name AS 'datasourceName'
         FROM DSS_DATAAPI_CONFIG a
         LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
         LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id
@@ -44,11 +44,11 @@
         <if test="apiName != null and apiName != ''">
             AND a.api_name LIKE concat('%', #{apiName}, '%')
         </if>
-        ORDER BY a.create_by DESC
+        ORDER BY a.update_time DESC
     </select>
 
     <select id="getOnlineApiInfoList" resultType="com.webank.wedatasphere.dss.data.api.server.entity.response.ApiInfo">
-        SELECT a.id,a.api_name,a.api_path,a.api_type,a.status,a.create_by,b.name AS 'groupName', c.name AS 'datasourceName'
+        SELECT a.id,a.api_name,a.api_path,a.api_type,a.status,a.label,a.create_by,a.create_time,a.update_by,a.update_time,b.name AS 'groupName', c.name AS 'datasourceName'
         FROM DSS_DATAAPI_CONFIG a
         LEFT JOIN DSS_DATAAPI_GROUP b ON a.group_id = b.id
         LEFT JOIN DSS_DATAAPI_DATASOURCE c ON a.datasource_id = c.id

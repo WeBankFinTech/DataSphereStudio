@@ -29,6 +29,15 @@ public class ApiManagerServiceImpl implements ApiManagerService {
     @Override
     public List<ApiInfo> getApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow,pageSize,true);
+        // MYSQL LIKE % _:  LIKE '%\_%', LIKE '%\%%'
+        if(apiName !=null) {
+            if ("_".equalsIgnoreCase(apiName.trim())) {
+                apiName = "\\_";
+            }
+            if ("%".equalsIgnoreCase(apiName.trim())) {
+                apiName = "\\%";
+            }
+        }
         List<ApiInfo> apiInfoList = apiConfigMapper.getApiInfoList(workspaceId,apiName);
         PageInfo<ApiInfo> pageInfo = new PageInfo<>(apiInfoList);
         totals.add(pageInfo.getTotal());
@@ -39,6 +48,15 @@ public class ApiManagerServiceImpl implements ApiManagerService {
     @Override
     public List<ApiInfo> getOnlineApiInfoList(Long workspaceId, String apiName, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow,pageSize,true);
+        // MYSQL LIKE % _:  LIKE '%\_%', LIKE '%\%%'
+        if(apiName !=null) {
+            if ("_".equalsIgnoreCase(apiName.trim())) {
+                apiName = "\\_";
+            }
+            if ("%".equalsIgnoreCase(apiName.trim())) {
+                apiName = "\\%";
+            }
+        }
         List<ApiInfo> apiInfoList = apiConfigMapper.getOnlineApiInfoList(workspaceId,apiName);
         PageInfo<ApiInfo> pageInfo = new PageInfo<>(apiInfoList);
         totals.add(pageInfo.getTotal());

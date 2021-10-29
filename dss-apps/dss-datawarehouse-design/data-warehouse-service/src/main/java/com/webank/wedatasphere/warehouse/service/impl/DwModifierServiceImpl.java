@@ -352,6 +352,10 @@ public class DwModifierServiceImpl implements DwModifierService {
                 m.setUpdateTime(now);
                 this.dwModifierListMapper.insert(m);
             }
+        } else {
+            QueryWrapper<DwModifierList> dwModifierListQueryWrapper = new QueryWrapper<>();
+            dwModifierListQueryWrapper.eq("modifier_id", record.getId());
+            this.dwModifierListMapper.delete(dwModifierListQueryWrapper);
         }
 
 

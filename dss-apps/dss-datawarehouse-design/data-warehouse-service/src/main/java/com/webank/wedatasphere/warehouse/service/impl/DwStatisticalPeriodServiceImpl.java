@@ -75,7 +75,9 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         QueryWrapper<DwStatisticalPeriod> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
         if (Strings.isNotBlank(name)) {
-            queryWrapper.like("name", name).or().like("en_name", name);
+            queryWrapper.and(qw -> {
+                qw.like("name", name).or().like("en_name", name);
+            });
         }
 
         if (!Objects.isNull(command.getEnabled())) {

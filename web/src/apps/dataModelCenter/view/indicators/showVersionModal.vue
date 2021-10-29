@@ -40,7 +40,10 @@
         </Select>
       </FormItem>
       <FormItem label="是否核心指标" prop="isCoreIndicator">
-        <i-switch v-model="formState.isCoreIndicator">
+        <i-switch
+          :value="Boolean(formState.isCoreIndicator)"
+          @input="formState.isCoreIndicator = Number($event)"
+        >
           <span slot="open">是</span>
           <span slot="close">否</span>
         </i-switch>
@@ -342,8 +345,8 @@ export default {
         comment: "",
         warehouseThemeName: "",
         owner: "",
-        principalName: "",
-        isCoreIndicator: false,
+        principalName: "ALL",
+        isCoreIndicator: 0,
         isAvailable: 1,
         themeArea: "",
         layerArea: "",
@@ -499,21 +502,17 @@ export default {
       try {
         let detail = this.bodyData.essential;
         detail.content = this.bodyData.content;
-        detail.content.indicatorSourceInfo = (() => {
-          try {
-            return JSON.parse(detail.content.indicatorSourceInfo);
-          } catch (error) {
-            return {};
-          }
-        })();
+        detail.content.indicatorSourceInfo = JSON.parse(
+          detail.content.indicatorSourceInfo
+        );
         let newFormState = {
           name: detail.name,
           fieldIdentifier: detail.fieldIdentifier,
           comment: detail.comment,
           warehouseThemeName: detail.warehouseThemeName,
           owner: detail.owner,
-          principalName: detail.principalName.split(","),
-          isCoreIndicator: Boolean(detail.isCoreIndicator),
+          principalName: detail.principalName,
+          isCoreIndicator: detail.isCoreIndicator,
           themeArea: detail.themeArea,
           layerArea: detail.layerArea,
           content: {

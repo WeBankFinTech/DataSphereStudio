@@ -1,7 +1,7 @@
 <template>
   <Select
-    :value="_value"
-    @input="$emit('_change', $event)"
+    :value="value"
+    @input="$emit('input', $event)"
     :loading="loading"
     :placeholder="placeholder"
     :multiple="multiple"
@@ -21,21 +21,16 @@
 
 <script>
 export default {
-  model: {
-    prop: "_value",
-    event: "_change",
-  },
   props: {
-    _value: {
-      type: String,
-    },
+    // value
+    value: {},
+    // 是否多选
+    multiple: {},
     // 请求方法
     fetch: {
       type: Function,
       require: true,
     },
-    // 是否多选
-    multiple: {},
     // 是否远程搜索
     searchMode: {
       type: Boolean,
@@ -46,23 +41,24 @@ export default {
     },
   },
   watch: {
-    _value: {
+    value: {
       handler(value) {
         if (value === undefined) return;
+        if (value.length === 0) return;
         let nowData = [];
-        if (this.multiple) {
+        if (Object.prototype.toString.call(value) === "[object Array]") {
           nowData.push(...value);
-        } else {
+        } else if (typeof value === "string") {
           nowData.push(value);
         }
         if (nowData.length) {
           for (let i = 0; i < nowData.length; i++) {
             const element = nowData[i];
-            if (element !== "") {
+            if (element) {
               let isExist = this.dataList.find(
                 (item) => item.value === element
               );
-              if (isExist === undefined) {
+              if (!isExist) {
                 this.dataList.unshift({
                   label: element,
                   value: element,
@@ -107,20 +103,21 @@ export default {
         this.loading = true;
         this.fetch(query)
           .then((data) => {
-            let nowData = [];
-            if (this.multiple) {
-              nowData.push(...this._value);
-            } else {
-              nowData.push(this._value);
+            let value = this.value;
+            let nowData;
+            if (Object.prototype.toString.call(value) === "[object Array]") {
+              nowData = value;
+            } else if (typeof value === "string") {
+              nowData = [value];
             }
             if (nowData.length) {
               for (let i = 0; i < nowData.length; i++) {
                 const element = nowData[i];
-                if (element !== "") {
+                if (element) {
                   let isExist = data.list.find(
                     (item) => item.value === element
                   );
-                  if (isExist === undefined) {
+                  if (!isExist) {
                     data.list.unshift({
                       label: element,
                       value: element,

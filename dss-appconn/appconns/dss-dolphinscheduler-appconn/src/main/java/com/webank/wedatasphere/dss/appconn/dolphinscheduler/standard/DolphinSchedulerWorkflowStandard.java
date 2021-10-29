@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerWorkflowService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
 /**
@@ -13,8 +14,7 @@ import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegra
 public class DolphinSchedulerWorkflowStandard extends WorkflowConversionIntegrationStandard {
 
     @Override
-    protected DSSToRelConversionService createDSSToRelConversionService() {
-        return new DolphinSchedulerWorkflowService();
+    public DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance) {
+        return new DolphinSchedulerWorkflowService(appInstance);
     }
-
 }

@@ -32,9 +32,10 @@
 
     <select id="getApiAuthList" resultMap="dataapi_auth">
         SELECT a.*, b.name as 'groupName' FROM dss_dataapi_auth a LEFT JOIN dss_dataapi_group b ON a.group_id = b.id
-        <where>
-            a.is_delete =0 AND a.workspace_id = #{workspaceId}
-        </where>
+        WHERE a.is_delete =0 AND a.workspace_id = #{workspaceId}
+        <if test="caller != null and caller != ''">
+            AND a.caller LIKE concat('%', #{caller}, '%')
+        </if>
         ORDER BY update_time desc
     </select>
 

@@ -44,9 +44,18 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     }
 
     @Override
-    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
+    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, String caller, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow, pageSize, true);
-        List<ApiAuthInfo> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId);
+        // MYSQL LIKE % _:  LIKE '%\_%', LIKE '%\%%'
+        if(caller !=null) {
+            if ("_".equalsIgnoreCase(caller.trim())) {
+                caller = "\\_";
+            }
+            if ("%".equalsIgnoreCase(caller.trim())) {
+                caller = "\\%";
+            }
+        }
+        List<ApiAuthInfo> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId,caller);
         PageInfo<ApiAuthInfo> pageInfo = new PageInfo<>(apiAuthList);
         totals.add(pageInfo.getTotal());
 

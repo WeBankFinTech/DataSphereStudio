@@ -438,7 +438,8 @@ export default {
     },
     handleApiChoosed(payload) {
       if (payload.type === "api") {
-        const { id, tempId, allProjectTree } = payload;
+        const { allProjectTree, ...rest } = payload;
+        const { id, tempId } = rest;
         const newApis = [...this.apiTabDatas];
         const hitIndex = newApis.findIndex(
           item => item.id === id || item.id === tempId
@@ -460,7 +461,7 @@ export default {
             const data = res && res.detail;
             if (data) {
               this.addTab({
-                ...payload,
+                ...rest,
                 apiName: payload.name,
                 groupId: payload.projectId,
                 ...data,

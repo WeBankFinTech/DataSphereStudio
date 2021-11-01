@@ -54,7 +54,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import com.webank.wedatasphere.dss.workflow.dao.OrchestratorReleaseInfoMapper;
+import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
@@ -210,7 +210,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Autowired
-    private OrchestratorReleaseInfoMapper orchestratorReleaseInfoMapper;
+    private OrchestratorMapper orchestratorMapper;
 
     @Override
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException {
@@ -221,13 +221,13 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         Map<Long, Long> schedulerWorkflowIdMap = new HashMap<>();
         flows.stream().forEach(flow -> {
             DSSOrchestratorVersion orchestratorVersion =
-                orchestratorReleaseInfoMapper.getOrchestratorIdByAppId(flow.getId());
+                orchestratorMapper.getOrchestratorVersionByAppId(flow.getId());
             releaseInfoMap.put(flow.getId(),
                 OrchestratorReleaseInfo.newInstance(orchestratorVersion.getOrchestratorId(),
                     orchestratorVersion.getId(), orchestratorVersion.getVersion(), flow.getId()));
             // 如果发布过，记录调度系统中对应的工作流id
             OrchestratorReleaseInfo releaseInfo =
-                orchestratorReleaseInfoMapper.getByOrchestratorId(orchestratorVersion.getOrchestratorId());
+                orchestratorMapper.getByOrchestratorId(orchestratorVersion.getOrchestratorId());
             if (releaseInfo != null) {
                 schedulerWorkflowIdMap.put(flow.getId(), releaseInfo.getSchedulerWorkflowId());
             }
@@ -263,18 +263,18 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 Long workflowId = Long.valueOf(flowId);
                 OrchestratorReleaseInfo releaseInfo = releaseInfoMap.get(workflowId);
                 OrchestratorReleaseInfo latestOrchestratorReleaseInfo =
-                    orchestratorReleaseInfoMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
+                    orchestratorMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
 
                 Long schedulerWorkflowId = Double.valueOf(String.valueOf(result.get(flowId))).longValue();
                 if (latestOrchestratorReleaseInfo == null) { // 未发布过，插入记录
-                    releaseInfo.setSchedulerWorkflowId(workflowId);
-                    orchestratorReleaseInfoMapper.insert(releaseInfo);
+                    releaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
+                    orchestratorMapper.insert(releaseInfo);
                 } else {
                     latestOrchestratorReleaseInfo.setOrchestratorVersionId(releaseInfo.getOrchestratorVersionId());
                     latestOrchestratorReleaseInfo.setOrchestratorVersion(releaseInfo.getOrchestratorVersion());
-                    latestOrchestratorReleaseInfo.setSchedulerWorkflowId(workflowId);
+                    latestOrchestratorReleaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
                     latestOrchestratorReleaseInfo.setUpdateTime(new Date());
-                    orchestratorReleaseInfoMapper.update(latestOrchestratorReleaseInfo);
+                    orchestratorMapper.update(latestOrchestratorReleaseInfo);
                 }
             });
             return ResponseOperateOrchestrator.success();

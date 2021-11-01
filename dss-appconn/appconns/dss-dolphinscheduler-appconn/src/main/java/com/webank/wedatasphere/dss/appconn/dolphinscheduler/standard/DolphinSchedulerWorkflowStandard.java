@@ -1,7 +1,9 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerWorkflowService;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerSecurityService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
+import com.webank.wedatasphere.dss.standard.app.development.service.RefQueryService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
@@ -20,6 +22,11 @@ public class DolphinSchedulerWorkflowStandard extends WorkflowConversionIntegrat
         service.setAppInstance(appInstance);
         initService(service);
         return service;
+    }
+
+    @Override
+    public RefQueryService getQueryService(AppInstance appInstance) {
+        return DolphinSchedulerSecurityService.getInstance(appInstance.getBaseUrl());
     }
 
 }

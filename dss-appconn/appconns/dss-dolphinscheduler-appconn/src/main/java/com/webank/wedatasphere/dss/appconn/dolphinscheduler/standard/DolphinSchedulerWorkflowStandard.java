@@ -15,6 +15,11 @@ public class DolphinSchedulerWorkflowStandard extends WorkflowConversionIntegrat
 
     @Override
     public DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance) {
-        return new DolphinSchedulerWorkflowService(appInstance);
+        DolphinSchedulerWorkflowService service = new DolphinSchedulerWorkflowService(appInstance);
+        service.setSSORequestService(service.getSSORequestService());
+        service.setAppInstance(appInstance);
+        initService(service);
+        return service;
     }
+
 }

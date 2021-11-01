@@ -14,7 +14,7 @@ import com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo;
  * @date 2021/10/27
  */
 @Mapper
-public interface OrchestratorReleaseInfoMapper {
+public interface OrchestratorMapper {
 
     void insert(OrchestratorReleaseInfo orchestratorReleaseInfo);
 
@@ -28,6 +28,12 @@ public interface OrchestratorReleaseInfoMapper {
     @Delete("DELETE FROM dss_orchestrator_release_info WHERE orchestrator_id = #{orchestratorId}")
     int removeByOrchestratorId(Long orchestratorId);
 
+    @Select("SELECT * FROM dss_orchestrator_version_info WHERE id = #{id}")
+    DSSOrchestratorVersion getOrchestratorVersionById(Long id);
+
     @Select("SELECT * FROM dss_orchestrator_version_info WHERE app_id = #{appId}")
-    DSSOrchestratorVersion getOrchestratorIdByAppId(Long appId);
+    DSSOrchestratorVersion getOrchestratorVersionByAppId(Long appId);
+
+    @Select("SELECT project_id FROM dss_orchestrator_info WHERE id = #{orchestratorId}")
+    Long getProjectId(Long orchestratorId);
 }

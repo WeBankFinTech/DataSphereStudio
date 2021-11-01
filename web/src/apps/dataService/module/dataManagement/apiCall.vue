@@ -347,7 +347,7 @@ export default {
     margin-bottom: 20px;
     overflow: hidden;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     align-items: center;
     .filter-input{
       width: 200px;

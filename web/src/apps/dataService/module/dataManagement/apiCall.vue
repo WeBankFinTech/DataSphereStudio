@@ -346,13 +346,16 @@ export default {
   .filter-box {
     margin-bottom: 20px;
     overflow: hidden;
+    display: flex;
+    justify-content: end;
+    align-items: center;
     .filter-input{
       width: 200px;
-      float: left;
+      margin-right: 12px;
     }
-    .filter-area {
-      float: right;
-    }
+    //.filter-area {
+    //  float: right;
+    //}
   }
   .operation-wrap {
     margin-left: -10px;

@@ -16,9 +16,14 @@
 
 package com.webank.wedatasphere.dss.framework.project.dao;
 
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
-import org.apache.ibatis.annotations.*;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 
 
 @Mapper
@@ -26,6 +31,12 @@ public interface DSSOrchestratorMapper extends BaseMapper<DSSOrchestrator> {
 
     @Select("Select `uuid` from `dss_orchestrator_info` where `id` = #{orchestratorId} ")
     String getUUID(@Param("orchestratorId") Long orchestratorId);
+
+    @Select("SELECT * FROM dss_orchestrator_release_info WHERE orchestrator_id = #{orchestratorId}")
+    OrchestratorReleaseInfo getByOrchestratorId(Long orchestratorId);
+
+    @Delete("DELETE FROM dss_orchestrator_release_info WHERE id = #{id}")
+    int removeOrchestratorReleaseInfoById(Long id);
 }
 
 

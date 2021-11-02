@@ -104,7 +104,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //4.保存dss_project_user 工程与用户关系
         projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest);
         // 5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
-        if (null != projectMap && projectMap.size() > 0) {
+        if (projectMap.size() > 0) {
             projectService.saveProjectRelation(project, projectMap);
         }
         DSSProjectVo dssProjectVo = new DSSProjectVo();
@@ -167,11 +167,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 .filter(appConn -> appConn instanceof OnlyStructureAppConn).forEach(appConn -> {
                     OnlyStructureAppConn structureAppConn = (OnlyStructureAppConn)appConn;
                     appConn.getAppDesc().getAppInstances().forEach(DSSExceptionUtils.handling(appInstance -> {
-                        ProjectService projectService =
+                        ProjectService appConnProjectService =
                             structureAppConn.getOrCreateStructureStandard().getProjectService(appInstance);
-                        if (projectService != null) {
+                        if (appConnProjectService != null) {
                             ProjectDeletionOperation projectDeletionOperation =
-                                projectService.getProjectDeletionOperation();
+                                appConnProjectService.getProjectDeletionOperation();
                             if (projectDeletionOperation != null) {
                                 projectDeletionOperation.deleteProject(projectRequestRef);
                             }
@@ -185,28 +185,33 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     // 1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程 新增dss_project调用
     private Map<AppInstance, Long> createAppConnProject(ProjectCreateRequest dssProjectCreateRequest, String username,
-        Workspace workspace) throws DSSProjectErrorException {
+        Workspace workspace) {
         Map<AppInstance, Long> projectMap = new HashMap<>(16);
         Map<AppConn, ProjectResponseRef> successAppConns = new HashMap<>(16);
         boolean createFailed = false;
+
         ProjectRequestRefImpl requestRef = new ProjectRequestRefImpl();
         requestRef.setName(dssProjectCreateRequest.getName());
         requestRef.setCreateBy(username);
         requestRef.setDescription(dssProjectCreateRequest.getDescription());
         requestRef.setWorkspaceName(dssProjectCreateRequest.getWorkspaceName());
         requestRef.setWorkspace(workspace);
-        requestRef.setParameter("releaseUsers", dssProjectCreateRequest.getReleaseUsers());
+        List<String> releaseUsers = dssProjectCreateRequest.getReleaseUsers();
+        releaseUsers.add(username);
+        requestRef.setParameter("releaseUsers", releaseUsers);
+
         for (AppConn appConn : AppConnManager.getAppConnManager().listAppConns()) {
             if (appConn instanceof OnlyStructureAppConn) {
                 OnlyStructureAppConn onlyStructureAppConn = (OnlyStructureAppConn)appConn;
                 StructureIntegrationStandard appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
                 // 如果该AppConn是有structureIntegrationStandard的话,那么所有的appinstance都要进行新建工程
                 for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
-                    ProjectService projectService = appStandard.getProjectService(appInstance);
-                    if (projectService == null) {
+                    ProjectService appStandardProjectService = appStandard.getProjectService(appInstance);
+                    if (appStandardProjectService == null) {
                         continue;
                     }
-                    ProjectCreationOperation projectCreationOperation = projectService.getProjectCreationOperation();
+                    ProjectCreationOperation projectCreationOperation =
+                        appStandardProjectService.getProjectCreationOperation();
                     try {
                         LOGGER.info("Begin to create project {} in {}", dssProjectCreateRequest.getName(),
                             appConn.getAppDesc().getAppName());
@@ -221,7 +226,6 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                         LOGGER.error("Failed to create project {} in {}", dssProjectCreateRequest.getName(),
                             appConn.getAppDesc().getAppInstances(), e);
                         createFailed = true;
-                        // break;
                     }
                 }
             }
@@ -235,8 +239,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     OnlyStructureAppConn onlyStructureAppConn = (OnlyStructureAppConn)appConn;
                     appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
                     for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
-                        ProjectService projectService = appStandard.getProjectService(appInstance);
-                        ProjectDeletionOperation operation = projectService.getProjectDeletionOperation();
+                        ProjectService appStandardProjectService = appStandard.getProjectService(appInstance);
+                        ProjectDeletionOperation operation = appStandardProjectService.getProjectDeletionOperation();
                         try {
                             operation.deleteProject(requestRef);
                         } catch (ExternalOperationFailedException e) {
@@ -279,12 +283,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 StructureIntegrationStandard appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
                 // 如果该AppConn是有structureIntegrationStandard的话,那么所有的appinstance都要进行新建工程
                 for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
-                    ProjectService projectService = appStandard.getProjectService(appInstance);
-                    if (projectService == null) {
+                    ProjectService appStandardProjectService = appStandard.getProjectService(appInstance);
+                    if (appStandardProjectService == null) {
                         continue;
                     }
 
-                    ProjectUpdateOperation operation = projectService.getProjectUpdateOperation();
+                    ProjectUpdateOperation operation = appStandardProjectService.getProjectUpdateOperation();
                     try {
                         if (operation != null) {
                             ProjectResponseRef responseRef = operation.updateProject(projectRequestRef);

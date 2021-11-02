@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.framework.project.contant.DSSProjectConstant;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
@@ -41,14 +42,13 @@ import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 public class DSSFrameworkDSTokenRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
 
-    private static final String DS_NAME = "dolphinscheduler";
-
     @GET
     @Path("/ds/token")
     public Response dsApiServiceTokenCreate(@Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
-        SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager().getAppConn(DS_NAME);
+        SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
+            .getAppConn(DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (schedulerAppConn == null) {
             logger.error("dolphinscheduler appconn is null, can not get scheduler api access token");
             return Message.messageToResponse(Message.error("dolphinscheduler appconn is null"));

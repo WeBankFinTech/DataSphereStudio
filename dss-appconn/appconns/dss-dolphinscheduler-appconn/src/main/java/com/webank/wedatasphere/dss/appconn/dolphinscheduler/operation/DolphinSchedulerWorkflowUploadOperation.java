@@ -135,7 +135,8 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         try {
             publishResult = publish(convertedRel);
         } catch (ExternalOperationFailedException e) {
-            return CommonResponseRef.error(e.getMessage());
+            logger.error("发布工作流失败，", e);
+            return CommonResponseRef.error(e.getDesc());
         }
 
         try {
@@ -230,7 +231,7 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         } catch (ExternalOperationFailedException e) {
             throw e;
         } catch (final Exception e) {
-            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", e, ExternalOperationFailedException.class);
+            throw new ExternalOperationFailedException(90012, "发布工作流调用调度系统失败", e);
         }
 
         try {
@@ -327,7 +328,7 @@ public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConver
         } catch (ExternalOperationFailedException e) {
             throw e;
         } catch (final Exception e) {
-            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流失败", e,
+            SchedulisExceptionUtils.dealErrorException(90012, "发布工作流调用调度系统失败", e,
                 ExternalOperationFailedException.class);
         }
 

@@ -72,12 +72,11 @@ public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletion
     @Override
     public ProjectResponseRef deleteProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
         // 删除工作流定义
-        // if ("Orchestrator".equalsIgnoreCase(projectRef.getType())) {
-        // deleteDolphinSchedulerProcessDefinition(projectRef);
-        // } else if ("Project".equalsIgnoreCase(projectRef.getType())) {
-        // deleteDolphinSchedulerProject(projectRef);
-        // }
-        deleteDolphinSchedulerProject(projectRef);
+        if ("Orchestrator".equalsIgnoreCase(projectRef.getType())) {
+            deleteDolphinSchedulerProcessDefinition(projectRef);
+        } else if ("Project".equalsIgnoreCase(projectRef.getType())) {
+            deleteDolphinSchedulerProject(projectRef);
+        }
 
         return new DolphinSchedulerProjectResponseRef();
     }

@@ -447,28 +447,32 @@ insert  into `dss_workflow_node_ui_validate`(`id`,`validate_type`,`validate_rang
 
 
 
-INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (1, 'schedulis', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/schedulis/lib', '');
+-- INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (1, 'schedulis', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/schedulis/lib', '');
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (2, 'orchestrator-framework', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.orchestrator.DefaultOrchestratorFrameworkAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/orchestrator-framework/lib', '');
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (3, 'workflow', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.workflow.appconn.DefaultWorkflowAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/workflow/lib', '');
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (4, 'visualis', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/visualis/lib', '');
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (5, 'eventchecker', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/eventchecker/lib', NULL);
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (6, 'datachecker', 0, 1, NULL, 0, NULL, 'com.webank.wedatapshere.dss.appconn.datachecker.DataCheckerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/datachecker/lib', NULL);
+INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`) VALUES (7, 'dolphinscheduler', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/dolphinscheduler/lib', '');
 
 
 
-select @dss_appconn_schedulisId:=id from `dss_appconn` where `appconn_name` = 'schedulis';
+-- select @dss_appconn_schedulisId:=id from `dss_appconn` where `appconn_name` = 'schedulis';
 select @dss_appconn_orchestratorId:=id from `dss_appconn` where `appconn_name` = 'orchestrator-framework';
 select @dss_appconn_workflowId:=id from `dss_appconn` where `appconn_name` = 'workflow';
 select @dss_appconn_visualisId:=id from `dss_appconn` where `appconn_name` = 'visualis';
 select @dss_appconn_eventcheckerId:=id from `dss_appconn` where `appconn_name` = 'eventchecker';
 select @dss_appconn_datacheckerId:=id from `dss_appconn` where `appconn_name` = 'datachecker';
+select @dss_appconn_dolphinschedulerId:=id from `dss_appconn` where `appconn_name` = 'dolphinscheduler';
 
-insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) values('1','PROD','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/');
+
+-- insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) values('1','PROD','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/');
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_orchestratorId, 'DEV', 'http://ORCHESTRATOR_IP:ORCHESTRATOR_PORT/#/workspaceHome?workspaceId=104', '', 'http://ORCHESTRATOR_IP:ORCHESTRATOR_PORT/#/workspaceHome?workspaceId=104', 'http://ORCHESTRATOR_IP:ORCHESTRATOR_PORT/#/workspaceHome?workspaceId=104');
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_workflowId, 'DEV', 'http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome?workspaceId=104', '', 'http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome?workspaceId=104', 'http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome?workspaceId=104');
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_visualisId, 'DEV', 'http://VISUALIS_IP:VISUALIS_PORT/', '', 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/projects', 'http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/');
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_eventcheckerId, 'DEV', 'eventchecker', '{"msg.eventchecker.jdo.option.name": "msg","msg.eventchecker.jdo.option.url": "EVENTCHECKER_JDBC_URL","msg.eventchecker.jdo.option.username": "EVENTCHECKER_JDBC_USERNAME","msg.eventchecker.jdo.option.password": "EVENTCHECKER_JDBC_PASSWORD"}', NULL, NULL);
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_datacheckerId, 'DEV', 'datachecker', '{"job.datachecker.jdo.option.name":"job","job.datachecker.jdo.option.url":"DATACHECKER_JOB_JDBC_URL","job.datachecker.jdo.option.username":"DATACHECKER_JOB_JDBC_USERNAME","job.datachecker.jdo.option.password":"DATACHECKER_JOB_JDBC_PASSWORD","bdp.datachecker.jdo.option.name":"bdp","bdp.datachecker.jdo.option.url":"DATACHECKER_BDP_JDBC_URL","bdp.datachecker.jdo.option.username":"DATACHECKER_BDP_JDBC_USERNAME","bdp.datachecker.jdo.option.password":"DATACHECKER_BDP_JDBC_PASSWORD","bdp.datachecker.jdo.option.login.type":"base64","bdp.mask.url":"http://BDP_MASK_IP:BDP_MASK_PORT/api/v1/mask-status?","bdp.mask.app.id":"wtss","bdp.mask.app.token":"20a0ccdfc0"}', NULL, NULL);
+INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_dolphinschedulerId, 'DEV', 'https://dolphin.ctyun.cn:10002/dolphinscheduler', '', 'https://dolphin.ctyun.cn:10002/dolphinscheduler', 'https://dolphin.ctyun.cn:10002/dolphinscheduler');
 
 
 

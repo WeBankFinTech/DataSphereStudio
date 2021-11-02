@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 
 /**
  * The interface Orchestrator release info mapper.
@@ -18,6 +18,7 @@ public interface OrchestratorMapper {
 
     void insert(OrchestratorReleaseInfo orchestratorReleaseInfo);
 
+    @Select("SELECT * FROM dss_orchestrator_release_info WHERE orchestrator_id = #{orchestratorId}")
     OrchestratorReleaseInfo getByOrchestratorId(Long orchestratorId);
 
     void update(OrchestratorReleaseInfo orchestratorReleaseInfo);

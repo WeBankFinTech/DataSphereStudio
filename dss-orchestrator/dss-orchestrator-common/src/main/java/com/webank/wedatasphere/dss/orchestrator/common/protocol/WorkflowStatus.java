@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.workflow.entity;
+package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 /**
  * The type Published process definition status.

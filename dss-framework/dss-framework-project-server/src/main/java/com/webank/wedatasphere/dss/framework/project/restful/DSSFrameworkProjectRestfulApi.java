@@ -171,7 +171,7 @@ public class DSSFrameworkProjectRestfulApi {
             return RestfulUtils.dealOk("删除工程成功");
         }catch(final Throwable t){
             LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);
-            return RestfulUtils.dealError("删除工程失败");
+            return RestfulUtils.dealError("删除工程失败：" + t.getMessage());
         }
     }
 

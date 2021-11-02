@@ -53,7 +53,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
@@ -159,9 +158,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             ProjectInfoVo projectInfo = projectMapper.getProjectInfoById(projectId);
             workspace.setWorkspaceName(projectInfo.getWorkspaceName());
 
-            ProjectRequestRef projectRequestRef = new ProjectRequestRefImpl();
+            ProjectRequestRefImpl projectRequestRef = new ProjectRequestRefImpl();
             projectRequestRef.setName(dSSProjectDO.getName());
             projectRequestRef.setWorkspace(workspace);
+            projectRequestRef.setType("Project");
 
             AppConnManager.getAppConnManager().listAppConns().stream()
                 .filter(appConn -> appConn instanceof OnlyStructureAppConn).forEach(appConn -> {

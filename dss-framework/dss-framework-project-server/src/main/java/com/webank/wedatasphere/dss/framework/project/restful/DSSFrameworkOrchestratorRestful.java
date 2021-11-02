@@ -16,27 +16,40 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
-import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.request.*;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
-import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuerySchedulerWorkflowStatus;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.linkis.rpc.Sender;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 
 
 @Component
@@ -52,7 +65,8 @@ public class DSSFrameworkOrchestratorRestful {
     private DSSFrameworkOrchestratorService dssFrameworkOrchestratorService;
     @Autowired
     private DSSOrchestratorService orchestratorService;
-
+    @Autowired
+    private DSSProjectUserService projectUserService;
     @Autowired
     private DSSProjectMapper projectMapper;
 
@@ -138,8 +152,42 @@ public class DSSFrameworkOrchestratorRestful {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
+
+        DSSOrchestrator dssProjectOrchestrator = null;
         try {
-            dssFrameworkOrchestratorService.deleteOrchestrator(username, deleteRequest,workspace);
+            // 使用工程的权限关系来限定 校验当前登录用户是否含有修改权限
+            projectUserService.isEditProjectAuth(deleteRequest.getProjectId(), username);
+
+            dssProjectOrchestrator = orchestratorService.getById(deleteRequest.getId());
+            // 查询为空，已被删除
+            if (dssProjectOrchestrator == null) {
+                return RestfulUtils.dealOk("删除工作流编排成功");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to delete orchestrator {} for user {}", deleteRequest, username, e);
+            return RestfulUtils.dealError("删除工作流编排失败:" + e.getMessage());
+        }
+
+        RequestQuerySchedulerWorkflowStatus request =
+            new RequestQuerySchedulerWorkflowStatus(username, dssProjectOrchestrator.getOrchestratorId());
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(null);
+
+        WorkflowStatus workflowStatus = null;
+        try {
+            workflowStatus = (WorkflowStatus)sender.ask(request);
+        } catch (Exception e) {
+            LOGGER.error("获取工作流调度状态失败，用户：{}，OrchestratorId：{}", username, dssProjectOrchestrator.getOrchestratorId(),
+                e);
+            return RestfulUtils.dealError("获取工作流调度状态失败");
+        }
+
+        if (workflowStatus.getPublished() && workflowStatus.isOnline(workflowStatus.getReleaseState())) {
+            return RestfulUtils.dealError("该工作流已上线，请先在调度中心下线");
+        }
+
+        try {
+            dssFrameworkOrchestratorService.deleteOrchestrator(username, dssProjectOrchestrator,
+                workflowStatus.getPublished());
             return RestfulUtils.dealOk("删除工作流编排模式成功");
         } catch (Exception e) {
             LOGGER.error("Failed to delete orchestrator {} for user {}", deleteRequest, username, e);

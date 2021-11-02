@@ -22,7 +22,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper">
 
     <resultMap id="orchestratorReleaseInfo"
-               type="com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo">
+               type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
         <result column="orchestrator_version_id" property="orchestratorVersionId" jdbcType="BIGINT"/>
@@ -39,19 +39,15 @@
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id"
-            parameterType="com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo">
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo">
         INSERT INTO dss_orchestrator_release_info (<include refid="orchestrator_release_info_main"/>)
         VALUES
         (#{id}, #{orchestratorId}, #{orchestratorVersionId}, #{orchestratorVersion}, #{schedulerWorkflowId},
         #{createTime}, #{updateTime})
     </insert>
 
-    <select id="getByOrchestratorId" resultMap="orchestratorReleaseInfo" parameterType="java.lang.Long">
-        select * from dss_orchestrator_release_info where orchestrator_id = #{orchestratorId}
-    </select>
-
     <update id="update"
-            parameterType="com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo">
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo">
         UPDATE dss_orchestrator_release_info
         <trim prefix="set" suffixOverrides=",">
             <if test="orchestratorVersionId != null">orchestrator_version_id = #{orchestratorVersionId},</if>

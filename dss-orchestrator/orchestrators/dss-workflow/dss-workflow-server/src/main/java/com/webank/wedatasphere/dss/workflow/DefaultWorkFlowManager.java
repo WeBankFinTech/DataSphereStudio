@@ -42,8 +42,10 @@ import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRefImpl;
@@ -56,12 +58,12 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
-import com.webank.wedatasphere.dss.workflow.entity.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
 
 @Component
@@ -82,6 +84,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Autowired
     private MetaInputService metaInputService;
+
+    @Autowired
+    private PublishService publishService;
 
     private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -282,5 +287,10 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             logger.error("convertWorkflow error:",e);
             return ResponseOperateOrchestrator.failed(e.getMessage());
         }
+    }
+
+    @Override
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws DSSErrorException {
+        return publishService.getSchedulerWorkflowStatus(username, orchestratorId);
     }
 }

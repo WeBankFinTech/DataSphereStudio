@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.workflow.entity;
+package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
 import java.util.Date;
 

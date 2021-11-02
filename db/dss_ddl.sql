@@ -1272,3 +1272,16 @@ CREATE TABLE `dss_user` (
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `dss_orchestrator_release_info`;
+CREATE TABLE `dss_orchestrator_release_info`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `orchestrator_id` bigint(20) NULL DEFAULT NULL,
+  `orchestrator_version_id` bigint(20) NULL DEFAULT NULL,
+  `orchestrator_version` varchar(255) DEFAULT NULL,
+  `scheduler_workflow_id` bigint(20) NULL DEFAULT NULL,
+  `create_time` datetime NULL DEFAULT NULL,
+  `update_time` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;

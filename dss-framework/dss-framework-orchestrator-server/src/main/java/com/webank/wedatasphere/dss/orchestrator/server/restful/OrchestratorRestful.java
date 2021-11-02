@@ -16,12 +16,29 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.codehaus.jackson.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.query.QueryOrchestratorVersion;
@@ -30,23 +47,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import org.codehaus.jackson.JsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.math3.util.Pair;
 
 
 @Component
@@ -146,25 +146,6 @@ public class OrchestratorRestful {
         String dssLabel = labelJsonNode.get(LabelKeyConvertor.ROUTE_LABEL_KEY).getTextValue();
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(dssLabel));
         return dssLabelList;
-    }
-
-
-
-    @GET
-    @Path("/getSchedulerWorkflowStatus")
-    public Response getSchedulerWorkflowStatus(@Context HttpServletRequest request,
-                                               @NotNull(message = "查询的空间id不能为空") @QueryParam("workspaceId") Long workspaceId,
-                                               @NotNull(message = "查询的编排id不能为空") @QueryParam("orchestratorId") Long orchestratorId) {
-        String username = SecurityFilter.getLoginUsername(request);
-        try {
-//            WorkflowStatus status = publishToSchedulerService.getSchedulerWorkflowStatus(username, orchestratorId);
-            return RestfulUtils.dealOk("获取调度工作流状态", new Pair<>("published", false),
-                    new Pair<>("releaseStatus", null));
-        } catch (final Throwable t) {
-            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
-                    orchestratorId, t);
-            return RestfulUtils.dealError("获取工作流调度状态失败");
-        }
     }
 
 }

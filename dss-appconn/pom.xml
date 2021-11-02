@@ -42,6 +42,7 @@
         <module>appconns/dss-workflow-appconn</module>
         <module>appconns/dss-sendemail-appconn</module>
         <module>appconns/dss-visualis-appconn</module>
+        <module>appconns/dss-dolphinscheduler-appconn</module>
     </modules>
 
 </project>

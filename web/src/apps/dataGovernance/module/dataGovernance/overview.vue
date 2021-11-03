@@ -85,10 +85,12 @@ export default {
                     marginLeft: "4.8px",
                     fontSize: "14px",
                     color: "#2E92F7",
-                    cursor: "pointer"
+                    cursor: params.row.guid ? "pointer" : "not-allowed"
                   },
                   on: {
-                    click: this.toTableInfo
+                    click: () => {
+                      this.toTableInfo(params.row.guid);
+                    }
                   }
                 },
                 params.row.tableName
@@ -192,13 +194,14 @@ export default {
         });
     },
     // 根據{guid}跳轉到表詳情
-    toTableInfo(e) {
-      console.log("xxx", e);
-      // this.$router.push({
-      //   name: "dataGovernance/assets/info",
-      //   params: { guid },
-      //   query: { workspaceId }
-      // });
+    toTableInfo(guid) {
+      if (!guid) return;
+      const workspaceId = this.$route.query.workspaceId;
+      this.$router.push({
+        name: "dataGovernance/assets/info",
+        params: { guid },
+        query: { workspaceId }
+      });
     }
   }
 };

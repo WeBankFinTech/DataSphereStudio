@@ -262,5 +262,16 @@
         <include>**/*</include>
       </includes>
     </fileSet>
+
+    <!--dss-data-governance-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-data-governance/dss-data-governance-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
   </fileSets>
 </assembly>

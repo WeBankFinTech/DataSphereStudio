@@ -55,12 +55,13 @@ public class ClassificationServiceImpl implements ClassificationService {
 
         try {
             atlasClassificationDef = atlasService.getClassificationDefByName(name);
-            logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] exists,  ignore it",name));
+            if(atlasClassificationDef !=null) {
+                logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] exists,  ignore it", name));
+            }
         }catch (AtlasServiceException ex) {
-            JsonParser parser = new JsonParser();
-            JsonObject jsonObject  = parser.parse(ex.getMessage()).getAsJsonObject();
-            // ATLAS-404-00-001
-            if (AtlasErrorCode.TYPE_NAME_NOT_FOUND.getErrorCode().equalsIgnoreCase(jsonObject.get(ATLAS_ERROR_CODE).getAsJsonObject().toString())) {
+            logger.info("@@@@@@@@@@ error:" + ex.getMessage());
+            // 404
+            if (ClientResponse.Status.NOT_FOUND ==ex.getStatus()) {
                 logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] don't exist,  create it...", name));
                 logger.info(String.format("@@@@@@@@@@@@@@ ==> initializeClassification, name=%s", name));
                 atlasTypesDef = new AtlasTypesDef();

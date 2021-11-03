@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.data.common.atlas;
 
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import org.apache.atlas.ApplicationProperties;
 import org.apache.atlas.AtlasClientV2;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.instance.AtlasClassification;
@@ -38,8 +40,8 @@ public class AtlasClient extends AtlasClientV2 {
     private static final String TYPEDEFS_API         = TYPES_API + "typedefs/";
     private static final String GET_CLASSIFICATION_BY_NAME_TEMPLATE = TYPES_API + "classificationdef/name/%s";
 
-    public AtlasClient(Configuration configuration,String[] baseUrl, String[] basicAuthUserNamePassword) {
-        super(configuration,baseUrl, basicAuthUserNamePassword);
+    public AtlasClient(String[] baseUrl, String[] basicAuthUserNamePassword) {
+        super(baseUrl, basicAuthUserNamePassword);
     }
 
     /**

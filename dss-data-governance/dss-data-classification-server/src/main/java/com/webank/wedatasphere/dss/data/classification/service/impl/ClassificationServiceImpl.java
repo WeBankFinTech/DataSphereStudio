@@ -1,11 +1,15 @@
 package com.webank.wedatasphere.dss.data.classification.service.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.webank.wedatasphere.dss.data.classification.service.ClassificationService;
 import com.webank.wedatasphere.dss.data.common.atlas.AtlasService;
 import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 import com.webank.wedatasphere.dss.data.common.exception.DataGovernanceException;
 import lombok.AllArgsConstructor;
+import org.apache.atlas.AtlasErrorCode;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.apache.atlas.model.typedef.AtlasTypesDef;
@@ -27,6 +31,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ClassificationServiceImpl implements ClassificationService {
     private static final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
+    private static final String ATLAS_ERROR_CODE ="errorCode";
 
     private AtlasService atlasService;
 
@@ -48,18 +53,25 @@ public class ClassificationServiceImpl implements ClassificationService {
         AtlasClassificationDef atlasClassificationDef =null;
         AtlasTypesDef atlasTypesDef =null;
 
-        atlasClassificationDef = this.getClassificationDefByName(name);
-        if(atlasClassificationDef ==null){
-            logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] don't exist,  create it...",name));
-            logger.info(String.format("@@@@@@@@@@@@@@ ==> initializeClassification, name=%s",name));
-            atlasTypesDef = new AtlasTypesDef();
-            atlasClassificationDef =new AtlasClassificationDef(name,description);
-            atlasTypesDef.getClassificationDefs().add(atlasClassificationDef);
-            this.createAtlasTypeDefs(atlasTypesDef);
-            logger.info(String.format("@@@@@@@@@@@@@@ <== initializeClassification, name=%s",name));
-        }
-        else{
+        try {
+            atlasClassificationDef = atlasService.getClassificationDefByName(name);
             logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] exists,  ignore it",name));
+        }catch (AtlasServiceException ex) {
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject  = parser.parse(ex.getMessage()).getAsJsonObject();
+            // ATLAS-404-00-001
+            if (AtlasErrorCode.TYPE_NAME_NOT_FOUND.getErrorCode().equalsIgnoreCase(jsonObject.get(ATLAS_ERROR_CODE).getAsJsonObject().toString())) {
+                logger.info(String.format("@@@@@@@@@@@@@@ === this classification [name=%s] don't exist,  create it...", name));
+                logger.info(String.format("@@@@@@@@@@@@@@ ==> initializeClassification, name=%s", name));
+                atlasTypesDef = new AtlasTypesDef();
+                atlasClassificationDef = new AtlasClassificationDef(name, description);
+                atlasTypesDef.getClassificationDefs().add(atlasClassificationDef);
+                this.createAtlasTypeDefs(atlasTypesDef);
+                logger.info(String.format("@@@@@@@@@@@@@@ <== initializeClassification, name=%s", name));
+            }
+            else {
+                throw new DataGovernanceException(ex.getMessage());
+            }
         }
     }
 

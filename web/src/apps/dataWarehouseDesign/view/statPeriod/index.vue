@@ -185,7 +185,7 @@ export default {
     },
   },
   mounted() {
-    this.handleGetData();
+    this.handleGetData(true);
   },
   watch: {
     "pageCfg.page"() {
@@ -207,11 +207,11 @@ export default {
         },
         {
           title: "英文名",
-          key: "name",
+          key: "enName",
         },
         {
           title: "负责人",
-          key: "name",
+          key: "owner",
         },
         {
           title: "主题域",

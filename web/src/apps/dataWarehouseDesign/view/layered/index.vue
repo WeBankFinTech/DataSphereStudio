@@ -35,13 +35,13 @@
           <Button
             size="small"
             style="margin-right: 5px"
-            @click="handleEdit(row.id)"
+            @click="handleEdit(0, row.id)"
           >
             编辑
           </Button>
           <Button
             size="small"
-            @click="handleDisable(row.id)"
+            @click="handleDisable(0, row.id)"
             style="margin-right: 5px"
             v-if="row.isAvailable"
           >
@@ -50,7 +50,7 @@
           <Button
             type="primary"
             size="small"
-            @click="handleEnable(row.id)"
+            @click="handleEnable(0, row.id)"
             style="margin-right: 5px"
             v-else
           >
@@ -97,13 +97,13 @@
           <Button
             size="small"
             style="margin-right: 5px"
-            @click="handleEdit(row.id)"
+            @click="handleEdit(1, row.id)"
           >
             编辑
           </Button>
           <Button
             size="small"
-            @click="handleDisable(row.id)"
+            @click="handleDisable(1, row.id)"
             style="margin-right: 5px"
             v-if="row.isAvailable"
           >
@@ -112,7 +112,7 @@
           <Button
             type="primary"
             size="small"
-            @click="handleEnable(row.id)"
+            @click="handleEnable(1, row.id)"
             style="margin-right: 5px"
             v-else
           >
@@ -155,14 +155,16 @@ export default {
   filters: { formatDate },
   methods: {
     // 弹窗回调
-    handleModalFinish() {
-      this.handleGetLayersCustom(true);
+    handleModalFinish(type) {
+      if (type === 0) return this.handleGetLayersPreset();
+      if (type === 1) return this.handleGetLayersCustom(true);
     },
     // 创建操作
     handleCreate() {
       this.modalCfg = {
         visible: true,
         mode: "create",
+        type: 1,
       };
     },
     // 删除操作
@@ -179,26 +181,29 @@ export default {
       });
     },
     // 编辑弹窗
-    handleEdit(id) {
+    handleEdit(type, id) {
       this.modalCfg = {
         visible: true,
         mode: "edit",
         id: id,
+        type: type,
       };
     },
     // 启用
-    async handleEnable(id) {
+    async handleEnable(type, id) {
       this.loading = true;
       await enableLayers(id);
       this.loading = false;
-      this.handleGetLayersCustom(true);
+      if (type === 0) return this.handleGetLayersPreset();
+      if (type === 1) return this.handleGetLayersCustom(true);
     },
     // 停用
-    async handleDisable(id) {
+    async handleDisable(type, id) {
       this.loading = true;
       await disableLayers(id);
       this.loading = false;
-      this.handleGetLayersCustom(true);
+      if (type === 0) return this.handleGetLayersPreset();
+      if (type === 1) return this.handleGetLayersCustom(true);
     },
     // 获取预设分层
     async handleGetLayersPreset() {
@@ -225,7 +230,7 @@ export default {
   },
   mounted() {
     this.handleGetLayersPreset();
-    this.handleGetLayersCustom();
+    this.handleGetLayersCustom(true);
   },
   watch: {
     "pageCfg.page"() {
@@ -280,7 +285,7 @@ export default {
           minWidth: 60,
         },
       ],
-      // 自定义分层列表
+      // 自定义分层加载中
       customloading: false,
       // 自定义分数据
       customDataList: [],
@@ -293,6 +298,7 @@ export default {
         mode: "",
         id: NaN,
         visible: false,
+        type: NaN,
       },
       // 分页配置
       pageCfg: {

@@ -29,8 +29,9 @@
       </FormItem>
       <FormItem label="可用角色" prop="principalName">
         <Select
-          v-model="formState.principalName"
           multiple
+          :value="(formState.principalName || '').split(',')"
+          @input="formState.principalName = $event.join()"
           placeholder="可用角色"
         >
           <Option
@@ -43,7 +44,12 @@
         </Select>
       </FormItem>
       <FormItem label="可用库" prop="databases">
-        <Select v-model="formState.databases" multiple placeholder="可用库">
+        <Select
+          multiple
+          placeholder="可用库"
+          :value="(formState.databases || '').split(',')"
+          @input="formState.databases = $event.join()"
+        >
           <Option
             v-for="item in dataBasesList"
             :value="item.value"
@@ -96,6 +102,9 @@ export default {
     id: {
       type: Number,
     },
+    type: {
+      type: Number,
+    },
   },
   emits: ["finish", "_changeVisible"],
   watch: {
@@ -110,8 +119,8 @@ export default {
         name: "",
         enName: "",
         owner: userName,
-        principalName: ["ALL"],
-        databases: [],
+        principalName: "ALL",
+        databases: "",
         description: "",
         order: 0,
       },
@@ -169,6 +178,7 @@ export default {
     };
   },
   methods: {
+    // 根据id获取数据
     async handleGetById(id) {
       this.loading = true;
       let { item } = await getLayersById(id);
@@ -176,45 +186,41 @@ export default {
       this.formState.name = item.name;
       this.formState.owner = item.owner;
       this.formState.enName = item.enName;
-      this.formState.principalName = item.principalName.split(",");
-      this.formState.databases = item.dbs.split(",");
+      this.formState.principalName = item.principalName;
+      this.formState.databases = item.dbs;
       this.formState.description = item.description;
       this.formState.order = item.sort;
     },
+    // 弹框取消回调
     cancelCallBack() {
       this.$refs["formRef"].resetFields();
     },
+    // 处理取消按钮
     handleCancel() {
       this.$refs["formRef"].resetFields();
       this.$emit("_changeVisible", false);
     },
+    // 获取表单提交数据
+    handlegetFormatData() {
+      return Object.assign({}, this.formState, {});
+    },
+    // 处理表单完成
     async handleOk() {
       this.$refs["formRef"].validate(async (valid) => {
         if (valid) {
           try {
             this.loading = true;
             if (this.mode === "create") {
-              await createLayersCustom(
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                  databases: this.formState.databases.join(","),
-                })
-              );
+              await createLayersCustom(this.handlegetFormatData());
               this.loading = false;
             }
             if (this.mode === "edit") {
-              await editLayersCustom(
-                this.id,
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                  databases: this.formState.databases.join(","),
-                })
-              );
+              await editLayersCustom(this.id, this.handlegetFormatData());
               this.loading = false;
             }
             this.$refs["formRef"].resetFields();
             this.$emit("_changeVisible", false);
-            this.$emit("finish");
+            this.$emit("finish", this.type);
           } catch (error) {
             this.loading = false;
             console.log(error);

@@ -22,8 +22,9 @@
       </FormItem>
       <FormItem label="可用角色" prop="principalName">
         <Select
-          v-model="formState.principalName"
           multiple
+          :value="(formState.principalName || '').split(',')"
+          @input="formState.principalName = $event.join()"
           placeholder="可用角色"
         >
           <Option
@@ -118,7 +119,7 @@ export default {
         name: "",
         enName: "",
         owner: userName,
-        principalName: ["ALL"],
+        principalName: "ALL",
         description: "",
       },
       authorityList: [
@@ -141,12 +142,14 @@ export default {
       this.formState.name = item.name;
       this.formState.enName = item.enName;
       this.formState.owner = item.owner;
-      this.formState.principalName = item.principalName.split(",");
+      this.formState.principalName = item.principalName;
       this.formState.description = item.description;
     },
+    // 弹框取消回调
     cancelCallBack() {
       this.$refs["formRef"].resetFields();
     },
+    // 取消按钮
     handleCancel() {
       this.$refs["formRef"].resetFields();
       this.$emit("_changeVisible", false);
@@ -157,20 +160,11 @@ export default {
           try {
             this.loading = true;
             if (this.mode === "create") {
-              await createThemedomains(
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                })
-              );
+              await createThemedomains(this.formState);
               this.loading = false;
             }
             if (this.mode === "edit") {
-              await editThemedomains(
-                this.id,
-                Object.assign({}, this.formState, {
-                  principalName: this.formState.principalName.join(","),
-                })
-              );
+              await editThemedomains(this.id, this.formState);
               this.loading = false;
             }
             this.$refs["formRef"].resetFields();

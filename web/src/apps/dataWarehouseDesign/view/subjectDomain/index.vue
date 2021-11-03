@@ -161,7 +161,7 @@ export default {
     },
   },
   mounted() {
-    this.handleGetData();
+    this.handleGetData(true);
   },
   watch: {
     "pageCfg.page"() {

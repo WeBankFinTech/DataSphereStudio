@@ -51,6 +51,8 @@
         "col_groupName": "业务流程",
         "col_label": "标签",
         "col_createBy": "负责人",
+        "col_updateTime": "更新时间",
+        "col_createTime": "创建时间",
         "viewMonitor": "查看监控图表"
       },
       "apiCall": {

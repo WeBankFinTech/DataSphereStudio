@@ -51,6 +51,8 @@
         "col_groupName": "GroupName",
         "col_label": "Label",
         "col_createBy": "CreateBy",
+        "col_updateTime": "updateTime",
+        "col_createTime": "createTime",
         "viewMonitor": "View Monitor"
       },
       "apiCall": {

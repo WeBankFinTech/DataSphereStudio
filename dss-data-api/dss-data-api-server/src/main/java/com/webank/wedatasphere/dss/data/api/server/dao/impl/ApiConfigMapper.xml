@@ -56,6 +56,6 @@
         <if test="apiName != null and apiName != ''">
             AND a.api_name LIKE concat('%', #{apiName}, '%')
         </if>
-        ORDER BY a.create_by DESC
+        ORDER BY a.update_time DESC
     </select>
 </mapper>

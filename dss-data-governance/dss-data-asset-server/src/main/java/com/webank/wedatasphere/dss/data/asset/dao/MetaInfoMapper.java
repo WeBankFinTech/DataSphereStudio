@@ -13,7 +13,7 @@ import java.util.List;
 //
 @Mapper
 public interface MetaInfoMapper {
-    Integer getTableStorage() throws SQLException;
+    Long getTableStorage() throws SQLException;
     List<HiveStorageInfo> getTop10Table() throws SQLException;
     int getTableInfo(@Param("dbName") String dbName,@Param("tableName") String tableName,@Param("isPartTable") Boolean isPartTable) throws  SQLException;
 

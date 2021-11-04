@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="355px" height="116px" viewBox="0 0 355 116" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 4</title>
+    <defs>
+        <linearGradient x1="6.3702011%" y1="40.4032673%" x2="99.8310786%" y2="60.994188%" id="linearGradient-1">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-13.591042%" y1="31.5569986%" x2="71.1528336%" y2="49.2226134%" id="linearGradient-2">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-3" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 25.9934694 7.48081633"></polygon>
+        <linearGradient x1="23.0320862%" y1="35.8544304%" x2="145.966322%" y2="62.9636076%" id="linearGradient-4">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.428714308%" y1="-5.26269841%" x2="66.4893219%" y2="47.6706349%" id="linearGradient-5">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-6" points="0.615510204 7.48081633 13.3044898 0.142040816 13.0677551 0 0.0946938776 7.48081633 13.0677551 14.9616327 13.3044898 14.8195918"></polygon>
+        <linearGradient x1="43.6784012%" y1="41.2842179%" x2="58.0502833%" y2="61.1369843%" id="linearGradient-7">
+            <stop stop-color="#749BFF" offset="0%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="26.9497691%" y1="33.3134884%" x2="57.9362985%" y2="50.8373023%" id="linearGradient-8">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="33.5353059%" y1="-5.26269841%" x2="55.4767924%" y2="47.6706349%" id="linearGradient-9">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-10" points="13.0677551 14.9616327 0.0946938776 7.48081633 0.0946938776 50.8979592 13.0677551 58.3787755 25.9934694 50.8979592 25.9934694 7.48081633"></polygon>
+        <linearGradient x1="6.41824818%" y1="40.3841734%" x2="99.7087591%" y2="60.9000133%" id="linearGradient-11">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-13.591042%" y1="31.6242474%" x2="71.1528336%" y2="49.2254479%" id="linearGradient-12">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-13" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 26.0408163 7.48081633"></polygon>
+        <linearGradient x1="98.7833835%" y1="40.1455807%" x2="29.3568094%" y2="66.7936467%" id="linearGradient-14">
+            <stop stop-color="#242993" offset="0%"></stop>
+            <stop stop-color="#292F9A" stop-opacity="0.86431214" offset="33.68584%"></stop>
+            <stop stop-color="#3A40AF" stop-opacity="0.437620477" offset="65.4654731%"></stop>
+            <stop stop-color="#4A53C5" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="22.8871976%" y1="35.6914557%" x2="146.262338%" y2="62.8009494%" id="linearGradient-15">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.0727277627%" y1="-5.26269841%" x2="66.6077367%" y2="47.6706349%" id="linearGradient-16">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.0727277627%" y1="-5.26269841%" x2="66.6077367%" y2="47.6706349%" id="linearGradient-17">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-18" points="0.615510204 7.48081633 13.3518367 0.142040816 13.0677551 0 0.0946938776 7.48081633 13.0677551 14.9616327 13.3518367 14.7722449"></polygon>
+        <linearGradient x1="43.6511694%" y1="41.2363835%" x2="58.0756958%" y2="61.0891499%" id="linearGradient-19">
+            <stop stop-color="#BCD5FF" offset="0%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="43.6593414%" y1="41.2364315%" x2="58.0838883%" y2="61.0891514%" id="linearGradient-20">
+            <stop stop-color="#5383F1" offset="0%"></stop>
+            <stop stop-color="#172A9C" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-21" points="26.0408163 50.8979592 13.0677551 58.3787755 13.0677551 14.9616327 26.0408163 7.48081633"></polygon>
+        <linearGradient x1="33.4750509%" y1="-5.26269841%" x2="55.4968355%" y2="47.6706349%" id="linearGradient-22">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="6.31023766%" y1="40.3489828%" x2="99.771298%" y2="60.9399035%" id="linearGradient-23">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-24" points="13.0677551 14.9616327 0.142040816 7.48081633 13.0677551 0 26.0408163 7.48081633"></polygon>
+        <linearGradient x1="98.7833835%" y1="40.201334%" x2="29.3568094%" y2="66.6986333%" id="linearGradient-25">
+            <stop stop-color="#242993" offset="0%"></stop>
+            <stop stop-color="#292F9A" stop-opacity="0.86431214" offset="33.68584%"></stop>
+            <stop stop-color="#3A40AF" stop-opacity="0.437620477" offset="65.4654731%"></stop>
+            <stop stop-color="#4A53C5" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="22.9407216%" y1="35.6917722%" x2="145.874678%" y2="62.8009494%" id="linearGradient-26">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0.428714308%" y1="-5.26269841%" x2="66.4893219%" y2="47.6706349%" id="linearGradient-27">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-28" points="0.662857143 7.48081633 13.3518367 0.142040816 13.0677551 0 0.142040816 7.48081633 13.0677551 14.9616327 13.3518367 14.7722449"></polygon>
+        <linearGradient x1="26.9342436%" y1="33.2656744%" x2="57.920773%" y2="50.7895814%" id="linearGradient-29">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-30" points="13.0677551 14.9616327 0.142040816 7.48081633 0.142040816 50.8979592 13.0677551 58.3787755 26.0408163 50.8979592 26.0408163 7.48081633"></polygon>
+        <linearGradient x1="6.3702011%" y1="40.4004158%" x2="99.8310786%" y2="60.9913365%" id="linearGradient-31">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-32" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 25.9934694 7.48081633"></polygon>
+        <linearGradient x1="23.0323656%" y1="35.8458861%" x2="145.966601%" y2="62.9550633%" id="linearGradient-33">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-34" points="0.615510204 7.48081633 13.3044898 0.142040816 13.0677551 0 0.0946938776 7.48081633 13.0677551 14.9616327 13.3044898 14.8195918"></polygon>
+        <linearGradient x1="31.0461904%" y1="38.4801823%" x2="74.133896%" y2="64.7243148%" id="linearGradient-35">
+            <stop stop-color="#BCD5FF" offset="0%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-20.4427788%" y1="26.2072464%" x2="73.7117002%" y2="49.6856993%" id="linearGradient-36">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-13.591042%" y1="8.5032468%" x2="71.1528336%" y2="48.2508801%" id="linearGradient-37">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-38" points="13.0677551 14.9616327 0.0946938776 7.48081633 0.0946938776 22.442449 13.0677551 29.9232653 25.9934694 22.442449 25.9934694 7.48081633"></polygon>
+        <linearGradient x1="6.3702011%" y1="40.3953464%" x2="99.8310786%" y2="60.9862671%" id="linearGradient-39">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-40" points="12.9730612 14.9616327 0 7.48081633 12.9730612 0 25.8987755 7.48081633"></polygon>
+        <linearGradient x1="23.0323656%" y1="35.8306962%" x2="145.966601%" y2="62.9398734%" id="linearGradient-41">
+            <stop stop-color="#E1EFFF" offset="0%"></stop>
+            <stop stop-color="#3CCACE" offset="10.22%"></stop>
+            <stop stop-color="#2F87A5" offset="34.45%"></stop>
+            <stop stop-color="#255385" offset="56.4%"></stop>
+            <stop stop-color="#1E2D6E" offset="75.34%"></stop>
+            <stop stop-color="#1A1660" offset="90.5%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <polygon id="path-42" points="0.520816327 7.48081633 13.2097959 0.142040816 12.9730612 0 0 7.48081633 12.9730612 14.9616327 13.2097959 14.8195918"></polygon>
+        <linearGradient x1="7.9357326%" y1="36.4661829%" x2="103.555138%" y2="67.4295645%" id="linearGradient-43">
+            <stop stop-color="#BCD5FF" offset="0%"></stop>
+            <stop stop-color="#180D5B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-13.591042%" y1="38.2710667%" x2="71.1528336%" y2="49.5056165%" id="linearGradient-44">
+            <stop stop-color="#C5D5FF" offset="0%"></stop>
+            <stop stop-color="#A2B6FF" offset="32.9668378%"></stop>
+            <stop stop-color="#86A0FF" offset="53.3504459%"></stop>
+            <stop stop-color="#5778FF" offset="75.4814521%"></stop>
+            <stop stop-color="#343EAD" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="工作空间首页" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="工作空间首页-组件商店" transform="translate(-274.000000, -732.000000)">
+            <g id="编组-3备份-6" transform="translate(273.000000, 731.000000)">
+                <g id="编组-4" transform="translate(1.000000, 1.000000)">
+                    <g id="编组-3备份">
+                        <rect id="矩形" x="0" y="0" width="355" height="116"></rect>
+                    </g>
+                    <g id="数据模型]" transform="translate(217.000000, 0.000000)" fill-rule="nonzero">
+                        <g id="编组" transform="translate(88.538776, 96.777143)">
+                            <polygon id="路径" fill="#E1EFFF" points="16.6661224 14.4408163 16.6661224 4.82938776 8.33306122 0 0 4.82938776 0 14.4408163 8.33306122 19.2228571"></polygon>
+                            <polygon id="路径" fill="#B8C7FF" points="8.33306122 9.61142857 0 4.82938776 8.33306122 0 16.6661224 4.82938776"></polygon>
+                            <polygon id="路径" fill="#91A9FF" points="16.6661224 14.4408163 8.33306122 19.2228571 8.33306122 9.61142857 16.6661224 4.82938776"></polygon>
+                            <polygon id="路径" fill="#E1E9FF" points="8.33306122 19.2228571 0 14.4408163 0 4.82938776 8.33306122 9.61142857"></polygon>
+                        </g>
+                        <g id="编组" transform="translate(20.027755, 102.506122)">
+                            <polygon id="路径" fill="#E1EFFF" points="9.70612245 8.38040816 9.70612245 2.79346939 4.87673469 0 0 2.79346939 0 8.38040816 4.87673469 11.2212245"></polygon>
+                            <polygon id="路径" fill="#B8C7FF" points="4.87673469 5.58693878 0 2.79346939 4.87673469 0 9.70612245 2.79346939"></polygon>
+                            <polygon id="路径" fill="#91A9FF" points="9.70612245 8.38040816 4.87673469 11.2212245 4.87673469 5.58693878 9.70612245 2.79346939"></polygon>
+                            <polygon id="路径" fill="#E1E9FF" points="4.87673469 11.2212245 0 8.38040816 0 2.79346939 4.87673469 5.58693878"></polygon>
+                        </g>
+                        <g id="编组" transform="translate(114.768980, 86.550204)">
+                            <polygon id="路径" fill="#E1EFFF" points="9.70612245 8.38040816 9.70612245 2.79346939 4.87673469 0 0 2.79346939 0 8.38040816 4.87673469 11.2212245"></polygon>
+                            <polygon id="路径" fill="#B8C7FF" points="4.87673469 5.58693878 0 2.79346939 4.87673469 0 9.70612245 2.79346939"></polygon>
+                            <polygon id="路径" fill="#91A9FF" points="9.70612245 8.38040816 4.87673469 11.2212245 4.87673469 5.58693878 9.70612245 2.79346939"></polygon>
+                            <polygon id="路径" fill="#E1E9FF" points="4.87673469 11.2212245 0 8.38040816 0 2.79346939 4.87673469 5.58693878"></polygon>
+                        </g>
+                        <g id="编组" transform="translate(0.000000, 19.933061)">
+                            <polygon id="路径" fill="#E1EFFF" points="6.72326531 5.82367347 6.72326531 1.94122449 3.36163265 0 0 1.94122449 0 5.82367347 3.36163265 7.76489796"></polygon>
+                            <polygon id="路径" fill="#B8C7FF" points="3.36163265 3.88244898 0 1.94122449 3.36163265 0 6.72326531 1.94122449"></polygon>
+                            <polygon id="路径" fill="#91A9FF" points="6.72326531 5.82367347 3.36163265 7.76489796 3.36163265 3.88244898 6.72326531 1.94122449"></polygon>
+                            <polygon id="路径" fill="#E1E9FF" points="3.36163265 7.76489796 0 5.82367347 0 1.94122449 3.36163265 3.88244898"></polygon>
+                        </g>
+                        <g id="编组" transform="translate(19.885714, 0.000000)">
+                            <g transform="translate(35.320816, 0.000000)">
+                                <g>
+                                    <polygon id="路径" fill="#E1F0FF" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 25.9934694 7.48081633"></polygon>
+                                    <g id="路径" opacity="0.5">
+                                        <use fill="url(#linearGradient-1)" xlink:href="#path-3"></use>
+                                        <use fill="url(#linearGradient-2)" xlink:href="#path-3"></use>
+                                    </g>
+                                    <path d="M13.0677551,67.6114286 C13.0204082,67.6114286 13.0204082,67.6114286 13.0204082,67.6114286 L0.0473469388,60.1306122 C0,60.0832653 0,60.0359184 0,59.9885714 C0,59.9412245 0.0473469388,59.8938776 0.0473469388,59.8465306 L13.0204082,52.3657143 C13.0677551,52.3183673 13.115102,52.3183673 13.162449,52.3657143 L26.1355102,59.8465306 C26.1828571,59.8938776 26.1828571,59.9412245 26.1828571,59.9885714 C26.1828571,60.0359184 26.1355102,60.0832653 26.1355102,60.1306122 L13.162449,67.6114286 C13.115102,67.6114286 13.0677551,67.6114286 13.0677551,67.6114286 Z M0.37877551,59.9885714 L13.0677551,67.3273469 L25.7567347,59.9885714 L13.0677551,52.6497959 L0.37877551,59.9885714 Z" id="形状" fill="#73FFF5"></path>
+                                    <polygon id="路径" fill="#0B0244" opacity="0.3" points="13.0677551 64.8179592 4.68734694 59.9885714 13.0677551 55.1591837 21.4008163 59.9885714"></polygon>
+                                    <g id="路径" opacity="0.8">
+                                        <use fill="url(#linearGradient-4)" xlink:href="#path-6"></use>
+                                        <use fill="url(#linearGradient-5)" xlink:href="#path-6"></use>
+                                    </g>
+                                    <polygon id="路径" fill="#708FFF" points="13.0677551 13.0204082 3.45632653 7.48081633 13.0677551 1.94122449 22.6318367 7.48081633"></polygon>
+                                    <polygon id="路径" fill="#E1EFFF" points="13.0677551 3.21959184 21.5428571 8.14367347 22.6318367 7.48081633 13.0677551 1.94122449 3.45632653 7.48081633 4.54530612 8.14367347"></polygon>
+                                    <polygon id="路径" fill="#95ADFF" points="13.0677551 58.3787755 0.0946938776 50.8979592 0.0946938776 7.48081633 13.0677551 14.9616327"></polygon>
+                                    <polygon id="路径" fill="url(#linearGradient-7)" points="25.9934694 50.8979592 13.0677551 58.3787755 13.0677551 14.9616327 25.9934694 7.48081633"></polygon>
+                                    <g id="路径" opacity="0.5">
+                                        <use fill="url(#linearGradient-8)" xlink:href="#path-10"></use>
+                                        <use fill="url(#linearGradient-9)" xlink:href="#path-10"></use>
+                                    </g>
+                                </g>
+                                <g transform="translate(1.325714, 9.658776)">
+                                    <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.01306122 L0,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                    <g fill="#E1EFFF" id="路径">
+                                        <polygon points="0.520816327 11.8367347 0.520816327 0.284081633 1.34568094e-14 6.72840468e-15 1.34568094e-14 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                        <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 2.03591837 9.46938776 6.62857143 9.46938776 15.8612245"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 1.04163265 1.75183673 1.98857143 2.27265306"></polygon>
+                                    <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                </g>
+                                <g transform="translate(14.298776, 9.658776)">
+                                    <path d="M0,6.01306122 L0,18.0865306 L10.4636735,12.0261224 L10.4636735,6.72840468e-15 L0,6.01306122 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                    <g fill="#E1EFFF" id="路径">
+                                        <polygon points="9.99020408 11.8367347 9.99020408 0.284081633 10.4636735 6.72840468e-15 10.4636735 12.0734694 0 18.1338776 0 17.6130612"></polygon>
+                                        <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 2.03591837 0.994285714 6.62857143 0.994285714 15.8612245"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.3820408 0.520816327 16.1453061 0.994285714 15.482449"></polygon>
+                                </g>
+                                <g transform="translate(1.325714, 23.768163)">
+                                    <path d="M1.34568094e-14,0 L1.34568094e-14,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L1.34568094e-14,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                    <g fill="#E1EFFF" id="路径">
+                                        <polygon points="0.520816327 11.8840816 0.520816327 0.284081633 1.34568094e-14 0 1.34568094e-14 12.1208163 10.4636735 18.1338776 10.4636735 17.6604082"></polygon>
+                                        <polygon points="9.94285714 16.1926531 9.94285714 6.43918367 1.51510204 1.51510204 1.51510204 2.03591837 9.46938776 6.62857143 9.46938776 15.9085714"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 1.04163265 1.75183673 1.98857143 2.32"></polygon>
+                                    <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1926531 9.46938776 15.482449"></polygon>
+                                </g>
+                                <g transform="translate(14.298776, 23.768163)">
+                                    <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                    <g fill="#E1EFFF" id="路径">
+                                        <polygon points="9.99020408 11.8840816 9.99020408 0.284081633 10.4636735 0 10.4636735 12.1208163 0 18.1338776 0 17.6604082"></polygon>
+                                        <polygon points="0.520816327 16.1926531 0.520816327 6.43918367 8.94857143 1.51510204 8.94857143 2.03591837 0.994285714 6.62857143 0.994285714 15.9085714"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.3820408 0.520816327 16.1926531 0.994285714 15.482449"></polygon>
+                                </g>
+                                <g transform="translate(1.325714, 37.924898)">
+                                    <path d="M1.34568094e-14,0 L1.34568094e-14,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L1.34568094e-14,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                    <g transform="translate(0.000000, 0.000000)" fill="#E1EFFF" id="路径">
+                                        <polygon points="0.520816327 11.8840816 0.520816327 0.284081633 1.34568094e-14 -1.34568094e-14 1.34568094e-14 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                        <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 2.03591837 9.46938776 6.62857143 9.46938776 15.8612245"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 1.04163265 1.75183673 1.98857143 2.27265306"></polygon>
+                                    <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                </g>
+                                <g transform="translate(14.298776, 37.924898)">
+                                    <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                    <g transform="translate(0.000000, 0.000000)" fill="#E1EFFF" id="路径">
+                                        <polygon points="9.99020408 11.8840816 9.99020408 0.284081633 10.4636735 -1.34568094e-14 10.4636735 12.0734694 0 18.1338776 0 17.6130612"></polygon>
+                                        <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 2.03591837 0.994285714 6.62857143 0.994285714 15.8612245"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.3820408 0.520816327 16.1453061 0.994285714 15.482449"></polygon>
+                                </g>
+                                <polygon id="路径" fill="#E1EFFF" points="23.2473469 11.1738776 23.7681633 11.4106122 22.8212245 11.9314286"></polygon>
+                            </g>
+                            <g transform="translate(0.000000, 22.726531)">
+                                <g>
+                                    <g>
+                                        <polygon id="路径" fill="#E1EFFF" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 26.0408163 7.48081633"></polygon>
+                                        <g id="路径" opacity="0.5">
+                                            <use fill="url(#linearGradient-11)" xlink:href="#path-13"></use>
+                                            <use fill="url(#linearGradient-12)" xlink:href="#path-13"></use>
+                                        </g>
+                                        <path d="M13.0677551,67.5640816 C13.0204082,67.5640816 13.0204082,67.5640816 13.0204082,67.5640816 L0.0473469388,60.0832653 C0,60.0359184 0,59.9885714 0,59.9412245 C0,59.8938776 0.0473469388,59.8465306 0.0473469388,59.7991837 L13.0204082,52.3183673 C13.0677551,52.2710204 13.115102,52.2710204 13.162449,52.3183673 L26.1355102,59.7991837 C26.1828571,59.8465306 26.1828571,59.8938776 26.1828571,59.9412245 C26.1828571,59.9885714 26.1355102,60.0359184 26.1355102,60.0832653 L13.162449,67.5640816 C13.115102,67.5640816 13.115102,67.5640816 13.0677551,67.5640816 Z M0.37877551,59.9412245 L13.0677551,67.28 L25.7567347,59.9885714 L13.0677551,52.6497959 L0.37877551,59.9412245 Z" id="形状" fill="#D3E0FF"></path>
+                                        <polygon id="路径" fill="url(#linearGradient-14)" opacity="0.3" points="13.0677551 64.7706122 4.73469388 59.9412245 13.0677551 55.1118367 21.4008163 59.9412245"></polygon>
+                                        <g id="路径" opacity="0.8">
+                                            <use fill="url(#linearGradient-15)" xlink:href="#path-18"></use>
+                                            <use fill="url(#linearGradient-16)" xlink:href="#path-18"></use>
+                                            <use fill="url(#linearGradient-17)" xlink:href="#path-18"></use>
+                                        </g>
+                                        <polygon id="路径" fill="#708FFF" points="13.0677551 13.0204082 3.45632653 7.48081633 13.0677551 1.94122449 22.6791837 7.48081633"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="13.0677551 3.1722449 21.5902041 8.09632653 22.6791837 7.48081633 13.0677551 1.94122449 3.45632653 7.48081633 4.54530612 8.09632653"></polygon>
+                                        <polygon id="路径" fill="#4464D1" points="13.0677551 58.3787755 0.0946938776 50.8979592 0.0946938776 7.48081633 13.0677551 14.9616327"></polygon>
+                                        <g id="路径">
+                                            <use fill="url(#linearGradient-19)" xlink:href="#path-21"></use>
+                                            <use fill="url(#linearGradient-20)" xlink:href="#path-21"></use>
+                                        </g>
+                                        <polygon id="路径" fill="url(#linearGradient-22)" opacity="0.5" points="13.0677551 14.9616327 0.0946938776 7.48081633 0.0946938776 50.8979592 13.0677551 58.3787755 26.0408163 50.8979592 26.0408163 7.48081633"></polygon>
+                                    </g>
+                                    <g transform="translate(1.373061, 9.611429)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.42204082,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 L9.42204082,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8840816 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.4677551 1.51510204 1.4677551 2.03591837 9.42204082 6.62857143 9.42204082 15.9085714"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.4677551 1.51510204 0.994285714 1.75183673 1.94122449 2.32"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.42204082 16.3820408 9.94285714 16.1453061 9.42204082 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.298776, 9.611429)">
+                                        <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M1.04163265,6.62857143 L9.51673469,1.75183673 L9.51673469,11.5053061 L1.04163265,16.3820408 L1.04163265,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="9.99020408 11.8840816 9.99020408 0.284081633 10.4636735 0 10.4636735 12.0734694 6.72840468e-15 18.1338776 6.72840468e-15 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.99591837 1.51510204 8.99591837 2.03591837 1.04163265 6.62857143 1.04163265 15.9085714"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.04163265 16.3820408 0.520816327 16.1453061 1.04163265 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(1.373061, 23.768163)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.42204082,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.42204082,6.62857143 L9.42204082,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8367347 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.4677551 1.51510204 1.4677551 2.03591837 9.42204082 6.62857143 9.42204082 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.4677551 1.51510204 0.994285714 1.75183673 1.94122449 2.27265306"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.42204082 16.3820408 9.94285714 16.1453061 9.42204082 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.298776, 23.768163)">
+                                        <path d="M6.72840468e-15,6.01306122 L6.72840468e-15,18.0865306 L10.4636735,12.0261224 L10.4636735,0 L6.72840468e-15,6.01306122 Z M1.04163265,6.62857143 L9.51673469,1.75183673 L9.51673469,11.5053061 L1.04163265,16.3820408 L1.04163265,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="9.99020408 11.8367347 9.99020408 0.284081633 10.4636735 0 10.4636735 12.0734694 6.72840468e-15 18.1338776 6.72840468e-15 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.99591837 1.51510204 8.99591837 2.03591837 1.04163265 6.62857143 1.04163265 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.04163265 16.3820408 0.520816327 16.1453061 1.04163265 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(1.373061, 37.924898)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.42204082,16.3820408 L0.994285714,11.4579592 L0.994285714,1.7044898 L9.46938776,6.58122449 L9.46938776,16.3820408 L9.42204082,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8367347 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.0865306 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.4677551 1.51510204 1.4677551 1.98857143 9.42204082 6.58122449 9.42204082 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.4677551 1.51510204 0.994285714 1.7044898 1.94122449 2.27265306"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.42204082 16.3820408 9.94285714 16.1453061 9.42204082 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.298776, 37.877551)">
+                                        <path d="M6.72840468e-15,6.06040816 L6.72840468e-15,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L6.72840468e-15,6.06040816 Z M1.04163265,6.62857143 L9.51673469,1.75183673 L9.51673469,11.5053061 L1.04163265,16.3820408 L1.04163265,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g transform="translate(0.000000, 0.047347)" fill="#E1EFFF" id="路径">
+                                            <polygon points="9.99020408 11.8367347 9.99020408 0.284081633 10.4636735 0 10.4636735 12.0734694 6.72840468e-15 18.0865306 6.72840468e-15 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.99591837 1.51510204 8.99591837 1.98857143 1.04163265 6.58122449 1.04163265 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.04163265 16.4293878 0.520816327 16.1926531 1.04163265 15.5297959"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="23.2946939 11.1265306 23.7681633 11.3632653 22.8212245 11.9314286"></polygon>
+                                </g>
+                                <g transform="translate(70.594286, 0.000000)">
+                                    <g>
+                                        <polygon id="路径" fill="#E1F7FF" points="13.0677551 14.9616327 0.142040816 7.48081633 13.0677551 0 26.0408163 7.48081633"></polygon>
+                                        <g id="路径" opacity="0.5">
+                                            <use fill="url(#linearGradient-23)" xlink:href="#path-24"></use>
+                                            <use fill="url(#linearGradient-2)" xlink:href="#path-24"></use>
+                                            <use fill="url(#linearGradient-2)" xlink:href="#path-24"></use>
+                                        </g>
+                                        <path d="M13.0677551,67.5640816 C13.0204082,67.5640816 13.0204082,67.5640816 13.0204082,67.5640816 L0.0473469388,60.0832653 C0,60.0359184 0,59.9885714 0,59.9412245 C0,59.8938776 0.0473469388,59.8465306 0.0473469388,59.7991837 L13.0204082,52.3183673 C13.0677551,52.2710204 13.115102,52.2710204 13.162449,52.3183673 L26.1355102,59.7991837 C26.1828571,59.8465306 26.1828571,59.8938776 26.1828571,59.9412245 C26.1828571,59.9885714 26.1355102,60.0359184 26.1355102,60.0832653 L13.162449,67.5640816 C13.115102,67.5640816 13.115102,67.5640816 13.0677551,67.5640816 Z M0.426122449,59.9412245 L13.115102,67.28 L25.8040816,59.9885714 L13.0677551,52.6497959 L0.426122449,59.9412245 Z" id="形状" fill="#D3E0FF"></path>
+                                        <polygon id="路径" fill="url(#linearGradient-25)" opacity="0.3" points="13.0677551 64.7706122 4.73469388 59.9412245 13.0677551 55.1118367 21.4481633 59.9412245"></polygon>
+                                        <g id="路径" opacity="0.8">
+                                            <use fill="url(#linearGradient-26)" xlink:href="#path-28"></use>
+                                            <use fill="url(#linearGradient-27)" xlink:href="#path-28"></use>
+                                            <use fill="url(#linearGradient-5)" xlink:href="#path-28"></use>
+                                        </g>
+                                        <polygon id="路径" fill="#708FFF" points="13.0677551 13.0204082 3.50367347 7.48081633 13.0677551 1.94122449 22.6791837 7.48081633"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="13.0677551 3.1722449 21.5902041 8.09632653 22.6791837 7.48081633 13.0677551 1.94122449 3.50367347 7.48081633 4.59265306 8.09632653"></polygon>
+                                        <polygon id="路径" fill="#4464D1" points="13.0677551 58.3787755 0.142040816 50.8979592 0.142040816 7.48081633 13.0677551 14.9616327"></polygon>
+                                        <polygon id="路径" fill="url(#linearGradient-20)" points="26.0408163 50.8979592 13.0677551 58.3787755 13.0677551 14.9616327 26.0408163 7.48081633"></polygon>
+                                        <g id="路径" opacity="0.5">
+                                            <use fill="url(#linearGradient-29)" xlink:href="#path-30"></use>
+                                            <use fill="url(#linearGradient-9)" xlink:href="#path-30"></use>
+                                        </g>
+                                    </g>
+                                    <g transform="translate(1.373061, 9.611429)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8840816 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 2.03591837 9.46938776 6.62857143 9.46938776 15.9085714"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 0.994285714 1.75183673 1.94122449 2.32"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.346122, 9.611429)">
+                                        <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="9.94285714 11.8840816 9.94285714 0.284081633 10.4636735 0 10.4636735 12.0734694 0 18.1338776 0 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 2.03591837 0.994285714 6.62857143 0.994285714 15.9085714"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.3820408 0.520816327 16.1453061 0.994285714 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(1.373061, 23.768163)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8367347 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 2.03591837 9.46938776 6.62857143 9.46938776 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 0.994285714 1.75183673 1.94122449 2.27265306"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.346122, 23.768163)">
+                                        <path d="M0,6.01306122 L0,18.0865306 L10.4636735,12.0261224 L10.4636735,0 L0,6.01306122 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="9.94285714 11.8367347 9.94285714 0.284081633 10.4636735 0 10.4636735 12.0734694 0 18.1338776 0 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 2.03591837 0.994285714 6.62857143 0.994285714 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.3820408 0.520816327 16.1453061 0.994285714 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(1.373061, 37.924898)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.473469388 11.8367347 0.473469388 0.284081633 0 0 0 12.0734694 10.4636735 18.0865306 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 1.98857143 9.46938776 6.58122449 9.46938776 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 0.994285714 1.7044898 1.94122449 2.27265306"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.346122, 37.877551)">
+                                        <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M0.994285714,6.62857143 L9.46938776,1.75183673 L9.46938776,11.5053061 L0.994285714,16.3820408 L0.994285714,6.62857143 Z" id="形状" fill="#708FFF"></path>
+                                        <g transform="translate(0.000000, 0.047347)" fill="#E1EFFF" id="路径">
+                                            <polygon points="9.94285714 11.8367347 9.94285714 0.284081633 10.4636735 0 10.4636735 12.0734694 0 18.0865306 0 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 1.98857143 0.994285714 6.58122449 0.994285714 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.4293878 0.520816327 16.1926531 0.994285714 15.5297959"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="23.2946939 11.1265306 23.7681633 11.3632653 22.8212245 11.9314286"></polygon>
+                                </g>
+                            </g>
+                            <g transform="translate(35.320816, 52.034286)">
+                                <g transform="translate(0.000000, 10.179592)">
+                                    <g>
+                                        <polygon id="路径" fill="#E1F7FF" points="13.0677551 14.9616327 0.0946938776 7.48081633 13.0677551 0 25.9934694 7.48081633"></polygon>
+                                        <g id="路径" opacity="0.5">
+                                            <use fill="url(#linearGradient-31)" xlink:href="#path-32"></use>
+                                            <use fill="url(#linearGradient-2)" xlink:href="#path-32"></use>
+                                        </g>
+                                        <path d="M13.0677551,39.3926531 C13.0204082,39.3926531 13.0204082,39.3926531 13.0204082,39.3926531 L0.0473469388,31.9118367 C0,31.8644898 0,31.8171429 0,31.7697959 C0,31.722449 0.0473469388,31.675102 0.0473469388,31.6277551 L13.0204082,24.1469388 C13.0677551,24.0995918 13.115102,24.0995918 13.162449,24.1469388 L26.1355102,31.6277551 C26.1828571,31.675102 26.1828571,31.722449 26.1828571,31.7697959 C26.1828571,31.8171429 26.1355102,31.8644898 26.1355102,31.9118367 L13.162449,39.3926531 C13.115102,39.3926531 13.0677551,39.3926531 13.0677551,39.3926531 Z M0.37877551,31.7697959 L13.0677551,39.1085714 L25.7567347,31.7697959 L13.0677551,24.4310204 L0.37877551,31.7697959 Z" id="形状" fill="#D3E0FF"></path>
+                                        <polygon id="路径" fill="url(#linearGradient-25)" opacity="0.3" points="13.0677551 36.5991837 4.68734694 31.7697959 13.0677551 26.9404082 21.4008163 31.7697959"></polygon>
+                                        <g id="路径" opacity="0.8">
+                                            <use fill="url(#linearGradient-33)" xlink:href="#path-34"></use>
+                                            <use fill="url(#linearGradient-27)" xlink:href="#path-34"></use>
+                                            <use fill="url(#linearGradient-5)" xlink:href="#path-34"></use>
+                                        </g>
+                                        <polygon id="路径" fill="#708FFF" points="13.0677551 13.0204082 3.45632653 7.48081633 13.0677551 1.94122449 22.6318367 7.48081633"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="13.0677551 3.21959184 21.5428571 8.14367347 22.6318367 7.48081633 13.0677551 1.94122449 3.45632653 7.48081633 4.54530612 8.14367347"></polygon>
+                                        <polygon id="路径" fill="#E1F7FF" points="13.0677551 29.9232653 0.0946938776 22.442449 0.0946938776 7.48081633 13.0677551 14.9616327"></polygon>
+                                        <polygon id="路径" fill="url(#linearGradient-35)" points="25.9934694 22.442449 13.0677551 29.9232653 13.0677551 14.9616327 25.9934694 7.48081633"></polygon>
+                                        <g id="路径" opacity="0.5">
+                                            <use fill="url(#linearGradient-36)" xlink:href="#path-38"></use>
+                                            <use fill="url(#linearGradient-37)" xlink:href="#path-38"></use>
+                                        </g>
+                                    </g>
+                                    <g transform="translate(1.325714, 9.658776)">
+                                        <path d="M0,0 L0,12.0734694 L10.4636735,18.1338776 L10.4636735,6.06040816 L0,0 Z M9.46938776,16.3820408 L0.994285714,11.5053061 L0.994285714,1.75183673 L9.46938776,6.62857143 L9.46938776,16.3820408 Z" id="形状" fill="#708FFF"></path>
+                                        <g fill="#E1EFFF" id="路径">
+                                            <polygon points="0.520816327 11.8367347 0.520816327 0.284081633 1.34568094e-14 0 1.34568094e-14 12.0734694 10.4636735 18.1338776 10.4636735 17.6130612"></polygon>
+                                            <polygon points="9.94285714 16.1453061 9.94285714 6.39183673 1.51510204 1.51510204 1.51510204 1.98857143 9.46938776 6.62857143 9.46938776 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="1.51510204 1.51510204 1.04163265 1.75183673 1.98857143 2.27265306"></polygon>
+                                        <polygon id="路径" fill="#E1EFFF" points="9.46938776 16.3820408 9.94285714 16.1453061 9.46938776 15.482449"></polygon>
+                                    </g>
+                                    <g transform="translate(14.298776, 9.611429)">
+                                        <path d="M0,6.06040816 L0,18.1338776 L10.4636735,12.0734694 L10.4636735,0 L0,6.06040816 Z M0.994285714,6.67591837 L9.46938776,1.79918367 L9.46938776,11.5526531 L0.994285714,16.4293878 L0.994285714,6.67591837 Z" id="形状" fill="#708FFF"></path>
+                                        <g transform="translate(0.000000, 0.047347)" fill="#E1EFFF" id="路径">
+                                            <polygon points="9.99020408 11.8367347 9.99020408 0.284081633 10.4636735 0 10.4636735 12.0734694 0 18.1338776 0 17.6130612"></polygon>
+                                            <polygon points="0.520816327 16.1453061 0.520816327 6.39183673 8.94857143 1.51510204 8.94857143 1.98857143 0.994285714 6.62857143 0.994285714 15.8612245"></polygon>
+                                        </g>
+                                        <polygon id="路径" fill="#E1EFFF" points="0.994285714 16.4293878 0.520816327 16.1926531 0.994285714 15.5297959"></polygon>
+                                    </g>
+                                    <polygon id="路径" fill="#E1EFFF" points="23.2473469 11.1738776 23.7681633 11.4106122 22.8212245 11.9314286"></polygon>
+                                </g>
+                                <g transform="translate(0.094694, 0.000000)" id="路径">
+                                    <g>
+                                        <polygon fill="#E1F7FF" points="12.9730612 14.9616327 0 7.48081633 12.9730612 0 25.8987755 7.48081633"></polygon>
+                                        <g opacity="0.5">
+                                            <use fill="url(#linearGradient-39)" xlink:href="#path-40"></use>
+                                            <use fill="url(#linearGradient-2)" xlink:href="#path-40"></use>
+                                        </g>
+                                        <g opacity="0.8">
+                                            <use fill="url(#linearGradient-41)" xlink:href="#path-42"></use>
+                                            <use fill="url(#linearGradient-27)" xlink:href="#path-42"></use>
+                                            <use fill="url(#linearGradient-5)" xlink:href="#path-42"></use>
+                                        </g>
+                                        <polygon fill="#708FFF" points="12.9730612 13.0204082 3.36163265 7.48081633 12.9730612 1.94122449 22.5371429 7.48081633"></polygon>
+                                        <polygon fill="#E1EFFF" points="12.9730612 3.21959184 21.4481633 8.14367347 22.5371429 7.48081633 12.9730612 1.94122449 3.36163265 7.48081633 4.45061224 8.14367347"></polygon>
+                                        <polygon fill="#E1F7FF" points="12.9730612 19.4122449 0 11.9314286 0 7.48081633 12.9730612 14.9616327"></polygon>
+                                        <polygon fill="url(#linearGradient-43)" points="25.8987755 11.9314286 12.9730612 19.4122449 12.9730612 14.9616327 25.8987755 7.48081633"></polygon>
+                                        <polygon fill="url(#linearGradient-44)" opacity="0.5" points="12.9730612 14.9616327 0 7.48081633 0 11.9314286 12.9730612 19.4122449 25.8987755 11.9314286 25.8987755 7.48081633"></polygon>
+                                    </g>
+                                    <g transform="translate(16.666122, 11.222114)">
+                                        <g transform="translate(0.000000, -0.000000)" fill="#708FFF">
+                                            <path d="M1.42040816,3.12400894 C1.42040816,3.59747833 1.08897959,4.11829465 0.710204082,4.35502935 C0.331428571,4.59176404 0,4.40237628 0,3.9289069 C0,3.45543751 0.331428571,2.93462118 0.710204082,2.69788649 C1.13632653,2.50849873 1.42040816,2.69788649 1.42040816,3.12400894 Z"></path>
+                                            <path d="M3.69306122,1.84564159 C3.69306122,2.31911098 3.36163265,2.83992731 2.98285714,3.076662 C2.60408163,3.31339669 2.27265306,3.12400894 2.27265306,2.65053955 C2.27265306,2.17707016 2.60408163,1.65625384 2.98285714,1.41951914 C3.36163265,1.18278445 3.69306122,1.3721722 3.69306122,1.84564159 Z"></path>
+                                            <path d="M5.96571429,0.519927305 C5.96571429,0.993396693 5.63428571,1.51421302 5.2555102,1.75094771 C4.87673469,1.98768241 4.54530612,1.79829465 4.54530612,1.32482526 C4.54530612,0.851355877 4.87673469,0.33053955 5.2555102,0.0938048561 C5.63428571,-0.142929838 5.96571429,0.0938048561 5.96571429,0.519927305 Z"></path>
+                                        </g>
+                                        <g transform="translate(0.047347, 0.046458)" fill="#E1EFFF">
+                                            <path d="M1.04163265,2.60408163 C1.04163265,2.65142857 1.08897959,2.74612245 1.08897959,2.84081633 C1.08897959,3.31428571 0.75755102,3.83510204 0.37877551,4.07183673 C0.236734694,4.16653061 0.0946938776,4.16653061 -1.34568094e-14,4.16653061 C0.0946938776,4.45061224 0.331428571,4.54530612 0.662857143,4.35591837 C1.04163265,4.11918367 1.37306122,3.59836735 1.37306122,3.12489796 C1.37306122,2.79346939 1.27836735,2.60408163 1.04163265,2.60408163 Z"></path>
+                                            <path d="M3.31428571,1.27836735 C3.31428571,1.32571429 3.36163265,1.42040816 3.36163265,1.51510204 C3.36163265,1.98857143 3.03020408,2.50938776 2.65142857,2.74612245 C2.50938776,2.84081633 2.36734694,2.84081633 2.27265306,2.84081633 C2.36734694,3.12489796 2.60408163,3.21959184 2.9355102,3.03020408 C3.31428571,2.79346939 3.64571429,2.27265306 3.64571429,1.79918367 C3.64571429,1.51510204 3.50367347,1.32571429 3.31428571,1.27836735 Z"></path>
+                                            <path d="M5.58693878,0 C5.58693878,0.0473469388 5.63428571,0.142040816 5.63428571,0.236734694 C5.63428571,0.710204082 5.30285714,1.23102041 4.92408163,1.4677551 C4.78204082,1.56244898 4.64,1.56244898 4.54530612,1.56244898 C4.64,1.84653061 4.87673469,1.94122449 5.20816327,1.75183673 C5.58693878,1.51510204 5.91836735,0.994285714 5.91836735,0.520816327 C5.91836735,0.189387755 5.77632653,0 5.58693878,0 Z"></path>
+                                        </g>
+                                    </g>
+                                    <g transform="translate(3.361633, 11.222114)">
+                                        <g transform="translate(0.000000, -0.000000)" fill="#708FFF">
+                                            <path d="M4.49795918,3.12400894 C4.49795918,3.59747833 4.82938776,4.11829465 5.20816327,4.35502935 C5.58693878,4.59176404 5.91836735,4.40237628 5.91836735,3.9289069 C5.91836735,3.45543751 5.58693878,2.93462118 5.20816327,2.69788649 C4.82938776,2.50849873 4.49795918,2.69788649 4.49795918,3.12400894 Z"></path>
+                                            <path d="M2.27265306,1.84564159 C2.27265306,2.31911098 2.60408163,2.83992731 2.98285714,3.076662 C3.36163265,3.31339669 3.69306122,3.12400894 3.69306122,2.65053955 C3.69306122,2.17707016 3.36163265,1.65625384 2.98285714,1.41951914 C2.55673469,1.18278445 2.27265306,1.3721722 2.27265306,1.84564159 Z"></path>
+                                            <path d="M0,0.519927305 C0,0.993396693 0.331428571,1.51421302 0.710204082,1.75094771 C1.08897959,1.98768241 1.42040816,1.79829465 1.42040816,1.32482526 C1.42040816,0.851355877 1.08897959,0.33053955 0.710204082,0.0938048561 C0.331428571,-0.142929838 0,0.0938048561 0,0.519927305 Z"></path>
+                                        </g>
+                                        <g transform="translate(0.000000, 0.046458)" fill="#E1EFFF">
+                                            <path d="M4.82938776,2.60408163 C4.82938776,2.65142857 4.78204082,2.74612245 4.78204082,2.84081633 C4.78204082,3.31428571 5.11346939,3.83510204 5.4922449,4.07183673 C5.63428571,4.16653061 5.77632653,4.16653061 5.87102041,4.16653061 C5.77632653,4.45061224 5.53959184,4.54530612 5.20816327,4.35591837 C4.82938776,4.11918367 4.49795918,3.59836735 4.49795918,3.12489796 C4.49795918,2.79346939 4.64,2.60408163 4.82938776,2.60408163 Z"></path>
+                                            <path d="M2.55673469,1.27836735 C2.55673469,1.32571429 2.50938776,1.42040816 2.50938776,1.51510204 C2.50938776,1.98857143 2.84081633,2.50938776 3.21959184,2.74612245 C3.36163265,2.84081633 3.50367347,2.84081633 3.59836735,2.84081633 C3.50367347,3.12489796 3.26693878,3.21959184 2.9355102,3.03020408 C2.55673469,2.79346939 2.22530612,2.27265306 2.22530612,1.79918367 C2.27265306,1.51510204 2.36734694,1.32571429 2.55673469,1.27836735 Z"></path>
+                                            <path d="M0.331428571,0 C0.331428571,0.0473469388 0.284081633,0.142040816 0.284081633,0.236734694 C0.284081633,0.710204082 0.615510204,1.23102041 0.994285714,1.4677551 C1.13632653,1.56244898 1.27836735,1.56244898 1.37306122,1.56244898 C1.27836735,1.84653061 1.04163265,1.94122449 0.710204082,1.75183673 C0.331428571,1.51510204 -1.34568094e-14,0.994285714 -1.34568094e-14,0.520816327 C-1.34568094e-14,0.189387755 0.142040816,0 0.331428571,0 Z"></path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

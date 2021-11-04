@@ -18,7 +18,7 @@ import java.util.Set;
  * @Created by suyc
  */
 public interface AssetService {
-    public Map<String, Integer> getHiveSummary() throws DataGovernanceException;
+    public Map<String, Long> getHiveSummary() throws DataGovernanceException;
 
     public List<HiveTblSimpleInfo> searchHiveTable(String classification, String query,
                                                    int limit, int offset) throws DataGovernanceException;

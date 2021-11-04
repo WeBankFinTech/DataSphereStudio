@@ -94,9 +94,7 @@
         </Form-item>
         <Form-item :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
           <Select filterable v-model="authFormData.groupId" :disabled="!!authFormData.id">
-            <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">
-              {{ item.groupName}}
-            </Option>
+            <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">{{ item.groupName}}</Option>
           </Select>
         </Form-item>
       </Form>

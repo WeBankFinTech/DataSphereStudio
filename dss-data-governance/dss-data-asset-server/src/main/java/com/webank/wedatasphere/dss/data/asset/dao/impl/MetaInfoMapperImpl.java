@@ -22,11 +22,11 @@ import java.util.List;
  */
 public class MetaInfoMapperImpl implements MetaInfoMapper {
     @Override
-    public Integer getTableStorage() throws SQLException {
+    public Long getTableStorage() throws SQLException {
         DataSource dataSource = DataSourceUtil.getDataSource();
 
         Connection con =dataSource.getConnection();
-        int num=0;
+        long num=0;
         PreparedStatement ps=null;
         ResultSet rs=null;
         try {
@@ -34,13 +34,13 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
-                num=rs.getInt(1);
+                num =rs.getLong(1);
             }
-            String sql2="select SUM(PARAM_VALUE) from PARTITION_PARAMS WHERE PARAM_KEY='totalSize'";
+            String sql2 ="select SUM(PARAM_VALUE) from PARTITION_PARAMS WHERE PARAM_KEY='totalSize'";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
             while (rs.next()){
-                num= num+rs.getInt(1);
+                num= num + rs.getLong(1);
             }
 
         } catch (DAOException | SQLException e){

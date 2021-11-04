@@ -67,12 +67,12 @@ public class AtlasService {
     /**
      * hive db数量
      */
-    public int getHiveDbCnt() throws AtlasServiceException {
+    public long getHiveDbCnt() throws AtlasServiceException {
         String jsonStr = atlasClient.getHiveDbs();
         if (StringUtils.isNotEmpty(jsonStr)) {
             JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
             if (jsonObject != null) {
-                return jsonObject.get("count").getAsInt();
+                return jsonObject.get("count").getAsLong();
             } else {
                 return 0;
             }
@@ -84,12 +84,12 @@ public class AtlasService {
     /**
      * hive table数量
      */
-    public int getHiveTableCnt() throws AtlasServiceException {
+    public long getHiveTableCnt() throws AtlasServiceException {
         String jsonStr = atlasClient.getHiveTables();
         if (StringUtils.isNotEmpty(jsonStr)) {
             JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
             if (jsonObject != null) {
-                return jsonObject.get("count").getAsInt();
+                return jsonObject.get("count").getAsLong();
             } else {
                 return 0;
             }

@@ -5,7 +5,7 @@
     @input="$emit('_changeVisible', $event)"
     width="920"
     :styles="styles"
-    @on-cancel="cancelCallBack"
+    @on-close="cancelCallBack"
   >
     <Form
       ref="formRef"
@@ -27,7 +27,6 @@
       </FormItem>
       <FormItem label="可用角色" prop="principalName">
         <Select
-          v-model="formState.principalName"
           multiple
           :value="(formState.principalName || '').split(',')"
           @input="formState.principalName = $event.join()"
@@ -43,7 +42,10 @@
         </Select>
       </FormItem>
       <FormItem label="是否核心指标" prop="isCoreIndicator">
-        <i-switch v-model="formState.isCoreIndicator">
+        <i-switch
+          :value="Boolean(formState.isCoreIndicator)"
+          @input="formState.isCoreIndicator = Number($event)"
+        >
           <span slot="open">是</span>
           <span slot="close">否</span>
         </i-switch>
@@ -378,8 +380,8 @@ export default {
         comment: "",
         warehouseThemeName: "",
         owner: userName,
-        principalName: ["ALL"],
-        isCoreIndicator: false,
+        principalName: "ALL",
+        isCoreIndicator: 0,
         isAvailable: 1,
         themeArea: "",
         layerArea: "",
@@ -581,21 +583,17 @@ export default {
       this.loading = true;
       let { detail } = await getIndicatorsById(id);
       this.loading = false;
-      detail.content.indicatorSourceInfo = (() => {
-        try {
-          return JSON.parse(detail.content.indicatorSourceInfo);
-        } catch (error) {
-          return {};
-        }
-      })();
+      detail.content.indicatorSourceInfo = JSON.parse(
+        detail.content.indicatorSourceInfo
+      );
       let newFormState = {
         name: detail.name,
         fieldIdentifier: detail.fieldIdentifier,
         comment: detail.comment,
         warehouseThemeName: detail.warehouseThemeName,
         owner: detail.owner,
-        principalName: detail.principalName.split(","),
-        isCoreIndicator: Boolean(detail.isCoreIndicator),
+        principalName: detail.principalName,
+        isCoreIndicator: detail.isCoreIndicator,
         isAvailable: detail.isAvailable,
         themeArea: detail.themeArea,
         layerArea: detail.layerArea,
@@ -650,11 +648,7 @@ export default {
     formatFormState() {
       let key = `info_${this.formState.content.indicatorType}`;
       this.formState.content.sourceInfo = this.formState._sourceInfo[key];
-      return Object.assign({}, this.formState, {
-        principalName: this.formState.principalName.join(","),
-        isCoreIndicator: Number(this.formState.isCoreIndicator),
-        _sourceInfo: undefined,
-      });
+      return Object.assign({}, this.formState, { _sourceInfo: undefined });
     },
     async handleOk() {
       this.$refs["formRef"].validate(async (valid) => {

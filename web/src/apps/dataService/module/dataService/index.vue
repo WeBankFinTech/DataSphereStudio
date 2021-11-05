@@ -147,6 +147,7 @@ import navMenu from "../common/navMenu.vue";
 import tag from "@/components/tag/index.vue";
 import apiCongfig from "./apiConfig.vue";
 import api from "@/common/service/api";
+import _ from 'lodash';
 
 export default {
   components: {
@@ -157,14 +158,17 @@ export default {
   data() {
     const validateGroupName = (rule, value, callback) => {
       const result = value && value.trim();
-      if (!result) {
-        callback(new Error("业务名称不能为空"));
+      const reg = /^[\u4e00-\u9fa5a-zA-Z][\w_\u4e00-\u9fa5]{3,19}$/g;
+      if (!reg.test(result)) {
+        callback(
+          new Error(
+            "支持汉字、英文、数字、下划线（_），以英文或汉字开头，4~20个字符"
+          )
+        );
       } else {
         if (this.groupDatas.some(item => item.name.trim() === result)) {
           callback(new Error("该名称已经存在"));
           return;
-        } else if (result.length > 20) {
-          callback(new Error("名称不能超过20个字符"));
         } else {
           callback();
         }
@@ -172,8 +176,13 @@ export default {
     };
     const validateAPIName = (rule, value, callback) => {
       const result = value && value.trim();
-      if (!result) {
-        callback(new Error("名称不能为空"));
+      const reg = /^[\u4e00-\u9fa5a-zA-Z][\w_\u4e00-\u9fa5]{3,19}$/g;
+      if (!reg.test(result)) {
+        callback(
+          new Error(
+            "支持汉字、英文、数字、下划线（_），以英文或汉字开头，4~20个字符"
+          )
+        );
       } else {
         const apis = (this.groupData && this.groupData.apis) || [];
         const isUpdate = this.modalType === "updateApi";
@@ -198,8 +207,6 @@ export default {
         if (isHad) {
           callback(new Error("该名称已经存在"));
           return;
-        } else if (result.length > 20) {
-          callback(new Error("名称不能超过20个字符"));
         } else {
           callback();
         }
@@ -207,10 +214,29 @@ export default {
     };
     const validateAPIPath = (rule, value, callback) => {
       const result = value && value.trim();
-      if (!result) {
-        callback(new Error("路径不能为空"));
+      const reg = /^\/[\w_-]{3,199}$/g;
+      if (!reg.test(result)) {
+        callback(
+          new Error(
+            "支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过200个字符，如/user"
+          )
+        );
       } else {
-        callback();
+        const isUpdate = this.modalType === "updateApi";
+        const isHad = this.allProjectTree.some(item => {
+          const { apis } = item;
+          return apis.some(api => {
+            return isUpdate
+              ? api.path.trim() === result && api.id !== this.apiForm.id
+              : api.path.trim() === result;
+          });
+        });
+        if (isHad) {
+          callback(new Error("该路径已经存在，请更换"));
+          return;
+        } else {
+          callback();
+        }
       }
     };
     return {
@@ -304,8 +330,10 @@ export default {
       this.modalVisible = true;
       this.modalType = type;
       this.modalTitle = type === "group" ? "新增业务流程" : "生成API";
+      console.log(pyload);
       if (type === "api") {
         this.groupData = data;
+        this.allProjectTree = groupDatas;
       } else {
         this.groupDatas = groupDatas;
       }
@@ -381,7 +409,8 @@ export default {
         isActive: true,
         name: data.apiName,
         id: data.id || data.tempId,
-        data
+        data,
+        originData: _.cloneDeep(data)
       });
       this.apiTabDatas = newApis;
     },
@@ -513,7 +542,7 @@ export default {
       const newApis = this.apiTabDatas.map(item => {
         let tmp = { ...item };
         if (tmp.id === data.id) {
-          tmp = { ...item, name: data.apiName, data };
+          tmp = { ...item, name: data.apiName, data, originData: _.cloneDeep(data) };
         }
         return tmp;
       });

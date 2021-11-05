@@ -67,7 +67,7 @@ export default {
       });
     },
     handleTreeModal(project) {
-      this.$emit("showModal", { type: "api", data: { ...project } });
+      this.$emit("showModal", { type: "api", data: { ...project }, groupDatas: [...this.originDatas] });
       this.treeModalShow = true;
       this.currentTreeProject = project;
     },

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,35 +18,37 @@ package com.webank.wedatasphere.dss.linkis.node.execution.parser;
 
 import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
+import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
-import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.linkis.filesystem.WorkspaceClientFactory;
 import com.webank.wedatasphere.linkis.filesystem.request.WorkspaceClient;
 import com.webank.wedatasphere.linkis.filesystem.response.ScriptFromBMLResponse;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
 
-/**
- * Created by johnnwang on 2019/11/2.
- */
+
 public class CodeParser implements JobParser {
 
-    private final static Pattern pb = Pattern.compile("((project)|(flow)|(node))://[^\\s\"]+[$\\s]{0,1}", Pattern.CASE_INSENSITIVE);
+    private static final Pattern pb = Pattern.compile("((project)|(flow)|(node))://[^\\s\"]+[$\\s]{0,1}", Pattern.CASE_INSENSITIVE);
 
     @Override
     public void parseJob(Job job) throws Exception{
         if (! ( job instanceof CommonLinkisJob) ) {
             return ;
         }
-        CommonLinkisJob linkisAppjointJob  = (CommonLinkisJob) job;
-        Map<String, Object> script = LinkisJobExecutionUtils.gson.fromJson(linkisAppjointJob.getCode(), new TypeToken<Map<String, Object>>() {}.getType());
-        List<BMLResource> jobResourceList = linkisAppjointJob.getJobResourceList();
+        CommonLinkisJob linkisAppConnJob  = (CommonLinkisJob) job;
+        Map<String, Object> script = LinkisJobExecutionUtils.gson.fromJson(linkisAppConnJob.getCode(), new TypeToken<Map<String, Object>>() {}.getType());
+        List<BMLResource> jobResourceList = linkisAppConnJob.getJobResourceList();
         BMLResource scriptResource = null;
         if (script == null) {
             throw  new LinkisJobExecutionErrorException(90102,"Script is empty");
@@ -64,43 +64,28 @@ public class CodeParser implements JobParser {
             throw  new LinkisJobExecutionErrorException(90102,"Failed to get script resource");
         }
 
-        Map<String, Object> executionParams = getExecutionParams(scriptResource, linkisAppjointJob);
-
+        Map<String, Object> executionParams = getExecutionParams(scriptResource, linkisAppConnJob);
         if (executionParams.get("executionCode") != null) {
-
             String executionCode = (String) executionParams.get("executionCode");
-            linkisAppjointJob.getLogObj().info("************************************SUBMIT CODE************************************");
-            linkisAppjointJob.getLogObj().info(executionCode);
-            linkisAppjointJob.getLogObj().info("************************************SUBMIT CODE************************************");
-
-            //get ResourceNames
-            //ArrayList<String> resourceNames = getResourceNames(executionCode);
-
-            //get ResourceList
-
-            //ArrayList<BMLResource> bmlResourceArrayList = getResourcesByNames(resourceNames, linkisAppjointJob);
-
+            linkisAppConnJob.getLogObj().info("************************************SUBMIT CODE************************************");
+            linkisAppConnJob.getLogObj().info(executionCode);
+            linkisAppConnJob.getLogObj().info("************************************SUBMIT CODE************************************");
             //parsedCode
-            linkisAppjointJob.setCode(executionCode);
-
-
-           /* //put resources
-            if (linkisAppjointJob.getRuntimeParams() != null) {
-                linkisAppjointJob.getRuntimeParams().put("resources", bmlResourceArrayList);
-            }*/
+            linkisAppConnJob.setCode(executionCode);
         }
         if (executionParams.get("params") != null && executionParams.get("params") instanceof Map) {
-            if (linkisAppjointJob.getParams() != null) {
-                linkisAppjointJob.getParams().putAll( (Map<String, Object>)executionParams.get("params"));
+            if (linkisAppConnJob.getParams() != null) {
+                linkisAppConnJob.getParams().putAll( (Map<String, Object>)executionParams.get("params"));
             }
         }
-
     }
 
-    private Map<String, Object> getExecutionParams(BMLResource bmlResource,  CommonLinkisJob linkisAppjointJob) {
+    private Map<String, Object> getExecutionParams(BMLResource bmlResource,  CommonLinkisJob linkisAppConnJob) {
         Map<String, Object> map = new HashMap<>();
-        WorkspaceClient client = WorkspaceClientFactory.getClient(linkisAppjointJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppjointJob.getJobProps()), LinkisJobExecutionConfiguration.LINKIS_URL.getValue(linkisAppjointJob.getJobProps()));
+        WorkspaceClient client = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
+            LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
         ScriptFromBMLResponse response = client.requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName());
+        linkisAppConnJob.getLogObj().info("Get execution code from workspace client,bml resource id "+bmlResource.getResourceId()+", version is "+bmlResource.getVersion());
         map.put("executionCode", response.scriptContent());
         map.put("params", response.metadata());
         return map;
@@ -122,22 +107,22 @@ public class CodeParser implements JobParser {
      * 3.Recursively find the flow file used in the script
      * 4.Replace file name with prefixed name
      * @param resourceNames
-     * @param linkisAppjointJob
+     * @param linkisAppConnJob
      * @return
      */
-    private  ArrayList<BMLResource> getResourcesByNames(ArrayList<String> resourceNames, CommonLinkisJob linkisAppjointJob) {
+    private  ArrayList<BMLResource> getResourcesByNames(ArrayList<String> resourceNames, CommonLinkisJob linkisAppConnJob) {
 
         ArrayList<BMLResource> bmlResourceArrayList = new ArrayList<>();
 
-        String jobName = linkisAppjointJob.getJobName();
-        String flowName = linkisAppjointJob.getSource().get("flowName");
-        String projectName = linkisAppjointJob.getSource().get("projectName");
+        String jobName = linkisAppConnJob.getJobName();
+        String flowName = linkisAppConnJob.getSource().get("flowName");
+        String projectName = linkisAppConnJob.getSource().get("projectName");
 
 
-        List<BMLResource> projectResourceList = linkisAppjointJob.getProjectResourceList();
+        List<BMLResource> projectResourceList = linkisAppConnJob.getProjectResourceList();
 
 
-        List<BMLResource> jobResourceList = linkisAppjointJob.getJobResourceList();
+        List<BMLResource> jobResourceList = linkisAppConnJob.getJobResourceList();
         for (String resourceName : resourceNames) {
             String[] resourceNameSplit = resourceName.split("://");
             String prefix = resourceNameSplit[0].toLowerCase();
@@ -150,7 +135,7 @@ public class CodeParser implements JobParser {
                     afterFileName = LinkisJobExecutionConfiguration.PROJECT_PREFIX + "_" + projectName + "_" + fileName;
                     break;
                 case "flow":
-                    resource = findFlowResource(linkisAppjointJob, fileName, flowName);
+                    resource = findFlowResource(linkisAppConnJob, fileName, flowName);
                     break;
                 case "node":
                     resource = findResource(jobResourceList, fileName);
@@ -159,7 +144,7 @@ public class CodeParser implements JobParser {
                 default:
             }
             if (null == resource) {
-                linkisAppjointJob.getLogObj().error("Failed to find the " + prefix + " resource file of " + fileName);
+                linkisAppConnJob.getLogObj().error("Failed to find the " + prefix + " resource file of " + fileName);
                 throw new RuntimeException("Failed to find the " + prefix + " resource file of " + fileName);
             }
             if (!afterFileName.equals(fileName)) {
@@ -176,10 +161,10 @@ public class CodeParser implements JobParser {
      * Recursive exit condition is top-level flow
      *
      */
-    private  BMLResource findFlowResource(CommonLinkisJob linkisAppjointJob, String fileName, String flowName) {
+    private  BMLResource findFlowResource(CommonLinkisJob linkisAppConnJob, String fileName, String flowName) {
 
         String fullFlowName = "";
-        Map<String, List<BMLResource>> fLowNameAndResources = linkisAppjointJob.getFlowNameAndResources();
+        Map<String, List<BMLResource>> fLowNameAndResources = linkisAppConnJob.getFlowNameAndResources();
         if (fLowNameAndResources == null){
             return null;
         }
@@ -205,7 +190,7 @@ public class CodeParser implements JobParser {
             return null;
         }
 
-        return findFlowResource(linkisAppjointJob, fileName, parentFlowName);
+        return findFlowResource(linkisAppConnJob, fileName, parentFlowName);
     }
 
 

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -22,80 +20,47 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-public interface DSSProjectService  extends IService<DSSProject> {
+public interface DSSProjectService  extends IService<DSSProjectDO> {
 
-    /**
-     * 新增工程
-     * @param username
-     * @param projectCreateRequest
-     */
-    public DSSProject createProject(String username, ProjectCreateRequest projectCreateRequest);
 
-    /**
-     * 修改工程
-     * @param username
-     * @param modifyRequest
-     */
-    public void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
+    DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest);
 
-    /**
-     * 根据工程名称获取工程详情
-     * @param name
-     * @return
-     */
-    public DSSProject getProjectByName(String name);
 
-    /**
-     * 根据工程名称获取指定工作空间的工程详情
-     *
-     * @param workspaceId
-     *            the workspace id
-     * @param name
-     *            the name
-     * @return project by name
-     */
-    public DSSProject getProjectByName(Long workspaceId, String name);
+    void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
 
-    /**
-     * 根据id获取工程详情
-     * @param id
-     * @return
-     */
-    public DSSProject getProjectById(Long id);
 
-    /**
-     * 查询工程list
-     * @param projectRequest
-     * @return
-     */
-    public List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest);
+    DSSProjectDO getProjectByName(String name);
 
-    /**
-     * 获取工程名称和空间名称
-     * @param id
-     * @return
-     */
-    public ProjectInfoVo getProjectInfoById(Long id);
 
-    void saveProjectRelation(DSSProject project, Map<AppInstance, Long> projectMap);
+    DSSProjectDO getProjectById(Long id);
+
+
+    List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest);
+
+
+    ProjectInfoVo getProjectInfoById(Long id);
+
+    void saveProjectRelation(DSSProjectDO project, Map<AppInstance, Long> projectMap);
 
     Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception;
 
-    void deleteProject(ProjectDeleteRequest projectDeleteRequest);
+    void deleteProject(Long projectId);
 
     List<String> getProjectAbilities(String username);
 
+
+    Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
     boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
 
 }

@@ -2206,7 +2206,7 @@ export default {
       }
       // 记录工作流是否在发布
       this.isFlowPubulish = true;
-      api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishToScheduler`, params, 'post').then((res) => {
+      api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishWorkflow`, params, 'post').then((res) => {
         this.pubulishShow = false;
         // 发布之后需要轮询结果
         let queryTime = 0;

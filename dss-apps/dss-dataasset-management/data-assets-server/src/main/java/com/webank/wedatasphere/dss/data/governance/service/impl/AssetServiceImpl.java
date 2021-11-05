@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.data.governance.service.impl;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.webank.wedatasphere.dss.data.governance.entity.CreateModelTypeInfo;
 import com.webank.wedatasphere.dss.data.governance.atlas.AtlasService;
 import com.webank.wedatasphere.dss.data.governance.dao.MetaInfoMapper;
 import com.webank.wedatasphere.dss.data.governance.dao.WorkspaceInfoMapper;
@@ -10,13 +11,16 @@ import com.webank.wedatasphere.dss.data.governance.exception.DAOException;
 import com.webank.wedatasphere.dss.data.governance.exception.DataGovernanceException;
 import com.webank.wedatasphere.dss.data.governance.service.AssetService;
 import com.webank.wedatasphere.dss.data.governance.utils.DateUtil;
+import com.webank.wedatasphere.dss.data.governance.vo.*;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
+import org.apache.atlas.model.typedef.AtlasClassificationDef;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,8 +47,130 @@ public class AssetServiceImpl implements AssetService {
 
             return result;
         } catch (AtlasServiceException | DAOException exception) {
-            throw new DataGovernanceException(23000,exception.getMessage());
+            throw new DataGovernanceException(23000, exception.getMessage());
         }
+    }
+
+
+    @Override
+    public CreateModelTypeInfo createModelType(CreateModelTypeVO vo) throws DataGovernanceException {
+        if (!ClassificationConstant.isTypeScope(vo.getType())) {
+            throw new DataGovernanceException(23000, "不支持此类型" + vo.getType());
+        }
+        try {
+            AtlasClassificationDef atlasClassificationDef = atlasService.createSubClassification(ClassificationConstant.formatName(vo.getType(), vo.getName()).get(), ClassificationConstant.getRoot(vo.getType()).get());
+            CreateModelTypeInfo dto = new CreateModelTypeInfo();
+            dto.setGuid(atlasClassificationDef.getGuid());
+            dto.setName(atlasClassificationDef.getName());
+            return dto;
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+    }
+
+
+    @Override
+    public void deleteModelType(DeleteModelTypeVO vo) throws Exception {
+        if (!ClassificationConstant.isTypeScope(vo.getType())) {
+            throw new DataGovernanceException(23000, "不支持此类型" + vo.getType());
+        }
+        try {
+            atlasService.deleteClassification(ClassificationConstant.formatName(vo.getType(), vo.getName()).get());
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+    }
+
+    @Override
+    public UpdateModelTypeInfo updateModelType(UpdateModelTypeVO vo) throws Exception {
+        if (!ClassificationConstant.isTypeScope(vo.getType())) {
+            throw new DataGovernanceException(23000, "不支持此类型" + vo.getType());
+        }
+        String newName = ClassificationConstant.formatName(vo.getType(), vo.getName()).get();
+        String root = ClassificationConstant.getRoot(vo.getType()).get();
+        String orgName = ClassificationConstant.formatName(vo.getType(), vo.getOrgName()).get();
+        AtlasClassificationDef atlasClassificationDef = null;
+        //首先尝试创建
+        try {
+            atlasClassificationDef = atlasService.createSubClassification(newName, root);
+        } catch (AtlasServiceException ex) {
+            //创建失败直接回退
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+
+        //尝试原类型
+        try {
+            atlasService.deleteClassification(orgName);
+        } catch (AtlasServiceException ex) {
+            //回滚删除创建的新类型
+            try {
+                atlasService.deleteClassification(newName);
+            } catch (AtlasServiceException ex1) {
+                throw new DataGovernanceException(23000, ex1.getMessage());
+            }
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+        UpdateModelTypeInfo info = new UpdateModelTypeInfo();
+        info.setGuid(atlasClassificationDef.getGuid());
+        info.setName(atlasClassificationDef.getName());
+        return info;
+    }
+
+
+    @Override
+    public void bindModelType(BindModelVO vo) throws Exception {
+        if (!ClassificationConstant.isTypeScope(vo.getModelType())) {
+            throw new DataGovernanceException(23000, "不支持此类型" + vo.getModelType());
+        }
+        String tableGuid = vo.getGuid();
+
+        if (StringUtils.isBlank(tableGuid)) {
+            tableGuid = getGuid(vo.getTableName());
+        }
+
+        try {
+            atlasService.addClassification(ClassificationConstant.formatName(vo.getModelType(),vo.getModelName()).get(),tableGuid,false);
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+
+    }
+
+    @Override
+    public void unBindModel(UnBindModelVO vo) throws Exception {
+        if (!ClassificationConstant.isTypeScope(vo.getModelType())) {
+            throw new DataGovernanceException(23000, "不支持此类型" + vo.getModelType());
+        }
+        String tableGuid = vo.getGuid();
+
+        if (StringUtils.isBlank(tableGuid)) {
+            tableGuid = getGuid(vo.getTableName());
+        }
+
+        try {
+            atlasService.deleteClassification(tableGuid,ClassificationConstant.formatName(vo.getModelType(),vo.getModelName()).get());
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+
+    }
+
+    private String getGuid(String tableName) throws DataGovernanceException {
+
+        //首先搜索指定表,查找guid
+        List<AtlasEntityHeader> atlasEntityHeaders = null;
+        try {
+            atlasEntityHeaders = atlasService.searchHiveTable0(null,tableName, true, 1, 0);
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+        if (CollectionUtils.isEmpty(atlasEntityHeaders)) {
+            throw new DataGovernanceException(23000, "table " + tableName + " not find");
+        }
+        if (atlasEntityHeaders.size()>1){
+            throw new DataGovernanceException(23000, "table " + tableName + " duplicate " + atlasEntityHeaders);
+        }
+       return atlasEntityHeaders.get(0).getGuid();
     }
 
     @Override
@@ -52,9 +178,9 @@ public class AssetServiceImpl implements AssetService {
                                                    int limit, int offset) throws DataGovernanceException {
         List<AtlasEntityHeader> atlasEntityHeaders = null;
         try {
-            atlasEntityHeaders = atlasService.searchHiveTable(classification, query, true, limit, offset);
+            atlasEntityHeaders = atlasService.searchHiveTable0(classification, query, true, limit, offset);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
 
         if (atlasEntityHeaders != null) {
@@ -67,6 +193,31 @@ public class AssetServiceImpl implements AssetService {
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
+                }
+                hiveTblBasic.setClassifications(atlasEntityHeader.getClassificationNames());
+
+                Object comment = atlasEntityHeader.getAttribute("comment");
+                if (comment != null) {
+                    hiveTblBasic.setComment(comment.toString());
+                }
+
+                Object aliases = atlasEntityHeader.getAttribute("aliases");
+                if (aliases != null) {
+                    hiveTblBasic.setAliases(aliases.toString());
+                }
+
+                Object lastAccessTime = atlasEntityHeader.getAttribute("lastAccessTime");
+                if (lastAccessTime != null) {
+                    hiveTblBasic.setLastAccessTime(DateUtil.unixToTimeStr((Double) lastAccessTime));
+                }
+
+                Object parameters = atlasEntityHeader.getAttribute("parameters");
+                if (parameters != null) {
+                    Map mapParameters = (Map) parameters;
+                    Object totalSize = mapParameters.get("totalSize");
+                    if (totalSize != null) {
+                        hiveTblBasic.setTotalSize(totalSize.toString());
+                    }
                 }
 
                 return hiveTblBasic;
@@ -81,7 +232,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasEntityHeaders = atlasService.searchHiveDb(classification, query, true, limit, offset);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
 
         if (atlasEntityHeaders != null) {
@@ -91,10 +242,13 @@ public class AssetServiceImpl implements AssetService {
                 hiveTblBasic.setName(atlasEntityHeader.getAttribute("name").toString());
                 hiveTblBasic.setQualifiedName(atlasEntityHeader.getAttribute("qualifiedName").toString());
                 hiveTblBasic.setOwner(atlasEntityHeader.getAttribute("owner").toString());
+
+
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
                 }
+
 
                 return hiveTblBasic;
             }).collect(Collectors.toList());
@@ -170,7 +324,7 @@ public class AssetServiceImpl implements AssetService {
 
             return hiveTblDetailInfo;
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -190,7 +344,7 @@ public class AssetServiceImpl implements AssetService {
             return partInfo;
 
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -231,7 +385,7 @@ public class AssetServiceImpl implements AssetService {
             sql.append(fields.get(fields.size() - 1)).append(" @$ from  ").append(tableName);
             return sql.toString();
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -318,7 +472,7 @@ public class AssetServiceImpl implements AssetService {
             }
             return sql.toString();
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -327,7 +481,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasService.modifyComment(guid, commentStr);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -347,7 +501,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             atlasService.setLabels(guid, labels);
         } catch (AtlasServiceException ex) {
-            throw new DataGovernanceException(23000,ex.getMessage());
+            throw new DataGovernanceException(23000, ex.getMessage());
         }
     }
 
@@ -356,15 +510,14 @@ public class AssetServiceImpl implements AssetService {
         try {
             return atlasService.getLineageInfo(guid, direction, depth);
         } catch (AtlasServiceException exception) {
-            throw new DataGovernanceException(23000,exception.getMessage());
+            throw new DataGovernanceException(23000, exception.getMessage());
         }
     }
 
     @Override
     public List<TableInfo> getTop10Table() throws DAOException {
-            return  metaInfoMapper.getTop10Table();
+        return metaInfoMapper.getTop10Table();
     }
-
 
 
 }

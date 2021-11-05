@@ -6,6 +6,10 @@
 assembly/target
 assembly/dss-package/target
 
+
+# dss-commons
+dss-commons/dss-sender-service/target
+
 # dss-appconn
 dss-appconn/appconns/dss-datachecker-appconn/target
 dss-appconn/appconns/dss-eventchecker-appconn/target
@@ -20,7 +24,9 @@ dss-appconn/dss-appconn-loader/target
 dss-appconn/dss-schedule-appconn-core/target
 dss-appconn/linkis-appconn-engineplugin/target
 dss-appconn/appconns/dss-dolphinscheduler-appconn/target
-
+dss-appconn/dss-appconn-manager/dss-appconn-manager-client/target
+dss-appconn/dss-appconn-manager/dss-appconn-manager-core/target
+dss-appconn/dss-scheduler-appconn/target
 
 # dss-apps
 dss-apps/dss-apiservice-server/target
@@ -51,6 +57,9 @@ dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target
 dss-orchestrator/orchestrators/dss-workflow/dss-linkis-node-execution/target
 dss-orchestrator/orchestrators/dss-workflow/dss-workflow-common/target
 dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target
+dss-orchestrator/dss-orchestrator-conversion-standard/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-conversion-standard/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-sdk/target
 
 # dss-standars
 dss-standard/dss-standard-common/target
@@ -63,10 +72,19 @@ dss-standard/structure-standard/dss-project-plugin/target
 dss-standard/structure-standard/dss-role-plugin/target
 dss-standard/structure-standard/dss-structure-integration-standard
 dss-standard/structure-standard/spring-origin-dss-project-plugin/target
+
 #dss-data-api
 dss-data-api/dss-api-sql-template/target
 dss-data-api/dss-data-api-server/target
 
+#dss-data-governance
+dss-data-governance/dss-data-governance-server/target
+dss-data-governance/dss-data-governance-common/target
+dss-data-governance/dss-data-asset-server/target
+dss-data-governance/dss-data-classification-server/target
+dss-data-governance/dss-data-warehouse-dao/target
+dss-data-governance/dss-data-warehouse-service/target
+dss-data-governance/dss-data-warehouse-server/target
 
 # plugins
 plugins/azkaban/linkis-jobtype/target
@@ -77,5 +95,3 @@ logs/*
 
 *.iml
 /plugins/dolphinscheduler/linkis-dolphinscheduler-client/target/
-
-web/yarn.lock

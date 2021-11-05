@@ -1,35 +1,31 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.node
 
-import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob
+import java.util.concurrent.Future
+
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext
 import com.webank.wedatasphere.dss.flow.execution.entrance.listener.NodeRunnerListener
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeExecutionState.NodeExecutionState
+import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
 import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import java.util.concurrent.Future
 
-import com.webank.wedatasphere.dss.appconn.schedule.core.entity.SchedulerNode
 
-/**
-  * Created by johnnwang on 2019/11/5.
-  */
 abstract class NodeRunner extends Runnable with Logging{
 
   private[flow] var future: Future[_] = _
@@ -44,9 +40,9 @@ abstract class NodeRunner extends Runnable with Logging{
      this.flowContext = flowContext
   }
 
-  def getNode:SchedulerNode
+  def getNode: WorkflowNode
 
-  def setNode(node: SchedulerNode):Unit
+  def setNode(node: WorkflowNode):Unit
 
   def getLinkisJob: LinkisJob
 

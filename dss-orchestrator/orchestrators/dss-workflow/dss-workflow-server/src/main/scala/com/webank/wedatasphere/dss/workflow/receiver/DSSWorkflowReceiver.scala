@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -24,10 +22,11 @@ import java.util
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
-import com.webank.wedatasphere.dss.workflow.common.protocol.{RequestCopyWorkflow, RequestCreateWorkflow, RequestImportWorkflow, ResponseCopyWorkflow, ResponseCreateWorkflow, ResponseDeleteWorkflow, ResponseImportWorkflow, ResponseQueryWorkflow, ResponseUpdateWorkflow}
+import com.webank.wedatasphere.dss.workflow.common.protocol._
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam
 import com.webank.wedatasphere.linkis.rpc.{Receiver, Sender}
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,9 +34,7 @@ import org.springframework.stereotype.Component
 
 import scala.concurrent.duration.Duration
 
-/**
- * Created by allenlliu on 2020/10/21.
- */
+
 @Component
 class DSSWorkflowReceiver extends Receiver {
 
@@ -74,7 +71,8 @@ class DSSWorkflowReceiver extends Receiver {
         reqExportFlow.flowID,
         reqExportFlow.projectId,
         reqExportFlow.projectName,
-        DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]))
+        DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]),
+        reqExportFlow.dssLabelList)
       ResponseExportWorkflow(dssExportFlowResource.get("resourceId").toString, dssExportFlowResource.get("version").toString,
         reqExportFlow.flowID)
 
@@ -88,6 +86,7 @@ class DSSWorkflowReceiver extends Receiver {
       dssFlowImportParam.setOrcVersion(requestImportWorkflow.getOrcVersion)
       dssFlowImportParam.setWorkspaceName(requestImportWorkflow.getWorkspaceName)
       dssFlowImportParam.setWorkspace(DSSCommonUtils.COMMON_GSON.fromJson(requestImportWorkflow.getWorkspaceStr, classOf[Workspace]))
+      dssFlowImportParam.setContextId(requestImportWorkflow.getContextId)
       val dssFlows = workflowManager.importWorkflow(requestImportWorkflow.getUserName,
         requestImportWorkflow.getResourceId,
         requestImportWorkflow.getBmlVersion,
@@ -111,7 +110,14 @@ class DSSWorkflowReceiver extends Receiver {
         requestQueryWorkFlow.rootFlowId)
       new ResponseQueryWorkflow(dssFlow)
 
-    case _ => throw new DSSErrorException(90000, "")
+    case requestConvertOrchestrator: RequestConvertOrchestrations =>
+      workflowManager.convertWorkflow(requestConvertOrchestrator)
+
+    case requestQuerySchedulerWorkflowStatus: RequestQuerySchedulerWorkflowStatus =>
+      workflowManager
+        .getSchedulerWorkflowStatus(requestQuerySchedulerWorkflowStatus.getUsername, requestQuerySchedulerWorkflowStatus.getOrchestratorId)
+
+    case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }
 
   override def receiveAndReply(message: Any, duration: Duration, sender: Sender): Any = {}

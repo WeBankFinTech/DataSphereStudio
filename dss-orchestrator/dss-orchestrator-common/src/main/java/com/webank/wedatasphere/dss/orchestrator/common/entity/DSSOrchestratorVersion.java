@@ -1,32 +1,31 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
-import com.sun.corba.se.impl.encoding.IDLJavaSerializationInputStream;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * created by cooperyang on 2020/10/16
- * Description:
- */
+
 public class DSSOrchestratorVersion {
+    private final static Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorVersion.class);
+
 
     private Long id;
     private Long orchestratorId;
@@ -38,6 +37,7 @@ public class DSSOrchestratorVersion {
     private Date   updateTime;
     private String updater;
     private String content;
+    private String contextId;
 
 
     public Long getId() {
@@ -120,15 +120,48 @@ public class DSSOrchestratorVersion {
         this.content = content;
     }
 
+    public String getContextId() {
+        return contextId;
+    }
+
+    public void setContextId(String contextId) {
+        this.contextId = contextId;
+    }
+
+    /**
+     * 提取出contextId
+     */
+    public void setFormatContextId(String contextId) {
+        try {
+            if (contextId == null || "".equals(contextId.trim()) || !contextId.contains("value") || !contextId.contains("contextId")) {
+                this.contextId = contextId;
+            } else {
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(contextId).getAsJsonObject();
+                String tempValue = jsonObject.get("value").getAsString();
+                String tempContextId = parser.parse(tempValue).getAsJsonObject().get("contextId").getAsString();
+                this.contextId = tempContextId;
+            }
+        } catch (Exception e) {
+            LOGGER.error("setFormatContextIdError-", e);
+            this.contextId = contextId;
+        }
+    }
+
     @Override
     public String toString() {
         return "DSSOrchestratorVersion{" +
                 "id=" + id +
                 ", orchestratorId=" + orchestratorId +
                 ", appId=" + appId +
+                ", projectId=" + projectId +
+                ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
+                ", comment='" + comment + '\'' +
                 ", updateTime=" + updateTime +
                 ", updater='" + updater + '\'' +
+                ", content='" + content + '\'' +
+                ", contextId='" + contextId + '\'' +
                 '}';
     }
 }

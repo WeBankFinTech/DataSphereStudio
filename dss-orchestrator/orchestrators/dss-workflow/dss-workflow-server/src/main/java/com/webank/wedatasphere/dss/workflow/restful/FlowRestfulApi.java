@@ -1,39 +1,41 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
-import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
-import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -41,20 +43,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.*;
 
-//import static com.webank.wedatasphere.dss.workspace.server.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.contextservice.service.ContextService;
+import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import com.webank.wedatasphere.dss.workflow.service.PublishService;
+import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 
-/**
- * Created by v_wbjftang on 2019/5/13.
- */
 @Component
 @Path("/dss/workflow")
 @Produces(MediaType.APPLICATION_JSON)
@@ -72,6 +82,9 @@ public class FlowRestfulApi {
 
     @Autowired
     private WorkFlowManager workFlowManager;
+
+    @Autowired
+    private OrchestratorMapper orchestratorMapper;
 
     ObjectMapper mapper = new ObjectMapper();
 
@@ -92,13 +105,13 @@ public class FlowRestfulApi {
         String description = json.get("description") == null ? null : json.get("description").getTextValue();
         Long parentFlowID = json.get("parentFlowID") == null ? null : json.get("parentFlowID").getLongValue();
         String uses = json.get("uses") == null ? null : json.get("uses").getTextValue();
-        JsonNode dssLabelsJsonNode = json.get("labels");
+        JsonNode dssLabelsJsonNode = json.get(DSSCommonUtils.DSS_LABELS_KEY);
         List<DSSLabel> dssLabelList = new ArrayList<>();
         if (dssLabelsJsonNode != null && dssLabelsJsonNode.getElements().hasNext()) {
             Iterator<JsonNode> nodeList = dssLabelsJsonNode.getElements();
             while (nodeList.hasNext()) {
                 JsonNode objNode =nodeList.next();
-                DSSLabel dssLabel = new CommonDSSLabel(objNode.getTextValue());
+                EnvDSSLabel dssLabel = new EnvDSSLabel(objNode.getTextValue());
                 dssLabelList.add(dssLabel);
             }
         }
@@ -113,29 +126,59 @@ public class FlowRestfulApi {
 
     @POST
     @Path("/publishWorkflow")
-    public Response publishWorkflow(@Context HttpServletRequest request, JsonNode jsonNode) throws ErrorException {
-        Long workflowId = jsonNode.get("workflowId").getLongValue();
-        String dssLabel = jsonNode.get("labels").getTextValue();
+    public Response publishWorkflow(@Context HttpServletRequest request, JsonNode jsonNode) {
+        Long orchestratorVersionId = jsonNode.get("orchestratorVersionId").getLongValue();
+        DSSOrchestratorVersion orchestratorVersion =
+            orchestratorMapper.getOrchestratorVersionById(orchestratorVersionId);
+        Long workflowId = orchestratorVersion.getAppId();
+        String dssLabel = jsonNode.get("dssLabel").asText();
+        // Long workflowId = jsonNode.get("workflowId").getLongValue();
+        // Map<String, Object> labels = StreamSupport.stream(Spliterators.spliteratorUnknownSize(dssLabel.getFields(),
+        // Spliterator.ORDERED), false).collect(Collectors.toMap(Entry::getKey, entry ->
+        // entry.getValue().getTextValue()));
+        //todo modify by front label
+        // JsonNode labelJsonNode = jsonNode.get(DSSCommonUtils.DSS_LABELS_KEY);
+        // String dssLabel = labelJsonNode.get(LabelKeyConvertor.ROUTE_LABEL_KEY).getTextValue();
+        Map<String, Object> labels=new HashMap<>();
+        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY,dssLabel);
         String comment = jsonNode.get("comment").getTextValue();
         Workspace workspace = SSOHelper.getWorkspace(request);
         String publishUser = SecurityFilter.getLoginUsername(request);
         Message message;
         try{
-            long taskId = publishService.submitPublish(publishUser, workflowId, dssLabel, workspace);
-            LOGGER.info("submit publish task ok ,taskId is {}", taskId);
-            if (taskId > 0){
+            String taskId = publishService.submitPublish(publishUser, workflowId, labels, workspace, comment);
+            LOGGER.info("submit publish task ok ,taskId is {}.", taskId);
+            if (StringUtils.isNotEmpty(taskId)){
                 message = Message.ok("生成工作流发布任务成功").data("releaseTaskId", taskId);
             } else{
-                LOGGER.error("taskId {} is error", taskId);
+                LOGGER.error("taskId {} is error.", taskId);
                 message = Message.error("发布工作流失败");
             }
         }catch(final Throwable t){
-            LOGGER.error("failed to submit publish task for workflow id {}", workflowId, t);
+            LOGGER.error("failed to submit publish task for workflow id {}.", workflowId, t);
             message = Message.error("发布工作流失败");
         }
         return Message.messageToResponse(message);
     }
 
+    @GET
+    @Path("/getSchedulerWorkflowStatus")
+    public Response getSchedulerWorkflowStatus(@Context HttpServletRequest request,
+        @NotNull(message = "查询的空间id不能为空") @QueryParam("workspaceId") Long workspaceId,
+        @NotNull(message = "查询的编排id不能为空") @QueryParam("orchestratorId") Long orchestratorId) {
+        String username = SecurityFilter.getLoginUsername(request);
+        try {
+            WorkflowStatus status = publishService.getSchedulerWorkflowStatus(username, orchestratorId);
+            Message result = Message.ok("获取调度工作流状态").data("published", status.getPublished()).data("releaseStatus",
+                status.getReleaseState());
+            // Message result = Message.ok("获取调度工作流状态").data("published", false).data("releaseStatus", null);
+            return Message.messageToResponse(result);
+        } catch (final Throwable t) {
+            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
+                orchestratorId, t);
+            return Message.messageToResponse(Message.error("获取工作流调度状态失败"));
+        }
+    }
 
     /**
      * 获取发布任务状态
@@ -147,20 +190,30 @@ public class FlowRestfulApi {
     @GET
     @Path("/getReleaseStatus")
     public Response getReleaseStatus(@Context HttpServletRequest request,
-                                     @NotNull(message = "查询的发布id不能为空") @QueryParam("releaseTaskId") Long releaseTaskId){
+                                     @NotNull(message = "查询的发布id不能为空") @QueryParam("releaseTaskId") Long releaseTaskId) {
         String username = SecurityFilter.getLoginUsername(request);
         Message message;
-        try{
-            String status = publishService.getStatus(username, releaseTaskId);
-            if (StringUtils.isNotBlank(status)){
-                message = Message.ok("获取进度成功").data("status", status);
-            }else{
+        try {
+            ResponseConvertOrchestrator response = publishService.getStatus(username, releaseTaskId.toString());
+            if (null != response.getResponse()) {
+                String status = response.getResponse().getJobStatus().toString();
+                status = StringUtils.isNotBlank(status) ? status.toLowerCase() : status;
+                //将发布失败原因，返回前端
+                if ("failed".equalsIgnoreCase(status)) {
+                    message = Message.error("发布失败:" + response.getResponse().getMessage()).data("status", status);
+                } else if (StringUtils.isNotBlank(status)) {
+                    message = Message.ok("获取进度成功").data("status", status);
+                } else {
+                    LOGGER.error("status is null or empty, failed to get status");
+                    message = Message.error("获取进度失败");
+                }
+            } else {
                 LOGGER.error("status is null or empty, failed to get status");
                 message = Message.error("获取进度失败");
             }
-        }catch(final Throwable t){
+        } catch (final Throwable t) {
             LOGGER.error("Failed to get release status for {}", releaseTaskId, t);
-            message = Message.error("获取状态失败");
+            message = Message.error("发布异常:" + t.getMessage());
         }
         return Message.messageToResponse(message);
     }

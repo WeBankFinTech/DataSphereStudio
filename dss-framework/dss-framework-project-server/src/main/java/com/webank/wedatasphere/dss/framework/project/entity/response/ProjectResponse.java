@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -22,9 +20,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author v_wbzwchen
- */
+
 public class ProjectResponse implements Serializable {
     private static final long serialVersionUID=1L;
     //工程id
@@ -43,13 +39,21 @@ public class ProjectResponse implements Serializable {
     private String source;
     //产品
     private String product;
-    // 是否可编辑
-    private Boolean editable;
     private Boolean isArchive;
     //工程创建时间
     private Date createTime;
     //工程修改时间
     private Date updateTime;
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    private Boolean editable;
 
     /**
      * 发布用户 list
@@ -204,14 +208,6 @@ public class ProjectResponse implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Boolean getEditable() {
-        return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
-    }
-
     @Override
     public String toString() {
         return "ResponseProjectVo{" +
@@ -224,7 +220,6 @@ public class ProjectResponse implements Serializable {
                 ", source='" + source + '\'' +
                 ", product='" + product + '\'' +
                 ", isArchive=" + isArchive +
-                ", editable=" + editable +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", releaseUsers=" + releaseUsers +

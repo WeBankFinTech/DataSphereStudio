@@ -1,60 +1,54 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.factory
 
+import java.io.File
+
+import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils
+import com.webank.wedatasphere.linkis.DataWorkCloudApplication
+import com.webank.wedatasphere.linkis.engineconn.common.conf.EngineConnConf
 import com.webank.wedatasphere.linkis.engineconn.common.creation.EngineCreationContext
-import com.webank.wedatasphere.linkis.engineconn.common.engineconn.{DefaultEngineConn, EngineConn}
-import com.webank.wedatasphere.linkis.engineconn.core.executor.ExecutorManager
-import com.webank.wedatasphere.linkis.engineconn.executor.entity.Executor
+import com.webank.wedatasphere.linkis.engineconn.common.engineconn.EngineConn
+import com.webank.wedatasphere.linkis.engineconn.computation.executor.creation.ComputationSingleExecutorEngineConnFactory
+import com.webank.wedatasphere.linkis.engineconn.executor.entity.LabelExecutor
+import com.webank.wedatasphere.linkis.governance.common.exception.engineconn.EngineConnExecutorErrorCode
 import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.creation.{ExecutorFactory, SingleExecutorEngineConnFactory}
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.cluster.ClusterLabel
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineRunTypeLabel
+import com.webank.wedatasphere.linkis.manager.engineplugin.common.exception.EngineConnPluginErrorException
+import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineType.EngineType
+import com.webank.wedatasphere.linkis.manager.label.entity.engine.RunType.RunType
+import com.webank.wedatasphere.linkis.manager.label.entity.engine.{EngineType, RunType}
 
-import scala.collection.JavaConversions._
+class AppConnEngineConnFactory extends ComputationSingleExecutorEngineConnFactory {
 
-class AppConnEngineConnFactory extends SingleExecutorEngineConnFactory{
+  private val appConnHomePath = new File(EngineConnConf.getWorkHome, AppConnUtils.APPCONN_DIR_NAME)
+  if(!appConnHomePath.exists() && !appConnHomePath.mkdir())
+    throw new EngineConnPluginErrorException(EngineConnExecutorErrorCode.INIT_EXECUTOR_FAILED,
+      s"Cannot mkdir ${appConnHomePath.getPath}, please make sure the permission is ok.")
+  DataWorkCloudApplication.setProperty(AppConnUtils.APPCONN_HOME_PATH.key, appConnHomePath.getPath)
+  warn(s"Set ${AppConnUtils.APPCONN_HOME_PATH.key}=${appConnHomePath.getPath}.")
 
-  override def createExecutor(engineCreationContext: EngineCreationContext, engineConn: EngineConn): Executor = {
-    val id = ExecutorManager.getInstance().generateId()
-    val executor = new AppConnEngineConnExecutor(id)
-//    val userWithCreator = ExecutorFactory.parseUserWithCreator(engineCreationContext.getLabels.toArray[Label[_]])
-//    executor.setUserWithCreator(userWithCreator)
-    val runTypeLabel = getDefaultEngineRunTypeLabel()
-    val clusterLabel = new ClusterLabel
-    clusterLabel.setClusterName("DEV")
-    clusterLabel.setClusterType("DEV")
-    executor.getExecutorLabels().add(clusterLabel)
-    executor.getExecutorLabels().add(runTypeLabel)
-    executor
-  }
+  override protected def newExecutor(id: Int,
+                                     engineCreationContext: EngineCreationContext,
+                                     engineConn: EngineConn): LabelExecutor =
+    new AppConnEngineConnExecutor(id)
 
-  override def createEngineConn(engineCreationContext: EngineCreationContext): EngineConn = {
-    val engineConn = new DefaultEngineConn(engineCreationContext)
-    engineConn.setEngineType("appconn")
-    engineConn
-  }
 
-  override def getDefaultEngineRunTypeLabel(): EngineRunTypeLabel = {
-    val runTypeLabel = new EngineRunTypeLabel
-    runTypeLabel.setRunType("appconn")
-    runTypeLabel
-  }
+  override protected def getEngineConnType: EngineType = EngineType.APPCONN
+
+  override protected def getRunType: RunType = RunType.APPCONN
+
 }

@@ -1,17 +1,27 @@
 package com.webank.wedatasphere.dss.data.governance.atlas;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.*;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.webank.wedatasphere.dss.data.governance.conf.GovernanceConf;
 import org.apache.atlas.ApplicationProperties;
+import org.apache.atlas.AtlasClientV2;
 import org.apache.atlas.AtlasException;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.discovery.AtlasSearchResult;
+import org.apache.atlas.model.discovery.SearchParameters;
+import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
+import org.apache.atlas.model.instance.ClassificationAssociateRequest;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
+import org.apache.atlas.model.typedef.AtlasClassificationDef;
+import org.apache.atlas.model.typedef.AtlasTypesDef;
 import org.apache.commons.configuration.Configuration;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -92,6 +102,70 @@ public class AtlasService {
         return atlasSearchResult.getEntities();
     }
 
+    /**
+     * 根据关键字搜索hive table
+     */
+    public List<AtlasEntityHeader> searchHiveTable0(String classification, String query,
+                                                   boolean excludeDeletedEntities, int limit, int offset) throws AtlasServiceException {
+
+        String jsonStr = atlasClient.basicSearchPostForString("hive_table",classification,query,excludeDeletedEntities,limit,offset);
+        AtlasSearchResult atlasSearchResult = gson.fromJson(jsonStr,AtlasSearchResult.class);//atlasClient.facetedSearch(searchParameters);
+
+        //实体绑定类型
+        //atlasClient.addClassification();
+        //创建子类型
+        //atlasClient.createAtlasTypeDefs()
+        return atlasSearchResult.getEntities();
+    }
+
+    /**
+     * 创建子类型
+     * @param name
+     * @param superType
+     * @return
+     * @throws AtlasServiceException
+     */
+    public AtlasClassificationDef createSubClassification(String name, String superType) throws AtlasServiceException {
+        String jsonStr = atlasClient.createSubClassification(name, superType);
+        AtlasTypesDef atlasTypesDef = gson.fromJson(jsonStr,AtlasTypesDef.class);
+        return atlasTypesDef.getClassificationDefs().get(0);
+    }
+
+    /**
+     * 删除指定模型类型
+     * @param name
+     * @throws AtlasServiceException
+     */
+    public void  deleteClassification(String name) throws AtlasServiceException{
+        atlasClient.deleteTypeByName(name);
+    }
+
+
+    /**
+     * 绑定类型
+     * @param typeName
+     * @param guid
+     * @throws AtlasServiceException
+     */
+    public void addClassification(String typeName,String guid,boolean propagate) throws AtlasServiceException {
+        AtlasClassification atlasClassification = new AtlasClassification();
+        atlasClassification.setTypeName(typeName);
+        atlasClassification.setPropagate(propagate);
+        atlasClassification.setRemovePropagationsOnEntityDelete(false);
+
+        ClassificationAssociateRequest request = new ClassificationAssociateRequest(Lists.newArrayList(guid),atlasClassification);
+        atlasClient.callAPI(AtlasClientV2.API_V2.ADD_CLASSIFICATION, (Class<?>) null, gson.toJson(request),new MultivaluedMapImpl());
+    }
+
+    /**
+     * 解绑类型
+     * @param guid
+     * @param typeName
+     * @throws AtlasServiceException
+     */
+    public void deleteClassification(String guid, String typeName)  throws AtlasServiceException{
+        atlasClient.deleteClassification(guid,typeName);
+    }
     /**
      * 获取hive table对象
      */
@@ -179,7 +253,7 @@ public class AtlasService {
      */
     public List<AtlasEntityHeader> searchHiveDb(String classification, String query,
                                                 boolean excludeDeletedEntities, int limit, int offset) throws AtlasServiceException{
-        String jsonStr =atlasClient.basicSearchForString("hive_db",classification,query,excludeDeletedEntities,limit,offset);
+        String jsonStr =atlasClient.basicSearchPostForString("hive_db",classification,query,excludeDeletedEntities,limit,offset);
         AtlasSearchResult atlasSearchResult = gson.fromJson(jsonStr, AtlasSearchResult.class);
 
         return atlasSearchResult.getEntities();

@@ -96,7 +96,11 @@
 </template>
 
 <script>
-import { getDimensions, switchDimensionsStatus } from "../../service/api";
+import {
+  getDimensions,
+  switchDimensionsStatus,
+  delDimensions,
+} from "../../service/api";
 import formatDate from "../../utils/formatDate";
 import EditModal from "./editModal.vue";
 export default {
@@ -119,10 +123,9 @@ export default {
         title: "警告",
         content: "确定删除此项吗？" + id,
         onOk: () => {
-          this.$Message.info("删除");
-        },
-        onCancel: () => {
-          this.$Message.info("取消");
+          delDimensions(id).then(() => {
+            this.handleGetData(true);
+          });
         },
       });
     },

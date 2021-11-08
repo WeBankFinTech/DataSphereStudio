@@ -135,6 +135,7 @@
       v-model="modalCfg.visible"
       :id="modalCfg.id"
       :mode="modalCfg.mode"
+      :type="modalCfg.type"
       @finish="handleModalFinish"
     />
   </div>

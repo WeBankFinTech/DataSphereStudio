@@ -1,8 +1,11 @@
 package com.webank.wedatasphere.dss.data.governance.service;
 
+import com.webank.wedatasphere.dss.data.governance.entity.CreateModelTypeInfo;
 import com.webank.wedatasphere.dss.data.governance.entity.*;
 import com.webank.wedatasphere.dss.data.governance.exception.DAOException;
 import com.webank.wedatasphere.dss.data.governance.exception.DataGovernanceException;
+import com.webank.wedatasphere.dss.data.governance.vo.*;
+import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 
 import java.sql.SQLException;
@@ -34,7 +37,6 @@ public interface AssetService {
 
     public void setLabels(String guid, Set<String> labels) throws DataGovernanceException;
 
-
     /**
      * 获取表实体的血缘信息
      */
@@ -42,4 +44,44 @@ public interface AssetService {
 
     public List<TableInfo> getTop10Table () throws DataGovernanceException, SQLException, DAOException;
 
+
+    /**
+     * 创建模型
+     * @param vo
+     * @return
+     */
+    CreateModelTypeInfo createModelType(CreateModelTypeVO vo) throws DataGovernanceException, AtlasServiceException;
+
+
+    /**
+     * 删除模型
+     * @param vo
+     * @throws Exception
+     */
+    void deleteModelType(DeleteModelTypeVO vo) throws Exception;
+
+
+
+    /**
+     * 更新模型
+     * @param vo
+     * @return
+     */
+    UpdateModelTypeInfo updateModelType(UpdateModelTypeVO vo) throws Exception;
+
+
+    /**
+     * 绑定模型
+     * @param vo
+     * @throws Exception
+     */
+    void bindModelType(BindModelVO vo) throws Exception;
+
+
+    /**
+     * 解绑模型
+     * @param vo
+     * @throws Exception
+     */
+    void unBindModel(UnBindModelVO vo) throws Exception;
 }

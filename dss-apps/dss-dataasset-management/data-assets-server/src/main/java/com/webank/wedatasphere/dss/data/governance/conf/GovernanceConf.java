@@ -27,7 +27,11 @@ public interface GovernanceConf {
     CommonVars<String> ATLAS_PASSWORD = CommonVars.apply("atlas.password");
     //CommonVars<String> METASTORE_DATASOURCE_PASSWORD = CommonVars.apply("atlas.client.readTimeoutMSecs");
     //CommonVars<String> METASTORE_DATASOURCE_PASSWORD = CommonVars.apply("atlas.client.connectTimeoutMSecs");
-
+    CommonVars<String>ATLAS_ROOT_INDICATOR = CommonVars.apply("atlas.root.indicator");
+    CommonVars<String>ATLAS_ROOT_MEASURE = CommonVars.apply("atlas.root.measure");
+    CommonVars<String>ATLAS_ROOT_DIMENSION = CommonVars.apply("atlas.root.dimension");
+    CommonVars<String>ATLAS_ROOT_LAYER = CommonVars.apply("atlas.root.layer");
+    CommonVars<String>ATLAS_ROOT_THEME = CommonVars.apply("atlas.root.theme");
 
 
     CommonVars<String> METASTORE_DATASOURCE_DRIVER = CommonVars.apply("metastore.datasource.driver", "com.mysql.jdbc.Driver");

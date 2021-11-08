@@ -13,7 +13,7 @@
           <Input
             :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
             size="small"
-            @on-search="onSearch"
+            @on-enter="onSearch"
             v-model="queryForTbls"
           >
             <span slot="prepend">
@@ -452,6 +452,11 @@ export default {
     padding: 0px;
     border: none;
     background-color: transparent;
+  }
+
+  ::v-deep .ivu-input-group .ivu-input,
+  .ivu-input-group .ivu-input-inner-container {
+    margin-left: 8px;
   }
 }
 </style>

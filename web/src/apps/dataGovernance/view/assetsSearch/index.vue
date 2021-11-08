@@ -2,17 +2,29 @@
   <div class="assets-index-wrap">
     <!-- top 搜索框 -->
     <div class="assets-index-t">
+      <img
+        src="../../assets/images/搜索框装饰图.png"
+        alt=""
+        style="position: absolute;"
+      />
       <!-- bottom -->
       <div class="assets-index-t-b1">
         <div class="assets-index-t-b1-search">
           <Input
-            search
-            :enter-button="$t(`message.dataGovernance.search`)"
             :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
-            size="large"
+            size="small"
             @on-search="onSearch"
             v-model="queryForTbls"
-          />
+          >
+            <span slot="prepend">
+              <Icon type="md-search" size="16" color="#2e92f7" />
+              <!-- <SvgIcon
+                icon-class="search"
+                style="fontSize: 16px"
+                :color="'#2e92f7'"
+              ></SvgIcon> -->
+            </span>
+          </Input>
         </div>
       </div>
     </div>
@@ -374,14 +386,13 @@ export default {
   }
 
   .assets-index-t-b1 {
-    height: 80px;
-    background-color: #edf1f6;
+    height: 46px;
+    background-color: #f8f9fc;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 11px 0px;
+    padding-left: 12px;
     &-search {
       min-width: 552px;
-      min-height: 40px;
     }
   }
 
@@ -435,6 +446,12 @@ export default {
       flex: 1;
       padding-bottom: 10px;
     }
+  }
+  ::v-deep .ivu-input-group-prepend,
+  .ivu-input-group-append {
+    padding: 0px;
+    border: none;
+    background-color: transparent;
   }
 }
 </style>

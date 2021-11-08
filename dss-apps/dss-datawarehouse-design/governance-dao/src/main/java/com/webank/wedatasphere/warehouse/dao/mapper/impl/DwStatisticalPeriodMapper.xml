@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper">
+
+    <select id="selectItems" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo">
+        select *
+        from (select a.*, b.name as themeArea, c.name as layerArea
+              from dss_datawarehouse_statistical_period a
+                       left outer join dss_datawarehouse_theme_domain b on a.theme_domain_id = b.id
+                       left outer join dss_datawarehouse_layer c on a.layer_id = c.id
+             ) t ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectPageItems" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo">
+        select *
+        from (select a.*, b.name as themeArea, c.name as layerArea
+              from dss_datawarehouse_statistical_period a
+                       left outer join dss_datawarehouse_theme_domain b on a.theme_domain_id = b.id
+                       left outer join dss_datawarehouse_layer c on a.layer_id = c.id
+             ) t ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectItemById" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo" parameterType="java.lang.Long">
+        select *
+        from (select a.*, b.name as themeArea, c.name as layerArea
+              from dss_datawarehouse_statistical_period a
+                       left outer join dss_datawarehouse_theme_domain b on a.theme_domain_id = b.id
+                       left outer join dss_datawarehouse_layer c on a.layer_id = c.id
+             ) t where t.id = #{id}
+    </select>
+
+</mapper>

@@ -56,7 +56,6 @@ Vue.prototype.$Message.config({
 })
 // 全局变量
 Vue.prototype.$API_PATH = API_PATH;
-
 new Vue({
   router,
   i18n,

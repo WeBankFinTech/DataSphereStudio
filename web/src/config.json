@@ -1,38 +1,66 @@
 {
-    "workspace": {
-        "routes": "apps/workspace/router",
-        "module": "apps/workspace/module",
-        "i18n": {
-            "en": "apps/workspace/i18n/en.json",
-            "zh-CN": "apps/workspace/i18n/zh.json"
-        },
-        "header": ""
+  "dataAssetManage": {
+    "routes": "apps/dataAssetManage/router",
+    "module": "apps/dataAssetManage/module",
+    "i18n": {
+      "en": "apps/dataAssetManage/i18n/en.json",
+      "zh-CN": "apps/dataAssetManage/i18n/zh.json"
     },
-    "scriptis": {
-        "routes": "apps/scriptis/router",
-        "module": "apps/scriptis/module",
-        "i18n": {
-            "en": "apps/scriptis/i18n/common/en.json",
-            "zh-CN": "apps/scriptis/i18n/common/zh.json"
-        },
-        "header": "apps/scriptis/module/header"
+    "header": ""
+  },
+  "dataModelCenter": {
+    "routes": "apps/dataModelCenter/router",
+    "module": "apps/dataModelCenter/module",
+    "i18n": {
+      "en": "apps/dataModelCenter/i18n/en.json",
+      "zh-CN": "apps/dataModelCenter/i18n/zh.json"
     },
-    "workflows": {
-        "routes": "apps/workflows/router",
-        "module": "apps/workflows/module",
-        "i18n": {
-            "en": "apps/workflows/i18n/common/en.json",
-            "zh-CN": "apps/workflows/i18n/common/zh.json"
-        },
-        "header": "apps/workflows/module/header"
+    "header": ""
+  },
+  "dataWarehouseDesign": {
+    "routes": "apps/dataWarehouseDesign/router",
+    "module": "apps/dataWarehouseDesign/module",
+    "i18n": {
+      "en": "apps/dataWarehouseDesign/i18n/en.json",
+      "zh-CN": "apps/dataWarehouseDesign/i18n/zh.json"
     },
-    "apiServices": {
-        "routes": "apps/apiServices/router",
-        "module": "apps/apiServices/module",
-        "i18n": {
-            "en": "apps/apiServices/i18n/en.json",
-            "zh-CN": "apps/apiServices/i18n/zh.json"
-        },
-        "header": "apps/apiServices/module/header"
-    }
+    "header": ""
+  },
+  "workspace": {
+    "routes": "apps/workspace/router",
+    "module": "apps/workspace/module",
+    "i18n": {
+      "en": "apps/workspace/i18n/en.json",
+      "zh-CN": "apps/workspace/i18n/zh.json"
+    },
+    "header": ""
+  },
+
+  "scriptis": {
+    "routes": "apps/scriptis/router",
+    "module": "apps/scriptis/module",
+    "i18n": {
+      "en": "apps/scriptis/i18n/common/en.json",
+      "zh-CN": "apps/scriptis/i18n/common/zh.json"
+    },
+    "header": "apps/scriptis/module/header"
+  },
+  "workflows": {
+    "routes": "apps/workflows/router",
+    "module": "apps/workflows/module",
+    "i18n": {
+      "en": "apps/workflows/i18n/common/en.json",
+      "zh-CN": "apps/workflows/i18n/common/zh.json"
+    },
+    "header": "apps/workflows/module/header"
+  },
+  "apiServices": {
+    "routes": "apps/apiServices/router",
+    "module": "apps/apiServices/module",
+    "i18n": {
+      "en": "apps/apiServices/i18n/en.json",
+      "zh-CN": "apps/apiServices/i18n/zh.json"
+    },
+    "header": "apps/apiServices/module/header"
+  }
 }

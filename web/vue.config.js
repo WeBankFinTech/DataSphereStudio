@@ -17,6 +17,7 @@
 
 // vue.config.js
 const path = require('path')
+const webpack = require('webpack')
 const fs = require('fs')
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
@@ -88,7 +89,8 @@ const virtualModules = new VirtualModulesPlugin({
 });
 
 const plugins = [
-  virtualModules
+  virtualModules,
+  new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn|ja/)
 ]
 
 // scriptis 有使用编辑器组件, 需要Monaco Editor
@@ -105,6 +107,7 @@ function resolve(dir) {
 }
 
 module.exports = {
+  productionSourceMap: false,
   publicPath: './',
   outputDir: 'dist/dist',
   chainWebpack: (config) => {
@@ -160,7 +163,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'x.x.x.x',
+        target: 'http://121.36.12.247:8088/',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'

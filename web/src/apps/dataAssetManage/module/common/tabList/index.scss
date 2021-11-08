@@ -1,0 +1,110 @@
+@import '@/common/style/variables.scss';
+.workflowTabContainer {
+    margin-left: 304px;
+    transition: margin-left .3s;
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    &.tree-fold {
+        margin-left: 54px;
+    }
+    .tap-bar {
+        // background: #fff;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+        margin-bottom: $padding-25;
+        .topTabList {
+            padding: 25px $padding-25 0px;
+            flex: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            .topLeft {
+                flex: 1;
+                min-width: 320px;
+                .ivu-breadcrumb {
+                    font-size: 21px;
+                    /deep/.ivu-breadcrumb-item-separator {
+                        // color: rgba(0,0,0,0.65);
+                        @include font-color($light-text-color, $dark-text-color);
+                    }
+                }
+            }
+            .buttonChange {
+                flex: none;
+                .ivu-btn {
+                    font-size: 14px;
+                }
+                .button-group {
+                    margin-left: 15px;
+                }
+            }
+        }
+        .bottomTapList {
+            padding: 0px $padding-25;
+            border-bottom: $border-width-base $border-style-base $border-color-base;
+            @include border-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
+            margin-top: 12px;
+            flex: none;
+            display: flex;
+            align-items: center;
+            font-size: $font-size-large;
+            .bottomLeftText {
+                cursor: pointer;
+                flex: none;
+                font-size: $font-size-large;
+                padding: 0 15px;
+                margin-bottom: -1px;
+                line-height: 40px;
+                position: relative;
+                &::after {
+                    content: "";
+                    border-left: 1px solid #DEE4EC;
+                    @include border-color($border-color-base, $dark-border-color-base);
+                    width: 0;
+                    position: absolute; 
+                    right: -15px;
+                    top: 12px;
+                    height: 16px;
+                    margin: 0 15px;
+                }
+            }
+            .active {
+                border-bottom: 2px solid $primary-color;
+                @include border-color($primary-color, $dark-primary-color);
+            }
+            .bottomRightContainer {
+                flex: 1;
+                height: 40px;
+            }
+        }
+    }
+    .defaultSlot {
+        flex: 1;
+    }
+}
+
+.tab-item {
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    // color: $title-color;
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 200px;
+    overflow: hidden;
+    margin-right: 2px;
+    &.active {
+        height: 40px;
+        // color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
+        border-radius: 4px 4px 0 0;
+        border-bottom: 2px solid $primary-color;
+        @include border-color($primary-color, $dark-primary-color);
+        line-height: 38px;
+    }
+}

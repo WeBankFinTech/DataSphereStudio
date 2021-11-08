@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerUpdateCommand;
@@ -252,7 +253,8 @@ public class DwLayerServiceImpl implements DwLayerService {
 //            autoCollectStrategy = "{}";
 //        }
 
-        if (!layer.getPreset()) {
+        // 预置分层也能修改
+//        if (!layer.getPreset()) {
             name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
             enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
             owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
@@ -275,10 +277,9 @@ public class DwLayerServiceImpl implements DwLayerService {
             layer.setEnName(enName);
 
             layer.setOwner(owner);
-        }
+//        }
 
-        // TODO
-        String user = "hdfs";
+//        String user = SecurityFilter.getLoginUsername(request);
 
         Long oldVersion = layer.getLockVersion();
 

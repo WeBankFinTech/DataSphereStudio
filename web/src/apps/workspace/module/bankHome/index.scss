@@ -1,4 +1,4 @@
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 
 .page-bgc {
   @include bg-color($workspace-background, $dark-workspace-background);
@@ -6,7 +6,7 @@
   .page-bgc-header {
     padding: 0px $padding-25 0;
     @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
-    border-bottom: $border-width-base  $border-style-base $border-color-base;
+    border-bottom: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-workspace-body-bg-color);
     .header-info {
       padding: 25px 0px 25px 0px;
@@ -15,19 +15,25 @@
       align-items: center;
       .info-name {
         font-size: 21px;
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        @include font-color(
+          $workspace-title-color,
+          $dark-workspace-title-color
+        );
         font-family: PingFangSC-Regular;
         &::after {
-          content: '';
-          border-right: 1px solid #DEE4EC;
+          content: "";
+          border-right: 1px solid #dee4ec;
           margin: 0 50px;
-          @include border-color(#DEE4EC, rgba(255,255,255,0.15));
+          @include border-color(#dee4ec, rgba(255, 255, 255, 0.15));
         }
         .workspace-name {
           font-size: 24px;
           // color:#044B93;
           font-family: PingFangSC-Medium;
-          @include font-color($workspace-name-color, $dark-workspace-name-color);
+          @include font-color(
+            $workspace-name-color,
+            $dark-workspace-name-color
+          );
         }
       }
       p {
@@ -51,10 +57,13 @@
       align-items: flex-start;
       // box-shadow: 0 1px 6px $shadow-color;
       // border-color: #eee;
-      border: $border-width-base  $border-style-base $border-color-base;
+      border: $border-width-base $border-style-base $border-color-base;
       min-height: 200px;
       width: 100%;
-      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include bg-color(
+        $workspace-body-bg-color,
+        $dark-workspace-body-bg-color
+      );
       @include border-color($border-color-base, $dark-workspace-body-bg-color);
       .workspace-create-search {
         padding: 0 35px;
@@ -93,7 +102,10 @@
         margin-bottom: 20px;
         border-left: 3px solid $primary-color;
         @include border-color($primary-color, $dark-primary-color);
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        @include font-color(
+          $workspace-title-color,
+          $dark-workspace-title-color
+        );
       }
     }
 
@@ -101,21 +113,26 @@
       flex: 3;
       min-width: 200px;
       padding: $padding-25;
-      min-height: 600px;
+      min-height: 765px;
       margin-left: $padding-25;
-      border: $border-width-base  $border-style-base $border-color-base;
-      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      border: $border-width-base $border-style-base $border-color-base;
+      @include bg-color(
+        $workspace-body-bg-color,
+        $dark-workspace-body-bg-color
+      );
       @include border-color($border-color-base, $dark-workspace-body-bg-color);
       .right-box {
         width: 100%;
         .line {
           margin: 20px 0;
-          border-bottom: $border-width-base  $border-style-base $border-color-base;
-          @include border-color($border-color-base, $dark-border-color-base)
-
+          border-bottom: $border-width-base $border-style-base
+            $border-color-base;
+          @include border-color($border-color-base, $dark-border-color-base);
         }
       }
-      .knowledge-list, .FAQ-list, .menu-list {
+      .knowledge-list,
+      .FAQ-list,
+      .menu-list {
         margin-top: 10px;
         font-size: 12px;
         // color: $text-desc-color;
@@ -124,7 +141,9 @@
         justify-content: flex-start;
         align-items: flex-start;
         flex-wrap: wrap;
-        .knowledge-item, .FAQ-item, .menu-item {
+        .knowledge-item,
+        .FAQ-item,
+        .menu-item {
           line-height: 25px;
           flex: 50%;
           padding-left: 15px;
@@ -139,19 +158,25 @@
           }
         }
       }
-      .video-header, .knowledge-header, .FAQ-header, .menu-header {
+      .video-header,
+      .knowledge-header,
+      .FAQ-header,
+      .menu-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
       }
       .title {
-        font-size: $font-size-large ;
+        font-size: $font-size-large;
         font-weight: bold;
         // color: $text-title-color;
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        @include font-color(
+          $workspace-title-color,
+          $dark-workspace-title-color
+        );
         &::before {
-          content: '';
+          content: "";
           padding-right: 12px;
           border-left: 3px solid $primary-color;
           @include border-color($primary-color, $dark-primary-color);
@@ -180,7 +205,6 @@
         pointer-events: none;
       }
     }
-
   }
   .app-list {
     display: flex;
@@ -200,9 +224,9 @@
       cursor: pointer;
       font-size: 24px;
       // background: #F8F9FC;
-      @include bg-color(#F8F9FC, $dark-workspace-body-bg-color);
-      border: 1px dashed #CFD7E1;
-      @include border-color(#CFD7E1, $dark-border-color-base);
+      @include bg-color(#f8f9fc, $dark-workspace-body-bg-color);
+      border: 1px dashed #cfd7e1;
+      @include border-color(#cfd7e1, $dark-border-color-base);
       border-radius: 2px;
       line-height: 90px;
       text-align: center;
@@ -249,7 +273,10 @@
         font-family: PingFangSC-Regular;
         font-size: 16px;
         // color: rgba(0,0,0,0.85);
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        @include font-color(
+          $workspace-title-color,
+          $dark-workspace-title-color
+        );
         text-align: center;
         width: 100%;
         padding: 0 10px;
@@ -264,7 +291,8 @@
       @include font-color($light-text-color, $dark-text-color);
     }
   }
-  .setting-bt-wrap, .more-util {
+  .setting-bt-wrap,
+  .more-util {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -291,19 +319,23 @@
       border-radius: $border-radius-base;
       height: 100%;
       position: relative;
-      -webkit-transition: all .2s ease-in-out;
-      transition: all .2s ease-in-out;
+      -webkit-transition: all 0.2s ease-in-out;
+      transition: all 0.2s ease-in-out;
       // background-color: #fff;
-      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include bg-color(
+        $workspace-body-bg-color,
+        $dark-workspace-body-bg-color
+      );
       /deep/.ivu-tabs-nav {
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        @include font-color(
+          $workspace-title-color,
+          $dark-workspace-title-color
+        );
       }
       .app-shop-top {
         margin-top: 9px;
         margin-bottom: 20px;
       }
-
     }
-
   }
 }

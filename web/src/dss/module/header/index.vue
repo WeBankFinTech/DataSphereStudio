@@ -8,14 +8,14 @@
           @mouseleave="mouseleave"
           @click="mouseover"
         >
-          <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF" />
+          <SvgIcon title="菜单" style="font-size: 28px;" icon-class="menu" color="#00FFFF" />
         </div>
         <div class="logo">
           <img
             @click.stop="goHome"
             class="logo-img"
             :style="{ cursor: isAdmin ? 'pointer' : 'default' }"
-            src="../../assets/images/dssLogo5_1.png"
+            src="../../assets/images/dssLogo.png"
             :alt="$t('message.common.logoName')"
           />
           <span class="version">{{sysVersion}}</span>

@@ -387,7 +387,7 @@ export default {
 
   .assets-index-t-b1 {
     height: 46px;
-    background-color: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-base-color);
     display: flex;
     padding: 11px 0px;
     padding-left: 12px;
@@ -405,10 +405,11 @@ export default {
       padding-right: 16px;
       padding-top: 15px;
       border-right: 1px solid #dee4ec;
+      @include border-color(#dee4ec, $dark-border-color-base);
       &-title {
         font-family: PingFangSC-Medium;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.85);
+        @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         font-weight: bold;
       }
       &-user {
@@ -418,7 +419,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-env {
@@ -428,7 +429,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-label {
@@ -438,7 +439,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
     }

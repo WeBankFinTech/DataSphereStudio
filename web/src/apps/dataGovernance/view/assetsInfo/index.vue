@@ -387,20 +387,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .assets-info-wrap {
   flex: 1;
   flex-direction: column;
   display: flex;
 
   .assets-info-top-t {
-    background-color: rgba(#f8f9fc, 1);
+    @include bg-color(rgba(#f8f9fc, 1), $dark-base-color);
     height: 22px;
     border-top: 1px solid #dee4ec;
     border-bottom: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-border-color-base);
   }
   .assets-info-top {
     min-height: 80px;
     border-bottom: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-border-color-base);
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -420,12 +423,13 @@ export default {
       padding-left: 16px;
       padding-top: 16px;
       border-right: 1px solid #dee4ec;
+      @include border-color(#dee4ec, $dark-border-color-base);
       margin-right: -1px;
 
       &-title {
         font-family: PingFangSC-Medium;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.85);
+        @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         font-weight: bold;
       }
 
@@ -436,12 +440,12 @@ export default {
           margin-top: 16px;
           label {
             font-weight: normal;
-            color: rgba(0, 0, 0, 0.85);
+            @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
             display: inline-block;
             width: 70px;
           }
           span {
-            color: rgba(0, 0, 0, 0.65);
+            @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
           }
         }
       }
@@ -464,8 +468,9 @@ export default {
   }
 
   .assets-info-label {
-    background: #f4f7fb;
+    @include bg-color(#f4f7fb, $dark-base-color);
     border: 1px solid #dee4ec;
+    @include border-color(#dee4ec, $dark-border-color-base);
     border-radius: 2px;
     display: inline-block;
     min-width: 58px;

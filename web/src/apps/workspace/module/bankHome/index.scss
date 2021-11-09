@@ -44,12 +44,11 @@
     }
   }
   .workspace-main {
-    padding: $padding-25;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    position: relative;
+    margin: $padding-25;
+    padding-bottom: $padding-25;
     .workspace-main-left {
-      flex: 10;
+      width: 75%;
       min-height: 600px;
       display: flex;
       flex-direction: column;
@@ -59,7 +58,6 @@
       // border-color: #eee;
       border: $border-width-base $border-style-base $border-color-base;
       min-height: 200px;
-      width: 100%;
       @include bg-color(
         $workspace-body-bg-color,
         $dark-workspace-body-bg-color
@@ -110,11 +108,13 @@
     }
 
     .workspace-main-right {
-      flex: 3;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 25px;
+      width: calc(25% - 25px);
       min-width: 200px;
       padding: $padding-25;
-      min-height: 765px;
-      margin-left: $padding-25;
       border: $border-width-base $border-style-base $border-color-base;
       @include bg-color(
         $workspace-body-bg-color,

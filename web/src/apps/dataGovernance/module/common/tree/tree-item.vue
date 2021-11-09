@@ -119,8 +119,9 @@ export default {
     }
   }
   .tree-content-active {
-    background-color: #e0edff;
+    @include bg-color(#e0edff, $dark-base-color);
     border-right: 3px solid #2e92f7;
+    @include border-color(#2e92f7, $dark-border-color-base);
   }
   .tree-content-children {
     margin-bottom: 8px;
@@ -177,7 +178,7 @@ export default {
   }
 
   .tree-icon-active {
-    color: #2e92f7;
+    @include font-color(#2e92f7, $dark-text-color);
   }
   .tree-children {
     transition: max-height 0.3s;

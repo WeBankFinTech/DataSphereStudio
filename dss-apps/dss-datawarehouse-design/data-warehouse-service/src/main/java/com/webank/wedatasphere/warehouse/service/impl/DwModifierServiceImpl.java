@@ -22,6 +22,7 @@ import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwModifierService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,9 +130,11 @@ public class DwModifierServiceImpl implements DwModifierService {
 //        String decorationList = command.getDecorationList();
         String description = command.getDescription();
 
-        PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme name id should not empty"));
+        PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme domain id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(layerId), DwException.argumentReject("layer id should not empty"));
         typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("type name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(typeName), DwException.argumentReject("type name must be digitg, chinese and underline"));
+
 //        typeNameAlias = PreconditionUtil.checkStringArgumentNotBlankTrim(typeNameAlias, DwException.argumentReject("typeNameAlias should not empty"));
 
         // 验证 主题域  分层是否存在
@@ -266,8 +269,9 @@ public class DwModifierServiceImpl implements DwModifierService {
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme domain id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(layerId), DwException.argumentReject("layer id should not empty"));
-        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("modifier type name should not empty"));
-
+//        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("modifier type name should not empty"));
+        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("type name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(typeName), DwException.argumentReject("type name must be digitg, chinese and underline"));
         // 验证 主题域  分层是否存在
         QueryWrapper<DwLayer> layerQueryWrapper = new QueryWrapper<>();
         layerQueryWrapper.eq("id", layerId);

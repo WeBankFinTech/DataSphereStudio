@@ -10,10 +10,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DwStatisticalPeriodMapper extends BaseMapper<DwStatisticalPeriod> {
-    IPage<DwStatisticalPeriodVo> selectPageItems(IPage<DwStatisticalPeriod> queryPage, @Param(Constants.WRAPPER) QueryWrapper<DwStatisticalPeriod> queryWrapper);
+//    IPage<DwStatisticalPeriodVo> selectPageItems(IPage<DwStatisticalPeriod> queryPage, @Param(Constants.WRAPPER) QueryWrapper<DwStatisticalPeriod> queryWrapper);
+
+    IPage<DwStatisticalPeriodVo> selectPageItems(IPage<DwStatisticalPeriod> queryPage, Map<String, Object> params);
 
     List<DwStatisticalPeriodVo> selectItems(@Param(Constants.WRAPPER) QueryWrapper<DwStatisticalPeriod> queryWrapper);
 

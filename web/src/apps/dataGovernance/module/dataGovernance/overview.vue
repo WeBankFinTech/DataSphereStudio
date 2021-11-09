@@ -237,6 +237,7 @@ export default {
   padding-top: 24px;
   padding-right: 3px;
   border-top: 24px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   .overview-t {
     &-card {
       display: flex;

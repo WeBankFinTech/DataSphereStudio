@@ -29,6 +29,7 @@ export default {
         edges: []
       }
       let keys = Object.keys(this.lineageData.guidEntityMap)
+      console.log(this.lineageData.guidEntityMap)
       keys.forEach(item => {
         const cur = this.lineageData.guidEntityMap[item]
         let icon

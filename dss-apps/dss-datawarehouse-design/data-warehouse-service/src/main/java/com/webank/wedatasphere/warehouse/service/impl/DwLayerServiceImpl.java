@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerUpdateCommand;
@@ -17,6 +18,7 @@ import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
 //import com.webank.wedatasphere.warehouse.mapper.DwLayerModelMapper;
 import com.webank.wedatasphere.warehouse.service.DwLayerService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +54,9 @@ public class DwLayerServiceImpl implements DwLayerService {
         String principalName = command.getPrincipalName();
 
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
         enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("charge user should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
         QueryWrapper<DwLayer> nameUniqueCheckQuery = new QueryWrapper<>();
@@ -166,12 +170,13 @@ public class DwLayerServiceImpl implements DwLayerService {
         QueryWrapper<DwLayer> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
         queryWrapper.eq("preset", Boolean.FALSE);
-        if (Strings.isNotBlank(name)) {
-            queryWrapper.like("name", name).or().like("en_name", name);
-        }
         if (!Objects.isNull(enabled)) {
             queryWrapper.eq("is_available", enabled);
         }
+        if (Strings.isNotBlank(name)) {
+            queryWrapper.like("name", name).or().like("en_name", name);
+        }
+
 
         Page<DwLayer> queryPage = new Page<>(page, size);
 
@@ -252,9 +257,12 @@ public class DwLayerServiceImpl implements DwLayerService {
 //            autoCollectStrategy = "{}";
 //        }
 
-        if (!layer.getPreset()) {
+        // 预置分层也能修改
+//        if (!layer.getPreset()) {
             name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-            enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+            PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+            enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+            PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
             owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
             // 并且自定义分层在更新名称的时候，名称不能重复
             QueryWrapper<DwLayer> nameUniqueCheckQuery = new QueryWrapper<>();
@@ -275,10 +283,9 @@ public class DwLayerServiceImpl implements DwLayerService {
             layer.setEnName(enName);
 
             layer.setOwner(owner);
-        }
+//        }
 
-        // TODO
-        String user = "hdfs";
+//        String user = SecurityFilter.getLoginUsername(request);
 
         Long oldVersion = layer.getLockVersion();
 

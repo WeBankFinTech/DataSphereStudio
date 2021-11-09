@@ -5,7 +5,6 @@ import com.webank.wedatasphere.dss.datamodel.table.service.TableService;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.client.GovernanceDwRemoteClient;
 import com.webank.wedatasphere.warehouse.client.action.ListDwLayerAction;
 import com.webank.wedatasphere.warehouse.client.action.ListDwThemeDomainAction;

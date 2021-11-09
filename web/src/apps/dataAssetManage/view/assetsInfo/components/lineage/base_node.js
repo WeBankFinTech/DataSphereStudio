@@ -1,8 +1,9 @@
 /* eslint-disable */
-import {Node} from 'butterfly-dag';
+import { Node } from "butterfly-dag";
+import $ from "jquery";
 
-import './base_node.scss';
-import './symbol/iconfont'
+import "./base_node.scss";
+import "./symbol/iconfont";
 
 class BaseNode extends Node {
   constructor(opts) {
@@ -10,18 +11,17 @@ class BaseNode extends Node {
     this.options = opts;
   }
 
-  draw = (opts) => {
+  draw = opts => {
     let container = $('<div class="relation-node"></div>')
-      .css('top', opts.top)
-      .css('left', opts.left)
-      .attr('id', opts.id)
+      .css("top", opts.top)
+      .css("left", opts.left)
+      .attr("id", opts.id)
       .addClass(opts.options.className);
-    let text = `<span>${opts.options.name}</span>`
-    if (opts.options.status !== 'ACTIVE') {
-      text = `<span style="color:rgba(0,0,0,0.2)">${opts.options.name}</span>`
+    let text = `<span>${opts.options.name}</span>`;
+    if (opts.options.status !== "ACTIVE") {
+      text = `<span style="color:rgba(0,0,0,0.2)">${opts.options.name}</span>`;
     }
-    let logoContainer =
-      $(`<div class="logo-container" title="${opts.options.name}">
+    let logoContainer = $(`<div class="logo-container" title="${opts.options.name}">
         <svg class="icon" aria-hidden="true" style="float: left;font-size: 34px;">
             <use xlink:href="#${opts.options.icon}" />
         </svg>
@@ -31,7 +31,7 @@ class BaseNode extends Node {
     container.append(logoContainer);
 
     return container[0];
-  }
+  };
 }
 
 export default BaseNode;

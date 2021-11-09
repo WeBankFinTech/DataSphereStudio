@@ -57,6 +57,14 @@ export const switchMeasuresStatus = (id, status) =>
   );
 
 /**
+ * 删除度量
+ * @returns {Object.result}
+ *
+ */
+export const delMeasures = id =>
+  api.fetch(`${API_PATH.DATAMODEL_PATH}measures/${id}`, {}, "delete");
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * 维度列表
  * @returns {Object.result}
  *
@@ -111,6 +119,12 @@ export const switchDimensionsStatus = (id, status) =>
     "put"
   );
 
+/**
+ * 删除维度
+ * @returns {Object.result}
+ */
+export const delDimensions = id =>
+  api.fetch(`${API_PATH.DATAMODEL_PATH}dimensions/${id}`, {}, "delete");
 ///////////////////////////////////////////
 
 /**
@@ -212,6 +226,13 @@ export const rollbackIndicatorsVersion = (name, version) =>
     { name, version },
     "post"
   );
+
+/**
+ * 删除指标
+ * @returns {Object.result}
+ */
+export const delIndicators = id =>
+  api.fetch(`${API_PATH.DATAMODEL_PATH}indicators/${id}`, {}, "delete");
 /////////////////////////////////////////////
 
 /**

@@ -1157,7 +1157,7 @@ export default {
         .pageTip {
           font-family: PingFangSC-Regular;
           font-size: 12px;
-          color: rgba(0, 0, 0, 0.45);
+          @include font-color(rgba(0, 0, 0, 0.45), $dark-text-color);
           margin-left: 10px;
         }
       }

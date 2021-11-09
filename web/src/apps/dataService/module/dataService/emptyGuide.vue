@@ -38,7 +38,7 @@ export default {
 .title {
   font-family: PingFangSC-Medium;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.65);
+  @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   line-height: 24px;
 }
 .stepWrap {
@@ -55,22 +55,23 @@ export default {
   height: 28px;
   box-sizing: border-box;
   border: 2px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-text-color);
   border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: PingFangSC-Regular;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.45);
+  @include font-color(rgba(0, 0, 0, 0.45), $dark-text-color);
 }
 .line {
   width: 2px;
   height: 41px;
-  background: #dee4ec;
+  @include bg-color(#dee4ec, $dark-text-color);
   margin-left: 12px;
 }
 .lineNone{
-  background: #fff;
+  display: none;
 }
 .rightWrap {
   width: 380px;
@@ -79,7 +80,7 @@ export default {
   padding-top: 2px;
   font-family: PingFangSC-Regular;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+  @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   line-height: 22px;
 }
 </style>

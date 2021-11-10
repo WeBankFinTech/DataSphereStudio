@@ -114,15 +114,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
             });
         }
 
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("status", Boolean.TRUE);
-//        if (!Objects.isNull(command.getEnabled())) {
-//            params.put("is_available", command.getEnabled());
-//        }
-//        if (Strings.isNotBlank(name)) {
-//            params.put("name", name);
-//        }
-
         Page<DwStatisticalPeriod> queryPage = new Page<>(page, size);
 
 //        IPage<DwStatisticalPeriodVo> _page = this.dwStatisticalPeriodMapper.selectPageItems(queryPage, queryWrapper);
@@ -174,8 +165,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         String statStartFormula = command.getStatStartFormula();
         String statEndFormula = command.getStatEndFormula();
 
-//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
         PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
         enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
@@ -200,7 +189,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         DwThemeDomain dwThemeDomain = this.dwThemeDomainMapper.selectOne(themeDomainQueryWrapper);
         PreconditionUtil.checkState(!Objects.isNull(dwThemeDomain), DwException.stateReject("theme domain not found"));
 
-//        String user = "hdfs";
         Date now = new Date();
 
         DwStatisticalPeriod record = new DwStatisticalPeriod();
@@ -229,9 +217,35 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
     public Message getById(HttpServletRequest request, Long id) throws DwException {
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
 
-        DwStatisticalPeriodVo record = this.dwStatisticalPeriodMapper.selectItemById(id);
-        PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("statistical period not found"));
-        PreconditionUtil.checkState(record.getStatus(), DwException.stateReject("statistical period has been removed"));
+        DwStatisticalPeriod period = this.dwStatisticalPeriodMapper.selectById(id);
+        PreconditionUtil.checkState(!Objects.isNull(period), DwException.stateReject("statistical period not found"));
+        PreconditionUtil.checkState(period.getStatus(), DwException.stateReject("statistical period has been removed"));
+
+        DwStatisticalPeriodVo record = new DwStatisticalPeriodVo();
+        record.setId(period.getId());
+        record.setName(period.getName());
+        record.setEnName(period.getEnName());
+        record.setDescription(period.getDescription());
+        record.setOwner(period.getOwner());
+        record.setStatus(period.getStatus());
+        record.setCreateTime(period.getCreateTime());
+        record.setUpdateTime(period.getUpdateTime());
+        record.setPrincipalName(period.getPrincipalName());
+        record.setStartTimeFormula(period.getStartTimeFormula());
+        record.setEndTimeFormula(period.getEndTimeFormula());
+        record.setLayerId(period.getLayerId());
+        record.setThemeDomainId(period.getThemeDomainId());
+        record.setIsAvailable(period.getIsAvailable());
+        // 单独查询
+        Optional.ofNullable(period.getLayerId()).ifPresent(lid -> {
+            DwLayer dwLayer = this.dwLayerMapper.selectById(lid);
+            record.setLayerArea(dwLayer.getName());
+        });
+
+        Optional.ofNullable(period.getThemeDomainId()).ifPresent(tid -> {
+            DwThemeDomain dwThemeDomain = dwThemeDomainMapper.selectById(tid);
+            record.setThemeArea(dwThemeDomain.getName());
+        });
 
         return Message.ok().data("item", record);
     }
@@ -274,8 +288,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         String statEndFormula = command.getStatEndFormula();
 
         PreconditionUtil.checkState(!Objects.isNull(id), DwException.argumentReject("id not empty"));
-//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
         PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
         enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
@@ -307,7 +319,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         DwThemeDomain dwThemeDomain = this.dwThemeDomainMapper.selectOne(themeDomainQueryWrapper);
         PreconditionUtil.checkState(!Objects.isNull(dwThemeDomain), DwException.stateReject("theme domain not found"));
 
-//        String user = "hdfs";
         Date now = new Date();
         Long oldLockVersion = record.getLockVersion();
 
@@ -354,8 +365,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         if (Objects.equals(enabled, record.getIsAvailable())) {
             return;
         }
-
-//        String user = "hdfs";
 
         Long oldVersion = record.getLockVersion();
         UpdateWrapper<DwStatisticalPeriod> updateWrapper = new UpdateWrapper<>();

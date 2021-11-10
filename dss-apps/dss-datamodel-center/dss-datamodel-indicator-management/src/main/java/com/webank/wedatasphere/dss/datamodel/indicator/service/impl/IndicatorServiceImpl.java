@@ -130,9 +130,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         }
 
         //校验引用情况
-        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())) {
+        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())||indicatorContentService.indicatorReference(dssDatamodelIndicator.getName())) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has referenced");
         }
+
 
 //        //有版本不能删除
 //        if (indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, dssDatamodelIndicator.getName())) > 0) {
@@ -140,8 +141,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 //        }
         //同时删除版本
         indicatorVersionService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, dssDatamodelIndicator.getName()));
-
-        return getBaseMapper().deleteById(id);
+        //删除指标
+        getBaseMapper().deleteById(id);
+        indicatorContentService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId,id));
+        return 1;
     }
 
 

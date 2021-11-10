@@ -16,6 +16,7 @@ import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwThemeDomainService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,9 +108,12 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         String description = command.getDescription();
 //        String authority = command.getAuthority();
 
+//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
 
@@ -191,9 +195,12 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
 //        String authority = command.getAuthority();
         String description = command.getDescription();
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
+//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
 
@@ -225,19 +232,15 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         DwThemeDomain nameAliasExist = this.dwThemeDomainMapper.selectOne(nameUniqueCheckQuery);
         PreconditionUtil.checkState(Objects.isNull(nameAliasExist), DwException.stateReject("theme domain en name aleardy exists"));
 
-//        String user = "hdfs";
-
         Long oldVersion = record.getLockVersion();
 
         Date now = new Date();
         record.setName(name);
         record.setEnName(enName);
         record.setDescription(description);
-//        record.setPrincipalName(authority);
         record.setPrincipalName(principalName);
         record.setOwner(owner);
         record.setSort(sort);
-//        record.setModifyUser(user);
         record.setUpdateTime(now);
         record.setLockVersion(oldVersion + 1);
 
@@ -276,10 +279,7 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
             return;
         }
 
-//        String user = "hdfs";
-
         Long oldVersion = record.getLockVersion();
-//        record.setModifyUser(user);
         record.setUpdateTime(new Date());
         record.setIsAvailable(enabled);
         record.setLockVersion(oldVersion + 1);

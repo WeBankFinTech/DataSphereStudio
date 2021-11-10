@@ -19,15 +19,14 @@ import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwStatisticalPeriodService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodService {
@@ -57,10 +56,38 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
             queryWrapper.and(qw -> {
                 qw.like("name", name).or().like("en_name", name);
             });
-//            queryWrapper.like("name", name).or().like("en_name", name);
         }
 
-        List<DwStatisticalPeriodVo> records = this.dwStatisticalPeriodMapper.selectItems(queryWrapper);
+        List<DwStatisticalPeriod> recs = this.dwStatisticalPeriodMapper.selectList(queryWrapper);
+
+        List<DwStatisticalPeriodVo> records = new ArrayList<>();
+        DwStatisticalPeriodVo vo;
+        for (DwStatisticalPeriod rec : recs) {
+            vo = new DwStatisticalPeriodVo();
+            vo.setId(rec.getId());
+            vo.setName(rec.getName());
+            vo.setEnName(rec.getEnName());
+            vo.setDescription(rec.getDescription());
+            vo.setOwner(rec.getOwner());
+            vo.setStatus(rec.getStatus());
+            vo.setCreateTime(rec.getCreateTime());
+            vo.setUpdateTime(rec.getUpdateTime());
+            vo.setPrincipalName(rec.getPrincipalName());
+            vo.setStartTimeFormula(rec.getStartTimeFormula());
+            vo.setEndTimeFormula(rec.getEndTimeFormula());
+            vo.setLayerId(rec.getLayerId());
+            vo.setThemeDomainId(rec.getThemeDomainId());
+            vo.setIsAvailable(rec.getIsAvailable());
+            // 单独查询
+            DwLayer dwLayer = this.dwLayerMapper.selectById(rec.getLayerId());
+            vo.setLayerArea(dwLayer.getName());
+            DwThemeDomain dwThemeDomain = dwThemeDomainMapper.selectById(rec.getThemeDomainId());
+            vo.setThemeArea(dwThemeDomain.getName());
+
+            records.add(vo);
+        }
+
+//        List<DwStatisticalPeriodVo> records = this.dwStatisticalPeriodMapper.selectItems(queryWrapper);
         return Message.ok().data("list", records);
     }
 
@@ -77,21 +104,48 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
 
         QueryWrapper<DwStatisticalPeriod> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
+        if (!Objects.isNull(command.getEnabled())) {
+            queryWrapper.eq("is_available", command.getEnabled());
+        }
+
         if (Strings.isNotBlank(name)) {
             queryWrapper.and(qw -> {
                 qw.like("name", name).or().like("en_name", name);
             });
         }
 
-        if (!Objects.isNull(command.getEnabled())) {
-            queryWrapper.eq("is_available", command.getEnabled());
-        }
-
         Page<DwStatisticalPeriod> queryPage = new Page<>(page, size);
 
-        IPage<DwStatisticalPeriodVo> _page = this.dwStatisticalPeriodMapper.selectPageItems(queryPage, queryWrapper);
+//        IPage<DwStatisticalPeriodVo> _page = this.dwStatisticalPeriodMapper.selectPageItems(queryPage, queryWrapper);
+//        IPage<DwStatisticalPeriodVo> _page = this.dwStatisticalPeriodMapper.selectPageItems(queryPage, params);
+        Page<DwStatisticalPeriod> _page = this.dwStatisticalPeriodMapper.selectPage(queryPage, queryWrapper);
+        List<DwStatisticalPeriod> recs = _page.getRecords();
+        List<DwStatisticalPeriodVo> records = new ArrayList<>();
+        DwStatisticalPeriodVo vo;
+        for (DwStatisticalPeriod rec : recs) {
+            vo = new DwStatisticalPeriodVo();
+            vo.setId(rec.getId());
+            vo.setName(rec.getName());
+            vo.setEnName(rec.getEnName());
+            vo.setDescription(rec.getDescription());
+            vo.setOwner(rec.getOwner());
+            vo.setStatus(rec.getStatus());
+            vo.setCreateTime(rec.getCreateTime());
+            vo.setUpdateTime(rec.getUpdateTime());
+            vo.setPrincipalName(rec.getPrincipalName());
+            vo.setStartTimeFormula(rec.getStartTimeFormula());
+            vo.setEndTimeFormula(rec.getEndTimeFormula());
+            vo.setLayerId(rec.getLayerId());
+            vo.setThemeDomainId(rec.getThemeDomainId());
+            vo.setIsAvailable(rec.getIsAvailable());
+            // 单独查询
+            DwLayer dwLayer = this.dwLayerMapper.selectById(rec.getLayerId());
+            vo.setLayerArea(dwLayer.getName());
+            DwThemeDomain dwThemeDomain = dwThemeDomainMapper.selectById(rec.getThemeDomainId());
+            vo.setThemeArea(dwThemeDomain.getName());
 
-        List<DwStatisticalPeriodVo> records = _page.getRecords();
+            records.add(vo);
+        }
 
         PageInfo<DwStatisticalPeriodVo> __page = new PageInfo<>(records, _page.getCurrent(), _page.getSize(), _page.getTotal());
 
@@ -112,7 +166,9 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         String statEndFormula = command.getStatEndFormula();
 
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
         statStartFormula = PreconditionUtil.checkStringArgumentNotBlankTrim(statStartFormula, DwException.argumentReject("stat start formula should not empty"));
         statEndFormula = PreconditionUtil.checkStringArgumentNotBlankTrim(statEndFormula, DwException.argumentReject("stat end formula should not empty"));
@@ -133,7 +189,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         DwThemeDomain dwThemeDomain = this.dwThemeDomainMapper.selectOne(themeDomainQueryWrapper);
         PreconditionUtil.checkState(!Objects.isNull(dwThemeDomain), DwException.stateReject("theme domain not found"));
 
-//        String user = "hdfs";
         Date now = new Date();
 
         DwStatisticalPeriod record = new DwStatisticalPeriod();
@@ -162,9 +217,35 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
     public Message getById(HttpServletRequest request, Long id) throws DwException {
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
 
-        DwStatisticalPeriodVo record = this.dwStatisticalPeriodMapper.selectItemById(id);
-        PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("statistical period not found"));
-        PreconditionUtil.checkState(record.getStatus(), DwException.stateReject("statistical period has been removed"));
+        DwStatisticalPeriod period = this.dwStatisticalPeriodMapper.selectById(id);
+        PreconditionUtil.checkState(!Objects.isNull(period), DwException.stateReject("statistical period not found"));
+        PreconditionUtil.checkState(period.getStatus(), DwException.stateReject("statistical period has been removed"));
+
+        DwStatisticalPeriodVo record = new DwStatisticalPeriodVo();
+        record.setId(period.getId());
+        record.setName(period.getName());
+        record.setEnName(period.getEnName());
+        record.setDescription(period.getDescription());
+        record.setOwner(period.getOwner());
+        record.setStatus(period.getStatus());
+        record.setCreateTime(period.getCreateTime());
+        record.setUpdateTime(period.getUpdateTime());
+        record.setPrincipalName(period.getPrincipalName());
+        record.setStartTimeFormula(period.getStartTimeFormula());
+        record.setEndTimeFormula(period.getEndTimeFormula());
+        record.setLayerId(period.getLayerId());
+        record.setThemeDomainId(period.getThemeDomainId());
+        record.setIsAvailable(period.getIsAvailable());
+        // 单独查询
+        Optional.ofNullable(period.getLayerId()).ifPresent(lid -> {
+            DwLayer dwLayer = this.dwLayerMapper.selectById(lid);
+            record.setLayerArea(dwLayer.getName());
+        });
+
+        Optional.ofNullable(period.getThemeDomainId()).ifPresent(tid -> {
+            DwThemeDomain dwThemeDomain = dwThemeDomainMapper.selectById(tid);
+            record.setThemeArea(dwThemeDomain.getName());
+        });
 
         return Message.ok().data("item", record);
     }
@@ -208,7 +289,9 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
 
         PreconditionUtil.checkState(!Objects.isNull(id), DwException.argumentReject("id not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
         statStartFormula = PreconditionUtil.checkStringArgumentNotBlankTrim(statStartFormula, DwException.argumentReject("stat start formula should not empty"));
         statEndFormula = PreconditionUtil.checkStringArgumentNotBlankTrim(statEndFormula, DwException.argumentReject("stat end formula should not empty"));
@@ -236,7 +319,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         DwThemeDomain dwThemeDomain = this.dwThemeDomainMapper.selectOne(themeDomainQueryWrapper);
         PreconditionUtil.checkState(!Objects.isNull(dwThemeDomain), DwException.stateReject("theme domain not found"));
 
-//        String user = "hdfs";
         Date now = new Date();
         Long oldLockVersion = record.getLockVersion();
 
@@ -283,8 +365,6 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         if (Objects.equals(enabled, record.getIsAvailable())) {
             return;
         }
-
-//        String user = "hdfs";
 
         Long oldVersion = record.getLockVersion();
         UpdateWrapper<DwStatisticalPeriod> updateWrapper = new UpdateWrapper<>();

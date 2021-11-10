@@ -11,13 +11,34 @@
              ) t ${ew.customSqlSegment}
     </select>
 
-    <select id="selectPageItems" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo">
+<!--    <select id="selectPageItems" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo">-->
+<!--        select *-->
+<!--        from (select a.*, b.name as themeArea, c.name as layerArea-->
+<!--              from dss_datawarehouse_statistical_period a-->
+<!--                       left outer join dss_datawarehouse_theme_domain b on a.theme_domain_id = b.id-->
+<!--                       left outer join dss_datawarehouse_layer c on a.layer_id = c.id-->
+<!--             ) t ${ew.customSqlSegment}-->
+<!--    </select>-->
+    <select id="selectPageItems" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo" parameterType="map">
         select *
         from (select a.*, b.name as themeArea, c.name as layerArea
               from dss_datawarehouse_statistical_period a
                        left outer join dss_datawarehouse_theme_domain b on a.theme_domain_id = b.id
                        left outer join dss_datawarehouse_layer c on a.layer_id = c.id
-             ) t ${ew.customSqlSegment}
+             ) t
+        where 1 = 1
+        <!--<if test="status != null and status != ''">
+            and t.status = #{status}
+        </if>
+        <if test="is_available != null and is_available != ''">
+            and t.is_available = #{is_available}
+        </if>
+        <if test="name != null and name != ''">
+            and (
+                t.name like '%${name}%' or t.en_name like '%${name}%'
+            )
+        </if>-->
+
     </select>
 
     <select id="selectItemById" resultType="com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo" parameterType="java.lang.Long">

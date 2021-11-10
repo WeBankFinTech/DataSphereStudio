@@ -222,7 +222,7 @@ import {
   createTable,
   generatorNewVersion,
   checkTableData,
-} from "../../../service/tableManageApi";
+} from "@dataModelCenter/service/tableManageApi";
 import ColumnEditor from "./columnEditor.vue";
 export default {
   components: { ColumnEditor },

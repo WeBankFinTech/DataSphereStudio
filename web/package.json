@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "axios": "0.19.2",
-    "babel-polyfill": "6.26.0",
     "butterfly-dag": "^4.1.8",
     "clipboard": "^2.0.8",
     "core-js": "2.6.11",
@@ -38,29 +37,22 @@
     "dt-sql-parser": "1.2.1",
     "eslint": "6.8.0",
     "eslint-plugin-vue": "6.2.2",
-    "highlight.js": "9.18.3",
     "iview": "3.5.4",
     "jquery": "^3.6.0",
-    "json-bigint": "^1.0.0",
     "lodash": "4.17.20",
     "md5": "2.3.0",
-    "mitt": "1.2.0",
     "moment": "2.29.1",
     "monaco-editor": "0.19.3",
-    "node-sass": "^4.14.1",
     "pinyin": "2.9.1",
     "qs": "6.9.4",
-    "reconnecting-websocket": "4.4.0",
-    "sql-formatter": "2.3.3",
-    "svgo": "1.3.0",
     "vue": "2.6.12",
     "vue-i18n": "8.22.1",
     "vue-router": "3.4.8",
     "vuedraggable": "2.24.3",
-    "vuescroll": "4.16.1",
-    "worker-loader": "2.0.0"
+    "vuescroll": "4.16.1"
   },
   "devDependencies": {
+    "babel-polyfill": "6.26.0",
     "@kazupon/vue-i18n-loader": "0.4.1",
     "@vue/cli-plugin-babel": "3.12.1",
     "@vue/cli-plugin-eslint": "3.12.1",
@@ -78,6 +70,7 @@
     "svg-sprite-loader": "5.0.0",
     "vue-cli-plugin-mockjs": "0.1.3",
     "vue-template-compiler": "2.6.12",
+    "node-sass": "^4.14.1",
     "webpack-virtual-modules": "0.3.2"
   }
 }

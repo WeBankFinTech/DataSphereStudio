@@ -80,7 +80,7 @@ import {
   createLayersCustom,
   getLayersById,
   editLayersCustom,
-} from "../../service/api";
+} from "@dataWarehouseDesign/service/api";
 import storage from "@/common/helper/storage";
 let userName = storage.get("baseInfo", "local").username;
 export default {

@@ -18,6 +18,7 @@ export default {
     return {
       height: 0,
       visualSrc: '',
+      // 控制刷新
       isRefresh: true
     };
   },
@@ -70,7 +71,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .iframeClass{
     height: 100%;
 }

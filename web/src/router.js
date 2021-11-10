@@ -23,35 +23,29 @@ const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 };
-const router = new VueRouter({
-  routes
-});
-
+const router = new VueRouter({ routes });
+// 路由跳转之前
 router.beforeEach((to, from, next) => {
   if (to.meta) {
     // 给路由添加参数，控制显示对应header
     if (to.meta.header) {
       to.query.showHeader = to.meta.header;
     }
+    // 是否有公开权限
     if (to.meta.publicPage) {
-      if (from.query.workspaceId && to.query.workspaceId === undefined) {
+      // workspaceId 处理
+      if (from.query.workspaceId && !Boolean(to.query.workspaceId)) {
         to.query.workspaceId = from.query.workspaceId;
         next(to);
       }
       // 公共页面不需要权限控制（404，500）
       next();
-    } else if (to.path != "/workspace") {
-      next("/workspace");
     } else {
-      if (from.query.workspaceId && to.query.workspaceId === undefined) {
-        to.query.workspaceId = from.query.workspaceId;
-        next(to);
-      }
-      next();
+      next("/workspace");
     }
   }
 });
-
+// 路由跳转之后 设置标题
 router.afterEach(to => {
   if (to.meta) {
     document.title = to.meta.title || "DataSphere Studio";

@@ -15,7 +15,6 @@
  *
  */
 
-// vue.config.js
 const path = require("path");
 const webpack = require("webpack");
 const fs = require("fs");
@@ -24,6 +23,7 @@ const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const VirtualModulesPlugin = require("webpack-virtual-modules");
 const apps = require("./src/config.json");
 
+// 获取packages中的版本号
 const getVersion = () => {
   const pkgPath = path.join(__dirname, "./package.json");
   let pkg = fs.readFileSync(pkgPath);
@@ -51,6 +51,7 @@ let appsI18n = [];
 let headers = [];
 
 Object.entries(apps).forEach(item => {
+  // 自动加载各个模块的 module
   if (item[1].module) {
     requireComponent.push(
       `require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`
@@ -78,7 +79,7 @@ Object.entries(apps).forEach(item => {
 
 let buildDynamicModules = Object.values(apps);
 buildDynamicModules = JSON.stringify(buildDynamicModules);
-
+// 虚拟模块
 const virtualModules = new VirtualModulesPlugin({
   "node_modules/dynamic-modules.js": `module.exports = {
     apps: ${buildDynamicModules},
@@ -98,6 +99,7 @@ const plugins = [
   new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn|ja/)
 ];
 
+// 针对木桶子模块加载一些插件
 // scriptis 有使用编辑器组件, 需要Monaco Editor
 if (modules.indexOf("scriptis") > -1) {
   plugins.push(new MonacoWebpackPlugin());
@@ -164,7 +166,24 @@ module.exports = {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
-        "@component": path.resolve(__dirname, "./src/components")
+        "@component": path.resolve(__dirname, "./src/components"),
+        // 各个子应用
+        "@apiServices": path.resolve(__dirname, "./src/apps/apiServices"),
+        "@dataAssetManage": path.resolve(
+          __dirname,
+          "./src/apps/dataAssetManage"
+        ),
+        "@dataModelCenter": path.resolve(
+          __dirname,
+          "./src/apps/dataModelCenter"
+        ),
+        "@dataWarehouseDesign": path.resolve(
+          __dirname,
+          "./src/apps/dataWarehouseDesign"
+        ),
+        "@scriptis": path.resolve(__dirname, "./src/apps/scriptis"),
+        "@workflows": path.resolve(__dirname, "./src/apps/workflows"),
+        "@workspace": path.resolve(__dirname, "./src/apps/workspace")
       }
     },
     plugins
@@ -177,6 +196,7 @@ module.exports = {
     }
   },
   devServer: {
+    host: "0.0.0.0",
     proxy: {
       "/api": {
         target: "http://121.36.12.247:8088/",

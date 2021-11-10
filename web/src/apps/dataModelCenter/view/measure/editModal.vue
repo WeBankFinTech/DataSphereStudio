@@ -77,7 +77,7 @@ import {
   editMeasures,
   getMeasuresById,
   getThemesList,
-} from "../../service/api";
+} from "@dataModelCenter/service/api";
 import storage from "@/common/helper/storage";
 let userName = storage.get("baseInfo", "local").username;
 export default {

@@ -16,11 +16,13 @@ export default {
     document.removeEventListener('copy', this.copyAction, false);
   },
   methods: {
+    // 复制动作
     copyAction(event) {
       // 谷歌浏览器中的clipboardData对象存在event事件里，用于获取剪贴板中的数据，只有在复制操作过程中才能监听到
       const string = event.clipboardData.getData('text/plain') || event.target.value || event.target.outerText;
       storage.set('copyString', string);
     },
+    // 清除 缓存
     clearSession() {
       tree.remove('scriptTree');
       tree.remove('hdfsTree');

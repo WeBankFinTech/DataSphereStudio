@@ -176,8 +176,8 @@ import {
   getDataBasesList,
   getThemesList,
   getLayersList,
-} from "../../../service/tableManageApi";
-import formatDate from "../../../utils/formatDate";
+} from "@dataModelCenter/service/tableManageApi";
+import formatDate from "@dataModelCenter/utils/formatDate";
 import storage from "@/common/helper/storage";
 import VersionListModal from "./versionListModal.vue";
 export default {

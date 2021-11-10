@@ -1,10 +1,10 @@
 import { merge } from 'lodash'
+// 引入dss 顶层路由
 import routes, { subAppRoutes } from "./dss/router"
 // 根据module参数配置要打包的应用，生成的虚拟模块
 const apps = require('dynamic-modules')
 // 处理路由，单个应用可以有独立的顶层路由配置layout，header，footer
 // length ===1 为单个子应用独立运行，否则为dss，包含多个子应用
-console.log(apps, 'apps')
 let subRoutes = subAppRoutes
 const appsRoutes = Object.values(apps.appsRoutes)
 if (apps.modules.length === 1) {
@@ -23,12 +23,13 @@ if (apps.microModule) {
   if (apps.appsRoutes[apps.microModule].subAppRoutes) {
     subRoutes = apps.appsRoutes[apps.microModule].subAppRoutes
   }
-    
+
   if (apps.microModule === 'workflows') {
     subRoutes.redirect =  '/process'
   }
 
 }
+
 if (appsRoutes) {
   appsRoutes.forEach(route => {
     if (apps.microModule === 'apiServices' && route.apiServicesRoutes) {

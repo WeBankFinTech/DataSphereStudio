@@ -233,7 +233,7 @@ public class DSSDataGovernanceAssetRestful {
     public Response deleteModelType(@Context HttpServletRequest req,@RequestBody DeleteModelTypeVO vo)throws Exception{
         logger.info("deleteModelTypeVO : {}", vo);
         assetService.deleteModelType(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","删除成功"));
     }
 
 

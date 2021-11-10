@@ -3,9 +3,12 @@ package com.webank.wedatasphere.dss.datamodel.table.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableVersionMapper;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
+import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableCollcetion;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableVersion;
 import com.webank.wedatasphere.dss.datamodel.table.service.TableMaterializedHistoryService;
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -32,13 +36,15 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
 
     @Override
     public String findLastVersion(String name) {
+        PageHelper.clearPage();
+        PageHelper.startPage(1,1);
         //查询当前表名称最大版本
-        DssDatamodelTableVersion lastVersion = getBaseMapper().selectOne(
+        PageInfo<DssDatamodelTableVersion> pageInfo = new PageInfo<>(getBaseMapper().selectList(
                 Wrappers.<DssDatamodelTableVersion>lambdaQuery()
                         .eq(DssDatamodelTableVersion::getName, name)
-                        .orderByDesc(DssDatamodelTableVersion::getVersion));
-
-        return lastVersion != null ? lastVersion.getVersion() : null;
+                        .orderByDesc(DssDatamodelTableVersion::getVersion)));
+        List<DssDatamodelTableVersion> list = pageInfo.getList();
+        return !CollectionUtils.isEmpty(list) ? list.get(0).getVersion() : null;
     }
 
 

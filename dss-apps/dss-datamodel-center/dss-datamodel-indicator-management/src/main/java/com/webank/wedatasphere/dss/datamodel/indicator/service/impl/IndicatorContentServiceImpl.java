@@ -69,10 +69,17 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
 
 
     @Override
-    public Boolean indicatorReference(String name) throws ErrorException {
+    public Boolean sourceInfoReference(String name) throws ErrorException {
         int columnVersionCount = getBaseMapper().selectCount(
                 Wrappers.<DssDatamodelIndicatorContent>lambdaQuery()
-                        .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,"\""+name + "\""));
+                        .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,"\""+ name + "\"")
+                        .or()
+                        .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,"\""+ name + ",")
+                        .or()
+                        .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,","+ name + ",")
+                        .or()
+                        .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,","+ name + "\""));
+
         return columnVersionCount>0;
     }
 }

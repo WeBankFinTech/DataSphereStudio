@@ -1,9 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -21,7 +19,6 @@ import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndica
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorContent;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorQuery;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorVersion;
-import com.webank.wedatasphere.dss.datamodel.indicator.restful.IndicatorRestfulApi;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorContentService;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorVersionService;
@@ -130,7 +127,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         }
 
         //校验引用情况
-        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())||indicatorContentService.indicatorReference(dssDatamodelIndicator.getName())) {
+        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())||indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getName())) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has referenced");
         }
 

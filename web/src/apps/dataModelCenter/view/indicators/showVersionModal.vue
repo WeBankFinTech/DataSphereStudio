@@ -85,7 +85,7 @@
         </RadioGroup>
       </FormItem>
       <!-- 原子指标 -->
-      <Row v-if="formState.content.indicatorType === 0">
+      <Row v-if="formState.content.indicatorType === 0" key="yzzb">
         <Col :span="24">
           <FormItem label="关联度量" prop="_sourceInfo.info_0.measure">
             <SelectPage
@@ -118,7 +118,7 @@
         </Col>
       </Row>
       <!-- 衍生指标 -->
-      <Row v-if="formState.content.indicatorType === 1">
+      <Row v-if="formState.content.indicatorType === 1" key="yszb">
         <Col :span="24">
           <FormItem
             label="依赖的原子指标"
@@ -158,7 +158,7 @@
         </Col>
       </Row>
       <!-- 派生指标 -->
-      <Row v-if="formState.content.indicatorType === 2">
+      <Row v-if="formState.content.indicatorType === 2" key="pszb">
         <Col :span="24">
           <FormItem label="依赖的指标" prop="_sourceInfo.info_2.indicatorName">
             <SelectPage
@@ -199,7 +199,7 @@
         </Col>
       </Row>
       <!-- 复杂指标 -->
-      <Row v-if="formState.content.indicatorType === 3">
+      <Row v-if="formState.content.indicatorType === 3" key="fzzb">
         <Col :span="24">
           <FormItem label="依赖的指标" prop="_sourceInfo.info_3.indicatorName">
             <SelectPage
@@ -240,7 +240,7 @@
         </Col>
       </Row>
       <!-- 自定义指标 -->
-      <Row v-if="formState.content.indicatorType === 4">
+      <Row v-if="formState.content.indicatorType === 4" key="zdyzb">
         <Col :span="24">
           <FormItem label="计算公式" prop="_sourceInfo.info_4.formula">
             <Input
@@ -297,22 +297,10 @@ import {
   getCyclesList,
   getModifiersList,
   getLayersList,
-} from "../../service/api";
-import SelectPage from "../../components/selectPage";
+} from "@dataModelCenter/service/api";
+import SelectPage from "@dataModelCenter/components/selectPage";
+import { extend } from "@/common/util/object";
 
-/**
- * 根据现有key合并对象
- *  @param (Number)
- *  @return (String)
- */
-function merge(obj, source) {
-  let keys = Object.keys(obj);
-  for (let i = 0; i < keys.length; i++) {
-    let key = keys[i];
-    if (source[key] !== undefined) obj[key] = source[key];
-  }
-  return obj;
-}
 let sourceInfoMap = {
   0: { measure: "", formula: "", dimension: "" },
   1: { indicatorName: "", formula: "", dimension: "" },
@@ -531,7 +519,7 @@ export default {
             info_4: Object.assign({}, sourceInfoMap[4]),
           },
         };
-        merge(
+        extend(
           newFormState._sourceInfo[`info_${detail.content.indicatorType}`],
           detail.content.indicatorSourceInfo
         );

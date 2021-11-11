@@ -38,7 +38,6 @@
     "eslint": "6.8.0",
     "eslint-plugin-vue": "6.2.2",
     "iview": "3.5.4",
-    "jquery": "^3.6.0",
     "lodash": "4.17.20",
     "md5": "2.3.0",
     "moment": "2.29.1",

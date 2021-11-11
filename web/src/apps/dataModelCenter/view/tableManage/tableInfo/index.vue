@@ -290,11 +290,14 @@ import {
   getCollectList,
   addCollect,
   delCancel,
-} from "../../../service/tableManageApi";
-import formatDate from "../../../utils/formatDate";
-import { fomatSqlForShow, fomatSqlForCopy } from "../../../utils/fomatSQL";
+} from "@dataModelCenter/service/tableManageApi";
+import formatDate from "@dataModelCenter/utils/formatDate";
+import {
+  fomatSqlForShow,
+  fomatSqlForCopy,
+} from "@dataModelCenter/utils/fomatSQL";
 import storage from "@/common/helper/storage";
-import handleClipboard from "../../../utils/clipboard";
+import handleClipboard from "@dataModelCenter/utils/clipboard";
 
 const columnInfoTableColumn = [
   {

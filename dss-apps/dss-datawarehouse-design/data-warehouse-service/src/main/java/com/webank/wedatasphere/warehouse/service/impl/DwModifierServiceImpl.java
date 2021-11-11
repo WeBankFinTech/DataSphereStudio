@@ -22,6 +22,7 @@ import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwModifierService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +59,17 @@ public class DwModifierServiceImpl implements DwModifierService {
     @Override
     public Message queryAllModifiers(HttpServletRequest request, DwModifierQueryCommand command) throws DwException {
         String typeName = command.getName();
+        Boolean isAvailable = command.getEnabled();
 
         QueryWrapper<DwModifier> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
+        if (!Objects.isNull(isAvailable)) {
+            queryWrapper.eq("is_available", isAvailable);
+        }
         if (Strings.isNotBlank(typeName)) {
-            queryWrapper.like("modifier_type", typeName);
+            queryWrapper.and(qw -> {
+                queryWrapper.like("modifier_type", typeName).or().like("modifier_type_en", typeName);
+            });
         }
         List<DwModifier> records = this.dwModifierMapper.selectList(queryWrapper);
 
@@ -125,13 +132,18 @@ public class DwModifierServiceImpl implements DwModifierService {
         Long themeDomainId = command.getThemeDomainId();
         Long layerId = command.getLayerId();
         String typeName = command.getTypeName();
+        String typeEnName = command.getTypeEnName();
+
 //        String typeNameAlias = command.getTypeNameAlias();
 //        String decorationList = command.getDecorationList();
         String description = command.getDescription();
 
-        PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme name id should not empty"));
+        PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme domain id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(layerId), DwException.argumentReject("layer id should not empty"));
         typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("type name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(typeName), DwException.argumentReject("type name must be digitg, chinese and underline"));
+        typeEnName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeEnName, DwException.argumentReject("type en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(typeEnName), DwException.argumentReject("type en name must be digitg, alpha and underline"));
 //        typeNameAlias = PreconditionUtil.checkStringArgumentNotBlankTrim(typeNameAlias, DwException.argumentReject("typeNameAlias should not empty"));
 
         // 验证 主题域  分层是否存在
@@ -155,19 +167,14 @@ public class DwModifierServiceImpl implements DwModifierService {
         DwModifier exist = this.dwModifierMapper.selectOne(nameUniqueCheckQuery);
         PreconditionUtil.checkState(Objects.isNull(exist), DwException.stateReject("modifier type name aleardy exists"));
 
-        // typeNameAlias 唯一性检测
-//        QueryWrapper<DwModifier> nameAliasUniqueCheckQuery = new QueryWrapper<>();
-//        nameAliasUniqueCheckQuery.eq("type_name_alias", typeNameAlias);
-//        nameAliasUniqueCheckQuery.eq("status", Boolean.TRUE);
-//        DwModifier exist2 = this.dwModifierMapper.selectOne(nameAliasUniqueCheckQuery);
-//        PreconditionUtil.checkState(Objects.isNull(exist2), DwException.stateReject("modifier typeNameAlias aleardy exists"));
-
-//        String user = "hdfs";
+        // typeNameEn 唯一性检测
+        QueryWrapper<DwModifier> nameAliasUniqueCheckQuery = new QueryWrapper<>();
+        nameAliasUniqueCheckQuery.eq("modifier_type_en", typeEnName);
+        nameAliasUniqueCheckQuery.eq("status", Boolean.TRUE);
+        DwModifier exist2 = this.dwModifierMapper.selectOne(nameAliasUniqueCheckQuery);
+        PreconditionUtil.checkState(Objects.isNull(exist2), DwException.stateReject("modifier type en name aleardy exists"));
 
         Date now = new Date();
-//        if (Strings.isNotBlank(decorationList)) {
-//
-//        }
 
         DwModifier record = new DwModifier();
         record.setThemeDomainId(dwThemeDomain.getId());
@@ -175,6 +182,7 @@ public class DwModifierServiceImpl implements DwModifierService {
         record.setLayerId(dwLayer.getId());
         record.setLayerArea(dwLayer.getName());
         record.setModifierType(typeName);
+        record.setModifierTypeEn(typeEnName);
         record.setDescription(description);
         record.setIsAvailable(Boolean.TRUE);
         record.setCreateTime(now);
@@ -260,14 +268,18 @@ public class DwModifierServiceImpl implements DwModifierService {
         Long themeDomainId = command.getThemeDomainId();
         Long layerId = command.getLayerId();
         String typeName = command.getTypeName();
-//        String typeNameAlias = command.getTypeNameAlias();
+        String typeEnName = command.getTypeEnName();
         String description = command.getDescription();
 
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(themeDomainId), DwException.argumentReject("theme domain id should not empty"));
         PreconditionUtil.checkArgument(!Objects.isNull(layerId), DwException.argumentReject("layer id should not empty"));
-        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("modifier type name should not empty"));
+//        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("modifier type name should not empty"));
+        typeName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeName, DwException.argumentReject("type name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(typeName), DwException.argumentReject("type name must be digitg, chinese and underline"));
 
+        typeEnName = PreconditionUtil.checkStringArgumentNotBlankTrim(typeEnName, DwException.argumentReject("type en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(typeEnName), DwException.argumentReject("type en name must be digitg, alpha and underline"));
         // 验证 主题域  分层是否存在
         QueryWrapper<DwLayer> layerQueryWrapper = new QueryWrapper<>();
         layerQueryWrapper.eq("id", layerId);
@@ -294,14 +306,12 @@ public class DwModifierServiceImpl implements DwModifierService {
         DwModifier exist = this.dwModifierMapper.selectOne(nameUniqueCheckQuery);
         PreconditionUtil.checkState(Objects.isNull(exist), DwException.stateReject("modifier type name aleardy exists"));
         // typeNameAlias 唯一性检测
-//        QueryWrapper<DwModifier> nameAliasUniqueCheckQuery = new QueryWrapper<>();
-//        nameAliasUniqueCheckQuery.eq("type_name_alias", typeNameAlias);
-//        nameAliasUniqueCheckQuery.ne("id", id);
-//        nameAliasUniqueCheckQuery.eq("status", Boolean.TRUE);
-//        DwModifier exist2 = this.dwModifierMapper.selectOne(nameAliasUniqueCheckQuery);
-//        PreconditionUtil.checkState(Objects.isNull(exist2), DwException.stateReject("modifier typeNameAlias aleardy exists"));
-
-//        String user = "hdfs";
+        QueryWrapper<DwModifier> nameAliasUniqueCheckQuery = new QueryWrapper<>();
+        nameAliasUniqueCheckQuery.eq("modifier_type_en", typeEnName);
+        nameAliasUniqueCheckQuery.ne("id", id);
+        nameAliasUniqueCheckQuery.eq("status", Boolean.TRUE);
+        DwModifier exist2 = this.dwModifierMapper.selectOne(nameAliasUniqueCheckQuery);
+        PreconditionUtil.checkState(Objects.isNull(exist2), DwException.stateReject("modifier type en name aleardy exists"));
 
         Long oldVersion = record.getLockVersion();
 

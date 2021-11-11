@@ -60,11 +60,11 @@ body{
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    // padding: 54px 0 0;
     position: $relative;
 }
 .layout-top {
     padding: 54px 0 0;
+    box-sizing: border-box;
 }
 
 .ivu-message {

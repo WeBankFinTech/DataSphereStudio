@@ -228,12 +228,12 @@ public class DSSDataGovernanceAssetRestful {
      * @return
      * @throws Exception
      */
-    @DELETE
-    @Path("/model/type")
+    @POST
+    @Path("/model/type/delete")
     public Response deleteModelType(@Context HttpServletRequest req,@RequestBody DeleteModelTypeVO vo)throws Exception{
         logger.info("deleteModelTypeVO : {}", vo);
         assetService.deleteModelType(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","删除成功"));
     }
 
 
@@ -249,7 +249,7 @@ public class DSSDataGovernanceAssetRestful {
     public Response bindModelType(@Context HttpServletRequest req,@RequestBody BindModelVO vo)throws Exception{
         logger.info("bindModelVO : {}", vo);
         assetService.bindModelType(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","绑定成功"));
     }
 
     /**
@@ -259,12 +259,12 @@ public class DSSDataGovernanceAssetRestful {
      * @return
      * @throws Exception
      */
-    @DELETE
-    @Path("/model/bind")
+    @POST
+    @Path("/model/unbind")
     public Response unBindModelType(@Context HttpServletRequest req,@RequestBody UnBindModelVO vo)throws Exception{
         logger.info("unBindModelVO : {}", vo);
         assetService.unBindModel(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","解绑成功"));
     }
 
 
@@ -275,8 +275,8 @@ public class DSSDataGovernanceAssetRestful {
      * @return
      * @throws Exception
      */
-    @PUT
-    @Path("/model/type")
+    @POST
+    @Path("/model/type/modify")
     public Response updateModelType(@Context HttpServletRequest req,@RequestBody UpdateModelTypeVO vo)throws Exception{
         logger.info("updateModelTypeVO : {}", vo);
         return Message.messageToResponse(Message.ok().data("result",assetService.updateModelType(vo)));

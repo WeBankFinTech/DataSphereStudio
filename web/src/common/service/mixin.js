@@ -102,7 +102,7 @@ export default {
               query
             });
           }
-          
+
         } else {
           this.$router.push({
             name: 'commonIframe',
@@ -115,9 +115,11 @@ export default {
         }
       }
     },
+    // 获取用户名称
     getUserName() {
-      return  storage.get("baseInfo") ? storage.get("baseInfo").username : null;
+      return storage.get("baseInfo", "local") ? storage.get("baseInfo", "local").username : null;
     },
+    // 获取当前WorkspaceName
     getCurrentWorkspaceName() {
       const workspaceData = storage.get("currentWorkspace");
       if (this.$route.query.workspaceName){

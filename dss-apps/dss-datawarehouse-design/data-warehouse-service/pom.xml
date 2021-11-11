@@ -36,6 +36,26 @@
         </dependency>
 
         <dependency>
+            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <artifactId>linkis-datasource-client</artifactId>
+            <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <artifactId>linkis-metadata</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <artifactId>linkis-publicservice</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <artifactId>linkis-bml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>

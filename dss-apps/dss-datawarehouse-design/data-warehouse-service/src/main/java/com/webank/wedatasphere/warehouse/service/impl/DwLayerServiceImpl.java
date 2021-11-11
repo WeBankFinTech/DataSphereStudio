@@ -5,18 +5,23 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerUpdateCommand;
 import com.webank.wedatasphere.warehouse.dao.domain.DwLayer;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper;
 import com.webank.wedatasphere.warehouse.dto.DwLayerDTO;
 import com.webank.wedatasphere.warehouse.dto.DwLayerListItemDTO;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
 //import com.webank.wedatasphere.warehouse.mapper.DwLayerModelMapper;
+import com.webank.wedatasphere.warehouse.service.DwDomainInUseCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwLayerService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +29,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
-public class DwLayerServiceImpl implements DwLayerService {
+public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAdapter {
 
     private final DwLayerMapper dwLayerMapper;
+    private final DwModifierMapper dwModifierMapper;
+    private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
 
     @Autowired
-    public DwLayerServiceImpl(final DwLayerMapper dwLayerMapper) {
+    public DwLayerServiceImpl(final DwLayerMapper dwLayerMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
         this.dwLayerMapper = dwLayerMapper;
+        this.dwModifierMapper = dwModifierMapper;
+        this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
+    }
+
+    @Override
+    public DwModifierMapper getDwModifierMapper() {
+        return dwModifierMapper;
+    }
+
+    @Override
+    public DwStatisticalPeriodMapper getDwStatisticalPeriodMapper() {
+        return dwStatisticalPeriodMapper;
     }
 
     @Transactional
@@ -52,7 +68,9 @@ public class DwLayerServiceImpl implements DwLayerService {
         String principalName = command.getPrincipalName();
 
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
         enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("charge user should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
         QueryWrapper<DwLayer> nameUniqueCheckQuery = new QueryWrapper<>();
@@ -117,9 +135,12 @@ public class DwLayerServiceImpl implements DwLayerService {
 
 
     @Override
-    public Message getAllLayers(HttpServletRequest request) throws DwException {
+    public Message getAllLayers(HttpServletRequest request, Boolean isAvailable) throws DwException {
         QueryWrapper<DwLayer> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
+        if (!Objects.isNull(isAvailable)) {
+            queryWrapper.eq("is_available", isAvailable);
+        }
         List<DwLayer> records = this.dwLayerMapper.selectList(queryWrapper);
 
         List<DwLayerListItemDTO> dtos = new ArrayList<>();
@@ -166,12 +187,13 @@ public class DwLayerServiceImpl implements DwLayerService {
         QueryWrapper<DwLayer> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
         queryWrapper.eq("preset", Boolean.FALSE);
-        if (Strings.isNotBlank(name)) {
-            queryWrapper.like("name", name).or().like("en_name", name);
-        }
         if (!Objects.isNull(enabled)) {
             queryWrapper.eq("is_available", enabled);
         }
+        if (Strings.isNotBlank(name)) {
+            queryWrapper.like("name", name).or().like("en_name", name);
+        }
+
 
         Page<DwLayer> queryPage = new Page<>(page, size);
 
@@ -202,6 +224,12 @@ public class DwLayerServiceImpl implements DwLayerService {
         DwLayer layer = this.dwLayerMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(layer), DwException.stateReject("layer not found"));
         PreconditionUtil.checkState(Objects.equals(Boolean.FALSE, layer.getPreset()), DwException.stateReject("preset layer could not be removed"));
+
+        // check in use
+        // statistical_period & modifier & data_model client api check
+        boolean inUse = isLayerInUse(layer.getId());
+        PreconditionUtil.checkState(!inUse, DwException.stateReject("layer is in use"));
+
         if (Objects.equals(Boolean.FALSE, layer.getStatus())) {
             return Message.ok();
         }
@@ -252,9 +280,21 @@ public class DwLayerServiceImpl implements DwLayerService {
 //            autoCollectStrategy = "{}";
 //        }
 
-        if (!layer.getPreset()) {
+        // 预置分层也能修改
+//        if (!layer.getPreset()) {
             name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-            enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+            PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+            enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+            PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
+
+            if (!Objects.equals(name, layer.getName()) || !Objects.equals(enName, layer.getEnName())) {
+                // check name enName if not equal, we should check if in use
+                // check in use
+                // statistical_period & modifier & data_model client api check
+                boolean inUse = isLayerInUse(layer.getId());
+                PreconditionUtil.checkState(!inUse, DwException.stateReject("layer is in use"));
+            }
+
             owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
             // 并且自定义分层在更新名称的时候，名称不能重复
             QueryWrapper<DwLayer> nameUniqueCheckQuery = new QueryWrapper<>();
@@ -275,10 +315,9 @@ public class DwLayerServiceImpl implements DwLayerService {
             layer.setEnName(enName);
 
             layer.setOwner(owner);
-        }
+//        }
 
-        // TODO
-        String user = "hdfs";
+//        String user = SecurityFilter.getLoginUsername(request);
 
         Long oldVersion = layer.getLockVersion();
 

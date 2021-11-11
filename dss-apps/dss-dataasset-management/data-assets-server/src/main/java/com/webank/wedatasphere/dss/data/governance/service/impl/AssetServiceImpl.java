@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.data.governance.vo.*;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
+import org.apache.atlas.model.instance.AtlasStruct;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.apache.commons.lang.StringUtils;
@@ -309,14 +310,43 @@ public class AssetServiceImpl implements AssetService {
             }
             HiveTblDetailInfo.HiveTblBasicInfo basic = new HiveTblDetailInfo.HiveTblBasicInfo();
             basic.setName(tableName);
+            basic.setQualifiedName(atlasEntity.getAttribute("qualifiedName").toString());
             basic.setOwner(String.valueOf(atlasEntity.getAttributes().get("owner")));
             basic.setCreateTime(new java.text.SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(atlasEntity.getCreateTime()));
             basic.setStore(String.valueOf(storage));
-            basic.setComment(String.valueOf(atlasEntity.getAttributes().get("comment")));
             Set<String> labels = atlasEntity.getLabels();
             basic.setLabels(labels);
             basic.setIsParTbl(isPartTable);
             basic.setGuid(guid);
+
+            if (!CollectionUtils.isEmpty(atlasEntity.getClassifications())) {
+                basic.setClassifications(atlasEntity.getClassifications().stream().map(AtlasStruct::getTypeName).collect(Collectors.toList()));
+            }
+            Object comment = atlasEntity.getAttribute("comment");
+            if (comment != null) {
+                basic.setComment(comment.toString());
+            }
+
+            Object aliases = atlasEntity.getAttribute("aliases");
+            if (aliases != null) {
+                basic.setAliases(aliases.toString());
+            }
+
+            Object lastAccessTime = atlasEntity.getAttribute("lastAccessTime");
+            if (lastAccessTime != null) {
+                basic.setLastAccessTime(DateUtil.unixToTimeStr((Double) lastAccessTime));
+            }
+
+            Object parameters = atlasEntity.getAttribute("parameters");
+            if (parameters != null) {
+                Map mapParameters = (Map) parameters;
+                Object totalSize = mapParameters.get("totalSize");
+                if (totalSize != null) {
+                    basic.setTotalSize(totalSize.toString());
+                }
+            }
+
+
             hiveTblDetailInfo.setColumns(hiveColumnInfos);
             hiveTblDetailInfo.setBasic(basic);
             hiveTblDetailInfo.setPartitionKeys(partitionColumns);

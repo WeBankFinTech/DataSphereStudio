@@ -54,7 +54,8 @@
         </template>
       </template>
       <template v-else>
-      <!-- 其他应用流程 -->
+        <!-- 其他应用流程 -->
+        <iframe id="iframe" :src="srcUrl" frameborder="0"  width="100%" height="100%"></iframe>
       </template>
     </WorkflowTabList>
     <ProjectForm
@@ -85,6 +86,7 @@ import MakeUp from '@/apps/workflows/module/makeUp'
 import ProjectForm from '@/components/projectForm/index.js'
 import api from '@/common/service/api';
 import mixin from '@/common/service/mixin';
+import util from '@/common/util/index.js';
 import commonModule from "@/apps/workflows/module/common";
 import { DEVPROCESS, ORCHESTRATORMODES } from '@/common/config/const.js';
 import { GetDicSecondList, GetAreaMap } from '@/common/service/apiCommonMethod.js';
@@ -154,6 +156,19 @@ export default {
       }
     }
   },
+  computed: {
+    srcUrl() {
+      const url = ''
+      const found = this.selectDevprocess.find((item) => this.modeOfKey === item.dicValue)
+      if (found) {
+        const {projectName, projectId} = this.$route.query
+        const workspaceId = this.getCurrentWorkspaceId()
+        const workspaceName = this.getCurrentWorkspaceName()
+        url = util.replaceHolder(found.url, { workspaceId, workspaceName, projectId, projectName })
+      }
+      return url
+    }
+  },
   created() {
     this.getAreaMap();
     this.getDicSecondList();
@@ -180,7 +195,7 @@ export default {
     },
     // 获取当前选择的开发流程
     getSelectDevProcess() {
-      this.selectDevprocess = this.devProcessBase ? this.devProcessBase.filter((item) => this.currentProjectData.devProcessList.includes(item.dicValue)) : []
+      this.selectDevprocess = this.devProcessBase || []
     },
     // 获取编排列表
     getSelectOrchestratorList() {
@@ -550,6 +565,3 @@ export default {
     }
   }
 </style>
-
-
-

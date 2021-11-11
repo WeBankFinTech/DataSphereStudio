@@ -22,6 +22,8 @@ public class DwModifierUpdateCommand {
 
     private String typeName;
 
+    private String typeEnName;
+
     private String description;
 
     private List<DwModifierUpdateListItem> list;

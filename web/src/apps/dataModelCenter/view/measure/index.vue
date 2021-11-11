@@ -96,8 +96,12 @@
 </template>
 
 <script>
-import { getMeasures, switchMeasuresStatus } from "../../service/api";
-import formatDate from "../../utils/formatDate";
+import {
+  getMeasures,
+  switchMeasuresStatus,
+  delMeasures,
+} from "@dataModelCenter/service/api";
+import formatDate from "@dataModelCenter/utils/formatDate";
 import EditModal from "./editModal.vue";
 export default {
   components: { EditModal },
@@ -122,10 +126,9 @@ export default {
         title: "警告",
         content: "确定删除此项吗？" + id,
         onOk: () => {
-          this.$Message.info("删除");
-        },
-        onCancel: () => {
-          this.$Message.info("取消");
+          delMeasures(id).then(() => {
+            this.handleGetData(true);
+          });
         },
       });
     },

@@ -82,13 +82,13 @@
 
 <script>
 import EditModal from "./editModal.vue";
-import formatDate from "../../utils/formatDate";
+import formatDate from "@dataWarehouseDesign/utils/formatDate";
 import {
   getThemedomains,
   deleteThemedomains,
   enableThemedomains,
   disableThemedomains,
-} from "../../service/api";
+} from "@dataWarehouseDesign/service/api";
 
 export default {
   components: { EditModal },

@@ -28,7 +28,7 @@ class UnBindModelTypeAction extends POSTAction with DataAssetsAction {
 
 object UnBindModelTypeAction {
 
-  def newBuilder = new Builder
+  def builder() = new Builder
 
   class Builder private[UnBindModelTypeAction] {
     private var user: String = _

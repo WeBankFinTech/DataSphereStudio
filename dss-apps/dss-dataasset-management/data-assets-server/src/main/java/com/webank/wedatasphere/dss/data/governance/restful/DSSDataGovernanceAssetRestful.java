@@ -249,7 +249,7 @@ public class DSSDataGovernanceAssetRestful {
     public Response bindModelType(@Context HttpServletRequest req,@RequestBody BindModelVO vo)throws Exception{
         logger.info("bindModelVO : {}", vo);
         assetService.bindModelType(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","绑定成功"));
     }
 
     /**
@@ -264,7 +264,7 @@ public class DSSDataGovernanceAssetRestful {
     public Response unBindModelType(@Context HttpServletRequest req,@RequestBody UnBindModelVO vo)throws Exception{
         logger.info("unBindModelVO : {}", vo);
         assetService.unBindModel(vo);
-        return Message.messageToResponse(Message.ok());
+        return Message.messageToResponse(Message.ok().data("result","解绑成功"));
     }
 
 

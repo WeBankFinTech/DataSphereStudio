@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.data.governance
 
-import com.webank.wedatasphere.dss.data.governance.request.{BindModelTypeAction, CreateModelTypeAction, DeleteModelTypeAction, GetHiveTblBasicAction, GetHiveTblCreateAction, GetHiveTblPartitionAction, SearchHiveDbAction, SearchHiveTblAction, UpdateModelTypeAction}
+import com.webank.wedatasphere.dss.data.governance.request.{BindModelTypeAction, CreateModelTypeAction, DeleteModelTypeAction, GetHiveTblBasicAction, GetHiveTblCreateAction, GetHiveTblPartitionAction, SearchHiveDbAction, SearchHiveTblAction, UnBindModelTypeAction, UpdateModelTypeAction}
 import com.webank.wedatasphere.dss.data.governance.response.{BindModelTypeResult, CreateModelTypeResult, DeleteModelTypeResult, GetHiveTblBasicResult, GetHiveTblCreateResult, GetHiveTblPartitionResult, SearchHiveDbResult, SearchHiveTblResult, UnBindModelTypeResult, UpdateModelTypeResult}
 
 trait DataAssetsRemoteClient extends RemoteClient {
@@ -12,6 +12,6 @@ trait DataAssetsRemoteClient extends RemoteClient {
   def createModelType(action: CreateModelTypeAction): CreateModelTypeResult
   def bindModelType(action: BindModelTypeAction): BindModelTypeResult
   def updateModelType(action: UpdateModelTypeAction): UpdateModelTypeResult
-  def unBindModelType(action: BindModelTypeAction): UnBindModelTypeResult
+  def unBindModelType(action: UnBindModelTypeAction): UnBindModelTypeResult
   def deleteModelType(action: DeleteModelTypeAction) : DeleteModelTypeResult
 }

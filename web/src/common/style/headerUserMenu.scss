@@ -1,7 +1,8 @@
 @import '@/common/style/variables.scss';
 .user-menu {
 //   background: $menu-dark-active-bg;
-  @include bg-color($background-color-header, $dark-background-color-header);
+  // @include bg-color($background-color-header, $dark-background-color-header);
+  background-color: #0B313C;
   width: 130px;
   border: none;
   position: $absolute;

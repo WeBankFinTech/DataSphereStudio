@@ -5,8 +5,7 @@ import com.webank.wedatasphere.dss.data.governance.exception.DataAssetsClientBui
 import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient
 import com.webank.wedatasphere.linkis.httpclient.request.POSTAction
 
-class CreateModelTypeAction extends POSTAction with DataAssetsAction {
-
+class DeleteModelTypeAction extends POSTAction with DataAssetsAction{
 
 
   private var name:String= _
@@ -21,13 +20,13 @@ class CreateModelTypeAction extends POSTAction with DataAssetsAction {
 
   override def getUser: String = user
 
-  override def suffixURLs: Array[String] = Array("data-assets", "asset", "model","type")
+  override def suffixURLs: Array[String] = Array("data-assets", "asset", "model","type","delete")
 }
 
-object CreateModelTypeAction{
+object DeleteModelTypeAction{
   def builder(): Builder = new Builder
 
-  class Builder private[CreateModelTypeAction]() {
+  class Builder private[DeleteModelTypeAction]() {
     private var user: String = _
     private var name:String= _
     private var `type`:ClassificationConstant= _
@@ -47,8 +46,8 @@ object CreateModelTypeAction{
       this;
     }
 
-    def build(): CreateModelTypeAction = {
-      val action = new CreateModelTypeAction
+    def build(): DeleteModelTypeAction = {
+      val action = new DeleteModelTypeAction
       if(`type` == null) throw new DataAssetsClientBuilderException("type is needed!")
       if (name == null) throw new DataAssetsClientBuilderException("name is needed!")
       action.name = name

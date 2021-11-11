@@ -2,7 +2,7 @@ package com.webank.wedatasphere.dss.data.governance
 
 import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
-import com.webank.wedatasphere.dss.data.governance.request.{CreateModelTypeAction, GetHiveTblBasicAction, GetHiveTblCreateAction, GetHiveTblPartitionAction, SearchHiveDbAction, SearchHiveTblAction}
+import com.webank.wedatasphere.dss.data.governance.request.{CreateModelTypeAction, DeleteModelTypeAction, GetHiveTblBasicAction, GetHiveTblCreateAction, GetHiveTblPartitionAction, SearchHiveDbAction, SearchHiveTblAction}
 import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
@@ -43,7 +43,11 @@ object TestDataAssetsRemoteClient {
 //    val hiveTblCreateResult = dataAssetsClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
 //    println(hiveTblCreateResult)
 
-    val createModelTypeResult = dataAssetsClient.createModelType(CreateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test000").build()).result
-    println(createModelTypeResult)
+    val deleteModelTypeResult = dataAssetsClient.deleteModelType(DeleteModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build())
+
+    println(deleteModelTypeResult.getResult)
+
+//    val createModelTypeResult = dataAssetsClient.createModelType(CreateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build()).getInfo
+//    println(createModelTypeResult)
   }
 }

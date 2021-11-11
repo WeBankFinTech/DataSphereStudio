@@ -28,13 +28,13 @@ object TestDataAssetsRemoteClient {
 
     val dataAssetsClient = new LinkisDataAssetsRemoteClient(clientConfig)
 //
-    val searchHiveTblResult = dataAssetsClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
-    println(searchHiveTblResult)
+//    val searchHiveTblResult = dataAssetsClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
+//    println(searchHiveTblResult)
 //
 //    val searchHiveDbResult = dataAssetsClient.searchHiveDb(SearchHiveDbAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
 //    println(searchHiveDbResult)
 //
-    val hiveTblBasicResult = dataAssetsClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setUser("hdfs").setGuid("0d3c2c4b-aa69-40d8-b562-e9cdc3d34d6f").build()).result
+    val hiveTblBasicResult = dataAssetsClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setUser("hdfs").setGuid("27920dc8-1eef-4d7d-9423-b5967d9e2d33").build()).result
     println(hiveTblBasicResult)
 //
 //    val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
@@ -53,18 +53,18 @@ object TestDataAssetsRemoteClient {
 //    println(updateModelTypeResult.getInfo.getGuid)
 //    println(updateModelTypeResult.getInfo.getName)
 
-      val bindResult = dataAssetsClient.bindModelType(BindModelTypeAction.builder()
-        .setUser("hdfs")
-        .setTableName("default.test02")
-        .setModelName("test001")
-        .setModelType(ClassificationConstant.INDICATOR).build())
-      println(bindResult.getResult)
-
-     val unBindResult = dataAssetsClient.unBindModelType(UnBindModelTypeAction.builder()
-            .setUser("hdfs")
-            .setTableName("default.test02")
-            .setModelName("test001")
-            .setModelType(ClassificationConstant.INDICATOR).build())
-    println(unBindResult.getResult)
+//      val bindResult = dataAssetsClient.bindModelType(BindModelTypeAction.builder()
+//        .setUser("hdfs")
+//        .setTableName("default.test02")
+//        .setModelName("test001")
+//        .setModelType(ClassificationConstant.INDICATOR).build())
+//      println(bindResult.getResult)
+//
+//     val unBindResult = dataAssetsClient.unBindModelType(UnBindModelTypeAction.builder()
+//            .setUser("hdfs")
+//            .setTableName("default.test02")
+//            .setModelName("test001")
+//            .setModelType(ClassificationConstant.INDICATOR).build())
+//    println(unBindResult.getResult)
   }
 }

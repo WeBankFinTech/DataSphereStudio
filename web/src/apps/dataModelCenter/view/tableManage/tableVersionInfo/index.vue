@@ -190,7 +190,7 @@ import {
   getThemesList,
   getDataBasesList,
   getDictionariesList,
-} from "../../../service/tableManageApi";
+} from "@dataModelCenter/service/tableManageApi";
 export default {
   data() {
     return {

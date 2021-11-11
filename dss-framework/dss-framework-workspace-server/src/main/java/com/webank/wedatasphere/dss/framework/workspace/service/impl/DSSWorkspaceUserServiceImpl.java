@@ -18,9 +18,12 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.util.LdapServerHelper;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,7 +44,16 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
 
     @Autowired
+    private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
+
+    @Autowired
     StaffInfoGetter staffInfoGetter;
+
+    @Autowired
+    LdapServerHelper ldapServerHelper;
+
+    @Autowired
+    WorkspaceDBHelper workspaceDBHelper;
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
@@ -50,6 +62,10 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         roles.forEach(role ->{
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator);
         });
+
+        //重置ldap角色
+        String roleName = workspaceDBHelper.getRoleNameById(roles.get(0));
+        ldapServerHelper.modifyUserToGroup(userName, roleName);
     }
 
     @Override
@@ -57,6 +73,10 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     public void deleteWorkspaceUser(String userName, int workspaceId) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         dssWorkspaceUserMapper.removeUserInWorkspace(userName, workspaceId);
+
+        //删除ldap用户及权限
+        List<String> roles = dssWorkspaceRoleMapper.getAllRoles(userName, workspaceId);
+        ldapServerHelper.deleteUserFromGroupName(userName, roles.get(0));
     }
 
     @Override

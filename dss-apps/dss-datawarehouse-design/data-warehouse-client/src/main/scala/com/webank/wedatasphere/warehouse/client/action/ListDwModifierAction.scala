@@ -5,6 +5,11 @@ import com.webank.wedatasphere.warehouse.client.DwAction
 
 class ListDwModifierAction extends GetAction with DwAction {
   private var user: String = _
+  private var isAvailable: Boolean = true
+
+  def setIsAvailable(isAvailable: Boolean): Unit = this.isAvailable = isAvailable
+
+  def getIsAvailable: Boolean = this.isAvailable
 
   override def setUser(user: String): Unit = this.user = user
 

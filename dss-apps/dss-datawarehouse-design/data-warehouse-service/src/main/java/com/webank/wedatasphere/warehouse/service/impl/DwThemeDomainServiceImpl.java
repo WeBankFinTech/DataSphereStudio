@@ -9,13 +9,17 @@ import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainUpdateCommand;
 import com.webank.wedatasphere.warehouse.dao.domain.DwThemeDomain;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwThemeDomainMapper;
 import com.webank.wedatasphere.warehouse.dto.DwThemeDomainDTO;
 import com.webank.wedatasphere.warehouse.dto.DwThemeDomainListItemDTO;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
+import com.webank.wedatasphere.warehouse.service.DwDomainInUseCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwThemeDomainService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
+import com.webank.wedatasphere.warehouse.utils.RegexUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +33,43 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class DwThemeDomainServiceImpl implements DwThemeDomainService {
+public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainInUseCheckAdapter {
 
     private final DwThemeDomainMapper dwThemeDomainMapper;
+    private final DwModifierMapper dwModifierMapper;
+    private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
 
     @Autowired
-    public DwThemeDomainServiceImpl(final DwThemeDomainMapper dwThemeDomainMapper) {
+    public DwThemeDomainServiceImpl(final DwThemeDomainMapper dwThemeDomainMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
         this.dwThemeDomainMapper = dwThemeDomainMapper;
+        this.dwModifierMapper = dwModifierMapper;
+        this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
+    }
+
+    @Override
+    public DwModifierMapper getDwModifierMapper() {
+        return dwModifierMapper;
+    }
+
+    @Override
+    public DwStatisticalPeriodMapper getDwStatisticalPeriodMapper() {
+        return dwStatisticalPeriodMapper;
     }
 
     @Override
     public Message queryAllThemeDomains(HttpServletRequest request, DwThemeDomainQueryCommand command) throws DwException {
         String name = command.getName();
+        Boolean enabled = command.getEnabled();
 
         QueryWrapper<DwThemeDomain> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
+        if (!Objects.isNull(enabled)) {
+            queryWrapper.eq("is_available", enabled);
+        }
         if (Strings.isNotBlank(name)) {
-            queryWrapper.like("name", name).or().like("en_name", name);
+            queryWrapper.and(qw -> {
+                qw.like("name", name).or().like("en_name", name);
+            });
         }
 
         List<DwThemeDomain> records = this.dwThemeDomainMapper.selectList(queryWrapper);
@@ -107,9 +131,12 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         String description = command.getDescription();
 //        String authority = command.getAuthority();
 
+//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
 
@@ -169,6 +196,12 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
         DwThemeDomain record = this.dwThemeDomainMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("theme domain not found"));
+
+        // check in use
+        // statistical_period & modifier & data_model client api check
+        boolean inUse = isThemeDomainInUse(record.getId());
+        PreconditionUtil.checkState(!inUse, DwException.stateReject("theme domain is in use"));
+
         if (Objects.equals(Boolean.FALSE, record.getStatus())) {
             return Message.ok();
         }
@@ -191,9 +224,12 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
 //        String authority = command.getAuthority();
         String description = command.getDescription();
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
+//        name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
+//        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
         name = PreconditionUtil.checkStringArgumentNotBlankTrim(name, DwException.argumentReject("name should not empty"));
-//        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
-        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("en name should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkCnName(name), DwException.argumentReject("name must be digitg, chinese and underline"));
+        enName = PreconditionUtil.checkStringArgumentNotBlankTrim(enName, DwException.argumentReject("name alias should not empty"));
+        PreconditionUtil.checkArgument(RegexUtil.checkEnName(enName), DwException.argumentReject("name must be digit, alpha and underline"));
         owner = PreconditionUtil.checkStringArgumentNotBlankTrim(owner, DwException.argumentReject("owner should not empty"));
 //        authority = PreconditionUtil.checkStringArgumentNotBlankTrim(authority, DwException.argumentReject("authority should not empty"));
 
@@ -208,6 +244,15 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         // 实体校验
         DwThemeDomain record = this.dwThemeDomainMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("theme domain not found"));
+        PreconditionUtil.checkState(record.getIsAvailable(), DwException.stateReject("theme domain is unAvailable"));
+
+        // if name enName not equal to database attribute, we should check domain if in use
+        if (!Objects.equals(name, record.getName()) || !Objects.equals(enName, record.getEnName())) {
+            // check in use
+            // statistical_period & modifier & data_model client api check
+            boolean inUse = isThemeDomainInUse(record.getId());
+            PreconditionUtil.checkState(!inUse, DwException.stateReject("theme domain is in use"));
+        }
 
         // name 唯一性检测
         QueryWrapper<DwThemeDomain> nameUniqueCheckQuery = new QueryWrapper<>();
@@ -225,19 +270,15 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
         DwThemeDomain nameAliasExist = this.dwThemeDomainMapper.selectOne(nameUniqueCheckQuery);
         PreconditionUtil.checkState(Objects.isNull(nameAliasExist), DwException.stateReject("theme domain en name aleardy exists"));
 
-//        String user = "hdfs";
-
         Long oldVersion = record.getLockVersion();
 
         Date now = new Date();
         record.setName(name);
         record.setEnName(enName);
         record.setDescription(description);
-//        record.setPrincipalName(authority);
         record.setPrincipalName(principalName);
         record.setOwner(owner);
         record.setSort(sort);
-//        record.setModifyUser(user);
         record.setUpdateTime(now);
         record.setLockVersion(oldVersion + 1);
 
@@ -276,10 +317,7 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService {
             return;
         }
 
-//        String user = "hdfs";
-
         Long oldVersion = record.getLockVersion();
-//        record.setModifyUser(user);
         record.setUpdateTime(new Date());
         record.setIsAvailable(enabled);
         record.setLockVersion(oldVersion + 1);

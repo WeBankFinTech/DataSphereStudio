@@ -31,6 +31,7 @@ export default [
     component: () =>
       import('./view/logPage/index.vue')
   },
+  // 登录
   {
     path: '/login',
     name: 'login',
@@ -83,6 +84,7 @@ export default [
     component: () =>
       import('./view/icon.vue'),
   },
+  // 404
   {
     path: '*',
     meta: {

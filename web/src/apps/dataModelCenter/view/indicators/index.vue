@@ -124,7 +124,11 @@
 </template>
 
 <script>
-import { getIndicators, switcIndicatorsStatus } from "../../service/api";
+import {
+  getIndicators,
+  switcIndicatorsStatus,
+  delIndicators,
+} from "../../service/api";
 import formatDate from "../../utils/formatDate";
 import EditModal from "./editModal.vue";
 import VersionListModal from "./versionListModal.vue";
@@ -151,10 +155,9 @@ export default {
         title: "警告",
         content: "确定删除此项吗？" + id,
         onOk: () => {
-          this.$Message.info("删除");
-        },
-        onCancel: () => {
-          this.$Message.info("取消");
+          delIndicators(id).then(() => {
+            this.handleGetData(true);
+          });
         },
       });
     },

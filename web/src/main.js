@@ -51,10 +51,10 @@ Vue.use(iView, {
 })
 
 Vue.config.productionTip = false
+// 全局变量
 Vue.prototype.$Message.config({
   duration: 3
 })
-// 全局变量
 Vue.prototype.$API_PATH = API_PATH;
 new Vue({
   router,

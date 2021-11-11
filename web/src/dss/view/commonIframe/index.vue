@@ -18,10 +18,12 @@ export default {
     return {
       height: 0,
       visualSrc: '',
+      // 控制刷新
       isRefresh: true
     };
   },
   watch: {
+    // 监听参数变化重载页面
     async '$route.query.projectID'() {
       await this.getCommonProjectId(this.$route.query.type, this.$route.query);
       this.getUrl();
@@ -70,7 +72,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .iframeClass{
     height: 100%;
 }

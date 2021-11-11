@@ -130,7 +130,7 @@
               <template slot-scope="{ row }" slot="updateTime">
                 {{ row.updateTime | formatDate }}
               </template>
-              <template slot="action">
+              <template slot-scope="{ row }" slot="action">
                 <Button
                   size="small"
                   @click="handleEdit(row.id, row.name, row.guid)"
@@ -176,8 +176,8 @@ import {
   getDataBasesList,
   getThemesList,
   getLayersList,
-} from "../../../service/tableManageApi";
-import formatDate from "../../../utils/formatDate";
+} from "@dataModelCenter/service/tableManageApi";
+import formatDate from "@dataModelCenter/utils/formatDate";
 import storage from "@/common/helper/storage";
 import VersionListModal from "./versionListModal.vue";
 export default {
@@ -349,6 +349,8 @@ export default {
     this.handleGetLayersData();
     // 数据库
     this.handleGetDataBaseData();
+    // 执行搜索
+    this.handleSearchTables(true);
   },
   methods: {
     // 表单完成回调

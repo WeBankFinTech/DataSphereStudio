@@ -109,7 +109,7 @@ import {
   createModifiers,
   editModifiers,
   getModifiersById,
-} from "../../service/api";
+} from "@dataWarehouseDesign/service/api";
 export default {
   model: {
     prop: "_visible",

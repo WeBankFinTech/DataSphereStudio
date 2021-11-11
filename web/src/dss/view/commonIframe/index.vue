@@ -23,6 +23,7 @@ export default {
     };
   },
   watch: {
+    // 监听参数变化重载页面
     async '$route.query.projectID'() {
       await this.getCommonProjectId(this.$route.query.type, this.$route.query);
       this.getUrl();

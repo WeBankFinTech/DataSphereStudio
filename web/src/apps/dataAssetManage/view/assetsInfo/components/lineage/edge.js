@@ -1,11 +1,10 @@
-import $ from 'jquery';
-import {Edge} from 'butterfly-dag';
+import { Edge } from "butterfly-dag";
 
 class RelationEdge extends Edge {
   draw(obj) {
     let path = super.draw(obj);
     if (this.options.color) {
-      $(path).addClass(this.options.color);
+      path.classList.add(this.options.color);
     }
     return path;
   }
@@ -13,7 +12,7 @@ class RelationEdge extends Edge {
   drawArrow(isShow) {
     let dom = super.drawArrow(isShow);
     if (this.options.color) {
-      $(dom).addClass(this.options.color);
+      dom.classList.add(this.options.color);
     }
     return dom;
   }
@@ -21,7 +20,9 @@ class RelationEdge extends Edge {
   drawLabel(text) {
     let dom = null;
     if (text) {
-      dom = $(`<span class="butterflies-label">${text}</span>`)[0];
+      let dom = document.createElement("span");
+      dom.classList.add("butterflies-label");
+      dom.innerText = text;
     }
     return dom;
   }

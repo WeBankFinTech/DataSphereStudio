@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { Node } from "butterfly-dag";
-import $ from "jquery";
 
 import "./base_node.scss";
 import "./symbol/iconfont";
@@ -12,25 +11,28 @@ class BaseNode extends Node {
   }
 
   draw = opts => {
-    let container = $('<div class="relation-node"></div>')
-      .css("top", opts.top)
-      .css("left", opts.left)
-      .attr("id", opts.id)
-      .addClass(opts.options.className);
+    let container = document.createElement("div");
+    container.classList.add("relation-node");
+    container.classList.add(opts.options.className);
+    container.style.top = opts.top + "px";
+    container.style.left = opts.left + "px";
+    container.setAttribute("id", opts.id);
     let text = `<span>${opts.options.name}</span>`;
     if (opts.options.status !== "ACTIVE") {
       text = `<span style="color:rgba(0,0,0,0.2)">${opts.options.name}</span>`;
     }
-    let logoContainer = $(`<div class="logo-container" title="${opts.options.name}">
-        <svg class="icon" aria-hidden="true" style="float: left;font-size: 34px;">
-            <use xlink:href="#${opts.options.icon}" />
-        </svg>
-        ${text}</div>`);
-    logoContainer.addClass(opts.options.className);
-
-    container.append(logoContainer);
-
-    return container[0];
+    let logoContainer = new DOMParser().parseFromString(
+      `<div class="logo-container" title="${opts.options.name}">
+        <svg class="icon" aria-hidden="true" style="float: left;font-size: 34px;">
+          <use xlink:href="#${opts.options.icon}" />
+        </svg>
+        ${text}
+      </div>`,
+      "text/html"
+    ).body.firstChild;
+    logoContainer.classList.add(opts.options.className);
+    container.appendChild(logoContainer);
+    return container;
   };
 }
 

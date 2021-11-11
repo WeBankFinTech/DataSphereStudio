@@ -20,6 +20,8 @@ public class DwModifierCreateCommand {
 
     private String typeName;
 
+    private String typeEnName;
+
     private String description;
 
     private List<DwModifierCreateListItem> list;

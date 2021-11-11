@@ -25,5 +25,5 @@ public interface DwLayerService {
 
     Message disable(HttpServletRequest request, Long id) throws DwException;
 
-    Message getAllLayers(HttpServletRequest request) throws DwException;
+    Message getAllLayers(HttpServletRequest request, Boolean isAvailable) throws DwException;
 }

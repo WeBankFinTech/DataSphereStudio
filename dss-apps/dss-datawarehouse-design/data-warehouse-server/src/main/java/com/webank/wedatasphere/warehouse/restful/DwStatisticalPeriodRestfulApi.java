@@ -13,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Component
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,10 +32,12 @@ public class DwStatisticalPeriodRestfulApi {
     @Path("/statistical_periods/all")
     public Response queryAll(
             @Context HttpServletRequest request,
-            @QueryParam("name") String name
+            @QueryParam("name") String name,
+            @QueryParam(value = "isAvailable") Boolean isAvailable
     )throws DwException {
         final DwStatisticalPeriodQueryCommand command = new DwStatisticalPeriodQueryCommand();
         command.setName(name);
+        command.setEnabled(isAvailable);
         Message message = this.dwStatisticalPeriodService.queryAll(request, command);
         return Message.messageToResponse(message);
     }

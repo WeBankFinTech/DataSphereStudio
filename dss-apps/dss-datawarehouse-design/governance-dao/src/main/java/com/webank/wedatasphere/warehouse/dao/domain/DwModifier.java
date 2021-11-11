@@ -28,6 +28,9 @@ public class DwModifier extends DssWorkspaceEntity {
     @TableField(value = "modifier_type")
     private String modifierType;
 
+    @TableField(value = "modifier_type_en")
+    private String modifierTypeEn;
+
     @TableField(value = "theme_domain_id")
     private Long themeDomainId;
 

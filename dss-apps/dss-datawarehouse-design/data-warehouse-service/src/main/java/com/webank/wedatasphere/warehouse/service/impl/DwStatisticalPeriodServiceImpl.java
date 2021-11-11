@@ -50,8 +50,13 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
     @Override
     public Message queryAll(HttpServletRequest request, DwStatisticalPeriodQueryCommand command) throws DwException {
         String name = command.getName();
+        Boolean enabled = command.getEnabled();
         QueryWrapper<DwStatisticalPeriod> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", Boolean.TRUE);
+        if (!Objects.isNull(enabled)) {
+            queryWrapper.eq("is_available", enabled);
+        }
+
         if (Strings.isNotBlank(name)) {
             queryWrapper.and(qw -> {
                 qw.like("name", name).or().like("en_name", name);

@@ -13,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Component
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,10 +32,12 @@ public class DwModifierRestfulApi {
     @Path("/modifiers/all")
     public Response queryAllModifiers(
             @Context HttpServletRequest request,
-            @QueryParam("typeName") String typeName
+            @QueryParam("typeName") String typeName,
+            @QueryParam(value = "isAvailable") Boolean isAvailable
     )throws DwException {
         final DwModifierQueryCommand command = new DwModifierQueryCommand();
         command.setName(typeName);
+        command.setEnabled(isAvailable);
         Message message = this.dwModifierService.queryAllModifiers(request, command);
         return Message.messageToResponse(message);
     }

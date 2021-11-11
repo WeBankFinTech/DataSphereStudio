@@ -12,6 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Component
 @Produces(MediaType.APPLICATION_JSON)
@@ -47,10 +48,12 @@ public class DwThemeDomainRestfulApi {
     @Path("/themedomains/all")
     public Response queryAllThemeDomains(
             @Context HttpServletRequest request,
-            @QueryParam("name") String name
+            @QueryParam("name") String name,
+            @QueryParam(value = "isAvailable") Boolean isAvailable
     )throws DwException {
         final DwThemeDomainQueryCommand command = new DwThemeDomainQueryCommand();
         command.setName(name);
+        command.setEnabled(isAvailable);
         Message message = this.dwThemeDomainService.queryAllThemeDomains(request, command);
         return Message.messageToResponse(message);
     }

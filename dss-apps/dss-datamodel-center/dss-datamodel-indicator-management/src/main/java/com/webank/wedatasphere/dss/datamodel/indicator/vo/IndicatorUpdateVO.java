@@ -1,6 +1,10 @@
 package com.webank.wedatasphere.dss.datamodel.indicator.vo;
 
+import lombok.Data;
+import lombok.ToString;
 
+@Data
+@ToString
 public class IndicatorUpdateVO {
 
     private String name;
@@ -35,112 +39,12 @@ public class IndicatorUpdateVO {
      */
     private String layerArea;
 
+    private String warehouseThemeNameEn;
+
+    private String themeAreaEn;
+
+    private String layerAreaEn;
 
     private IndicatorContentVO content;
 
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFieldIdentifier() {
-        return fieldIdentifier;
-    }
-
-    public void setFieldIdentifier(String fieldIdentifier) {
-        this.fieldIdentifier = fieldIdentifier;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public String getWarehouseThemeName() {
-        return warehouseThemeName;
-    }
-
-    public void setWarehouseThemeName(String warehouseThemeName) {
-        this.warehouseThemeName = warehouseThemeName;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getPrincipalName() {
-        return principalName;
-    }
-
-    public void setPrincipalName(String principalName) {
-        this.principalName = principalName;
-    }
-
-    public Integer getIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(Integer isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-
-    public Integer getIsCoreIndicator() {
-        return isCoreIndicator;
-    }
-
-    public void setIsCoreIndicator(Integer isCoreIndicator) {
-        this.isCoreIndicator = isCoreIndicator;
-    }
-
-    public String getThemeArea() {
-        return themeArea;
-    }
-
-    public void setThemeArea(String themeArea) {
-        this.themeArea = themeArea;
-    }
-
-    public String getLayerArea() {
-        return layerArea;
-    }
-
-    public void setLayerArea(String layerArea) {
-        this.layerArea = layerArea;
-    }
-
-    public IndicatorContentVO getContent() {
-        return content;
-    }
-
-    public void setContent(IndicatorContentVO content) {
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "IndicatorAddVO{" +
-                "name='" + name + '\'' +
-                ", fieldIdentifier='" + fieldIdentifier + '\'' +
-                ", comment='" + comment + '\'' +
-                ", warehouseThemeName='" + warehouseThemeName + '\'' +
-                ", owner='" + owner + '\'' +
-                ", principalName='" + principalName + '\'' +
-                ", isAvailable=" + isAvailable +
-                ", isCoreIndicator=" + isCoreIndicator +
-                ", themeArea='" + themeArea + '\'' +
-                ", layerArea='" + layerArea + '\'' +
-                ", content=" + content +
-                '}';
-    }
 }

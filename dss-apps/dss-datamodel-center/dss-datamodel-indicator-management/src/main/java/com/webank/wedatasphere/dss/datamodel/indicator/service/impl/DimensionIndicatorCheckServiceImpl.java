@@ -22,8 +22,18 @@ public class DimensionIndicatorCheckServiceImpl implements DimensionIndicatorChe
 
     @Override
     public Boolean referenceCase(String name) {
-        int versionCount = indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, "\""+name + "\""));
-        int contentCount = indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, "\""+name + "\""));
+        return check(name);
+    }
+
+    private Boolean check(String name) {
+        int versionCount = indicatorVersionService.contentReferenceCount(name);// indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, "\""+name + "\""));
+        int contentCount = indicatorContentService.sourceInfoReference(name);//indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, "\""+name + "\""));
         return versionCount > 0 || contentCount > 0;
+    }
+
+
+    @Override
+    public Boolean referenceEn(String name) {
+        return check(name);
     }
 }

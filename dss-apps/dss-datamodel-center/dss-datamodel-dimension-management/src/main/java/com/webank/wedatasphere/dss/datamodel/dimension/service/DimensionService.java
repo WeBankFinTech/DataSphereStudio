@@ -19,7 +19,7 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @param vo
      * @return
      */
-    int addDimension(DimensionAddVO vo);
+    int addDimension(DimensionAddVO vo)throws ErrorException;
 
     /**
      * 启用/禁用
@@ -35,7 +35,7 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @param vo
      * @return
      */
-    int updateDimension(Long id, DimensionUpdateVO vo);
+    int updateDimension(Long id, DimensionUpdateVO vo) throws ErrorException;
 
 
     /**
@@ -60,4 +60,12 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @return
      */
     Message listDimensions(DimensionQueryVO vo);
+
+
+    /**
+     * 主题引用情况
+     * @param name
+     * @return
+     */
+    int dimensionThemeReferenceCount(String name);
 }

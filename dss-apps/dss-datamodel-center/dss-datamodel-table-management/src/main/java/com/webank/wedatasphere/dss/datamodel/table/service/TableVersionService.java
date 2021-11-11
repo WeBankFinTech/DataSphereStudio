@@ -35,4 +35,20 @@ public interface TableVersionService extends IService<DssDatamodelTableVersion> 
      * @return
      */
     DssDatamodelTableVersion findBackup(String name,String version);
+
+
+    /**
+     * 表内容引用情况
+     * @param content
+     * @return
+     */
+    int tableContentReference(String content);
+
+
+    /**
+     * 字段内容引用情况
+     * @param content
+     * @return
+     */
+    int tableColumnsReference(String content);
 }

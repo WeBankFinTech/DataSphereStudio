@@ -387,7 +387,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer tableColumnBind(Long columnId, TableColumnBindVO vo) throws ErrorException {
-        return tableColumnsService.tableColumnBind(columnId, vo.getModelType(), vo.getModelName());
+        return tableColumnsService.tableColumnBind(columnId, vo.getModelType(), vo.getModelName(),vo.getModelNameEn());
     }
 
 
@@ -548,5 +548,30 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         List<PartInfoDTO> partInfoDTOS = assertsGson.fromJson(assertsGson.toJson(result.getResult()), new TypeToken<List<PartInfoDTO>>() {
         }.getType());
         return Message.ok().data("list", partInfoDTOS);
+    }
+
+
+    @Override
+    public int tableThemeReferenceCount(String name) {
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeName,name));
+        int versionCount = tableVersionService.tableContentReference(name);
+        return currentCount + versionCount;
+    }
+
+    @Override
+    public int tableLayerReferenceCount(String name) {
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerName,name));
+        int versionCount = tableVersionService.tableContentReference(name);
+        return currentCount + versionCount;
+    }
+
+    @Override
+    public int tableCycleReferenceCount(String name) {
+        return 0;
+    }
+
+    @Override
+    public int tableModifierReferenceCount(String name) {
+        return 0;
     }
 }

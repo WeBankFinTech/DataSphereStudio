@@ -9,6 +9,7 @@ import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorVersionMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dto.IndicatorVersionDTO;
+import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorContent;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorVersion;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorVersionService;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -66,5 +67,19 @@ public class IndicatorVersionServiceImpl extends ServiceImpl<DssDatamodelIndicat
                 Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery()
                         .eq(DssDatamodelIndicatorVersion::getName, name)
                         .eq(DssDatamodelIndicatorVersion::getVersion, version));
+    }
+
+
+    @Override
+    public int contentReferenceCount(String context) {
+        return getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery()
+                        .like(DssDatamodelIndicatorVersion::getVersionContext,"\""+ context + "\"")
+                        .or()
+                        .like(DssDatamodelIndicatorVersion::getVersionContext,"\""+ context + ",")
+                        .or()
+                        .like(DssDatamodelIndicatorVersion::getVersionContext,","+ context + ",")
+                        .or()
+                        .like(DssDatamodelIndicatorVersion::getVersionContext,","+ context + "\""));
     }
 }

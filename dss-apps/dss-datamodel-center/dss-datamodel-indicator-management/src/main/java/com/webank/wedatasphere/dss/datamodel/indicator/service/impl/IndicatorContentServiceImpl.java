@@ -69,8 +69,9 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
 
 
     @Override
-    public Boolean sourceInfoReference(String name) throws ErrorException {
-        int columnVersionCount = getBaseMapper().selectCount(
+    public int sourceInfoReference(String name) {
+
+        return getBaseMapper().selectCount(
                 Wrappers.<DssDatamodelIndicatorContent>lambdaQuery()
                         .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,"\""+ name + "\"")
                         .or()
@@ -79,7 +80,5 @@ public class IndicatorContentServiceImpl extends ServiceImpl<DssDatamodelIndicat
                         .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,","+ name + ",")
                         .or()
                         .like(DssDatamodelIndicatorContent::getIndicatorSourceInfo,","+ name + "\""));
-
-        return columnVersionCount>0;
     }
 }

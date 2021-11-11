@@ -54,5 +54,5 @@ public interface TableColumnsService extends IService<DssDatamodelTableColumns> 
 
 
 
-    Integer tableColumnBind(Long id, Integer modelType, String modelName) throws ErrorException;
+    Integer tableColumnBind(Long id, Integer modelType, String modelName,String modelNameEn) throws ErrorException;
 }

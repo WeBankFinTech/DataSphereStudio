@@ -4,8 +4,8 @@
   <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns">
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_table_columns-->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="table_id" jdbcType="BIGINT" property="tableId" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="table_id" jdbcType="INTEGER" property="tableId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="alias" jdbcType="VARCHAR" property="alias" />
     <result column="type" jdbcType="VARCHAR" property="type" />
@@ -15,7 +15,8 @@
     <result column="length" jdbcType="INTEGER" property="length" />
     <result column="rule" jdbcType="VARCHAR" property="rule" />
     <result column="model_type" jdbcType="INTEGER" property="modelType" />
-    <result column="model_id" jdbcType="BIGINT" property="modelId" />
+    <result column="model_name_en" jdbcType="VARCHAR" property="modelNameEn" />
+    <result column="model_id" jdbcType="INTEGER" property="modelId" />
     <result column="model_name" jdbcType="VARCHAR" property="modelName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -23,6 +24,6 @@
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, table_id, `name`, `alias`, `type`, `comment`, is_partition_field, is_primary, 
-    `length`, `rule`, model_type, model_id, model_name, create_time, update_time
+    `length`, `rule`, model_type, model_name_en, model_id, model_name, create_time, update_time
   </sql>
 </mapper>

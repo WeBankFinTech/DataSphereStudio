@@ -2,9 +2,11 @@ package com.webank.wedatasphere.dss.datamodel.table.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 public class DssDatamodelTableColumns {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -33,9 +35,14 @@ public class DssDatamodelTableColumns {
     private Integer modelType;
 
     /**
+     * 模型信息英文名称
+     */
+    private String modelNameEn;
+
+    /**
      * 关联具体模型id信息（因为有版本数据表id不可靠，暂时不用）
      */
-    private Long modelId;
+    private Integer modelId;
 
     /**
      * 模型信息名称
@@ -46,21 +53,7 @@ public class DssDatamodelTableColumns {
 
     private Date updateTime;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTableId() {
-        return tableId;
-    }
-
-    public void setTableId(Long tableId) {
-        this.tableId = tableId;
-    }
 
     public String getName() {
         return name;
@@ -134,11 +127,19 @@ public class DssDatamodelTableColumns {
         this.modelType = modelType;
     }
 
-    public Long getModelId() {
+    public String getModelNameEn() {
+        return modelNameEn;
+    }
+
+    public void setModelNameEn(String modelNameEn) {
+        this.modelNameEn = modelNameEn;
+    }
+
+    public Integer getModelId() {
         return modelId;
     }
 
-    public void setModelId(Long modelId) {
+    public void setModelId(Integer modelId) {
         this.modelId = modelId;
     }
 

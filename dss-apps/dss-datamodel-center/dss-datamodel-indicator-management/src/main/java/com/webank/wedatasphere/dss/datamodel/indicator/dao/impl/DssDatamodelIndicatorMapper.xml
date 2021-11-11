@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicator">
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_indicator-->
-    <id column="id" jdbcType="BIGINT" property="id" />
+    <id column="id" jdbcType="INTEGER" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="field_identifier" jdbcType="VARCHAR" property="fieldIdentifier" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
@@ -18,11 +18,12 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="warehouse_theme_name_en" jdbcType="VARCHAR" property="warehouseThemeNameEn" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, `name`, field_identifier, `comment`, warehouse_theme_name, `owner`, principal_name, 
     is_available, is_core_indicator, theme_area, layer_area, create_time, update_time, 
-    version
+    version, warehouse_theme_name_en
   </sql>
 </mapper>

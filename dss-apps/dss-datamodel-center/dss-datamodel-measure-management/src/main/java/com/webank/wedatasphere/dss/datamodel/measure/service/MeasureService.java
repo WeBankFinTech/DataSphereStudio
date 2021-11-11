@@ -19,7 +19,7 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param vo
      * @return
      */
-    int addMeasure(MeasureAddVO vo);
+    int addMeasure(MeasureAddVO vo)throws ErrorException;
 
     /**
      * 启用/禁用
@@ -35,7 +35,7 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param vo
      * @return
      */
-    int updateMeasure(Long id, MeasureUpdateVO vo);
+    int updateMeasure(Long id, MeasureUpdateVO vo)throws ErrorException;
 
 
     /**
@@ -60,4 +60,12 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @return
      */
     Message listMeasures(MeasureQueryVO vo);
+
+
+    /**
+     * 主题引用情况
+     * @param name
+     * @return
+     */
+    int measureThemeReferenceCount(String name);
 }

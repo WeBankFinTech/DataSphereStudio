@@ -38,5 +38,10 @@ public interface IndicatorVersionService extends IService<DssDatamodelIndicatorV
     DssDatamodelIndicatorVersion findBackup(String name,String version);
 
 
-
+    /**
+     * 引用情况
+     * @param context
+     * @return
+     */
+    int contentReferenceCount(String context);
 }

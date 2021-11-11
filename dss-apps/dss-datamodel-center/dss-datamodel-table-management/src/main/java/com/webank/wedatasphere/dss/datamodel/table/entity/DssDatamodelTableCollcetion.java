@@ -2,9 +2,11 @@ package com.webank.wedatasphere.dss.datamodel.table.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 public class DssDatamodelTableCollcetion {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -92,187 +94,15 @@ public class DssDatamodelTableCollcetion {
      */
     private String guid;
 
-    public Long getId() {
-        return id;
-    }
+    /**
+     * 数仓层级英文
+     */
+    private String warehouseLayerNameEn;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    /**
+     * 数仓主题英文
+     */
+    private String warehouseThemeNameEn;
 
-    public String getDataBase() {
-        return dataBase;
-    }
 
-    public void setDataBase(String dataBase) {
-        this.dataBase = dataBase;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getWarehouseLayerName() {
-        return warehouseLayerName;
-    }
-
-    public void setWarehouseLayerName(String warehouseLayerName) {
-        this.warehouseLayerName = warehouseLayerName;
-    }
-
-    public String getWarehouseThemeName() {
-        return warehouseThemeName;
-    }
-
-    public void setWarehouseThemeName(String warehouseThemeName) {
-        this.warehouseThemeName = warehouseThemeName;
-    }
-
-    public String getLifecycle() {
-        return lifecycle;
-    }
-
-    public void setLifecycle(String lifecycle) {
-        this.lifecycle = lifecycle;
-    }
-
-    public Integer getIsPartitionTable() {
-        return isPartitionTable;
-    }
-
-    public void setIsPartitionTable(Integer isPartitionTable) {
-        this.isPartitionTable = isPartitionTable;
-    }
-
-    public Integer getIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(Integer isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-
-    public String getStorageType() {
-        return storageType;
-    }
-
-    public void setStorageType(String storageType) {
-        this.storageType = storageType;
-    }
-
-    public String getPrincipalName() {
-        return principalName;
-    }
-
-    public void setPrincipalName(String principalName) {
-        this.principalName = principalName;
-    }
-
-    public String getCompress() {
-        return compress;
-    }
-
-    public void setCompress(String compress) {
-        this.compress = compress;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public Integer getIsExternal() {
-        return isExternal;
-    }
-
-    public void setIsExternal(Integer isExternal) {
-        this.isExternal = isExternal;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getGuid() {
-        return guid;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
 }

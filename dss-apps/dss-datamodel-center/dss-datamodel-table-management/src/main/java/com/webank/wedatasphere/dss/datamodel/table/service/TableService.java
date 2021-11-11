@@ -177,4 +177,35 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @return
      */
     Integer tableCheckData(TableCheckDataVO vo) throws ErrorException;
+
+
+    /**
+     * 主题引用情况
+     * @param name
+     * @return
+     */
+    int tableThemeReferenceCount(String name);
+
+    /**
+     * 分层引用情况
+     * @param name
+     * @return
+     */
+    int tableLayerReferenceCount(String name);
+
+
+    /**
+     * 周期引用情况
+     * @param name
+     * @return
+     */
+    int tableCycleReferenceCount(String name);
+
+
+    /**
+     * 修饰词引用情况
+     * @param name
+     * @return
+     */
+    int tableModifierReferenceCount(String name);
 }

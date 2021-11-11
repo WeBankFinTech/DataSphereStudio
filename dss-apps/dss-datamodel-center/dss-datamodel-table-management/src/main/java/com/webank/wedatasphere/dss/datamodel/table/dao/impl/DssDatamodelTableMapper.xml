@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable">
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_table-->
-    <id column="id" jdbcType="BIGINT" property="id" />
+    <id column="id" jdbcType="INTEGER" property="id" />
     <result column="data_base" jdbcType="VARCHAR" property="dataBase" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="alias" jdbcType="VARCHAR" property="alias" />
@@ -13,7 +13,9 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="warehouse_layer_name" jdbcType="VARCHAR" property="warehouseLayerName" />
+    <result column="warehouse_layer_name_en" jdbcType="VARCHAR" property="warehouseLayerNameEn" />
     <result column="warehouse_theme_name" jdbcType="VARCHAR" property="warehouseThemeName" />
+    <result column="warehouse_theme_name_en" jdbcType="VARCHAR" property="warehouseThemeNameEn" />
     <result column="lifecycle" jdbcType="VARCHAR" property="lifecycle" />
     <result column="is_partition_table" jdbcType="INTEGER" property="isPartitionTable" />
     <result column="is_available" jdbcType="INTEGER" property="isAvailable" />
@@ -29,7 +31,8 @@
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, data_base, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
-    warehouse_theme_name, lifecycle, is_partition_table, is_available, storage_type, 
-    principal_name, `compress`, file_type, version, is_external, `location`, `label`
+    warehouse_layer_name_en, warehouse_theme_name, warehouse_theme_name_en, lifecycle, 
+    is_partition_table, is_available, storage_type, principal_name, `compress`, file_type, 
+    version, is_external, `location`, `label`
   </sql>
 </mapper>

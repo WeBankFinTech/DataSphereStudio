@@ -26,9 +26,19 @@ public class TableVersionAddVO {
     private String warehouseLayerName;
 
     /**
+     * 数仓层级英文
+     */
+    private String warehouseLayerNameEn;
+
+    /**
      * 数仓主题格式为： theme_domain_name.theme_name
      */
     private String warehouseThemeName;
+
+    /**
+     * 数仓主题英文
+     */
+    private String warehouseThemeNameEn;
 
     /**
      * 生命周期

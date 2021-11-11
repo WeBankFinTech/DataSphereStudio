@@ -77,4 +77,19 @@ public class TableVersionServiceImpl extends ServiceImpl<DssDatamodelTableVersio
                         .eq(DssDatamodelTableVersion::getName, name)
                         .eq(DssDatamodelTableVersion::getVersion, version));
     }
+
+
+    @Override
+    public int tableContentReference(String content) {
+        return getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
+                        .like(DssDatamodelTableVersion::getTableParams,"\""+content + "\""));
+    }
+
+    @Override
+    public int tableColumnsReference(String content) {
+        return getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
+                        .like(DssDatamodelTableVersion::getColumns,"\""+content + "\""));
+    }
 }

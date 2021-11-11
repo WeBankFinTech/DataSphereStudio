@@ -25,9 +25,25 @@ public class IndicatorTableCheckServiceImpl implements IndicatorTableCheckServic
                 Wrappers.<DssDatamodelTableColumns>lambdaQuery()
                         .eq(DssDatamodelTableColumns::getModelType, 1)
                         .eq(DssDatamodelTableColumns::getModelName, name));
-        int columnVersionCount = tableVersionService.getBaseMapper().selectCount(
-                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
-                        .like(DssDatamodelTableVersion::getColumns,"\""+name + "\""));
+
+        int columnVersionCount = getColumnVersionCount(name);
         return columnCount > 0 || columnVersionCount>0 ;
+    }
+
+    private int getColumnVersionCount(String name) {
+        return tableVersionService.getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
+                        .like(DssDatamodelTableVersion::getColumns, "\"" + name + "\""));
+    }
+
+
+    @Override
+    public Boolean referenceEn(String name) {
+        int columnEnCount = tableColumnsService.getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
+                        .eq(DssDatamodelTableColumns::getModelType, 1)
+                        .eq(DssDatamodelTableColumns::getModelNameEn, name));
+        int columnVersionCount = getColumnVersionCount(name);
+        return columnEnCount > 0 || columnVersionCount>0 ;
     }
 }

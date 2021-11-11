@@ -36,5 +36,9 @@ public class TableColumnVO {
 
     private String modelName;
 
+    /**
+     * 模型信息英文名称
+     */
+    private String modelNameEn;
 
 }

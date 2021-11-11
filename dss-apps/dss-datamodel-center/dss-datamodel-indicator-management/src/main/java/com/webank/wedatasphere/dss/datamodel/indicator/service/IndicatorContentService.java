@@ -51,5 +51,5 @@ public interface IndicatorContentService extends IService<DssDatamodelIndicatorC
      * @return
      * @throws ErrorException
      */
-    Boolean sourceInfoReference(String name) throws ErrorException;
+    int sourceInfoReference(String name);
 }

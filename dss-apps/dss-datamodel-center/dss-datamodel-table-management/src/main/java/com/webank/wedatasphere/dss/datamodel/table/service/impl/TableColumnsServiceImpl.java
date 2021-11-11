@@ -62,10 +62,11 @@ public class TableColumnsServiceImpl extends ServiceImpl<DssDatamodelTableColumn
 
 
     @Override
-    public Integer tableColumnBind(Long id, Integer modelType, String modelName) throws ErrorException{
+    public Integer tableColumnBind(Long id, Integer modelType, String modelName,String modelNameEn) throws ErrorException{
         DssDatamodelTableColumns updateOne = new DssDatamodelTableColumns();
         updateOne.setModelType(modelType);
         updateOne.setModelName(modelName);
+        updateOne.setModelNameEn(modelNameEn);
         updateOne.setUpdateTime(new Date());
         return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelTableColumns>lambdaUpdate().eq(DssDatamodelTableColumns::getId,id));
     }

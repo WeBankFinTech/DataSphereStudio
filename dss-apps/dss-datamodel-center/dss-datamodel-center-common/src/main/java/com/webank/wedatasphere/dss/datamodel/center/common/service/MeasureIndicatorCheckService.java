@@ -8,4 +8,6 @@ public interface MeasureIndicatorCheckService {
      * @return
      */
     Boolean referenceCase(String name);
+
+    Boolean referenceEn(String name);
 }

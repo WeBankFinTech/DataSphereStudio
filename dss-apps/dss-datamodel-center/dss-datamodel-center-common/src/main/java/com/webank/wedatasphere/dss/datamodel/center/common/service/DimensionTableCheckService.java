@@ -8,4 +8,12 @@ public interface DimensionTableCheckService {
      * @return
      */
     Boolean referenceCase(String name);
+
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    Boolean referenceCaseEn(String name);
 }

@@ -27,9 +27,24 @@ public class DimensionTableCheckServiceImpl implements DimensionTableCheckServic
                 Wrappers.<DssDatamodelTableColumns>lambdaQuery()
                         .eq(DssDatamodelTableColumns::getModelType, 0)
                         .eq(DssDatamodelTableColumns::getModelName, name));
-        int columnVersionCount = tableVersionService.getBaseMapper().selectCount(
-                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
-                        .like(DssDatamodelTableVersion::getColumns,"\""+name + "\""));
+        int columnVersionCount = getColumnVersionCount(name);
         return columnCount > 0 || columnVersionCount>0 ;
+    }
+
+
+    @Override
+    public Boolean referenceCaseEn(String name) {
+        int columnCount = tableColumnsService.getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
+                        .eq(DssDatamodelTableColumns::getModelType, 0)
+                        .eq(DssDatamodelTableColumns::getModelNameEn, name));
+        int columnVersionCount = getColumnVersionCount(name);
+        return columnCount > 0 || columnVersionCount>0 ;
+    }
+
+    private int getColumnVersionCount(String name) {
+        return tableVersionService.getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
+                        .like(DssDatamodelTableVersion::getColumns, "\"" + name + "\""));
     }
 }

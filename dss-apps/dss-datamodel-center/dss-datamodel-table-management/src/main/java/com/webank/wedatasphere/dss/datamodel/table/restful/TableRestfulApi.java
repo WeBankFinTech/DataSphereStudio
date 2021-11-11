@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.datamodel.table.restful;
 
 import com.webank.wedatasphere.dss.datamodel.center.common.service.AuthenticationClientStrategy;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.DataWarehouseReferenceService;
 import com.webank.wedatasphere.dss.datamodel.table.service.TableService;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -38,6 +40,10 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
 
     @Autowired
     private GovernanceDwRemoteClient governanceDwRemoteClient;
+
+
+    @Resource
+    private DataWarehouseReferenceService dataWarehouseReferenceService;
 
     /**
      * 新增
@@ -181,6 +187,20 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
         return Message.messageToResponse(Message.ok().data("list", governanceDwRemoteClient.listThemeDomains(action).getAll()));
     }
 
+
+    /**
+     * 主题引用情况
+     *
+     * @param req
+     * @return
+     */
+    @GET
+    @Path("/themes/reference/{name}")
+    public Response themesReference(@Context HttpServletRequest req,@PathParam("name") String name) {
+       LOGGER.info("themes reference name : {}",name);
+       return Message.messageToResponse(Message.ok().data("result",dataWarehouseReferenceService.themeReferenceCount(name)));
+    }
+
     /**
      * 相关分层
      *
@@ -193,6 +213,45 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
         ListDwLayerAction action = new ListDwLayerAction();
         action.setUser(getStrategyUser(req));
         return Message.messageToResponse(Message.ok().data("list", governanceDwRemoteClient.listLayers(action).getAll()));
+    }
+
+    /**
+     * 分层引用情况
+     *
+     * @param req
+     * @return
+     */
+    @GET
+    @Path("/layers/reference/{name}")
+    public Response layersReference(@Context HttpServletRequest req,@PathParam("name") String name) {
+        LOGGER.info("layers reference name : {}",name);
+        return Message.messageToResponse(Message.ok().data("result",dataWarehouseReferenceService.layerReferenceCount(name)));
+    }
+
+    /**
+     * 周期引用情况
+     *
+     * @param req
+     * @return
+     */
+    @GET
+    @Path("/cycles/reference/{name}")
+    public Response cycleReference(@Context HttpServletRequest req,@PathParam("name") String name) {
+        LOGGER.info("cycles reference name : {}",name);
+        return Message.messageToResponse(Message.ok().data("result",dataWarehouseReferenceService.cycleReferenceCount(name)));
+    }
+
+    /**
+     * 修饰词引用情况
+     *
+     * @param req
+     * @return
+     */
+    @GET
+    @Path("/modifiers/reference/{name}")
+    public Response modifiersReference(@Context HttpServletRequest req,@PathParam("name") String name) {
+        LOGGER.info("modifiers reference name : {}",name);
+        return Message.messageToResponse(Message.ok().data("result",dataWarehouseReferenceService.modifierReferenceCount(name)));
     }
 
     /**

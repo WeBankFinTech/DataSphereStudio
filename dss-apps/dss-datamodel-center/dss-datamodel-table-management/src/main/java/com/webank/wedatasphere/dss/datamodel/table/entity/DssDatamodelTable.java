@@ -2,9 +2,11 @@ package com.webank.wedatasphere.dss.datamodel.table.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 public class DssDatamodelTable {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -29,9 +31,19 @@ public class DssDatamodelTable {
     private String warehouseLayerName;
 
     /**
+     * 数仓层级英文
+     */
+    private String warehouseLayerNameEn;
+
+    /**
      * 数仓主题格式为： theme_domain_name.theme_name
      */
     private String warehouseThemeName;
+
+    /**
+     * 数仓主题英文
+     */
+    private String warehouseThemeNameEn;
 
     /**
      * 生命周期
@@ -82,13 +94,6 @@ public class DssDatamodelTable {
      */
     private String label;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getDataBase() {
         return dataBase;
@@ -154,12 +159,28 @@ public class DssDatamodelTable {
         this.warehouseLayerName = warehouseLayerName;
     }
 
+    public String getWarehouseLayerNameEn() {
+        return warehouseLayerNameEn;
+    }
+
+    public void setWarehouseLayerNameEn(String warehouseLayerNameEn) {
+        this.warehouseLayerNameEn = warehouseLayerNameEn;
+    }
+
     public String getWarehouseThemeName() {
         return warehouseThemeName;
     }
 
     public void setWarehouseThemeName(String warehouseThemeName) {
         this.warehouseThemeName = warehouseThemeName;
+    }
+
+    public String getWarehouseThemeNameEn() {
+        return warehouseThemeNameEn;
+    }
+
+    public void setWarehouseThemeNameEn(String warehouseThemeNameEn) {
+        this.warehouseThemeNameEn = warehouseThemeNameEn;
     }
 
     public String getLifecycle() {

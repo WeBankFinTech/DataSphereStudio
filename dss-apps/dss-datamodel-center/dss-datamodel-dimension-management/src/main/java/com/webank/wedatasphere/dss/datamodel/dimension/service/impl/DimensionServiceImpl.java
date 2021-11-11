@@ -23,6 +23,8 @@ import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
 public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMapper,DssDatamodelDimension>  implements DimensionService {
 
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DimensionServiceImpl.class);
+
     private final ModelMapper modelMapper = new ModelMapper();
 
     @Resource
@@ -46,7 +50,13 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int addDimension(DimensionAddVO vo) {
+    public int addDimension(DimensionAddVO vo) throws DSSDatamodelCenterException{
+        if (getBaseMapper().selectCount(Wrappers.<DssDatamodelDimension>lambdaQuery().eq(DssDatamodelDimension::getName, vo.getName())
+                .or().eq(DssDatamodelDimension::getFieldIdentifier,vo.getFieldIdentifier())) > 0) {
+            LOGGER.error("errorCode : {}, dimension name or field identifier can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(), vo.getName());
+            throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_ADD_ERROR.getCode(), "dimension name or field identifier can not repeat");
+        }
+
         DssDatamodelDimension newOne = modelMapper.map(vo,DssDatamodelDimension.class);
         newOne.setCreateTime(new Date());
         newOne.setUpdateTime(new Date());
@@ -66,10 +76,35 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateDimension(Long id, DimensionUpdateVO vo) {
-        DssDatamodelDimension updateOne =modelMapper.map(vo,DssDatamodelDimension.class);
-        updateOne.setUpdateTime(new Date());
-        return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelDimension>lambdaUpdate().eq(DssDatamodelDimension::getId,id));
+    public int updateDimension(Long id, DimensionUpdateVO vo) throws DSSDatamodelCenterException{
+        DssDatamodelDimension org =modelMapper.map(vo,DssDatamodelDimension.class);
+        if (org == null) {
+            LOGGER.error("errorCode : {}, update dimension error not exists", ErrorCode.DIMENSION_UPDATE_ERROR.getCode());
+            throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_UPDATE_ERROR.getCode(), "update dimension error not exists");
+        }
+
+        //当更新名称时
+        if (!StringUtils.equals(vo.getName(), org.getName())) {
+            int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelDimension>lambdaQuery().eq(DssDatamodelDimension::getName, vo.getName()));
+
+            if (repeat > 0 ||(dimensionIndicatorCheckService.referenceCase(org.getName()))||dimensionTableCheckService.referenceCase(org.getName())) {
+                LOGGER.error("errorCode : {}, dimension name can not repeat", ErrorCode.DIMENSION_UPDATE_ERROR.getCode());
+                throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_UPDATE_ERROR.getCode(), "dimension name can not repeat");
+            }
+        }
+
+        //当更新标识时
+        if (!StringUtils.equals(vo.getFieldIdentifier(), org.getFieldIdentifier())) {
+            int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelDimension>lambdaQuery().eq(DssDatamodelDimension::getFieldIdentifier, vo.getFieldIdentifier()));
+
+            if (repeat > 0 ||(dimensionIndicatorCheckService.referenceEn(org.getFieldIdentifier()))||dimensionIndicatorCheckService.referenceEn(org.getFieldIdentifier())) {
+                LOGGER.error("errorCode : {}, dimension field identifier can not repeat", ErrorCode.DIMENSION_UPDATE_ERROR.getCode());
+                throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_UPDATE_ERROR.getCode(), "dimension field identifier can not repeat");
+            }
+        }
+
+        org.setUpdateTime(new Date());
+        return getBaseMapper().update(org, Wrappers.<DssDatamodelDimension>lambdaUpdate().eq(DssDatamodelDimension::getId,id));
     }
 
 
@@ -82,8 +117,8 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
             throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_DELETE_ERROR.getCode(), "dimension id " +id +" not exists");
         }
         //校验引用情况
-        if (dimensionIndicatorCheckService.referenceCase(dssDatamodelDimension.getName())
-        ||dimensionTableCheckService.referenceCase(dssDatamodelDimension.getName())){
+        if (dimensionIndicatorCheckService.referenceCase(dssDatamodelDimension.getName())||dimensionTableCheckService.referenceCaseEn(dssDatamodelDimension.getFieldIdentifier())
+        ||dimensionTableCheckService.referenceCase(dssDatamodelDimension.getName())||dimensionTableCheckService.referenceCaseEn(dssDatamodelDimension.getFieldIdentifier())){
             throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_DELETE_ERROR.getCode(), "dimension id " +id +" has referenced");
         }
         return getBaseMapper().deleteById(id);
@@ -119,5 +154,13 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
             throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_QUERY_ERROR.getCode(), "dimension id " +id +" not exists");
         }
         return modelMapper.map(dssDatamodelDimension,DimensionQueryDTO.class);
+    }
+
+
+    @Override
+    public int dimensionThemeReferenceCount(String name) {
+        int count = getBaseMapper().selectCount(Wrappers.<DssDatamodelDimension>lambdaQuery().eq(DssDatamodelDimension::getWarehouseThemeName,name));
+        int countEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelDimension>lambdaQuery().eq(DssDatamodelDimension::getWarehouseThemeName,name));
+        return count + countEn;
     }
 }

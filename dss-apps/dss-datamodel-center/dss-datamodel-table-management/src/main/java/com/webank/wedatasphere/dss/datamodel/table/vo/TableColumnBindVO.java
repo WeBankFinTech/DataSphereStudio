@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.datamodel.table.vo;
 
+import lombok.Data;
 
+@Data
 public class TableColumnBindVO {
     /**
      * 0 维度，1 指标 2 度量
@@ -12,28 +14,10 @@ public class TableColumnBindVO {
      */
     private String modelName;
 
+    /**
+     * 模型信息英文名称
+     */
+    private String modelNameEn;
 
-    public Integer getModelType() {
-        return modelType;
-    }
 
-    public void setModelType(Integer modelType) {
-        this.modelType = modelType;
-    }
-
-    public String getModelName() {
-        return modelName;
-    }
-
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    @Override
-    public String toString() {
-        return "TableColumnBindVO{" +
-                "modelType=" + modelType +
-                ", modelName='" + modelName + '\'' +
-                '}';
-    }
 }

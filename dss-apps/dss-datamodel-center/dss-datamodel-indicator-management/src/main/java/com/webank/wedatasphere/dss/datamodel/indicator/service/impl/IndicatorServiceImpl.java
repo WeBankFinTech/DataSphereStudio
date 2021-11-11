@@ -64,9 +64,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
-        if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())) > 0) {
-            LOGGER.error("errorCode : {}, indicator name can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(), vo.getName());
-            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name can not repeat");
+        if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())
+            .or().eq(DssDatamodelIndicator::getFieldIdentifier,vo.getFieldIdentifier())) > 0) {
+            LOGGER.error("errorCode : {}, indicator name or field identifier can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(), vo.getName());
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name or field identifier can not repeat");
         }
 
         DssDatamodelIndicator newOne = modelMapper.map(vo, DssDatamodelIndicator.class);
@@ -96,9 +97,18 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         if (!StringUtils.equals(vo.getName(), org.getName())) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName()));
             String lastVersion = indicatorVersionService.findLastVersion(org.getName());
-            if (repeat > 0 || StringUtils.isNotBlank(lastVersion)) {
+            if (repeat > 0 || StringUtils.isNotBlank(lastVersion)||(indicatorTableCheckService.referenceEn(org.getName()))) {
                 LOGGER.error("errorCode : {}, indicator name can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
                 throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator name can not repeat");
+            }
+        }
+
+        //当更新指标标识时,存在其他指标名称同名或者当前指标名称已经存在版本信息，则不允许修改指标名称
+        if (!StringUtils.equals(vo.getFieldIdentifier(), org.getFieldIdentifier())) {
+            int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getFieldIdentifier, vo.getFieldIdentifier()));
+            if (repeat > 0 ||(indicatorTableCheckService.referenceEn(org.getFieldIdentifier()))) {
+                LOGGER.error("errorCode : {}, indicator field identifier can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+                throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator field identifier can not repeat");
             }
         }
 
@@ -127,7 +137,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         }
 
         //校验引用情况
-        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())||indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getName())) {
+        if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())
+                ||indicatorTableCheckService.referenceEn(dssDatamodelIndicator.getFieldIdentifier())
+                || indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getName()) > 0
+                || indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getFieldIdentifier())>0) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has referenced");
         }
 
@@ -137,10 +150,11 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 //            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has version");
 //        }
         //同时删除版本
-        indicatorVersionService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, dssDatamodelIndicator.getName()));
+        indicatorVersionService.getBaseMapper()
+                .delete(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().eq(DssDatamodelIndicatorVersion::getName, dssDatamodelIndicator.getName()));
         //删除指标
         getBaseMapper().deleteById(id);
-        indicatorContentService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId,id));
+        indicatorContentService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, id));
         return 1;
     }
 
@@ -151,7 +165,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
                 .eq(vo.getIsAvailable() != null, "is_available", vo.getIsAvailable())
                 .eq(vo.getIndicatorType() != null, "indicator_type", vo.getIndicatorType())
-                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()),"warehouse_theme_name",vo.getWarehouseThemeName())
+                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), "warehouse_theme_name", vo.getWarehouseThemeName())
                 .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
         PageHelper.clearPage();
         PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
@@ -208,14 +222,16 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
         String orgName = orgVersion.getName();
+        String orgNameEn = orgVersion.getName();
         String orgV = orgVersion.getVersion();
         String assignVersion = newVersion(orgName, orgV);
 
         //指标名称不能改变
-        if (!StringUtils.equals(orgName, vo.getName())) {
+        if (!StringUtils.equals(orgName, vo.getName())||!StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
             LOGGER.error("errorCode : {}, indicator name must be same", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name must be same");
         }
+
         //查询指标详细信息
         DssDatamodelIndicatorContent orgContent = indicatorContentService.queryByIndicateId(id);
         if (orgContent == null) {
@@ -322,5 +338,36 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 .map(dssDatamodelIndicatorVersion -> modelMapper.map(dssDatamodelIndicatorVersion, IndicatorVersionQueryDTO.class))
                 .collect(Collectors.toList());
         return Message.ok().data("list", list);
+    }
+
+
+    @Override
+    public int indicatorThemeReferenceCount(String name) {
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getThemeArea, name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getThemeAreaEn, name));
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount + currentCountEn;
+    }
+
+    @Override
+    public int indicatorLayerReferenceCount(String name) {
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getLayerArea, name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getLayerAreaEn, name));
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount + currentCountEn;
+    }
+
+    @Override
+    public int indicatorCycleReferenceCount(String name) {
+        int currentCount = indicatorContentService.sourceInfoReference(name);
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount;
+    }
+
+    @Override
+    public int indicatorModifierReferenceCount(String name) {
+        int currentCount = indicatorContentService.sourceInfoReference(name);
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount;
     }
 }

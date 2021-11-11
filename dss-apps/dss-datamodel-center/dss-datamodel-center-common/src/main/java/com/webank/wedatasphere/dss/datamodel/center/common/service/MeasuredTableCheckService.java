@@ -8,4 +8,6 @@ public interface MeasuredTableCheckService {
      * @return
      */
     Boolean referenceCase(String name);
+
+    Boolean referenceEn(String name);
 }

@@ -46,7 +46,7 @@ public class MeasureRestfulApi {
      */
     @POST
     @Path("/measures")
-    public Response add(@Context HttpServletRequest req, @RequestBody MeasureAddVO vo) throws IOException {
+    public Response add(@Context HttpServletRequest req, @RequestBody MeasureAddVO vo) throws ErrorException{
         LOGGER.info("measureAddVO : {}", vo);
         //String userName = SecurityFilter.getLoginUsername(req);
         return Message.messageToResponse(Message.ok().data("count", measureService.addMeasure(vo)));
@@ -75,7 +75,7 @@ public class MeasureRestfulApi {
      */
     @PUT
     @Path("/measures/{id}")
-    public Response update(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody MeasureUpdateVO vo) {
+    public Response update(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody MeasureUpdateVO vo) throws ErrorException{
         LOGGER.info("update id : {}, vo : {}", id, vo);
         return Message.messageToResponse(Message.ok().data("count",measureService.updateMeasure(id,vo)));
     }

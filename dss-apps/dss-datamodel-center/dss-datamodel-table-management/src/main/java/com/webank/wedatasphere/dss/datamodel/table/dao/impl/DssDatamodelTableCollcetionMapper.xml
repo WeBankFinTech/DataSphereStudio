@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableCollcetion">
     <!--@mbg.generated-->
     <!--@Table dss_datamodel_table_collcetion-->
-    <id column="id" jdbcType="BIGINT" property="id" />
+    <id column="id" jdbcType="INTEGER" property="id" />
     <result column="data_base" jdbcType="VARCHAR" property="dataBase" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="alias" jdbcType="VARCHAR" property="alias" />
@@ -27,12 +27,14 @@
     <result column="location" jdbcType="VARCHAR" property="location" />
     <result column="label" jdbcType="VARCHAR" property="label" />
     <result column="guid" jdbcType="VARCHAR" property="guid" />
+    <result column="warehouse_layer_name_en" jdbcType="VARCHAR" property="warehouseLayerNameEn" />
+    <result column="warehouse_theme_name_en" jdbcType="VARCHAR" property="warehouseThemeNameEn" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, data_base, `name`, `alias`, creator, `comment`, create_time, update_time, warehouse_layer_name, 
     warehouse_theme_name, lifecycle, is_partition_table, is_available, storage_type, 
     principal_name, `compress`, file_type, `user`, version, is_external, `location`, 
-    `label`, guid
+    `label`, guid, warehouse_layer_name_en, warehouse_theme_name_en
   </sql>
 </mapper>

@@ -82,7 +82,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int addTable(TableAddVO vo) throws ErrorException {
+    public Long addTable(TableAddVO vo) throws ErrorException {
 
         int sameCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getName, vo.getName()));
         if (sameCount > 0) {
@@ -99,7 +99,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         Long tableId = newOne.getId();
         addColumns(tableId, vo.getColumns());
 
-        return 1;
+        return newOne.getId();
     }
 
     private void addColumns(Long tableId, List<TableColumnVO> columnVOs) throws ErrorException {

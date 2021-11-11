@@ -58,7 +58,7 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
     public Response add(@Context HttpServletRequest req, @RequestBody TableAddVO vo) throws ErrorException {
         vo.setCreator(getStrategyUser(req));
         LOGGER.info("tablesAddVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",tableService.addTable(vo)));
+        return Message.messageToResponse(Message.ok().data("id",tableService.addTable(vo)));
     }
 
 

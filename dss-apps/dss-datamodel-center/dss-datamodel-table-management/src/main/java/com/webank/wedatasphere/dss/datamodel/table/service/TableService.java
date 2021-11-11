@@ -15,7 +15,7 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @param vo
      * @return
      */
-    int addTable(TableAddVO vo)  throws ErrorException;
+    Long addTable(TableAddVO vo)  throws ErrorException;
 
 
     /**

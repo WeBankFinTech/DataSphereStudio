@@ -261,7 +261,7 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        //target: "http://***REMOVED***:8088",
+        // target: "http://***REMOVED***:8088",
         //target: 'http://***REMOVED***:9202', //yichao
         // target: "http://***REMOVED***:9202", //jiawei
         target: "http://luban.ctyun.cn:8088",
@@ -272,7 +272,8 @@ module.exports = {
         }
       },
       "/dolphinscheduler": {
-        target: "http://***REMOVED***:12345",
+        //target: "http://***REMOVED***:12345",
+        target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"

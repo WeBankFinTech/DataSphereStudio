@@ -2,6 +2,7 @@
   <div style="height:100%">
     <navMenu
       :menuFold="navFold"
+      :currentTreeId="apiTabDatas.find(i=>i.isActive) ? apiTabDatas.find(i=>i.isActive).id : null"
       @showModal="showModal"
       @handleApiChoosed="handleApiChoosed"
       @on-menu-toggle="handleFold"

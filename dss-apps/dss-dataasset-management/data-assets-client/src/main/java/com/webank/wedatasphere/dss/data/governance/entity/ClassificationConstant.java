@@ -29,6 +29,7 @@ public enum ClassificationConstant {
 
     private int type;
 
+    public static final String SEPARATOR = "_";
 
     private String typeCode;
 

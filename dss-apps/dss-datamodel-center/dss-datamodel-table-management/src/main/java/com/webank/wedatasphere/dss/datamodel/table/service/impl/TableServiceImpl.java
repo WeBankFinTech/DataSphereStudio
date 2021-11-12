@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
+import com.webank.wedatasphere.dss.data.governance.entity.HiveSimpleInfo;
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
 import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
@@ -182,7 +184,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         headlineDTO.setStorageType(0);
         headlineDTO.setTableType(0);
         headlineDTO.setEntityType(
-               tableMaterializedHistoryService.isMaterialized(table.getName(),table.getVersion())?1:0);
+                tableMaterializedHistoryService.isMaterialized(table.getName(), table.getVersion()) ? 1 : 0);
         tableQueryDTO.setHeadline(headlineDTO);
         return tableQueryDTO;
     }
@@ -211,7 +213,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         //判断旧版本是否有数据
-        tableMaterializedHistoryService.checkData(orgVersion,vo.getCreator());
+        tableMaterializedHistoryService.checkData(orgVersion, vo.getCreator());
         //没有数据删除表
         //tableMaterializedHistoryService.dropTable(orgVersion.getName(),vo.getCreator());
 
@@ -387,7 +389,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer tableColumnBind(Long columnId, TableColumnBindVO vo) throws ErrorException {
-        return tableColumnsService.tableColumnBind(columnId, vo.getModelType(), vo.getModelName(),vo.getModelNameEn());
+        return tableColumnsService.tableColumnBind(columnId, vo.getModelType(), vo.getModelName(), vo.getModelNameEn());
     }
 
 
@@ -470,11 +472,47 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             tableListDTO.setCreator(hiveTblSimpleInfoDTO.getOwner());
             tableListDTO.setCreateTime(hiveTblSimpleInfoDTO.getCreateTime());
             tableListDTO.setName(StringUtils.substringBefore(hiveTblSimpleInfoDTO.getQualifiedName(), "@"));
+            tableListDTO.setDataBase(StringUtils.substringBefore(hiveTblSimpleInfoDTO.getQualifiedName(), "."));
+
+            tableListDTO.setUpdateTime(hiveTblSimpleInfoDTO.getLastAccessTime());
+            tableListDTO.setAlias(hiveTblSimpleInfoDTO.getAliases());
+            tableListDTO.setComment(hiveTblSimpleInfoDTO.getComment());
+            tableListDTO.setSize(getSize(hiveTblSimpleInfoDTO));
+            String theme = getThemes(hiveTblSimpleInfoDTO.getClassifications());
+            tableListDTO.setWarehouseThemeName(theme);
+            tableListDTO.setWarehouseThemeNameEn(theme);
+
             tableListDTOS.add(tableListDTO);
         });
 
         return Message.ok().data("list", tableListDTOS)
                 .data("total", tableListDTOS.size());
+    }
+
+    private String getThemes(List<String> classifcations){
+        if (CollectionUtils.isEmpty(classifcations)){
+            return null;
+        }
+        for (String classification : classifcations){
+            String prefix = StringUtils.substringBefore(classification,ClassificationConstant.SEPARATOR);
+            if (ClassificationConstant.THEME.getTypeCode().equals(prefix)){
+                return StringUtils.substringAfter(classification,ClassificationConstant.SEPARATOR);
+            }
+        }
+        return null;
+    }
+
+    private long getSize(HiveTblSimpleInfoDTO hiveTblSimpleInfoDTO) {
+        long size = 0L;
+        if (StringUtils.isBlank(hiveTblSimpleInfoDTO.getTotalSize())) {
+            return size;
+        }
+        try {
+            size = Long.parseLong(hiveTblSimpleInfoDTO.getTotalSize());
+        } catch (Exception e) {
+            //ignore
+        }
+        return size;
     }
 
     private Message listDataModel(TableListVO vo) {
@@ -512,7 +550,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     public Message previewData(TableDataPreviewVO vo) throws ErrorException {
-        if (!tableMaterializedHistoryService.tableExists(vo.getTableName(),vo.getUser())) {
+        if (!tableMaterializedHistoryService.tableExists(vo.getTableName(), vo.getUser())) {
             return Message.ok();
         }
         DataModelUJESJobTask dataModelUJESJobTask = PreviewDataModelUJESJobTask.newBuilder().user(vo.getUser()).code(vo.getTableName()).count(10).build();
@@ -521,9 +559,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             previewDataDTO = previewDataModelUJESJobLauncher.launch(dataModelUJESJobTask);
         } catch (Exception e) {
             if (e instanceof UJESJobException) {
-                UJESJobException ujesJobException = (UJESJobException)e;
+                UJESJobException ujesJobException = (UJESJobException) e;
                 //表不存在错误忽略
-                if (ujesJobException.getErrCode()==40002) {
+                if (ujesJobException.getErrCode() == 40002) {
                     LOGGER.error(e.getMessage(), e);
                     return Message.ok();
                 }
@@ -537,7 +575,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public Integer tableCheckData(TableCheckDataVO vo) throws ErrorException {
         return ((tableMaterializedHistoryService.tableExists(vo.getTableName(), vo.getUser())
-                &&tableMaterializedHistoryService.hasData(vo.getTableName(),vo.getUser()))?1:0);
+                && tableMaterializedHistoryService.hasData(vo.getTableName(), vo.getUser())) ? 1 : 0);
     }
 
     private Message queryByGuid(String guid, String user) {
@@ -553,24 +591,24 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     @Override
     public int tableThemeReferenceCount(String name) {
-        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeName,name));
-        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeNameEn,name));
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeName, name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeNameEn, name));
         int versionCount = tableVersionService.tableContentReference(name);
         return currentCount + versionCount + currentCountEn;
     }
 
     @Override
     public int tableLayerReferenceCount(String name) {
-        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerName,name));
-        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerNameEn,name));
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerName, name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerNameEn, name));
         int versionCount = tableVersionService.tableContentReference(name);
         return currentCount + versionCount + currentCountEn;
     }
 
     @Override
     public int tableCycleReferenceCount(String name) {
-        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycle,name));
-        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycleEn,name));
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycle, name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycleEn, name));
         int versionCount = tableVersionService.tableContentReference(name);
         return currentCount + versionCount + currentCountEn;
     }

@@ -60,7 +60,7 @@ export default class Pie extends Base {
     checkKeyInModel(data[0], textKey, dataKey)
 
     const legendData = []
-    const radius = ring ? ['50%', '70%'] : '60%'
+    const radius = ring ? ['65%', '70%'] : '60%'
     const center = title ? ['50%', '60%'] : ['50%', '50%']
     const series = [{
       radius: radius,
@@ -92,6 +92,13 @@ export default class Pie extends Base {
 
     // Injection configuration to series
     const { insertSeries } = this.settings
+    series[0].itemStyle = {
+      normal: {
+        color: (params) => {
+          return params.data.color
+        }
+      }
+    }
     let _series = series
     if (insertSeries && insertSeries.length && series.length) {
       _series = this.injectDataIntoSeries(insertSeries, _series)
@@ -100,7 +107,12 @@ export default class Pie extends Base {
     const opts = {
       title: {
         text: title,
-        x: 'center'
+        x: 'center',
+        y: 'center',
+        textStyle: {
+          fontSize: 14,
+          color: 'rgba(0,0,0,0.45)'
+        }
       },
       tooltip: {
         trigger: 'item',

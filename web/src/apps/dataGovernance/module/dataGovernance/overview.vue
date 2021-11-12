@@ -52,15 +52,15 @@ export default {
         {
           title: "数据库总数",
           iconName: "shujukuzongshu",
-          content: 2,
+          content: 0,
           unit: "个"
         },
-        { title: "表总数", iconName: "biaozongshu", content: 6, unit: "个" },
+        { title: "表总数", iconName: "biaozongshu", content: 0, unit: "个" },
         {
           title: "总存容量",
           iconName: "zongcunchuliang",
-          content: 296.25,
-          unit: "MB"
+          content: 0,
+          unit: ""
         }
       ],
       tableSelf: this,
@@ -164,15 +164,38 @@ export default {
     // 获取 数据资产概要
     getDataAssetsSummary() {
       let that = this;
+      let hiveStore_unit = "";
       getHiveSummary()
         .then(data => {
           if (data.result) {
             const { hiveStore, hiveDb, hiveTable } = data.result;
-            data.result["hiveStore"] = (hiveStore / 1024 / 1024).toFixed(2);
+            let len = hiveStore.toString().length;
+            if (len <= 7) {
+              data.result["hiveStore"] = (hiveStore / 1024 / 1024).toFixed(2);
+              hiveStore_unit = "MB";
+            } else if (len > 7 && len < 10) {
+              data.result["hiveStore"] = (
+                hiveStore /
+                1024 /
+                1024 /
+                1024
+              ).toFixed(2);
+              hiveStore_unit = "GB";
+            } else {
+              data.result["hiveStore"] = (
+                hiveStore /
+                1024 /
+                1024 /
+                1024 /
+                1024
+              ).toFixed(2);
+              hiveStore_unit = "TB";
+            }
             const models = that.models.slice(0);
             models[0].content = hiveDb;
             models[1].content = hiveTable;
             models[2].content = data.result["hiveStore"];
+            models[2].unit = hiveStore_unit;
             that.models = models;
           }
           console.log(data);
@@ -214,6 +237,7 @@ export default {
   padding-top: 24px;
   padding-right: 3px;
   border-top: 24px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   .overview-t {
     &-card {
       display: flex;

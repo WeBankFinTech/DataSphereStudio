@@ -14,7 +14,7 @@
       }"
     >
       <div class="ds-main-container">
-        <div class="ds-breadcumb">
+        <div class="ds-breadcumb" v-if="title !== '数据资产目录'">
           <span>{{ title }}</span>
         </div>
         <div class="ds-router-view">
@@ -57,7 +57,11 @@ export default {
           id: 4,
           name: "数仓规划",
           children: [
-            { id: 41, name: "主题域配置", pathName: "dataGovernance/subjectDomain" },
+            {
+              id: 41,
+              name: "主题域配置",
+              pathName: "dataGovernance/subjectDomain"
+            },
             { id: 42, name: "分层配置", pathName: "dataGovernance/layered" }
           ]
         },

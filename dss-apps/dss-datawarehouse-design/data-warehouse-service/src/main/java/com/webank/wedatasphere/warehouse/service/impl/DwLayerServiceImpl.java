@@ -4,21 +4,37 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
+import com.webank.wedatasphere.dss.data.governance.request.BindModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.CreateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.DeleteModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.UpdateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult;
+import com.webank.wedatasphere.dss.data.governance.response.DeleteModelTypeResult;
+import com.webank.wedatasphere.dss.data.governance.response.UpdateModelTypeResult;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import com.webank.wedatasphere.linkis.datasource.client.request.GetInfoByDataSourceIdAction;
+import com.webank.wedatasphere.linkis.httpclient.response.Result;
+import com.webank.wedatasphere.linkis.metadatamanager.common.Json;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.warehouse.LinkisRemoteClientHolder;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwLayerUpdateCommand;
 import com.webank.wedatasphere.warehouse.dao.domain.DwLayer;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwThemeDomainMapper;
 import com.webank.wedatasphere.warehouse.dto.DwLayerDTO;
 import com.webank.wedatasphere.warehouse.dto.DwLayerListItemDTO;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
 //import com.webank.wedatasphere.warehouse.mapper.DwLayerModelMapper;
-import com.webank.wedatasphere.warehouse.service.DwDomainInUseCheckAdapter;
+import com.webank.wedatasphere.warehouse.exception.DwExceptionCode;
+import com.webank.wedatasphere.warehouse.service.DwDomainReferenceCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwLayerService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
 import com.webank.wedatasphere.warehouse.utils.RegexUtil;
@@ -32,15 +48,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
-public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAdapter {
+public class DwLayerServiceImpl implements DwLayerService, DwDomainReferenceCheckAdapter {
 
     private final DwLayerMapper dwLayerMapper;
+    private final DwThemeDomainMapper dwThemeDomainMapper;
     private final DwModifierMapper dwModifierMapper;
     private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
 
     @Autowired
-    public DwLayerServiceImpl(final DwLayerMapper dwLayerMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
+    public DwLayerServiceImpl(final DwLayerMapper dwLayerMapper, final DwThemeDomainMapper dwThemeDomainMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
         this.dwLayerMapper = dwLayerMapper;
+        this.dwThemeDomainMapper = dwThemeDomainMapper;
         this.dwModifierMapper = dwModifierMapper;
         this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
     }
@@ -55,9 +73,20 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
         return dwStatisticalPeriodMapper;
     }
 
+    @Override
+    public DwLayerMapper getDwLayerMapper() {
+        return dwLayerMapper;
+    }
+
+    @Override
+    public DwThemeDomainMapper getDwThemeDomainMapper() {
+        return dwThemeDomainMapper;
+    }
+
     @Transactional
     @Override
     public Message createDwCustomLayer(HttpServletRequest request, DwLayerCreateCommand command) throws DwException {
+        String username = SecurityFilter.getLoginUsername(request);
         String name = command.getName();
         String enName = command.getEnName();
         String databases = command.getDatabases();
@@ -114,6 +143,25 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
 
         int insert = this.dwLayerMapper.insert(layer);
         PreconditionUtil.checkState(1 == insert, DwException.stateReject("create dw layer failed"));
+
+        // 建立关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            CreateModelTypeAction action = new CreateModelTypeAction.Builder().setType(ClassificationConstant.LAYER).setName(enName).setUser(username).build();
+            CreateModelTypeResult result = dataAssetsRemoteClient.createModelType(action);
+
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.CREATE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.CREATE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
+
 
         return Message.ok().data("id", layer.getId());
     }
@@ -225,9 +273,10 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
         PreconditionUtil.checkState(!Objects.isNull(layer), DwException.stateReject("layer not found"));
         PreconditionUtil.checkState(Objects.equals(Boolean.FALSE, layer.getPreset()), DwException.stateReject("preset layer could not be removed"));
 
+        String username = SecurityFilter.getLoginUsername(request);
         // check in use
         // statistical_period & modifier & data_model client api check
-        boolean inUse = isLayerInUse(layer.getId());
+        boolean inUse = isLayerInUse(layer.getId(), username);
         PreconditionUtil.checkState(!inUse, DwException.stateReject("layer is in use"));
 
         if (Objects.equals(Boolean.FALSE, layer.getStatus())) {
@@ -236,6 +285,25 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
         layer.setStatus(Boolean.FALSE);
         int i = this.dwLayerMapper.updateById(layer);
         PreconditionUtil.checkState(1 == i, DwException.stateReject("remove action failed"));
+
+        // 删除关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            DeleteModelTypeAction action = new DeleteModelTypeAction.Builder().setType(ClassificationConstant.LAYER).setName(layer.getEnName()).setUser(username).build();
+            DeleteModelTypeResult result = dataAssetsRemoteClient.deleteModelType(action);
+
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.DELETE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.DELETE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
+
         return Message.ok();
     }
 
@@ -250,6 +318,7 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
     @Transactional
     @Override
     public Message update(HttpServletRequest request, DwLayerUpdateCommand command) throws DwException {
+        String username = SecurityFilter.getLoginUsername(request);
         // 基本参数校验
         Long id = command.getId();
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
@@ -291,7 +360,8 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
                 // check name enName if not equal, we should check if in use
                 // check in use
                 // statistical_period & modifier & data_model client api check
-                boolean inUse = isLayerInUse(layer.getId());
+
+                boolean inUse = isLayerInUse(layer.getId(), username);
                 PreconditionUtil.checkState(!inUse, DwException.stateReject("layer is in use"));
             }
 
@@ -338,6 +408,25 @@ public class DwLayerServiceImpl implements DwLayerService, DwDomainInUseCheckAda
         int i = this.dwLayerMapper.update(layer, updateWrapper);
 
         PreconditionUtil.checkState(1 == i, DwException.stateReject("update layer failed"));
+
+        // 更新关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            UpdateModelTypeAction action = new UpdateModelTypeAction.Builder().setType(ClassificationConstant.LAYER).setName(layer.getEnName()).setUser(username).build();
+            UpdateModelTypeResult result = dataAssetsRemoteClient.updateModelType(action);
+
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.UPDATE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.UPDATE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
+
         return Message.ok();
     }
 

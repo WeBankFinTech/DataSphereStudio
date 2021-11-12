@@ -4,11 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
+import com.webank.wedatasphere.dss.data.governance.request.CreateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.DeleteModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.UpdateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult;
+import com.webank.wedatasphere.dss.data.governance.response.DeleteModelTypeResult;
+import com.webank.wedatasphere.dss.data.governance.response.UpdateModelTypeResult;
+import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.warehouse.LinkisRemoteClientHolder;
 import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwThemeDomainUpdateCommand;
 import com.webank.wedatasphere.warehouse.dao.domain.DwThemeDomain;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwThemeDomainMapper;
@@ -16,7 +28,8 @@ import com.webank.wedatasphere.warehouse.dto.DwThemeDomainDTO;
 import com.webank.wedatasphere.warehouse.dto.DwThemeDomainListItemDTO;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
-import com.webank.wedatasphere.warehouse.service.DwDomainInUseCheckAdapter;
+import com.webank.wedatasphere.warehouse.exception.DwExceptionCode;
+import com.webank.wedatasphere.warehouse.service.DwDomainReferenceCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwThemeDomainService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
 import com.webank.wedatasphere.warehouse.utils.RegexUtil;
@@ -33,17 +46,29 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainInUseCheckAdapter {
+public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainReferenceCheckAdapter {
 
+    private final DwLayerMapper dwLayerMapper;
     private final DwThemeDomainMapper dwThemeDomainMapper;
     private final DwModifierMapper dwModifierMapper;
     private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
 
     @Autowired
-    public DwThemeDomainServiceImpl(final DwThemeDomainMapper dwThemeDomainMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
+    public DwThemeDomainServiceImpl(final DwLayerMapper dwLayerMapper, final DwThemeDomainMapper dwThemeDomainMapper, final DwModifierMapper dwModifierMapper, final DwStatisticalPeriodMapper dwStatisticalPeriodMapper) {
+        this.dwLayerMapper = dwLayerMapper;
         this.dwThemeDomainMapper = dwThemeDomainMapper;
         this.dwModifierMapper = dwModifierMapper;
         this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
+    }
+
+    @Override
+    public DwLayerMapper getDwLayerMapper() {
+        return dwLayerMapper;
+    }
+
+    @Override
+    public DwThemeDomainMapper getDwThemeDomainMapper() {
+        return dwThemeDomainMapper;
     }
 
     @Override
@@ -123,6 +148,7 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
     @Transactional
     @Override
     public Message create(HttpServletRequest request, DwThemeDomainCreateCommand command) throws DwException {
+        String username = SecurityFilter.getLoginUsername(request);
         String name = command.getName();
         String enName = command.getEnName();
         String principalName = command.getPrincipalName();
@@ -170,6 +196,23 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
         int insert = this.dwThemeDomainMapper.insert(record);
         PreconditionUtil.checkState(1 == insert, DwException.stateReject("create dw theme domain failed"));
 
+        // 建立关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            CreateModelTypeAction action = new CreateModelTypeAction.Builder().setType(ClassificationConstant.THEME).setName(enName).setUser(username).build();
+            CreateModelTypeResult result = dataAssetsRemoteClient.createModelType(action);
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.CREATE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.CREATE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
+
         return Message.ok().data("id", record.getId());
     }
 
@@ -197,9 +240,11 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
         DwThemeDomain record = this.dwThemeDomainMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("theme domain not found"));
 
+        String username = SecurityFilter.getLoginUsername(request);
+
         // check in use
         // statistical_period & modifier & data_model client api check
-        boolean inUse = isThemeDomainInUse(record.getId());
+        boolean inUse = isThemeDomainInUse(record.getId(), username);
         PreconditionUtil.checkState(!inUse, DwException.stateReject("theme domain is in use"));
 
         if (Objects.equals(Boolean.FALSE, record.getStatus())) {
@@ -208,12 +253,32 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
         record.setStatus(Boolean.FALSE);
         int i = this.dwThemeDomainMapper.updateById(record);
         PreconditionUtil.checkState(1 == i, DwException.stateReject("remove action failed"));
+
+        // 删除关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            DeleteModelTypeAction action = new DeleteModelTypeAction.Builder().setType(ClassificationConstant.THEME).setName(record.getEnName()).setUser(username).build();
+            DeleteModelTypeResult result = dataAssetsRemoteClient.deleteModelType(action);
+
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.DELETE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.DELETE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
+
         return Message.ok();
     }
 
     @Transactional
     @Override
     public Message update(HttpServletRequest request, DwThemeDomainUpdateCommand command) throws DwException {
+        String username = SecurityFilter.getLoginUsername(request);
         // 基本参数校验
         Long id = command.getId();
         String name = command.getName();
@@ -250,7 +315,8 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
         if (!Objects.equals(name, record.getName()) || !Objects.equals(enName, record.getEnName())) {
             // check in use
             // statistical_period & modifier & data_model client api check
-            boolean inUse = isThemeDomainInUse(record.getId());
+
+            boolean inUse = isThemeDomainInUse(record.getId(), username);
             PreconditionUtil.checkState(!inUse, DwException.stateReject("theme domain is in use"));
         }
 
@@ -289,6 +355,24 @@ public class DwThemeDomainServiceImpl implements DwThemeDomainService, DwDomainI
         int i = this.dwThemeDomainMapper.update(record, updateWrapper);
 
         PreconditionUtil.checkState(1 == i, DwException.stateReject("update theme domain failed"));
+
+        // 更新关联
+        try {
+            LinkisDataAssetsRemoteClient dataAssetsRemoteClient = LinkisRemoteClientHolder.getDataAssetsRemoteClient();
+            UpdateModelTypeAction action = new UpdateModelTypeAction.Builder().setType(ClassificationConstant.THEME).setName(record.getEnName()).setUser(username).build();
+            UpdateModelTypeResult result = dataAssetsRemoteClient.updateModelType(action);
+
+            if (result.getStatus() != 0) {
+                throw new DwException(result.getStatus(), result.getMessage());
+            }
+        } catch (Exception e) {
+            if (e instanceof ErrorException) {
+                ErrorException ee = (ErrorException) e;
+                throw new DwException(DwExceptionCode.UPDATE_MODEL_TYPE_ERROR.getCode(), e.getMessage(), ee.getIp(), ee.getPort(), ee.getServiceKind());
+            } else {
+                throw new DwException(DwExceptionCode.UPDATE_MODEL_TYPE_ERROR.getCode(), e.getMessage());
+            }
+        }
 
         return Message.ok();
     }

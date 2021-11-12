@@ -56,6 +56,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-datamodel-center-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>data-assets-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>

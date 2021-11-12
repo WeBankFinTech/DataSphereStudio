@@ -2,9 +2,9 @@ package com.webank.wedatasphere.warehouse.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.cqe.DwStatisticalPeriodCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwStatisticalPeriodQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwStatisticalPeriodUpdateCommand;
@@ -12,11 +12,13 @@ import com.webank.wedatasphere.warehouse.dao.domain.DwLayer;
 import com.webank.wedatasphere.warehouse.dao.domain.DwStatisticalPeriod;
 import com.webank.wedatasphere.warehouse.dao.domain.DwThemeDomain;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
+import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwStatisticalPeriodMapper;
 import com.webank.wedatasphere.warehouse.dao.mapper.DwThemeDomainMapper;
 import com.webank.wedatasphere.warehouse.dao.vo.DwStatisticalPeriodVo;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
+import com.webank.wedatasphere.warehouse.service.DwDomainReferenceCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwStatisticalPeriodService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
 import com.webank.wedatasphere.warehouse.utils.RegexUtil;
@@ -29,22 +31,45 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
-public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodService {
+public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodService, DwDomainReferenceCheckAdapter {
 
-    private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
     private final DwLayerMapper dwLayerMapper;
     private final DwThemeDomainMapper dwThemeDomainMapper;
+    private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
+    private final DwModifierMapper dwModifierMapper;
 
     @Autowired
     public DwStatisticalPeriodServiceImpl(
             final DwStatisticalPeriodMapper dwStatisticalPeriodMapper,
             final DwLayerMapper dwLayerMapper,
-            final DwThemeDomainMapper dwThemeDomainMapper
+            final DwThemeDomainMapper dwThemeDomainMapper,
+            final DwModifierMapper dwModifierMapper
 
     ) {
         this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
         this.dwLayerMapper = dwLayerMapper;
         this.dwThemeDomainMapper = dwThemeDomainMapper;
+        this.dwModifierMapper = dwModifierMapper;
+    }
+
+    @Override
+    public DwLayerMapper getDwLayerMapper() {
+        return dwLayerMapper;
+    }
+
+    @Override
+    public DwThemeDomainMapper getDwThemeDomainMapper() {
+        return dwThemeDomainMapper;
+    }
+
+    @Override
+    public DwModifierMapper getDwModifierMapper() {
+        return dwModifierMapper;
+    }
+
+    @Override
+    public DwStatisticalPeriodMapper getDwStatisticalPeriodMapper() {
+        return dwStatisticalPeriodMapper;
     }
 
     @Override
@@ -261,6 +286,11 @@ public class DwStatisticalPeriodServiceImpl implements DwStatisticalPeriodServic
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
         DwStatisticalPeriod record = this.dwStatisticalPeriodMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("statistical period not found"));
+
+        String username = SecurityFilter.getLoginUsername(request);
+        boolean inUse = isStatisticalPeriodInUse(record.getId(), username);
+        PreconditionUtil.checkState(!inUse, DwException.stateReject("statistical period is in use, id = {}, name = {}", record.getId(), record.getName()));
+
         if (Objects.equals(Boolean.FALSE, record.getStatus())) {
             return Message.ok();
         }

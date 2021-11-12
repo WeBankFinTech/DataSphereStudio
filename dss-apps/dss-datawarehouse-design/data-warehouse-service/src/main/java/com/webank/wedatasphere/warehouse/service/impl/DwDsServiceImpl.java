@@ -6,7 +6,7 @@ import com.webank.wedatasphere.linkis.datasource.client.response.QueryDataSource
 import com.webank.wedatasphere.linkis.datasourcemanager.common.domain.DataSource;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import com.webank.wedatasphere.warehouse.DwDataSourceRemoteClient;
+import com.webank.wedatasphere.warehouse.LinkisRemoteClientHolder;
 import com.webank.wedatasphere.warehouse.client.DataSourceDTO;
 import com.webank.wedatasphere.warehouse.service.DwDsService;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class DwDsServiceImpl implements DwDsService {
 //        String userName = "hdfs";
         LOGGER.info("listAllDataSources userName:" + userName);
 
-        LinkisDataSourceRemoteClient linkisDataSourceRemoteClient = DwDataSourceRemoteClient.getLinkisDataSourceRemoteClient();
+        LinkisDataSourceRemoteClient linkisDataSourceRemoteClient = LinkisRemoteClientHolder.getLinkisDataSourceRemoteClient();
         QueryDataSourceAction.Builder builder = QueryDataSourceAction.builder()
                 .setSystem("system")
                 .setIdentifies("")

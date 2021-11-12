@@ -1,5 +1,7 @@
 package com.webank.wedatasphere.warehouse
 
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
+import com.webank.wedatasphere.dss.datamodel.center.client.impl.LinkisDatamodelCenterRemoteClient
 import com.webank.wedatasphere.linkis.datasource.client.impl.LinkisDataSourceRemoteClient
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy
 import com.webank.wedatasphere.linkis.httpclient.dws.config.{DWSClientConfig, DWSClientConfigBuilder}
@@ -8,7 +10,7 @@ import com.webank.wedatasphere.warehouse.client.DwDataSourceConfiguration
 import java.lang
 import java.util.concurrent.TimeUnit
 
-object DwDataSourceRemoteClient {
+object LinkisRemoteClientHolder {
   //Linkis Datasource Client Config
   val serverUrl: String = DwDataSourceConfiguration.SERVER_URL.getValue
   val connectionTimeout: lang.Long = DwDataSourceConfiguration.CONNECTION_TIMEOUT.getValue
@@ -39,7 +41,19 @@ object DwDataSourceRemoteClient {
 
   val dataSourceClient = new LinkisDataSourceRemoteClient(clientConfig)
 
+  var dataModelRemoteClient = new LinkisDatamodelCenterRemoteClient(clientConfig)
+
+  var dataAssetsRemoteClient = new LinkisDataAssetsRemoteClient(clientConfig)
+
   def getLinkisDataSourceRemoteClient: LinkisDataSourceRemoteClient = {
     dataSourceClient
+  }
+
+  def getDataModelRemoteClient: LinkisDatamodelCenterRemoteClient = {
+    dataModelRemoteClient
+  }
+
+  def getDataAssetsRemoteClient: LinkisDataAssetsRemoteClient = {
+    dataAssetsRemoteClient
   }
 }

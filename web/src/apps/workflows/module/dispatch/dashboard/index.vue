@@ -34,7 +34,7 @@
               </m-process-state-count>
             </div>
           </div>
-          <div class="col-md-6">
+          <!--<div class="col-md-6">
             <div class="chart-title">
               <span>{{$t('message.scheduler.taskStatusStatistics')}}</span>
             </div>
@@ -42,7 +42,7 @@
               <m-task-status-count :search-params="searchParams" @goToList="goToList">
               </m-task-status-count>
             </div>
-          </div>
+          </div>-->
         </div>
         <div class="row">
           <div class="col-md-12">
@@ -65,9 +65,10 @@ import util from "@/common/util"
 //import dayjs from 'dayjs'
 import mDefineUserCount from './source/defineUserCount'
 import mProcessStateCount from './source/processStateCount'
-import mTaskStatusCount from './source/taskStatusCount'
+//import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
+import {formatDate} from '../convertor'
 
 export default {
   name: 'projects-index-index',
@@ -135,6 +136,23 @@ export default {
           return cb(this.projectId)
         })
       }
+    },
+    getMixedBarLineData(currentDay) {
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-paging`, {
+          pageSize: 1000,
+          pageNo: 1,
+          startDate: `${currentDay} 00:00:00`,
+          endDate: `${currentDay} 23:59:59`,
+        }, 'get').then((res) => {
+          res.totalList.forEach(item => {
+            item.scheduleTime = formatDate(item.scheduleTime)
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
+          })
+        })
+      })
+
     }
   },
   created () {
@@ -155,7 +173,7 @@ export default {
     mListConstruction,
     mDefineUserCount,
     mProcessStateCount,
-    mTaskStatusCount
+    //mTaskStatusCount
   }
 }
 </script>

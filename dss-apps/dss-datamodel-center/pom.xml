@@ -35,6 +35,7 @@
         <module>dss-datamodel-measure-management</module>
         <module>dss-datamodel-table-management</module>
         <module>dss-datamodel-center-common</module>
+        <module>dss-datamodel-center-client</module>
     </modules>
 
 

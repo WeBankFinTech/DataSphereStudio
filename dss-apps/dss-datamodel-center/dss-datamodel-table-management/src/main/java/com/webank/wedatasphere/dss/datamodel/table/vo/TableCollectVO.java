@@ -49,6 +49,8 @@ public class TableCollectVO {
      */
     private String lifecycle;
 
+    private String lifecycleEn;
+
     private Integer isPartitionTable;
 
     private Integer isAvailable;

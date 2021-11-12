@@ -34,37 +34,39 @@ object TestDataAssetsRemoteClient {
 //    val searchHiveDbResult = dataAssetsClient.searchHiveDb(SearchHiveDbAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
 //    println(searchHiveDbResult)
 //
-    val hiveTblBasicResult = dataAssetsClient.getHiveTblBasic(GetHiveTblBasicAction.builder().setUser("hdfs").setGuid("27920dc8-1eef-4d7d-9423-b5967d9e2d33").build()).result
+    val hiveTblBasicResult = dataAssetsClient
+  .getHiveTblBasic(GetHiveTblBasicAction.builder().setUser("hdfs").setGuid("27920dc8-1eef-4d7d-9423-b5967d9e2d33").build())
+  .result
     println(hiveTblBasicResult)
-//
-//    val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
-//    println(hiveTblPartitionResult)
-//
-//    val hiveTblCreateResult = dataAssetsClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
-//    println(hiveTblCreateResult)
 
-//    val deleteModelTypeResult = dataAssetsClient.deleteModelType(DeleteModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build())
-//    println(deleteModelTypeResult.getResult)
+    val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
+    println(hiveTblPartitionResult)
 
-//    val createModelTypeResult = dataAssetsClient.createModelType(CreateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build()).getInfo
-//    println(createModelTypeResult)
+    val hiveTblCreateResult = dataAssetsClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
+    println(hiveTblCreateResult)
 
-//    val  updateModelTypeResult =dataAssetsClient.updateModelType(UpdateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test000NEW").setOrgName("test000").build())
-//    println(updateModelTypeResult.getInfo.getGuid)
-//    println(updateModelTypeResult.getInfo.getName)
+    val deleteModelTypeResult = dataAssetsClient.deleteModelType(DeleteModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build())
+    println(deleteModelTypeResult.getResult)
 
-//      val bindResult = dataAssetsClient.bindModelType(BindModelTypeAction.builder()
-//        .setUser("hdfs")
-//        .setTableName("default.test02")
-//        .setModelName("test001")
-//        .setModelType(ClassificationConstant.INDICATOR).build())
-//      println(bindResult.getResult)
-//
-//     val unBindResult = dataAssetsClient.unBindModelType(UnBindModelTypeAction.builder()
-//            .setUser("hdfs")
-//            .setTableName("default.test02")
-//            .setModelName("test001")
-//            .setModelType(ClassificationConstant.INDICATOR).build())
-//    println(unBindResult.getResult)
+    val createModelTypeResult = dataAssetsClient.createModelType(CreateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test004").build()).getInfo
+    println(createModelTypeResult)
+
+    val  updateModelTypeResult =dataAssetsClient.updateModelType(UpdateModelTypeAction.builder().setUser("hdfs").setType(ClassificationConstant.INDICATOR).setName("test000NEW").setOrgName("test000").build())
+    println(updateModelTypeResult.getInfo.getGuid)
+    println(updateModelTypeResult.getInfo.getName)
+
+    val bindResult = dataAssetsClient.bindModelType(BindModelTypeAction.builder()
+        .setUser("hdfs")
+        .setTableName("default.test02")
+        .setModelName("test001")
+        .setModelType(ClassificationConstant.INDICATOR).build())
+      println(bindResult.getResult)
+
+     val unBindResult = dataAssetsClient.unBindModelType(UnBindModelTypeAction.builder()
+            .setUser("hdfs")
+            .setTableName("default.test02")
+            .setModelName("test001")
+            .setModelType(ClassificationConstant.INDICATOR).build())
+    println(unBindResult.getResult)
   }
 }

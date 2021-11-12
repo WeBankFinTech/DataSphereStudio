@@ -554,20 +554,25 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public int tableThemeReferenceCount(String name) {
         int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeName,name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseThemeNameEn,name));
         int versionCount = tableVersionService.tableContentReference(name);
-        return currentCount + versionCount;
+        return currentCount + versionCount + currentCountEn;
     }
 
     @Override
     public int tableLayerReferenceCount(String name) {
         int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerName,name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getWarehouseLayerNameEn,name));
         int versionCount = tableVersionService.tableContentReference(name);
-        return currentCount + versionCount;
+        return currentCount + versionCount + currentCountEn;
     }
 
     @Override
     public int tableCycleReferenceCount(String name) {
-        return 0;
+        int currentCount = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycle,name));
+        int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycleEn,name));
+        int versionCount = tableVersionService.tableContentReference(name);
+        return currentCount + versionCount + currentCountEn;
     }
 
     @Override

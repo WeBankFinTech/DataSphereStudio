@@ -16,7 +16,7 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @param version
      * @return
      */
-    int addIndicator(IndicatorAddVO vo, String version) throws ErrorException;
+    Long addIndicator(IndicatorAddVO vo, String version) throws ErrorException;
 
 
 

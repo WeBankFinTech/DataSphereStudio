@@ -6,8 +6,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
+import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
+import com.webank.wedatasphere.dss.data.governance.request.CreateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.request.UpdateModelTypeAction;
+import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult;
+import com.webank.wedatasphere.dss.data.governance.response.UpdateModelTypeResult;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.context.DataModelSecurityContextHolder;
+import com.webank.wedatasphere.dss.datamodel.center.common.event.CreateModelEvent;
+import com.webank.wedatasphere.dss.datamodel.center.common.event.DeleteModelEvent;
+import com.webank.wedatasphere.dss.datamodel.center.common.event.UpdateModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.AssertsSyncService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.IndicatorTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.IndicatorQueryMapper;
@@ -61,11 +72,17 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Resource
     private IndicatorTableCheckService indicatorTableCheckService;
 
+    @Resource
+    private LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient;
+
+    @Resource
+    private AssertsSyncService assertsSyncService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
+    public Long addIndicator(IndicatorAddVO vo, String version) throws ErrorException {
         if (getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName())
-            .or().eq(DssDatamodelIndicator::getFieldIdentifier,vo.getFieldIdentifier())) > 0) {
+                .or().eq(DssDatamodelIndicator::getFieldIdentifier, vo.getFieldIdentifier())) > 0) {
             LOGGER.error("errorCode : {}, indicator name or field identifier can not repeat, name : {}", ErrorCode.INDICATOR_ADD_ERROR.getCode(), vo.getName());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "indicator name or field identifier can not repeat");
         }
@@ -79,7 +96,16 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             LOGGER.error("errorCode : {}, add indicator error", ErrorCode.INDICATOR_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_ADD_ERROR.getCode(), "add indicator error");
         }
-        return indicatorContentService.addIndicatorContent(newOne.getId(), version, vo.getContent());
+
+        indicatorContentService.addIndicatorContent(newOne.getId(), version, vo.getContent());
+
+        //同步atlas
+        CreateModelTypeResult result = assertsSyncService.syncCreateModel(
+                new CreateModelEvent(this
+                        , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                        , vo.getFieldIdentifier()
+                        , ClassificationConstant.INDICATOR));
+        return newOne.getId();
     }
 
 
@@ -97,7 +123,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         if (!StringUtils.equals(vo.getName(), org.getName())) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName()));
             String lastVersion = indicatorVersionService.findLastVersion(org.getName());
-            if (repeat > 0 || StringUtils.isNotBlank(lastVersion)||(indicatorTableCheckService.referenceEn(org.getName()))) {
+            if (repeat > 0 || StringUtils.isNotBlank(lastVersion) || (indicatorTableCheckService.referenceEn(org.getName()))) {
                 LOGGER.error("errorCode : {}, indicator name can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
                 throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator name can not repeat");
             }
@@ -106,7 +132,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //当更新指标标识时,存在其他指标名称同名或者当前指标名称已经存在版本信息，则不允许修改指标名称
         if (!StringUtils.equals(vo.getFieldIdentifier(), org.getFieldIdentifier())) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getFieldIdentifier, vo.getFieldIdentifier()));
-            if (repeat > 0 ||(indicatorTableCheckService.referenceEn(org.getFieldIdentifier()))) {
+            if (repeat > 0 || (indicatorTableCheckService.referenceEn(org.getFieldIdentifier()))) {
                 LOGGER.error("errorCode : {}, indicator field identifier can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
                 throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator field identifier can not repeat");
             }
@@ -125,7 +151,21 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "update indicator error not exists");
         }
 
-        return indicatorContentService.updateIndicatorContent(orgId, version, vo.getContent());
+        indicatorContentService.updateIndicatorContent(orgId, version, vo.getContent());
+
+
+
+        //同步atlas
+        UpdateModelTypeResult updateModelTypeResult = assertsSyncService.syncUpdateModel(
+                new UpdateModelEvent(this
+                        ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                        ,vo.getFieldIdentifier()
+                        ,org.getFieldIdentifier()
+                        ,ClassificationConstant.INDICATOR)
+        );
+
+
+        return 1;
     }
 
 
@@ -138,9 +178,9 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
         //校验引用情况
         if (indicatorTableCheckService.referenceCase(dssDatamodelIndicator.getName())
-                ||indicatorTableCheckService.referenceEn(dssDatamodelIndicator.getFieldIdentifier())
+                || indicatorTableCheckService.referenceEn(dssDatamodelIndicator.getFieldIdentifier())
                 || indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getName()) > 0
-                || indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getFieldIdentifier())>0) {
+                || indicatorContentService.sourceInfoReference(dssDatamodelIndicator.getFieldIdentifier()) > 0) {
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_DELETE_ERROR.getCode(), "indicator id " + id + " has referenced");
         }
 
@@ -155,6 +195,14 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //删除指标
         getBaseMapper().deleteById(id);
         indicatorContentService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, id));
+
+
+        //同步资产
+        assertsSyncService.syncDeleteModel(new DeleteModelEvent(this
+                ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                ,dssDatamodelIndicator.getFieldIdentifier()
+                ,ClassificationConstant.INDICATOR));
+
         return 1;
     }
 
@@ -227,7 +275,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         String assignVersion = newVersion(orgName, orgV);
 
         //指标名称不能改变
-        if (!StringUtils.equals(orgName, vo.getName())||!StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
+        if (!StringUtils.equals(orgName, vo.getName()) || !StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
             LOGGER.error("errorCode : {}, indicator name must be same", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name must be same");
         }

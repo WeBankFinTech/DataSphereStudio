@@ -14,19 +14,19 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.gateway.parser
+package com.webank.wedatasphere.dss.common.label;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars
+public class LabelRouteVO {
 
+    private String route;
 
-object DSSGatewayConfiguration {
-  val DSS_SPRING_NAME = CommonVars("wds.linkis.dss.name", "dss-server")
+    public String getRoute() {
+        return route;
+    }
 
-  val DSS_URL_LABEL_PREFIX = CommonVars("wds.dss.gateway.url.prefix.name", "labels")
-
-  val DSS_URL_ROUTE_LABEL_PREFIX = CommonVars("wds.dss.gateway.url.prefix.name", "labelsRoute")
-
-  val DSS_URL_APPCONNS = CommonVars("wds.dss.gateway.url.appconns", "visualis")
+    public void setRoute(String route) {
+        this.route = route;
+    }
 
 
 }

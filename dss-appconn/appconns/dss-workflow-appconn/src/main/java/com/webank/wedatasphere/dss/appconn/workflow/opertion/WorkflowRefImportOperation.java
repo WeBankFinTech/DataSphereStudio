@@ -25,7 +25,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowImportRequestRef;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestImportWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseImportWorkflow;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

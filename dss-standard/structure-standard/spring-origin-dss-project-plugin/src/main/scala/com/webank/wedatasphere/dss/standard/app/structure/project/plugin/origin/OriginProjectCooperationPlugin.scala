@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperati
 import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandardFactory
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.{ProjectAuth, ProjectCooperationPlugin}
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
+import org.apache.linkis.httpclient.request.HttpAction
 import javax.servlet.http.HttpServletRequest
 
 

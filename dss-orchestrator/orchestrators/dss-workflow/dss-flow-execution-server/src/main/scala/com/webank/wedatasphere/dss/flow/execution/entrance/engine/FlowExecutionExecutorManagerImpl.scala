@@ -19,10 +19,10 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.engine
 import java.util
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.scheduler.executer.{Executor, ExecutorManager}
-import com.webank.wedatasphere.linkis.scheduler.listener.ExecutorListener
-import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEvent
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.scheduler.executer.{Executor, ExecutorManager}
+import org.apache.linkis.scheduler.listener.ExecutorListener
+import org.apache.linkis.scheduler.queue.SchedulerEvent
 
 import scala.concurrent.duration.Duration
 

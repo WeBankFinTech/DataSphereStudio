@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.common.entity;
 
 /**
- * @author allenlliu
  * @date 2020/12/16 11:53
  */
 public enum PublishType {

@@ -70,7 +70,6 @@ public class DSSFrameworkOrchestratorRestful {
             //保存编排模式
             //todo 先注释掉
             // orchestratorService.saveOrchestrator(createRequest,null,username);
-            // return RestfulUtils.dealOk("创建工作流编排模式成功", new Pair<>("orchestratorId", 1L));
             CommonOrchestratorVo orchestratorVo = dssFrameworkOrchestratorService.createOrchestrator(username, createRequest, workspace);
             return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
         } catch (Exception e) {

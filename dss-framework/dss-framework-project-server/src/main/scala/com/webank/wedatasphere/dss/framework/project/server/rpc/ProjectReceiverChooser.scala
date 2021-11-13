@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService
-import com.webank.wedatasphere.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
+import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
 import javax.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

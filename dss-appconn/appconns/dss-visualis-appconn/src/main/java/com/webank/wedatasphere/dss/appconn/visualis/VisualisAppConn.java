@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.ext.ThirdlyAppConn;
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractOnlySSOAppConn;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 public class VisualisAppConn extends AbstractOnlySSOAppConn implements ThirdlyAppConn {
 

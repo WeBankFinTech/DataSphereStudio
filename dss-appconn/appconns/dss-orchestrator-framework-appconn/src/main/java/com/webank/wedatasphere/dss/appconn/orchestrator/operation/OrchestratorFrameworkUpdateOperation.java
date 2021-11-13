@@ -26,7 +26,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateO
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

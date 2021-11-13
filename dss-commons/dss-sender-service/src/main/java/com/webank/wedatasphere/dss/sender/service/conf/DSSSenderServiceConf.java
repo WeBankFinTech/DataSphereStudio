@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.sender.service.conf;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 /**
  * @author allenlliu

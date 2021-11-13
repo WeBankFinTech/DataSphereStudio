@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.common.label;
 
-import com.webank.wedatasphere.linkis.manager.label.entity.GenericLabel;
+import org.apache.linkis.manager.label.entity.GenericLabel;
 
 /**
  * The basic label class of DSS. All other labels of DSS must extends this class.

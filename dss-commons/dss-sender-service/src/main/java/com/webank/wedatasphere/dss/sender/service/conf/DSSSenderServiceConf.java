@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.sender.service.conf;
 import org.apache.linkis.common.conf.CommonVars;
 
 /**
- * @author allenlliu
  * @date 2021/6/24 17:23
  */
 public class DSSSenderServiceConf {

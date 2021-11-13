@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author allenlliu
  * @date 2021/6/28 11:41
  */
 public class DSSSenderServiceFactory {

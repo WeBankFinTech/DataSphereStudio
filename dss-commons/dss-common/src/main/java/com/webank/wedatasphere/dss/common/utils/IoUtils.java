@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * @author allenlliu
  * @version 2.0.0
  * @date 2020/03/11 11:18 AM
  */

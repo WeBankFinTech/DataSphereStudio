@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.common.protocol.project;
 
 /**
- * Created by enjoyyin on 2021/7/2.
+ * @Date 2021/7/2.
  */
 public class ProjectInfoRequest {
 

@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author: jinyangrao on 2021/7/16
+ * @Date 2021/7/16
  * @description:
  */
 public class LabelInstanceFactory {

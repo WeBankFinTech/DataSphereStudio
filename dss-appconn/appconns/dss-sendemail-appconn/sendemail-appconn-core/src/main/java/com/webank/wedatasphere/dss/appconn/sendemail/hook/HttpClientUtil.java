@@ -128,9 +128,7 @@ public final class HttpClientUtil {
     }
 
 	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
+	 * 调用saltapi时n
 	 */
 	public static String postJsonBody(String url, int timeout, Map<String, Object> headerMap,
 			String paraData, String encoding) {
@@ -344,9 +342,7 @@ public final class HttpClientUtil {
 	}
 
 	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
+	 * 调用saltapi时n
 	 */
 	public static String postJsonBody2(String url, int timeout, Map<String, Object> headerMap,
                                        List<NameValuePair> paramsList, String encoding) {
@@ -397,9 +393,7 @@ public final class HttpClientUtil {
 	}
 
 	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
+	 * 调用saltapi时n
 	 */
 	public static String postJsonBody3(String url, int timeout, Map<String, Object> headerMap,
 			Map<String, Object> paramsList, String encoding) {

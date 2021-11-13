@@ -17,15 +17,15 @@
 package com.webank.wedatasphere.dss.datapipe.execute;
 
 import com.webank.wedatasphere.dss.datapipe.config.DataPipeServiceConfiguration;
-import com.webank.wedatasphere.linkis.common.conf.Configuration;
-import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
-import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent;
-import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
-import com.webank.wedatasphere.linkis.ujes.client.UJESClientImpl;
-import com.webank.wedatasphere.linkis.ujes.client.request.JobExecuteAction;
-import com.webank.wedatasphere.linkis.ujes.client.response.JobExecuteResult;
+import org.apache.linkis.common.conf.Configuration;
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import org.apache.linkis.server.socket.controller.ServerEvent;
+import org.apache.linkis.ujes.client.UJESClient;
+import org.apache.linkis.ujes.client.UJESClientImpl;
+import org.apache.linkis.ujes.client.request.JobExecuteAction;
+import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
 import java.util.HashMap;
 import java.util.Map;

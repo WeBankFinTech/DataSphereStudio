@@ -22,9 +22,6 @@ import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
-/**
- * @date 2021/6/24 17:13
- */
 public class DSSSenderServiceImpl implements DSSSenderService {
 
     private final Sender orcSender = Sender.getSender(DSSSenderServiceConf.ORCHESTRATOR_SERVER_DEV_NAME.getValue());

@@ -14,9 +14,9 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.conf
+package org.apache.linkis.manager.engineplugin.appconn.conf
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars
+import org.apache.linkis.common.conf.CommonVars
 
 
 object AppConnEngineConnConfiguration {

@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.linkis.node.execution.conf;
 
 
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
-import com.webank.wedatasphere.linkis.common.conf.Configuration;
+import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.Configuration;
 import java.util.Map;
 
 

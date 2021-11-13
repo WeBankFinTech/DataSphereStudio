@@ -14,20 +14,14 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.gateway.parser
+package org.apache.linkis.gateway.parser
 
-import java.util
-
-import com.webank.wedatasphere.linkis.gateway.http.GatewayContext
-import com.webank.wedatasphere.linkis.gateway.ujes.route.label.RouteLabelParser
-import com.webank.wedatasphere.linkis.manager.label.builder.factory.LabelBuilderFactoryContext
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.route.RouteLabel
-import com.webank.wedatasphere.linkis.protocol.constants.TaskConstant
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper
+import org.apache.linkis.gateway.http.GatewayContext
+import org.apache.linkis.gateway.ujes.route.label.RouteLabelParser
+import org.apache.linkis.manager.label.entity.route.RouteLabel
 import org.springframework.stereotype.Component
 
-import scala.collection.JavaConversions._
+import java.util
 
 
 @Component

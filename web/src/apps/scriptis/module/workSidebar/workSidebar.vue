@@ -1022,7 +1022,7 @@ export default {
       };
       const name = `${secondStep.dbName}.${secondStep.tbName}`;
       const tabName = `import_${secondStep.tbName}_to_${name}`;
-      const code = `val destination = """${JSON.stringify(destination)}"""\nval source = """${JSON.stringify(source)}"""\ncom.webank.wedatasphere.linkis.engine.imexport.LoadData.loadDataToTable(spark,source,destination)`;
+      const code = `val destination = """${JSON.stringify(destination)}"""\nval source = """${JSON.stringify(source)}"""\norg.apache.linkis.engine.imexport.LoadData.loadDataToTable(spark,source,destination)`;
       const md5Path = util.md5(tabName);
       this.dispatch('Workbench:add', {
         id: md5Path,

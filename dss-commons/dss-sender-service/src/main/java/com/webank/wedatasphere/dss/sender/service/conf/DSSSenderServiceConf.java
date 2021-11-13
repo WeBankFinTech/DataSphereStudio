@@ -18,9 +18,6 @@ package com.webank.wedatasphere.dss.sender.service.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-/**
- * @date 2021/6/24 17:23
- */
 public class DSSSenderServiceConf {
     public static final CommonVars<String> ORCHESTRATOR_SERVER_DEV_NAME =
             CommonVars.apply("wds.dss.orc.server.dev.name", "DSS-Framework-Orchestrator-Server-Dev");

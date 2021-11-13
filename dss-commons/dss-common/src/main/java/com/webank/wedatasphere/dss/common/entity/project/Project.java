@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.entity.project;
 
-/**
- * @Date 2019/9/16.
- */
 public interface Project {
     Long getId();
 

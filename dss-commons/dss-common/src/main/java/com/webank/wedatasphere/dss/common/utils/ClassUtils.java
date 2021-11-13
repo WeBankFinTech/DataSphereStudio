@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.reflections.Reflections;
 
-/**
- * @Date 2021/6/24.
- */
 public class ClassUtils {
 
     private static final ClassHelper CLASS_HELPER = new ClassHelper() {

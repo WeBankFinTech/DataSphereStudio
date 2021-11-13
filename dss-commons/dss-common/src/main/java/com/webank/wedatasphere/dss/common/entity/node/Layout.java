@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.entity.node;
 
-/**
- * @Date 2019/11/12.
- */
 public class Layout {
     private float x;
     private float y;

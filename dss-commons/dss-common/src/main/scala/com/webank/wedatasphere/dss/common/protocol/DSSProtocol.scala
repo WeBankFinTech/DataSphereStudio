@@ -16,10 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.protocol
 
-/**
- * @Date 2020/11/17
- * Description:
- */
 trait DSSProtocol {
 
 }

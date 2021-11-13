@@ -24,7 +24,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugi
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.linkis.common.utils.ByteTimeUtils;
+import org.apache.linkis.common.utils.ByteTimeUtils;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.lang.exception.ExceptionUtils;

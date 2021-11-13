@@ -22,8 +22,8 @@ import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
 import com.webank.wedatasphere.dss.apiservice.core.vo.*;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -45,18 +46,15 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
-@Path("/dss/apiservice")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Component
+@RequestMapping(path = "/dss/apiservice", produces = {"application/json"})
+@RestController
 public class ApiServiceCoreRestfulApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceCoreRestfulApi.class);
-    
+
     @Autowired
     private ApiService apiService;
-    
+
     @Autowired
     private ApiServiceQueryService apiServiceQueryService;
 
@@ -65,9 +63,8 @@ public class ApiServiceCoreRestfulApi {
 
     private static final Pattern WRITABLE_PATTERN = Pattern.compile("^\\s*(insert|update|delete|drop|alter|create).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
-    @POST
-    @Path("/api")
-    public Response insert(ApiServiceVo apiService, @Context HttpServletRequest req) {
+    @RequestMapping(value = "/api",method = RequestMethod.POST)
+    public Message insert(ApiServiceVo apiService, @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -139,9 +136,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/api", "Fail to insert service api[新增服务api失败]");
     }
 
-    @POST
-    @Path("/create")
-    public Response create(ApiServiceVo apiService, @Context HttpServletRequest req) {
+    @RequestMapping(value = "/create",method = RequestMethod.POST)
+    public Message create(ApiServiceVo apiService, @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -213,13 +209,11 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/api", "Fail to insert service api[新增服务api失败]");
     }
 
-    @PUT
-    @Path("/api/{api_service_version_id}")
-    public Response update(ApiServiceVo apiService,
-                           @PathParam("api_service_version_id") Long apiServiceVersionId,
+    @RequestMapping(value = "/api/{api_service_version_id}",method = RequestMethod.PUT)
+    public Message update(ApiServiceVo apiService,
+                           @PathVariable("api_service_version_id") Long apiServiceVersionId,
                            @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
-
 
             if (StringUtils.isBlank(apiService.getScriptPath())) {
                 return Message.error("'api service script path' is missing[缺少脚本路径]");
@@ -297,13 +291,12 @@ public class ApiServiceCoreRestfulApi {
 
 
 
-    @GET
-    @Path("/search")
-    public Response query(@QueryParam("name") String name,
-                                    @QueryParam("tag") String tag,
-                                    @QueryParam("status") Integer status,
-                                    @QueryParam("creator") String creator,
-                                    @QueryParam("workspaceId") Integer workspaceId,
+    @RequestMapping(value = "/search",method = RequestMethod.GET)
+    public Message query(@RequestParam(required = false, name = "name") String name,
+                                    @RequestParam(required = false, name = "tag") String tag,
+                                    @RequestParam(required = false, name = "status") Integer status,
+                                    @RequestParam(required = false, name = "creator") String creator,
+                                    @RequestParam(required = false, name = "workspaceId") Integer workspaceId,
                                     @Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
@@ -322,9 +315,8 @@ public class ApiServiceCoreRestfulApi {
     }
 
 
-    @GET
-    @Path("/getUserServices")
-    public Response getUserServices(@QueryParam("workspaceId") Integer workspaceId,
+    @RequestMapping(value = "/getUserServices",method = RequestMethod.GET)
+    public Message getUserServices(@RequestParam(required = false, name = "workspaceId") Integer workspaceId,
             @Context HttpServletRequest req){
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
@@ -338,9 +330,8 @@ public class ApiServiceCoreRestfulApi {
 
 
 
-    @GET
-    @Path("/tags")
-    public Response query( @Context HttpServletRequest req,@QueryParam("workspaceId") Integer workspaceId) {
+    @RequestMapping(value = "/tags",method = RequestMethod.GET)
+    public Message query( @Context HttpServletRequest req,@RequestParam(required = false, name = "workspaceId") Integer workspaceId) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
 
@@ -350,11 +341,10 @@ public class ApiServiceCoreRestfulApi {
     }
 
 
-    
 
-    @GET
-    @Path("/query")
-    public Response queryByScriptPath(@QueryParam("scriptPath") String scriptPath,
+
+    @RequestMapping(value = "/query",method = RequestMethod.GET)
+    public Message queryByScriptPath(@RequestParam(required = false, name = "scriptPath") String scriptPath,
                                       @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -378,9 +368,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/query", "Fail to query page of service api[查询服务api失败]");
     }
 
-    @GET
-    @Path("/queryById")
-    public Response queryById(@QueryParam("id") Long id,
+    @RequestMapping(value = "/queryById",method = RequestMethod.GET)
+    public Message queryById(@RequestParam(required = false, name = "id") Long id,
                               @Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
@@ -396,9 +385,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/queryById", "Fail to query page of service api[查询服务api失败]");
     }
 
-    @GET
-    @Path("/checkPath")
-    public Response checkPath(@QueryParam("scriptPath") String scriptPath, @QueryParam("path") String path) {
+    @RequestMapping(value = "/checkPath",method = RequestMethod.GET)
+    public Message checkPath(@RequestParam(required = false, name = "scriptPath") String scriptPath, @RequestParam(required = false, name = "path") String path) {
         //需要跨用户查询
         return ApiUtils.doAndResponse(() -> {
             if (StringUtils.isBlank(scriptPath)) {
@@ -412,9 +400,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/checkPath", "Fail to check path of service api[校验服务api路径失败]");
     }
 
-    @GET
-    @Path("/checkName")
-    public Response checkName(@QueryParam("name") String name) {
+    @RequestMapping(value = "/checkName",method = RequestMethod.GET)
+    public Message checkName(@RequestParam(required = false, name = "name") String name) {
         //需要跨用户查询
         return ApiUtils.doAndResponse(() -> {
             if (StringUtils.isBlank(name)) {
@@ -425,9 +412,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/checkName", "Fail to check name of service api[校验服务api名称失败]");
     }
 
-    @GET
-    @Path("/apiDisable")
-    public Response apiDisable(@QueryParam("id") Long id,
+    @RequestMapping(value = "/apiDisable",method = RequestMethod.GET)
+    public Message apiDisable(@RequestParam(required = false, name = "id") Long id,
                                @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -439,9 +425,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/apiDisable", "Fail to disable api[禁用api失败]");
     }
 
-    @GET
-    @Path("/apiEnable")
-    public Response apiEnable(@QueryParam("id") Long id,
+    @RequestMapping(value = "/apiEnable",method = RequestMethod.GET)
+    public Message apiEnable(@RequestParam(required = false, name = "id") Long id,
                               @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -453,9 +438,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/apiEnable", "Fail to enable api[启用api失败]");
     }
 
-    @GET
-    @Path("/apiDelete")
-    public Response apiDelete(@QueryParam("id") Long id,
+    @RequestMapping(value = "/apiDelete",method = RequestMethod.GET)
+    public Message apiDelete(@RequestParam(required = false, name = "id") Long id,
                                @Context HttpServletRequest req) {
         //目前暂时不实际删除数据，只做不可见和不可用。
         return ApiUtils.doAndResponse(() -> {
@@ -468,9 +452,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/apiDelete", "Fail to delete api[删除api失败]");
     }
 
-    @POST
-    @Path("/apiCommentUpdate")
-    public Response apiCommentUpdate(@Context HttpServletRequest req, JsonNode json) {
+    @RequestMapping(value = "/apiCommentUpdate",method = RequestMethod.POST)
+    public Message apiCommentUpdate(@Context HttpServletRequest req, JsonNode json) {
         //目前暂时不实际删除数据，只做不可见和不可用。
         Long id = json.get("id").getLongValue();
         String comment=json.get("comment").getTextValue();
@@ -485,10 +468,9 @@ public class ApiServiceCoreRestfulApi {
     }
 
 
-    @GET
-    @Path("/apiParamQuery")
-    public Response apiParamQuery(@QueryParam("scriptPath") String scriptPath,
-                                  @QueryParam("versionId") Long versionId,
+    @RequestMapping(value = "/apiParamQuery",method = RequestMethod.GET)
+    public Message apiParamQuery(@RequestParam(required = false, name = "scriptPath") String scriptPath,
+                                  @RequestParam(required = false, name = "versionId") Long versionId,
                                   @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -503,9 +485,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/apiParamQuery", "Fail to query api info[查询api信息失败]");
     }
 
-    @GET
-    @Path("/apiVersionQuery")
-    public Response apiVersionQuery(@QueryParam("serviceId") Long serviceId,
+    @RequestMapping(value = "/apiVersionQuery",method = RequestMethod.GET)
+    public Message apiVersionQuery(@RequestParam(required = false, name = "serviceId") Long serviceId,
                                     @Context HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -519,9 +500,8 @@ public class ApiServiceCoreRestfulApi {
         }, "/apiservice/apiVersionQuery", "Fail to query api version[查询api版本失败]");
     }
 
-    @GET
-    @Path("/apiContentQuery")
-    public Response apiContentQuery(@QueryParam("versionId") Long versionId,
+    @RequestMapping(value = "/apiContentQuery",method = RequestMethod.GET)
+    public Message apiContentQuery(@RequestParam(required = false, name = "versionId") Long versionId,
                                     @Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {

@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.log
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 
 class FlowExecutionLog(log:Logging) extends LinkisJobExecutionLog {

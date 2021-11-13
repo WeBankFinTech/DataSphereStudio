@@ -16,35 +16,33 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import com.webank.wedatasphere.dss.framework.common.utils.RestfulUtils;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.request.*;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import org.apache.commons.math3.util.Pair;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 
-@Component
-@Path("/dss/framework/project")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RestController
 public class DSSFrameworkOrchestratorRestful {
-
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkOrchestratorRestful.class);
 
@@ -63,9 +61,8 @@ public class DSSFrameworkOrchestratorRestful {
      * @param createRequest
      * @return
      */
-    @POST
-    @Path("createOrchestrator")
-    public Response createOrchestrator(@Context HttpServletRequest httpServletRequest, @Valid OrchestratorCreateRequest createRequest) {
+    @RequestMapping(path ="createOrchestrator", method = RequestMethod.POST)
+    public Message createOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
@@ -73,12 +70,11 @@ public class DSSFrameworkOrchestratorRestful {
             //保存编排模式
             //todo 先注释掉
             // orchestratorService.saveOrchestrator(createRequest,null,username);
-            // return RestfulUtils.dealOk("创建工作流编排模式成功", new Pair<>("orchestratorId", 1L));
             CommonOrchestratorVo orchestratorVo = dssFrameworkOrchestratorService.createOrchestrator(username, createRequest, workspace);
-            return RestfulUtils.dealOk("创建工作流编排模式成功", new Pair<>("orchestratorId", orchestratorVo.getOrchestratorId()));
+            return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
         } catch (Exception e) {
             LOGGER.error("Failed to create orchestrator {} for user {}", createRequest, username, e);
-            return RestfulUtils.dealError("创建工作流编排模式失败:" + e.getMessage());
+            return Message.error("创建工作流编排模式失败:" + e.getMessage());
         }
     }
 
@@ -89,15 +85,14 @@ public class DSSFrameworkOrchestratorRestful {
      * @param orchestratorRequest
      * @return
      */
-    @POST
-    @Path("getAllOrchestrator")
-    public Response getAllOrchestrator(@Context HttpServletRequest httpServletRequest, @Valid OrchestratorRequest orchestratorRequest) {
+    @RequestMapping(path ="getAllOrchestrator", method = RequestMethod.POST)
+    public Message getAllOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
-            return RestfulUtils.dealOk("获取编排模式成功", new Pair<>("page", orchestratorService.getListByPage(orchestratorRequest, username)));
+            return Message.ok("获取编排模式成功").data("page", orchestratorService.getListByPage(orchestratorRequest, username));
         } catch (Exception e) {
             LOGGER.error("getAllOrchestratorError ", e);
-            return RestfulUtils.dealError("获取编排模式失败:" + e.getMessage());
+            return Message.error("获取编排模式失败:" + e.getMessage());
         }
     }
 
@@ -108,9 +103,8 @@ public class DSSFrameworkOrchestratorRestful {
      * @param modifyRequest
      * @return
      */
-    @POST
-    @Path("modifyOrchestrator")
-    public Response modifyOrchestrator(@Context HttpServletRequest httpServletRequest, @Valid OrchestratorModifyRequest modifyRequest) {
+    @RequestMapping(path ="modifyOrchestrator", method = RequestMethod.POST)
+    public Message modifyOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
@@ -118,10 +112,10 @@ public class DSSFrameworkOrchestratorRestful {
              CommonOrchestratorVo orchestratorVo = dssFrameworkOrchestratorService.modifyOrchestrator(username, modifyRequest,workspace);
             //保存编排模式
 //            orchestratorService.updateOrchestrator(modifyRequest, username);
-            return RestfulUtils.dealOk("创建工作流编排模式成功", new Pair<>("orchestratorId", orchestratorVo.getOrchestratorId()));
+            return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
         } catch (Exception e) {
             LOGGER.error("Failed to create orchestrator {} for user {}", modifyRequest, username, e);
-            return RestfulUtils.dealError("创建工作流编排模式失败:" + e.getMessage());
+            return Message.error("创建工作流编排模式失败:" + e.getMessage());
         }
     }
 
@@ -132,18 +126,17 @@ public class DSSFrameworkOrchestratorRestful {
      * @param deleteRequest
      * @return
      */
-    @POST
-    @Path("deleteOrchestrator")
-    public Response deleteOrchestrator(@Context HttpServletRequest httpServletRequest, @Valid OrchestratorDeleteRequest deleteRequest) {
+    @RequestMapping(path ="deleteOrchestrator", method = RequestMethod.POST)
+    public Message deleteOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
         try {
             dssFrameworkOrchestratorService.deleteOrchestrator(username, deleteRequest,workspace);
-            return RestfulUtils.dealOk("删除工作流编排模式成功");
+            return Message.ok("删除工作流编排模式成功");
         } catch (Exception e) {
             LOGGER.error("Failed to delete orchestrator {} for user {}", deleteRequest, username, e);
-            return RestfulUtils.dealError("删除工作流编排模式失败:" + e.getMessage());
+            return Message.error("删除工作流编排模式失败:" + e.getMessage());
         }
     }
 }

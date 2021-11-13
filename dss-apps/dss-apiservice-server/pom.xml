@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -31,7 +31,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jersey.version>2.16</jersey.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
     </properties>
@@ -44,7 +43,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-module</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
@@ -63,7 +62,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -103,7 +102,7 @@
         </dependency>
         <!--bml client-->
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-bml-client</artifactId>
             <version>${linkis.version}</version>
             <exclusions>
@@ -113,7 +112,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>json4s-jackson_2.11</artifactId>
@@ -122,7 +121,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-computation-client</artifactId>
             <version>${linkis.version}</version>
             <exclusions>
@@ -132,7 +131,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -142,31 +141,31 @@
             <version>42.2.12</version>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-mybatis</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-storage</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-common</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
@@ -202,7 +201,7 @@
         </dependency>
         <!--Metadata common-->
 <!--        <dependency>-->
-<!--            <groupId>com.webank.wedatasphere.linkis</groupId>-->
+<!--            <groupId>org.apache.linkis</groupId>-->
 <!--            <artifactId>linkis-metadatamanager-common</artifactId>-->
 <!--            <version>${linkis.version}</version>-->
 <!--        </dependency>-->
@@ -213,7 +212,7 @@
         </dependency>
 
 <!--        <dependency>-->
-<!--            <groupId>com.webank.wedatasphere.linkis</groupId>-->
+<!--            <groupId>org.apache.linkis</groupId>-->
 <!--            <artifactId>linkis-datasourcemanager-common</artifactId>-->
 <!--            <version>${linkis.version}</version>-->
 <!--        </dependency>-->

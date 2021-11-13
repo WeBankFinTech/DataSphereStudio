@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.linkis.common.utils.ClassUtils;
+import org.apache.linkis.common.utils.ClassUtils;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;

@@ -27,11 +27,11 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecuti
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
-import com.webank.wedatasphere.linkis.governance.common.entity.job.JobRequest
-import com.webank.wedatasphere.linkis.governance.common.entity.task.RequestPersistTask
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.CodeLanguageLabel
-import com.webank.wedatasphere.linkis.manager.label.utils.LabelUtil
+import org.apache.linkis.governance.common.entity.job.JobRequest
+import org.apache.linkis.governance.common.entity.task.RequestPersistTask
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.engine.CodeLanguageLabel
+import org.apache.linkis.manager.label.utils.LabelUtil
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters.asScalaBufferConverter

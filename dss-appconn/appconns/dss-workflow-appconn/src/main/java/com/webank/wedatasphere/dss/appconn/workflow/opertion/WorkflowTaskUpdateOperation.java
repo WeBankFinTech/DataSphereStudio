@@ -24,7 +24,7 @@ import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentS
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 
 
 public class WorkflowTaskUpdateOperation implements RefUpdateOperation<WorkflowUpdateRequestRef> {

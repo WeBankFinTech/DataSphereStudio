@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
-import com.webank.wedatasphere.linkis.storage.resultset.ResultSetFactory
+import org.apache.linkis.storage.resultset.ResultSetFactory
 
 class MultiContentEmailGenerator extends AbstractEmailGenerator {
 

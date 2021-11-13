@@ -24,7 +24,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestra
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
 

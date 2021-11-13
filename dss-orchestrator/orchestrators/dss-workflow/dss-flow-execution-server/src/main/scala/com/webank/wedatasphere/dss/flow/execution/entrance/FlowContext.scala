@@ -20,7 +20,7 @@ import java.util
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeRunner
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
-import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEventState.SchedulerEventState
+import org.apache.linkis.scheduler.queue.SchedulerEventState.SchedulerEventState
 
 
 trait FlowContext {

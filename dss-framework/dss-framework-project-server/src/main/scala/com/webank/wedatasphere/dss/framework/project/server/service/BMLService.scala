@@ -22,9 +22,9 @@ import java.util.UUID
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.utils.IoUtils
-import com.webank.wedatasphere.linkis.bml.client.{BmlClient, BmlClientFactory}
-import com.webank.wedatasphere.linkis.bml.protocol.{BmlDownloadResponse, BmlUpdateResponse, BmlUploadResponse}
-import com.webank.wedatasphere.linkis.common.utils.{JavaLog, Logging, Utils}
+import org.apache.linkis.bml.client.{BmlClient, BmlClientFactory}
+import org.apache.linkis.bml.protocol.{BmlDownloadResponse, BmlUpdateResponse, BmlUploadResponse}
+import org.apache.linkis.common.utils.{JavaLog, Logging, Utils}
 import org.apache.commons.io.IOUtils
 import org.springframework.stereotype.Component
 

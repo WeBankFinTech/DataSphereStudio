@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedEx
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 trait AbstractEmailGenerator extends EmailGenerator with Logging{
 

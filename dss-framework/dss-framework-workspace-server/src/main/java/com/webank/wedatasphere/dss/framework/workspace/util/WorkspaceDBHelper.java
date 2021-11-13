@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
-import com.webank.wedatasphere.linkis.common.utils.Utils;
+import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

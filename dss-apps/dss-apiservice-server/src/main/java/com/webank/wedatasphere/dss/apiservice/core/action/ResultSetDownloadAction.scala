@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.action
 
-import com.webank.wedatasphere.linkis.httpclient.request.{DownloadAction, GetAction}
-import com.webank.wedatasphere.linkis.ujes.client.request.UJESJobAction
+import org.apache.linkis.httpclient.request.{DownloadAction, GetAction}
+import org.apache.linkis.ujes.client.request.UJESJobAction
 
 import scala.tools.nsc.interpreter.InputStream
 

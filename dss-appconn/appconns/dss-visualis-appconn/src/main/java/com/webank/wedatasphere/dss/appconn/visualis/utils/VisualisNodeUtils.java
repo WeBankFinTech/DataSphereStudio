@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.Map;
 

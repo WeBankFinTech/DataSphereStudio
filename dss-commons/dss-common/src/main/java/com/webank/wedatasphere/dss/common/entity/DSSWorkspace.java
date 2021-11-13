@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.entity;
 
-/**
- * @Date 2021/7/1.
- */
 public interface DSSWorkspace {
 
     String getWorkspaceName();

@@ -18,9 +18,6 @@ package com.webank.wedatasphere.dss.common.exception;
 
 import org.apache.linkis.common.exception.ErrorException;
 
-/**
- * @Date 2019/11/6.
- */
 public class DSSErrorException extends ErrorException {
 
     public DSSErrorException(int errCode, String desc) {

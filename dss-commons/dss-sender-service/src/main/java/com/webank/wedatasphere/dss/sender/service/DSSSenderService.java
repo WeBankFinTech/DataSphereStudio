@@ -20,9 +20,6 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
-/**
- * @date 2021/6/24 17:09
- */
 public interface DSSSenderService {
 
     Sender getOrcSender();

@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.entity;
 
-/**
- * @date 2020/12/16 11:53
- */
 public enum PublishType {
     FULL,DELTA
 }

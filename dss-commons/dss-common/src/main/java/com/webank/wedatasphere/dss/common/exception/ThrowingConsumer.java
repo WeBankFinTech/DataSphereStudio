@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.common.exception;
 
 /**
- * Created by v_wbjftang on 2019/9/20.
+ * @Date 2019/9/20.
  */
 @FunctionalInterface
 public interface ThrowingConsumer<T,E extends Exception> {

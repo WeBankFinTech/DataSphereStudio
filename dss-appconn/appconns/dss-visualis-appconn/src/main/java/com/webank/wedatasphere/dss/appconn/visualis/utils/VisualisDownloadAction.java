@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
-import com.webank.wedatasphere.linkis.httpclient.request.DownloadAction;
-import com.webank.wedatasphere.linkis.httpclient.request.GetAction;
-import com.webank.wedatasphere.linkis.httpclient.request.UserAction;
+import org.apache.linkis.httpclient.request.DownloadAction;
+import org.apache.linkis.httpclient.request.GetAction;
+import org.apache.linkis.httpclient.request.UserAction;
 
 import java.io.InputStream;
 

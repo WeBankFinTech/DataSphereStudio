@@ -11,9 +11,10 @@
  * limitations under the License.
  */
 
-package com.webank.wedatasphere.dss.framework.project.conf
+package com.webank.wedatasphere.dss.common.utils
 
 import org.apache.linkis.server.Message
+
 import javax.ws.rs.core.Response
 
 

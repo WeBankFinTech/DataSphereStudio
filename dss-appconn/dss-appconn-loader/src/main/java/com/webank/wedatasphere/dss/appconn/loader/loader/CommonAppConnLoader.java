@@ -23,7 +23,7 @@ import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnExcepti
 import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;

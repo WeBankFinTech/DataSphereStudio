@@ -23,7 +23,6 @@ import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
 /**
- * @author allenlliu
  * @date 2021/6/24 17:13
  */
 public class DSSSenderServiceImpl implements DSSSenderService {

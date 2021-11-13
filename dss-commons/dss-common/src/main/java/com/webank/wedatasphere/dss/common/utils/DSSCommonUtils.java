@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import org.apache.linkis.common.conf.CommonVars;
 
 /**
- * @Author alexyang
  * @Date 2020/3/16
  */
 public class DSSCommonUtils {

@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.standard.EventCheckerDevelopmentStandard;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractAppConn;
-import com.webank.wedatasphere.dss.appconn.eventchecker.standard.EventCheckerDevelopmentStandard;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 
 public class EventCheckerAppConn extends AbstractAppConn implements OnlyDevelopmentAppConn {

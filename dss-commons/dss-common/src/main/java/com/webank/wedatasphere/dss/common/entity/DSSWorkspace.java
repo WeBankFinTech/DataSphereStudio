@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.common.entity;
 
 /**
- * Created by enjoyyin on 2021/7/1.
+ * @Date 2021/7/1.
  */
 public interface DSSWorkspace {
 

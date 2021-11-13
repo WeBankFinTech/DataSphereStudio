@@ -14,16 +14,22 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.common.conf
+package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
-import java.util.Properties
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * @author allenlliu
- * @date 2021/3/10 17:32
- */
-object DSSConfiguration {
+@XmlRootElement
+public class QueryOrchestratorVersion {
 
-  def getAllProperties: Properties = BDPConfiguration.properties
+    @NotNull(message = "orchestratorId不能为空")
+    private Long orchestratorId;
 
+    public Long getOrchestratorId() {
+        return orchestratorId;
+    }
+
+    public void setOrchestratorId(Long orchestratorId) {
+        this.orchestratorId = orchestratorId;
+    }
 }

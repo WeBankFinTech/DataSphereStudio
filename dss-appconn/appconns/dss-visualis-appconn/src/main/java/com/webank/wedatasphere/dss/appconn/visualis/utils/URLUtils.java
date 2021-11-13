@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
-import com.webank.wedatasphere.linkis.server.conf.ServerConfiguration;
+import org.apache.linkis.server.conf.ServerConfiguration;
 
 public class URLUtils {
     public final static String widgetUrl = "/api/rest_j/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/widget" + "/smartcreate";

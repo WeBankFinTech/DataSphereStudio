@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.common.conf;
 import org.apache.linkis.common.conf.CommonVars;
 
 /**
- * @Author alexyang
  * @Date 2020/3/27
  */
 public class DSSCommonConf {

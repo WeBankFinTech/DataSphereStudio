@@ -23,11 +23,6 @@ import java.util
 
 import org.apache.linkis.manager.label.builder.factory.{LabelBuilderFactory, LabelBuilderFactoryContext}
 
-
-/**
- * @author: jinyangrao on 2021/7/16
- * @description:
- */
 object LabelBuilder {
 
   def buildLabel(labelMap: util.Map[String, Object]): util.Map[String, Label[_]] = {

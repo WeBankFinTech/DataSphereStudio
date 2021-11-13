@@ -23,10 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @Date 2021/7/16
- * @description:
- */
 public class LabelInstanceFactory {
 
     private static final Logger log = LoggerFactory.getLogger(LabelInstanceFactory.class);

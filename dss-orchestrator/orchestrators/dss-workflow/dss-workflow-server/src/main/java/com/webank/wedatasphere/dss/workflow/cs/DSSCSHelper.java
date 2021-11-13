@@ -18,11 +18,11 @@ package com.webank.wedatasphere.dss.workflow.cs;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.webank.wedatasphere.linkis.cs.client.service.CSTableService;
-import com.webank.wedatasphere.linkis.cs.common.entity.metadata.CSTable;
-import com.webank.wedatasphere.linkis.cs.common.entity.source.ContextKeyValue;
-import com.webank.wedatasphere.linkis.cs.common.exception.CSErrorException;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.cs.client.service.CSTableService;
+import org.apache.linkis.cs.common.entity.metadata.CSTable;
+import org.apache.linkis.cs.common.entity.source.ContextKeyValue;
+import org.apache.linkis.cs.common.exception.CSErrorException;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

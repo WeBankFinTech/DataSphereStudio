@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 
-import com.webank.wedatasphere.linkis.httpclient.request.POSTAction;
+import org.apache.linkis.httpclient.request.POSTAction;
 
 public class FlowScheduleAction extends POSTAction  {
 

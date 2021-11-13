@@ -17,13 +17,9 @@
 package com.webank.wedatasphere.dss.sender.service;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
-/**
- * @author allenlliu
- * @date 2021/6/24 17:09
- */
 public interface DSSSenderService {
 
     Sender getOrcSender();

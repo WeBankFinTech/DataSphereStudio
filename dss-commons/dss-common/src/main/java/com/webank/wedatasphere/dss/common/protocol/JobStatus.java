@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.common.protocol;
 
 /**
- * created by cooperyang on 2020/11/17
+ * @Date 2020/11/17
  * Description:
  */
 public enum JobStatus {

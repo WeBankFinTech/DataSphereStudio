@@ -29,10 +29,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
-/**
- * @version 2.0.0
- * @date 2020/03/11 11:18 AM
- */
 public class IoUtils {
 
     private static Logger logger = LoggerFactory.getLogger(IoUtils.class);

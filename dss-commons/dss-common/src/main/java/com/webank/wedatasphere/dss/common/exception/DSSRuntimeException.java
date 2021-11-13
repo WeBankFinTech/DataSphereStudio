@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.common.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.WarnException;
+import org.apache.linkis.common.exception.WarnException;
 
 /**
  * Created by v_wbjftang on 2019/9/24.

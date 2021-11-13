@@ -76,6 +76,6 @@ EMAIL_PASSWORD=xxxxx
 EMAIL_PROTOCOL=smtp
 ############## ############## dss_appconn_instance configuration   end   ############## ##############
 
-DSS_VERSION=1.0.0
+DSS_VERSION=1.0.1
 
 DSS_FILE_NAME="dss-$DSS_VERSION"

@@ -23,11 +23,11 @@ import java.util.Date
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.httpclient.Client
-import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.httpclient.Client
+import org.apache.linkis.httpclient.dws.DWSHttpClient
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder
+import org.apache.linkis.httpclient.request.HttpAction
 import org.apache.commons.io.IOUtils
 import org.apache.http.impl.cookie.BasicClientCookie
 

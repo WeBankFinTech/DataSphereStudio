@@ -33,7 +33,7 @@ public class ClassUtils {
     private static final ClassHelper CLASS_HELPER = new ClassHelper() {
         @Override
         protected Reflections getReflections(Class<?> clazz) {
-            return com.webank.wedatasphere.linkis.common.utils.ClassUtils.reflections();
+            return org.apache.linkis.common.utils.ClassUtils.reflections();
         }
     };
 
@@ -67,7 +67,7 @@ public class ClassUtils {
 
         public <T> T getInstance(Class<T> clazz) throws DSSErrorException {
             List<Class<? extends T>> factoryClasses = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !com.webank.wedatasphere.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c)).collect(Collectors.toList());
+                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c)).collect(Collectors.toList());
             if(factoryClasses.isEmpty()) {
                 DSSExceptionUtils.dealErrorException(60053, "Cannot find instance for " + clazz.getSimpleName(), DSSErrorException.class);
             } else if(factoryClasses.size() > 1) {
@@ -94,27 +94,27 @@ public class ClassUtils {
 
         public <T> T getInstanceOrDefault(Class<T> clazz, T defaultValue) {
             Optional<T> optional = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !com.webank.wedatasphere.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
+                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
                     !c.isInstance(defaultValue)).findFirst().map(DSSExceptionUtils.map(Class::newInstance));
             return optional.orElse(defaultValue);
         }
 
         public <T> T getInstanceOrDefault(Class<T> clazz, Predicate<Class<? extends T>> filterOp, T defaultValue) {
             Optional<T> optional = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !com.webank.wedatasphere.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
+                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
                     filterOp.test(c)).findFirst().map(DSSExceptionUtils.map(Class::newInstance));
             return optional.orElse(defaultValue);
         }
 
         public <T> List<T> getInstances(Class<T> clazz) {
             return getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !com.webank.wedatasphere.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
+                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
                 .map(DSSExceptionUtils.map(Class::newInstance)).collect(Collectors.toList());
         }
 
         public <T> List<Class<? extends T>> getClasses(Class<T> clazz) {
             return getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !com.webank.wedatasphere.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
+                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
                 .collect(Collectors.toList());
         }
 

@@ -27,10 +27,10 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowQueryEr
 import com.webank.wedatasphere.dss.flow.execution.entrance.service.WorkflowQueryService
 import com.webank.wedatasphere.dss.flow.execution.entrance.status.TaskStatus
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.governance.common.entity.task._
-import com.webank.wedatasphere.linkis.manager.label.utils.LabelUtils
-import com.webank.wedatasphere.linkis.protocol.utils.ZuulEntranceUtils
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.governance.common.entity.task._
+import org.apache.linkis.manager.label.utils.LabelUtils
+import org.apache.linkis.protocol.utils.ZuulEntranceUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Autowired

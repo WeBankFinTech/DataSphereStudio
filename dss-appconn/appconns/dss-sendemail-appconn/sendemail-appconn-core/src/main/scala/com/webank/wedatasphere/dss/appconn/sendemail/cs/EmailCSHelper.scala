@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.appconn.sendemail.cs
 
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.cs.client.service.LinkisJobDataServiceImpl
-import com.webank.wedatasphere.linkis.cs.client.utils.{ContextServiceUtils, SerializeHelper}
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.{ContextScope, ContextType}
-import com.webank.wedatasphere.linkis.cs.common.entity.source.CommonContextKey
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils
-import com.webank.wedatasphere.linkis.server.JSONUtils
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.cs.client.service.LinkisJobDataServiceImpl
+import org.apache.linkis.cs.client.utils.{ContextServiceUtils, SerializeHelper}
+import org.apache.linkis.cs.common.entity.enumeration.{ContextScope, ContextType}
+import org.apache.linkis.cs.common.entity.source.CommonContextKey
+import org.apache.linkis.cs.common.utils.CSCommonUtils
+import org.apache.linkis.server.JSONUtils
 
 import scala.collection.JavaConversions._
 

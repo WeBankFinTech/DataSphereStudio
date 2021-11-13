@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.scheduler;
 
-import com.webank.wedatasphere.linkis.common.utils.Utils;
+import org.apache.linkis.common.utils.Utils;
 
 import java.util.concurrent.ExecutorService;
 

@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import org.apache.commons.math3.util.Pair;
 
 
@@ -26,23 +26,23 @@ import java.util.Arrays;
 
 public class RestfulUtils {
 
-    public static Response dealError(String reason){
+    public static Message dealError(String reason){
         Message message = Message.error(reason);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    public static Response dealOk(String msg){
+    public static Message dealOk(String msg){
         Message message = Message.ok(msg);
-        return Message.messageToResponse(message);
+        return message;
     }
 
 
 
     @SafeVarargs
-    public static Response dealOk(String msg, Pair<String, Object>... data){
+    public static Message dealOk(String msg, Pair<String, Object>... data){
         Message message = Message.ok(msg);
         Arrays.stream(data).forEach(p -> message.data(p.getKey(), p.getValue()));
-        return Message.messageToResponse(message);
+        return message;
     }
 
 

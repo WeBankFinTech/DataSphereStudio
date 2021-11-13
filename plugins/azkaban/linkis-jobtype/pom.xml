@@ -22,7 +22,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>linkis-jobtype</artifactId>
     <properties>
@@ -30,7 +30,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-linkis-node-execution</artifactId>

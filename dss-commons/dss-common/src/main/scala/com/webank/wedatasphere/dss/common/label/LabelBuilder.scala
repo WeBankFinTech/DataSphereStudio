@@ -16,12 +16,12 @@
 
 package com.webank.wedatasphere.dss.common.label
 
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.Label
 
 import scala.collection.JavaConverters._
 import java.util
 
-import com.webank.wedatasphere.linkis.manager.label.builder.factory.{LabelBuilderFactory, LabelBuilderFactoryContext}
+import org.apache.linkis.manager.label.builder.factory.{LabelBuilderFactory, LabelBuilderFactoryContext}
 
 
 /**

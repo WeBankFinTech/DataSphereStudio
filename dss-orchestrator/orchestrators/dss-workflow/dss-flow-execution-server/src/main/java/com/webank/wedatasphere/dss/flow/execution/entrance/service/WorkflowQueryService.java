@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.service;
 
-import com.webank.wedatasphere.linkis.governance.common.entity.task.*;
+import org.apache.linkis.governance.common.entity.task.*;
 
 
 public interface WorkflowQueryService {

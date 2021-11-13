@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.workflow.scheduler;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import com.webank.wedatasphere.linkis.common.utils.Utils;
+import org.apache.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

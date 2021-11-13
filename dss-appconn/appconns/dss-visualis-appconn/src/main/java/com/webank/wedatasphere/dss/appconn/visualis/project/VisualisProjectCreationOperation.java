@@ -26,10 +26,10 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreatio
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction;
-import com.webank.wedatasphere.linkis.httpclient.response.HttpResult;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
-import com.webank.wedatasphere.linkis.server.conf.ServerConfiguration;
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
+import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.conf.ServerConfiguration;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

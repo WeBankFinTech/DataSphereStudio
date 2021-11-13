@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor
+package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
 import java.util.Map
@@ -29,21 +29,21 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequest
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import com.webank.wedatasphere.dss.standard.common.entity.ref.{AsyncResponseRef, DefaultRefFactory, ResponseRef}
-import com.webank.wedatasphere.linkis.common.utils.{OverloadUtils, Utils}
-import com.webank.wedatasphere.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
-import com.webank.wedatasphere.linkis.engineconn.launch.EngineConnServer
-import com.webank.wedatasphere.linkis.governance.common.utils.GovernanceConstant
-import com.webank.wedatasphere.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFailedException
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.cluster.ClusterLabel
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineTypeLabel
-import com.webank.wedatasphere.linkis.protocol.UserWithCreator
-import com.webank.wedatasphere.linkis.protocol.engine.JobProgressInfo
-import com.webank.wedatasphere.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper
+import org.apache.linkis.common.utils.{OverloadUtils, Utils}
+import org.apache.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
+import org.apache.linkis.engineconn.launch.EngineConnServer
+import org.apache.linkis.governance.common.utils.GovernanceConstant
+import org.apache.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
+import org.apache.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFailedException
+import org.apache.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
+import org.apache.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.cluster.ClusterLabel
+import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
+import org.apache.linkis.protocol.UserWithCreator
+import org.apache.linkis.protocol.engine.JobProgressInfo
+import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
+import org.apache.linkis.server.BDPJettyServerHelper
 import org.apache.commons.lang.StringUtils
 
 import scala.beans.BeanProperty

@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.WarnException;
+import org.apache.linkis.common.exception.WarnException;
 
 
 public class DSSProjectWarnException extends WarnException {

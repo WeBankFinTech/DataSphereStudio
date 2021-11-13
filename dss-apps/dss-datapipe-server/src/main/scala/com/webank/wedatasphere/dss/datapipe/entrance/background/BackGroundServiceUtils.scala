@@ -24,12 +24,12 @@ import java.util.Date
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.{GsonBuilder, JsonElement, JsonPrimitive, JsonSerializationContext, JsonSerializer}
-import com.webank.wedatasphere.linkis.common.conf.CommonVars
-import com.webank.wedatasphere.linkis.common.io.FsPath
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.storage.FSFactory
-import com.webank.wedatasphere.linkis.storage.fs.FileSystem
-import com.webank.wedatasphere.linkis.storage.utils.FileSystemUtils
+import org.apache.linkis.common.conf.CommonVars
+import org.apache.linkis.common.io.FsPath
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.storage.FSFactory
+import org.apache.linkis.storage.fs.FileSystem
+import org.apache.linkis.storage.utils.FileSystemUtils
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.time.DateFormatUtils
 

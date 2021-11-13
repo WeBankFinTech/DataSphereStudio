@@ -22,7 +22,7 @@ import java.util.{Base64, UUID}
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
-import com.webank.wedatasphere.linkis.common.conf.Configuration
+import org.apache.linkis.common.conf.Configuration
 import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64OutputStream
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration._

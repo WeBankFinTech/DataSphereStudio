@@ -33,7 +33,7 @@
           type="error" 
           size="small" 
           @click="edit(row)">
-          {{$t('message.workspaceManagemnet.editor')}}
+          {{$t('message.workspaceManagemnet.edit')}}
         </Button>
         <Button
           type="primary"
@@ -58,7 +58,7 @@
             <Input v-model="addDataSource.note" placeholder="please enter dataSourceDesc"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
-            <Input v-model="addDataSource.url" placeholder="please enter JDBC URL"></Input>
+            <Input v-model="addDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
             <Input v-model="addDataSource.username" placeholder="please enter userName"></Input>
@@ -96,7 +96,7 @@
             <Input v-model="editDataSource.note" placeholder="please enter dataSourceDesc"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
-            <Input v-model="editDataSource.url" placeholder="please enter JDBC URL"></Input>
+            <Input v-model="editDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
             <Input v-model="editDataSource.username" placeholder="please enter userName"></Input>

@@ -108,7 +108,7 @@
       "failedNotice": "Invalid items found, please check and then retry!",
       "userManagement": "User Management",
       "delete": "Delete",
-      "editor": "Editor",
+      "edit": "Edit",
       "comfirmDelete": "Comfirm Delete",
       "role": "Role",
       "user": "User",
@@ -205,7 +205,8 @@
         "status": "Status：",
         "desc": "Description：",
         "workspaceType": "Workspace Type："
-      }
+      },
+      "JdbcUrlFormat": "Format like: jdbc:mysql://ServerIP:Port/Database"
     },
     "Project": {
       "title": "Project list",

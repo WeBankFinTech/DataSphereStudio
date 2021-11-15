@@ -108,7 +108,7 @@
       "failedNotice": "验证项未通过，请检查后再试！",
       "userManagement": "用户管理",
       "delete": "删除",
-      "editor": "编辑",
+      "edit": "编辑",
       "comfirmDelete": "确认删除",
       "role": "角色",
       "user": "用户",
@@ -205,7 +205,8 @@
         "status": "状态：",
         "desc": "描述：",
         "workspaceType": "工作空间类型："
-      }
+      },
+      "JdbcUrlFormat": "格式如：jdbc:mysql://ServerIP:Port/Database"
     },
     "Project": {
       "title": "项目列表",

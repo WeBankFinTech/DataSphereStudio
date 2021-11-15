@@ -270,7 +270,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
         String orgName = orgVersion.getName();
-        String orgNameEn = orgVersion.getName();
+        String orgNameEn = orgVersion.getFieldIdentifier();
         String orgV = orgVersion.getVersion();
         String assignVersion = newVersion(orgName, orgV);
 

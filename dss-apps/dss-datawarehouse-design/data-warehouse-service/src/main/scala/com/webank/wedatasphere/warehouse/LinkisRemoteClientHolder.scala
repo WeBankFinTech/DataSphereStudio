@@ -2,7 +2,7 @@ package com.webank.wedatasphere.warehouse
 
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
 import com.webank.wedatasphere.dss.datamodel.center.client.impl.LinkisDatamodelCenterRemoteClient
-import com.webank.wedatasphere.linkis.datasource.client.impl.LinkisDataSourceRemoteClient
+import com.webank.wedatasphere.linkis.datasource.client.impl.{LinkisDataSourceRemoteClient, LinkisMetadataSourceRemoteClient}
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy
 import com.webank.wedatasphere.linkis.httpclient.dws.config.{DWSClientConfig, DWSClientConfigBuilder}
 import com.webank.wedatasphere.warehouse.client.DwDataSourceConfiguration
@@ -41,6 +41,8 @@ object LinkisRemoteClientHolder {
 
   val dataSourceClient = new LinkisDataSourceRemoteClient(clientConfig)
 
+  val metadataSourceRemoteClient = new LinkisMetadataSourceRemoteClient(clientConfig)
+
   var dataModelRemoteClient = new LinkisDatamodelCenterRemoteClient(clientConfig)
 
   var dataAssetsRemoteClient = new LinkisDataAssetsRemoteClient(clientConfig)
@@ -55,5 +57,9 @@ object LinkisRemoteClientHolder {
 
   def getDataAssetsRemoteClient: LinkisDataAssetsRemoteClient = {
     dataAssetsRemoteClient
+  }
+
+  def getMetadataSourceRemoteClient: LinkisMetadataSourceRemoteClient = {
+    metadataSourceRemoteClient
   }
 }

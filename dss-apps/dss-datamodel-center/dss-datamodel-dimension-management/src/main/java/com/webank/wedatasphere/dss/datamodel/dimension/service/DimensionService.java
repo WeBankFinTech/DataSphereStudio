@@ -1,7 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.dimension.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.dimension.dto.DimensionQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension;
 import com.webank.wedatasphere.dss.datamodel.dimension.vo.DimensionAddVO;
@@ -19,7 +18,7 @@ public interface DimensionService extends IService<DssDatamodelDimension> {
      * @param vo
      * @return
      */
-    int addDimension(DimensionAddVO vo)throws ErrorException;
+    long addDimension(DimensionAddVO vo)throws ErrorException;
 
     /**
      * 启用/禁用

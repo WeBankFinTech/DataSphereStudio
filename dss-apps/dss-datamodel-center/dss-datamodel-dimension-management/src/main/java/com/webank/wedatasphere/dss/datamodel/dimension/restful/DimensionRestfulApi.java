@@ -42,7 +42,7 @@ public class DimensionRestfulApi {
     @Path("/dimensions")
     public Response add(@Context HttpServletRequest req, @RequestBody DimensionAddVO vo) throws ErrorException {
         LOGGER.info("dimensionAddVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count", dimensionService.addDimension(vo)));
+        return Message.messageToResponse(Message.ok().data("id", dimensionService.addDimension(vo)));
     }
 
     /**

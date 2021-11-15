@@ -1,7 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.measure.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.measure.dto.MeasureQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.measure.entity.DssDatamodelMeasure;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
@@ -19,7 +18,7 @@ public interface MeasureService extends IService<DssDatamodelMeasure> {
      * @param vo
      * @return
      */
-    int addMeasure(MeasureAddVO vo)throws ErrorException;
+    long addMeasure(MeasureAddVO vo)throws ErrorException;
 
     /**
      * 启用/禁用

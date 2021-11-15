@@ -80,6 +80,22 @@ public class TableRestfulApi implements AuthenticationClientStrategy {
 
 
     /**
+     * 主动绑定
+     *
+     * @param req
+     * @return
+     * @throws IOException
+     */
+    @PUT
+    @Path("/tables/bind/{id}")
+    public Response bind(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+        LOGGER.info("bind model id : {}", id);
+        tableService.bindModel(id);
+        return Message.messageToResponse(Message.ok());
+    }
+
+
+    /**
      * 查看
      *
      * @param req

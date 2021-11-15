@@ -32,4 +32,9 @@ public class TableListVO extends PageVO {
 
     private String modelName;
 
+    /**
+     * -1 表示查询逻辑表  0 表示查询asserts
+     */
+    private Integer tableType = -1;
+
 }

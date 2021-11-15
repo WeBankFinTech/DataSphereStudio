@@ -124,17 +124,18 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getName, vo.getName()));
             String lastVersion = indicatorVersionService.findLastVersion(org.getName());
             if (repeat > 0 || StringUtils.isNotBlank(lastVersion) || (indicatorTableCheckService.referenceEn(org.getName()))) {
-                LOGGER.error("errorCode : {}, indicator name can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
-                throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator name can not repeat");
+                LOGGER.error("errorCode : {}, indicator name can not repeat or referenced", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+                throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator name can not repeat or referenced");
             }
         }
 
+        String orgFieldIdentifier =  org.getFieldIdentifier();
         //当更新指标标识时,存在其他指标名称同名或者当前指标名称已经存在版本信息，则不允许修改指标名称
-        if (!StringUtils.equals(vo.getFieldIdentifier(), org.getFieldIdentifier())) {
+        if (!StringUtils.equals(vo.getFieldIdentifier(), orgFieldIdentifier)) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicator>lambdaQuery().eq(DssDatamodelIndicator::getFieldIdentifier, vo.getFieldIdentifier()));
-            if (repeat > 0 || (indicatorTableCheckService.referenceEn(org.getFieldIdentifier()))) {
-                LOGGER.error("errorCode : {}, indicator field identifier can not repeat", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
-                throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator field identifier can not repeat");
+            if (repeat > 0 || (indicatorTableCheckService.referenceEn(orgFieldIdentifier))) {
+                LOGGER.error("errorCode : {}, indicator field identifier can not repeat or referenced", ErrorCode.INDICATOR_UPDATE_ERROR.getCode());
+                throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_UPDATE_ERROR.getCode(), "indicator field identifier can not repeat or referenced");
             }
         }
 
@@ -160,7 +161,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
                 new UpdateModelEvent(this
                         ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                         ,vo.getFieldIdentifier()
-                        ,org.getFieldIdentifier()
+                        ,orgFieldIdentifier
                         ,ClassificationConstant.INDICATOR)
         );
 
@@ -276,8 +277,8 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
         //指标名称不能改变
         if (!StringUtils.equals(orgName, vo.getName()) || !StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
-            LOGGER.error("errorCode : {}, indicator name must be same", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode());
-            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name must be same");
+            LOGGER.error("errorCode : {}, indicator name or fieldIdentifier must be same", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode());
+            throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name or fieldIdentifier must be same");
         }
 
         //查询指标详细信息

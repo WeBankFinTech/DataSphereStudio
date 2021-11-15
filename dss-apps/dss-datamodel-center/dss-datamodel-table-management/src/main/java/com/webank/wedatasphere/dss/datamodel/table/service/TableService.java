@@ -208,4 +208,11 @@ public interface TableService extends IService<DssDatamodelTable> {
      * @return
      */
     int tableModifierReferenceCount(String name);
+
+
+    /**
+     * 主动绑定模型
+     * @param id
+     */
+    void bindModel(long id) throws ErrorException;
 }

@@ -15,7 +15,9 @@ import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteCl
 import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.context.DataModelSecurityContextHolder;
 import com.webank.wedatasphere.dss.datamodel.center.common.dto.PreviewDataDTO;
+import com.webank.wedatasphere.dss.datamodel.center.common.event.BindModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.center.common.ujes.task.DataModelUJESJobTask;
 import com.webank.wedatasphere.dss.datamodel.center.common.ujes.launcher.PreviewDataModelUJESJobLauncher;
@@ -24,6 +26,10 @@ import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dao.TableQueryMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.*;
 import com.webank.wedatasphere.dss.datamodel.table.entity.*;
+import com.webank.wedatasphere.dss.datamodel.table.event.BindModelByColumnsEvent;
+import com.webank.wedatasphere.dss.datamodel.table.event.BindModelByTableEvent;
+import com.webank.wedatasphere.dss.datamodel.table.event.UpdateBindModelByColumnsEvent;
+import com.webank.wedatasphere.dss.datamodel.table.event.UpdateBindModelByTableEvent;
 import com.webank.wedatasphere.dss.datamodel.table.service.*;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
@@ -33,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -80,6 +88,9 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
     private Gson gson = new Gson();
 
+    @Resource
+    private ApplicationEventPublisher publisher;
+
     private final Gson assertsGson = new GsonBuilder().setDateFormat("yyyy MM-dd HH:mm:ss").create();
 
     @Override
@@ -99,12 +110,19 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         getBaseMapper().insert(newOne);
 
         Long tableId = newOne.getId();
-        addColumns(tableId, vo.getColumns());
+        List<DssDatamodelTableColumns> columns = addColumns(tableId, vo.getColumns());
+
+        String user = DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser();
+
+        //发布表绑定模型事件
+        publisher.publishEvent(new BindModelByTableEvent(this, user, newOne));
+        publisher.publishEvent(new BindModelByColumnsEvent(this, user, newOne.getName(), columns));
 
         return newOne.getId();
     }
 
-    private void addColumns(Long tableId, List<TableColumnVO> columnVOs) throws ErrorException {
+
+    private List<DssDatamodelTableColumns> addColumns(Long tableId, List<TableColumnVO> columnVOs) throws ErrorException {
         List<DssDatamodelTableColumns> columns = Lists.newArrayList();
         for (TableColumnVO columnVO : columnVOs) {
             DssDatamodelTableColumns newColumn = modelMapper.map(columnVO, DssDatamodelTableColumns.class);
@@ -112,6 +130,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         }
 
         tableColumnsService.batchInsert(tableId, columns);
+        return columns;
     }
 
     @Override
@@ -138,6 +157,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
 
         Long orgId = org.getId();
         String version = org.getVersion();
+        List<DssDatamodelTableColumns> orgColumns = tableColumnsService.listByTableId(id);
 
         DssDatamodelTable updateOne = modelMapper.map(vo, DssDatamodelTable.class);
         updateOne.setUpdateTime(new Date());
@@ -146,13 +166,21 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             LOGGER.error("errorCode : {}, update table error not exists", ErrorCode.TABLE_UPDATE_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.TABLE_UPDATE_ERROR.getCode(), "update table error not exists");
         }
-        List<DssDatamodelTableColumns> columns = Lists.newArrayList();
+        List<DssDatamodelTableColumns> newColumns = Lists.newArrayList();
         for (TableColumnVO columnVO : vo.getColumns()) {
             DssDatamodelTableColumns newColumn = modelMapper.map(columnVO, DssDatamodelTableColumns.class);
-            columns.add(newColumn);
+            newColumns.add(newColumn);
         }
 
-        return tableColumnsService.batchUpdate(orgId, columns);
+        tableColumnsService.batchUpdate(orgId, newColumns);
+
+
+        String user = DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser();
+        publisher.publishEvent(new UpdateBindModelByTableEvent(this, user, org, updateOne));
+        publisher.publishEvent(new UpdateBindModelByColumnsEvent(this, user, org.getName(), orgColumns, newColumns));
+
+
+        return 1;
     }
 
 
@@ -245,8 +273,12 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         getBaseMapper().insert(newOne);
 
         Long tableId = newOne.getId();
-        addColumns(tableId, vo.getColumns());
+        List<DssDatamodelTableColumns> newColumns = addColumns(tableId, vo.getColumns());
 
+        //发布更新模型绑定事件
+        String user = DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser();
+        publisher.publishEvent(new UpdateBindModelByTableEvent(this, user, orgVersion, newOne));
+        publisher.publishEvent(new UpdateBindModelByColumnsEvent(this, user, orgVersion.getName(), orgColumns, newColumns));
 
         return 1;
     }
@@ -312,6 +344,14 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         rollbackColumns.forEach(columns -> columns.setId(null));
         tableColumnsService.batchInsert(rollbackOne.getId(), rollbackColumns);
         tableVersionService.getBaseMapper().deleteById(rollbackId);
+
+
+        //发布更新模型绑定事件
+        String user = DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser();
+        publisher.publishEvent(new UpdateBindModelByTableEvent(this, user, current, rollbackOne));
+        publisher.publishEvent(new UpdateBindModelByColumnsEvent(this, user, current.getName(), currentColumns, rollbackColumns));
+
+
         return 1;
     }
 
@@ -434,7 +474,7 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
             return listByIndicator(vo);
         }
 
-        if (StringUtils.isNotBlank(vo.getWarehouseLayerName()) || StringUtils.isNotBlank(vo.getWarehouseThemeName())) {
+        if (vo.getTableType() < 0 || StringUtils.isNotBlank(vo.getWarehouseLayerName()) || StringUtils.isNotBlank(vo.getWarehouseThemeName())) {
             return listDataModel(vo);
         }
         return listAssets(vo);
@@ -489,14 +529,14 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
                 .data("total", tableListDTOS.size());
     }
 
-    private String getThemes(List<String> classifcations){
-        if (CollectionUtils.isEmpty(classifcations)){
+    private String getThemes(List<String> classifcations) {
+        if (CollectionUtils.isEmpty(classifcations)) {
             return null;
         }
-        for (String classification : classifcations){
-            String prefix = StringUtils.substringBefore(classification,ClassificationConstant.SEPARATOR);
-            if (ClassificationConstant.THEME.getTypeCode().equals(prefix)){
-                return StringUtils.substringAfter(classification,ClassificationConstant.SEPARATOR);
+        for (String classification : classifcations) {
+            String prefix = StringUtils.substringBefore(classification, ClassificationConstant.SEPARATOR);
+            if (ClassificationConstant.THEME.getTypeCode().equals(prefix)) {
+                return StringUtils.substringAfter(classification, ClassificationConstant.SEPARATOR);
             }
         }
         return null;
@@ -616,5 +656,19 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public int tableModifierReferenceCount(String name) {
         return 0;
+    }
+
+
+    @Override
+    public void bindModel(long id) throws ErrorException{
+        DssDatamodelTable current = getBaseMapper().selectById(id);
+        if (current == null) {
+            LOGGER.error("errorCode : {}, bind table error not exists", ErrorCode.TABLE_BIND_ERROR.getCode());
+            throw new DSSDatamodelCenterException(ErrorCode.TABLE_BIND_ERROR.getCode(), "bind table error not exists");
+        }
+        String user = DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser();
+        List<DssDatamodelTableColumns> currentColumns = tableColumnsService.listByTableId(id);
+        publisher.publishEvent(new BindModelByTableEvent(this,user,current));
+        publisher.publishEvent(new BindModelByColumnsEvent(this,user,current.getName(),currentColumns));
     }
 }

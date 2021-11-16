@@ -5,21 +5,20 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import com.webank.wedatasphere.warehouse.cqe.DwModifierCreateCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwModifierQueryCommand;
 import com.webank.wedatasphere.warehouse.cqe.DwModifierUpdateCommand;
 import com.webank.wedatasphere.warehouse.dao.domain.*;
 import com.webank.wedatasphere.warehouse.dao.domain.DwLayer;
 import com.webank.wedatasphere.warehouse.dao.domain.DwThemeDomain;
-import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierListMapper;
-import com.webank.wedatasphere.warehouse.dao.mapper.DwModifierMapper;
-import com.webank.wedatasphere.warehouse.dao.mapper.DwLayerMapper;
-import com.webank.wedatasphere.warehouse.dao.mapper.DwThemeDomainMapper;
+import com.webank.wedatasphere.warehouse.dao.mapper.*;
 import com.webank.wedatasphere.warehouse.dto.DwModifierDTO;
 import com.webank.wedatasphere.warehouse.dto.DwModifierListDTO;
 import com.webank.wedatasphere.warehouse.dto.DwModifierListItemDTO;
 import com.webank.wedatasphere.warehouse.dto.PageInfo;
 import com.webank.wedatasphere.warehouse.exception.DwException;
+import com.webank.wedatasphere.warehouse.service.DwDomainReferenceCheckAdapter;
 import com.webank.wedatasphere.warehouse.service.DwModifierService;
 import com.webank.wedatasphere.warehouse.utils.PreconditionUtil;
 import com.webank.wedatasphere.warehouse.utils.RegexUtil;
@@ -36,24 +35,47 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class DwModifierServiceImpl implements DwModifierService {
+public class DwModifierServiceImpl implements DwModifierService, DwDomainReferenceCheckAdapter {
 
     private final DwModifierMapper dwModifierMapper;
     private final DwModifierListMapper dwModifierListMapper;
+    private final DwStatisticalPeriodMapper dwStatisticalPeriodMapper;
     private final DwLayerMapper dwLayerMapper;
     private final DwThemeDomainMapper dwThemeDomainMapper;
 
     @Autowired
     public DwModifierServiceImpl(
             DwModifierMapper dwModifierMapper,
+            DwStatisticalPeriodMapper dwStatisticalPeriodMapper,
             DwModifierListMapper dwModifierListMapper,
             DwLayerMapper dwLayerMapper,
             DwThemeDomainMapper dwThemeDomainMapper
     ) {
         this.dwModifierMapper = dwModifierMapper;
+        this.dwStatisticalPeriodMapper = dwStatisticalPeriodMapper;
         this.dwModifierListMapper = dwModifierListMapper;
         this.dwLayerMapper = dwLayerMapper;
         this.dwThemeDomainMapper = dwThemeDomainMapper;
+    }
+
+    @Override
+    public DwLayerMapper getDwLayerMapper() {
+        return dwLayerMapper;
+    }
+
+    @Override
+    public DwThemeDomainMapper getDwThemeDomainMapper() {
+        return dwThemeDomainMapper;
+    }
+
+    @Override
+    public DwStatisticalPeriodMapper getDwStatisticalPeriodMapper() {
+        return this.dwStatisticalPeriodMapper;
+    }
+
+    @Override
+    public DwModifierMapper getDwModifierMapper() {
+        return dwModifierMapper;
     }
 
     @Override
@@ -252,6 +274,11 @@ public class DwModifierServiceImpl implements DwModifierService {
         PreconditionUtil.checkArgument(!Objects.isNull(id), DwException.argumentReject("id should not be null"));
         DwModifier record = this.dwModifierMapper.selectById(id);
         PreconditionUtil.checkState(!Objects.isNull(record), DwException.stateReject("modifier not found"));
+
+        String username = SecurityFilter.getLoginUsername(request);
+        boolean inUse = isModifierInUse(record.getId(), username);
+        PreconditionUtil.checkState(!inUse, DwException.stateReject("modifier is in use, id = {}, name = {}", record.getId(), record.getModifierType()));
+
         if (Objects.equals(Boolean.FALSE, record.getStatus())) {
             return Message.ok();
         }

@@ -510,7 +510,7 @@ export default {
       this.publishingList = this.publishingList.filter((i) => i !== id);
     },
     orchestratorImport() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`
+      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile`
       this.uploadData = {
         projectName: this.$route.query.projectName,
         projectID: +this.$route.query.projectID,

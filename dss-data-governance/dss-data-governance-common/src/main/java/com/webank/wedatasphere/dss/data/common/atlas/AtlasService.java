@@ -21,6 +21,8 @@ import org.apache.atlas.model.typedef.AtlasTypesDef;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -42,17 +44,13 @@ import java.util.stream.Collectors;
  */
 @Service("atlasService")
 public class AtlasService {
-    private final AtlasClient atlasClient;
+    private AtlasClient atlasClient;
     private final Gson gson;
 
-    public AtlasService() throws AtlasException {
-        Configuration configuration = ApplicationProperties.get("dss-data-governance-server.properties");
-        String[] urls =new String[]{AtlasConf.ATLAS_REST_ADDRESS.getValue()};
-        String[] basicAuthUsernamePassword =new String[]{ AtlasConf.ATLAS_USERNAME.getValue(), AtlasConf.ATLAS_PASSWORD.getValue()};
-
-        atlasClient = new AtlasClient(configuration,urls,basicAuthUsernamePassword);
-
-
+    public AtlasService() {
+        String[] urls = new String[]{AtlasConf.ATLAS_REST_ADDRESS.getValue()};
+        String[] basicAuthUsernamePassword = new String[]{AtlasConf.ATLAS_USERNAME.getValue(), AtlasConf.ATLAS_PASSWORD.getValue()};
+        atlasClient = new AtlasClient(urls, basicAuthUsernamePassword);
 
         GsonBuilder builder = new GsonBuilder();
         // Register an adapter to manage the date types as long values
@@ -69,18 +67,16 @@ public class AtlasService {
     /**
      * hive db数量
      */
-    public int getHiveDbCnt() throws AtlasServiceException {
+    public long getHiveDbCnt() throws AtlasServiceException {
         String jsonStr = atlasClient.getHiveDbs();
-        if(StringUtils.isNotEmpty(jsonStr)){
+        if (StringUtils.isNotEmpty(jsonStr)) {
             JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
-            if(jsonObject !=null){
-                return jsonObject.get("count").getAsInt();
-            }
-            else{
+            if (jsonObject != null) {
+                return jsonObject.get("count").getAsLong();
+            } else {
                 return 0;
             }
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -88,18 +84,16 @@ public class AtlasService {
     /**
      * hive table数量
      */
-    public int getHiveTableCnt() throws AtlasServiceException {
+    public long getHiveTableCnt() throws AtlasServiceException {
         String jsonStr = atlasClient.getHiveTables();
-        if(StringUtils.isNotEmpty(jsonStr)){
+        if (StringUtils.isNotEmpty(jsonStr)) {
             JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
-            if(jsonObject !=null){
-                return jsonObject.get("count").getAsInt();
-            }
-            else{
+            if (jsonObject != null) {
+                return jsonObject.get("count").getAsLong();
+            } else {
                 return 0;
             }
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -110,7 +104,7 @@ public class AtlasService {
      */
     public List<AtlasEntityHeader> searchHiveTable(String classification, String query,
                                                    boolean excludeDeletedEntities, int limit, int offset) throws AtlasServiceException {
-        String jsonStr =atlasClient.basicSearchForString("hive_table",classification,query,excludeDeletedEntities,limit,offset);
+        String jsonStr = atlasClient.basicSearchForString("hive_table", classification, query, excludeDeletedEntities, limit, offset);
         AtlasSearchResult atlasSearchResult = gson.fromJson(jsonStr, AtlasSearchResult.class);
 
         return atlasSearchResult.getEntities();
@@ -120,7 +114,7 @@ public class AtlasService {
      * 获取hive table对象
      */
     public AtlasEntity getHiveTblByGuid(String guid) throws AtlasServiceException {
-        String jsonStr =atlasClient.getEntityByGuidForString(guid,false,false);
+        String jsonStr = atlasClient.getEntityByGuidForString(guid, false, false);
 
         AtlasEntity.AtlasEntityWithExtInfo atlasEntityWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntityWithExtInfo.class);
 
@@ -131,7 +125,7 @@ public class AtlasService {
      * 获取hive table对象
      */
     public AtlasEntity getHiveTblByAttribute(Map<String, String> uniqAttributes, boolean minExtInfo, boolean ignoreRelationship) throws AtlasServiceException {
-        String jsonStr =atlasClient.getEntityByAttributeForString("hive_table",uniqAttributes,minExtInfo,ignoreRelationship);
+        String jsonStr = atlasClient.getEntityByAttributeForString("hive_table", uniqAttributes, minExtInfo, ignoreRelationship);
 
         AtlasEntity.AtlasEntityWithExtInfo atlasEntityWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntityWithExtInfo.class);
 
@@ -142,7 +136,7 @@ public class AtlasService {
      * 获取hive column对象
      */
     public AtlasEntity getHiveColumn(String guid) throws AtlasServiceException {
-        String jsonStr =atlasClient.getEntityByGuidForString(guid,true,true);
+        String jsonStr = atlasClient.getEntityByGuidForString(guid, true, true);
 
         AtlasEntity.AtlasEntityWithExtInfo atlasEntityWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntityWithExtInfo.class);
 
@@ -153,7 +147,7 @@ public class AtlasService {
      * 获取多个hive column对象
      */
     public List<AtlasEntity> getHiveColumnsByGuids(List<String> guids) throws AtlasServiceException {
-        String jsonStr =atlasClient.getEntitiesByGuidsForString(guids,true,true);
+        String jsonStr = atlasClient.getEntitiesByGuidsForString(guids, true, true);
         AtlasEntity.AtlasEntitiesWithExtInfo atlasEntitiesWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntitiesWithExtInfo.class);
 
         return atlasEntitiesWithExtInfo.getEntities();
@@ -163,7 +157,7 @@ public class AtlasService {
     /**
      * 修改实体的注释
      */
-    public void modifyComment(String guid,String commentStr) throws AtlasServiceException {
+    public void modifyComment(String guid, String commentStr) throws AtlasServiceException {
         atlasClient.modifyComment(guid, commentStr);
     }
 
@@ -187,7 +181,7 @@ public class AtlasService {
     public AtlasLineageInfo getLineageInfo(final String guid, final AtlasLineageInfo.LineageDirection direction, final int depth) throws AtlasServiceException {
         String jsonStr = atlasClient.getLineageInfoForString(guid, direction, depth);
 
-        AtlasLineageInfo atlasLineageInfo = gson.fromJson(jsonStr,AtlasLineageInfo.class);
+        AtlasLineageInfo atlasLineageInfo = gson.fromJson(jsonStr, AtlasLineageInfo.class);
 
         return atlasLineageInfo;
     }
@@ -197,7 +191,7 @@ public class AtlasService {
      */
     public String getHiveTblNameById(String guid) throws AtlasServiceException {
         String jsonStr = atlasClient.getHeaderByIdForString(guid);
-        AtlasEntityHeader atlasEntityHeader = gson.fromJson(jsonStr,AtlasEntityHeader.class);
+        AtlasEntityHeader atlasEntityHeader = gson.fromJson(jsonStr, AtlasEntityHeader.class);
 
         return atlasEntityHeader.getAttribute("qualifiedName").toString().split("@")[0];
     }
@@ -205,14 +199,14 @@ public class AtlasService {
     /**
      * 根据guid来获取hive tbl名称 和 是否分区表
      */
-    public Map<String,Object> getHiveTblNameAndIsPartById(String guid) throws AtlasServiceException {
-        Map<String,Object> result =new HashMap<>(2);
+    public Map<String, Object> getHiveTblNameAndIsPartById(String guid) throws AtlasServiceException {
+        Map<String, Object> result = new HashMap<>(2);
 
-        String jsonStr = atlasClient.getEntityByGuidForString(guid,true,false);
+        String jsonStr = atlasClient.getEntityByGuidForString(guid, true, false);
         AtlasEntity.AtlasEntityWithExtInfo atlasEntityWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntityWithExtInfo.class);
 
-        result.put("tblName",atlasEntityWithExtInfo.getEntity().getAttribute("qualifiedName").toString().split("@")[0]);
-        result.put("isPartition",((List)atlasEntityWithExtInfo.getEntity().getAttribute("partitionKeys")).size() >0);
+        result.put("tblName", atlasEntityWithExtInfo.getEntity().getAttribute("qualifiedName").toString().split("@")[0]);
+        result.put("isPartition", ((List) atlasEntityWithExtInfo.getEntity().getAttribute("partitionKeys")).size() > 0);
 
         return result;
     }
@@ -220,9 +214,9 @@ public class AtlasService {
     /**
      * 获取所有的分类
      */
-    public AtlasTypesDef getClassificationDef( ) throws AtlasServiceException {
+    public AtlasTypesDef getClassificationDef() throws AtlasServiceException {
         String jsonStr = atlasClient.getClassificationDefForString();
-        AtlasTypesDef atlasTypesDef = gson.fromJson(jsonStr,AtlasTypesDef.class);
+        AtlasTypesDef atlasTypesDef = gson.fromJson(jsonStr, AtlasTypesDef.class);
 
         return atlasTypesDef;
     }
@@ -232,7 +226,7 @@ public class AtlasService {
      */
     public AtlasClassificationDef getClassificationDefByName(String name) throws AtlasServiceException {
         String jsonStr = atlasClient.getClassificationDefByNameForString(name);
-        AtlasClassificationDef atlasClassificationDef = gson.fromJson(jsonStr,AtlasClassificationDef.class);
+        AtlasClassificationDef atlasClassificationDef = gson.fromJson(jsonStr, AtlasClassificationDef.class);
 
         return atlasClassificationDef;
     }
@@ -241,9 +235,9 @@ public class AtlasService {
      * 根据名称获取分类的一级子类型
      */
     public List<AtlasClassificationDef> getClassificationDefListByName(String name) throws AtlasServiceException {
-        List<AtlasClassificationDef> atlasClassificationDefList =new ArrayList<AtlasClassificationDef>();
+        List<AtlasClassificationDef> atlasClassificationDefList = new ArrayList<AtlasClassificationDef>();
 
-        AtlasClassificationDef atlasClassificationDef =this.getClassificationDefByName(name);
+        AtlasClassificationDef atlasClassificationDef = this.getClassificationDefByName(name);
         //atlasClassificationDefList.add(atlasClassificationDef);
 
         Set<String> subTypes = atlasClassificationDef.getSubTypes();
@@ -263,7 +257,7 @@ public class AtlasService {
      * 获取所有分层的一级子类型，包括系统预置分层和用户自定义分层
      */
     public List<AtlasClassificationDef> getClassificationDefListForLayer() throws AtlasServiceException {
-        List<AtlasClassificationDef> atlasClassificationDefList =new ArrayList<AtlasClassificationDef>();
+        List<AtlasClassificationDef> atlasClassificationDefList = new ArrayList<AtlasClassificationDef>();
         // 系统预置分层的一级子分类
         atlasClassificationDefList.addAll(this.getClassificationDefListByName(AtlasConf.ATLAS_CLASSIFICATION_LAYER_SYSTEM.getValue()));
 
@@ -278,7 +272,7 @@ public class AtlasService {
      */
     public AtlasTypesDef createAtlasTypeDefs(final AtlasTypesDef typesDef) throws AtlasServiceException {
         String jsonStr = atlasClient.createAtlasTypeDefsForString(typesDef);
-        AtlasTypesDef atlasTypesDef = gson.fromJson(jsonStr,AtlasTypesDef.class);
+        AtlasTypesDef atlasTypesDef = gson.fromJson(jsonStr, AtlasTypesDef.class);
 
         return atlasTypesDef;
     }
@@ -301,7 +295,7 @@ public class AtlasService {
      * 为实体添加分类
      */
     public void addClassifications(String guid, List<AtlasClassification> classifications) throws AtlasServiceException {
-        atlasClient.addClassifications(guid,classifications);
+        atlasClient.addClassifications(guid, classifications);
     }
 
     /**
@@ -329,8 +323,8 @@ public class AtlasService {
      * 为实体删除已有的分类，添加新的分类
      */
     public void removeAndAddClassifications(String guid, List<AtlasClassification> newClassifications) throws AtlasServiceException {
-        AtlasClassificationV2.AtlasClassificationsV2 oldAtlasClassifications =this.getClassifications(guid);
-        if(oldAtlasClassifications !=null && oldAtlasClassifications.getList() !=null){
+        AtlasClassificationV2.AtlasClassificationsV2 oldAtlasClassifications = this.getClassifications(guid);
+        if (oldAtlasClassifications != null && oldAtlasClassifications.getList() != null) {
             oldAtlasClassifications.getList().stream().forEach(ele -> {
                 try {
                     this.deleteClassification(guid, ele.getTypeName());
@@ -339,7 +333,7 @@ public class AtlasService {
                 }
             });
         }
-        if(newClassifications !=null && newClassifications.size() >0) {
+        if (newClassifications != null && newClassifications.size() > 0) {
             atlasClient.addClassifications(guid, newClassifications);
         }
     }

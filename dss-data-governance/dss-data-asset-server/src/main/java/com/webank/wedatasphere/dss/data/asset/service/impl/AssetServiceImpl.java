@@ -52,9 +52,9 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public Map<String, Integer> getHiveSummary() throws DataGovernanceException {
+    public Map<String, Long> getHiveSummary() throws DataGovernanceException {
         try {
-            Map<String, Integer> result = new HashMap<>();
+            Map<String, Long> result = new HashMap<>();
 
             result.put("hiveDb", atlasService.getHiveDbCnt());
             result.put("hiveTable", atlasService.getHiveTableCnt());

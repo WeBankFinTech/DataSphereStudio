@@ -119,4 +119,20 @@ public interface IndicatorService extends IService<DssDatamodelIndicator> {
      * @return
      */
     int indicatorModifierReferenceCount(String name);
+
+
+    /**
+     * 维度引用情况
+     * @param name
+     * @return
+     */
+    int indicatorDimensionReferenceCount(String name);
+
+
+    /**
+     * 度量引用情况
+     * @param name
+     * @return
+     */
+    int indicatorMeasureReferenceCount(String name);
 }

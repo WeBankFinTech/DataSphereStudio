@@ -19,6 +19,7 @@ import com.webank.wedatasphere.dss.datamodel.center.common.event.DeleteModelEven
 import com.webank.wedatasphere.dss.datamodel.center.common.event.UpdateModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.AssertsSyncService;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.DatamodelReferencService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.IndicatorTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.IndicatorQueryMapper;
@@ -77,6 +78,10 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
     @Resource
     private AssertsSyncService assertsSyncService;
+
+
+    @Resource
+    private DatamodelReferencService datamodelReferencService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -222,7 +227,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         //IPage<DssDatamodelIndicatorQuery> iPage = indicatorQueryMapper.page(new Page<>(vo.getPageNum(), vo.getPageSize()), queryWrapper);
 
         return Message.ok()
-                .data("list", pageInfo.getList())
+                .data("list", pageInfo.getList().stream().peek(e-> e.setRefCount(datamodelReferencService.indicatorReferenceCount(e.getName()))).collect(Collectors.toList()))
                 .data("total", pageInfo.getTotal());
     }
 
@@ -415,6 +420,21 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
     @Override
     public int indicatorModifierReferenceCount(String name) {
+        int currentCount = indicatorContentService.sourceInfoReference(name);
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount;
+    }
+
+
+    @Override
+    public int indicatorDimensionReferenceCount(String name) {
+        int currentCount = indicatorContentService.sourceInfoReference(name);
+        int versionCount = indicatorVersionService.contentReferenceCount(name);
+        return currentCount + versionCount;
+    }
+
+    @Override
+    public int indicatorMeasureReferenceCount(String name) {
         int currentCount = indicatorContentService.sourceInfoReference(name);
         int versionCount = indicatorVersionService.contentReferenceCount(name);
         return currentCount + versionCount;

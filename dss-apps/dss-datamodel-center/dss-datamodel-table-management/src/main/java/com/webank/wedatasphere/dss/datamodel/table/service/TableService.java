@@ -211,6 +211,29 @@ public interface TableService extends IService<DssDatamodelTable> {
 
 
     /**
+     * 维度引用情况
+     * @param name
+     * @return
+     */
+    int tableDimensionReferenceCount(String name);
+
+
+    /**
+     * 度量引用情况
+     * @param name
+     * @return
+     */
+    int tableMeasureReferenceCount(String name);
+
+
+    /**
+     * 指标引用情况
+     * @param name
+     * @return
+     */
+    int tableIndicatorReferenceCount(String name);
+
+    /**
      * 主动绑定模型
      * @param id
      */

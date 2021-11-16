@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.datamodel.center.common.service.DimensionIndi
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorContent;
 import com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorVersion;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorContentService;
+import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorVersionService;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +21,19 @@ public class DimensionIndicatorCheckServiceImpl implements DimensionIndicatorChe
     @Resource
     private IndicatorContentService indicatorContentService;
 
+    @Resource
+    private IndicatorService indicatorService;
+
     @Override
     public Boolean referenceCase(String name) {
         return check(name);
     }
 
     private Boolean check(String name) {
-        int versionCount = indicatorVersionService.contentReferenceCount(name);// indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, "\""+name + "\""));
-        int contentCount = indicatorContentService.sourceInfoReference(name);//indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, "\""+name + "\""));
-        return versionCount > 0 || contentCount > 0;
+//        int versionCount = indicatorVersionService.contentReferenceCount(name);// indicatorVersionService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorVersion>lambdaQuery().like(DssDatamodelIndicatorVersion::getVersionContext, "\""+name + "\""));
+//        int contentCount = indicatorContentService.sourceInfoReference(name);//indicatorContentService.getBaseMapper().selectCount(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().like(DssDatamodelIndicatorContent::getIndicatorSourceInfo, "\""+name + "\""));
+//        return versionCount > 0 || contentCount > 0;
+        return indicatorService.indicatorDimensionReferenceCount(name)>0;
     }
 
 

@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteCl
 import com.webank.wedatasphere.dss.data.governance.request.*;
 import com.webank.wedatasphere.dss.data.governance.response.*;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ModeType;
 import com.webank.wedatasphere.dss.datamodel.center.common.context.DataModelSecurityContextHolder;
 import com.webank.wedatasphere.dss.datamodel.center.common.dto.PreviewDataDTO;
 import com.webank.wedatasphere.dss.datamodel.center.common.event.BindModelEvent;
@@ -651,6 +652,28 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
         int currentCountEn = getBaseMapper().selectCount(Wrappers.<DssDatamodelTable>lambdaQuery().eq(DssDatamodelTable::getLifecycleEn, name));
         int versionCount = tableVersionService.tableContentReference(name);
         return currentCount + versionCount + currentCountEn;
+    }
+
+    @Override
+    public int tableDimensionReferenceCount(String name) {
+        return referenceCount(name, ModeType.DIMENSION);
+    }
+
+    private int referenceCount(String name, ModeType modeType) {
+        int currentCount = tableColumnsService.modelReferenceCount(modeType, name);
+        int currentCountEn = tableColumnsService.modelReferenceCountEn(modeType, name);
+        int versionCount = tableVersionService.tableColumnsReference(name);
+        return currentCount + versionCount + currentCountEn;
+    }
+
+    @Override
+    public int tableMeasureReferenceCount(String name) {
+        return referenceCount(name, ModeType.MEASURE);
+    }
+
+    @Override
+    public int tableIndicatorReferenceCount(String name) {
+        return referenceCount(name, ModeType.INDICATOR);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.table.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ModeType;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableColumnsMapper;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.dss.datamodel.table.service.TableColumnsService;
@@ -69,5 +70,22 @@ public class TableColumnsServiceImpl extends ServiceImpl<DssDatamodelTableColumn
         updateOne.setModelNameEn(modelNameEn);
         updateOne.setUpdateTime(new Date());
         return getBaseMapper().update(updateOne, Wrappers.<DssDatamodelTableColumns>lambdaUpdate().eq(DssDatamodelTableColumns::getId,id));
+    }
+
+
+    @Override
+    public int modelReferenceCount(ModeType modeType, String name) {
+        return getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
+                        .eq(DssDatamodelTableColumns::getModelType, modeType.getType())
+                        .eq(DssDatamodelTableColumns::getModelName, name));
+    }
+
+    @Override
+    public int modelReferenceCountEn(ModeType modeType, String name) {
+        return getBaseMapper().selectCount(
+                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
+                        .eq(DssDatamodelTableColumns::getModelType, modeType.getType())
+                        .eq(DssDatamodelTableColumns::getModelNameEn, name));
     }
 }

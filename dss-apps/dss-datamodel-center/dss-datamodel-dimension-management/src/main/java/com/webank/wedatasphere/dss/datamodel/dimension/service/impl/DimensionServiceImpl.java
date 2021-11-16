@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.datamodel.center.common.event.DeleteModelEven
 import com.webank.wedatasphere.dss.datamodel.center.common.event.UpdateModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.AssertsSyncService;
+import com.webank.wedatasphere.dss.datamodel.center.common.service.DatamodelReferencService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.DimensionIndicatorCheckService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.DimensionTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
 @Service
 public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMapper,DssDatamodelDimension>  implements DimensionService {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DimensionServiceImpl.class);
 
     private final ModelMapper modelMapper = new ModelMapper();
@@ -56,6 +56,9 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     @Resource
     private AssertsSyncService assertsSyncService;
+
+    @Resource
+    private DatamodelReferencService datamodelReferencService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -176,7 +179,11 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
                 .data("list",pageInfo
                         .getList()
                         .stream()
-                        .map(dssDatamodelDimension -> modelMapper.map(dssDatamodelDimension, DimensionQueryDTO.class))
+                        .map(dssDatamodelDimension ->{
+                            DimensionQueryDTO dto = modelMapper.map(dssDatamodelDimension, DimensionQueryDTO.class);
+                            dto.setRefCount(datamodelReferencService.dimensionReferenceCount(dssDatamodelDimension.getName()));
+                            return dto;
+                        })
                         .collect(Collectors.toList()))
                 .data("total",pageInfo.getTotal());
     }

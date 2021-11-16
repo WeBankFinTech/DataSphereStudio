@@ -2,6 +2,8 @@ package com.webank.wedatasphere.dss.datamodel.table.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ModeType;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.linkis.common.exception.ErrorException;
 
@@ -55,4 +57,21 @@ public interface TableColumnsService extends IService<DssDatamodelTableColumns> 
 
 
     Integer tableColumnBind(Long id, Integer modelType, String modelName,String modelNameEn) throws ErrorException;
+
+
+    /**
+     * 模型引用计数
+     * @param modeType
+     * @param name
+     * @return
+     */
+    int modelReferenceCount(ModeType modeType, String name);
+
+    /**
+     * 模型英文引用计数
+     * @param modeType
+     * @param name
+     * @return
+     */
+    int modelReferenceCountEn(ModeType modeType, String name);
 }

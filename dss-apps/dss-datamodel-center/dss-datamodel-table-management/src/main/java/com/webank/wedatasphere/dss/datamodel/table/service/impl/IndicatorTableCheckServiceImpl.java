@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.datamodel.table.service.impl;
 
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.webank.wedatasphere.dss.datamodel.center.common.constant.ModeType;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.IndicatorTableCheckService;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableColumns;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableVersion;
@@ -21,29 +22,16 @@ public class IndicatorTableCheckServiceImpl implements IndicatorTableCheckServic
 
     @Override
     public Boolean referenceCase(String name) {
-        int columnCount = tableColumnsService.getBaseMapper().selectCount(
-                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
-                        .eq(DssDatamodelTableColumns::getModelType, 1)
-                        .eq(DssDatamodelTableColumns::getModelName, name));
-
-        int columnVersionCount = getColumnVersionCount(name);
+        int columnCount = tableColumnsService.modelReferenceCount(ModeType.INDICATOR,name);
+        int columnVersionCount = tableVersionService.tableContentReference(name);
         return columnCount > 0 || columnVersionCount>0 ;
-    }
-
-    private int getColumnVersionCount(String name) {
-        return tableVersionService.getBaseMapper().selectCount(
-                Wrappers.<DssDatamodelTableVersion>lambdaQuery()
-                        .like(DssDatamodelTableVersion::getColumns, "\"" + name + "\""));
     }
 
 
     @Override
     public Boolean referenceEn(String name) {
-        int columnEnCount = tableColumnsService.getBaseMapper().selectCount(
-                Wrappers.<DssDatamodelTableColumns>lambdaQuery()
-                        .eq(DssDatamodelTableColumns::getModelType, 1)
-                        .eq(DssDatamodelTableColumns::getModelNameEn, name));
-        int columnVersionCount = getColumnVersionCount(name);
+        int columnEnCount = tableColumnsService.modelReferenceCountEn(ModeType.INDICATOR,name);
+        int columnVersionCount = tableVersionService.tableContentReference(name);
         return columnEnCount > 0 || columnVersionCount>0 ;
     }
 }

@@ -11,6 +11,8 @@ import org.apache.http.message.BasicHeader;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Dolphin scheduler get request operation.
@@ -20,6 +22,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
  */
 public class DolphinSchedulerGetRequestOperation
     implements SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> {
+    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerGetRequestOperation.class);
 
     private DolphinSchedulerSecurityService dolphinSchedulerSecurityService;
 
@@ -35,6 +38,8 @@ public class DolphinSchedulerGetRequestOperation
         try {
             ArrayList<Header> headers = new ArrayList<>();
             Header header = new BasicHeader("token", dolphinSchedulerSecurityService.getUserToken(req.getUser()));
+            logger.info("dolphin请求url"+req.getURI()+"token "+dolphinSchedulerSecurityService.getUserToken(req.getUser()));
+
             headers.add(header);
             httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
             return httpClient.execute(req);

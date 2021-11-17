@@ -10,6 +10,6 @@ import com.webank.wedatasphere.linkis.common.conf.CommonVars;
  */
 public interface DolphinSchedulerConf {
 
-    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.admin.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
+    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.admin.token", "fcdd944c03d5792719781f2c6e7b7542");
 
 }

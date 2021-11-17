@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +48,7 @@ public class DSSDbApiDataSourceRestful {
     public Message connect(@QueryParam("workspaceId") Integer workspaceId, @QueryParam("type") String type) {
 
         List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(workspaceId, type);
-        List<DataSource> availableConnections = dssDbApiDataSourceService.getAvailableConns(allConnections);
-        return Message.ok().data("availableConns", availableConnections);
+        return Message.ok().data("availableConns", allConnections);
 
     }
 
@@ -112,8 +112,32 @@ public class DSSDbApiDataSourceRestful {
     @POST
     @Path("/delete/{id}")
     public Message deleteDatasource(@PathParam("id") Integer id) {
-        dssDbApiDataSourceService.deleteById(id);
-        return Message.ok("删除成功");
+        if (dssDbApiDataSourceService.isDataSourceUsing(id)){
+            return Message.error("该数据源正在被使用,请下线与此数据源相关的api后再删除");
+        } else {
+            dssDbApiDataSourceService.deleteById(id);
+            return Message.ok("删除成功");
+        }
+    }
+
+    @POST
+    @Path("/test")
+    public Message testDatasource(@RequestBody DataSource dataSource) {
+        Connection connection = null;
+        try {
+            connection = JdbcUtil.getConnection(dataSource);
+        } catch (Exception e) {
+            return Message.error(e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    return Message.error(e.getMessage());
+                }
+            }
+        }
+        return Message.ok("测试连接成功");
     }
 
 }

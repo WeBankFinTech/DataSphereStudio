@@ -5,7 +5,7 @@
       <Title :title="'总体计量'"></Title>
 
       <div class="overview-t-card">
-        <div v-for="model in models" :key="model.title">
+        <div v-for="model in models" :key="model.title" style="flex: 1;">
           <ICard :model="model"></ICard>
         </div>
       </div>
@@ -20,21 +20,20 @@
           :context="tableSelf"
           :columns="columns1"
           :data="data1"
-          width="558"
           size="large"
         ></Table>
       </div>
 
       <!-- bottom right -->
-      <div class="overview-b-r">
-        <!-- <Title :title="'表读取次数 Top10'"></Title>
+      <!-- <div class="overview-b-r">
+        <Title :title="'表读取次数 Top10'"></Title>
         <Table
           :columns="columns2"
           :data="data2"
           width="558"
           size="large"
-        ></Table> -->
-      </div>
+        ></Table>
+      </div> -->
     </div>
   </div>
 </template>
@@ -73,8 +72,7 @@ export default {
             return h("div", [
               h("SvgIcon", {
                 props: {
-                  "icon-class": "biao",
-                  color: "#3495F7"
+                  "icon-class": "biao"
                 },
                 style: {
                   fontSize: "15px"
@@ -86,7 +84,13 @@ export default {
                   style: {
                     marginLeft: "4.8px",
                     fontSize: "14px",
-                    color: "#3495F7"
+                    color: "#2E92F7",
+                    cursor: params.row.guid ? "pointer" : "not-allowed"
+                  },
+                  on: {
+                    click: () => {
+                      this.toTableInfo(params.row.guid);
+                    }
                   }
                 },
                 params.row.tableName
@@ -188,6 +192,16 @@ export default {
         .catch(err => {
           that.$Message.error(err);
         });
+    },
+    // 根據{guid}跳轉到表詳情
+    toTableInfo(guid) {
+      if (!guid) return;
+      const workspaceId = this.$route.query.workspaceId;
+      this.$router.push({
+        name: "dataGovernance/assets/info",
+        params: { guid },
+        query: { workspaceId }
+      });
     }
   }
 };
@@ -212,9 +226,40 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    margin-right: 24px;
+    margin-bottom: 24px;
     &-l {
-      margin-right: 25px;
+      width: 100%;
     }
   }
+}
+::v-deep .ivu-table-wrapper {
+  border: none;
+}
+::v-deep .ivu-table:after {
+  width: 0;
+}
+
+::v-deep .ivu-table-large th {
+  height: 0px;
+}
+
+::v-deep .ivu-table-large td {
+  height: 0px;
+}
+
+::v-deep .ivu-table th {
+  height: 0px;
+}
+
+::v-deep .ivu-table td {
+  height: 0px;
+}
+
+::v-deep .ivu-table-cell {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 </style>

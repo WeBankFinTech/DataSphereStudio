@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.webank.wedatasphere.linkis.common.utils.JsonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -90,7 +91,10 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
         try (CloseableHttpResponse httpResponse =
             this.postOperation.requestWithSSO(null, httpPost);) {
             HttpEntity ent = httpResponse.getEntity();
+            logger.info("dolphin返回报文"+ent.toString());
+
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
+            logger.info("dolphin返回报文"+entString);
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()) {
                 String codeString = DolphinAppConnUtils.getValueFromEntity(entString, "code");

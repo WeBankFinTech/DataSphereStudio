@@ -29,7 +29,7 @@
             @click.stop="goHome"
             class="logo-img"
             :style="{ cursor: 'pointer'}"
-            src="../../assets/images/dssLogo5_1.png"
+            src="../../assets/images/dssLogo-smart.png"
             :alt="$t('message.common.logoName')"
           >
           <span class="version">{{sysVersion}}</span>
@@ -331,7 +331,7 @@ export default {
       return arr;
     },
     handleOutsideClick() {
-      if(this.$parent.$refs.newGuidance.currentStep !== 6){
+      if(this.$parent.$refs.newGuidance && this.$parent.$refs.newGuidance.currentStep !== 6){
         this.isUserMenuShow = false;
       }
     },

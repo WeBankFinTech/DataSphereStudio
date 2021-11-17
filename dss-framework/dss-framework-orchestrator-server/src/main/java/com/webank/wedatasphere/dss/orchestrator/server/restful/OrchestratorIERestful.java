@@ -157,15 +157,14 @@ public class OrchestratorIERestful {
 
     //生成label list
     public List<DSSLabel> getDSSLabelList(String labels) {
-        //原来的逻辑
-//        List<DSSLabel> dssLabelList = Arrays.asList(dssLabels.split(",")).stream().map(label -> {
-//            DSSLabel dssLabel = new EnvDSSLabel(label);
-//            return dssLabel;
-//        }).collect(Collectors.toList());
         String labelStr = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
-        Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
-        if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
-            labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+        try{
+            Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
+            if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+                labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+            }
+        }catch (Exception e){
+            logger.error("get labels failed for {}", e.getMessage());
         }
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
         return dssLabelList;

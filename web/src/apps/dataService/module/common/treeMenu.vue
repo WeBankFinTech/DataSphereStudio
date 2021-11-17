@@ -82,7 +82,7 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      this.$emit("handleApiChoosed", node);
+      this.$emit("handleApiChoosed", {...node, allProjectTree: this.originDatas});
     },
     getAllApi(type = "", payload = {}) {
       //获取数据服务所有的api

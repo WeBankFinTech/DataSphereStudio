@@ -6,6 +6,7 @@
     <div class="apiTest-head">
       <div class="api-select" v-if="!fromDataService">
         <Select
+          filterable
           v-model="currentApiId"
           style="width:200px"
           @on-change="handleChangeApi"

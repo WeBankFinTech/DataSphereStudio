@@ -43,6 +43,7 @@ public class DolphinSchedulerPostRequestOperation
             httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
             return httpClient.execute(req);
         } catch (Throwable t) {
+            logger.error("dolphin请求报错",t);
             throw new AppStandardErrorException(90009, t.getMessage(), t);
         }
     }

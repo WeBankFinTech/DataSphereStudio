@@ -41,6 +41,7 @@ public class DolphinSchedulerPostRequestOperation
             Header header = new BasicHeader("token", dolphinSchedulerSecurityService.getUserToken(req.getUser()));
             headers.add(header);
             httpClient = HttpClients.custom().setDefaultHeaders(headers).build();
+            logger.info("dolphin请求url"+req.getURI()+"token"+dolphinSchedulerSecurityService.getUserToken(req.getUser()));
             return httpClient.execute(req);
         } catch (Throwable t) {
             logger.error("dolphin请求报错",t);

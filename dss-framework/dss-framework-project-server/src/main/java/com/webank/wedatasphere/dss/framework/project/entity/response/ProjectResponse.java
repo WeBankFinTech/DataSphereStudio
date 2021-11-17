@@ -227,6 +227,7 @@ public class ProjectResponse implements Serializable {
                 ", accessUsers=" + accessUsers +
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
+                ", editable=" + editable +
                 '}';
     }
 }

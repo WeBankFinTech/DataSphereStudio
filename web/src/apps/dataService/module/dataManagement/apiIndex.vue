@@ -144,6 +144,7 @@ export default {
       this.getApiList();
     },
     handleSearch() {
+      this.pageData.pageNow = 1;
       this.getApiList();
     },
     test(row) {
@@ -199,7 +200,7 @@ export default {
         document.body.appendChild(inputEl);
         inputEl.select(); // 选择对象;
         document.execCommand("Copy"); // 执行浏览器复制命令
-        this.$Message.success(this.$t('message.dataService.apiIndex.copied')); 
+        this.$Message.success(this.$t('message.dataService.apiIndex.copied'));
         inputEl.remove();
       }).catch((err) => {
         console.error(err)

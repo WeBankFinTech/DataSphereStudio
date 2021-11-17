@@ -19,7 +19,7 @@ public interface ApiAuthService extends IService<ApiAuth> {
     public List<ApiGroupInfo> getApiGroupList(Long workspaceId);
     public boolean saveApiAuth(ApiAuth apiAuth) throws ErrorException;
 
-    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize);
+    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, String caller, List<Long> totals, Integer pageNow, Integer pageSize);
 
     public void deleteApiAuth(Long id);
 

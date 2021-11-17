@@ -8,8 +8,9 @@
     border-radius: 100px;
     border:1px solid #D9D9D9;
     cursor: pointer;
+    background-color: white !important;
     &:hover {
-      border:  1px solid #F66902;
+      border:  1px solid #2E92F7;
       .datac-icon {
         line-height: 52px;
       }

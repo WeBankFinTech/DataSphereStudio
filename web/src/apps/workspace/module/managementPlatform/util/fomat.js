@@ -1,12 +1,12 @@
-const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
-const menuOptions = [];
-menuInfo.forEach(info => {
-  menuOptions.push(info.title_en);
-});
-const _menuOptions = new Map();
-menuOptions.forEach((item, idx) => {
-  _menuOptions.set(item, idx);
-});
+// const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
+// const menuOptions = [];
+// menuInfo.forEach(info => {
+//   menuOptions.push(info.title_en);
+// });
+// const _menuOptions = new Map();
+// menuOptions.forEach((item, idx) => {
+//   _menuOptions.set(item, idx);
+// });
 
 /**
  *
@@ -25,6 +25,15 @@ function formatComponentData(component) {
   } else {
     _component.is_active = false;
   }
+  const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
+  const menuOptions = [];
+  menuInfo.forEach(info => {
+    menuOptions.push(info.title_en);
+  });
+  const _menuOptions = new Map();
+  menuOptions.forEach((item, idx) => {
+    _menuOptions.set(item, idx);
+  });
   _component.onestop_menu_id = menuOptions[_component.onestop_menu_id - 1];
   return _component;
 }
@@ -45,6 +54,15 @@ function formatComponentDataForPost(component) {
   } else {
     _component.is_active = 0;
   }
+  const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
+  const menuOptions = [];
+  menuInfo.forEach(info => {
+    menuOptions.push(info.title_en);
+  });
+  const _menuOptions = new Map();
+  menuOptions.forEach((item, idx) => {
+    _menuOptions.set(item, idx);
+  });
 
   _component.onestop_menu_id = _menuOptions.get(_component.onestop_menu_id) + 1;
 

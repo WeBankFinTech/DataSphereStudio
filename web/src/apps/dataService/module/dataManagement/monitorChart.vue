@@ -10,9 +10,9 @@
       </div>
       <div class="mc-body">
         <Tabs type="card">
-          <Tab-pane label="APP请求次数">
+          <Tab-pane label="API请求次数">
             <div class="mc-range">
-              <div class="chart-title">APP请求次数(次)</div>
+              <div class="chart-title">API请求次数(次)</div>
               <rangeGroup @on-date-change="getCntByApi" />
             </div>
             <div ref="chartReq" style="height:300px"></div>

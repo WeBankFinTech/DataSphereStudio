@@ -131,24 +131,12 @@ public class DSSDbApiConfigRestful {
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 
     }
 
-    /**
-     * 服务发布/下线
-     * @param request
-     * @return
-     */
-    @POST
-    @Path("release")
-    public Response releaseApi(@Context HttpServletRequest request, JsonNode jsonNode) {
-        Integer status = jsonNode.get("status").getValueAsInt();
-        String apiId = jsonNode.get("apiId").getTextValue();
-        apiConfigService.release(status, apiId);
-        return Message.messageToResponse(Message.ok());
-    }
 
     /**
      * 第三方调用 api
@@ -164,8 +152,8 @@ public class DSSDbApiConfigRestful {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
             Message message = Message.ok().data("response", resJo);
             return Message.messageToResponse(message);
-
         } catch (Exception exception) {
+            log.error("ERROR", "Error found: ", exception);
             return RestfulUtils.dealError(exception.getMessage());
         }
 

@@ -36,7 +36,8 @@ router.beforeEach((to, from, next) => {
     }
     if (to.meta.admin) {
       // 如果不是管理员权限，则跳转404，防止手动修改路由跳转
-      if (storage.get("baseInfo", 'local').isAdmin) {
+      const baseInfo = storage.get("baseInfo", 'local');
+      if (baseInfo && baseInfo.isAdmin) {
         next();
       } else {
         next('/404')

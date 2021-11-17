@@ -39,7 +39,7 @@ public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 
     void addApiAuth(ApiAuth dssDataApiAuth);
 
-    List<ApiAuthInfo> getApiAuthList(Long workspaceId);
+    List<ApiAuthInfo> getApiAuthList(@Param("workspaceId") Long workspaceId, @Param("caller") String caller);
 
     @Update("UPDATE dss_dataapi_auth SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
     void deleteApiAuth(@Param("id") Long id);

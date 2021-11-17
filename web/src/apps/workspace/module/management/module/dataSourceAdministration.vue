@@ -68,6 +68,11 @@
         </FormItem>
       </Form>
       <div slot="footer">
+        <div style="display: inline-block; width: 64%; text-align: left">
+          <Button type="info" size="large" @click="test('add', 'addDataSource')">{{
+            $t("message.workspaceManagemnet.test")
+          }}</Button>
+        </div>
         <Button type="text" size="large" @click="cancel('add', 'addDataSource')">{{
           $t("message.workspaceManagemnet.cancel")
         }}</Button>
@@ -101,6 +106,11 @@
         </FormItem>
       </Form>
       <div slot="footer">
+        <div style="display: inline-block; width: 64%; text-align: left">
+          <Button type="info" size="large" @click="test('edit', 'editDataSource')">{{
+            $t("message.workspaceManagemnet.test")
+          }}</Button>
+        </div>
         <Button type="text" size="large" @click="cancel('edit', 'editDataSource')">{{
           $t("message.workspaceManagemnet.cancel")
         }}</Button>
@@ -319,6 +329,37 @@ export default {
       }else if(action === "edit"){
         this.editshow = false
       }
+    },
+    test(action, ref){
+      this.$refs[ref].validate((valid) => {
+        if (valid) {
+          let params = {}
+          if(action === "add"){
+            params = {
+              workspaceId: this.workspaceId,
+              name: this.addDataSource.name,
+              username: this.addDataSource.username,
+              type: this.addDataSource.type,
+              note: this.addDataSource.note,
+              url: this.addDataSource.url,
+              pwd: this.addDataSource.pwd
+            }
+          }else{
+            params = {
+              workspaceId: this.workspaceId,
+              name: this.editDataSource.name,
+              username: this.editDataSource.username,
+              type: this.editDataSource.type,
+              note: this.editDataSource.note,
+              url: this.editDataSource.url,
+              pwd: this.editDataSource.pwd
+            }
+          }
+          api.fetch(`${this.$API_PATH.DATASOURCE_PATH}test`, params).then(()=>{
+            this.$Message.success(this.$t('message.workspaceManagemnet.testSuccess'))
+          })
+        }
+      })
     }
   }
 }

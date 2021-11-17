@@ -138,9 +138,6 @@ export default {
         project_url: [
           { required: true, message: "项目页不能为空", trigger: "blur" }
         ],
-        redirect_url: [
-          { required: true, message: "单点接口不能为空", trigger: "blur" }
-        ],
         desc_cn: [{ required: true, message: "描述不能为空", trigger: "blur" }],
         desc_en: [
           { required: true, message: "英文描述不能为空", trigger: "blur" }

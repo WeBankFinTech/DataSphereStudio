@@ -68,10 +68,16 @@ public class DSSDbApiManagerRestful {
     @Path("/online/{apiId}")
     public Response onlineApi(@PathParam("apiId") Long apiId) throws DataApiException {
 
+
         ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
         if(apiInfo.getIsTest() == 0){
-            throw new DataApiException("请测试通过后,再上线");
+            throw new DataApiException("请测试通过后再上线");
         }
+
+        if(apiInfo.getStatus() == 1){
+            throw new DataApiException("该Api已发布,请勿重复发布");
+        }
+
         apiManagerService.onlineApi(apiId);
         apiInfo = apiManagerService.getApiInfo(apiId);
         Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);

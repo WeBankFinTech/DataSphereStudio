@@ -99,7 +99,8 @@ public class DSSDbApiAuthRestful {
 
     @GET
     @Path("/list")
-    public Response getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+    public Response getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("caller") String caller,
+                                   @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -108,7 +109,7 @@ public class DSSDbApiAuthRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
+        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,caller,totals,pageNow,pageSize);
         return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
     }
 

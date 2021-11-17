@@ -91,6 +91,7 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
             this.postOperation.requestWithSSO(null, httpPost);) {
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
+            logger.info("dolphin返回报文"+entString);
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()) {
                 String codeString = DolphinAppConnUtils.getValueFromEntity(entString, "code");

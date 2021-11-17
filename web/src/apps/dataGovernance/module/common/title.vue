@@ -7,14 +7,14 @@
 
 <script>
 export default {
-  name: 'title',
+  name: "title",
   props: {
     title: {
       type: String,
-      default: ''
+      default: ""
     }
   }
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -22,20 +22,20 @@ export default {
   margin-bottom: 24px;
 }
 .title-line {
-    display: inline-block;
-    width: 4px;
-    height: 16px;
-    background-color: #2E92F7;
-    margin-right: 8px;
-    vertical-align: middle;
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background-color: #2e92f7;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 .title-name {
-    display: inline-block;
-    font-size: 16px;
-    line-height: 22px;
-    color: #606266;
-    font-family: PingFangSC-Medium;
-    font-weight: bold;
-    vertical-align: middle;
+  display: inline-block;
+  font-size: 16px;
+  line-height: 22px;
+  color: rgba($color: #000000, $alpha: 0.85);
+  font-family: PingFangSC-Medium;
+  font-weight: bold;
+  vertical-align: middle;
 }
 </style>

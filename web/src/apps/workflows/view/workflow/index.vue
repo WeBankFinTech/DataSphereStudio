@@ -158,7 +158,7 @@ export default {
   },
   computed: {
     srcUrl() {
-      const url = ''
+      let url = ''
       const found = this.selectDevprocess.find((item) => this.modeOfKey === item.dicValue)
       if (found) {
         const {projectName, projectId} = this.$route.query

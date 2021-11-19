@@ -31,13 +31,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "@/common/style/variables.scss";
 .i-card-wrap {
   flex: 1;
   box-sizing: border-box;
   height: 113px;
   display: flex;
-  background: #ffffff;
-  border: 1px solid #dee4ec;
+  @include bg-color(#fff, $dark-base-color);
+  border: 1px solid;
+  @include border-color(#dee4ec, $dark-border-color-base);
   border-radius: 4px;
   margin-right: 24px;
   &-l {
@@ -53,19 +55,19 @@ export default {
     &-title {
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: #606266;
+      @include font-color(#606266, $dark-text-color);
       margin-bottom: 8px;
     }
     &-content {
       font-family: PingFangSC-Medium;
       font-size: 24px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       line-height: 33px;
     }
     &-unit {
       font-family: PingFangSC-Medium;
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.45);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       line-height: 33px;
       margin-left: 8px;
     }

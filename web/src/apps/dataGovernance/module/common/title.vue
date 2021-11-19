@@ -18,6 +18,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "@/common/style/variables.scss";
 .title-wrap {
   margin-bottom: 24px;
 }
@@ -25,7 +26,7 @@ export default {
   display: inline-block;
   width: 4px;
   height: 16px;
-  background-color: #2e92f7;
+  @include bg-color(#2e92f7, $dark-base-color);
   margin-right: 8px;
   vertical-align: middle;
 }
@@ -33,7 +34,7 @@ export default {
   display: inline-block;
   font-size: 16px;
   line-height: 22px;
-  color: rgba($color: #000000, $alpha: 0.85);
+  @include font-color(rgba($color: #000000, $alpha: 0.85), $dark-text-color);
   font-family: PingFangSC-Medium;
   font-weight: bold;
   vertical-align: middle;

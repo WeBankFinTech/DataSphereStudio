@@ -92,6 +92,7 @@ export default {
   padding-left: 24px;
   padding-right: 24px;
   border: 1px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   border-top: none;
   border-left: none;
   display: flex;
@@ -99,16 +100,17 @@ export default {
   justify-content: center;
   cursor: pointer;
   &:hover {
-    background: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-base-color);
     box-shadow: 0 2px 12px 0 $shadow-color;
   }
   .tab-card-t {
     display: flex;
     &-l {
-      color: #3495f7;
+      @include font-color(#3495f7, $dark-text-color);
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;
+        @include border-color(#dee4ec, $dark-border-color-base);
         width: 0;
         right: -15px;
         top: 12px;
@@ -119,7 +121,7 @@ export default {
     &-r {
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       text-align: left;
       line-height: 22px;
     }
@@ -127,14 +129,14 @@ export default {
   .tab-card-b {
     font-size: 14px;
     font-family: PingFangSC-Regular;
-    color: rgba(0, 0, 0, 0.85);
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
     overflow: hidden;
     span {
       margin-right: 80px;
-      color: rgba(0, 0, 0, 0.65);
+      @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
       display: inline-block;
     }
   }

@@ -12,7 +12,7 @@
       :value="searchValue"
       prefix="ios-search"
       placeholder="请输入API名称搜索"
-      style="width: 230px;border:0;margin-top: 10px;margin-bottom: 10px;"
+      style="width: 220px;border:0;margin-top: 10px;margin-bottom: 10px;"
       @on-change="handleSearch"
     /></div>
     <Tree
@@ -38,11 +38,15 @@ export default {
   components: {
     Tree
   },
+  props: {
+    currentTreeId: {
+      type: Number
+    }
+  },
   data() {
     return {
       loadingTree: false,
       projectsTree: [],
-      currentTreeId: +this.$route.query.projectID, // tree中active节点
       searchValue: "",
       originDatas: []
     };
@@ -122,7 +126,7 @@ export default {
                 }
               }
               return {
-                id: n.groupId,
+                id: 'group' + n.groupId, // 防止group和api的id一样导致同时active的问题
                 name: n.groupName,
                 type: "project",
                 canWrite: () => true,

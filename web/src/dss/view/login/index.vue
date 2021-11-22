@@ -97,7 +97,7 @@ export default {
       this.loginForm.user = userNameAndPass.split('&')[0];
       this.loginForm.password = userNameAndPass.split('&')[1];
     }
-    this.getPublicKey();
+    this.getPublicKey()
   },
   mounted() {
     // 如果有登录状态，且用户手动跳转到login页，则判断登录态是否过期
@@ -191,6 +191,11 @@ export default {
                 storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
               }
               if (rst) {
+                // 跳转去旧版
+                if (rst.redirectLinkisUrl) {
+                  location.href = rst.redirectLinkisUrl;
+                  return
+                }
                 // 如果没有代理用户者先存登陆信息，后面的header会重新覆盖
                 GetBaseInfo(false).then((res) => {
                   storage.set('baseInfo', res, 'local');

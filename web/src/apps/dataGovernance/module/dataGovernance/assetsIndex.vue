@@ -200,7 +200,7 @@ export default {
           display: inline-block;
           height: 40px;
           line-height: 40px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
           cursor: pointer;
           min-width: 100px;
           max-width: 200px;

@@ -347,7 +347,7 @@ export default {
       });
     },
     supportIcon(node) {
-      const supportModes = this.SUPPORTED_LANG_MODES;
+      const supportModes = this.SUPPORTED_LANG_MODES || [];
       const match = supportModes.find((item) => item.rule.test(this.node.label));
       if (node.isLeaf && match) {
         return {

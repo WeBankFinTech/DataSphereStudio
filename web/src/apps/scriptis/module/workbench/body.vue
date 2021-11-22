@@ -17,6 +17,10 @@
     <createTableView
       :work="work"
       v-if="work.type=='createTable'"/>
+    <dbDetails
+      v-if="work.type == 'dbDetails'"
+      :work="work">
+    </dbDetails>
 
   </div>
 </template>
@@ -25,12 +29,15 @@ import scriptView from './script/script.vue';
 import backgroundScriptView from './script/backgroundScript.vue';
 import detailView from './tableDetails/index.vue';
 import createTableView from './createTable/index.vue';
+import dbDetails from './dbDetails/index.vue';
 export default {
+  name: 'workbench',
   components: {
     scriptView,
     backgroundScriptView,
     detailView,
-    createTableView
+    createTableView,
+    dbDetails
   },
   props: {
     work: Object,

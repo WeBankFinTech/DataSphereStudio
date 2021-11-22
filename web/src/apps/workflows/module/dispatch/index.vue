@@ -1595,7 +1595,6 @@ export default {
 .scheduler-wrapper{
   @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
   min-height: 80vh;
-  // padding-top: 16px;
   float: left;
   width: 100%;
 
@@ -1607,6 +1606,8 @@ export default {
     min-height: calc(80vh - 16px);
     border-right: 1px solid #DEE4EC;
     border-left: 1px solid #DEE4EC;
+    padding-bottom: 3000px;
+    margin-bottom: -3000px;
     @include border-color($border-color-base, $dark-workspace-background);
     @include bg-color($light-base-color, $dark-base-color);
     @include font-color($light-text-color, $dark-text-color);

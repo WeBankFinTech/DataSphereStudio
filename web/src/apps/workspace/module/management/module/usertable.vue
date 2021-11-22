@@ -144,6 +144,7 @@ export default {
       loading: true,
       row: '',
       loading1: false,
+      usernamelist: [],
       options: [],
       pageSetting: {
         total: 0,
@@ -163,8 +164,11 @@ export default {
       },
       addrule: {
         id: [
-          { required: true, type: 'number', message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: 'change' },
+          { required: true, type: 'number', message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: 'change' }
         ],
+        //name: [
+        //  { required: true, message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: "blur" },
+        //],
         role: [
           { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' },
         ]
@@ -299,6 +303,14 @@ export default {
 
       });
     },
+    /*username(){
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`,{
+      },'get').then((rst)=>{
+        rst.users.forEach(item=>{
+          this.usernamelist.push(item.username)
+        })
+      })
+    },*/
     getColumns(){
       const column = [
         { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
@@ -381,6 +393,7 @@ export default {
     creater() {
       this.useradd = {
         id: "",
+        name: "",
         role: []
       }
       this.creatershow = true;

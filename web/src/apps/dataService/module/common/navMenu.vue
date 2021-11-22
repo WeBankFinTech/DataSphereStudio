@@ -18,6 +18,7 @@
     </div>
     <div class="ds-nav-panel ds-nav-panel-develop" v-if="currentTab == '/dataService'">
       <TreeMenu
+        :currentTreeId="currentTreeId"
         @showModal="showModal"
         @handleApiChoosed="handleApiChoosed"
         ref="treeMenu"
@@ -42,6 +43,9 @@ export default {
     menuFold: {
       type: Boolean,
       default: false
+    },
+    currentTreeId: {
+      type: Number
     }
   },
   data() {
@@ -49,7 +53,6 @@ export default {
       currentTab: this.$route.path,
       loadingTree: false,
       projectsTree: [],
-      currentTreeId: +this.$route.query.projectID, // tree中active节点,
       searchValue: 123,
       originDatas: []
     };
@@ -108,9 +111,9 @@ export default {
   .ds-nav-menu {
     z-index: 1;
     width: 54px;
-    @include bg-color(#f8f9fc, $dark-base-color);
+    @include bg-color(#f8f9fc, $dark-menu-base-color);
     border-right: 1px solid #dee4ec;
-    @include border-color(#dee4ec, $dark-menu-base-color);
+    @include border-color(#dee4ec, $dark-base-color);
     &-item {
       height: 44px;
       line-height: 44px;
@@ -119,11 +122,11 @@ export default {
       font-size: 26px;
       @include font-color(#333, $dark-text-color);
       &:hover {
-        @include bg-color(#eceff4, $dark-menu-base-color);
+        @include bg-color(#eceff4, $dark-base-color);
       }
     }
     .active {
-      @include bg-color(#eceff4, $dark-menu-base-color);
+      @include bg-color(#eceff4, $dark-base-color);
       border-left: 3px solid #2e92f7;
       @include border-color(#2e92f7, #4B8FF3);
     }
@@ -138,8 +141,8 @@ export default {
     padding: 10px;
     overflow-y: auto;
     border-right: 1px solid #dee4ec;
-    @include border-color(#dee4ec, $dark-menu-base-color);
-    @include bg-color(#f8f9fc, $dark-menu-base-color);
+    @include border-color(#dee4ec, $dark-border-color);
+    @include bg-color(#f8f9fc, $dark-base-color);
   }
   .ds-nav-panel-develop{
     padding-left: 0;

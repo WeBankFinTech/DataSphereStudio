@@ -40,9 +40,9 @@
             z-index: 1;
             width: 54px;
             // background: #F8F9FC;
-            @include bg-color(#F8F9FC, $dark-workspace-background);
+            @include bg-color(#F8F9FC, $dark-menu-base-color);
             border-right: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-workspace-background);
+            @include border-color($border-color-base, $dark-active-menu-item);
             &-item {
                 height: 44px;
                 line-height: 44px;
@@ -75,8 +75,8 @@
             padding: 10px 0;
             overflow-y: auto;
             border-right: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-workspace-background);
-            @include bg-color($light-base-color, $dark-menu-base-color);
+            @include border-color($border-color-base, $dark-menu-base-color);
+            @include bg-color($light-base-color, $dark-workspace-background);
         }
     }
     .workflowListContainer {
@@ -125,7 +125,7 @@
             &.active {
                 height: 32px;
                 padding-bottom: 5px;
-                background: #fff;   
+                background: #fff;
                 transform: translateZ(0);
                 border: 1px solid #dcdee2;
                 border-bottom:1px solid #fff;

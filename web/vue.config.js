@@ -55,44 +55,39 @@ let headers = [];
 
 Object.entries(apps).forEach(item => {
   if (item[1].module) {
-    requireComponent.push(
-      `require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`
-    );
-    requireComponentVue.push(
-      `require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`
-    );
+    requireComponent.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`)
+    requireComponentVue.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`)
   }
   // 获取个模块header
   if (item[1].header) {
-    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`);
+    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`)
   }
   // 处理路由
   if (item[1].routes) {
-    appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`);
+    appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`)
   }
   // 处理国际化
   if (item[1].i18n) {
     appsI18n.push(`{
       'zh-CN': require('@/${item[1].i18n["zh-CN"]}'),
-      'en': require('@/${item[1].i18n["en"]}')
-    }`);
+      'en': require('@/${item[1].i18n['en']}')
+    }`)
   }
-});
+})
 
-let buildDynamicModules = Object.values(apps);
-buildDynamicModules = JSON.stringify(buildDynamicModules);
+let buildDynamicModules = Object.values(apps)
+buildDynamicModules = JSON.stringify(buildDynamicModules)
 
 const virtualModules = new VirtualModulesPlugin({
-  "node_modules/dynamic-modules.js": `module.exports = {
+  'node_modules/dynamic-modules.js': `module.exports = {
     apps: ${buildDynamicModules},
     modules: ${JSON.stringify(modules)},
-    appsRoutes: {${appsRoutes.join(",")}},
-    appsI18n: [${appsI18n.join(",")}],
-    requireComponent: [${requireComponent.join(",")}],
-    requireComponentVue: [${requireComponentVue.join(",")}],
-    microModule: ${JSON.stringify(process.env.npm_config_micro_module) ||
-      false},
-    headers:{${headers.join(",")}}
+    appsRoutes: {${appsRoutes.join(',')}},
+    appsI18n: [${appsI18n.join(',')}],
+    requireComponent: [${requireComponent.join(',')}],
+    requireComponentVue: [${requireComponentVue.join(',')}],
+    microModule: ${JSON.stringify(process.env.npm_config_micro_module) || false},
+    headers:{${headers.join(',')}}
   };`
 });
 
@@ -261,10 +256,10 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        //target: "http://127.0.0.1:8088",
+        target: "http://127.0.0.1:8088",
         //target: 'http://127.0.0.1:9202', //yichao
         // target: "http://127.0.0.1:9202", //jiawei
-        target: "http://luban.ctyun.cn:8088",
+        //target: "http://luban.ctyun.cn:8088",
         //target: 'http://devluban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {
@@ -273,6 +268,7 @@ module.exports = {
       },
       "/dolphinscheduler": {
         target: "http://127.0.0.1:12345",
+        target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"
@@ -285,3 +281,4 @@ module.exports = {
     }
   }
 };
+

@@ -13,10 +13,10 @@
 
         <vue-luban-menu
           v-if="isNavShowMenu"
-          :apps="menuList" 
-          :favorites="favorites" 
+          :apps="menuList"
+          :favorites="favorites"
           @menu-click="handleMenuClick"
-          @favorite-remove="removeFavorite" 
+          @favorite-remove="removeFavorite"
           @favorite-add="addFavorite"
           ref="vueLubanMenu">
           <div class="luban-menu-trigger">
@@ -28,16 +28,17 @@
           <img
             @click.stop="goHome"
             class="logo-img"
-            :style="{ cursor: 'pointer'}"
-            src="../../assets/images/dssLogo-smart.png"
+            :style="{ cursor: isAdmin ? 'pointer' : 'default' }"
+            src="../../assets/images/dssLogo5_1.png"
             :alt="$t('message.common.logoName')"
-          >
+          />
+
           <span class="version">{{sysVersion}}</span>
         </div>
       </div>
       <!-- <span v-if="showWorkspaceNav && !currentProject.id" class="workspace-icon" :title="$t('message.common.project')">
         <SvgIcon style="font-size: 2rem;" class="icon selected workspace-svg" icon-class="project" color="#ffffff"/>
-      </span> -->
+      </span>-->
       <Dropdown class="project-dro" v-if="showWorkspaceNav && !currentProject.id">
         <div class="project">
           {{ currentWorkspace.name }}
@@ -89,12 +90,24 @@
           <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
           <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
         </div>
-        <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>
+        <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
       </div>
       <ul class="menu">
-        <li v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.common.home")}}</li>
-        <li class="menu-item" v-if="isAdmin && homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
-        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
+        <li
+          v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId"
+          class="menu-item"
+          @click="goSpaceHome"
+        >{{$t("message.common.home")}}</li>
+        <li
+          class="menu-item"
+          v-if="homeRoles && $route.query.workspaceId"
+          @click="goRolesPath"
+        >{{ homeRoles.name }}</li>
+        <li
+          class="menu-item"
+          v-if="$route.query.workspaceId"
+          @click="goConsole"
+        >{{$t("message.common.management")}}</li>
       </ul>
       <div class="icon-group">
         <Icon
@@ -124,7 +137,7 @@ import navMenu from "./navMenu/index.vue";
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
 import eventbus from '@/common/helper/eventbus';
-import { 
+import {
   GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo,
   GetFavorites, AddFavorite, RemoveFavorite
 } from '@/common/service/apiCommonMethod.js';
@@ -193,9 +206,9 @@ export default {
       return moudleName;
     },
     showWorkspaceNav() {
-      return (this.$route.path.indexOf("/workspaceHome") !== -1) 
-        || (this.$route.path.indexOf("/dataService") !== -1) 
-        || (this.$route.path.indexOf("/dataManagement") !== -1) 
+      return (this.$route.path.indexOf("/workspaceHome") !== -1)
+        || (this.$route.path.indexOf("/dataService") !== -1)
+        || (this.$route.path.indexOf("/dataManagement") !== -1)
         || this.$route.path === '/project' || this.$route.path === '/workspace'
     }
   },
@@ -307,7 +320,7 @@ export default {
     },
     init() {
       GetBaseInfo().then(rst => {
-        
+
         if (!isEmpty(rst)) {
           this.userName = rst.username;
           // 根据权限来判断是否开启logo跳转(管理员才会开启)
@@ -404,7 +417,7 @@ export default {
             ...this.$route.query,
             workspaceId: workspace.id
           }
-        });
+        })
       }
     },
     changeProj(proj, p) {
@@ -412,15 +425,16 @@ export default {
         p.id == this.currentProject.id &&
         proj.id == this.$route.query.projectTaxonomyID
       )
-        return;
+        return
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
-      if (["/process"].includes(this.$route.path)) {
-        this.$router.replace({ path: "/project" });
+      if (['/process'].includes(this.$route.path)) {
+        this.$router.replace({ path: '/project' })
       } else {
         this.$router.replace({
           path: this.$route.path,
           query: {
             workspaceId: this.$route.query.workspaceId,
+            ...this.$route.query,
             projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,
@@ -459,7 +473,7 @@ export default {
     },
     goConsole(){
       const url =
-        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console'
       this.$router.push({
         name: 'commonIframe',
         query: {

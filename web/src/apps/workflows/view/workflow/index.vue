@@ -1,6 +1,5 @@
 <template>
   <div class="workflow-wrap">
-
     <div class="workflow-nav-tree" :class="{'tree-fold': treeFold }" >
       <div class="project-nav-menu">
         <div class="project-nav-menu-item active" @click="handleTreeToggle">
@@ -68,8 +67,14 @@
           </Workflow>
         </div>
         <template v-for="(item, index) in tabList.filter((i) => i.type === DEVPROCESS.DEVELOPMENTCENTER)">
+          <commonIframe
+            v-if="item.url && item.isIframe"
+            v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
+            :key="item.name"
+            :url="current.url"
+          ></commonIframe>
           <process
-            v-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
+            v-else-if="item.orchestratorMode === ORCHESTRATORMODES.WORKFLOW"
             :key="item.tabId"
             v-show="(item.version ? (currentVal.name===item.name && currentVal.version === item.version) : currentVal.name===item.name) && !textColor"
             :query="item.query"
@@ -87,7 +92,8 @@
         <DS :activeTab="4" class="scheduler-center"></DS>
       </template>
       <template v-else>
-      <!-- 其他应用流程 -->
+        <!-- 其他应用流程 -->
+        <!--<iframe id="iframe" :src="srcUrl" frameborder="0"  width="100%" height="100%"></iframe>-->
       </template>
     </WorkflowTabList>
     <ProjectForm
@@ -101,6 +107,7 @@
       @getDevProcessData="getDevProcessData"
       @show="ProjectShowAction"
       @confirm="ProjectConfirm"></ProjectForm>
+<<<<<<< HEAD
   </div>
 </template>
 <script>
@@ -189,6 +196,7 @@ export default {
       this.getProjectData();
       this.tryOpenWorkFlow();
       this.updateBread();
+      //if (this.topTabList[1]) this.topTabList[1].name = this.$route.query.projectName;
     },
     selectOrchestratorList(val) {
       if (val.length > 0) {
@@ -219,7 +227,18 @@ export default {
     },
     isScheduler() {
       return this.$route.name === 'Scheduler'
-    }
+    },
+    /*srcUrl() {
+      let url = ''
+      const found = this.selectDevprocess.find((item) => this.modeOfKey === item.dicValue)
+      if (found) {
+        const {projectName, projectId} = this.$route.query
+        const workspaceId = this.getCurrentWorkspaceId()
+        const workspaceName = this.getCurrentWorkspaceName()
+        url = util.replaceHolder(found.url, {workspaceId, workspaceName, projectId, projectName})
+      }
+      return url
+    }*/
   },
   methods: {
     handleTreeToggle() {
@@ -253,7 +272,6 @@ export default {
     },
     // 获取工程的数据
     getProjectData() {
-
       api.fetch(`${this.$API_PATH.PROJECT_PATH}getAllProjects`, {
         workspaceId: +this.$route.query.workspaceId,
         id: +this.$route.query.projectID
@@ -585,6 +603,8 @@ export default {
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
         type: DEVPROCESS.DEVELOPMENTCENTER,
+        //isIframe: openOrchestrator.isIframe,
+        //url: openOrchestrator.OrchestratorOpenUrl + `?${qs.stringify(params)}`
       };
       this.tabList.push(this.current);
       this.lastVal = this.currentVal;

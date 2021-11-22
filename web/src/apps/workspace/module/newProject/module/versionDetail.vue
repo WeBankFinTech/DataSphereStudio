@@ -177,7 +177,7 @@ export default {
     // 获取工程版本列表
     getVersionList() {
       api.fetch('/dss/listAllProjectVersions', { id: this.currentProjectData.id }, 'get').then((res) => {
-        this.versionData = res.versions;
+        this.versionData = res.versions || [];
         this.versionPage.totalSize = res.versions.length;
       });
     },

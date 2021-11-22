@@ -6,7 +6,7 @@
     @mouseout="mouseout"
   >
     <span :title="component.title_cn" class="tabs-title-text">{{
-      component.title_en
+      component.title_cn
     }}</span>
     <span class="tabs-title-button">
       <Icon

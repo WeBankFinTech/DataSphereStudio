@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 package com.webank.wedatasphere.dss.apiservice.core.service.impl;
@@ -24,11 +22,9 @@ import com.webank.wedatasphere.dss.apiservice.core.constant.ApiCommonConstant;
 import com.webank.wedatasphere.dss.apiservice.core.constant.SQLMetadataInfoCheckStatus;
 import com.webank.wedatasphere.dss.apiservice.core.constant.SaveTokenEnum;
 import com.webank.wedatasphere.dss.apiservice.core.dao.*;
-import com.webank.wedatasphere.dss.apiservice.core.datamap.DataMapStatus;
-import com.webank.wedatasphere.dss.apiservice.core.datamap.UUIDGenerator;
+import com.webank.wedatasphere.dss.apiservice.core.util.UUIDGenerator;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceQueryException;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceTokenException;
-import com.webank.wedatasphere.dss.apiservice.core.execute.ExecuteCodeHelper;
 import com.webank.wedatasphere.dss.apiservice.core.execute.LinkisJobSubmit;
 import com.webank.wedatasphere.dss.apiservice.core.token.JwtManager;
 import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
@@ -50,6 +46,7 @@ import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.ibatis.annotations.Param;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +59,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * service impl
- *
- * @author zhulixin
- */
+
 @Service
 public class ApiServiceImpl implements ApiService {
 
@@ -88,8 +81,7 @@ public class ApiServiceImpl implements ApiService {
     @Autowired
     TokenAuth tokenAuth;
 
-    @Autowired
-    ApiServiceApprovalDao apiServiceApprovalDao;
+
 
 
     /**
@@ -138,15 +130,15 @@ public class ApiServiceImpl implements ApiService {
             //1为正常 0为禁用
             apiVersionVo.setStatus(1);
 
+            String approvalNo = UUIDGenerator.genUUID();
+            apiVersionVo.setAuthId(approvalNo);
 
-            //生成审批记录，必须使用发布用户执行sql
-            sendApprovalToDM(user,apiService,apiVersionVo);
             //顺序不能改变，版本信息依赖审批单信息
             //todo update by query
             apiVersionVo.setMetadataInfo("default");
             apiServiceVersionDao.insert(apiVersionVo);
 
-            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
+
 
             // insert linkis_oneservice_params
             List<ParamVo> params = apiService.getParams();
@@ -208,7 +200,7 @@ public class ApiServiceImpl implements ApiService {
             //顺序不能改变，版本信息依赖审批单信息
             apiServiceVersionDao.insert(apiVersionVo);
 
-            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
+//            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
 
             // insert linkis_oneservice_params
             List<ParamVo> params = apiService.getParams();
@@ -252,7 +244,7 @@ public class ApiServiceImpl implements ApiService {
                     apiService.setCreator(maxTargetApiVersionVo.getCreator());
                     apiService.setId(maxTargetApiVersionVo.getApiId());
                     apiServiceDao.updateToTarget(apiService);
-                    LOG.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
+                    Log.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
 
 
                     String version = updateResult.get("version");
@@ -271,8 +263,9 @@ public class ApiServiceImpl implements ApiService {
                     apiServiceVersionVo.setSource(apiService.getScriptPath());
                     //0默认已禁用 1为正常
                     apiServiceVersionVo.setStatus(1);
-                    //生成审批记录
-                    sendApprovalToDM(apiService.getModifier(), apiService, apiServiceVersionVo);
+                    String approvalNo = UUIDGenerator.genUUID();
+                    apiServiceVersionVo.setAuthId(approvalNo);
+
                     //todo update by query
                     apiServiceVersionVo.setMetadataInfo("null");
                     //顺序不能改变，版本信息依赖审批单信息
@@ -292,7 +285,7 @@ public class ApiServiceImpl implements ApiService {
                         }
                     }
 
-                    addApprovalToDB(apiService, apiServiceVersionVo.getId(), apiServiceVersionVo.getAuthId());
+//                    addApprovalToDB(apiService, apiServiceVersionVo.getId(), apiServiceVersionVo.getAuthId());
 
                     //insert a token record for self
                     genTokenForPublisher(apiService, apiServiceVersionVo.getId());
@@ -355,11 +348,6 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public List<ApiServiceVo> queryByWorkspaceId(Integer workspaceId, String userName){
         List<ApiServiceVo> result = apiServiceDao.queryByWorkspaceId(workspaceId,userName);
-        result.stream().forEach(apiServiceVo -> {
-            ApiVersionVo apiVersionVo = getMaxVersion(apiServiceVo.getId());
-            ApprovalVo approvalVo =apiServiceApprovalDao.queryByVersionId(apiVersionVo.getId());
-            apiServiceVo.setApprovalVo(approvalVo);
-        });
         return result;
     }
 
@@ -375,7 +363,6 @@ public class ApiServiceImpl implements ApiService {
                 apiServiceVo.setParams(apiServiceParamDao.queryByVersionId(maxApiVersionVo.getId()));
                 apiServiceVo.setUserToken(userTokenManagerVos.get(0).getToken());
                 apiServiceVo.setLatestVersionId(maxApiVersionVo.getId());
-                apiServiceVo.setApprovalVo(apiServiceApprovalDao.queryByVersionId(maxApiVersionVo.getId()));
             }
         }else {
             return null;
@@ -564,37 +551,14 @@ public class ApiServiceImpl implements ApiService {
 
 
     public SQLMetadataInfoCheckStatus sendApprovalToDM(String user, ApiServiceVo apiService, ApiVersionVo apiVersionVo) throws Exception {
-        //             需要把发布者的SQL脚本内容，解析出对应的metadata库表信息
 
-//        ApprovalVo approvalVo = apiService.getApprovalVo();
         String approvalNo = UUIDGenerator.genUUID();
         apiVersionVo.setAuthId(approvalNo);
         return SQLMetadataInfoCheckStatus.LEGAL;
     }
 
 
-    public  void addApprovalToDB(ApiServiceVo apiService,Long  apiVersionId,String approvalNumber){
 
-        ApprovalVo approvalVo = apiService.getApprovalVo();
-        // 需要插入审批单记录
-        approvalVo.setApiId(apiService.getId());
-        approvalVo.setApiVersionId(apiVersionId);
-        approvalVo.setApprovalNo(approvalNumber);
-
-        approvalVo.setCreator(apiService.getCreator());
-
-        approvalVo.setStatus(DataMapStatus.INITED.getIndex());
-        approvalVo.setCreateTime(new Date());
-        approvalVo.setUpdateTime(new Date());
-        if(StringUtils.isEmpty(approvalVo.getApprovalName())){
-            approvalVo.setApprovalName("default");
-        }
-        if(StringUtils.isEmpty(approvalVo.getExecuteUser())) {
-            approvalVo.setExecuteUser(approvalVo.getCreator());
-        }
-        apiServiceApprovalDao.insert(approvalVo);
-
-    }
 
     public void  genTokenForPublisher(ApiServiceVo apiService,Long apiVersionId) throws ApiServiceTokenException {
 
@@ -633,7 +597,7 @@ public class ApiServiceImpl implements ApiService {
             apiServiceToken.setApiServiceId(tokenManagerVo.getApiId());
 
             tokenManagerVo.setToken(JwtManager.createToken(userName,apiServiceToken,tokenManagerVo.getDuration()));
-            //审批单号使用默认的，自己给自己授权
+
             tokenManagerVo.setApplySource(ApiCommonConstant.DEFAULT_APPROVAL_NO);
             tokenManagerVoList.add(tokenManagerVo);
         });

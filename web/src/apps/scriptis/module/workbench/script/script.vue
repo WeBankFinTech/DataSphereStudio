@@ -105,6 +105,7 @@ export default {
     log,
     history,
     weProgress,
+    // diagnosis,
   },
   props: {
     work: {
@@ -137,7 +138,7 @@ export default {
       },
       visualParams: {},
       scriptViewState: {
-        topPanelHeight: '250px',
+        topPanelHeight: this.node ? 300 : 450,
         bottomContentHeight: '250',
         topPanelFull: false,
         showPanel,
@@ -174,11 +175,13 @@ export default {
         progress: this.work.type !== 'historyScript',
         result: this.scriptResult.total || (this.script.resultList && this.script.resultList.length),
         log: this.isLogShow || this.work.type === 'historyScript',
+        diagnosis: this.work.type !== 'historyScript' && this.script.diagnosis,
         history: this.work.type !== 'historyScript',
         show_progress: showPanel === 'progress',
         show_result: showPanel === 'result',
         show_log: showPanel === 'log',
         show_history: showPanel === 'history',
+        show_diagnosis: showPanel === 'diagnosis',
         show_visual: showPanel === 'visual'
       }
     }
@@ -213,6 +216,11 @@ export default {
       // 加入用户名来区分不同账户下的tab
       this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
     },
+    current(){
+      if (this.node) {
+        this.resizePanel()
+      }
+    }
   },
   async created() {
     this.userName = this.getUserName();
@@ -341,6 +349,7 @@ export default {
     elementResizeEvent.bind(this.$el, this.resize);
     this.$nextTick(() => {
       this.dispatch('WebSocket:init');
+      this.resizePanel();
     });
     window.onbeforeunload = () => {
       if (this.work.unsave || this.script.running) {
@@ -414,22 +423,23 @@ export default {
         })
       }
     },
-    resize(evt, h) {
-      h =  (!h || h < 1) ?  (this.$el ? this.$el.clientHeight * 0.618 : 350) : h
-      let bh = this.$el ? this.$el.clientHeight - h - 75 : 0 // 底部内容区高度
-      if (h > this.$el.clientHeight) {
-        h = this.$el.clientHeight - 32 // 保持 tab 栏可见
-        bh = 100 // 应该不可见^_^
-      }
-      this.scriptViewState = {
-        ...this.scriptViewState,
-        topPanelHeight: h + 'px',
-        bottomContentHeight: bh
-      }
-    },
     handleMouseUp() {
       if (this.isMouseDown) {
         this.isMouseDown = false;
+      }
+    },
+    // panel 分割线拖动调整大小
+    resizePanel() {
+      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
+        this.scriptViewState.topPanelHeight = this.$refs.topPanel.$el.clientHeight
+        this.scriptViewState.bottomContentHeight = this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight;
+      }
+    },
+    // 浏览器窗口缩放
+    resize() {
+      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
+        this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
+        this.scriptViewState.bottomContentHeight = this.$el.clientHeight * 0.4;
       }
     },
     'Workbench:save'(work) {
@@ -488,7 +498,14 @@ export default {
         })
       }
     },
-
+    'Workbench:removeTab'() {
+      // fix ***REMOVED***
+      if (this.node) {
+        setTimeout(()=>{
+          this.resizePanel()
+        })
+      }
+    },
     getCacheWork(work) {
       let {
         filepath,
@@ -532,13 +549,14 @@ export default {
         },
       };
       if (isStorage) {
-        initData.method = '/api/rest_j/v1/entrance/backgroundservice';
+        initData.method = 'dss/datapipe/backgroundservice';
         initData.data.background = option.backgroundType;
       }
 
       return initData;
     },
     run(option, cb) {
+      this.handleLines = {}
       if (option && option.id === this.script.id) {
         if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
         if (this.scriptViewState.topPanelFull) {
@@ -632,8 +650,8 @@ export default {
         });
 
         this.execute.on('history', (ret) => {
-          const index = findIndex(this.script.history, (o) => o.taskID === ret.taskID);
-          const findHis = find(this.script.history, (o) => o.taskID === ret.taskID);
+          const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
+          const findHis = find(this.script.history, (o) => o.taskID == ret.taskID);
           let newItem = null;
           // 这里针对的是导入导出脚本，executionCode为object的情况
           const code = typeof (this.script.executionCode) === 'string' && this.script.executionCode ? this.script
@@ -751,7 +769,7 @@ export default {
               }
             });
           } else {
-            progressInfo = [];
+            this.script.progress.progressInfo = [];
           }
 
           if (progress == 1) {
@@ -819,6 +837,12 @@ export default {
             });
           }
         });
+        this.execute.on('diagnosis', (info) => {
+          this.script.diagnosis = info;
+          // 加入用户名来区分不同账户下的tab
+          this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
+          this.showPanelTab('diagnosis');
+        });
         this.execute.on('WebSocket:send', (data) => {
           this.dispatch('WebSocket:send', data);
         });
@@ -847,7 +871,10 @@ export default {
           task
         }) => {
           const costTime = util.convertTimestamp(task.costTime);
-          this.script.progress.costTime = costTime;
+          this.script.progress = {
+            ...this.script.progress,
+            costTime
+          };
           const name = this.work.filepath || this.work.filename;
           this.$Notice.close(name);
           this.$Notice.success({
@@ -961,6 +988,7 @@ export default {
       };
       this.script.logLine = 1;
       this.script.steps = ['Submitted'];
+      this.script.diagnosis = null;
       this.script.resultList = null;
       this._execute_last_progress = null;
     },
@@ -1074,6 +1102,7 @@ export default {
           params: this.convertSettingParams(this.script.params),
         };
           // this.work.code = this.script.data;
+
         const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
@@ -1394,6 +1423,11 @@ export default {
       if (type === 'log') {
         this.isLogShow = true;
         this.showPanelTab(type);
+      } else if (type === 'diagnosis') {
+        this.getDiagnosis().then((res) => {
+          this.script.diagnosis = res.diagnosticInfo;
+          this.showPanelTab(type);
+        });
       }
     },
     nodeConvertSettingParams(params) {
@@ -1411,6 +1445,9 @@ export default {
         variable,
         configuration,
       };
+    },
+    getDiagnosis() {
+      return api.fetch(`/entrance/${this.execute.id}/runtimeTuning`, 'get');
     },
     convertSettingParams(params) {
       const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
@@ -1448,6 +1485,7 @@ export default {
     }
     &.full-screen {
         top: 85px;
+        cursor: ns-resize;
         right: 0;
         bottom: 0;
         left: 0;

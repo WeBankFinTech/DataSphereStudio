@@ -50,7 +50,7 @@ export default {
           id: 'changeTheme',
           name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
           icon: 'md-repeat',
-        }, 
+        },
         {
           id: 'logout',
           name: this.$t('message.common.logOut'),
@@ -156,6 +156,5 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-
 @import '@/common/style/headerUserMenu.scss';
 </style>

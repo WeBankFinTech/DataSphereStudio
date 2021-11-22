@@ -43,3 +43,4 @@ export default [
       import('./view/process/index.vue'),
   }
 ]
+

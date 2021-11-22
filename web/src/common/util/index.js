@@ -37,7 +37,7 @@ let util = {
    */
   replaceHolder(url, obj = {}) {
     obj = {
-      dssurl: location.origin,
+      dssurl: location.origin + location.pathname, // dssurl应加上pathname
       cookies: document.cookie,
       ...obj
     }

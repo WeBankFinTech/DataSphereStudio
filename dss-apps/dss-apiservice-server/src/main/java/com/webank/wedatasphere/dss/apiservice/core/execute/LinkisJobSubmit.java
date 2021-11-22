@@ -1,24 +1,23 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.apiservice.core.execute;
 
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
+import com.webank.wedatasphere.linkis.common.conf.Configuration;
 import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
 import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
@@ -31,11 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/12 03:33 PM
- */
+
 public class LinkisJobSubmit {
 
 
@@ -43,7 +38,7 @@ public class LinkisJobSubmit {
     public  static UJESClient getClient(Map<String, String> props) {
 
         UJESClient   client = getUJESClient(
-                ApiServiceConfiguration.LINKIS_URL.getValue(props),
+                Configuration.GATEWAY_URL().getValue(props),
                 ApiServiceConfiguration.LINKIS_ADMIN_USER.getValue(props),
                 ApiServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
                 props);

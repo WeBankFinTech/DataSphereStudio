@@ -262,6 +262,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .field-info-wrap {
   padding-left: 24px;
   padding-right: 24px;
@@ -282,7 +283,7 @@ export default {
     &-header {
       font-family: PingFangSC-Medium;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       line-height: 22px;
       font-weight: bold;
       margin-bottom: 15px;
@@ -292,11 +293,12 @@ export default {
 .field-info-rich-text {
   margin: 8px 24px;
   padding: 5px 12px;
-  background: #ffffff;
+  @include bg-color(#fff, $dark-base-color);
   border: 1px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   border-radius: 4px;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+  @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   line-height: 22px;
   overflow-y: auto;
   max-height: 200px;

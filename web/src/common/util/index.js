@@ -37,7 +37,7 @@ let util = {
    */
   replaceHolder(url, obj = {}) {
     obj = {
-      dssurl: location.origin + location.pathname, // dssurl应加上pathname
+      dssurl: location.origin,
       cookies: document.cookie,
       ...obj
     }
@@ -57,6 +57,8 @@ let util = {
           return obj[b]
         })
       }
+      // 额外传递dsspath，即pathname
+      result['dsspath'] = location.pathname;
     }
     const distUrl = dist.length > 1 ? `${dist[0]}?${qs.stringify(result)}` : dist[0]
     return distUrl

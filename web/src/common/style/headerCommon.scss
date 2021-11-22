@@ -7,8 +7,7 @@
   height: 54px;
   line-height: 54px;
   padding: 0 20px;
-  // @include bg-color($background-color-header, $dark-background-color-header);
-  background-color: #0B313C;
+  @include bg-color($background-color-header, $dark-background-color-header);
   color: $dark-color;
   // box-shadow: $shadow-down;
   z-index: $zindex-affix;

@@ -37,7 +37,7 @@ import api from '@/common/service/api'
 import { pie } from './chartConfig'
 import Chart from '../../components/ana-charts'
 import mNoData from '../../components/noData/noData'
-import { tasksStateList } from '../../config'
+import { dashboardStateList } from '../../config'
 import echarts from 'echarts'
 import util from "@/common/util"
 export default {
@@ -56,20 +56,28 @@ export default {
   methods: {
     _goProcess (name) {
       this.$emit('goToList', 2, {
-        stateType: _.find(tasksStateList, ['desc', name]).code,
+        stateType: _.find(dashboardStateList, ['desc', name]).code,
         startDate: this.searchParams.startDate,
         endDate: this.searchParams.endDate
       })
     },
     _handleProcessState (res) {
       let data = res.taskCountDtos
-      this.processStateList = _.map(data, v => {
-        return {
-          key: _.find(tasksStateList, ['code', v.taskStateType]).desc,
-          value: v.count
+      this.processStateList = []
+      _.map(data, v => {
+        if (_.find(dashboardStateList, ['code', v.taskStateType])) {
+          this.processStateList.push({
+            key: _.find(dashboardStateList, ['code', v.taskStateType]).desc,
+            value: v.count,
+            color: _.find(dashboardStateList, ['code', v.taskStateType]).color
+          })
         }
       })
-      const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
+      let totalCount = 0
+      this.processStateList.forEach(item => {
+        totalCount += item.value
+      })
+      const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: `流程状态数量\n${totalCount}`, ring: true })
       myChart.echart.setOption(pie)
       // 首页不允许跳转
       if (this.searchParams.projectId) {

@@ -1,6 +1,13 @@
 <template>
   <div class="tree-item">
-    <div class="tree-content" @click="handleItemToggle">
+    <div
+      class="tree-content"
+      @click="handleItemToggle"
+      :class="{
+        'tree-content-active': currentTreeId == model.id,
+        'tree-content-children': !model.children
+      }"
+    >
       <div class="tree-icon" v-if="model.id < 10">
         <SvgIcon v-if="model.opened" icon-class="open" />
         <SvgIcon v-else icon-class="close" />
@@ -86,7 +93,7 @@ export default {
     },
     handleGroupMaxHeight() {
       if (this.model.opened && this.model.children) {
-        this.maxHeight = this.model.children.length * 32;
+        this.maxHeight = this.model.children.length * 42;
       } else {
         this.maxHeight = 0;
       }
@@ -101,6 +108,7 @@ export default {
   outline: none;
   @include font-color($light-text-color, $dark-text-color);
   .tree-content {
+    height: 34px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -109,6 +117,14 @@ export default {
       // background-color: #EDF1F6;
       @include bg-color(#edf1f6, $dark-active-menu-item);
     }
+  }
+  .tree-content-active {
+    @include bg-color(#e0edff, $dark-base-color);
+    border-right: 3px solid #2e92f7;
+    @include border-color(#2e92f7, $dark-border-color-base);
+  }
+  .tree-content-children {
+    margin-bottom: 8px;
   }
   .leaf {
     color: transparent;
@@ -148,7 +164,7 @@ export default {
   .tree-name {
     display: block;
     flex: 1;
-    line-height: 32px;
+    line-height: 34px;
     padding: 0 6px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -162,7 +178,7 @@ export default {
   }
 
   .tree-icon-active {
-    color: #2e92f7;
+    @include font-color(#2e92f7, $dark-text-color);
   }
   .tree-children {
     transition: max-height 0.3s;

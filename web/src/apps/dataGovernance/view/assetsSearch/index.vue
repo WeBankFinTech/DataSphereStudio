@@ -2,17 +2,29 @@
   <div class="assets-index-wrap">
     <!-- top 搜索框 -->
     <div class="assets-index-t">
+      <img
+        src="../../assets/images/搜索框装饰图.png"
+        alt=""
+        style="position: absolute;"
+      />
       <!-- bottom -->
       <div class="assets-index-t-b1">
         <div class="assets-index-t-b1-search">
           <Input
-            search
-            :enter-button="$t(`message.dataGovernance.search`)"
             :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
-            size="large"
-            @on-search="onSearch"
+            size="small"
+            @on-enter="onSearch"
             v-model="queryForTbls"
-          />
+          >
+            <span slot="prepend">
+              <Icon type="md-search" size="16" color="#2e92f7" />
+              <!-- <SvgIcon
+                icon-class="search"
+                style="fontSize: 16px"
+                :color="'#2e92f7'"
+              ></SvgIcon> -->
+            </span>
+          </Input>
         </div>
       </div>
     </div>
@@ -374,14 +386,13 @@ export default {
   }
 
   .assets-index-t-b1 {
-    height: 80px;
-    background-color: #edf1f6;
+    height: 46px;
+    @include bg-color(#f8f9fc, $dark-base-color);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 11px 0px;
+    padding-left: 12px;
     &-search {
       min-width: 552px;
-      min-height: 40px;
     }
   }
 
@@ -394,10 +405,11 @@ export default {
       padding-right: 16px;
       padding-top: 15px;
       border-right: 1px solid #dee4ec;
+      @include border-color(#dee4ec, $dark-border-color-base);
       &-title {
         font-family: PingFangSC-Medium;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.85);
+        @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         font-weight: bold;
       }
       &-user {
@@ -407,7 +419,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-env {
@@ -417,7 +429,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-label {
@@ -427,7 +439,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
     }
@@ -435,6 +447,17 @@ export default {
       flex: 1;
       padding-bottom: 10px;
     }
+  }
+  ::v-deep .ivu-input-group-prepend,
+  .ivu-input-group-append {
+    padding: 0px;
+    border: none;
+    background-color: transparent;
+  }
+
+  ::v-deep .ivu-input-group .ivu-input,
+  .ivu-input-group .ivu-input-inner-container {
+    margin-left: 8px;
   }
 }
 </style>

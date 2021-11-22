@@ -13,7 +13,7 @@
         style="margin-bottom: 16px"
       >
         <template slot-scope="{ row }" slot="isAvailable">
-          {{ row.isAvailable ? '启用' : '禁用' }}
+          {{ row.isAvailable ? "启用" : "禁用" }}
         </template>
         <template slot-scope="{ row }" slot="createTime">
           {{ row.createTime | formatDate }}
@@ -76,7 +76,7 @@
         style="margin-bottom: 16px"
       >
         <template slot-scope="{ row }" slot="isAvailable">
-          {{ row.isAvailable ? '启用' : '禁用' }}
+          {{ row.isAvailable ? "启用" : "禁用" }}
         </template>
         <template slot-scope="{ row }" slot="createTime">
           {{ row.createTime | formatDate }}
@@ -140,75 +140,75 @@ import {
   getLayersCustom,
   deleteLayers,
   enableLayers,
-  disableLayers,
-} from '../../service/api'
-import EditModal from './editModal.vue'
-import formatDate from '../../utils/formatDate'
+  disableLayers
+} from "../../service/api";
+import EditModal from "./editModal.vue";
+import formatDate from "../../utils/formatDate";
 export default {
   components: { EditModal },
   filters: {
-    formatDate,
+    formatDate
   },
   methods: {
     handleModalFinish() {
-      this.handleGetLayersCustom()
+      this.handleGetLayersCustom();
     },
     handleCreate() {
       this.modalCfg = {
         visible: true,
-        mode: 'create',
-      }
+        mode: "create"
+      };
     },
     async handleDelete(name) {
-      this.customloading = true
-      await deleteLayers(name)
-      this.customloading = false
-      this.handleGetLayersCustom()
+      this.customloading = true;
+      await deleteLayers(name);
+      this.customloading = false;
+      this.handleGetLayersCustom();
     },
     handleEdit(name) {
       this.modalCfg = {
         visible: true,
-        mode: 'edit',
-        name,
-      }
+        mode: "edit",
+        name
+      };
     },
     async handleEnable(id) {
-      this.loading = true
-      await enableLayers(id)
-      this.loading = false
-      this.handleGetLayersCustom()
+      this.loading = true;
+      await enableLayers(id);
+      this.loading = false;
+      this.handleGetLayersCustom();
     },
     async handleDisable(id) {
-      this.loading = true
-      await disableLayers(id)
-      this.loading = false
-      this.handleGetLayersCustom()
+      this.loading = true;
+      await disableLayers(id);
+      this.loading = false;
+      this.handleGetLayersCustom();
     },
     async handleGetLayersPreset() {
-      this.preSetloading = true
-      let { result } = await getLayersPreset()
-      this.preSetloading = false
-      this.presetDataList = result
+      this.preSetloading = true;
+      let { result } = await getLayersPreset();
+      this.preSetloading = false;
+      this.presetDataList = result;
     },
     async handleGetLayersCustom() {
-      this.customloading = true
-      let data = await getLayersCustom()
-      this.customloading = false
-      let { result } = data
-      this.customDataList = result
+      this.customloading = true;
+      let data = await getLayersCustom();
+      this.customloading = false;
+      let { result } = data;
+      this.customDataList = result;
     }
   },
   mounted() {
-    this.handleGetLayersPreset()
-    this.handleGetLayersCustom()
+    this.handleGetLayersPreset();
+    this.handleGetLayersCustom();
   },
   watch: {},
   data() {
     return {
       columns: [
         {
-          title: '分层名称',
-          key: 'name',
+          title: "分层名称",
+          key: "name"
         },
         /*{
           title: '英文名',
@@ -220,9 +220,9 @@ export default {
           slot: 'isAvailable',
         },*/
         {
-          title: '描述',
-          key: 'description',
-          ellipsis: true,
+          title: "描述",
+          key: "description",
+          ellipsis: true
         },
         /*{
           title: '分层选择权限',
@@ -235,21 +235,21 @@ export default {
           slot: 'dbs',
         },*/
         {
-          title: '创建时间',
-          key: 'createTime',
-          slot: 'createTime',
+          title: "创建时间",
+          key: "createTime",
+          slot: "createTime"
         },
         {
-          title: '更新时间',
-          key: 'updateTime',
-          slot: 'updateTime',
+          title: "更新时间",
+          key: "updateTime",
+          slot: "updateTime"
         },
         {
-          title: '操作',
-          key: 'action',
-          slot: 'action',
-          minWidth: 60,
-        },
+          title: "操作",
+          key: "action",
+          slot: "action",
+          minWidth: 60
+        }
       ],
       customloading: false,
       customDataList: [],
@@ -257,16 +257,17 @@ export default {
       presetDataList: [],
       // 弹窗参数
       modalCfg: {
-        mode: '',
-        name: '',
-        visible: false,
+        mode: "",
+        name: "",
+        visible: false
       }
-    }
-  },
-}
+    };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .title-line {
   display: flex;
   justify-content: space-between;
@@ -274,6 +275,7 @@ export default {
   margin-bottom: 16px;
   .title {
     border-left: 6px solid #1890ff;
+    @include border-color(#1890ff, $dark-border-color-base);
     padding-left: 6px;
   }
 }

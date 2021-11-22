@@ -91,6 +91,10 @@ body {
   background: $scrollbar-color;
 }
 
+.we-editor .monaco-editor .margin {
+  background-color: #f2f3f6;
+}
+
 .ivu-modal-header {
   //   background-color: #FAFAFA !important;
   @include bg-color(#FAFAFA, $dark-base-color);
@@ -116,42 +120,3 @@ body {
   z-index: 1001;
 }
 
-// 智慧营区版本菜单导航样式
-.luban-menu-trigger {
-  background-color: #61B381 !important;
-}
-.luban-nav-panel .nav-right {
-  background-color: #062228 !important;
-}
-.luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner:hover {
-  background-color: #0B313C !important;
-}
-.luban-nav-panel .nav-left {
-  background-color: #05191D !important;
-}
-.luban-nav-panel .nav-left .nav-all.active, .luban-nav-panel .nav-left .nav-all:hover {
-  background-color: #062228 !important;
-}
-.luban-nav-panel .nav-left .nav-collect .nav-item:hover {
-  background-color: #062228 !important;
-}
-html[data-theme="dark"] {
-  .luban-menu-trigger {
-    background-color: #61B381 !important;
-  }
-  .luban-nav-panel .nav-right {
-    background-color: #062228 !important;
-  }
-  .luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner:hover {
-    background-color: #0B313C !important;
-  }
-  .luban-nav-panel .nav-left {
-    background-color: #05191D !important;
-  }
-  .luban-nav-panel .nav-left .nav-all.active, .luban-nav-panel .nav-left .nav-all:hover {
-    background-color: #062228 !important;
-  }
-  .luban-nav-panel .nav-left .nav-collect .nav-item:hover {
-    background-color: #062228 !important;
-  }
-}

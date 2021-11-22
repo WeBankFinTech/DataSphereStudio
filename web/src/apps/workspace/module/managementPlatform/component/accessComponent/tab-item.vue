@@ -165,8 +165,6 @@ export default {
       let _this = this;
       _this.$refs["formValidate"].validate(valid => {
         if (valid) {
-          _this.$Message.success("Success!");
-          // 提交
           _this.$emit("on-save", postData);
         } else {
           _this.$Message.error("Fail!");

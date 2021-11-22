@@ -46,8 +46,6 @@
         height: 400px;
         overflow-y: auto;
         @include bg-color($background-color-header, $dark-menu-base-color);
-        
-
         padding: 0 15px;
         .proj-name {
             padding:7px 15px;
@@ -118,4 +116,5 @@
       height: 24px;
       vertical-align: middle;
     }
+
 }

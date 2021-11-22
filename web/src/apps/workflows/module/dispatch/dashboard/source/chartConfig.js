@@ -9,8 +9,8 @@ const pie = {
       minAngle: 5, // The smallest sector angle (0 ~ 360), used to prevent a value from being too small, causing the sector to be too small to affect the interaction
       avoidLabelOverlap: true, // Whether to prevent the label overlap policy
       hoverAnimation: true, // Whether to enable hover to enlarge the animation on the sector.
-      radius: ['30%', '60%'],
-      center: ['53%', '60%'],
+      radius: ['45%', '60%'],
+      center: ['50%', '50%'],
       label: {
         align: 'left',
         normal: {

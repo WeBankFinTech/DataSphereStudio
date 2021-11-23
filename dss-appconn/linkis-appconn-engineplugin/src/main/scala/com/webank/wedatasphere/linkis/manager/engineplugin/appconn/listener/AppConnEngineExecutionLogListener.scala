@@ -14,10 +14,10 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.listener
+package org.apache.linkis.manager.engineplugin.appconn.listener
 
 import com.webank.wedatasphere.dss.standard.app.development.listener.ExecutionLogListener
-import com.webank.wedatasphere.linkis.engineconn.computation.executor.execute.EngineExecutionContext
+import org.apache.linkis.engineconn.computation.executor.execute.EngineExecutionContext
 
 class AppConnEngineExecutionLogListener(val engineExecutionContext: EngineExecutionContext) extends ExecutionLogListener {
 

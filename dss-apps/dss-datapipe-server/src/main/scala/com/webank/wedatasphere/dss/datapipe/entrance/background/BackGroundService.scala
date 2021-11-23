@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.datapipe.entrance.background
 
-import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent
+import org.apache.linkis.server.socket.controller.ServerEvent
 
 
 trait BackGroundService {

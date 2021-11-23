@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.Orchestrator
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 public interface DSSFrameworkOrchestratorService {
 

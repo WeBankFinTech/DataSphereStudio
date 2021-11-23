@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.apiservice.core.util;
 
 import com.webank.wedatasphere.dss.apiservice.core.exception.*;
 import com.webank.wedatasphere.dss.apiservice.core.vo.MessageVo;
-import com.webank.wedatasphere.linkis.common.exception.WarnException;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.common.exception.WarnException;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

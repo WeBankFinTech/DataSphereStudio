@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.data.common.conf;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 /**
  * @author suyc

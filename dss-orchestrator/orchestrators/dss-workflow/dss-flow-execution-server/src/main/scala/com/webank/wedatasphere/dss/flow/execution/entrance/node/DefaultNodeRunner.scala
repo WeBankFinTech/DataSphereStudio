@@ -27,8 +27,8 @@ import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNo
 import com.webank.wedatasphere.dss.linkis.node.execution.job.{JobTypeEnum, LinkisJob}
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
-import com.webank.wedatasphere.linkis.common.exception.ErrorException
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.common.exception.ErrorException
+import org.apache.linkis.common.utils.{Logging, Utils}
 
 
 class DefaultNodeRunner extends NodeRunner with Logging {

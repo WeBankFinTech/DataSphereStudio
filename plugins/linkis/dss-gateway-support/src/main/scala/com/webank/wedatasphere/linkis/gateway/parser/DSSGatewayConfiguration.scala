@@ -14,9 +14,9 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.gateway.parser
+package org.apache.linkis.gateway.parser
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars
+import org.apache.linkis.common.conf.CommonVars
 
 
 object DSSGatewayConfiguration {

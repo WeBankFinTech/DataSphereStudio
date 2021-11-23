@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.common.label;
 
-import com.webank.wedatasphere.linkis.manager.label.entity.Label;
+import org.apache.linkis.manager.label.entity.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

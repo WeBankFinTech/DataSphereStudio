@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.exception
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException
+import org.apache.linkis.common.exception.ErrorException
 
 case class NoSuchAppConnException(errDesc:String) extends ErrorException(70059, errDesc)
 

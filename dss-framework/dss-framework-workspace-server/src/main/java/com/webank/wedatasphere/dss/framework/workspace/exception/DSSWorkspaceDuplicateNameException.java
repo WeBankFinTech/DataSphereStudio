@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -18,7 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 /**
  * created by cooperyang on 2020/3/16

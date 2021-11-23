@@ -30,25 +30,25 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-computation-client</artifactId>
             <version>${linkis.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-protocol</artifactId>
             <version>${linkis.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-storage-script-dev-client</artifactId>
             <version>${linkis.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-label-common</artifactId>
             <version>${linkis.version}</version>
         </dependency>

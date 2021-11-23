@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.exception;
 
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;

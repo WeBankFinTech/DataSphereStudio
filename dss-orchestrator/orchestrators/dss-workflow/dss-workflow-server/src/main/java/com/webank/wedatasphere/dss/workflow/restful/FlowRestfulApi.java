@@ -62,8 +62,8 @@ import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 
 @Component
 @Path("/dss/workflow")

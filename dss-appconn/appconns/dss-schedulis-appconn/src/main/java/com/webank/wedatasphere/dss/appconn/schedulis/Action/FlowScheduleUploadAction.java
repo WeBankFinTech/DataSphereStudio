@@ -17,9 +17,9 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.sso.UserInfo;
-import com.webank.wedatasphere.linkis.httpclient.request.BinaryBody;
-import com.webank.wedatasphere.linkis.httpclient.request.POSTAction;
-import com.webank.wedatasphere.linkis.httpclient.request.UploadAction;
+import org.apache.linkis.httpclient.request.BinaryBody;
+import org.apache.linkis.httpclient.request.POSTAction;
+import org.apache.linkis.httpclient.request.UploadAction;
 import scala.Option;
 
 

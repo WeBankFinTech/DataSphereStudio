@@ -75,6 +75,8 @@ let util = {
           return obj[b]
         })
       }
+      // 额外传递dsspath，即pathname
+      result['dsspath'] = location.pathname;
     }
     const distUrl = dist.length > 1 ? `${dist[0]}?${qs.stringify(result)}` : dist[0]
     return distUrl

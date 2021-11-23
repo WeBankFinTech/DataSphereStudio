@@ -91,10 +91,6 @@ body {
   background: $scrollbar-color;
 }
 
-.we-editor .monaco-editor .margin {
-  background-color: #f2f3f6;
-}
-
 .ivu-modal-header {
   //   background-color: #FAFAFA !important;
   @include bg-color(#FAFAFA, $dark-base-color);
@@ -119,4 +115,3 @@ body {
   height: 100%;
   z-index: 1001;
 }
-

@@ -88,6 +88,7 @@ public class AssetServiceImpl implements AssetService {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
                 }
                 String dbName = (atlasEntityHeader.getAttribute("qualifiedName").toString().split("\\."))[0];
+                hiveTblBasic.setDbName(dbName);
 
                 try {
                     AtlasEntity atlasEntity = atlasService.getHiveTblByGuid(atlasEntityHeader.getGuid());
@@ -97,8 +98,6 @@ public class AssetServiceImpl implements AssetService {
                     throw new DataGovernanceException(ex.getMessage());
                 }
 
-
-                hiveTblBasic.setDbName(dbName);
                 return hiveTblBasic;
             }).collect(Collectors.toList());
         }

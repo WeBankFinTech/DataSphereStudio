@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.sender.service.impl;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderService;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import java.util.List;
 
 /**

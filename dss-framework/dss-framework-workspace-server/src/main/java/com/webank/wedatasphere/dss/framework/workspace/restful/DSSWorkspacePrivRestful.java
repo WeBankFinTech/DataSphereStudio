@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -24,8 +24,8 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspacePrivService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.math3.util.Pair;
 import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.data.asset.restful;
 import com.webank.wedatasphere.dss.data.asset.entity.HiveTblLabelInfo;
 import com.webank.wedatasphere.dss.data.asset.service.AssetService;
 import com.webank.wedatasphere.dss.data.asset.service.WorkspaceInfoService;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

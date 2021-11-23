@@ -29,8 +29,8 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;

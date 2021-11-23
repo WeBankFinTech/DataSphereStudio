@@ -20,7 +20,7 @@ import java.util
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 import org.springframework.stereotype.Component
 
 import scala.collection.JavaConversions._

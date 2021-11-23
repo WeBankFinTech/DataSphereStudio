@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.data.api.server.restful;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiManagerService;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

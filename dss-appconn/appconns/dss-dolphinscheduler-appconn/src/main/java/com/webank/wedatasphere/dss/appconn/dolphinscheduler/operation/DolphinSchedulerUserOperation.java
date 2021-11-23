@@ -25,7 +25,7 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConn
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.common.utils.JsonUtils;
+import org.apache.linkis.common.utils.JsonUtils;
 
 /**
  * The type Dolphin scheduler user operation.

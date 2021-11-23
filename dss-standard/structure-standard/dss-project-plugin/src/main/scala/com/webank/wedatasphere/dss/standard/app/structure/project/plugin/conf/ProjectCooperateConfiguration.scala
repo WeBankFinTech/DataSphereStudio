@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.conf
 
-import com.webank.wedatasphere.linkis.common.conf.{CommonVars, TimeType}
+import org.apache.linkis.common.conf.{CommonVars, TimeType}
 
 
 object ProjectCooperateConfiguration {

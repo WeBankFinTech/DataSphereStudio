@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.apiservice.core.token;
 import com.sun.jersey.core.util.Base64;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceToken;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars$;
+import org.apache.linkis.common.conf.CommonVars$;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;

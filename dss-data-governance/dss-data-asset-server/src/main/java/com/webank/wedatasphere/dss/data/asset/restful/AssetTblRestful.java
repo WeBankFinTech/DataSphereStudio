@@ -6,7 +6,7 @@ import com.webank.wedatasphere.dss.data.asset.entity.HiveTblClassificationInfo;
 import com.webank.wedatasphere.dss.data.asset.entity.HiveTblSimpleInfo;
 import com.webank.wedatasphere.dss.data.asset.service.AssetService;
 import com.webank.wedatasphere.dss.data.asset.service.WorkspaceInfoService;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import lombok.AllArgsConstructor;
 import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;

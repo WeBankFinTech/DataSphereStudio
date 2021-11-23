@@ -70,7 +70,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletio
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 
 public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestratorService {

@@ -28,7 +28,7 @@
     <artifactId>dss-gateway-support</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-gateway-server-support</artifactId>
             <version>${linkis.version}</version>
         </dependency>

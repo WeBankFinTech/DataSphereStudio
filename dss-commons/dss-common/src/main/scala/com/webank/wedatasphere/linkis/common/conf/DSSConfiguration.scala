@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.common.conf
+package org.apache.linkis.common.conf
 
 import java.util.Properties
 

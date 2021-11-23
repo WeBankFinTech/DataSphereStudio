@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -18,7 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 /**
  * created by cooperyang on 2020/3/15

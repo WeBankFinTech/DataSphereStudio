@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.bo;
 
-import com.webank.wedatasphere.linkis.ujes.client.response.JobExecuteResult;
+import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
 
 public class ApiServiceJob {

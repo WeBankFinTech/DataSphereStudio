@@ -18,11 +18,11 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext$;
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob;
-import com.webank.wedatasphere.linkis.entrance.EntranceServer;
-import com.webank.wedatasphere.linkis.entrance.annotation.EntranceServerBeanAnnotation;
-import com.webank.wedatasphere.linkis.protocol.utils.ZuulEntranceUtils;
-import com.webank.wedatasphere.linkis.scheduler.queue.Job;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.entrance.EntranceServer;
+import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
+import org.apache.linkis.protocol.utils.ZuulEntranceUtils;
+import org.apache.linkis.scheduler.queue.Job;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

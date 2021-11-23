@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 import java.lang.reflect.Constructor;
 

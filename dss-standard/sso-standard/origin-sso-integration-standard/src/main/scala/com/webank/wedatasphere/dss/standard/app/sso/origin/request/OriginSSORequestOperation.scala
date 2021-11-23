@@ -26,11 +26,11 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOp
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException
-import com.webank.wedatasphere.linkis.common.utils.{ByteTimeUtils, Logging, Utils}
-import com.webank.wedatasphere.linkis.httpclient.Client
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
-import com.webank.wedatasphere.linkis.httpclient.response.impl.DefaultHttpResult
-import com.webank.wedatasphere.linkis.httpclient.response.{HttpResult, Result}
+import org.apache.linkis.common.utils.{ByteTimeUtils, Logging, Utils}
+import org.apache.linkis.httpclient.Client
+import org.apache.linkis.httpclient.request.HttpAction
+import org.apache.linkis.httpclient.response.impl.DefaultHttpResult
+import org.apache.linkis.httpclient.response.{HttpResult, Result}
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.http.impl.cookie.BasicClientCookie

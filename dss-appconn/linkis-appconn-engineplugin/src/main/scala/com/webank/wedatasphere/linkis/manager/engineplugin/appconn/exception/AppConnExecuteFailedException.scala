@@ -14,8 +14,8 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.exception
+package org.apache.linkis.manager.engineplugin.appconn.exception
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException
+import org.apache.linkis.common.exception.ErrorException
 
 case class AppConnExecuteFailedException (errCode:Int, desc:String) extends ErrorException(errCode, desc)

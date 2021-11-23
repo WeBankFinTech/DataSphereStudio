@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.framework.appconn;
 import com.webank.wedatasphere.dss.appconn.manager.impl.AbstractAppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
-import com.webank.wedatasphere.linkis.DataWorkCloudApplication;
+import org.apache.linkis.DataWorkCloudApplication;
 
 
 public class SpringAppConnManager extends AbstractAppConnManager {

@@ -48,8 +48,8 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.rpc.Sender;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.security.SecurityFilter;
 
 
 @Component

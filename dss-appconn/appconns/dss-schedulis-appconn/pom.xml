@@ -45,7 +45,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>json4s-jackson_2.11</artifactId>

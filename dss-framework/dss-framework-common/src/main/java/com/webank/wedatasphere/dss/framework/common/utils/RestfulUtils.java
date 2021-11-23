@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.common.utils;
 
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import org.apache.commons.math3.util.Pair;
 
 import javax.ws.rs.core.Response;

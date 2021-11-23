@@ -353,6 +353,7 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
                     // 提前30s过期，方便刷新
                     long expireTimeStamp = DateUtil.strToTimeStamp(expireTime, DateUtil.FORMAT_LONG) - expireTimeGap;
                     result.put("token", token);
+//                    result.put("token","fcdd944c03d5792719781f2c6e7b7542");
                     result.put("expire_time", String.valueOf(expireTimeStamp));
                     return result;
                 } else {

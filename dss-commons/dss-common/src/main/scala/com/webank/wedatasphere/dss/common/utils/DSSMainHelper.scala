@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.common.utils
 
-import com.webank.wedatasphere.linkis.common.conf.{BDPConfiguration, CommonVars, DSSConfiguration}
+import org.apache.linkis.common.conf.{BDPConfiguration, CommonVars, DSSConfiguration}
 
 import scala.collection.JavaConversions._
 

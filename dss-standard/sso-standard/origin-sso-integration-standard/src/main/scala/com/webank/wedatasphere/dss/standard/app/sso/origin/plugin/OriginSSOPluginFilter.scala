@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.sso.origin.plugin
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard
 import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandardFactory
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.SSOPluginFilter
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 
 abstract class OriginSSOPluginFilter extends SSOPluginFilter with Logging{

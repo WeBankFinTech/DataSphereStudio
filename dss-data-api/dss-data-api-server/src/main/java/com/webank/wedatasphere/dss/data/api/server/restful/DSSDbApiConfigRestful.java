@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -25,8 +25,8 @@ import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
 import com.webank.wedatasphere.dss.data.api.server.util.RestfulUtils;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;

@@ -41,7 +41,7 @@
 
     <properties>
         <dss.version>1.0.0</dss.version>
-        <linkis.version>1.0.2</linkis.version>
+        <linkis.version>1.0.3</linkis.version>
         <scala.version>2.12.10</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
@@ -94,7 +94,7 @@
                 <version>${commons.lang.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.webank.wedatasphere.linkis</groupId>
+                <groupId>org.apache.linkis</groupId>
                 <artifactId>linkis-common</artifactId>
                 <version>${linkis.version}</version>
             </dependency>

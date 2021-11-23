@@ -23,7 +23,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOpe
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestCopyWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCopyWorkflow;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 
 
 public class WorkflowTaskCopyOperation implements RefCopyOperation<WorkflowCopyRequestRef> {

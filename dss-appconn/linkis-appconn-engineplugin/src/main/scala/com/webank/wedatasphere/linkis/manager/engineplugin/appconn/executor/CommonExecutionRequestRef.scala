@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor
+package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
 

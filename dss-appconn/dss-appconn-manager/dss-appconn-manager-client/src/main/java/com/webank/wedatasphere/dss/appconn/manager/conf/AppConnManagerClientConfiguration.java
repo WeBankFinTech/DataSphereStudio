@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.manager.conf;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 public class AppConnManagerClientConfiguration {
 

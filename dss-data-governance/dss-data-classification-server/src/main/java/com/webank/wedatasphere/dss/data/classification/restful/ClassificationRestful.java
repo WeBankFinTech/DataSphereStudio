@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.data.classification.restful;
 
 import com.webank.wedatasphere.dss.data.classification.service.ClassificationService;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import lombok.AllArgsConstructor;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.apache.atlas.model.typedef.AtlasTypesDef;

@@ -14,28 +14,23 @@
  * limitations under the License.
  *
  */
-@import "@/common/style/variables.scss";
+
 $border-color: #e0e0e0;
 .we-table {
     position: relative;
     border-right: 1px solid $border-color;
-    @include border-color($border-color, $dark-border-color-base);
     min-width: 100%;
     thead th {
-        // background-color: rgb(94, 157, 224);
-        @include bg-color(rgb(94, 157, 224), $dark-header-bg-color);
-        // color: #fff;
-        @include font-color(#fff, $dark-text-color);
+        background-color: rgb(94, 157, 224);
+        color: #fff;
     }
 }
 
 .we-table-header {
     height: 40px;
     line-height: 40px;
-    // background-color: rgb(94, 157, 224);
-    @include bg-color(rgb(94, 157, 224), $dark-header-bg-color);
-    // color: #fff;
-    @include font-color(#fff, $dark-text-color);
+    background-color: rgb(94, 157, 224);
+    color: #fff;
     .we-table-header-box {
         width: calc(100% - 40px);
         margin: auto;
@@ -51,22 +46,18 @@ $border-color: #e0e0e0;
 }
 
 .list-header .list-view-item {
-    // color: #fff;
-    @include font-color(#fff, $dark-text-color);
+    color: #fff;
     border-right: 1px solid #e8eaec;
-    @include border-color($border-color-base, $dark-border-color-base);
 }
 
 .we-column-item {
     border-right: 1px solid #e8eaec;
-    @include border-color($border-color-base, $dark-border-color-base);
     &.null-text {
         color: #ed4014;
         font-style: italic;
     }
     &.active {
-        // background-color: #ebf7ff;
-        @include bg-color(#ebf7ff, $dark-base-color);
+        background-color: #ebf7ff;
     }
 }
 
@@ -166,15 +157,13 @@ $border-color: #e0e0e0;
     height: 100%;
     .we-table {
         border: 1px solid #dcdee2;
-        @include border-color($border-color-base, $dark-base-color);
         table-layout: fixed;
         .we-table-thead {
-            @include bg-color($primary-color, $dark-header-bg-color);
+            background-color: #2d8cf0;
+            color: #fff;
             .we-table-thead-cell {
                 border-right: 1px solid #dcdee2;
                 border-bottom: 1px solid #dcdee2;
-                @include border-color($border-color-base, $dark-border-color-base);
-                @include font-color(#fff, $dark-workspace-title-color);
                 min-width: 0;
                 height: 48px;
                 box-sizing: border-box;
@@ -186,18 +175,14 @@ $border-color: #e0e0e0;
         .we-table-row {
             height: 40px;
             &:nth-child(2n) {
-                // background-color: #f8f8f9;
-                @include bg-color(#f8f8f9, $dark-base-color);
+                background-color: #f8f8f9;
             }
             &:hover {
-                // background-color: #ebf7ff;
-                @include bg-color(#ebf7ff, $dark-active-menu-item);
+                background-color: #ebf7ff;
             }
             .we-table-row-cell {
                 border-right: 1px solid #dcdee2;
                 border-bottom: 1px solid #dcdee2;
-                @include border-color($border-color-base, $dark-border-color-base);
-                @include font-color($light-text-color, $dark-text-color);
                 min-width: 0;
                 height: 48px;
                 box-sizing: border-box;
@@ -222,8 +207,7 @@ $border-color: #e0e0e0;
                         text-overflow: ellipsis;
                     }
                     .render-btn {
-                        // color: #515a6e;
-                        @include font-color(#515a6e, $dark-text-color);
+                        color: #515a6e;
                         background-color: transparent;
                         border-color: transparent;
                         padding: 1px 7px 2px;
@@ -242,7 +226,6 @@ $border-color: #e0e0e0;
                         &:hover {
                             color: #57a3f3;
                             background-color: #fff;
-                            @include bg-color(#fff, $dark-hover-color-base);
                             border-color: transparent;
                             text-decoration: none;
                         }

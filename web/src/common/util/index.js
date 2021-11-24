@@ -1,5 +1,3 @@
-/*eslint-disable */
-
 /*
  * Copyright 2019 WeBank
  *
@@ -24,21 +22,8 @@ import * as objectUtil from './object';
 import * as typeUtil from './type';
 import * as convertUtil from './convert';
 import * as currentModules from './currentModules'
-import filters from './filters'
-import api from "@/common/service/api"
-import storage from "@/common/service/storage"
 
-import Vue from 'vue'
-const Hub = new Vue()
-function deleteEmptyChildren(cur) {
-  if (cur.children && !cur.children.length) {
-    delete cur.children
-  } else if (cur.children && cur.children.length) {
-    for (let i = 0; i < cur.children.length; i++) {
-      deleteEmptyChildren(cur.children[i])
-    }
-  }
-}
+
 let util = {
   executeCopy(textValue) {
     const input = document.createElement('textarea');
@@ -75,8 +60,6 @@ let util = {
           return obj[b]
         })
       }
-      // 额外传递dsspath，即pathname
-      result['dsspath'] = location.pathname;
     }
     const distUrl = dist.length > 1 ? `${dist[0]}?${qs.stringify(result)}` : dist[0]
     return distUrl
@@ -109,19 +92,7 @@ let util = {
       key = `${new Date().getTime()}.${Math.ceil(Math.random() * 1000)}`
     }
     return key;
-  },
-  Hub,
-  checkToken(cb, forceUpdate) {
-    if (forceUpdate || !api.getToken()) {
-      api.fetch('/dss/framework/project/ds/token', 'get').then((res) => {
-        storage.set('token', res.token, res.expire_time)
-        cb && cb()
-      })
-    } else {
-      cb && cb()
-    }
-  },
-  deleteEmptyChildren
+  }
 };
 objectUtil.merge(util, domUtil, objectUtil, typeUtil, convertUtil, currentModules);
 

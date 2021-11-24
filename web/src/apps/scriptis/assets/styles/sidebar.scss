@@ -20,7 +20,6 @@
     height: 100%;
     overflow: hidden;
     padding-top: 38px;
-    @include bg-color($light-base-color, $dark-menu-base-color);
     .we-side-bar-content {
         height: 100%;
         overflow-y: auto;
@@ -36,7 +35,7 @@
         &::-webkit-scrollbar-track {
             border-radius: $border-radius-base;
             box-shadow: $shadow-inset;
-            @include bg-color($light-base-color, $dark-menu-base-color);
+            background: $body-background;
         }
     }
 }

@@ -28,7 +28,6 @@
     }
     .center-panel{
         border-left: $border-width-base $border-style-base $border-color-base;
-        @include border-color($border-color-base, $dark-base-color);
     }
 
     .right-panel{
@@ -39,9 +38,7 @@
         width: 44px;
         height: 100%;
         border-right: $border-width-base $border-style-base $border-color-base;
-        @include border-color($border-color-base, $dark-menu-base-color);
-        // background: $table-thead-bg;
-        @include bg-color($table-thead-bg, $dark-base-color);
+        background: $table-thead-bg;
         .nav-warp{
             position: $absolute;
             height: 100%;
@@ -54,18 +51,16 @@
             padding: 32px 4px;
             text-align: center;
             cursor: pointer;
-            @include font-color(#333, $dark-text-color);
             &.actived{
                 width: 44px;
                 border-left: 3px solid $primary-color;
-                @include border-color($primary-color, $dark-primary-color);
-                // border-bottom: $border-width-base $border-style-base $border-color-base;
-                // border-top: $border-width-base $border-style-base $border-color-base;
-                @include bg-color($active-menu-item, $dark-menu-base-color);
-                @include font-color($primary-color, $dark-primary-color);
+                border-bottom: $border-width-base $border-style-base $border-color-base;
+                border-top: $border-width-base $border-style-base $border-color-base;
+                background: $background-color-white ;
+                color: $primary-color;
             }
             &:hover{
-                @include font-color($primary-color, $dark-primary-color);
+                color: $primary-color;
             }
             .nav-icon{
                 font-size: $font-size-large;
@@ -94,10 +89,11 @@
     }
     .fi-flink-sql {
         background-image: url('../images/flink.svg');
-        width: 12px;
+        width: 20px;
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
+        margin-right: -8px;
     }
     // @media screen and(max-height: 790px) {
     //     .nav-list {

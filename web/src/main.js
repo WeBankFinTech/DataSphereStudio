@@ -24,32 +24,9 @@ import App from './dss/view/app.vue'
 import router from './router'
 import i18n from './common/i18n'
 import mixinDispatch from './common/service/moduleMixin'
-
-// import wa from './common/service/wa'
 // 导入各模块的公共路径常量
 import API_PATH from './common/config/apiPath.js'
 import 'iview/dist/styles/iview.css'
-import '@/common/style/theme/default.less'
-
-// Icon
-import './components/svgIcon/index.js'
-import './dss/module/index.js'
-
-import LubanMenu from 'vue-luban-menu'
-Vue.use(LubanMenu)
-
-
-// moduleMixin
-if (apps.requireComponent) {
-  apps.requireComponent.forEach(item=>{
-    mixinDispatch(item)
-  })
-}
-if (apps.requireComponentVue) {
-  apps.requireComponentVue.forEach(item=>{
-    mixinDispatch(undefined, item)
-  })
-}
 
 // Icon
 import './components/svgIcon/index.js'
@@ -79,7 +56,6 @@ Vue.prototype.$Message.config({
 })
 // 全局变量
 Vue.prototype.$API_PATH = API_PATH;
-// wa();
 
 new Vue({
   router,
@@ -87,9 +63,3 @@ new Vue({
   render: (h) => h(App)
 }).$mount('#app')
 console.log(`当前环境:${process.env.NODE_ENV}`)
-if (localStorage.getItem('theme') === 'dark') {
-  window.document.documentElement.setAttribute('data-theme', 'dark');
-} else {
-  window.document.documentElement.setAttribute('data-theme', '');
-}
-

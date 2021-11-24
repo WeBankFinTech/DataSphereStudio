@@ -1,37 +1,35 @@
 <template>
-  <div class="layout-footer">
-    <div class="footer-btn footer-doc" @click="toggleGuide">
-      <SvgIcon icon-class="question" />
-    </div>
-    <Guide :show="guideShow" @on-toggle="toggleGuide" ref="Guide"/>
+  <div
+    ref="footerChannel"
+    class="layout-footer"
+    @mousedown.prevent.stop="onMouseDown"
+    @mouseup.prevent.stop="oMouseUp"
+    @click.prevent.stop="toast">
     <resource-simple
       ref="resourceSimple"
       @update-job="updateJob">
     </resource-simple>
-    <div class="footer-btn footer-channel"
-         :title="msg"
-         @mousedown.prevent.stop="onMouseDown"
-         @mouseup.prevent.stop="oMouseUp"
-         @click.prevent.stop="toast">
-      <SvgIcon class="footer-channel-job" icon-class="job" />
+    <div
+      :title="msg"
+      class="footer-channel">
+      <Icon
+        class="footer-channel-job"
+        type="ios-swap"/>
       <span class="footer-channel-job-num">{{ num }}</span>
     </div>
   </div>
 </template>
 <script>
 import resourceSimpleModule from '@/dss/module/resourceSimple';
-import Guide from './guide.vue'
 import api from '@/common/service/api';
 export default {
   components: {
     resourceSimple: resourceSimpleModule.component,
-    Guide,
   },
   data() {
     return {
       num: 0,
       msg: '',
-      guideShow: false,
       moveX: null,
       moveY: null,
       isMouseDrop: false,
@@ -46,7 +44,7 @@ export default {
   },
   watch: {
     '$route'() {
-      this.resetChannelPosition()
+      this.resetChannelPosition();
     }
   },
   methods: {
@@ -76,9 +74,6 @@ export default {
         return;
       }
       this.$refs.resourceSimple.open();
-    },
-    toggleGuide() {
-      this.guideShow = !this.guideShow;
     },
     onMouseDown(e) {
       e = e || window.event;

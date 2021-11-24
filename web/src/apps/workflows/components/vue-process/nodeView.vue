@@ -1,8 +1,7 @@
 <template lang="html">
   <!-- 摆放节点的大工作区 -->
-  <div ref="viewport"
+  <div ref="viewport" :style="getBaseStyle"
     class="designer-viewport"
-    :class="{'designer-viewport-fold': shapeFold}"
     @mousemove="mousemove"
     @mousedown="mousedown"
     @mouseup="mouseup"
@@ -87,12 +86,6 @@ export default {
     Noder,
     Linker
   },
-  props: {
-    shapeFold: {
-      type: Boolean,
-      default: false
-    }
-  },
   // 通过这个mixin引入store和state
   mixins: [mixin],
   data() {
@@ -107,6 +100,12 @@ export default {
     };
   },
   computed: {
+    // 获取大工作区的样式
+    getBaseStyle() {
+      return {
+        left: this.state.shapeOptions.viewWidth + 'px'
+      };
+    },
     // 获取大工作区的背景
     getGridStyle() {
       return {

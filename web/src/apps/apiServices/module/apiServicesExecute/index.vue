@@ -223,11 +223,6 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/style/variables.scss';
   .dataServicesContent {
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*width: $percent-all;*/
-    /*height: $percent-all;*/
-    /*background-color: #F4F7FB;*/
     height: 100%;
     .tap-bar {
       background: #fff;

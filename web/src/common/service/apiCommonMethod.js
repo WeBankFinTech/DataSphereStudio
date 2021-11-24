@@ -34,10 +34,7 @@ const GetWorkspaceData = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}worksp
 const GetWorkspaceApplications = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${params}/applications`, {}, {method: 'get', cacheOptions: {time: 3000}})
 
 // 获取工作空间归属部门数据
-const GetDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/dept/list`, 'get')
-
-// 获取工作空间树形归属部门数据
-const GetTreeDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/dept/treeselect`, 'get')
+const GetDepartments = () => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/departments`, 'get')
 
 // 判断工作空间是否重复
 const CheckWorkspaceNameExist = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/exists`, params, 'get')
@@ -54,15 +51,6 @@ const GetWorkspaceBaseInfo = (params) =>  api.fetch(`${API_PATH.WORKSPACE_PATH}g
 // 获取工程的应用领域
 const GetAreaMap = () =>  api.fetch(`${API_PATH.PROJECT_PATH}listApplicationAreas`, "get")
 
-// 获取常用功能列表
-const GetFavorites = (workspaceId) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, workspaceId, 'get')
-
-// 添加常用应用
-const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, data, 'post')
-
-// 删除收藏菜单
-const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, data, 'post')
-
 export {
   GetDicSecondList,
   GetAreaMap,
@@ -72,12 +60,8 @@ export {
   GetWorkspaceData,
   GetWorkspaceApplications,
   GetDepartments,
-  GetTreeDepartments,
   CheckWorkspaceNameExist,
   GetDicList,
   GetWorkspaceList,
-  GetWorkspaceBaseInfo,
-  GetFavorites,
-  AddFavorite,
-  RemoveFavorite
+  GetWorkspaceBaseInfo
 }

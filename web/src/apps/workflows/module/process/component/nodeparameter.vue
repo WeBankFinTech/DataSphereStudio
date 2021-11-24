@@ -22,7 +22,7 @@
           @add-tag="appAddTag"
           @delete-tag="appdDeleteTag"></we-tag>
       </FormItem>
-      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeDesc')" prop="desc" :rules="descRules">
+      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeDesc')">
         <Input v-model="currentNode.desc" type="textarea"
           :placeholder="$t('message.workflow.process.nodeParameter.inputeNodeDesc')" />
       </FormItem>
@@ -128,10 +128,7 @@ export default {
         { required: true, message: this.$t('message.workflow.process.nodeParameter.TXJDMC'), trigger: 'blur' },
         { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.process.nodeParameter.BXYZMKTXHX'), trigger: 'change' },
         { validator: validatorName, trigger: 'blur' },
-        { min: 1, max: 20, message: this.$t('message.workflow.process.nodeParameter.CDZ20ZF'), trigger: 'change' },
-      ],
-      descRules: [
-        { max: 200, message: `${this.$t('message.workflow.process.nodeParameter.CDZ200ZF')}`,  trigger: 'blur' },
+        { min: 1, max: 128, message: this.$t('message.workflow.process.nodeParameter.CDZ128ZF'), trigger: 'change' },
       ],
       resources: [],
       paramsIsChange: false,
@@ -205,11 +202,11 @@ export default {
         if (settings.length > 0) {
           settings.forEach((item) => {
             if (item.key === key) {
-              value =  item.value || item.defaultValue;
+              value =  item.configValue || item.defaultValue;
             }
           });
           if (key === 'wds.linkis.yarnqueue') {
-            value = rst[1].fullTree[0].settings[0].value || rst[1].fullTree[0].settings[0].defaultValue;
+            value = rst[1].fullTree[0].settings[0].configValue || rst[1].fullTree[0].settings[0].defaultValue;
           }
         }
       }

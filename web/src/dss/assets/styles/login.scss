@@ -55,7 +55,6 @@
         }
         .label {
             font-size: 14px;
-            color: #333;
         }
         input {
             border: none;
@@ -64,7 +63,6 @@
             padding-left: 15px;
             color: $input-color;
             border: 1px solid #DEE4EC;
-            background-color: $body-background !important;
         }
         button {
             height: 45px;
@@ -75,7 +73,6 @@
     }
     .remember-user-name {
         margin: 5px 0 0 10px;
-        color: #333;
     }
     .ivu-form-item {
         margin-bottom: 20px;

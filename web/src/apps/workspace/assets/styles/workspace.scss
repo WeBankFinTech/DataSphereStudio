@@ -53,11 +53,10 @@
 
 .nodata-tips {
   font-size: 12px;
-  margin: auto;
+  margin: 0 20px;
   height: 70px;
   line-height: 70px;
   text-align: center;
-  @include font-color($light-text-color, $dark-text-color);
 }
 
 .workspace-main {
@@ -74,8 +73,7 @@
     font-weight: bold;
     padding-left: 23px;
     border-left: 2px solid $primary-color;
-    @include border-color($primary-color, $dark-primary-color);
-    margin: 10px 25px;
+
   }
 
   .left {

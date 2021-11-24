@@ -39,9 +39,7 @@
  */
 import virtualList from '@/components/virtualList';
 import item from './item';
-
 let clickTimer = null;
-
 export default {
   name: 'VirtualTree',
   components: {

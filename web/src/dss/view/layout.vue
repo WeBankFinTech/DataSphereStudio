@@ -4,22 +4,19 @@
       v-if="!$route.query.noHeader"
       :is="showHeader"
       @clear-session="clearSession"
-      @set-init="setInit"
-      ref="layoutHeader"></component>
+      @set-init="setInit"></component>
     <keep-alive v-if="isInit">
       <router-view
         v-if="$route.meta.keepAlive"/>
     </keep-alive>
     <router-view
       v-if="!$route.meta.keepAlive"/>
-    <layout-footer ref="layoutFooter"/>
-    <newGuidance v-if="$route.path === '/workspaceHome'" ref="newGuidance"/>
+    <layout-footer/>
   </div>
 </template>
 <script>
 import headerModule from '@/dss/module/header';
 import footerModule from '@/dss/module/footer';
-import newComerGuidanceModule from "@/dss/module/newGuidance"
 import layoutMixin from '@/common/service/layoutMixin.js';
 // 导入虚拟模块获取各个header
 const apps = require('dynamic-modules');
@@ -31,7 +28,6 @@ export default {
   components: {
     layoutFooter: footerModule.component,
     layoutHeader: headerModule.component,
-    newGuidance: newComerGuidanceModule.component,
     ...obj
   },
   data() {

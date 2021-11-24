@@ -1,18 +1,26 @@
 <template>
   <div>
     <slot></slot>
-    <div class="content-item">
-      <div v-if="canCreateProject"
+    <Row class="content-item">
+      <i-col
         class="project-item project-header"
-        @click="addProject">
+        :xs="12"
+        :sm="8"
+        :md="6"
+        :lg="5"
+        @click.native="addProject">
         <Icon class="add-icon" type="md-add" size="20">
         </Icon>
         <span>{{$t('message.Project.createProject')}}</span>
-      </div>
+      </i-col>
       <template  v-if="dataList.length > 0">
-        <div
+        <i-col
           class="project-item"
-          @click="goto(currentData, subitem)"
+          :xs="12"
+          :sm="8"
+          :md="6"
+          :lg="5"
+          @click.native="goto(currentData, subitem)"
           v-for="(subitem, index) in cachedataList"
           :key="subitem.id"
         >
@@ -22,10 +30,10 @@
                 <SvgIcon style="font-size: 16px;" color="#5580eb" icon-class="base"/>
                 {{subitem.name}}
               </span>
-              <div v-if="subitem.canWrite()" class="menu-bar">
+              <div v-if="checkEditable(subitem, getUserName())" class="menu-bar">
                 <Button size="small" @click.stop>管理</Button>
                 <ul class="menu-list">
-                  <li class="list-item" v-if="subitem.canDelete()" @click.stop="deleteProject(subitem)">删除</li>
+                  <li class="list-item" @click.stop="deleteProject(subitem)">删除</li>
                   <li class="list-item" @click.stop="modify(currentData.id, subitem)">配置</li>
                   <!-- <li class="list-item" @click.stop="publish(currentData.id, subitem)">发布</li> -->
                 </ul>
@@ -48,13 +56,13 @@
 
             </span>
           </Tooltip>
-        </div>
+        </i-col>
 
       </template>
       <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
-    </div>
+    </Row>
     <Page
-      v-if="dataList.length > 0"
+      v-if="dataList.length > 0 && pagination.size < dataList.length "
       class="page-bar"
       :total="dataList.length"
       show-sizer
@@ -68,9 +76,6 @@
 </template>
 <script>
 import mixin from '@/common/service/mixin';
-import storage from '@/common/helper/storage';
-import {canCreate} from '@/common/config/permissions.js';
-import eventbus from '@/common/helper/eventbus';
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -115,11 +120,10 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 20, 30]
+        opts: [10, 30, 45, 60]
       },
       isToolbarShow: false,
       cardShowNum: 4,
-      canCreateProject: false
     };
   },
   mixins: [mixin],
@@ -143,13 +147,6 @@ export default {
       }
     }
   },
-  mounted() {
-    this.checkCreate();
-    eventbus.on('workspace.change', this.checkCreate);
-  },
-  beforeDestroy() {
-    eventbus.off('workspace.change', this.checkCreate);
-  },
   methods: {
     addProject() {
       this.$emit('addProject');
@@ -158,12 +155,12 @@ export default {
     selectAction(name) {
       console.log(name, 'name')
     },
-    checkCreate(roles){
-      const workspaceRoles = roles || storage.get(`workspaceRoles`) || [];
-      if (canCreate(workspaceRoles)) {
-        this.canCreateProject = true;
+    checkEditable(item, name) {
+      // 先判断是否可编辑
+      if (item.editUsers && item.editUsers.length > 0) {
+        return item.editUsers.some(e => e === name);
       } else {
-        this.canCreateProject = false;
+        return false;
       }
     },
     modify(classifyId, project) {
@@ -228,10 +225,6 @@ export default {
 // 待版本稳定后将card需要重新部样式
 .content-item {
     margin: 15px 0px 25px 0px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    grid-row-gap: 20px;
-    grid-column-gap: 20px;
     .project-list-ul {
         padding: 10px 20px;
         display: flex;
@@ -240,63 +233,56 @@ export default {
         flex-wrap: wrap;
     }
     .project-item {
-        min-height: 150px;
-        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+        height: 142px;
+        margin-right: 25px;
+        margin-bottom: 25px;
+        background: #fff;
+        max-width: 319px;
         border-radius: 2px;
-        border: 1px solid #DEE4EC;
-        @include border-color($border-color-base, $dark-border-color-base);
+        border: 1px solid #dcdee2;
         padding: $padding-25;
         cursor: pointer;
         &:hover {
-          box-shadow: 0 2px 8px 0 $shadow-color;
+          box-shadow: 0 2px 12px 0 $shadow-color;
         }
         .project-main {
           height: 100%;
-          display: flex;
-          flex-direction: column;
           .top-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             .project-title {
+              flex: 1;
               font-size: $font-size-large;
-              margin-right: 30px;
               font-weight: 600;
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Medium;
-              // color: $text-title-color;
-              @include font-color($workspace-title-color, $dark-workspace-title-color);
+              color: $text-title-color;
               letter-spacing: 0;
             }
             .menu-bar {
               position: relative;
               flex-basis: 40px;
-              /deep/.ivu-btn {
-                @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
-                @include border-color($border-color-base, $dark-border-color-base);
-                @include font-color($light-text-color, $dark-text-color);
-              }
               .menu-list {
                 display: none;
                 position: absolute;
-                bottom: 23px;
+                bottom: 25px;
                 left: -8px;
                 border-radius: 4px;
                 padding: 5px 0;
                 box-shadow: 0 1px 6px rgba(0,0,0,.2);
                 z-index: 999;
-                @include bg-color($menu-list-bg-color, $dark-menu-list-bg-color);
+                background-color: #fff;
                 cursor: pointer;
                 .list-item {
                   width: 60px;
                   padding: 5px 8px;
                   text-align: center;
-                  @include font-color($light-text-color, $dark-text-color);
                   &:hover {
-                    @include bg-color($hover-color-base, $dark-hover-color-base);
+                    background-color: #f3f3f3;
                   }
                 }
               }
@@ -313,32 +299,24 @@ export default {
             text-overflow: ellipsis;
             overflow: hidden;
             font-size: $font-size-14;
-            @include font-color($light-text-desc-color, $dark-text-desc-color);
-            margin: 15px 0;
+            color: rgba(0,0,0,0.5);
+            margin: 10px 0;
           }
           .bottom-bar {
-            margin-bottom: 0;
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            flex-wrap: wrap;
-            height: 23px;
-            overflow: hidden;
             width: 100%;
             .tag-item {
-              // color: $text-desc-color;
-              @include font-color($light-text-color, $dark-text-color);
+              color: $text-desc-color;
               padding: 2px 10px;
               margin-right: 10px;
-              border-radius: 11px;
-              @include bg-color(#F3F3F3, $dark-base-color);
-              border: 1px solid $border-color-base;
-              @include border-color($border-color-base, $dark-border-color-base);
+              border-radius: 14px;
+              background-color:#F3F3F3;
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Regular;
-              font-size: 12px;
             }
           }
         }
@@ -346,12 +324,9 @@ export default {
     .project-header {
       text-align: center;
       font-size: $font-size-large;
-      @include font-color($light-text-color, $dark-text-color);
       line-height: 102px;
       border: 1px dashed  #dcdee2;
-      @include border-color($border-color-base, $dark-border-color-base);
-      // background: #F8F9FC;
-      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      background: #F8F9FC;
       .add-icon {
         margin-top: -2px;
         margin-right: 5px;
@@ -383,8 +358,7 @@ export default {
     box-shadow: 1px 1px 5px rgba(88, 175, 251, .6);
     -webkit-animation: process 800ms infinite linear;
     animation: process 800ms infinite linear;
-    // background-color: $background-color-base;
-    @include bg-color($workspace-background, $dark-workspace-background);
+    background-color: $background-color-base;
     &:after {
         content: '';
         position: absolute;

@@ -14,109 +14,89 @@
  * limitations under the License.
  *
  */
- @import '@/common/style/variables.scss';
 
- .entry {
-   font-size: 16px;
-   height: 120px;
-   line-height: 120px;
-   background: #515a6e;
-   margin: 10px 30px 10px 10px;
-   color: #FFF;
-   text-align: center;
-   cursor: pointer;
-
-   &:hover {
-     font-weight: 600;
-
-     .icon-blod {
-       font-weight: 600;
-     }
-   }
- }
-
- .no-data-bgc {
-   font-size: $font-size-base;
-   position: absolute;
-   top: 0;
-   bottom: 40px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-
-   .no-data-img {
-     width: 200px;
-     margin-top: 150px;
-   }
-
-   .bg-text {
-     width: 60%;
-     text-align: left;
-     display: block;
-     line-height: 40px;
-
-     &.weight {
-       margin-top: 10px;
-       font-weight: bold;
-     }
-
-     &.indent {
-       text-indent: 2em;
-     }
-   }
- }
-
- .icon-blod {
-   margin-right: 2px;
- }
-
- .page-bgc {
-   @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
-   min-width: 500px;
-
-   .project-header {
-     height: 32px;
-
-     .header-title {
-       font-size: $font-size-large;
-       font-weight: bold;
-       padding-left: 12px;
-       border-left: 3px solid $primary-color;
-       @include border-color($primary-color, $dark-primary-color);
-       @include font-color($workspace-title-color,$dark-workspace-title-color);
-     }
-
-     .header-tool {
-       float: right;
-       @include font-color($primary-color, $dark-primary-color);
-       cursor: pointer;
-
-       .sort-icon {
-         font-size: 14px;
-         margin-right: 20px;
-         .icon {
-           margin-left: 5px;
-           font-size: 14px;
-           @include font-color($primary-color, $dark-primary-color);
-         }
-       }
-
-       .search-input {
-         width: 200px;
-         line-height: 100%;
-       }
-     }
-   }
- }
-
- .radio-box .ivu-radio .ivu-radio-inner {
-   border: 1px solid $primary-color;
- }
-
- .create-item {
-   text-align: center;
-   cursor: pointer;
-   line-height: 25px;
- }
-
+@import '@/common/style/variables.scss';
+.entry {
+    font-size: 16px;
+    height: 120px;
+    line-height: 120px;
+    background: #515a6e;
+    margin: 10px 30px 10px 10px;
+    color: #FFF;
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+        font-weight: 600;
+        .icon-blod {
+            font-weight: 600;
+        }
+    }
+}
+.no-data-bgc {
+    font-size: $font-size-base;
+    position: absolute;
+    top: 0;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .no-data-img {
+        width: 200px;
+        margin-top: 150px;
+    }
+    .bg-text {
+        width: 60%;
+        text-align: left;
+        display: block;
+        line-height: 40px;
+        &.weight {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        &.indent {
+            text-indent: 2em;
+        }
+    }
+}
+.icon-blod {
+    margin-right: 2px;
+}
+.page-bgc {
+    background: $body-background;
+    min-width: 500px;
+    .project-header {
+        height: 32px;
+        .header-title {
+            font-size: $font-size-large  ;
+            font-weight: bold;
+            padding-left: 12px;
+            border-left: 3px solid $primary-color;
+            color: $text-title-color;
+        }
+        .header-tool {
+            float: right;
+            color: $primary-color;
+            cursor: pointer;
+            .sort-icon {
+                margin: 0px 20px;
+                .icon {
+                    margin-left: 5px;
+                    color: $primary-color;
+                }
+            }
+            .search-input {
+                width: 200px;
+                margin-right: 30px;
+            }
+        }
+    }
+}
+.radio-box .ivu-radio .ivu-radio-inner{
+    border: 1px solid $primary-color;
+}
+.create-item {
+    text-align: center;
+    cursor: pointer;
+    line-height: 25px;
+}

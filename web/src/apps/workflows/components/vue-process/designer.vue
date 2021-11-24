@@ -1,15 +1,11 @@
 <template>
   <div :style="getStyle()" :class="{'show-toolbar': showActionView}" class="designer" @mousemove="moveShape" @mouseup="stopMoveShape">
-    <ShapeView v-if="showViews.shapeView" ref="shapeView" :shapes="myShapes" :shapeFold="shapeFold" @on-toggle-shape="toggleShape" />
-    <div class="designer-expand" v-if="shapeFold" @click="toggleShape">
-      <SvgIcon icon-class="unfold" />
-    </div>
+    <ShapeView v-if="showViews.shapeView" ref="shapeView" :shapes="myShapes" />
     <ActionView v-if="showActionView">
       <slot />
     </ActionView>
     <ControlView v-if="showViews.control" @format="format" @resetToOriginalData="resetToOriginalData" />
     <NodeView ref="designerView"
-      :shapeFold="shapeFold"
       @box-select="boxSelectChange"
       @node-view-scroll="nodeViewScroll" />
     <BaseInfo v-if="state.editBaseInfoNode" v-clickoutside="closeBaseInfo" :node="state.editBaseInfoNode" />
@@ -114,8 +110,7 @@ export default {
       showViews: Object.assign({ ...defaultViewOptions }, this.viewOptions),
       nodeViewScrollTop: 0,
       nodeViewScrollLeft: 0,
-      showActionView: this.$slots.default !== undefined,
-      shapeFold: false,
+      showActionView: this.$slots.default !== undefined
     }
   },
   computed: {
@@ -154,7 +149,7 @@ export default {
       let shapeView = this.showViews.shapeView;
       this.showViews = Object.assign({}, defaultViewOptions, v);
       if (shapeView !== this.showViews.shapeView) {
-        commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 180 : 0 });
+        commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 250 : 0 });
         this.$nextTick(() => {
           if (this.$refs.designerView) {
             this.$refs.designerView.initView();
@@ -204,7 +199,7 @@ export default {
   },
   mounted() {
     this._cacheChange = {};
-    commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 180 : 0 });
+    commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 250 : 0 });
     this.$nextTick(() => {
       if (this.$refs.designerView) {
         this.$refs.designerView.initView();
@@ -310,10 +305,6 @@ export default {
         type: 'shape',
         data: node
       });
-    },
-    toggleShape() {
-      this.shapeFold = !this.shapeFold;
-      this.$emit('toggle-shape', this.shapeFold);
     },
     moveShape(e) {
       if (this.state.disabled) return;

@@ -52,35 +52,27 @@ export default {
   margin-bottom: 20px;
   font-size: $font-size-large;
   font-weight: bold;
-  @include font-color($workspace-title-color,$dark-workspace-title-color);
   &::before {
     content: '';
     padding-right: 12px;
     border-left: 3px solid $primary-color;
-    @include border-color($primary-color, $dark-primary-color);
   }
 }
 .list-content {
-  display: flex;
-  flex-direction: row;
   .list-item-bar {
     position: relative;
-    flex: 1;
-    margin-left: 20px;
-    &:first-child {
-      margin-left: 0;
-    }
+    float: left;
+    margin-right: 25px;
+    margin-bottom: 25px;
     .list-item {
-      padding: 35px 15px 15px 15px;
-      @include bg-color($app-process-bg-color, $dark-app-process-bg-color);
-      border: 1px solid #DEE4EC;
-      @include border-color($border-color-base, $dark-app-process-bg-color);
-      box-shadow: 1px 1px 2px 1px rgba(29, 121, 214, 0.1);
+      padding: 10px;
+      border: 1px solid #ccc;
       border-radius: $border-radius-small;
-      min-width: 140px;
-      height: 360px;
+      width: 186px;
+      height: 386px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       align-items: center;
       .status-icon {
         font-size: 115px;
@@ -88,39 +80,24 @@ export default {
       .title {
         font-size: $font-size-large;
         font-weight: bold;
-        margin-top: 5px;
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
       }
       .desc {
         font-size: $font-size-small;
         display: none;
-        @include font-color($light-text-desc-color, $dark-text-desc-color);
+        width: 100px;
       }
       .link {
-        height: 30px;
-        width: 95px;
-        margin-top: 35px;
         font-size: $font-size-base;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        @include bg-color($app-process-bg-color, $dark-app-process-bg-color);
-        @include border-color($border-color-base, $dark-border-color-base);
-        @include font-color($light-text-color, $dark-text-color);
       }
       &:hover {
-        transform: translateY(-1px);
+        transform: translateY(-5px);
         transition: transform .2s linear;
-        box-shadow: 2px 2px 2px 1px rgba(29, 121, 214, 0.1);
+        box-shadow: 0 2px 12px 0 $shadow-color;
         .status-icon {
           margin-top: 0;
         }
         .desc {
           display: block;
-          margin-top: 15px;
-        }
-        .link {
-          margin-top: 15px;
         }
         .title {
           color:$primary-color;
@@ -131,19 +108,8 @@ export default {
       margin: 0 20px;
       position: absolute;
       top: 50%;
-      right: -40px;
+      right: -35px;
       font-size: 30px;
-      /deep/.svg-icon {
-        height: 20px;
-      }
-    }
-  }
-  @media only screen and (min-width: 1600px){
-    .list-item-bar {
-      margin-left: 40px;
-      &:first-child {
-        margin-left: 0;
-      }
     }
   }
 }

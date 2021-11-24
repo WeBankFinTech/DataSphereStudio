@@ -20,7 +20,6 @@ import api from '@/common/service/api';
 import storage from '@/common/helper/storage';
 import mixin from '@/common/service/mixin';
 import util from '@/common/util';
-import eventbus from '@/common/helper/eventbus';
 export default {
   name: 'dssMenu',
   mixins: [mixin],
@@ -45,13 +44,7 @@ export default {
           id: 'changeLang',
           name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : '简体中文',
           icon: 'md-repeat',
-        },
-        {
-          id: 'changeTheme',
-          name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
-          icon: 'md-repeat',
-        },
-        {
+        }, {
           id: 'logout',
           name: this.$t('message.common.logOut'),
           icon: 'ios-log-out',
@@ -76,9 +69,6 @@ export default {
         case 'changeLang':
           this.changeLang();
           break;
-        case 'changeTheme':
-          this.changeTheme();
-          break;
       }
     },
     openUserManagement() {
@@ -88,7 +78,6 @@ export default {
       util.windowOpen(this.getFAQUrl());
     },
     clearCache() {
-      localStorage.setItem('cacheGuide', null)
       this.$Modal.confirm({
         title: this.$t('message.common.userMenu.title'),
         content: this.$t('message.common.userMenu.content'),
@@ -124,37 +113,11 @@ export default {
         localStorage.setItem('locale', 'zh-CN');
       }
       window.location.reload();
-    },
-    changeTheme(){
-      document.querySelector('body').classList.add('notransition');
-      if(localStorage.getItem('theme')==='dark'){
-        window.document.documentElement.setAttribute('data-theme', '')
-        localStorage.setItem('theme', '');
-        eventbus.emit('monaco.change', 'light');
-      }else {
-        window.document.documentElement.setAttribute('data-theme', 'dark')
-        localStorage.setItem('theme', 'dark');
-        eventbus.emit('monaco.change', 'dark');
-      }
-      setTimeout(() => {
-        document.querySelector('body').classList.remove('notransition');
-      }, 1000);
-
-      this.menuList = this.menuList.map(i => {
-        if (i.id == 'changeTheme') {
-          return {
-            id: 'changeTheme',
-            name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
-            icon: 'md-repeat',
-          }
-        } else {
-          return i;
-        }
-      })
     }
   },
 };
 </script>
 <style scoped lang="scss">
+
 @import '@/common/style/headerUserMenu.scss';
 </style>

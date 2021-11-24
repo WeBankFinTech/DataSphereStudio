@@ -114,20 +114,21 @@
         :list="script.resultList"
         @change="changeSet">
       </result-set-list>
-      <Page
-        :transfer="true"
-        v-if="resultType === '2'"
-        ref="page"
-        :total="tableData.total"
-        :page-size-opts="page.sizeOpts"
-        :page-size="page.size"
-        :current="page.current"
-        class-name="page"
-        size="small"
-        show-total
-        show-sizer
-        @on-change="change"
-        @on-page-size-change="changeSize" />
+      <div class="page">
+        <Page
+          :transfer="true"
+          v-if="resultType === '2'"
+          ref="page"
+          :total="tableData.total"
+          :page-size-opts="page.sizeOpts"
+          :page-size="page.size"
+          :current="page.current"
+          size="small"
+          show-total
+          show-sizer
+          @on-change="change"
+          @on-page-size-change="changeSize" />
+      </div>
     </div>
     <we-menu
       ref="contextMenu"
@@ -208,7 +209,7 @@ export default {
       page: {
         current: 1,
         size: 50,
-        sizeOpts: [25, 50, 80, 100],
+        sizeOpts: [20, 50, 80, 100],
       },
       isLoading: false,
       // 当前高亮的行
@@ -238,7 +239,7 @@ export default {
       return this.result.type;
     },
     resultHeight() {
-      return this.scriptViewState.bottomContentHeight
+      return this.scriptViewState.bottomContentHeight - 34 - 35 // 减去tab,分页高度
     }
   },
   watch: {
@@ -631,7 +632,7 @@ export default {
   height: 100%;
   overflow: hidden;
   padding-left: $toolbarWidth;
-  @include bg-color($light-base-color, $dark-base-color);
+  background: $body-background;
   .html-result-div {
     overflow-y: auto;
   }
@@ -645,7 +646,6 @@ export default {
     .result-normal-table {
       border: none;
       border-right: $border-width-base $border-style-base $border-color-base;
-      @include border-color($border-color-base, $dark-border-color-base);
       min-width: 100%;
       .ivu-table {
         min-width: 100%;
@@ -671,10 +671,11 @@ export default {
   .we-page-container {
     display: flex;
     width: 100%;
-    height: 42px;
+    height: 35px;
     text-align: center;
-    padding-top: 10px;
     padding-left: 10px;
+    align-items: center;
+    justify-content: center;
     .page {
       display: inline-block;
       margin: 0 auto;

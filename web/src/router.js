@@ -17,7 +17,6 @@
 
 import VueRouter from "vue-router";
 import { routes } from './dynamic-apps'
-import storage from '@/common/helper/storage';
 
 // 解决重复点击路由跳转报错
 const originalPush = VueRouter.prototype.push;
@@ -34,15 +33,7 @@ router.beforeEach((to, from, next) => {
     if (to.meta.header) {
       to.query.showHeader = to.meta.header
     }
-    if (to.meta.admin) {
-      // 如果不是管理员权限，则跳转404，防止手动修改路由跳转
-      const baseInfo = storage.get("baseInfo", 'local');
-      if (baseInfo && baseInfo.isAdmin) {
-        next();
-      } else {
-        next('/404')
-      }
-    } else if (to.meta.publicPage) {
+    if (to.meta.publicPage) {
       // 公共页面不需要权限控制（404，500）
       next();
     } else if( to.path != '/workspace') {
@@ -55,7 +46,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   if (to.meta) {
-    document.title = to.meta.title || '鲁班';
+    document.title = to.meta.title || 'DataSphere Studio';
   }
 });
 

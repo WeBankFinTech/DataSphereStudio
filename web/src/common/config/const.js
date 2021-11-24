@@ -1,7 +1,5 @@
 const DEVPROCESS = {
   DEVELOPMENTCENTER: 'dev',// 开发中心
-  PRODUCTCENTER: 'prod',// 生产中心
-  OPERATIONCENTER: 'scheduler',//运维中心
   IFRAME: 'iframe'
 }
 
@@ -10,6 +8,4 @@ const ORCHESTRATORMODES = {
   SINGLETASK: 'pom_single_task',// 单任务编排
   CONSTSTORCHESTRATOR: 'pom_consist_orchestrator'// 组合编排
 }
-
 export { DEVPROCESS, ORCHESTRATORMODES }
-

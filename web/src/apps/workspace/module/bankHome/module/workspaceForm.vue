@@ -26,7 +26,7 @@
           :placeholder="$t('message.workspace.selectDepartment')">
           <Option
             v-for="(item, index) in departments"
-            :label="item.deptName"
+            :label="item.name"
             :value="String(item.id)"
             :key="index"/>
         </Select>
@@ -112,7 +112,7 @@ export default {
   },
   mounted() {
     GetDepartments().then((res) => {
-      this.departments = res.deptList;
+      this.departments = res.departments;
     });
   },
   watch: {

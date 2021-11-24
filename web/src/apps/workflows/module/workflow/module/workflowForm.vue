@@ -5,6 +5,7 @@
     :closable="false">
     <Form
       :label-width="100"
+      label-position="left"
       ref="projectForm"
       :model="workflowDataCurrent"
       :rules="formValid"
@@ -13,8 +14,6 @@
         :label="$t('message.orchestratorModes.orchestratorName')"
         prop="orchestratorName">
         <Input
-          :disabled="isPublished"
-          :maxlength=21
           v-model="workflowDataCurrent.orchestratorName"
           :placeholder="$t('message.workflow.inputFlowName')"
         ></Input>
@@ -29,21 +28,21 @@
       <!-- 不同的编排类型显示不同的编排方式， 动态接口获取 -->
       <template v-if="workflowDataCurrent.orchestratorMode">
         <FormItem v-if="selectOrchestrator.dicValue === FORMITEMTYPE.RADIO" :label="$t('message.orchestratorModes.orchestratorMethod')" prop="orchestratorWayString"
-          :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
+          :rules="[{ required: true, trigger: 'blur' }]">
           <RadioGroup v-model="workflowDataCurrent.orchestratorWayString">
             <Radio v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :label="item.dicKey">
               <span>{{item.dicName}}</span>
             </Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString" :rules="[{ required: true, trigger: 'blur' }]">
           <Select v-model="workflowDataCurrent.orchestratorWayString">
             <Option v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :value="item.dicKey">
               {{ item.dicName}}
             </Option>
           </Select>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array', message: $t('message.workflow.orchestratorWayString') }]">
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray" :rules="[{ required: true, trigger: 'blur', type: 'array' }]">
           <CheckboxGroup v-model="workflowDataCurrent.orchestratorWayArray">
             <Checkbox v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :label="item.dicKey" :key="item.dicKey">
               <span style="margin-left: 10px">{{item.dicName}}</span>
@@ -78,15 +77,12 @@
       <Button
         type="primary"
         size="large"
-        :disabled="submiting"
-        :loading="submiting"
         @click="Ok">{{$t('message.workflow.ok')}}</Button>
     </div>
   </Modal>
 </template>
 <script>
-import tag from '@component/tag/index.vue';
-import { getSchedulingStatus } from '@/apps/workflows/service/api.js';
+import tag from '@component/tag/index.vue'
 const FORMITEMTYPE = {
   RADIO: 'radio',
   SELECT: 'select',
@@ -120,86 +116,62 @@ export default {
     selectOrchestratorList: {
       type: Array,
       default: () => []
-    },
-    classifyList: {
-      type: Array,
-      default: () => []
     }
   },
   data() {
     return {
-      submiting: false,
       ProjectShow: false,
       originBusiness: '',
-      isPublished: false,
-      workflowDataCurrent: {},
       FORMITEMTYPE
     };
   },
   computed: {
     formValid() {
-      let validateName = (rule, value, callback) => {
-        const list = this.classifyList[0].dwsFlowList;
-        if (list.find(i => i.orchestratorId !== this.workflowData.orchestratorId && i.orchestratorName === value)) {
-          callback(new Error(this.$t('message.workflow.nameRepeat')))
-        } else {
-          callback()
-        }
-      };
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
+          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
-          { trigger: 'blur', validator: validateName }
         ],
         description: [
-          { required: true, message: this.$t('message.workflow.enterDesc'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.descLength')}200`, max: 200 },
+          { required: true, trigger: 'blur' },
+          { message: `${this.$t('message.workflow.nameLength')}200`, max: 200 },
         ],
         orchestratorMode: [
-          { required: true, trigger: 'blur', message: this.$t('message.workflow.orchestratorMode') }
+          { required: true, trigger: 'blur' }
         ]
       }
     },
+    // selectOrchestratorList() {
+    //   return this.orchestratorModeList.list;
+    // },
     selectOrchestrator() {
       return this.orchestratorModeList.list.find((item) => item.dicKey === this.workflowDataCurrent.orchestratorMode);
+    },
+    workflowDataCurrent() {
+      const currentData = this.workflowData;
+      if (this.workflowData && this.workflowData.orchestratorWays && this.orchestratorModeList.list.length > 0) {
+        if ([this.FORMITEMTYPE.RADIO, this.FORMITEMTYPE.SELECT].includes(this.orchestratorModeList.list.find((item) => item.dicKey === this.workflowData.orchestratorMode).dicValue)) {
+          currentData.orchestratorWayString = this.workflowData.orchestratorWays[0];
+        } else {
+          currentData.orchestratorWayArray = this.workflowData.orchestratorWays;
+        }
+      }
+      return currentData;
     }
   },
   watch: {
-    async addProjectShow(val) {
+    addProjectShow(val) {
       this.ProjectShow = val;
-      if(this.actionType != 'add' && val) {
-        await this.asyncGetSchedulingStatus()
-      }
     },
     ProjectShow(val) {
       if (val) {
         this.originBusiness = this.workflowDataCurrent.uses;
-        this.submiting = false; // ProjectShow为true时确认按钮可以点击
       }
       this.$emit('show', val);
     },
-    workflowData(value){
-      const currentData = value;
-      if (value && value.orchestratorWays && this.orchestratorModeList.list.length > 0) {
-        if ([this.FORMITEMTYPE.RADIO, this.FORMITEMTYPE.SELECT].includes(this.orchestratorModeList.list.find((item) => item.dicKey === value.orchestratorMode).dicValue)) {
-          currentData.orchestratorWayString = value.orchestratorWays[0];
-        } else {
-          currentData.orchestratorWayArray = value.orchestratorWays;
-        }
-      }
-      this.workflowDataCurrent = {
-        ...currentData
-      };
-    }
   },
   methods: {
-    asyncGetSchedulingStatus(){
-      return getSchedulingStatus(this.workflowData.workspaceId, this.workflowData.orchestratorId).then(data=>{
-        this.isPublished = data.published;
-      });
-    },
     // 处理编排模式值类型不同方法,最终只存数组
     modeValueTypeChange(workflowDataCurrent) {
       let currentData = JSON.parse(JSON.stringify(workflowDataCurrent));
@@ -215,7 +187,6 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
-          this.submiting = true;
           this.$emit('confirm', this.modeValueTypeChange(this.workflowDataCurrent));
           this.ProjectShow = false;
         } else {
@@ -238,7 +209,7 @@ export default {
       const tmpArr = this.workflowDataCurrent.uses.split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.workflowDataCurrent.uses = tmpArr.toString();
+      this.workflowData.uses = tmpArr.toString();
     }
   },
 };

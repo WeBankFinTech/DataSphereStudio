@@ -29,7 +29,7 @@ export default {
   },
   data () {
     return {
-
+      
     };
   },
   computed: {
@@ -38,7 +38,7 @@ export default {
         transition: 'all .2s ease-in-out',
         overflow: 'hidden',
         width: (this.value ? this.collapsedWidth : this.width) + 'px'
-      }
+      } 
     },
     triggerStyle() {
       return {
@@ -64,17 +64,15 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-@import '@/common/style/variables.scss';
     .menuSiderWrap {
         position: relative;
-        @include bg-color($light-base-color, $dark-menu-base-color);
     }
     .triggerIcon {
         position: absolute;
         top: 20px;
         font-size: 14px;
-        @include bg-color(#333c, $dark-active-menu-item);
-        @include font-color(#fff, $dark-text-color);
+        background: #333c;
+        color: #fff;
         line-height: 16px;
         padding: 2px;
         border-radius: 2px;

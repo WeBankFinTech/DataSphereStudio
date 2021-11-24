@@ -163,7 +163,7 @@ export default {
       return this.status && !(this.status === 'Scheduled' || this.status === 'Inited');
     },
     height() {
-      return this.scriptViewState.bottomContentHeight + 41
+      return this.scriptViewState.bottomContentHeight - 34 //减去tab高度
     }
   },
   methods: {
@@ -253,19 +253,18 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/style/variables.scss';
   .progress {
-    @include bg-color($light-base-color, $dark-base-color);
+    background: $body-background;
     position: relative;
     .ivu-table-wrapper {
       border: none;
       .ivu-table th {
-        @include font-color($light-base-color, $dark-base-color);
-        @include bg-color($primary-color, $dark-primary-color);
+        background-color: $table-thead-blue-bg;
+        color: $body-background;
       }
     }
     .total-progress {
       padding: 6px 0;
       color: $title-color;
-      @include font-color($workspace-title-color, $dark-workspace-title-color);
       .title {
         text-align: center;
       }
@@ -305,7 +304,7 @@ export default {
         left: 0;
         right: 0;
         bottom: 0;
-        @include bg-color($light-base-color, $dark-base-color);
+        background: $body-background;
         border-radius: 10px;
         animation: ivu-progress-active 2s $ease-in-out infinite;
     }
@@ -316,7 +315,6 @@ export default {
     .total-progress {
         padding: 6px 0;
         color: $title-color;
-        @include font-color($workspace-title-color, $dark-workspace-title-color);
         .title {
             text-align: center;
         }

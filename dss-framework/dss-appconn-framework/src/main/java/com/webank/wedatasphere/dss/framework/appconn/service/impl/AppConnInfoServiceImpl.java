@@ -28,13 +28,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class AppConnInfoServiceImpl implements AppConnInfoService {
-
     @Autowired
     private AppConnMapper appConnMapper;
-
     @Autowired
     private AppInstanceMapper appInstanceMapper;
 

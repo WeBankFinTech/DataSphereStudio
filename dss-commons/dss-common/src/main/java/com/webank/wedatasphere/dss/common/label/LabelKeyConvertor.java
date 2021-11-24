@@ -22,10 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author: jinyangrao on 2021/7/16
- * @description:
- */
 public class LabelKeyConvertor {
 
     private static final Logger log = LoggerFactory.getLogger(LabelKeyConvertor.class);

@@ -18,24 +18,12 @@ package com.webank.wedatasphere.dss.common.protocol.framework
 
 import com.webank.wedatasphere.dss.common.protocol.DSSProtocol
 
-
-/**
- * created by cooperyang on 2020/11/17
- * Description:
- * DSS框架RPC所需要用到RPC
- */
-
-
-
 trait FrameworkProtocol extends DSSProtocol
-
 
 case class ReleaseOrchestratorRequest(releaseUser:String, orchestratorVersionId:Long, orchestratorId:Long,
                                       dssLabel:String, workspaceName:String, workSpaceStr: String) extends FrameworkProtocol
 
 case class ReleaseOrchestratorResponse(jobId:Long) extends FrameworkProtocol
-
-
 
 case class ReleaseOrchestratorStatusRequest(jobId:Long) extends FrameworkProtocol
 

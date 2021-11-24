@@ -59,16 +59,11 @@
     <div class="defaultSlot">
       <slot></slot>
     </div>
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
   </div>
 </template>
 <script>
 import weTab from './tabs.vue';
 import i18n from '@/common/i18n';
-import eventbus from '@/common/helper/eventbus';
 export default {
   name: "WorkflowTabList",
   components: {
@@ -110,13 +105,6 @@ export default {
     },
     currentTab: {
       type: null
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    modeOfKey: {
-      type: String
     }
   },
   data() {
@@ -132,21 +120,9 @@ export default {
     buttonText(val, old) {
       // 只有新旧值变化的时候才改变
       if (val.length > 0 && JSON.stringify(val) !== JSON.stringify(old)) {
-        if (this.$route.name === 'Scheduler') {
-          val.forEach(item => {
-            if (item.dicValue === 'scheduler') {
-              this.currentButton = item
-            }
-          })
-        } else {
-          this.currentButton = val[0];
-        }
+        this.currentButton = val[0];
         this.$emit('handleChangeButton', this.currentButton);
       }
-    },
-    modeOfKey(val) {
-      if (val)
-        this.currentButton = this.buttonText.find((item) => item.dicValue === val);
     }
   },
   methods: {
@@ -155,16 +131,13 @@ export default {
     },
     onChooseWork(tabData) {
       this.$emit('bandleTapTab', tabData.tabId)
-      // tabData.id是编排id
-      eventbus.emit('workflow.orchestratorId', { orchestratorId: tabData.id, mod: 'auto' });
     },
     handleChangeButton(dicValue) {
-      const btn = this.buttonText.find((item) => item.dicValue === dicValue);
-      this.$emit('handleChangeButton', btn);
+      this.currentButton = this.buttonText.find((item) => item.dicValue === dicValue);
+      this.$emit('handleChangeButton', this.currentButton);
     },
     selectProject() {
       this.$emit('selectProject');
-      eventbus.emit('workflow.change', 'dev');
     },
     menuHandleChangeButton() {
       this.$emit('menuHandleChangeButton')

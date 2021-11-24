@@ -188,7 +188,7 @@ export default {
       let isVaild;
       if (this.currentNode && this.currentNode.data) {
         const name = this.currentNode.data.name;
-        const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+        const reg = ['.csv', '.txt'];
         const tabSuffix = name.substr(name.lastIndexOf('.'), name.length);
         isVaild = indexOf(reg, tabSuffix) !== -1;
       }
@@ -348,12 +348,11 @@ export default {
           }
         });
       }
-      const result = /^[a-zA-Z]+:\/\//.exec(this.currentNode.data.path) || [];
       this.$refs.upload.open({
         path: this.currentNode.data.path,
         nameList,
         apiPrefix: module.data.API_PATH,
-        type: result[0] || PREFIX,
+        type: PREFIX,
       });
     },
     handleCreate(node) {

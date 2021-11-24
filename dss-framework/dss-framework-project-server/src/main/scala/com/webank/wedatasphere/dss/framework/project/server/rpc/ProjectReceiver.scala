@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace, ResponseUserWorkspace, ResponseWorkspaceUserList}
 import org.apache.linkis.rpc.{Receiver, Sender}

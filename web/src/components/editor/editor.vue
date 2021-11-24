@@ -8,7 +8,6 @@ import monaco from './monaco-loader';
 import { merge, debounce } from 'lodash';
 import storage from '@/common/helper/storage';
 import highRiskGrammar from './highRiskGrammar';
-import eventbus from '@/common/helper/eventbus';
 
 const types = {
   code: {
@@ -134,13 +133,10 @@ export default {
   },
   mounted() {
     this.initMonaco();
-    this.changeTheme(localStorage.getItem('theme'));
-    eventbus.on('monaco.change', this.changeTheme);
   },
   beforeDestroy: function() {
     // 销毁 editor，进行gc
     this.editor && this.editor.dispose();
-    eventbus.off('monaco.change', this.changeTheme);
   },
   methods: {
     // 初始化
@@ -173,14 +169,6 @@ export default {
           })
         }
       }), 100)
-    },
-    changeTheme(theme) {
-      if (theme == 'dark') {
-        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
-      }
-      if (theme == 'light') {
-        monaco.editor.setTheme('logview');
-      }
     },
     changeInnerText(elList, text) {
       elList.forEach((el) => {

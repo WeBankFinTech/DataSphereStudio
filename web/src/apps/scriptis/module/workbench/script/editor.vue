@@ -139,8 +139,7 @@ export default {
       return this.script.running;
     },
     isHdfs() {
-      return false
-      //return this.work.filepath.indexOf('hdfs') === 0;
+      return this.work.filepath.indexOf('hdfs') === 0;
     },
     isSupport() {
       return this.script.executable;
@@ -294,7 +293,6 @@ export default {
     .editor-content {
       height: calc(100% - 32px);
       display: flex;
-      @include bg-color($light-base-color, $dark-menu-base-color);
     }
   }
   .workbench-body-navbar {
@@ -303,10 +301,9 @@ export default {
     left: 0;
     width: 100%;
     z-index: 2;
-    @include bg-color($light-base-color, $dark-menu-base-color);
+    background-color: #fff;
     padding: 0 4px;
     border-bottom: $border-width-base $border-style-base $border-color-base;
-    @include border-color($border-color-base, $dark-menu-base-color);
     height: 32px;
     line-height: 32px;
     display: flex;
@@ -321,14 +318,14 @@ export default {
   .workbench-body-navbar-item {
     margin: 0 16px;
     cursor: pointer;
-    @include font-color($light-text-color, $dark-text-color);
+    color: rgba($text-color, 0.8);
     &.disabled {
-      @include font-color($light-text-desc-color, $dark-text-desc-color);
+      color: rgba($text-color, 0.5);
     }
     &:hover {
-      @include font-color($primary-color, $dark-primary-color);
+      color: $link-active-color;
         &.disabled {
-          @include font-color($light-text-desc-color, $dark-text-desc-color);
+          color: rgba($text-color, 0.5);
       }
     }
     .ivu-icon {

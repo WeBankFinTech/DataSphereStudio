@@ -108,7 +108,6 @@ export default {
         },
       };
       if (this.work.backgroundType) {
-        //initData.method = '/api/rest_j/v1/entrance/backgroundservice';
         initData.method = 'dss/datapipe/backgroundservice';
         initData.data.background = this.work.backgroundType;
         initData.data.scriptPath = this.work.filename;
@@ -319,7 +318,7 @@ export default {
         this.script.progress = {
           ...this.script.progress,
           costTime
-        }
+        };
         const name = this.work.filepath || this.work.filename;
         this.$Notice.close(name);
         this.$Notice.success({

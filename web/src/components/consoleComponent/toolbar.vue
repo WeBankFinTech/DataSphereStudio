@@ -27,11 +27,11 @@
                   <Col span="10">
                   <Radio label="1">{{$t('message.common.toolbar.graphAnalysis')}}</Radio>
                   </Col>
-                  <!--<Col
+                  <Col
                     span="10"
                     offset="4">
                   <Radio label="2">{{$t('message.common.toolbar.excelAnalysis')}}</Radio>
-                  </Col>-->
+                  </Col>
                 </RadioGroup>
               </Row>
             </div>
@@ -141,20 +141,14 @@
           </div>
         </Poptip>
       </li>
-      <!-- <li
-        @click="openPopup('export')"
-        v-if="$route.name === 'Home' && analysistext.flag !== 2">
-=======
       <li
         @click="openPopup('export')"
         v-if="$route.name === 'Home' && analysistext.flag !== 2 && resultType === '2'">
->>>>>>> b5c29e41490d1200fbd6b32f407ea018def62aec
         <SvgIcon :style="{ 'font-size': '20px' }" icon-class="export" color="#515a6e"/>
         <span
           class="v-toolbar-icon"
           v-if="isIconLabelShow">{{ $t('message.common.toolbar.export') }}</span>
-<<<<<<< HEAD
-      </li> -->
+      </li>
       <li
         @click="openPopup('rowView')"
         v-if="row"
@@ -248,19 +242,23 @@ export default {
       isIconLabelShow: true,
       iconSize: 14,
       allDownload: false, // 是否下载全部结果集
-      resultsShowType: '1'
+      resultsShowType: '2'
     };
   },
   computed: {
     analysistext: function(){
       let describe = '';
-      this.visualShow === "table"? describe = {
-        flag: 1,
-        text: this.$t('message.common.toolbar.deepAnalysis')
-      } : describe = {
+      // this.visualShow === "table"? describe = {
+      //   flag: 1,
+      //   text: this.$t('message.common.toolbar.deepAnalysis')
+      // } : describe = {
+      //   flag: 2,
+      //   text: this.$t('message.common.toolbar.resultGroup')
+      // };
+      describe = {
         flag: 2,
         text: this.$t('message.common.toolbar.resultGroup')
-      };
+      }
       return describe
     },
     isAll() {
@@ -364,8 +362,7 @@ export default {
     position: $absolute;
     left: 40px;
     margin-left: -$toolbarWidth;
-    // background: $body-background;
-    @include bg-color($light-base-color, $dark-menu-base-color);
+    background: $body-background;
     .we-poptip {
       padding: 12px;
       line-height: 28px;
@@ -381,7 +378,6 @@ export default {
       width: 100%;
       height: 100%;
       border-right: 1px solid #dcdee2;
-      @include border-color($border-color-base, $dark-menu-base-color);
       padding-top: 10px;
       li {
         padding-bottom: 20px;

@@ -111,11 +111,11 @@
           </Table>
         </div>
         <div v-if="step === 3">
-          <!-- <FormItem
+          <FormItem
             prop="approvalName"
             :label="$t('message.scripts.apiPublish.addApiModal.approvalName')">
             <Input v-model="addApiData.approvalName"/>
-          </FormItem> -->
+          </FormItem>
           <FormItem
             prop="applyUser"
             :label="$t('message.scripts.apiPublish.addApiModal.applyUser')">
@@ -181,6 +181,13 @@
         </template>
         <template v-if="step === 2">
           <FormItem
+            prop="approvalName"
+            :label="$t('message.scripts.apiPublish.addApiModal.approvalName')"
+            :rules="[{ required: true, message: 'The name cannot be empty', trigger: 'blur' }]"
+          >
+            <Input v-model="updateApiData.approvalName"/>
+          </FormItem>
+          <FormItem
             prop="applyUser"
             :label="$t('message.scripts.apiPublish.addApiModal.applyUser')"
             :rules="[
@@ -198,6 +205,12 @@
               { required: false }
             ]">
             <Input v-model="updateApiData.proxyUser"/>
+          </FormItem>
+          <FormItem
+            prop="describe"
+            :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitTwo'), max: 200 }]"
+            :label="$t('message.scripts.apiPublish.addApiModal.describe')">
+            <Input v-model="updateApiData.describe" show-word-limit type="textarea"/>
           </FormItem>
           <FormItem
             prop="comment"
@@ -270,7 +283,7 @@ export default {
       addApiModalWidth: 450,
       ruleValidate: {
         approvalName: [
-          { required: true, message: 'The name cannot be empty', trigger: 'blur' }
+          { required: true, message: this.$t('message.scripts.apiPublish.rule.approvalName'), trigger: 'blur' }
         ],
         apiName: [
           {
@@ -333,6 +346,10 @@ export default {
         {
           label: 'Date',
           value: 3
+        },
+        {
+          label: 'Array',
+          value: 4
         }
       ],
       requireList: [
@@ -624,7 +641,7 @@ export default {
     apiDataFill(id) {
       const currentApi = this.apiList.find((item) => item.id == id);
       if (currentApi) {
-        // this.updateApiData.approvalName = currentApi.approvalVo.approvalName;
+        this.updateApiData.approvalName = currentApi.approvalVo.approvalName;
         // 如果之前绑定的用户被删除，需要清掉
         this.updateApiData.applyUser = currentApi.approvalVo.applyUser.split(',').filter((item) => this.applyUserList.some((i) => i.name === item));
         this.updateApiData.proxyUser = currentApi.approvalVo.executeUser;
@@ -1030,28 +1047,4 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-@import '@/common/style/variables.scss';
-.workbench-body-navbar-item {
-  margin: 0 16px;
-  cursor: pointer;
-  color: rgba($text-color, 0.8);
-  &.disabled {
-      color: rgba($text-color, 0.5);
-  }
-  &:hover {
-      color: $link-active-color;
-      &.disabled {
-          color: rgba($text-color, 0.5);
-      }
-  }
-  .ivu-icon {
-      font-size: 16px;
-  }
-  .navbar-item-name {
-      margin-left: 1px;
-  }
-}
-</style>
-
-
+<style lang="scss" src="./index.scss" />

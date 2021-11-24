@@ -100,10 +100,8 @@ export default {
     }
     .table-row-table {
       .ivu-table th {
-        // background-color: $table-thead-blue-bg;
-        @include bg-color($primary-color,$dark-primary-color);
-        // color: $body-background;
-        @include font-color(#fff, #000);
+        background-color: $table-thead-blue-bg;
+        color: $body-background;
       }
       .ivu-table .is-null {
         color: $error-color;

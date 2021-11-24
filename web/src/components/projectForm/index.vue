@@ -41,55 +41,50 @@
         </Select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.publishPermissions')"
-        prop="releaseUsers"
-        >
-        <luban-select
-          v-model="projectDataCurrent.releaseUsers"
-          multiple
-          filterable
-          :placeholder="$t('message.workflow.projectDetail.userAllowedPublish')">
-          <Option
-            v-for="(item, index) in releaseUsers"
-            :label="item"
-            :value="item"
-            :key="index"/>
-        </luban-select>
-      </FormItem>
-      <FormItem
         :label="$t('message.workflow.projectDetail.editPermissions')"
         prop="editUsers">
-        <luban-select
+        <Select
           v-model="projectDataCurrent.editUsers"
-          :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
           :placeholder="$t('message.workflow.projectDetail.usersAllowedToEdit')">
           <Option
             v-for="(item, index) in editUsersMap"
-            :disabled="item==projectDataCurrent.createBy"
             :label="item"
             :value="item"
             :key="index"/>
-        </luban-select>
+        </Select>
       </FormItem>
       <FormItem
         :label="$t('message.workflow.projectDetail.viewPermissions')"
         prop="accessUsers">
-        <luban-select
+        <Select
           v-model="projectDataCurrent.accessUsers"
-          :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
           :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')">
           <Option
             v-for="(item, index) in accessUsersMap"
-            :disabled="item==projectDataCurrent.createBy"
             :label="item"
             :value="item"
             :key="index"/>
-        </luban-select>
+        </Select>
       </FormItem>
+      <!-- <FormItem
+        :label="$t('message.workflow.projectDetail.opPermissions')"
+        prop="releaseUsers">
+        <Select
+          v-model="projectDataCurrent.releaseUsers"
+          multiple
+          filterable
+          :placeholder="$t('message.workflow.projectDetail.selectOPUser')">
+          <Option
+            v-for="(item, index) in accessUsersMap"
+            :label="item"
+            :value="item"
+            :key="index"/>
+        </Select>
+      </FormItem> -->
       <FormItem :label="$t('message.workflow.projectDetail.devProcess')" prop="devProcessList">
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
           <Checkbox v-for="item in devProcess" :label="item.dicValue" :key="item.dicKey">
@@ -100,7 +95,7 @@
       </FormItem>
       <FormItem v-if="framework" :label="$t('message.workflow.projectDetail.orchestratorMode')" prop="orchestratorModeList">
         <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
-          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey" :disabled="!item.enabled">
+          <Checkbox v-for="item in orchestratorModeList.list" :label="item.dicKey" :key="item.dicKey">
             <span class="icon-bar">
               <SvgIcon class="icon-style" :icon-class="item.icon"/>
               <span style="margin-left: 10px">{{item.dicName}}</span>
@@ -134,8 +129,6 @@
       <Button
         type="primary"
         size="large"
-        :disabled="submiting"
-        :loading="submiting"
         @click="Ok">{{$t('message.workflow.ok')}}</Button>
     </div>
   </Modal>
@@ -143,13 +136,10 @@
 <script>
 import storage from "@/common/helper/storage";
 import tag from '@component/tag/index.vue';
-import lubanSelect from '@component/select/index.vue';
-import _ from 'lodash';
 import { GetWorkspaceUserList, GetDicList } from '@/common/service/apiCommonMethod.js';
 export default {
   components: {
     'we-tag': tag,
-    'luban-select': lubanSelect
   },
   props: {
     projectData: {
@@ -179,12 +169,10 @@ export default {
   },
   data() {
     return {
-      test: [],
       ProjectShow: false,
       originBusiness: '',
       editUsersMap: [],
       accessUsersMap: [],
-      releaseUsers: [],
       devProcess: [
         {
           id: 1,
@@ -200,12 +188,13 @@ export default {
         }
       ],
       devProcessList: [],
-      selectCompiling: [],
-      projectDataCurrent: {},
-      submiting: false,
+      selectCompiling: []
     };
   },
   computed: {
+    projectDataCurrent() {
+      return this.projectData;
+    },
     formValid() {
       let validateName = (rule, value, callback) => {
         let currentWorkspaceName = storage.get("currentWorkspace") ? storage.get("currentWorkspace").name : null;
@@ -219,7 +208,7 @@ export default {
       return {
         name: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}20`, max: 20 },
+          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
           { validator: validateName, trigger: 'blur' }
         ],
@@ -237,18 +226,13 @@ export default {
         ],
         orchestratorModeList: [
           { required: true, message: this.$t('message.workflow.projectDetail.pleaseSelect'), trigger: 'blur', type: "array" }
-        ],
-        releaseUsers: [
-          { required: true, message: this.$t('message.workflow.projectDetail.userAllowedPublish'), trigger: 'change', type: 'array' },
         ]
       }
     }
   },
   mounted() {
     GetWorkspaceUserList({workspaceId: +this.$route.query.workspaceId}).then((res) => {
-      this.accessUsersMap = res.users.accessUsers;
-      this.editUsersMap = res.users.editUsers;
-      this.releaseUsers = res.users.releaseUsers;
+      this.accessUsersMap = this.editUsersMap = res.users;
     })
     this.getData();
   },
@@ -262,21 +246,6 @@ export default {
       }
       this.$emit('show', val);
     },
-    projectData(value){
-      // const handleCreateUser = (arr,createBy)=> {
-      //   const index = arr.indexOf(createBy);
-      //   if(index === -1){
-      //     arr.unshift(index);
-      //   }else {
-      //     arr.unshift(arr.splice(index)[0])
-      //   }
-      // }
-      const cloneObj = _.cloneDeep(value);
-      // handleCreateUser(cloneObj.accessUsers || [], cloneObj.createBy);
-      // handleCreateUser(cloneObj.editUsers || [], cloneObj.createBy);
-
-      this.projectDataCurrent = cloneObj;
-    }
   },
   methods: {
     getData() {
@@ -292,11 +261,8 @@ export default {
     Ok() {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
-          this.submiting = true;
-          this.$emit('confirm', this.projectDataCurrent, () => {
-            this.ProjectShow = false;
-            this.submiting = false;
-          });
+          this.$emit('confirm', this.projectDataCurrent);
+          this.ProjectShow = false;
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

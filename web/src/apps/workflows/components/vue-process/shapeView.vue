@@ -1,43 +1,37 @@
 <template lang="html">
-  <div class="designer-shape" :class="{'shape-fold': shapeFold}">
-    <div class="shape-head">
-      <div class="head-title">组件</div>
-      <div class="head-btn" @click="toggleShape">
-        <SvgIcon icon-class="putaway"/>
-      </div>
-    </div>
+  <div :style="getBaseStyle" class="designer-shape">
     <input v-model="searchValue" :placeholder="$t('message.workflow.vueProcess.search')" class="shape-search">
     <div v-for="(shape, index) in search" :key="index" :class="{ 'top': index==0 }" class="shape-container">
       <div :class="{open: shape.show}" class="shape-title" @click="toggleTitle(shape)">
-        <SvgIcon v-show="!shape.show" class="icon" icon-class="close" verticalAlign="0px" />
-        <SvgIcon v-show="shape.show" class="icon" icon-class="open" verticalAlign="0px" />
+        <Icon v-show="!shape.show" name="turn_right" />
+        <Icon v-show="shape.show" name="turn_top" />
         {{ shape.title }}
       </div>
       <div v-show="shape.show" v-if="shape.children && shape.children.length>0" class="shape-content">
         <div v-for="(item, index) in shape.children" :key="index" :title="item.title" class="shape-box"
           @mousedown="beginDragShap(item, $event)">
-          <img :src="item.image" :alt="item.title" class="shape-box-img" @error="error" />
+          <img :src="item.image" :alt="item.title" class="shape-box-img" @error="error" :style="getBoxStyle" />
           <div :title="item.title" class="shape-title-txt">{{ item.title }}</div>
         </div>
       </div>
     </div>
     <div v-show="state.draging.type=='shape'" ref="dragShapBox" :style="getBoxStyle" class="shape-box-draging">
-      <img v-if="state.draging.type=='shape'" :src="state.draging.data.image" class="shape-box-img" :style="getBoxStyle">
+      <img v-if="state.draging.type=='shape'" :src="state.draging.data.image" class="shape-box-img">
     </div>
   </div>
 </template>
 <script>
+import Icon from './icon.vue'
 import { mapActions, commit, mixin } from './store';
 export default {
+  components: {
+    Icon
+  },
   mixins: [mixin],
   props: {
     shapes: {
       type: Array,
       required: true
-    },
-    shapeFold: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -46,6 +40,11 @@ export default {
     };
   },
   computed: {
+    getBaseStyle() {
+      return {
+        width: this.state.shapeOptions.viewWidth + 'px'
+      };
+    },
     getBoxStyle() {
       return {
         'height': this.state.shapeOptions.height + 'px',
@@ -89,9 +88,6 @@ export default {
     },
     toggleTitle(shape) {
       shape.show = !shape.show;
-    },
-    toggleShape() {
-      this.$emit('on-toggle-shape');
     },
     beginDragShap(shape, e) {
       if (this.state.disabled || this.state.mapMode) return;

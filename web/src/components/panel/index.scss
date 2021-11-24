@@ -34,12 +34,11 @@
 
 .we-panel-item {
     position: absolute;
-    @include bg-color($light-base-color, $dark-base-color);
+    background: #fff;
 }
 
 .we-panel-dash {
     position: absolute;
-    width: 1px !important;
-    background-color: transparent;
+    background: transparent;
     z-index: $zindex-drawer;
 }

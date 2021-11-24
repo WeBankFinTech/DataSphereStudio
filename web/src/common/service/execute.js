@@ -288,7 +288,7 @@ Execute.prototype.queryLog = function() {
     .then((rst) => {
       this.fromLine = rst.fromLine;
       this.handleLines = this.handleLines || {}
-      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
+      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) { 
         return  Promise.resolve();
       } else if(this.fromLine) {
         this.handleLines[fromLine+'_'+this.fromLine] = 1
@@ -353,15 +353,7 @@ Execute.prototype.getResultList = function() {
         this.trigger('steps', 'FailedToGetResultList');
         logError(err, this);
       });
-  } else if (this.resultsetInfo) {
-    // insert等操作执行成功后返回的resultLocation为null的情况
-    this.trigger('steps', 'Completed');
   } else {
-    this.trigger('notice', {
-      type: 'error',
-      msg: i18n.t('message.common.execute.error.getResultList'),
-      autoJoin: true,
-    });
     const log = '**result tips: empty!';
     this.trigger('log', log);
     this.trigger('steps', 'Completed');

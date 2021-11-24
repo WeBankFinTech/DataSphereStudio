@@ -1,14 +1,26 @@
 <template>
-  <div class="we-panel we-panel-vertical">
-    <div ref="topPanel" :class="{'full-screen': scriptViewState.topPanelFull}"  class="editor-panel" :style="{'height': scriptViewState.topPanelHeight}">
+  <we-panel class="container" diretion="vertical" @on-resize="resize" @on-resized="resizePanel">
+    <we-panel-item
+      ref="topPanel"
+      :index="1"
+      :min="36"
+      :height="scriptViewState.topPanelHeight"
+      class="editor-panel"
+      :class="{'full-screen': scriptViewState.topPanelFull}"
+    >
       <editor ref="editor" :script="script" :work="work" :script-type="work.type" :readonly="readonly" @on-save="save" @on-run="run"
         @on-stop="stop"/>
       <Spin v-if="saveLoading" size="large" class="new-sidebar-spin" fix />
-      <!-- 头部的线 -->
-      <div class="script-line" @mousedown.stop="handleMouseDown"></div>
-    </div>
+    </we-panel-item>
     <!-- 使用v-if把非当前脚本DOM移除文档防止DOM节点过多影响性能 -->
-    <div v-if="current===work.id" :class="{'full-screen': scriptViewState.bottomPanelFull}" class="log-panel">
+    <we-panel-item
+      v-if="current===work.id"
+      :index="2"
+      :min="36"
+      :height="scriptViewState.bottomContentHeight"
+      class="log-panel"
+      :class="{'full-screen': scriptViewState.bottomPanelFull}"
+    >
       <div class="workbench-tabs">
         <div class="workbench-tab-wrapper">
           <div class="workbench-tab">
@@ -28,46 +40,55 @@
               class="workbench-tab-item" @click="showPanelTab('history')">
               <span>{{ $t('message.scripts.tabs.history') }}</span>
             </div>
+            <!-- <div v-if="bottomTab.diagnosis" :class="{active: scriptViewState.showPanel == 'diagnosis'}"
+              class="workbench-tab-item" @click="showPanelTab('diagnosis')">
+              <span>{{ $t('message.scripts.tabs.diagnosis') }}</span>
+            </div> -->
           </div>
         </div>
+        <div class="workbench-container">
+          <we-progress
+            v-if="bottomTab.show_progress"
+            :current="script.progress.current"
+            :waiting-size="script.progress.waitingSize"
+            :steps="script.steps"
+            :status="script.status"
+            :script-view-state="scriptViewState"
+            :application="script.application"
+            :progress-info="script.progress.progressInfo"
+            :cost-time="script.progress.costTime"
+            @open-panel="openPanel" />
+          <result
+            v-if="bottomTab.show_result"
+            ref="result"
+            :script="script"
+            :dispatch="dispatch"
+            :visualShow="visualShow"
+            :script-view-state="scriptViewState"
+            :dataWranglerParams="dataWranglerParams"
+            getResultUrl="filesystem"
+            @on-set-change="changeResultSet"
+            @on-analysis="openAnalysisTab"
+            :visualParams="visualParams" />
+          <log
+            v-if="bottomTab.show_log"
+            :status='script.status'
+            :logs="script.log"
+            :log-line="script.logLine"
+            :script-view-state="scriptViewState"/>
+          <history
+            v-if="bottomTab.show_history"
+            :history="script.history"
+            :script-view-state="scriptViewState"
+            :run-type="script.runType"
+            :node="node" />
+          <!-- <diagnosis
+            v-if="bottomTab.show_diagnosis"
+            :diagnosis="script.diagnosis" /> -->
+        </div>
       </div>
-      <we-progress
-        v-if="bottomTab.show_progress"
-        :current="script.progress.current"
-        :waiting-size="script.progress.waitingSize"
-        :steps="script.steps"
-        :status="script.status"
-        :script-view-state="scriptViewState"
-        :application="script.application"
-        :progress-info="script.progress.progressInfo"
-        :cost-time="script.progress.costTime"
-        @open-panel="openPanel" />
-      <result
-        v-if="bottomTab.show_result"
-        ref="result"
-        :script="script"
-        :dispatch="dispatch"
-        :visualShow="visualShow"
-        :script-view-state="scriptViewState"
-        :dataWranglerParams="dataWranglerParams"
-        getResultUrl="filesystem"
-        @on-set-change="changeResultSet"
-        @on-analysis="openAnalysisTab"
-        :visualParams="visualParams" />
-      <log
-        v-if="bottomTab.show_log"
-        :status='script.status'
-        :logs="script.log"
-        :log-line="script.logLine"
-        :script-view-state="scriptViewState"/>
-      <history
-        v-if="bottomTab.show_history"
-        :history="script.history"
-        :script-view-state="scriptViewState"
-        :run-type="script.runType"
-        :node="node" />
-    </div>
-  </div>
+    </we-panel-item>
+  </we-panel>
 </template>
 <script>
 import {
@@ -92,13 +113,14 @@ import {
 
 import editor from './editor.vue';
 import history from './history.vue';
+// import diagnosis from './intelligentDiagnosis.vue';
 import result from '@/components/consoleComponent/result.vue';
 import log from '@/components/consoleComponent/log.vue';
 import weProgress from '@/components/consoleComponent/progress.vue';
-import elementResizeEvent from '@/common/helper/elementResizeEvent';
 import mixin from '@/common/service/mixin';
 
 export default {
+  name: 'editor-script',
   components: {
     result,
     editor,
@@ -344,9 +366,6 @@ export default {
     this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
   },
   mounted() {
-    window.addEventListener('mousemove', this.handleMouseMove);
-    window.addEventListener('mouseup', this.handleMouseUp);
-    elementResizeEvent.bind(this.$el, this.resize);
     this.$nextTick(() => {
       this.dispatch('WebSocket:init');
       this.resizePanel();
@@ -363,12 +382,6 @@ export default {
     // 关闭tab页面不再继续轮询接口
     if (this.execute && this.execute.run !== undefined) {
       this.execute.run = false;
-    }
-    window.removeEventListener('mousemove', this.handleMouseMove);
-    window.removeEventListener('mouseup', this.handleMouseUp);
-    elementResizeEvent.unbind(this.$el);
-    if (this.animationFrameId) {
-      elementResizeEvent.cancelAnimationFrame(this.animationFrameId);
     }
     clearTimeout(this.autoSaveTimer);
     let runningScripts = storage.get(this._running_scripts_key, 'local') || {};
@@ -390,44 +403,6 @@ export default {
     window.onbeforeunload = null;
   },
   methods: {
-    // 鼠标位置事件兼容
-    getStdMouseEvent(event) {
-      return {
-        positionX: event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
-        positionY: event.clientY + document.body.scrollTop + document.documentElement.scrollTop,
-      };
-    },
-    // 拖拽的线鼠标按下事件
-    handleMouseDown(e) {
-      // 阻止冒泡事件和默认事件
-      e.stopPropagation();
-      e.preventDefault();
-      // 先记录当前鼠标按下的位置
-      const positionEvent = this.getStdMouseEvent(e);
-      this.startY = positionEvent.positionY;
-      this.mouseDownHeight = this.$refs.topPanel.offsetHeight;
-      this.isMouseDown = true;
-    },
-    handleMouseMove(e) {
-      if (this.isMouseDown) {
-        const positionEvent = this.getStdMouseEvent(e);
-        this.currentY = positionEvent.positionY;
-        // 计算其实位置到移动的距离
-        this.moveResult = this.currentY - this.startY;
-        if (this.animationFrameId) {
-          elementResizeEvent.cancelAnimationFrame(this.animationFrameId);
-        }
-        this.animationFrameId = elementResizeEvent.requestAnimationFrame(() => {
-          let h = this.mouseDownHeight - -this.moveResult
-          this.resize(null, h)
-        })
-      }
-    },
-    handleMouseUp() {
-      if (this.isMouseDown) {
-        this.isMouseDown = false;
-      }
-    },
     // panel 分割线拖动调整大小
     resizePanel() {
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
@@ -502,7 +477,7 @@ export default {
       // fix ***REMOVED***
       if (this.node) {
         setTimeout(()=>{
-          this.resizePanel()
+          this.resizePanel() 
         })
       }
     },
@@ -1102,8 +1077,7 @@ export default {
           params: this.convertSettingParams(this.script.params),
         };
           // this.work.code = this.script.data;
-
-        const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
+        const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
             if (this.work.filepath) {
@@ -1158,15 +1132,9 @@ export default {
       }
     },
     showPanelTab(type) {
-      let h = this.scriptViewState.topPanelHeight.replace('px', '') - 0
-      let bottomContentHeight = this.scriptViewState.bottomContentHeight
-      if(this.$el && this.$el.clientHeight > 0) {
-        bottomContentHeight = this.$el.clientHeight - h - 75
-      }
       this.scriptViewState = {
         ...this.scriptViewState,
         showPanel: type,
-        bottomContentHeight
       }
       if (type === 'log') {
         this.localLogShow();
@@ -1479,13 +1447,10 @@ export default {
         bottom: -2px;
         z-index: 3;
         border-bottom: 1px solid #dcdee2;
-        @include border-color($border-color-base, $dark-base-color);
-        @include bg-color($light-base-color, $dark-base-color);
         cursor: ns-resize;
     }
     &.full-screen {
-        top: 85px;
-        cursor: ns-resize;
+        top: 85px !important;
         right: 0;
         bottom: 0;
         left: 0;
@@ -1495,25 +1460,26 @@ export default {
         height: 100% !important;
     }
     .new-sidebar-spin {
-        @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
+        background-color: rgba(255, 255, 255, .1);
     }
   }
   .log-panel {
     margin-top: 1px;
     border-top: $border-width-base $border-style-base $border-color-base;
-    @include border-color($border-color-base, $dark-border-color-base);
-    @include bg-color($light-base-color, $dark-base-color);
+    background-color: $background-color-base;
     .workbench-tabs {
       position: $relative;
       height: 100%;
       overflow: hidden;
       box-sizing: border-box;
       z-index: 3;
+      display: flex;
+      flex-flow: column;
       .workbench-tab-wrapper {
+        height: 34px;
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
-        @include border-color($border-color-base, $dark-menu-base-color);
         &.full-screen {
             position: fixed;
             left: 0;
@@ -1529,7 +1495,7 @@ export default {
           justify-content: flex-start;
           align-items: flex-start;
           height: 32px;
-          @include bg-color($light-base-color, $dark-base-color);
+          background-color: $body-background;
           width: calc(100% - 45px);
           overflow: hidden;
           &.work-list-tab {
@@ -1552,24 +1518,21 @@ export default {
             display: inline-block;
             height: 32px;
             line-height: 32px;
-            @include bg-color($light-base-color, $dark-submenu-color);
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
+            background-color: $background-color-base;
+            color: $title-color;
             cursor: pointer;
             min-width: 100px;
             max-width: 200px;
             overflow: hidden;
             margin-right: 2px;
             border: 1px solid #eee;
-            @include border-color($border-color-base, $dark-border-color-base);
             &.active {
               margin-top: 1px;
-              @include bg-color($light-base-color, $dark-base-color);
-              @include font-color($primary-color, $dark-primary-color);
+              background-color: $body-background;
+              color: $primary-color;
               border-radius: 4px 4px 0 0;
-              border-left: 1px solid $border-color-base;
-              border-right: 1px solid $border-color-base;
-              border-top: 1px solid $border-color-base;
-              @include border-color($border-color-base, $dark-border-color-base);
+              border: 1px solid $border-color-base;
+              border-bottom: 2px solid $primary-color;
             }
           }
         }

@@ -35,31 +35,31 @@ public class ApiUtils {
      * @param tryOperation operate function
      * @param failMessage  message
      */
-    public static Response doAndResponse(TryOperation tryOperation, String method, String failMessage) {
+    public static Message doAndResponse(TryOperation tryOperation, String method, String failMessage) {
         try {
             Message message = tryOperation.operateAndGetMessage();
-            return Message.messageToResponse(setMethod(message, method));
+            return setMethod(message, method);
         } catch (ConstraintViolationException e) {
             LOG.error("api error, method: " + method, e);
-            return new BeanValidationExceptionMapper().toResponse(e);
+            return Message.error(e.getMessage());
         } catch (WarnException e) {
             LOG.error("api error, method: " + method, e);
-            return Message.messageToResponse(setMethod(Message.warn(e.getMessage()), method));
+            return setMethod(Message.warn(e.getMessage()), method);
         } catch (AssertException e) {
             LOG.error("api error, method: " + method, e);
-            return Message.messageToResponse(setMethod(Message.error(e.getMessage()), method));
+            return setMethod(Message.error(e.getMessage()), method);
 
         } catch (ApiExecuteException e) {
         LOG.error("api error, method: " + method, e);
-        return Message.messageToResponse(setMethod(Message.error(e.getMessage()), method));
+        return setMethod(Message.error(e.getMessage()), method);
         }
         catch (ApiServiceQueryException e) {
             LOG.error("api error, method: " + method, e);
-            return Message.messageToResponse(setMethod(Message.error(e.getMessage()), method));
+            return setMethod(Message.error(e.getMessage()), method);
         }
         catch (Exception e) {
             LOG.error("api error, method: " + method, e);
-            return Message.messageToResponse(setMethod(Message.error(failMessage, e), method));
+            return Message.error(e.getMessage());
         }
     }
 

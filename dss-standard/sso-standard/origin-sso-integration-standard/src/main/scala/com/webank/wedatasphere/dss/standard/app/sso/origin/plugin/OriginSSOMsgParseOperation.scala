@@ -31,14 +31,14 @@ class OriginSSOMsgParseOperation extends AbstractSSOMsgParseOperation {
     val dssUrl = dssMsg.getDSSUrl
     val dwsHttpClient:Client=null
     Utils.tryFinally({
-    val dwsHttpClient = HttpClient.getHttpClient(dssUrl, "DSS")
-    val userInfoAction = new UserInfoAction
-    HttpClient.addCookies(dssMsg, userInfoAction)
-    dwsHttpClient.execute(userInfoAction) match {
-      case userInfoResult: UserInfoResult =>
-        userInfoResult.getUserName
-    }
-  })(IOUtils.closeQuietly(dwsHttpClient))
+      val dwsHttpClient = HttpClient.getHttpClient(dssUrl, "DSS")
+      val userInfoAction = new UserInfoAction
+      HttpClient.addCookies(dssMsg, userInfoAction)
+      dwsHttpClient.execute(userInfoAction) match {
+        case userInfoResult: UserInfoResult =>
+          userInfoResult.getUserName
+      }
+    })(Utils.tryQuietly(dwsHttpClient.close()))
   }
 
 }

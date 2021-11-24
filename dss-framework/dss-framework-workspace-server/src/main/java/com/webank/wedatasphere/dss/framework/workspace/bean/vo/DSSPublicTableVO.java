@@ -1,18 +1,16 @@
- /*
+/*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,10 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.util.Arrays;
 
-/**
- * created by cooperyang on 2020/3/8
- * Description:
- */
+
 public class DSSPublicTableVO extends AbstractDSSVO{
     private int id;
     private String name;
@@ -123,14 +118,6 @@ public class DSSPublicTableVO extends AbstractDSSVO{
     }
 
 
-    public static void main(String[] args){
-        DSSPublicTableVO vo1 =
-                new DSSPublicTableVO(1, "default.aaa", "正常", "视图表", true, "enjoyyin", "700", "enjoyyin", "2020-03-08 20:14:01");
-        DSSPublicTableVO vo2 =
-                new DSSPublicTableVO(2, "default.bbb", "正常", "普通表", false, "enjoyyin", "700", "cooperyang", "2020-03-08 20:14:01");
 
-        System.out.println(VOUtils.gson.toJson(Arrays.asList(vo1, vo2)));
-
-    }
 
 }

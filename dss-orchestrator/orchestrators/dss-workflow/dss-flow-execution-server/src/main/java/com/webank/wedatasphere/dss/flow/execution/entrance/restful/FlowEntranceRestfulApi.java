@@ -34,18 +34,16 @@ import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
 
-@Path("/dss/flow/entrance")
-@Component
+@RequestMapping(path = "/dss/flow/entrance")
+@RestController
 public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 
     private EntranceServer entranceServer;
@@ -66,9 +64,8 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
      * Repsonse
      */
     @Override
-    @POST
-    @Path("/execute")
-    public Response execute(@Context HttpServletRequest req, Map<String, Object> json) {
+    @RequestMapping(value = "/execute",method = RequestMethod.POST)
+    public Message execute(@Context HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
 //        try{
         logger.info("Begin to get an execID");
@@ -76,10 +73,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         params.put("workspace", workspace);
-        //
-//        String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
-        String label = "dev";
-
+        String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();
@@ -101,14 +95,13 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 //            message.setStatus(1);
 //            message.setMethod("/api/entrance/execute");
 //        }
-        return Message.messageToResponse(message);
+        return message;
 
     }
 
     @Override
-    @GET
-    @Path("/{id}/status")
-    public Response status(@PathParam("id") String id, @QueryParam("taskID") String taskID) {
+    @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
+    public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = Option.apply(null);
@@ -122,7 +115,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             message = Message.ok();
             message.setMethod("/api/entrance/" + id + "/status");
             message.data("status", status).data("execID", id);
-            return Message.messageToResponse(message);
+            return message;
         }
         if (job.isDefined()) {
             message = Message.ok();
@@ -131,11 +124,10 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         } else {
             message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
     private void pushLog(String log, Job job) {
         entranceServer.getEntranceContext().getOrCreateLogManager().onLogUpdate(job, log);
     }
-
 }

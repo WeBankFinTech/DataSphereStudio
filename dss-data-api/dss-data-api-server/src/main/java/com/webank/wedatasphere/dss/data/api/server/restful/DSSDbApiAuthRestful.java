@@ -67,7 +67,7 @@ public class DSSDbApiAuthRestful {
 
     @POST
     @Path("/save")
-    public Response saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
+    public Message saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
         if(apiAuth.getId() ==null) {
             String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
@@ -84,22 +84,22 @@ public class DSSDbApiAuthRestful {
 
         boolean flag = apiAuthService.saveApiAuth(apiAuth);
         if(flag) {
-            return Message.messageToResponse(Message.ok("保存成功"));
+            return Message.ok("保存成功");
         }else{
-            return Message.messageToResponse(Message.error("保存失败"));
+            return Message.error("保存失败");
         }
     }
 
     @GET
     @Path("/token")
-    public Response generateToken( ) {
+    public Message generateToken( ) {
         String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
-        return Message.messageToResponse(Message.ok().data("token",token));
+        return Message.ok().data("token",token);
     }
 
     @GET
     @Path("/list")
-    public Response getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("caller") String caller,
+    public Message getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("caller") String caller,
                                    @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
@@ -110,26 +110,26 @@ public class DSSDbApiAuthRestful {
 
         List<Long> totals = new ArrayList<>();
         List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,caller,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
+        return Message.ok().data("list",apiAuths).data("total", totals.get(0));
     }
 
     @POST
     @Path("/{id}")
-    public Response deleteApiAuth(@PathParam("id") Long id){
+    public Message deleteApiAuth(@PathParam("id") Long id){
         log.info("-------delete apiauth:    " + id + ", begin");
         apiAuthService.deleteApiAuth(id);
 
         Message message = Message.ok("删除成功");
-        return Message.messageToResponse(message);
+        return message;
     }
 
     @GET
     @Path("/apigroup")
-    public Response getApiGroup(@QueryParam("workspaceId") Long workspaceId){
+    public Message getApiGroup(@QueryParam("workspaceId") Long workspaceId){
         List<ApiGroupInfo> apiGroupInfoList = apiAuthService.getApiGroupList(workspaceId);
 
         Message message = Message.ok().data("list",apiGroupInfoList);
-        return Message.messageToResponse(message);
+        return message;
     }
 }
 

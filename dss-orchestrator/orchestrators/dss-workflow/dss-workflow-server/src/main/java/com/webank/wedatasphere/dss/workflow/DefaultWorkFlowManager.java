@@ -16,19 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -65,6 +52,18 @@ import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.linkis.server.BDPJettyServerHelper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultWorkFlowManager implements WorkFlowManager {
@@ -84,7 +83,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Autowired
     private MetaInputService metaInputService;
-
     @Autowired
     private PublishService publishService;
 
@@ -214,6 +212,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         return rootFlows;
     }
 
+
     @Autowired
     private OrchestratorMapper orchestratorMapper;
 
@@ -226,27 +225,27 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         Map<Long, Long> schedulerWorkflowIdMap = new HashMap<>();
         flows.stream().forEach(flow -> {
             DSSOrchestratorVersion orchestratorVersion =
-                orchestratorMapper.getOrchestratorVersionByAppId(flow.getId());
+                    orchestratorMapper.getOrchestratorVersionByAppId(flow.getId());
             releaseInfoMap.put(flow.getId(),
-                OrchestratorReleaseInfo.newInstance(orchestratorVersion.getOrchestratorId(),
-                    orchestratorVersion.getId(), orchestratorVersion.getVersion(), flow.getId()));
+                    OrchestratorReleaseInfo.newInstance(orchestratorVersion.getOrchestratorId(),
+                            orchestratorVersion.getId(), orchestratorVersion.getVersion(), flow.getId()));
             // 如果发布过，记录调度系统中对应的工作流id
             OrchestratorReleaseInfo releaseInfo =
-                orchestratorMapper.getByOrchestratorId(orchestratorVersion.getOrchestratorId());
+                    orchestratorMapper.getByOrchestratorId(orchestratorVersion.getOrchestratorId());
             if (releaseInfo != null) {
                 schedulerWorkflowIdMap.put(flow.getId(), releaseInfo.getSchedulerWorkflowId());
             }
         });
 
         SchedulerAppConn appConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
-            .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+                .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (appConn == null) {
             appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
         }
 //        List<AppInstance> appInstances = appConn.getAppDesc().getAppInstancesByLabels(requestConversionWorkflow.getDSSLabels());
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
         DSSToRelConversionOperation operation = appConn.getOrCreateWorkflowConversionStandard()
-            .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
+                .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
         DSSToRelConversionRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRef(DSSToRelConversionRequestRef.class, appConn.getAppDesc().getAppName());
         if(requestRef instanceof ProjectToRelConversionRequestRefImpl) {
             ProjectToRelConversionRequestRefImpl relConversionRequestRef = (ProjectToRelConversionRequestRefImpl) requestRef;
@@ -268,7 +267,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 Long workflowId = Long.valueOf(flowId);
                 OrchestratorReleaseInfo releaseInfo = releaseInfoMap.get(workflowId);
                 OrchestratorReleaseInfo latestOrchestratorReleaseInfo =
-                    orchestratorMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
+                        orchestratorMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
 
                 Long schedulerWorkflowId = Double.valueOf(String.valueOf(result.get(flowId))).longValue();
                 if (latestOrchestratorReleaseInfo == null) { // 未发布过，插入记录

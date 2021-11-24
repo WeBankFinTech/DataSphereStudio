@@ -18,10 +18,6 @@ package com.webank.wedatasphere.dss.common.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-/**
- * @Author alexyang
- * @Date 2020/3/27
- */
 public class DSSCommonConf {
 
     public static final CommonVars<String> DSS_IO_ENV = CommonVars.apply("wds.dss.server.io.env", "BDAP_DEV");

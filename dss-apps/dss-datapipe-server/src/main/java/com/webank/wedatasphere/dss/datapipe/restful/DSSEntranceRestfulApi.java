@@ -30,30 +30,24 @@ import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
 
-@Path("/dss/datapipe")
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/datapipe", produces = {"application/json"})
+@RestController
 public class DSSEntranceRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(DSSEntranceRestfulApi.class);
 
-    @POST
-    @Path("/backgroundservice")
-    public Response backgroundservice(@Context HttpServletRequest req, Map<String, Object> json) {
+    @RequestMapping(value = "/backgroundservice",method = RequestMethod.POST)
+    public Message backgroundservice(@Context HttpServletRequest req,@RequestBody Map<String, Object> json) {
         Message message = null;
         logger.info("Begin to get an execID");
         String backgroundType = (String) json.get("background");
@@ -64,7 +58,7 @@ public class DSSEntranceRestfulApi {
             bgService = new LoadBackGroundService();
         }else{
             message = Message.error("export type is not exist："+backgroundType);
-            return Message.messageToResponse(message);
+            return message;
         }
         Gson gson = new Gson();
         Map<String, Object> executionCode = (Map<String, Object>) json.get("executionCode");
@@ -84,7 +78,7 @@ public class DSSEntranceRestfulApi {
         message.data("execID", jobExecuteResult.getExecID());
         message.data("taskID", jobExecuteResult.getTaskID());
         logger.info("End to get an an execID: {}, taskID: {}", jobExecuteResult.getExecID(), jobExecuteResult.getTaskID());
-        return Message.messageToResponse(message);
+        return message;
 
     }
 

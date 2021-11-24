@@ -30,10 +30,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * created by cooperyang on 2019/6/13
- * Description:
- */
 public class ZipHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipHelper.class);

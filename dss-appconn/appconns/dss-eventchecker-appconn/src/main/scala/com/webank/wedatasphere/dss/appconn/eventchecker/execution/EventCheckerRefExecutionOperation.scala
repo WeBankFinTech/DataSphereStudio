@@ -16,12 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
-
-
-
 import java.util.{Properties, UUID}
 
-import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
 import com.webank.wedatasphere.dss.standard.app.development.listener.{ExecutionLogListener, ExecutionResultListener}
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
@@ -32,6 +28,7 @@ import org.apache.linkis.common.log.LogUtils
 import org.apache.linkis.common.utils.Utils
 import org.apache.linkis.storage.LineRecord
 import org.apache.commons.io.IOUtils
+import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import org.slf4j.LoggerFactory;
 
 

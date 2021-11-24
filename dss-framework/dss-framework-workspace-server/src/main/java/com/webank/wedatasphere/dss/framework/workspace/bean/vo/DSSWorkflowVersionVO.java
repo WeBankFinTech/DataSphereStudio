@@ -1,18 +1,16 @@
- /*
+/*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -21,10 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/3/8
- * Description:
- */
+
 public class DSSWorkflowVersionVO {
     private int workflowId;
     private String version;
@@ -93,15 +88,6 @@ public class DSSWorkflowVersionVO {
         this.workflowJson = workflowJson;
     }
 
-    public static void main(String[] args){
 
-        DSSWorkflowVersionVO vo1 =
-                new DSSWorkflowVersionVO(123, "v0001", "enjoyyin", "第一次的版本", "2020-03-08 13:47:01", "工作流json");
-        DSSWorkflowVersionVO vo2 =
-                new DSSWorkflowVersionVO(123, "v0002", "cooperyang", "第二次的版本", "2020-03-08 14:47:01", "工作流json");
-
-        List<DSSWorkflowVersionVO> list = Arrays.asList(vo1, vo2);
-        System.out.println(VOUtils.gson.toJson(list));
-    }
 
 }

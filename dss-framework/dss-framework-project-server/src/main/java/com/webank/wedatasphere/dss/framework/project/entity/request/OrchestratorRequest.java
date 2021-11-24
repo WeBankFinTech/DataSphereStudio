@@ -24,15 +24,8 @@ import java.util.List;
 @XmlRootElement
 public class OrchestratorRequest {
 
-    public Long getOrchestratorId() {
-        return orchestratorId;
-    }
+    private Long id;
 
-    public void setOrchestratorId(Long orchestratorId) {
-        this.orchestratorId = orchestratorId;
-    }
-
-    private Long orchestratorId;
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
 
@@ -46,7 +39,13 @@ public class OrchestratorRequest {
     private String orchestratorMode;
 
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getWorkspaceId() {
         return workspaceId;
@@ -75,7 +74,7 @@ public class OrchestratorRequest {
     @Override
     public String toString() {
         return "OrchestratorRequest{" +
-                " orchestratorId=" + orchestratorId +
+                "id=" + id +
                 ", workspaceId=" + workspaceId +
                 ", projectId=" + projectId +
                 ", orchestratorMode='" + orchestratorMode + '\'' +

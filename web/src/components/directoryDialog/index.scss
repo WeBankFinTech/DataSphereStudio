@@ -19,11 +19,9 @@
 .we-directory {
     .we-directory-input {
         .ivu-input[disabled], fieldset[disabled] .ivu-input {
-            // color: #333;
-            @include font-color($light-text-color, $dark-text-color);
+            color: #333;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
-            @include bg-color($disabled-bg-color, $dark-disabled-bg-color);
         }
     }
     .we-directory-tree {
@@ -31,10 +29,8 @@
         border: 1px solid $border-color-base;
         border-top: 0;
         border-radius: 0 0 5px 5px;
-        // background: #fefefe;
-        @include bg-color(#fefefe, $dark-base-color);
-        @include border-color($border-color-base, $dark-border-color-base);
-        // box-shadow: 0px 2px 2px #dedede inset;
+        background: #fefefe;
+        box-shadow: 0px 2px 2px #dedede inset;
         overflow: auto;
     }
     .is-hide {

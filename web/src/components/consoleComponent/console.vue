@@ -92,7 +92,7 @@ export default {
     comData: {
       type: Object
     },
-    heigth: {
+    height: {
       type: [String, Number]
     },
     dispatch: {
@@ -153,7 +153,6 @@ export default {
     }
   },
   mounted() {
-    this.scriptViewState.bottomContentHeight = this.heigth - 75;
   },
   methods: {
     killExecute(flag = false) {
@@ -388,8 +387,7 @@ export default {
     },
     openAnalysisTab(type) {
       this.visualShow = type;
-      // flage ? this.visualShow = 'table' : this.visualShow = 'visual'
-      // this.flage = !this.flage;
+
       if (type === 'visual') {
         this.biLoading = true;
         let rows = this.scriptResult.headRows;
@@ -677,9 +675,6 @@ export default {
       }
       .workbench-container {
         height: calc(100% - 36px);
-        &.node {
-            height: 100%;
-        }
         flex: 1;
         @keyframes ivu-progress-active {
             0% {

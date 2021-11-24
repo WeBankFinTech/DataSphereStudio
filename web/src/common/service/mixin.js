@@ -94,16 +94,15 @@ export default {
         this.$Message.warning(this.$t('message.common.warning.comingSoon'));
       } else {
         if (!info.ifIframe) {
-          if(url.startsWith('http')){
-            let newUrl = new URLSearchParams();
-            Object.keys(query).forEach(key=>{
-              newUrl.set(key, query[key]);
-            })
-            window.open(util.replaceHolder(url), '_blank')
-          }else {
-            this.$router.push({path: url, query});
+          if (url.startsWith('http')) {
+            util.windowOpen(url);
+          } else {
+            this.$router.push({
+              path: url,
+              query
+            });
           }
-
+          
         } else {
           this.$router.push({
             name: 'commonIframe',

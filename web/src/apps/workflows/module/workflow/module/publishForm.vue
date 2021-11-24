@@ -41,12 +41,12 @@ export default {
   },
   methods: {
     publish() {
-      // 发布到生产中心
-      api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishToScheduler`, {
+
+      api.fetch(`${this.$API_PATH.PUBLISH_PATH}releaseOrchestrator`, {
         comment: this.comment,
         orchestratorId: this.currentData.orchestratorId,
         orchestratorVersionId: this.currentData.orchestratorVersionId,
-        dssLabel: this.getCurrentDsslabels()
+        labels: {route: this.getCurrentDsslabels()}
       }).then((res) => {
         // 轮询结果超过十分钟，提示超时
         let timeoutVlaue = 0;
@@ -62,7 +62,7 @@ export default {
       const timer = setTimeout(() => {
         timeoutValue += 8000;
         // init  running  success failed
-        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getPublishStatus`, { releaseTaskId, dssLabel: this.getCurrentDsslabels() }, 'get').then((res) => {
+        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getPublishStatus`, { releaseTaskId, labels: this.getCurrentDsslabels() }, 'get').then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);

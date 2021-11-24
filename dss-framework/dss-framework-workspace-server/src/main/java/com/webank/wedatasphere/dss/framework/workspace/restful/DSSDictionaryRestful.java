@@ -1,18 +1,16 @@
- /*
+/*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -21,36 +19,25 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSDictionaryRequestVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSDictionaryService;
-import com.webank.wedatasphere.dss.framework.workspace.util.RestfulUtils;
 import org.apache.linkis.server.Message;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-/**
- * created by cooperyang on 2020/10/26
- * Description:侧边栏的内容展示
- */
-@Component
-@Path("/dss/framework/workspace/")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+@RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
+@RestController
 public class DSSDictionaryRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSDictionaryRestful.class);
@@ -64,37 +51,35 @@ public class DSSDictionaryRestful {
      * @param dictionaryRequestVO
      * @return
      */
-    @POST
-    @Path("getDicList")
-    public Response getDevFlowList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+    @RequestMapping(path ="getDicList", method = RequestMethod.POST)
+    public Message getDevFlowList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
-                return Message.messageToResponse(Message.error("workspaceId(空间id)不能为空"));
+                return Message.error("workspaceId(空间id)不能为空");
             }
             if(StringUtils.isEmpty(dictionaryRequestVO.getParentKey())&&StringUtils.isEmpty(dictionaryRequestVO.getDicKey())){
-                return Message.messageToResponse(Message.error("获取的parentKey和dicKey不能同时为空"));
+                return Message.error("获取的parentKey和dicKey不能同时为空");
             }
             List<DSSDictionary> dictionaries = dictionaryService.getListByParam(dictionaryRequestVO);
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));
             if(CollectionUtils.isNotEmpty(dictionaries) && isEnglish){
                 dictionaries.stream().forEach(e->international(e));
             }
-            return RestfulUtils.dealOk("获取数据字典成功", new Pair<>("list", dictionaries));
+            return Message.ok("获取数据字典成功").data("list", dictionaries);
         }catch(Exception e){
             LOGGER.error("Fail to get getDevFlowListError for user {} in workspace {}",dictionaryRequestVO.getWorkspaceId(), e);
-            return RestfulUtils.dealError("获取数据字典失败:"+e.getMessage());
+            return Message.error("获取数据字典失败:"+e.getMessage());
         }
     }
 
-    @POST
-    @Path("getDicSecondList")
-    public Response getDicSecondList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+    @RequestMapping(path ="getDicSecondList", method = RequestMethod.POST)
+    public Message getDicSecondList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
-                return Message.messageToResponse(Message.error("workspaceId(空间id)不能为空"));
+                return Message.error("workspaceId(空间id)不能为空");
             }
             if(StringUtils.isEmpty(dictionaryRequestVO.getParentKey())&&StringUtils.isEmpty(dictionaryRequestVO.getDicKey())){
-                return Message.messageToResponse(Message.error("获取的parentKey和dicKey不能同时为空"));
+                return Message.error("获取的parentKey和dicKey不能同时为空");
             }
             Map<String,Object> map = dictionaryService.getDicSecondList(dictionaryRequestVO);
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));
@@ -110,10 +95,10 @@ public class DSSDictionaryRestful {
                     }
                 }
             }
-            return RestfulUtils.dealOk("获取数据字典成功", new Pair<>("list", map));
+            return Message.ok("获取数据字典成功").data("list", map);
         }catch(Exception e){
             LOGGER.error("Fail to get getDicSecondListError for user {} in workspace {}",dictionaryRequestVO.getWorkspaceId(), e);
-            return RestfulUtils.dealError("获取数据字典失败:"+e.getMessage());
+            return Message.ok("获取数据字典失败:"+e.getMessage());
         }
     }
 

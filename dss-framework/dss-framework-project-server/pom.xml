@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
        <!-- <relativePath>../../pom.xml</relativePath>-->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -274,6 +274,14 @@
                 </includes>
             </resource>
 
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 </project>

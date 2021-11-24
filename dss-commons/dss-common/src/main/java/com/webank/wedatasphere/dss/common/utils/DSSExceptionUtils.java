@@ -29,9 +29,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by v_wbjftang on 2019/9/24.
- */
 public class DSSExceptionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSExceptionUtils.class);

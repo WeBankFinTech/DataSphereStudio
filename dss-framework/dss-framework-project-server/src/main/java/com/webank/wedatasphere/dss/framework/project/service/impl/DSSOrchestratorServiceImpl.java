@@ -205,8 +205,8 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
         queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
-        if (orchestratorRequest.getOrchestratorId() != null) {
-            queryWrapper.eq("orchestrator_id", orchestratorRequest.getOrchestratorId());
+        if (orchestratorRequest.getId() != null) {
+            queryWrapper.eq("orchestrator_id", orchestratorRequest.getId());
         }
         if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
             queryWrapper.eq("orchestrator_mode", orchestratorRequest.getOrchestratorMode());

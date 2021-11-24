@@ -63,7 +63,7 @@ public class DSSDbApiConfigRestful {
      */
     @POST
     @Path("save")
-    public Response saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
+    public Message saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
         String username = SecurityFilter.getLoginUsername(request);
         apiConfig.setCreateBy(username);
         apiConfig.setUpdateBy(username);
@@ -79,7 +79,7 @@ public class DSSDbApiConfigRestful {
      */
     @POST
     @Path("/group/create")
-    public Response saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
+    public Message saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
         String username = SecurityFilter.getLoginUsername(request);
         apiGroup.setCreateBy(username);
         apiConfigService.addGroup(apiGroup);
@@ -94,7 +94,7 @@ public class DSSDbApiConfigRestful {
      */
     @GET
     @Path("/list")
-    public Response getApiList(@QueryParam("workspaceId") String workspaceId) {
+    public Message getApiList(@QueryParam("workspaceId") String workspaceId) {
         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
         Message message = Message.ok().data("list", list);
         return Message.messageToResponse(message);
@@ -108,7 +108,7 @@ public class DSSDbApiConfigRestful {
 
     @GET
     @Path("/detail")
-    public Response getApiDetail(@QueryParam("apiId") int apiId) {
+    public Message getApiDetail(@QueryParam("apiId") int apiId) {
         ApiConfig apiConfig = apiConfigService.getById(apiId);
         Message message = Message.ok().data("detail", apiConfig);
         return Message.messageToResponse(message);
@@ -124,7 +124,7 @@ public class DSSDbApiConfigRestful {
 
     @POST
     @Path("/test/{path:[a-zA-Z0-9_/]+}")
-    public Response testApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
+    public Message testApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
 
         try {
             ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map,true);
@@ -147,7 +147,7 @@ public class DSSDbApiConfigRestful {
      */
     @POST
     @Path("/execute/{path:[a-zA-Z0-9_/]+}")
-    public Response executeApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
+    public Message executeApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
         try {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
             Message message = Message.ok().data("response", resJo);

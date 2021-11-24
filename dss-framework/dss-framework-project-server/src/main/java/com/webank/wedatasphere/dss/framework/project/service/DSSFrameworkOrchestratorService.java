@@ -15,7 +15,6 @@
  */
 
 package com.webank.wedatasphere.dss.framework.project.service;
-
 import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
@@ -23,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.Orchestrator
 import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
+
 
 public interface DSSFrameworkOrchestratorService {
 
@@ -34,20 +34,8 @@ public interface DSSFrameworkOrchestratorService {
 
     CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception;
 
-    /**
-     * 删除编排模式.
-     *
-     * @param username
-     *            the username
-     * @param dssOrchestrator
-     *            the dss orchestrator
-     * @param deleteSchedulerWorkflow
-     *            the delete scheduler workflow
-     * @throws ErrorException
-     *             the error exception
-     */
     void deleteOrchestrator(String username, DSSOrchestrator dssOrchestrator, Boolean deleteSchedulerWorkflow)
-        throws ErrorException;
+            throws ErrorException;
 
     CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception;
 

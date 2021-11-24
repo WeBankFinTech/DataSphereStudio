@@ -20,7 +20,7 @@ export const subAppRoutes = {
   component: () => import('./view/layout.vue'),
   redirect: '/home',
   meta: {
-    title: '鲁班',
+    title: 'DataSphere Studio',
     publicPage: true, // 权限公开
   },
   children: []

@@ -69,7 +69,7 @@ dssConf(){
             #access_log  /var/log/nginx/host.access.log  main;
 
             location /dss/visualis {
-            root   ${dss_basepath}/dss/visualis; # 静态文件目录
+            root   ${dss_basepath}; # 静态文件目录
             autoindex on;
             }
 
@@ -200,9 +200,6 @@ if [[ $version -eq 7 ]]; then
 fi
 echo '安装visualis前端,用户自行编译DSS前端安装包，则安装时需要把visualis的前端安装包放置于此'$dss_basepath/dss/visualis'，用于自动化安装:'
 cd $dss_basepath/dss/visualis;unzip -o build.zip  > /dev/null
-<<<<<<< HEAD
-=======
 echo '安装linkis管理台,用户自行编译DSS前端安装包，则安装时需要把linkis管理台安装包放置于此'$dss_basepath/dss/linkis'，用于自动化安装:'
 cd $dss_basepath/dss/linkis;unzip -o build.zip  > /dev/null
->>>>>>> b5c29e41490d1200fbd6b32f407ea018def62aec
 echo "请浏览器访问：http://${dss_ipaddr}:${dss_port}"

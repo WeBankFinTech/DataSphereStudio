@@ -1,43 +1,29 @@
 <template>
   <div>
     <div class="layout-header">
-      <div
-        class="layout-header-menu-icon"
-      >
-        <!-- <div style="display:inline-block;"
+      <div class="layout-header-menu-icon">
+        <div
+          style="display:inline-block;"
           v-show="isNavShowMenu"
           @mouseleave="mouseleave"
-          @click="mouseover">
-          <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF"/>
-        </div> -->
-
-        <vue-luban-menu
-          v-if="isNavShowMenu"
-          :apps="menuList" 
-          :favorites="favorites" 
-          @menu-click="handleMenuClick"
-          @favorite-remove="removeFavorite" 
-          @favorite-add="addFavorite"
-          ref="vueLubanMenu">
-          <div class="luban-menu-trigger">
-            <img src="../../assets/images/luban-menu-trigger.png">
-          </div>
-        </vue-luban-menu>
-
+          @click="mouseover"
+        >
+          <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF" />
+        </div>
         <div class="logo">
           <img
             @click.stop="goHome"
             class="logo-img"
-            :style="{ cursor: 'pointer'}"
+            :style="{ cursor: isAdmin ? 'pointer' : 'default' }"
             src="../../assets/images/dssLogo5_1.png"
             :alt="$t('message.common.logoName')"
-          >
+          />
           <span class="version">{{sysVersion}}</span>
         </div>
       </div>
       <!-- <span v-if="showWorkspaceNav && !currentProject.id" class="workspace-icon" :title="$t('message.common.project')">
         <SvgIcon style="font-size: 2rem;" class="icon selected workspace-svg" icon-class="project" color="#ffffff"/>
-      </span> -->
+      </span>-->
       <Dropdown class="project-dro" v-if="showWorkspaceNav && !currentProject.id">
         <div class="project">
           {{ currentWorkspace.name }}
@@ -58,7 +44,7 @@
       </Dropdown>
       <!-- <span v-if="currentProject.id" class="proj-select" :title="$t('message.common.project')">
         <SvgIcon style="font-size: 2rem;" icon-class="file" color="#1d9cf0"/>
-      </span>&nbsp; -->
+      </span>&nbsp;-->
       <Dropdown class="project-dro" v-if="currentProject.id">
         <div class="project">
           {{ currentProject.name }}
@@ -73,7 +59,8 @@
                 @click="changeProj(proj,p)"
                 :key="proj.id+p.id"
                 :class="{'active':p.id == currentProject.id}"
-                class="proj-item">{{ p.name }}</span>
+                class="proj-item"
+              >{{ p.name }}</span>
             </div>
           </div>
         </DropdownMenu>
@@ -84,17 +71,27 @@
         class="user"
         @click="handleUserClick"
       >
-        <div class="userName">
-          <span>{{ userName || 'Null' }}</span>
-          <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon"/>
-          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon"/>
-        </div>
-        <userMenu v-show="isUserMenuShow" @clear-session="clearSession"/>
+        <span>{{ userName || 'Null' }}</span>
+        <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon" />
+        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon" />
+        <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
       </div>
       <ul class="menu">
-        <li v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId" class="menu-item" @click="goSpaceHome">{{$t("message.common.home")}}</li>
-        <li class="menu-item" v-if="isAdmin && homeRoles && $route.query.workspaceId" @click="goRolesPath">{{ homeRoles.name }}</li>
-        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
+        <li
+          v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId"
+          class="menu-item"
+          @click="goSpaceHome"
+        >{{$t("message.common.home")}}</li>
+        <li
+          class="menu-item"
+          v-if="homeRoles && $route.query.workspaceId"
+          @click="goRolesPath"
+        >{{ homeRoles.name }}</li>
+        <li
+          class="menu-item"
+          v-if="$route.query.workspaceId"
+          @click="goConsole"
+        >{{$t("message.common.management")}}</li>
       </ul>
       <div class="icon-group">
         <Icon
@@ -116,18 +113,19 @@
   </div>
 </template>
 <script>
-import { isEmpty } from "lodash";
-import storage from "@/common/helper/storage";
-import userMenu from "./userMenu.vue";
-import clickoutside from "@/common/helper/clickoutside";
-import navMenu from "./navMenu/index.vue";
-import mixin from '@/common/service/mixin';
-import util from '@/common/util';
-import eventbus from '@/common/helper/eventbus';
-import { 
-  GetBaseInfo, GetWorkspaceApplications, GetWorkspaceList, GetWorkspaceBaseInfo,
-  GetFavorites, AddFavorite, RemoveFavorite
-} from '@/common/service/apiCommonMethod.js';
+import { isEmpty } from 'lodash'
+import storage from '@/common/helper/storage'
+import userMenu from './userMenu.vue'
+import clickoutside from '@/common/helper/clickoutside'
+import navMenu from './navMenu/index.vue'
+import mixin from '@/common/service/mixin'
+import util from '@/common/util'
+import {
+  GetBaseInfo,
+  GetWorkspaceApplications,
+  GetWorkspaceList,
+  GetWorkspaceBaseInfo
+} from '@/common/service/apiCommonMethod.js'
 export default {
   directives: {
     clickoutside
@@ -144,34 +142,33 @@ export default {
       homeRoles: null,
       sysVersion: process.env.VUE_APP_VERSION,
       isUserMenuShow: false,
-      userName: "",
+      userName: '',
       isNavMenuShow: false,
       currentProject: {},
       projectList: [],
-      isSandbox: process.env.NODE_ENV === "sandbox",
+      isSandbox: process.env.NODE_ENV === 'sandbox',
       workspaceList: [],
       currentWorkspace: {},
-      menuList: [],
-      // luban-nav-menu
-      favorites: [],
-    };
+      menuList: []
+    }
   },
   mixins: [mixin],
   created() {
-    this.getWorkspacesRoles().then(res => {
-      // cookies改变最新后再执行其他方法
-      if(res) {
-        this.init();
-        this.getApplications();
-        this.getWorkspaces();
-        this.getWorkspaceFavorites();
-      }
-    }).catch(err => {
-      console.error(err)
-    });
+    this.getWorkspacesRoles()
+      .then(res => {
+        // cookies改变最新后再执行其他方法
+        if (res) {
+          this.init()
+          this.getApplications()
+          this.getWorkspaces()
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      })
   },
   mounted() {
-    this.getCurrentProject();
+    this.getCurrentProject()
   },
   computed: {
     isNavShowMenu() {
@@ -179,46 +176,47 @@ export default {
     },
     moudleName() {
       let moudleNameMaps = {
-        "/home": "Scriptis",
-        "/console": "Console",
-        "/workflow": "Workflow",
-        "/process": "Workflow"
-      };
-      let moudleName;
+        '/home': 'Scriptis',
+        '/console': 'Console',
+        '/workflow': 'Workflow',
+        '/process': 'Workflow'
+      }
+      let moudleName
       Object.keys(moudleNameMaps).forEach(k => {
         if (this.$route.path.indexOf(k) > -1) {
-          moudleName = moudleNameMaps[k];
+          moudleName = moudleNameMaps[k]
         }
-      });
-      return moudleName;
+      })
+      return moudleName
     },
     showWorkspaceNav() {
-      return (this.$route.path.indexOf("/workspaceHome") !== -1) 
-        || (this.$route.path.indexOf("/dataService") !== -1) 
-        || (this.$route.path.indexOf("/dataManagement") !== -1) 
-        || this.$route.path === '/project' || this.$route.path === '/workspace'
+      return (
+        this.$route.path.indexOf('/workspaceHome') !== -1 ||
+        this.$route.path === '/project' ||
+        this.$route.path === '/workspace'
+      )
     }
   },
   watch: {
     '$route.query.projectID'(newValue) {
-      this.projectID = newValue;
-      this.getCurrentProject();
+      this.projectID = newValue
+      this.getCurrentProject()
     },
     // 将以前的'$route.query.workspaceId'监听换成'$route'，之前的无法监听组件之间的切换触发
-    '$route'(v) {
+    $route(v) {
       // 设定条件只有切换在工作空间首页时才触发
-      if(v.name === 'workspaceHome') {
-        this.init();
-        this.getWorkspacesRoles().then(res => {
-          // cookies改变最新后再执行其他方法
-          if(res) {
-            this.getApplications();
-            this.getWorkspaces();
-            this.getWorkspaceFavorites();
-          }
-        }).catch(err => {
-          console.error(err)
-        });
+      if (v.name === 'workspaceHome') {
+        this.getWorkspacesRoles()
+          .then(res => {
+            // cookies改变最新后再执行其他方法
+            if (res) {
+              this.getApplications()
+              this.getWorkspaces()
+            }
+          })
+          .catch(err => {
+            console.error(err)
+          })
       }
     }
   },
@@ -226,177 +224,136 @@ export default {
     // 获取进入工作空间的用户权限
     getWorkspacesRoles() {
       // 如果下面接口不通时，默认显示用户名
-      if (storage.get("baseInfo", 'local')) {
-        this.userName = storage.get("baseInfo", 'local').username;
+      if (storage.get('baseInfo', 'local')) {
+        this.userName = storage.get('baseInfo', 'local').username
       }
       return new Promise((resolve, reject) => {
         if (this.$route.query.workspaceId) {
           GetWorkspaceBaseInfo({
             workspaceId: this.$route.query.workspaceId || ''
-          }).then((res) => {
-            // 缓存数据，供其他页面判断使用
-            storage.set(`workspaceRoles`, res.roles, 'session');
-            // roles主动触发，防止接口请求和sessionstorge之间的时间差导致角色没有及时转换
-            eventbus.emit('workspace.change', res.roles);
-            // 获取顶部的快捷入口
-            this.homeRoles = { name: res.topName, path: res.topUrl, id: res.workspaceId };
-            // 同步改变cookies在请求中的附带
-            resolve(true)
-            // 改变了cookies通知其他地方
-            this.$router.app.$emit("getChangeCookies");
-          }).catch((err) => {
-            reject(err)
           })
+            .then(res => {
+              // 缓存数据，供其他页面判断使用
+              storage.set(`workspaceRoles`, res.roles, 'session')
+              // 获取顶部的快捷入口
+              this.homeRoles = {
+                name: res.topName,
+                path: res.topUrl,
+                id: res.workspaceId
+              }
+              // 同步改变cookies在请求中的附带
+              resolve(true)
+              // 改变了cookies通知其他地方
+              this.$router.app.$emit('getChangeCookies')
+            })
+            .catch(err => {
+              reject(err)
+            })
         } else {
           resolve(false)
         }
       })
     },
-    isShowWorkspaceMenu(){
-      return (!this.currentProject.id && (this.$route.query && this.$route.query.workspaceId) && this.$route.path.indexOf('workflow')===-1 );
+    isShowWorkspaceMenu() {
+      return (
+        !this.currentProject.id &&
+        (this.$route.query && this.$route.query.workspaceId) &&
+        this.$route.path.indexOf('workflow') === -1
+      )
     },
     getApplications() {
-      if(this.$route.query.workspaceId) {
-        GetWorkspaceApplications(this.$route.query.workspaceId).then(data=>{
-          this.menuList = data.applications || [];
-          // 展示有权限的实例
-          this.menuList = this.menuList.map(app => {
-            if (app.appInstances && app.appInstances.length) {
-              return {
-                ...app,
-                appInstances: app.appInstances.filter(item => item.accessable)
-              }
-            }
-            return app;
-          });
-          // 类别下没有实例则隐藏
-          this.menuList = this.menuList.filter(app => app.appInstances.length)
+      if (this.$route.query.workspaceId) {
+        GetWorkspaceApplications(this.$route.query.workspaceId).then(data => {
+          this.menuList = data.applications || []
         })
       }
     },
     getWorkspaces() {
-      GetWorkspaceList({}, 'get').then((res) => {
-        this.workspaceList = res.workspaces;
-        this.getCurrentWorkspace();
-      }).catch(() => {
-      })
-    },
-    getWorkspaceFavorites() {
-      if(this.$route.query.workspaceId) {
-        GetFavorites(this.$route.query.workspaceId).then(data=>{
-          this.favorites = data.favorites || [];
+      GetWorkspaceList({}, 'get')
+        .then(res => {
+          this.workspaceList = res.workspaces
+          this.getCurrentWorkspace()
         })
-      }
-    },
-    addFavorite(app) {
-      if(this.$route.query.workspaceId) {
-        AddFavorite(this.$route.query.workspaceId, { menuApplicationId: app.id }).then(data=>{
-          this.favorites = this.favorites.concat({...app, id: data.favoriteId, menuApplicationId: app.id })
-        })
-      }
-    },
-    removeFavorite(app) {
-      if(this.$route.query.workspaceId) {
-        RemoveFavorite({ workspaceId: this.$route.query.workspaceId, applicationId: app.menuApplicationId }).then(()=>{
-          this.favorites = this.favorites.filter(i => i.menuApplicationId !== app.menuApplicationId);
-        })
-      }
-    },
-    handleMenuClick(item) {
-      this.gotoCommonIframe(item.name, {workspaceId: this.$route.query.workspaceId})
+        .catch(() => {})
     },
     init() {
       GetBaseInfo().then(rst => {
-        
         if (!isEmpty(rst)) {
-          this.userName = rst.username;
+          this.userName = rst.username
           // 根据权限来判断是否开启logo跳转(管理员才会开启)
-          this.isAdmin = rst.isAdmin;
-          storage.set("baseInfo", rst, "local");
-          this.$router.app.$emit("username", rst.username);
-          this.$emit("set-init");
+          this.isAdmin = rst.isAdmin
+          storage.set('baseInfo', rst, 'local')
+          this.$router.app.$emit('username', rst.username)
+          this.$emit('set-init')
         }
-      });
+      })
     },
     goto(name) {
       this.$router.push({
-        name: name,
-      });
+        name: name
+      })
     },
     getClass(path) {
-      let arr = [];
+      let arr = []
       if (this.$route.name === path || this.$route.meta.parent === path) {
-        arr.push("selected");
+        arr.push('selected')
       }
-      return arr;
+      return arr
     },
     handleOutsideClick() {
-      if(this.$parent.$refs.newGuidance && this.$parent.$refs.newGuidance.currentStep !== 6){
-        this.isUserMenuShow = false;
-      }
+      this.isUserMenuShow = false
     },
     handleUserClick() {
-      this.isUserMenuShow = !this.isUserMenuShow;
+      this.isUserMenuShow = !this.isUserMenuShow
     },
     clearSession() {
-      this.$emit("clear-session");
+      this.$emit('clear-session')
     },
     handleNavMenuClose() {
-      this.isNavMenuShow = false;
+      this.isNavMenuShow = false
     },
     mouseover() {
-      this.isNavMenuShow = (this.$route.path != '/newhome' && this.$route.query.workspaceId)
+      this.isNavMenuShow =
+        this.$route.path != '/newhome' && this.$route.query.workspaceId
     },
     mouseleave() {
-      this.isNavMenuShow = false;
+      this.isNavMenuShow = false
     },
     getCurrentWorkspace() {
-      let workspaceId = +this.$route.query.workspaceId;
+      let workspaceId = +this.$route.query.workspaceId
       if (workspaceId) {
         this.workspaceList.forEach(item => {
           if (item.id === workspaceId) {
-            this.currentWorkspace = item;
-            storage.set("currentWorkspace", item);
+            this.currentWorkspace = item
+            storage.set('currentWorkspace', item)
           }
-        });
+        })
       }
     },
     getCurrentProject() {
-      let projList = storage.get("projectList", "local");
-      this.projectList = projList;
-      let projId = this.$route.query.projectID;
-      let proj = {};
+      let projList = storage.get('projectList', 'local')
+      this.projectList = projList
+      let projId = this.$route.query.projectID
+      let proj = {}
       if (projId && this.projectList) {
         this.projectList.forEach(item => {
           if (item.dwsProjectList) {
             item.dwsProjectList.forEach(p => {
               if (p.id == projId) {
-                proj = { ...p };
+                proj = { ...p }
               }
-            });
+            })
           }
-        });
+        })
       }
-      this.currentProject = proj;
+      this.currentProject = proj
     },
     // 切换工作空间
     changeWorkspace(workspace) {
-      if (workspace.id === this.currentWorkspace.id) return;
-      storage.set("curWorkspace", workspace, "local")
+      if (workspace.id === this.currentWorkspace.id) return
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
-      if (["/process"].includes(this.$route.path)) {
-        this.$router.replace({ path: "/workspace" });
-      } else if ((this.$route.path.indexOf("/dataService") !== -1) || (this.$route.path.indexOf("/dataManagement") !== -1)) {
-        // 数据服务切换workspace通过一个redirect路由来实现页面的刷新，避免在每个页面都watch route
-        this.currentWorkspace = workspace;
-        storage.set("currentWorkspace", workspace);
-        this.$router.replace({
-          path: '/redirect' + this.$route.path,
-          query: {
-            ...this.$route.query,
-            workspaceId: workspace.id
-          }
-        });
+      if (['/process'].includes(this.$route.path)) {
+        this.$router.replace({ path: '/workspace' })
       } else {
         this.$router.replace({
           path: this.$route.path,
@@ -404,7 +361,7 @@ export default {
             ...this.$route.query,
             workspaceId: workspace.id
           }
-        });
+        })
       }
     },
     changeProj(proj, p) {
@@ -412,52 +369,47 @@ export default {
         p.id == this.currentProject.id &&
         proj.id == this.$route.query.projectTaxonomyID
       )
-        return;
+        return
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
-      if (["/process"].includes(this.$route.path)) {
-        this.$router.replace({ path: "/project" });
+      if (['/process'].includes(this.$route.path)) {
+        this.$router.replace({ path: '/project' })
       } else {
         this.$router.replace({
           path: this.$route.path,
           query: {
-            workspaceId: this.$route.query.workspaceId,
+            ...this.$route.query,
             projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,
             notPublish: p.notPublish
           }
-        });
+        })
       }
     },
     goHome() {
-      if(this.isAdmin){
-        this.$router.push("/newhome");
-      }
-      else {
-        this.goSpaceHome();
-      }
+      if (this.isAdmin) this.$router.push('/newhome')
     },
     linkTo(type) {
-      let url = "";
-      if (type === "book") {
-        url = `https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md`;
-      } else if (type === "github") {
-        url = `https://github.com/WeBankFinTech/DataSphereStudio`;
-      } else if (type === "freedback") {
-        url = "https://wj.qq.com/s2/4943071/c037/ ";
-        if (localStorage.getItem("locale") === "en") {
-          url = "https://wj.qq.com/s2/4943706/5a8b";
+      let url = ''
+      if (type === 'book') {
+        url = `https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md`
+      } else if (type === 'github') {
+        url = `https://github.com/WeBankFinTech/DataSphereStudio`
+      } else if (type === 'freedback') {
+        url = 'https://wj.qq.com/s2/4943071/c037/ '
+        if (localStorage.getItem('locale') === 'en') {
+          url = 'https://wj.qq.com/s2/4943706/5a8b'
         }
       }
-      util.windowOpen(url);
+      util.windowOpen(url)
     },
-    goSpaceHome(){
-      let workspaceId = this.$route.query.workspaceId;
-      if(!workspaceId) return this.goHome();
-      this.$router.push({path: '/workspaceHome',query: { workspaceId }});
-      this.currentProject = {};
+    goSpaceHome() {
+      let workspaceId = this.$route.query.workspaceId
+      if (!workspaceId) return this.goHome()
+      this.$router.push({ path: '/workspaceHome', query: { workspaceId } })
+      this.currentProject = {}
     },
-    goConsole(){
+    goConsole() {
       const url =
         location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
       this.$router.push({
@@ -467,13 +419,15 @@ export default {
           url
         }
       })
-      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goRolesPath() {
       // 根据接口getWorkspaceBaseInfo渲染跳转不同路径
-      this.$router.push({path: this.homeRoles.path, query: Object.assign({}, this.$route.query)});
-    },
+      this.$router.push({
+        path: this.homeRoles.path,
+        query: Object.assign({}, this.$route.query)
+      })
+    }
   }
-};
+}
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

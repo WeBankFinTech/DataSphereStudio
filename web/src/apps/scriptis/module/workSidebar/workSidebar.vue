@@ -62,11 +62,11 @@
         <span>{{ $t('message.scripts.constants.delete') }}</span>
       </we-menu-item>
       <we-menu-item class="ctx-divider"/>
-      <!-- <we-menu-item
+      <we-menu-item
         v-if="currentNode.isLeaf && isVaildType"
         @select="openImportToHiveDialog">
         <span>{{ $t('message.scripts.contextMenu.importToHive') }}</span>
-      </we-menu-item> -->
+      </we-menu-item>
       <we-menu-item
         v-if="currentNode.isLeaf"
         @select="openImportDialog">
@@ -191,8 +191,7 @@ export default {
       filterTree: [],
       // 用于延迟渲染模块，减少请求
       timeoutFlag: false,
-      // navList: ['search', 'newFile', 'refresh', 'import'],
-      navList: ['search', 'newFile', 'refresh'],
+      navList: ['search', 'newFile', 'refresh', 'import'],
       hdfsTree: [],
       hdfsPath: '',
       loadHdfsDataFn: () => {},
@@ -219,7 +218,7 @@ export default {
       let isVaild;
       if (this.currentNode && this.currentNode.data) {
         const name = this.currentNode.data.name;
-        const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+        const reg = ['.csv', '.txt'];
         const tabSuffix = name.substr(
           name.lastIndexOf('.'),
           name.length
@@ -425,12 +424,11 @@ export default {
           }
         });
       }
-      const result = /^[a-zA-Z]+:\/\//.exec(this.currentNode.data.path) || [];
       this.$refs.upload.open({
         path: this.currentNode.data.path,
         nameList,
         apiPrefix: module.data.API_PATH,
-        type: result[0] || PREFIX,
+        type: PREFIX,
       });
     },
     handleCreate(node) {

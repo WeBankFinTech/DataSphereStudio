@@ -25,7 +25,7 @@
     left: 0;
     width: 100%;
     // z-index: 100;
-    @include bg-color($light-base-color, $dark-menu-base-color);
+    background: #fff;
     i{
         flex: 0 1 auto;
         color: #589feb;
@@ -40,7 +40,6 @@
     justify-content: flex-start;
     align-items: center;
     border: 1px solid #eee;
-    @include border-color($border-color-base, $dark-menu-base-color);
     border-right: none;
     border-left: none;
 }
@@ -51,13 +50,11 @@
     align-items: center;
     height: $actionbar-height;
     border: 1px solid #eee;
-    @include border-color($border-color-base, $dark-menu-base-color);
     border-right: none;
     border-left: none;
 
     input{
-        @include font-color($light-text-color, $dark-text-color);
-        @include bg-color($light-base-color, $dark-base-color);
+        color: $text-color;
         padding-left: 12px;
         border: none;
         flex: 1 1 auto;
@@ -66,20 +63,20 @@
         height: 100%;
     }
     input::-webkit-input-placeholder {
-        @include font-color($input-placeholder-color, $dark-input-placeholder-color);
+        color: $input-placeholder-color;
     }
     &:focus{
         outline: none
     }
     .search-btn{
-        @include font-color($light-text-color, $dark-text-color);
+        color: $text-color;
         width: $actionbar-height;
         height: $actionbar-height;
         line-height: $actionbar-height;
         text-align: center;
 
         &:hover{
-            @include font-color($light-text-color, $dark-text-color);
+            color: $text-color;
         }
 
         &:before{

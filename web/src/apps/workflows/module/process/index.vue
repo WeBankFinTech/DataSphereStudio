@@ -1,7 +1,7 @@
 <template>
   <div class="page-process" ref="page_process">
     <Card
-      v-if="!checkEditable(query) && showTip"
+      v-if="!checkEditable(processData) && showTip"
       shadow
       class="process-readonly-tip-card"
     >
@@ -29,9 +29,9 @@
               alt
             />
             <div :title="item.title" class="process-tab-name">{{ item.title }}</div>
-            <SvgIcon v-show="!item.isHover && item.node && item.node.isChange && checkEditable(query)" class="process-tab-unsave-icon" icon-class="fi-radio-on2"/>
+            <SvgIcon v-show="!item.isHover && item.node && item.node.isChange && checkEditable(processData)" class="process-tab-unsave-icon" icon-class="fi-radio-on2"/>
             <Icon
-              v-if="item.isHover && (item.close || query.product)"
+              v-if="item.isHover && (item.close || processData.product)"
               type="md-close"
               @click.stop="remove(index)"
             />
@@ -48,10 +48,10 @@
             :import-replace="false"
             :flow-id="item.data.appId"
             :version="item.data.version"
-            :product="query.product"
-            :readonly="!checkEditable(query)"
-            :publish="query.releasable"
-            :isLatest="query.isLatest === 'true'"
+            :product="processData.product"
+            :readonly="!checkEditable(processData)"
+            :priv="processData.priv"
+            :isLatest="processData.isLatest === 'true'"
             :tabs="tabs"
             :open-files="openFiles"
             :orchestratorId="item.data.id"
@@ -64,7 +64,6 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
-            @showDolphinscheduler="showDS"
           ></Process>
           <Ide
             v-if="item.type === 'IDE'"
@@ -73,24 +72,22 @@
             :parameters="item.data"
             :node="item.node"
             :in-flows-index="index"
-            :readonly="!checkEditable(query)"
+            :readonly="!checkEditable(processData)"
             @save="saveIDE(index, arguments)"
           ></Ide>
           <commonIframe
             v-if="item.type === 'Iframe'"
             v-show="index===active"
             :key="item.title"
-            :parametes="item.data"
             :node="item.node"
             @save="saveNode"
           ></commonIframe>
           <div
-            v-if="item.type === 'DS'"
+            v-if="item.type === 'DiaoDu'"
             v-show="index===active"
             :key="item.title"
-          >
-            <DS :query="query" :tab-name="query.name"></DS>
-          </div>
+            style="width:100%; height:100%"
+          ></div>
         </template>
       </div>
     </div>
@@ -101,17 +98,15 @@ import { isEmpty, isArguments } from "lodash";
 import api from "@/common/service/api";
 import util from "@/common/util";
 import Process from "./module.vue";
+import qs from 'qs';
 import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
-import eventbus from '@/common/helper/eventbus';
-import DS from '@/apps/workflows/module/dispatch'
 export default {
   components: {
     Process,
     Ide: Ide.component,
-    commonIframe: commonModule.component.iframe,
-    DS
+    commonIframe: commonModule.component.iframe
   },
   props: {
     query: {
@@ -119,15 +114,17 @@ export default {
       default: () => {}
     }
   },
-  computed: {},
   data() {
+    let processData = this.query || qs.parse(location.search)
+    processData.priv = processData.priv - 0
     return {
+      processData,
       tabs: [
         {
           title: this.$t("message.workflow.process.index.BJMS"),
           type: "Process",
           close: false,
-          data: this.query,
+          data: processData,
           node: {
             isChange: false,
             type: "workflow.subflow"
@@ -142,7 +139,7 @@ export default {
       showTip: true,
       openFiles: {},
       nodeImg: NODEICON
-    }
+    };
   },
   mounted() {
     this.getCache().then(tabs => {
@@ -154,39 +151,15 @@ export default {
     this.changeTitle(false);
   },
   methods: {
-    getTaskInstanceList(data, cb, pageSize=10, pageNo=1) {
-      if (!this.dagProcessId) return
-      api.fetch(`dolphinscheduler/projects/${this.projectName}/task-instance/list-paging`, {
-        processInstanceId: this.dagProcessId,
-        pageSize,
-        pageNo,
-        name: data.label
-      }, 'get').then((res) => {
-        let list = res.totalList
-        let thisTimeList = list.filter(item => item.flag === 'YES')
-        for (let i = 0; i < thisTimeList.length; i++) {
-          if (thisTimeList[i].name === data.label) {
-            return cb && cb(thisTimeList[i].id)
-          }
-        }
-        return cb && cb()
-      }).catch(() => {
-      })
-    },
     // 判断是否有意编辑权限
     // 没有权限的和历史的都不可编辑
     checkEditable(item) {
       // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
-      if (item.editable && this.query.readonly !== 'true') {
+      if ([2,3].includes(item.priv) && this.processData.readonly !== 'true') {
         return true
       } else {
         return false
       }
-      // if ([2,3].includes(item.priv) && this.query.readonly !== 'true') {
-      //   return true
-      // } else {
-      //   return false
-      // }
     },
     gotoAction(back = -1) {
       if (back) {
@@ -198,11 +171,6 @@ export default {
       this.showTip = false;
     },
     choose(index) {
-      if (index == 0) {
-        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'dev' });
-      } else {
-        eventbus.emit('workflow.orchestratorId', { orchestratorId: this.query.id, mod: 'scheduler' });
-      }
       this.active = index;
       this.updateProjectCacheByActive();
     },
@@ -302,17 +270,17 @@ export default {
           let config = {
             method: "get"
           };
-          if (this.query.product) {
+          if (this.processData.product) {
             config.headers = {
               "Token-User": this.getUserName()
             };
           }
-          api.fetch(this.query.product ? "/filesystem/product/openScriptFromBML" : "/filesystem/openScriptFromBML", {
+          api.fetch(this.processData.product ? "/filesystem/product/openScriptFromBML" : "/filesystem/openScriptFromBML", {
             fileName,
             resourceId,
             version,
             creator: node.creator || "",
-            projectName: this.$route.query.projectName || ""
+            projectName: this.processData.projectName || ""
           }, config).then(res => {
             let content = res.scriptContent;
             let params = {};
@@ -367,7 +335,7 @@ export default {
       if (node.type == NODETYPE.FLOW) {
         // 子流程必须已保存, 才可以被打开
         let flowId = node.jobContent ? node.jobContent.embeddedFlowId : "";
-        let {orchestratorVersionId, id} = {...this.query}
+        let {orchestratorVersionId, id} = {...this.processData}
         this.getTabsAndChoose({
           type: "Process",
           node,
@@ -522,26 +490,26 @@ export default {
     },
     updateProjectCacheByTab() {
       this.dispatch("workflowIndexedDB:updateProjectCache", {
-        projectID: this.$route.query.projectID,
+        projectID: this.processData.projectID,
         key: "tabList",
         value: {
           tab: this.tabs,
           token: "flowId",
           sKey: "tab",
-          sValue: this.query.flowId
+          sValue: this.processData.flowId
         },
         isDeep: true
       });
     },
     updateProjectCacheByActive() {
       this.dispatch("workflowIndexedDB:updateProjectCache", {
-        projectID: this.$route.query.projectID,
+        projectID: this.processData.projectID,
         key: "tabList",
         value: {
           active: this.active,
           token: "flowId",
           sKey: "active",
-          sValue: this.query.flowId
+          sValue: this.processData.flowId
         },
         isDeep: true
       });
@@ -549,12 +517,12 @@ export default {
     getCache() {
       return new Promise(resolve => {
         this.dispatch("workflowIndexedDB:getProjectCache", {
-          projectID: this.$route.query.projectID,
+          projectID: this.processData.projectID,
           cb: cache => {
             const list = (cache && cache.tabList) || [];
             let tabs = null;
             list.forEach(item => {
-              if (+item.flowId === +this.query.flowId) {
+              if (+item.flowId === +this.processData.flowId) {
                 tabs = item.tab;
                 this.active = item.active || 0;
               }
@@ -569,39 +537,14 @@ export default {
       if (val) {
         this.tabs[0].title = this.$t("message.workflow.process.index.DTMS");
       } else {
-        if (this.query.readonly === "true") {
+        if (this.processData.readonly === "true") {
           this.tabs[0].title = this.$t("message.workflow.process.index.ZDMS");
         } else {
           this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
         }
       }
-    },
-    showDS() {
-      util.checkToken(() => {
-        let tab = {
-          title: this.query.name + '-' + this.$t("message.workflow.process.schedule"),
-          type: "DS",
-          close: true,
-          data: this.query,
-          node: {
-            isChange: false,
-            type: "workflow.subflow"
-          },
-          key: this.query.appId,
-          isHover: false
-        }
-        for (let i = 0;i < this.tabs.length; i++) {
-          let cur = this.tabs[i]
-          // 已经打开
-          if (cur.key === this.query.appId) {
-            return  this.choose(i)
-          }
-        }
-        this.tabs.push(tab)
-        this.choose(this.tabs.length - 1)
-      })
     }
-  }
+  },
 };
 </script>
 <style lang="scss" src="@/apps/workflows/assets/styles/process.scss"></style>

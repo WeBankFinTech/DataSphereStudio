@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
- @import '@/common/style/variables.scss';
+
 .dynamic-form {
     padding: 10px 10px 2px;;
     margin: 10px;
-    @include bg-color($menu-dark-subsidiary-color, $dark-base-color);
+    background: rgba(255,255,255,.7);
     border-radius: 4px;
     .dynamic-form-header-wrap {
         display: flex;
@@ -27,7 +27,6 @@
         height: 30px;
         padding-right: 7px;
         .dynamic-form-header-title {
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
             display: inline-block;
         }
         .icon-add {
@@ -44,7 +43,6 @@
         }
         .tc {
             text-align: center;
-            @include font-color($light-text-color, $dark-text-color);
         }
     }
 }

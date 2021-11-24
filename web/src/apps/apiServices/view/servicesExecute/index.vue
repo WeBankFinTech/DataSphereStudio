@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <services-execute />
-  </div>
+  <services-execute />
 </template>
 
 <script>

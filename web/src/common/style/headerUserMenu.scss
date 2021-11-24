@@ -1,27 +1,25 @@
 @import '@/common/style/variables.scss';
 .user-menu {
-//   background: $menu-dark-active-bg;
-  @include bg-color($background-color-header, $dark-background-color-header);
+  background: $menu-dark-active-bg;
   width: 130px;
   border: none;
   position: $absolute;
-  top: 53px;
+  top: 62px;
   left: 50%;
-  margin-left: -72px;
-  border-radius: 0 0 $border-radius-small $border-radius-small;
-//   .user-menu-arrow {
-//       width: 0;
-//       height: 0;
-//       border: 8px solid $body-background;
-//       border-color: transparent transparent $menu-dark-active-bg transparent;
-//       border-top: 0;
-//       @include border-color($background-color-header, $dark-background-color-header);
-//       list-style: none;
-//       position: $absolute;
-//       top: -8px;
-//       left: 50%;
-//       margin-left: -4px;
-//   }
+  margin-left: -75px;
+  border-radius: $border-radius-small;
+  .user-menu-arrow {
+      width: 0;
+      height: 0;
+      border: 8px solid $body-background;
+      border-color: transparent transparent $menu-dark-active-bg transparent;
+      border-top: 0;
+      list-style: none;
+      position: $absolute;
+      top: -8px;
+      left: 50%;
+      margin-left: -4px;
+  }
   .user-menu-item {
       list-style: none;
       padding-left: 20px;
@@ -32,9 +30,7 @@
       font-size: $font-size-base;
       &:hover {
           color: $body-background;
-        //   background: $dark-bg-dark;
-          @include bg-color($background-color-header, $dark-background-color-header);
-          @include font-color($primary-color, $dark-primary-color);
+          background: $dark-bg-dark;
           border-top: none;
           border-radius: $border-radius-small;
       }

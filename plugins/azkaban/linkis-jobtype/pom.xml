@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2019 WeBank
+  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
+  ~  you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +23,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>linkis-jobtype</artifactId>
     <properties>
@@ -30,7 +31,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-linkis-node-execution</artifactId>

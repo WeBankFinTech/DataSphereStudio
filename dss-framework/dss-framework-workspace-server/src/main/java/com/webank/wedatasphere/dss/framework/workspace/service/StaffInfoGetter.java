@@ -14,16 +14,17 @@
  *
  */
 
-package org.apache.linkis.common.conf
+package com.webank.wedatasphere.dss.framework.workspace.service;
 
-import java.util.Properties
+import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 
-/**
- * @author allenlliu
- * @date 2021/3/10 17:32
- */
-object DSSConfiguration {
+import java.util.List;
 
-  def getAllProperties: Properties = BDPConfiguration.properties
+
+public interface StaffInfoGetter {
+
+    List<StaffInfo> getAllUsers();
+
+    String getFullOrgNameByUsername(String username);
 
 }

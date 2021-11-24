@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext$;
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob;
 import org.apache.linkis.entrance.EntranceServer;
@@ -26,6 +27,7 @@ import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.ws.rs.*;
@@ -34,11 +36,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-
-@Path("/dss/flow/entrance")
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/flow/entrance")
+@RestController
 public class FlowExecutionRestfulApi {
 
     private EntranceServer entranceServer;
@@ -50,9 +49,8 @@ public class FlowExecutionRestfulApi {
         this.entranceServer = entranceServer;
     }
 
-    @GET
-    @Path("/{id}/execution")
-    public Response execution(@PathParam("id") String id) {
+    @RequestMapping(value = "/{id}/execution",method = RequestMethod.GET)
+    public Message execution(@PathVariable("id") String id,@RequestParam("labels") String labels) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = entranceServer.getJob(realId);
@@ -83,7 +81,7 @@ public class FlowExecutionRestfulApi {
         } catch (Exception e) {
             message = Message.error("Failed to get job execution info");
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
 }

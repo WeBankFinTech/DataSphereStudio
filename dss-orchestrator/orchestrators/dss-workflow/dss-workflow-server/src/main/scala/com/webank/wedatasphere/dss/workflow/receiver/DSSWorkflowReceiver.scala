@@ -22,7 +22,7 @@ import java.util
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus,ResponseOperateOrchestrator}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow

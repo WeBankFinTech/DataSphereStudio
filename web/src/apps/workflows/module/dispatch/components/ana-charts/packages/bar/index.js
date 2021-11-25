@@ -63,6 +63,7 @@ export default class Bar extends Base {
         xAxisKey: 'key',
         dataKey: 'value'
       },
+      barColor = '',
       // Chart title
       title = 'Single bar histogram'
     } = this.settings
@@ -73,7 +74,8 @@ export default class Bar extends Base {
 
     const series = [{
       type: TYPE,
-      data: []
+      data: [],
+      color: barColor
     }]
     const xAxis = {
       type: 'category',

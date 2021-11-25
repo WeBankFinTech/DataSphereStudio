@@ -32,12 +32,19 @@
             <div class="row dashboard-module-content">
               <m-process-state-count :search-params="searchParams" @goToList="goToList">
               </m-process-state-count>
+              <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
+        </div>
+        <div class="row">
           <div class="col-md-12 dashboard-module">
             <div class="chart-title">
               <!--<span>{{$t('message.scheduler.taskStatusStatistics')}}</span>-->
               <span>工作流实例与成功率统计</span>
+              <div class="day-change">
+                <div :class="daySelected === 1?'selected': ''" @click="changeDay(1)">今日</div>
+                <div :class="daySelected === 2?'selected': ''" @click="changeDay(2)">昨日</div>
+              </div>
             </div>
             <div class="dashboard-module-content">
               <div id="mixedBarLine" style="height: 500px"></div>
@@ -52,6 +59,7 @@
             <div class="dashboard-module-content">
               <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
               </m-define-user-count>
+              <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
         </div>
@@ -87,13 +95,36 @@ export default {
       dataTime: [],
       projectList: [],
 
-      mixedBarLineChart: null
+      mixedBarLineChart: null,
+      daySelected: 1,
+      loading: false
     }
   },
   props: {
 
   },
   methods: {
+    changeDay(day){
+      if (day)
+        this.daySelected = day
+      let dd = new Date(),
+        tYear, tMonth, tDay
+      if (this.daySelected === 1) {
+        tYear = dd.getFullYear(),
+        tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
+        tDay = dd.getDate()
+      } else if (this.daySelected === 2) {
+        dd.setDate(dd.getDate() - 1)
+        tYear = dd.getFullYear(),
+        tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
+        tDay = dd.getDate()
+      }
+      if (this.daySelected) {
+        this.getMixedBarLineData(`${tYear}-${tMonth}-${tDay}`, (dd) => {
+          this.buildMixedBarLineChart(dd)
+        })
+      }
+    },
     getFullName() {
       for (let i = 0; i < this.projectList.length; i++) {
         if (this.projectList[i].id === this.projectId) {
@@ -123,6 +154,7 @@ export default {
       if (this.projectId) {
         return cb(this.projectId)
       } else {
+        this.loading = true
         let searchVal = `${this.workspaceName}-${this.projectName}`
         api.fetch(`dolphinscheduler/projects/list-paging`, {
           pageSize: 100,
@@ -130,6 +162,7 @@ export default {
           searchVal: ''
         }, 'get').then(res => {
           this.projectList = res.totalList
+          this.loading = false
           for (let i = 0; i < res.totalList.length; i++) {
             if (res.totalList[i].name === searchVal) {
               this.projectId = res.totalList[i].id
@@ -150,7 +183,9 @@ export default {
           endDate: `${currentDay} 23:59:59`,
         }, 'get').then((res) => {
           let objTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            successTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            successTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            failureTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            successPercent = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
           res.totalList.forEach(item => {
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
@@ -160,10 +195,22 @@ export default {
             if (curState === 'SUCCESS') {
               successTotal[curHour] = successTotal[curHour] + 1
             }
+            if (curState === 'FAILURE') {
+              failureTotal[curHour] = failureTotal[curHour] + 1
+            }
+          })
+          successTotal.forEach((success, index) => {
+            if (objTotal[index]) {
+              successPercent[index] = (success / objTotal[index]).toFixed(1)
+            } else {
+              successPercent[index] = 0
+            }
           })
           cb && cb({
             objTotal,
-            successTotal
+            successTotal,
+            failureTotal,
+            successPercent
           })
         })
       })
@@ -235,9 +282,16 @@ export default {
             name: '成功率',
             type: 'line',
             yAxisIndex: 1,
-            data: data.successTotal,
+            data: data.successPercent,
             color: '#5AD8A6'
-          }
+          },
+          {
+            name: '失败数',
+            type: 'line',
+            yAxisIndex: 1,
+            data: data.failureTotal,
+            color: 'rgba(0,0,0,0)'
+          },
         ]
       };
       this.mixedBarLineChart.setOption(option)
@@ -255,14 +309,7 @@ export default {
           this.searchParams.endDate = this.dataTime[1]
         })
         this.$nextTick(() => {
-          let dd = new Date(),
-            tYear = dd.getFullYear(),
-            tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-            tDay = dd.getDate()
-
-          this.getMixedBarLineData(`${tYear}-${tMonth}-${tDay}`, (dd) => {
-            this.buildMixedBarLineChart(dd)
-          })
+          this.changeDay()
         })
       })
     })
@@ -335,6 +382,21 @@ export default {
     margin-bottom: 24px;
     .dashboard-module-content {
       padding: 30px;
+      position: relative;
+      margin:0 0 24px;
+    }
+    .day-change {
+      float: right;
+      >div {
+        height: 60px;
+        margin: 0 10px;
+        padding: 0 3px;
+        display: inline-block;
+        cursor: pointer;
+        &.selected {
+           border-bottom: 2px solid #2A6F97;
+        }
+      }
     }
   }
 </style>

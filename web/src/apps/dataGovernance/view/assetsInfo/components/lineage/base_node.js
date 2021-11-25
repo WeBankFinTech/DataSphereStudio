@@ -3,6 +3,7 @@ import {Node} from 'butterfly-dag';
 
 import './base_node.scss';
 import './symbol/iconfont'
+import util from '@/common/util'
 
 class BaseNode extends Node {
   constructor(opts) {
@@ -19,6 +20,9 @@ class BaseNode extends Node {
     let text = `<span>${opts.options.name}</span>`
     if (opts.options.status !== 'ACTIVE') {
       text = `<span style="color:rgba(0,0,0,0.2)">${opts.options.name}</span>`
+    } else if (opts.options.icon === 'icon-a-hivetable') {
+      text = `<span id="${opts.options.model.guid}">${opts.options.name}</span>`
+      util.Hub.$emit('register_click_hive_table', opts.options.model)
     }
     let logoContainer =
       $(`<div class="logo-container" title="${opts.options.name}">

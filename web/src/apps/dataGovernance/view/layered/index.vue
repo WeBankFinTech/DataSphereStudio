@@ -268,6 +268,9 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
+.console-page{
+  margin: 0 24px;
+}
 .title-line {
   display: flex;
   justify-content: space-between;

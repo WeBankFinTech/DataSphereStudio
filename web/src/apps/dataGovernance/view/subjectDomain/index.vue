@@ -211,6 +211,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.console-page {
+  margin: 0 24px;
+}
 .top-line {
   margin-bottom: 16px;
   display: flex;

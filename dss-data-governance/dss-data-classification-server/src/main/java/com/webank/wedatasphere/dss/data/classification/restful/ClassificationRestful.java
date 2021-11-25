@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.data.classification.restful;
 
 import com.webank.wedatasphere.dss.data.classification.service.ClassificationService;
+import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 import com.webank.wedatasphere.linkis.server.Message;
 import lombok.AllArgsConstructor;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
@@ -11,16 +12,20 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author suyc
@@ -59,11 +64,21 @@ public class ClassificationRestful {
 
     /**
      * 根据名称获取分类,包括一级子分类
+     * keyword 按照分类名称模糊搜索
      */
     @GET
     @Path("/{name}/subtypes")
-    public Response getClassificationDefList(@Context HttpServletRequest req, @PathParam("name") String name) throws Exception {
-        return Message.messageToResponse(Message.ok().data("result",classificationService.getClassificationDefListByName(name)));
+    public Response getClassificationDefList(@Context HttpServletRequest req,
+                                             @PathParam("name") String name,
+                                             @QueryParam("keyword") @DefaultValue("")  String keyword) throws Exception {
+        List<AtlasClassificationDef> atlasClassificationDefList = classificationService.getClassificationDefListByName(name);
+        if(atlasClassificationDefList ==null || keyword ==null || keyword.trim().equalsIgnoreCase("")) {
+            return Message.messageToResponse(Message.ok().data("result", atlasClassificationDefList));
+        }
+        else{
+            Pattern regex = Pattern.compile(keyword);
+            return Message.messageToResponse(Message.ok().data("result",atlasClassificationDefList.stream().filter(ele -> regex.matcher(ele.getName()).find()).collect(Collectors.toList())));
+        }
     }
 
     /**

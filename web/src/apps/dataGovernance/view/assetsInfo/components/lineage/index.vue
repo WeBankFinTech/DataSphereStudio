@@ -41,11 +41,16 @@ export default {
         } else if (cur.typeName === 'spark_process') {
           icon = 'icon-a-sparkprocess'
         }
+
         data.nodes.push({
           id: item,
           name: cur.displayText,
           icon: icon,
           status: cur.status,
+          model: {
+            name: cur.displayText,
+            ...cur
+          },
           Class: node,
           className: 'nodeBackground-color'
         })

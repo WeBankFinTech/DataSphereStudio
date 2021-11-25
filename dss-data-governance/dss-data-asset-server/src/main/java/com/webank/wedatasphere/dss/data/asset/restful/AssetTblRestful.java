@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @Classname HiveTblRestful
@@ -77,21 +79,16 @@ public class AssetTblRestful {
     @Path("/search")
     public Response searchHiveTbl(@QueryParam("classification") String classification,
                                   @QueryParam("query")  String query,
-                                  @QueryParam("owner") @DefaultValue("")  String owner,
+                                  @QueryParam("owner") @DefaultValue("")  String keyword,
                                   @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) int limit,
                                   @QueryParam("offset") @DefaultValue(DEFAULT_OFFSET) int offset) throws Exception {
         List<HiveTblSimpleInfo> hiveTblBasicList = assetService.searchHiveTable(classification,'*'+query+'*',limit,offset);
-        if(owner.equals(null)||owner.equals("")||owner.equals(" ")||owner.equals("undefined")){
+        if(hiveTblBasicList ==null || keyword ==null || keyword.trim().equals("")) {
             return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList));
         }
         else {
-            List<HiveTblSimpleInfo> res=new ArrayList<>();
-            for (HiveTblSimpleInfo hiveTblSimpleInfo : hiveTblBasicList) {
-                if(hiveTblSimpleInfo.getOwner().equals(owner)){
-                    res.add(hiveTblSimpleInfo);
-                }
-            }
-            return Message.messageToResponse(Message.ok().data("result",res));
+            Pattern regex = Pattern.compile(keyword);
+            return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList.stream().filter(ele -> regex.matcher(ele.getOwner()).find()).collect(Collectors.toList())));
         }
     }
 

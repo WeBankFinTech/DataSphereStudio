@@ -13,13 +13,11 @@
 
     <!-- bottom -->
     <div class="tab-card-b">
-      <span style="width: 110px">负责人：{{ model.owner }}</span>
-      <span style="width: 210px">创建时间：{{ model.createTime }}</span>
-      <span style="width: 110px">数据库：{{ model.dbName }}</span>
-      <div>
-        <span style="width: 110px">主题域：{{ subject }}</span>
-        <span style="width: 110px">分层：{{ layer }}</span>
-      </div>
+      <div :title="model.owner">负责人：{{ model.owner }}</div>
+      <div :title="model.createTime">创建时间：{{ model.createTime }}</div>
+      <div :title="model.dbName">数据库：{{ model.dbName }}</div>
+      <div :title="subject">主题域：{{ subject }}</div>
+      <div :title="layer">分层：{{ layer }}</div>
     </div>
   </div>
 </template>
@@ -133,9 +131,13 @@ export default {
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
-    overflow: hidden;
-    span {
-      margin-right: 80px;
+    >div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-break: break-all;
+      overflow: hidden;
+      margin-right: 5px;
+      width: calc(33% - 5px);
       @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
       display: inline-block;
     }

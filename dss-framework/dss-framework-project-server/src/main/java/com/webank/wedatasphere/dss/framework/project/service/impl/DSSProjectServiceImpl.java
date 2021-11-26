@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -31,68 +29,58 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProject;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-/**
- * @author v_wbzwchen
- * @since 2020-12-17
- */
-@Component
-public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProject> implements DSSProjectService {
-
-
+public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProjectDO> implements DSSProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSProjectServiceImpl.class);
-
     @Autowired
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
     @Autowired
-    private DSSProjectUserMapper projectUserMapper;
-
+    private DSSOrchestratorService orchestratorService;
     @Autowired
-    private AppConnService appConnService;
-
+    private DSSProjectUserMapper projectUserMapper;
 
     public static final String MODE_SPLIT = ",";
     public static final String KEY_SPLIT = "-";
-
     private final String SUPPORT_ABILITY = ProjectConf.SUPPORT_ABILITY.getValue();
 
     @Override
-    public DSSProject createProject(String username, ProjectCreateRequest projectCreateRequest) {
-        DSSProject project = new DSSProject();
+    public DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest) {
+        DSSProjectDO project = new DSSProjectDO();
         project.setName(projectCreateRequest.getName());
         project.setWorkspaceId(projectCreateRequest.getWorkspaceId());
         project.setCreateBy(username);
+        project.setUsername(username);
         project.setCreateTime(new Date());
         project.setBusiness(projectCreateRequest.getBusiness());
         project.setProduct(projectCreateRequest.getProduct());
@@ -111,7 +99,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     public void modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
         projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
-        DSSProject project = new DSSProject();
+        DSSProjectDO project = new DSSProjectDO();
         //修改的字段
         project.setDescription(projectModifyRequest.getDescription());
         project.setUpdateTime(new Date());
@@ -124,35 +112,80 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setBusiness(projectModifyRequest.getBusiness());
         project.setProduct(projectModifyRequest.getProduct());
 
-        UpdateWrapper<DSSProject> updateWrapper = new UpdateWrapper<DSSProject>();
+        UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<DSSProjectDO>();
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
         projectMapper.update(project, updateWrapper);
     }
 
     @Override
-    public DSSProject getProjectByName(String name) {
-        QueryWrapper<DSSProject> projectQueryWrapper = new QueryWrapper<DSSProject>();
+    public DSSProjectDO getProjectByName(String name) {
+        QueryWrapper<DSSProjectDO> projectQueryWrapper = new QueryWrapper<DSSProjectDO>();
         projectQueryWrapper.eq("name", name);
-        List<DSSProject> projectList = projectMapper.selectList(projectQueryWrapper);
+        List<DSSProjectDO> projectList = projectMapper.selectList(projectQueryWrapper);
         return CollectionUtils.isEmpty(projectList) ? null : projectList.get(0);
     }
 
     @Override
-    public DSSProject getProjectByName(Long workspaceId, String name) {
-        QueryWrapper<DSSProject> projectQueryWrapper = new QueryWrapper<DSSProject>();
-        projectQueryWrapper.eq("workspace_id", workspaceId);
-        projectQueryWrapper.eq("name", name);
-        return projectMapper.selectOne(projectQueryWrapper);
-    }
-
-    @Override
-    public DSSProject getProjectById(Long id) {
+    public DSSProjectDO getProjectById(Long id) {
         return projectMapper.selectById(id);
     }
 
     @Override
     public List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest) {
+       /* //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
+        List<QueryProjectVo> list = projectMapper.getListByParam(projectRequest);
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+
+        List<ProjectResponse> projectResponseList = new ArrayList<>();
+        ProjectResponse projectResponse = null;
+        for (QueryProjectVo projectVo : list) {
+            if (projectVo.getVisible() == 0) {
+                continue;
+            }
+            projectResponse = new ProjectResponse();
+            projectResponse.setApplicationArea(projectVo.getApplicationArea());
+            projectResponse.setId(projectVo.getId());
+            projectResponse.setBusiness(projectVo.getBusiness());
+            projectResponse.setCreateBy(projectVo.getCreateBy());
+            projectResponse.setDescription(projectVo.getDescription());
+            projectResponse.setName(projectVo.getName());
+            projectResponse.setProduct(projectVo.getProduct());
+            projectResponse.setSource(projectVo.getSource());
+            projectResponse.setArchive(projectVo.getArchive());
+            projectResponse.setCreateTime(projectVo.getCreateTime());
+            projectResponse.setUpdateTime(projectVo.getUpdateTime());
+            projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
+            projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            projectResponseList.add(projectResponse);
+            *//**
+             * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+             * 从而得到：查看权限用户、编辑权限用户、发布权限用户
+             *//*
+            String pusername = projectVo.getPusername();
+            if (StringUtils.isEmpty(pusername)) {
+                continue;
+            }
+            Map<String, List<String>> userPricMap = new HashMap<>();
+            String[] tempstrArr = pusername.split(MODE_SPLIT);
+
+            for (String s : tempstrArr) {
+                String[] strArr = s.split(KEY_SPLIT);
+                String key = strArr[0] + KEY_SPLIT + strArr[1];
+                userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                userPricMap.get(key).add(strArr[2]);
+            }
+            List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+            List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+            projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+        }
+        return projectResponseList;*/
+
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
         List<QueryProjectVo> list;
         if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) {
@@ -227,10 +260,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return projectResponseList;
     }
 
-    private boolean isWorkspaceAdmin(Long workspaceId, String username) {
-        return !projectUserMapper.getUserWorkspaceAdminRole(workspaceId, username).isEmpty();
-    }
-
     @Override
     public ProjectInfoVo getProjectInfoById(Long id) {
         return projectMapper.getProjectInfoById(id);
@@ -238,7 +267,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
 
     @Override
-    public void saveProjectRelation(DSSProject project, Map<AppInstance, Long> projectMap) {
+    public void saveProjectRelation(DSSProjectDO project, Map<AppInstance, Long> projectMap) {
         List<ProjectRelationPo> relationPos = new ArrayList<>();
         projectMap.forEach((k, v) -> {
             relationPos.add(new ProjectRelationPo(project.getId(), k.getId(), v));
@@ -249,7 +278,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
     @Override
     public Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception {
-        AppConn appConn = appConnService.getAppConn(appConnName);
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(appConnName);
         List<AppInstance> appInstances = appConn.getAppDesc().getAppInstancesByLabels(dssLabels);
         if (appInstances.get(0) != null) {
             Long appInstanceId = appInstances.get(0).getId();
@@ -262,11 +291,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
     @Override
     @Transactional
-    public void deleteProject(ProjectDeleteRequest projectDeleteRequest) {
+    public void deleteProject(Long projectId) {
         // 删除项目信息
-        projectMapper.deleteProjectInfo(projectDeleteRequest.getId());
+        projectMapper.deleteProjectInfo(projectId);
         // 删除项目角色信息
-        projectUserMapper.deleteAllPriv(projectDeleteRequest.getId());
+        projectUserMapper.deleteAllPriv(projectId);
     }
 
     @Override
@@ -276,9 +305,14 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
+    public Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception {
+        return orchestratorService.importOrchestrator(orchestratorInfo);
+    }
+
+    @Override
     public boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException {
         //校验当前登录用户是否含有删除权限，默认创建用户可以删除工程
-        QueryWrapper<DSSProject> queryWrapper = new QueryWrapper<DSSProject>();
+        QueryWrapper<DSSProjectDO> queryWrapper = new QueryWrapper<DSSProjectDO>();
         queryWrapper.eq("id", projectId);
         queryWrapper.eq("create_by", username);
         long count = projectMapper.selectCount(queryWrapper);
@@ -287,4 +321,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
         return true;
     }
+
+    private boolean isWorkspaceAdmin(Long workspaceId, String username) {
+        return !projectUserMapper.getUserWorkspaceAdminRole(workspaceId, username).isEmpty();
+    }
+
 }

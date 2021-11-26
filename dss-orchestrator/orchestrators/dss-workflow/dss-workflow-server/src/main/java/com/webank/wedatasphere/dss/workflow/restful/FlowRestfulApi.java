@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
@@ -113,6 +114,23 @@ public class FlowRestfulApi {
         return message;
     }
 
+    @RequestMapping(value = "getSchedulerWorkflowStatus",method = RequestMethod.GET)
+    public Message getSchedulerWorkflowStatus(@Context HttpServletRequest request,
+        @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
+        @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
+        String username = SecurityFilter.getLoginUsername(request);
+        try {
+            WorkflowStatus status = publishService.getSchedulerWorkflowStatus(username, orchestratorId);
+            Message result = Message.ok("获取调度工作流状态").data("published", status.getPublished()).data("releaseStatus",
+                status.getReleaseState());
+            // Message result = Message.ok("获取调度工作流状态").data("published", false).data("releaseStatus", null);
+            return result;
+        } catch (final Throwable t) {
+            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
+                orchestratorId, t);
+            return Message.error("获取工作流调度状态失败");
+        }
+    }
 
     /**
      * 获取发布任务状态

@@ -1,31 +1,29 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.framework.appconn.entity;
 
+import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
+import com.webank.wedatasphere.dss.common.entity.Resource;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @author: jinyangrao on 2020/10/15
- */
 
-public class AppConnBean implements Serializable {
+
+public class AppConnBean implements AppConnInfo, Serializable {
 
     private static final long serialVersionUID=1L;
     private Long id;
@@ -39,11 +37,9 @@ public class AppConnBean implements Serializable {
     // todo:未来这两个字段的作用是在bml和默认应用的。
     private String reference;
     private String resource;
+    private Resource resourceObj;
     private String className;
     private String appConnClassPath;
-
-
-
 
     private List<AppInstanceBean> appInstanceBeans;
 
@@ -56,6 +52,7 @@ public class AppConnBean implements Serializable {
         this.id = id;
     }
 
+    @Override
     public String getAppConnName() {
         return appConnName;
     }
@@ -120,8 +117,18 @@ public class AppConnBean implements Serializable {
         this.appInstanceBeans = appInstanceBeans;
     }
 
+    @Override
     public String getClassName() {
         return className;
+    }
+
+    @Override
+    public Resource getAppConnResource() {
+        return resourceObj;
+    }
+
+    public void setAppConnResource(Resource resource) {
+        resourceObj = resource;
     }
 
     public void setClassName(String className) {

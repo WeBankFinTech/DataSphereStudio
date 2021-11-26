@@ -1,28 +1,25 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
 import com.google.common.collect.Maps;
+import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.OriginSSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
@@ -33,21 +30,27 @@ import com.webank.wedatasphere.linkis.httpclient.request.HttpAction;
 import com.webank.wedatasphere.linkis.httpclient.response.HttpResult;
 import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
 import com.webank.wedatasphere.linkis.server.conf.ServerConfiguration;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 public class VisualisProjectCreationOperation implements ProjectCreationOperation {
 
     private static Logger logger = LoggerFactory.getLogger(VisualisProjectCreationOperation.class);
     private final static String projectUrl = "/api/rest_s/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/projects";
     private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
-    StructureService structureService;
+    private StructureService structureService;
 
-    public VisualisProjectCreationOperation(StructureService service) {
+    public VisualisProjectCreationOperation(StructureService service, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) {
         this.structureService = service;
-        this.ssoRequestOperation = new OriginSSORequestOperation(this.structureService.getAppDesc().getAppName());
+        this.ssoRequestOperation = ssoRequestOperation;
+    }
+    private String getAppName() {
+        return VisualisAppConn.VISUALIS_APPCONN_NAME;
+    }
+
+    @Override
+    public void init() {
     }
 
     @Override
@@ -60,7 +63,7 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
         visualisPostAction.addRequestPayload("pic", "6");
         visualisPostAction.addRequestPayload("visibility", true);
         SSOUrlBuilderOperation ssoUrlBuilderOperation = projectRef.getWorkspace().getSSOUrlBuilderOperation().copy();
-        ssoUrlBuilderOperation.setAppName(structureService.getAppDesc().getAppName());
+        ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
         ssoUrlBuilderOperation.setWorkspace(projectRef.getWorkspace().getWorkspaceName());
         String response = "";

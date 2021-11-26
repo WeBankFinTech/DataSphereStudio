@@ -20,21 +20,24 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinScheduler
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.SchedulisExceptionUtils;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
+/**
+ * The type Dolphin scheduler process definition query operation.
+ *
+ * @author yuxin.yuan
+ * @date 2021/10/29
+ */
 public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQueryOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProcessDefinitionQueryOperation.class);
-
-    private AppDesc appDesc;
 
     private SSOUrlBuilderOperation ssoUrlBuilderOperation;
 
@@ -42,13 +45,27 @@ public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQuery
 
     private String queryProcessDefinitionByIdUrl;
 
-    public DolphinSchedulerProcessDefinitionQueryOperation(AppDesc appDesc) {
-        this.appDesc = appDesc;
-        String baseUrl = this.appDesc.getAppInstances().get(0).getBaseUrl();
+    public DolphinSchedulerProcessDefinitionQueryOperation(String baseUrl) {
+        this.queryProcessDefinitionByIdUrl =
+            baseUrl.endsWith("/") ? baseUrl + "projects/${projectName}/process/select-by-id"
+                : baseUrl + "/projects/${projectName}/process/select-by-id";
+
         this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
-        this.queryProcessDefinitionByIdUrl = baseUrl.endsWith("/") ?
-            baseUrl + "projects/${projectName}/process/select-by-id" :
-            baseUrl + "/projects/${projectName}/process/select-by-id";
+    }
+
+    @Override
+    public void setDevelopmentService(DevelopmentService service) {
+
+    }
+
+    @Override
+    public ResponseRef query(RequestRef ref) throws ExternalOperationFailedException {
+        CommonRequestRef requestRef = (CommonRequestRef)ref;
+        String dolphinProjectName =
+            ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getProjectName());
+        String releaseState = queryProcessDefinitionReleaseStateById(dolphinProjectName,
+            (Long)requestRef.getParameter("processId"), (String)requestRef.getParameter("username"));
+        return new DolphinSchedulerProjectResponseRef(releaseState);
     }
 
     private String queryProcessDefinitionReleaseStateById(String projectName, Long processId, String userName)
@@ -88,18 +105,4 @@ public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQuery
         return null;
     }
 
-    @Override
-    public ResponseRef query(RequestRef ref) throws ExternalOperationFailedException {
-        CommonRequestRef requestRef = (CommonRequestRef)ref;
-        String dolphinProjectName = ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(),
-            requestRef.getProjectName());
-        String releaseState = queryProcessDefinitionReleaseStateById(dolphinProjectName,
-            (Long)requestRef.getParameter("processId"), (String)requestRef.getParameter("username"));
-        return new DolphinSchedulerProjectResponseRef(releaseState);
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-
-    }
 }

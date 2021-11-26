@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -48,9 +46,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by v_wbjftang on 2019/9/16.
- */
+
 public final class SchedulisSecurityService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SchedulisSecurityService.class);
@@ -140,9 +136,11 @@ public final class SchedulisSecurityService {
         params.add(new BasicNameValuePair(USER_TOKEN_KEY, token));
         params.add(new BasicNameValuePair(USER_STR, user));
         params.add(new BasicNameValuePair(CIPHER_STR, token));
-//        params.add(new BasicNameValuePair(SUPER_USER_STR, SUPER_USER));
-//        params.add(new BasicNameValuePair(SUPER_USER_CIPHER_STR, SUPER_USER_CIPHER));
-//        params.add(new BasicNameValuePair(USER_SECRET, USER_RSA));
+
+        params.add(new BasicNameValuePair(SUPER_USER_STR, SUPER_USER));
+        params.add(new BasicNameValuePair(SUPER_USER_CIPHER_STR, SUPER_USER_CIPHER));
+        params.add(new BasicNameValuePair(USER_SECRET, USER_RSA));
+
         params.add(new BasicNameValuePair("action", "login"));
         httpPost.setEntity(new UrlEncodedFormEntity(params));
         CookieStore cookieStore = new BasicCookieStore();

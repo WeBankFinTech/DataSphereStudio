@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,46 +18,44 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.app.development.crud.*;
-import com.webank.wedatasphere.dss.standard.app.development.process.DevProcessService;
-import com.webank.wedatasphere.dss.standard.app.development.process.ProcessService;
-import com.webank.wedatasphere.dss.standard.app.development.publish.ImportRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.publish.RefImportService;
-import com.webank.wedatasphere.dss.standard.app.development.query.OpenRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.standard.common.desc.EnvironmentLabel;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.DefaultRefFactory;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import com.webank.wedatasphere.linkis.rpc.Sender;
 import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author allenlliu
- * @date 2020/11/19 10:34
- */
 @Service
 public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
 
@@ -68,13 +64,7 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     @Autowired
     private NodeInfoMapper nodeInfoMapper;
 
-    @Autowired
-    private AppConnService appConnService;
-
-    private Sender projectSender = Sender.getSender(DSSWorkFlowConstant.PROJECT_SERVER_NAME.getValue());
-
-
-    private RefFactory refFactory=new DefaultRefFactory();
+    private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
 
     @Override
     public List<NodeGroup> listNodeGroups() {
@@ -84,20 +74,23 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
 
 
     @Override
-    public Map<String, Object> createNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException, InstantiationException, IllegalAccessException {
-        AppConn appConn =  appConnService.getAppConnByNodeType(node.getNodeType());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =(DevelopmentIntegrationStandard)appConn.getAppStandards().stream().filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).findAny().orElse(null);
+    public Map<String, Object> createNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+
+        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
         if(null != developmentIntegrationStandard)
         {
-            DevProcessService devProcessService = (DevProcessService) developmentIntegrationStandard.getProcessServices().stream().filter(processService -> processService instanceof DevProcessService).findAny().orElse(null);
-            RefCreationOperation refCreationOperation = devProcessService.getRefCRUDService().createTaskCreationOperation();
-            String label = node.getJobContent().get("labels").toString();
+            String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
+            AppInstance appInstance = getAppInstance(appConn, label);
+            RefCreationOperation refCreationOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefCreationOperation();
+
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
-            AppInstance appInstance = getAppInstance(developmentIntegrationStandard, label);
-            devProcessService.setAppInstance(appInstance);
-            CreateNodeRequestRef ref = null;
+
+            NodeRequestRef ref = null;
             try {
-                ref = (CreateNodeRequestRef) refFactory.newRef(CreateNodeRequestRef.class, refCreationOperation.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+                ref = AppConnRefFactoryUtils
+                        .newAppConnRef(NodeRequestRef.class, refCreationOperation.getClass().getClassLoader(), appConn.getAppDesc().getAppName().toLowerCase());
             } catch (Exception e) {
                 logger.error("Failed to create CreateNodeRequestRef", e);
             }
@@ -124,11 +117,11 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         return null;
     }
 
-    private AppInstance getAppInstance(DevelopmentIntegrationStandard developmentIntegrationStandard, String label) {
+    private AppInstance getAppInstance(AppConn appConn, String label) {
         AppInstance appInstance = null;
-        for (AppInstance instance : developmentIntegrationStandard.getAppDesc().getAppInstances()) {
+        for (AppInstance instance : appConn.getAppDesc().getAppInstances()) {
             for (DSSLabel dssLabel : instance.getLabels()) {
-                if(dssLabel.getLabel().equalsIgnoreCase(label)){
+                if(((EnvDSSLabel)dssLabel).getEnv().equalsIgnoreCase(label)){
                     appInstance = instance;
                     break;
                 }
@@ -138,27 +131,27 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     private Long parseProjectId(Long dssProjectId, String appconnName, String labels){
-        DSSLabel dssLabel = new DSSLabel(labels);
+        DSSLabel dssLabel = new EnvDSSLabel(labels);
         ProjectRelationRequest projectRelationRequest = new ProjectRelationRequest(dssProjectId, appconnName, Lists.newArrayList(dssLabel));
         ProjectRelationResponse projectRelationResponse = (ProjectRelationResponse) projectSender.ask(projectRelationRequest);
         return projectRelationResponse.getAppInstanceProjectId();
     }
 
     @Override
-    public void deleteNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException, InstantiationException, IllegalAccessException {
-        AppConn appConn =  appConnService.getAppConnByNodeType(node.getNodeType());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =(DevelopmentIntegrationStandard)appConn.getAppStandards().stream().filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).findAny().orElse(null);
+    public void deleteNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
         if(null != developmentIntegrationStandard)
         {
-            DevProcessService devProcessService   = (DevProcessService) developmentIntegrationStandard.getProcessServices().stream().filter(processService -> processService instanceof DevProcessService).findAny().orElse(null);
-            RefDeletionOperation refDeletionOperation = devProcessService.getRefCRUDService().createRefDeletionOperation();
-            String label = node.getJobContent().get("labels").toString();
+            String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
+            AppInstance appInstance = getAppInstance(appConn, label);
+            RefDeletionOperation refDeletionOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefDeletionOperation();
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
-            AppInstance appInstance = getAppInstance(developmentIntegrationStandard, label);
-            devProcessService.setAppInstance(appInstance);
-            DeleteNodeRequestRef ref = null;
+            NodeRequestRef ref = null;
             try {
-                ref = (DeleteNodeRequestRef)refFactory.newRef(DeleteNodeRequestRef.class, refDeletionOperation.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
+                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create DeleteNodeRequestRef", e);
             }
@@ -177,20 +170,20 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     @Override
-    public Map<String, Object> updateNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException, InstantiationException, IllegalAccessException {
-        AppConn appConn =  appConnService.getAppConnByNodeType(node.getNodeType());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =(DevelopmentIntegrationStandard)appConn.getAppStandards().stream().filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).findAny().orElse(null);
+    public Map<String, Object> updateNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
         if(null != developmentIntegrationStandard)
         {
-            DevProcessService devProcessService = (DevProcessService) developmentIntegrationStandard.getProcessServices().stream().filter(processService -> processService instanceof DevProcessService).findAny().orElse(null);
-            RefUpdateOperation refUpdateOperation = devProcessService.getRefCRUDService().createRefUpdateOperation();
-            String label = node.getJobContent().get("labels").toString();
+            String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
+            AppInstance appInstance = getAppInstance(appConn, label);
+            RefUpdateOperation refUpdateOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefUpdateOperation();
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
-            AppInstance appInstance = getAppInstance(developmentIntegrationStandard, label);
-            devProcessService.setAppInstance(appInstance);
-            UpdateNodeRequestRef ref = null;
+            NodeRequestRef ref = null;
             try {
-                ref = (UpdateNodeRequestRef)refFactory.newRef(UpdateNodeRequestRef.class, refUpdateOperation.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
+                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create UpdateNodeRequestRef", e);
             }
@@ -237,35 +230,29 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     @Override
-    public Map<String, Object> importNode(String userName, AbstractAppConnNode node, Map<String, Object> resourceMap, Workspace workspace, String orcVersion) throws Exception {
-        AppConn appConn = appConnService.getAppConnByNodeType(node.getNodeType());
-        DSSLabel dssLabel = new EnvironmentLabel();
-        dssLabel.setLabel(DSSWorkFlowConstant.DSS_EXPORT_ENV.getValue());
-        List<DSSLabel> dssLabels = new ArrayList<>();
-        dssLabels.add(dssLabel);
+    public Map<String, Object> importNode(String userName, AbstractAppConnNode node, Map<String, Object> resourceMap,
+        Workspace workspace, String orcVersion) throws Exception {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        EnvDSSLabel dssLabel = new EnvDSSLabel(DSSWorkFlowConstant.DSS_IMPORT_ENV.getValue());
         if (appConn != null) {
-            AppStandard devStandOption = appConn.getAppStandards().stream()
-                    .filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard)
-                    .findAny().orElse(null);
-            if (null != devStandOption) {
-                DevelopmentIntegrationStandard devStand = (DevelopmentIntegrationStandard) devStandOption;
-                ProcessService processService = devStand.getProcessService(dssLabels);
-                AppInstance appInstance = getAppInstance(devStand, dssLabel.getLabel());
-                processService.setAppInstance(appInstance);
-                RefImportService refImportService = (RefImportService) processService.getRefOperationService().stream()
-                        .filter(refOperationService -> refOperationService instanceof RefImportService).findAny().orElse(null);
-                refImportService.setDevelopmentService(processService);
-                ImportRequestRef requestRef = (ImportRequestRef)refFactory.newRef(ImportRequestRef.class, refImportService.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+            DevelopmentIntegrationStandard devStand =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
+            if (null != devStand) {
+
+                AppInstance appInstance = getAppInstance(appConn, dssLabel.getEnv());
+
+                RefImportService refImportService =  devStand.getRefImportService(appInstance);
+                ImportRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRef(ImportRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
                 //todo request param def
                 requestRef.setParameter("jobContent", node.getJobContent());
-                requestRef.setParameter("projectId", parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), dssLabel.getLabel()));
+                requestRef.setParameter("projectId", parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), dssLabel.getEnv()));
                 requestRef.setParameter("nodeType", node.getNodeType());
                 requestRef.setParameter("orcVersion", orcVersion);
                 requestRef.setParameter("user", userName);
                 requestRef.getParameters().putAll(resourceMap);
                 requestRef.setWorkspace(workspace);
                 if (null != refImportService) {
-                    ResponseRef responseRef = refImportService.createRefImportOperation().importRef(requestRef);
+                    ResponseRef responseRef = refImportService.getRefImportOperation().importRef(requestRef);
                     return responseRef.toMap();
                 }
             }
@@ -275,18 +262,18 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
 
     @Override
     public String getNodeJumpUrl(Map<String, Object> params, AbstractAppConnNode node) throws ExternalOperationFailedException {
-        AppConn appConn = appConnService.getAppConnByNodeType(node.getNodeType());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =(DevelopmentIntegrationStandard)appConn.getAppStandards().stream().filter(appStandard -> appStandard instanceof DevelopmentIntegrationStandard).findAny().orElse(null);
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
         if(null != developmentIntegrationStandard){
-            DevProcessService devProcessService = (DevProcessService) developmentIntegrationStandard.getProcessServices().stream().filter(processService -> processService instanceof DevProcessService).findAny().orElse(null);
-            RefQueryOperation refQueryOperation = devProcessService.getRefQueryService().getRefQueryOperation();
-            String label = params.get("labels").toString();
-            AppInstance appInstance = getAppInstance(developmentIntegrationStandard, label);
-            String redirectUrl = appConnService.getRedirectUrl(node.getNodeType(), appInstance);
-            devProcessService.setAppInstance(appInstance);
+            String label = params.get(DSSCommonUtils.DSS_LABELS_KEY).toString();
+            AppInstance appInstance = getAppInstance(appConn, label);
+            RefQueryOperation refQueryOperation = developmentIntegrationStandard.getRefQueryService(appInstance).getRefQueryOperation();
+
+            String redirectUrl = (String) appInstance.getConfig().get(AppInstanceConstants.REDIRECT_URL);
             OpenRequestRef ref = null;
             try {
-                ref = (OpenRequestRef)refFactory.newRef(OpenRequestRef.class, refQueryOperation.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(OpenRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create UpdateNodeRequestRef", e);
             }

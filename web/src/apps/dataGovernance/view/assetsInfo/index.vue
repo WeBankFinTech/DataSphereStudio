@@ -52,7 +52,7 @@
               type="md-create"
               v-if="!isCommentEdit"
               @click="isCommentEdit = true"
-              style="float:right;cursor: pointer;margin-right: 110px;margin-top: 2px;"
+              style="float:right;cursor: pointer;margin-top: 2px;"
             ></Icon>
             <Icon
               type="md-checkmark"
@@ -148,8 +148,9 @@
       <!-- right -->
 
       <div class="assets-info-b-r">
-        <Tabs type="card" class="assets-tabs">
+        <Tabs type="card" class="assets-tabs" v-model="curTab">
           <TabPane label="字段信息"
+                   name="info"
             ><field-info
               :fieldInfo="fieldInfo"
               :rangeFieldInfo="rangeFieldInfo"
@@ -159,7 +160,7 @@
             ><range-info :rangeInfo="rangeInfo"></range-info
           ></TabPane> -->
           <!-- <TabPane label="数据预览">标签三的内容</TabPane> -->
-          <TabPane label="数据血缘">
+          <TabPane label="数据血缘" name="lineage">
             <div class="dagreLayout-page" v-if="lineageData">
               <lineage
                 class="flow-canvas"
@@ -178,6 +179,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import fieldInfo from "../fieldInfo/index.vue";
 import rangeInfo from "../rangeInfo/index.vue";
 import lineage from "./components/lineage";
@@ -192,6 +194,8 @@ import {
   getLayersAll,
   updateClassifications
 } from "../../service/api";
+import util from '@/common/util'
+import { EventBus } from "../../module/common/eventBus/event-bus"
 
 export default {
   name: "assetsInfo",
@@ -222,7 +226,8 @@ export default {
       subjectList: [],
       layerList: [],
       isChangingClassifications: false,
-      editable: false
+      editable: false,
+      curTab: 'info'
     };
   },
   watch: {
@@ -242,6 +247,22 @@ export default {
       let { result } = res;
       this.layerList = result;
     });
+
+    util.Hub.$on('register_click_hive_table', data => {
+      this.$nextTick(()=> {
+        $(`#${data.guid}`).on('click', () => {
+          this.curTab = 'info'
+          EventBus.$emit("on-choose-card", data);
+          const workspaceId = this.$route.query.workspaceId,
+            guid = data.guid
+          this.$router.push({
+            name: "dataGovernance/assets/info",
+            params: { guid },
+            query: { workspaceId }
+          });
+        })
+      })
+    })
   },
   methods: {
     init() {
@@ -330,6 +351,7 @@ export default {
           console.log("getTblPartition", err);
         });
     },
+
     // 获取血缘数据
     getLineageData() {
       let guid = this.$route.params.guid;

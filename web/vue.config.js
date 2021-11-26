@@ -153,7 +153,7 @@ module.exports = {
   publicPath: "./",
   outputDir: "dist/dist",
   lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
-  productionSourceMap: process.env.NODE_ENV === "dev", // 生产环境无需source map加速构建，但不如设置devtool生效
+  productionSourceMap: process.env.NODE_ENV === "dev", // 生产环境无需source map加速构建
   css: {
     loaderOptions: {
       less: {
@@ -205,27 +205,13 @@ module.exports = {
               ]
             }
           }
-        ])
-        .use(
-          new UglifyJsPlugin({
-            uglifyOptions: {
-              // output: {
-              //   comments: false
-              // },
-              warnings: false,
-              compress: {
-                drop_debugger: true, // 去掉debugger
-                drop_console: true, // 去掉console
-                pure_funcs: ["console.log"] // 移除console
-              }
-            }
-          })
-        );
+        ]);
+      // 移除UglifyJsPlugin(之前的写法也并未生效)，使用默认的terser-webpack-plugin，build更快；
+      // 如果想设置drop_console，升级@vue-cli再设置，否则会增加build时间
       config.performance.set("hints", false);
     }
   },
   configureWebpack: configWrap({
-    devtool: "eval", // 控制source map生成方式加速build
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

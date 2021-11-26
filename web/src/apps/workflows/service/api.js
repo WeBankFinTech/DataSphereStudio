@@ -8,7 +8,7 @@ import api from '@/common/service/api';
  * @returns 
  */
 const getPublishStatus = (releaseTaskId, dssLabel)=>{
-  return api.fetch(`${API_PATH.PUBLISH_PATH}getPublishStatus`, {releaseTaskId,  dssLabel}, 'get');
+  return api.fetch(`${API_PATH.PUBLISH_PATH}getReleaseStatus`, {releaseTaskId,  dssLabel}, 'get');
 }
 
 const getSchedulingStatus = (workspaceId, orchestratorId)=>{

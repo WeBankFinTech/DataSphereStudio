@@ -54,6 +54,22 @@ export default Object.freeze([{
   isCanBeOpen: true,
   flowType: 'fql'
 },
+{
+  rule: /\.(psql)$/i,
+  lang: 'sql',
+  executable: true,
+  application: 'presto',
+  runType: 'presto',
+  ext: '.psql',
+  scriptType: 'presto',
+  abbr: 'sql',
+  logo: 'fi-presto-sql',
+  color: '#FF9900',
+  isCanBeNew: true,
+  label: 'Presto',
+  isCanBeOpen: true,
+  flowType: 'presto'
+},
 // {
 //   rule: /\.(out)$/i,
 //   lang: 'out',

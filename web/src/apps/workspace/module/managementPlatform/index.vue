@@ -282,8 +282,6 @@ export default {
         const updateData = formatComponentDataForPost(componentItem);
         UpdateDataFromId(componentItem.id, updateData)
           .then(data => {
-            _this.getMenuForcomponentAccess();
-            _this.updateBaseInfo();
             _this.$Message.success("更新成功");
           })
           .catch(err => {
@@ -295,8 +293,6 @@ export default {
         const postData = formatComponentDataForPost(componentItem);
         CreateData(postData)
           .then(data => {
-            _this.getMenuForcomponentAccess();
-            _this.updateBaseInfo();
             _this.$Message.success("新增成功");
           })
           .catch(err => {
@@ -304,9 +300,6 @@ export default {
           });
       }
     },
-
-    ok() {},
-    cancel() {},
 
     // 拉取类别数据
     getMenuForcomponentAccess() {

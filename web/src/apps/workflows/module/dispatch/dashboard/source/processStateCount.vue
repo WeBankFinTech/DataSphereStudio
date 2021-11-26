@@ -8,18 +8,18 @@
         <div class="col-md-5">
           <div class="table-small-model">
             <table>
-              <tr>
-                <th width="40">{{$t('message.scheduler.header.id')}}</th>
-                <th>{{$t('message.scheduler.header.Number')}}</th>
-                <th>{{$t('message.scheduler.header.State')}}</th>
-              </tr>
+              <!--<tr>-->
+                <!--<th width="40">{{$t('message.scheduler.header.id')}}</th>-->
+                <!--<th>{{$t('message.scheduler.header.State')}}</th>-->
+                <!--<th>{{$t('message.scheduler.header.Number')}}</th>-->
+              <!--</tr>-->
               <tr v-for="(item,$index) in processStateList" :key="$index">
-                <td><span>{{$index+1}}</span></td>
+                <!--<td><span>{{$index+1}}</span></td>-->
+                <td><span :style="{'display':'inline','height':'5px','width':'5px','borderRadius':'50%','float':'left','marginTop':'13px','marginRight':'5px','backgroundColor':item.color}"></span><span class="ellipsis" style="width: 70%;" :title="item.key">{{item.key}}</span></td>
                 <td>
                   <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
                   <span v-else><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)">{{item.value}}</a></span>
                 </td>
-                <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
               </tr>
             </table>
           </div>
@@ -77,7 +77,8 @@ export default {
       this.processStateList.forEach(item => {
         totalCount += item.value
       })
-      const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: `流程状态数量\n${totalCount}`, ring: true })
+      const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: `流程状态数量\n${totalCount}`,
+        ring: true})
       myChart.echart.setOption(pie)
       // 首页不允许跳转
       if (this.searchParams.projectId) {
@@ -94,13 +95,15 @@ export default {
       handler (o) {
         this.isSpin = true
         util.checkToken(() => {
-          api.fetch(`dolphinscheduler/projects/analysis/process-state-count`, o, 'get').then(res => {
-            this.processStateList = []
-            this._handleProcessState(res)
-            this.isSpin = false
-          }).catch(() => {
-            this.isSpin = false
-          })
+          if (o.projectId) {
+            api.fetch(`dolphinscheduler/projects/analysis/process-state-count`, o, 'get').then(res => {
+              this.processStateList = []
+              this._handleProcessState(res)
+              this.isSpin = false
+            }).catch(() => {
+              this.isSpin = false
+            })
+          }
         })
       }
     },
@@ -130,5 +133,8 @@ export default {
 }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
+<style lang="scss" rel="stylesheet/scss" scoped>
+  td {
+    border-bottom: none !important;
+  }
 </style>

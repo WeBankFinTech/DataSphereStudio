@@ -17,7 +17,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -39,10 +39,9 @@ import java.util.Map;
  */
 //@RestController
 //@RequestMapping("/dss/framework/admin/user")
-@Component
-@Path("/dss/framework/admin/user")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+@RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
+@RestController
 public class DssFrameworkAdminUserController extends BaseController {
     @Resource
     private DssAdminUserService dssAdminUserService;
@@ -52,9 +51,9 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     DssUserMapper dssUserMapper;
 
-    //    @GetMapping("/list")
-    @GET
-    @Path("/list")
+//    @GET
+//    @Path("/list")
+    @RequestMapping(path ="list", method = RequestMethod.GET)
 //    public TableDataInfo list(DssAdminUser user) {
     public TableDataInfo list(@QueryParam("userName") String userName, @QueryParam("deptId") Long deptId, @QueryParam("phonenumber") String phonenumber, @QueryParam("beginTime") String beginTime, @QueryParam("endTime") String endTime) {
         DssAdminUser user = new DssAdminUser();
@@ -71,8 +70,10 @@ public class DssFrameworkAdminUserController extends BaseController {
     }
 
     //    @PostMapping("/add")
-    @POST
-    @Path("/add")
+//    @POST
+//    @Path("/add")
+    @RequestMapping(path ="add", method = RequestMethod.POST)
+
     public Message add(@Validated @RequestBody DssAdminUser user, @Context HttpServletRequest req
     ) {
         try {
@@ -108,16 +109,17 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     }
 
-    //    @GetMapping(value = {"/{id}"})@PathParam("id")
-    @GET
-    @Path("/{id}")
-    public Message getInfo(@PathParam("id") Long userId) {
+
+    //    @GET
+//    @Path("/{id}")
+    @RequestMapping(path ="{id}", method = RequestMethod.GET)
+    public Message getInfo(@PathVariable("id") Long userId) {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
     }
 
-    //    @PostMapping("/edit")
-    @POST
-    @Path("/edit")
+//    @POST
+//    @Path("/edit")
+    @RequestMapping(path ="edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminUser user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
@@ -130,8 +132,9 @@ public class DssFrameworkAdminUserController extends BaseController {
         return Message.ok().data("修改用户成功", dssAdminUserService.updateUser(user));
     }
 
-    @POST
-    @Path("/resetPsw")
+//    @POST
+//    @Path("/resetPsw")
+    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
     public Message resetPwd(@RequestBody DssAdminUser user) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);

@@ -38,15 +38,16 @@ fi
 
 echo "start to subsitution conf"
 sed -i  "s#jobtype.lib.dir.*#jobtype.lib.dir=$AZKABAN_JOBTYPE_DIR/linkis/lib#g" ${workDir}/private.properties
-sed -i  "s#wds.linkis.gateway.url.*#wds.linkis.gateway.url=$LINKIS_GATEWAY_URL#g" ${workDir}/plugin.properties
+sed -i  "s#wds.linkis.gateway.url.v0.*#wds.linkis.gateway.url.v0=$LINKIS_GATEWAY_URL#g" ${workDir}/plugin.properties
+sed -i  "s#wds.linkis.gateway.url.v1.*#wds.linkis.gateway.url.v1=$LINKIS_GATEWAY_URL#g" ${workDir}/plugin.properties
 sed -i  "s#wds.linkis.client.flow.author.user.token.*#wds.linkis.client.flow.author.user.token=$LINKIS_GATEWAY_TOKEN#g" ${workDir}/plugin.properties
 isSuccess "subsitution conf"
 
 echo "$COPY Plugin"
-ssh  -p $SSH_PORT $AZKABAN_EXECUTOR_HOST "cd $AZKABAN_JOBTYPE_DIR;rm -rf linkis-bak; mv -f linkis ../linkis-bak"
+##ssh  -p $SSH_PORT $AZKABAN_EXECUTOR_HOST "cd $AZKABAN_JOBTYPE_DIR;rm -rf linkis-bak; mv -f linkis ../linkis-bak"
 
 scp   -P $SSH_PORT  -r ${workDir} $AZKABAN_EXECUTOR_HOST:$AZKABAN_JOBTYPE_DIR
 
 echo "reload jobType"
 
-curl $AZKABAN_EXECUTOR_URL
+##curl $AZKABAN_EXECUTOR_URL

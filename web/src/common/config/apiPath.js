@@ -9,3 +9,4 @@ export default {
   DATA_GOVERNANCE: '/dss/data/governance/asset/',
   WAREHOUSE_PATH: '/dss/data/governance/classification/'
 }
+

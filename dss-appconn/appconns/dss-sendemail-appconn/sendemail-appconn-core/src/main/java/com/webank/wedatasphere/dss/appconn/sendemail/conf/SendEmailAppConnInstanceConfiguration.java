@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -30,14 +28,10 @@ import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.HtmlEma
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.PictureEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.TableEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailRefExecutionHook;
-import com.webank.wedatasphere.linkis.common.utils.ClassUtils;
-import java.util.Arrays;
+import com.webank.wedatasphere.dss.common.utils.ClassUtils;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/**
- * Created by enjoyyin on 2019/10/14.
- */
 
 public class SendEmailAppConnInstanceConfiguration {
 
@@ -54,14 +48,9 @@ public class SendEmailAppConnInstanceConfiguration {
     private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks = createSendEmailRefExecutionHooks();
 
     private static EmailSender createEmailSender() {
-        String emailSenderClass = SendEmailAppConnConfiguration.EMAIL_SENDER_CLASS().getValue();
-        try {
-            return (EmailSender)SendEmailAppConnInstanceConfiguration.class.getClassLoader().loadClass(emailSenderClass).newInstance();
-           // return  (EmailSender) ClassUtils.getClassInstance(emailSenderClass);
-        } catch (Exception e) {
-            logger.warn("{} can not be instanced, use SpringJavaEmailSender by default.", emailSenderClass, e);
-            return new SpringJavaEmailSender();
-        }
+        EmailSender emailSender = ClassUtils.getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
+        logger.info("Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
+        return emailSender;
     }
 
     private static EmailContentGenerator[] createEmailContentGenerators() {
@@ -74,27 +63,11 @@ public class SendEmailAppConnInstanceConfiguration {
     }
 
     private static SendEmailRefExecutionHook[] createSendEmailRefExecutionHooks() {
-        String hookClasses = SendEmailAppConnConfiguration.EMAIL_HOOK_CLASSES().getValue();
-        return Arrays.stream(hookClasses.split(",")).map(clazz -> {
-            SendEmailRefExecutionHook sendEmailRefExecutionHook = null;
-            try {
-                sendEmailRefExecutionHook = (SendEmailRefExecutionHook)SendEmailAppConnInstanceConfiguration.class.getClassLoader().loadClass(clazz).newInstance();
-            } catch (InstantiationException e) {
-                logger.warn("{} can not be instanced", clazz, e);
-            } catch (IllegalAccessException e) {
-                logger.warn("{} can not be instanced", clazz, e);
-            } catch (ClassNotFoundException e) {
-                logger.warn("{} can not be instanced", clazz, e);
-            }
-            return sendEmailRefExecutionHook;
-        }).filter(hook -> null!= hook).toArray(SendEmailRefExecutionHook[]::new);
+        List<SendEmailRefExecutionHook> hooks = ClassUtils.getInstances(SendEmailRefExecutionHook.class);
+        logger.info("SendEmailRefExecutionHook list is {}.", hooks);
+        return hooks.toArray(new SendEmailRefExecutionHook[0]);
     }
 
-
-    /**
-     * 如果是行内就直接返回com.webank.wedatasphere.dss.appjoint.sendemail.sender.EsbEmailSender
-     * @return
-     */
     public static EmailSender getEmailSender() {
         return EMAIL_SENDER;
     }

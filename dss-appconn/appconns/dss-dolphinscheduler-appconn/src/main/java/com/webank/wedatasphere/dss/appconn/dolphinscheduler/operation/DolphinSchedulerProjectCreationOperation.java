@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.webank.wedatasphere.linkis.common.utils.JsonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -24,7 +25,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinScheduler
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
@@ -36,39 +36,45 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
  * The type Dolphin scheduler project creation operation.
  *
  * @author yuxin.yuan
- * @date 2021/05/18
+ * @date 2021/10/18
  */
 public class DolphinSchedulerProjectCreationOperation implements ProjectCreationOperation, DolphinSchedulerConf {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectCreationOperation.class);
-    private static final Long DEFAULT_PROJECT_ID = 0L;
 
-    private SSOUrlBuilderOperation ssoUrlBuilderOperation;
+    private static final Long DEFAULT_PROJECT_ID = 0L;
 
     private DolphinSchedulerProjectService dolphinSchedulerProjectService;
 
     private String baseUrl;
 
-    private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
-
     private String projectUrl;
 
-    public DolphinSchedulerProjectCreationOperation(DolphinSchedulerProjectService dolphinSchedulerProjectService) {
-        this.dolphinSchedulerProjectService = dolphinSchedulerProjectService;
-        init();
+    private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
+
+    public DolphinSchedulerProjectCreationOperation() {
     }
 
-    private void init() {
+    @Override
+    public void init() {
         this.baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
-        this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
         this.projectUrl = baseUrl.endsWith("/") ? baseUrl + "projects/create" : baseUrl + "/projects/create";
+
+        this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
+    }
+
+    @Override
+    public void setStructureService(StructureService service) {
+        if (service instanceof DolphinSchedulerProjectService) {
+            this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
+        }
     }
 
     @Override
     public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
         // Dolphin Scheduler项目名
         String dsProjectName = ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
-        logger.info("begin to create project in Dolphin Scheduler, project is {}", dsProjectName);
+        logger.info("begin to create project in DolphinScheduler, project is {}", dsProjectName);
 
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("projectName", dsProjectName));
@@ -83,19 +89,22 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
 
         DolphinSchedulerProjectResponseRef responseRef = new DolphinSchedulerProjectResponseRef();
         try (CloseableHttpResponse httpResponse =
-            this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);) {
+            this.postOperation.requestWithSSO(null, httpPost);) {
             HttpEntity ent = httpResponse.getEntity();
+            logger.info("dolphin返回报文"+ent.toString());
+
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
+            logger.info("dolphin返回报文"+entString);
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()) {
                 String codeString = DolphinAppConnUtils.getValueFromEntity(entString, "code");
                 int code = Integer.parseInt(codeString);
 
                 if (Constant.DS_RESULT_CODE_SUCCESS == code) {
-                    logger.info("Dolphin Scheduler新建项目 {} 成功, 返回的信息是 {}", dsProjectName,
+                    logger.info("DolphinScheduler新建项目 {} 成功, 返回的信息是 {}", dsProjectName,
                         DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
                 } else if (Constant.DS_RESULT_CODE_PROJECT_ALREADY_EXISTS == code) {
-                    logger.info("Dolphin Scheduler项目 {} 已经存在, 返回的信息是 {}", dsProjectName,
+                    logger.info("DolphinScheduler项目 {} 已经存在, 返回的信息是 {}", dsProjectName,
                         DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
                     // 不返回project id
                     responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
@@ -107,7 +116,7 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
                 throw new ExternalOperationFailedException(90021, "新建工程失败, 原因:" + entString);
             }
         } catch (final Exception e) {
-            throw new ExternalOperationFailedException(90022, "failed to create project in Dolphin Scheduler", e);
+            throw new ExternalOperationFailedException(90022, "failed to create project in DolphinScheduler", e);
         }
 
         // 需要授权的用户名
@@ -128,13 +137,6 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
         // 不返回project id
         responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
         return responseRef;
-    }
-
-    @Override
-    public void setStructureService(StructureService service) {
-        if (service instanceof DolphinSchedulerProjectService) {
-            this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
-        }
     }
 
 }

@@ -136,10 +136,10 @@ export const getWorkspaceUsers = (workspackId, search) =>
  * @params {workspaceId}
  * @returns Array
  */
-export const getThemedomains = (name) =>
+export const getThemedomains = (keyword) =>
   api.fetch(
     `${API_PATH.WAREHOUSE_PATH}subject/subtypes`,
-    { name },
+    { keyword },
     'get'
   )
 

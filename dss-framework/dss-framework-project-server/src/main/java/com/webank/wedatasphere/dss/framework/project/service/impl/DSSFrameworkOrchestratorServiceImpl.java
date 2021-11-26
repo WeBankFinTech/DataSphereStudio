@@ -114,9 +114,6 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
             OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                     getType(OrchestratorTypeEnum.getTypeByKey(orchestratorCreateRequest.getOrchestratorMode()));
 
-            LabelRouteVo labelRouteVo = new LabelRouteVo();
-            labelRouteVo.setRoute("dev");
-            orchestratorCreateRequest.setLabels(labelRouteVo);
             List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
             OrchestratorCreateRequestRef orchestratorCreateRequestRef = null;
             String appconnName = "workflow";
@@ -186,9 +183,7 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
         try {
             OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                     getType(OrchestratorTypeEnum.getTypeByKey(orchestratorModifyRequest.getOrchestratorMode()));
-//            List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
-            List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel("dev"));
-
+            List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
 
             String appconnName = "workflow";
             WorkflowOrchestratorUpdateRequestRef orchestratorUpdateRequestRef = new WorkflowOrchestratorUpdateRequestRef();

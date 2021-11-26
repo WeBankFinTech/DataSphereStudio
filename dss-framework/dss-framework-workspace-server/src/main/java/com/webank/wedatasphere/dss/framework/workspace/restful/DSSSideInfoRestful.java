@@ -41,7 +41,7 @@ public class DSSSideInfoRestful {
     private DSSSideInfoService dssSideInfoService;
 
     @RequestMapping(path ="getSideInfos", method = RequestMethod.GET)
-    public Message getSideInfos(@Context HttpServletRequest request, @RequestParam(required = false, name = "workspaceID") Integer workspaceId){
+    public Message getSideInfos(@Context HttpServletRequest request, @RequestParam(required = false, name = "workspaceId") Integer workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
         try{
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));

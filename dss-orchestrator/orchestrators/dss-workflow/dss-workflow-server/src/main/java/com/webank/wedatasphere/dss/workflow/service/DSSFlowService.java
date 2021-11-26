@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -24,9 +22,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by v_wbjftang on 2019/5/15.
- */
 public interface DSSFlowService {
     DSSFlow getFlowByID(Long id);
 
@@ -74,7 +69,7 @@ public interface DSSFlowService {
 
     Integer getParentRank(Long flowID);
 
-    DSSFlow copyRootFlow(Long rootFlowId,String userName,String workspaceName,String projectName,String version) throws DSSErrorException, IOException;
+    DSSFlow copyRootFlow(Long rootFlowId,String userName,String workspaceName,String projectName,String version,String contextIdStr) throws DSSErrorException, IOException;
 
 //    DWSFlowVersion getLatestVersionByFlowIDAndProjectVersionID(Long flowID, Long projectVersionID);
 

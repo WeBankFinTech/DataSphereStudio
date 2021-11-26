@@ -1,31 +1,33 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
-import com.webank.wedatasphere.dss.orchestrator.publish.OrchestratorPublishService;
+import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.desc.CommonDSSLabel;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.linkis.server.Message;
 import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
@@ -51,53 +53,40 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA})
 @Component
 @Path("/dss/framework/orchestrator")
 public class OrchestratorIERestful {
-
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorIERestful.class);
-
-    @Autowired
-    private OrchestratorPublishService orchestratorPublishService;
-
     @Autowired
     private BMLService bmlService;
-
     @Autowired
     OrchestratorService orchestratorService;
-
+    @Autowired
+    private DSSOrchestratorContext orchestratorContext;
 
     @POST
     @Path("/importOrchestratorFile")
     public Response importOrcFile(@Context HttpServletRequest req,
                                   @FormDataParam("projectName") String projectName,
                                   @FormDataParam("projectID") Long projectID,
-                                  @FormDataParam("dssLabels") String dssLabels,
+                                  @FormDataParam("dssLabels") String labels,
                                   FormDataMultiPart form) throws DSSErrorException, UnsupportedEncodingException {
         List<FormDataBodyPart> files = form.getFields("file");
-        if(null == files || files.size()==0){
+        if (null == files || files.size() == 0) {
             throw new DSSErrorException(100788, "Import orchestrator failed for files is empty");
         }
-        Long importOrcId=0L;
+        Long importOrcId = 0L;
         for (FormDataBodyPart p : files) {
-
             InputStream inputStream = p.getValueAs(InputStream.class);
             FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
             String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
-
-
-
             String userName = SecurityFilter.getLoginUsername(req);
-            List<DSSLabel> dssLabelList = Arrays.asList(dssLabels.split(",")).stream().map(label -> {
-                DSSLabel dssLabel = new CommonDSSLabel();
-                dssLabel.setLabel(label);
-                return dssLabel;
-            }).collect(Collectors.toList());
-
+            labels = "{\"route\":\"dev\"}";
+            //调用工具类生产label
+            List<DSSLabel> dssLabelList = getDSSLabelList(labels);
 //            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
 //                    .path("/downloadFile/")
 //                    .path(fileName)
@@ -108,9 +97,8 @@ public class OrchestratorIERestful {
 //            InputStream inputStream = bmlService.readLocalResourceFile(userName, targetLocation.toAbsolutePath().toString());
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
-
             try {
-                importOrcId = orchestratorPublishService.importOrchestrator(userName,
+                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(userName,
                         workspace.getWorkspaceName(),
                         projectName,
                         projectID,
@@ -137,26 +125,20 @@ public class OrchestratorIERestful {
                               @QueryParam("orchestratorId") Long orchestratorId,
                               @QueryParam("orcVersionId") Long orcVersionId,
                               @DefaultValue("false") @QueryParam("addOrcVersion") Boolean addOrcVersion,
-                              @DefaultValue("dev") @QueryParam("dssLabels") String dssLabels) throws DSSErrorException, IOException {
-
+                              @QueryParam("dssLabels") String labels) throws DSSErrorException, IOException {
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
         resp.setCharacterEncoding(charset);
-
         Workspace workspace = SSOHelper.getWorkspace(req);
         String userName = SecurityFilter.getLoginUsername(req);
-
-        List<DSSLabel> dssLabelList = Arrays.asList(dssLabels.split(",")).stream().map(label -> {
-            DSSLabel dssLabel = new CommonDSSLabel();
-            dssLabel.setLabel(label);
-            return dssLabel;
-        }).collect(Collectors.toList());
+        labels = "{\"route\":\"dev\"}";
+        List<DSSLabel> dssLabelList = getDSSLabelList(labels);
         Map<String, Object> res = null;
         OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
-        orcVersionId =orchestratorVo.getDssOrchestratorVersion().getId();
-        logger.info("export orchestrator orchestratorId " + orchestratorId+",orcVersionId:"+orcVersionId);
+        orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
+        logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
-            res = orchestratorPublishService.exportOrchestrator(userName,
+            res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
                     workspace.getWorkspaceName(),
                     orchestratorId,
                     orcVersionId,
@@ -180,8 +162,22 @@ public class OrchestratorIERestful {
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }
-
         }
     }
 
+    //生成label list
+    public static List<DSSLabel> getDSSLabelList(String labels) {
+        //原来的逻辑
+//        List<DSSLabel> dssLabelList = Arrays.asList(dssLabels.split(",")).stream().map(label -> {
+//            DSSLabel dssLabel = new EnvDSSLabel(label);
+//            return dssLabel;
+//        }).collect(Collectors.toList());
+        String labelStr = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
+        Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
+        if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+            labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+        }
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
+        return dssLabelList;
+    }
 }

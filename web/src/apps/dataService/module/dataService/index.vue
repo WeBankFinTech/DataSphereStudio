@@ -343,16 +343,16 @@ export default {
         this.$refs["apiForm"].validate(valid => {
           if (valid) {
             if (modalType === "api") {
-              const { id, name } = this.groupData;
+              const { groupId, name } = this.groupData;
               const tempId = Date.now();
               const params = { ...this.apiForm };
               params.apiName = params.apiName.trim();
               params.apiPath = params.apiPath.trim();
               this.$refs.navMenu.treeMethod("addApi", {
-                id,
+                id: groupId,
                 data: {
                   name: params.apiName,
-                  projectId: id,
+                  projectId: groupId,
                   projectName: name,
                   tempId,
                   type: "api"
@@ -360,7 +360,7 @@ export default {
               });
               this.addTab({
                 ...params,
-                groupId: this.groupData.id,
+                groupId: this.groupData.groupId,
                 tempId
               });
             } else {

@@ -210,7 +210,7 @@ export default {
         .then(data => {
           if (data.result) {
             data.result.forEach(item => {
-              let tempLen = (item.storage.length / 3).toFixed() - 0
+              let tempLen = Math.floor(item.storage.length / 3)
               let len = tempLen > 2 ? 3 : tempLen
               item.storage = (item.storage / (1024 * (len + 1))).toFixed(2)
               switch(len){

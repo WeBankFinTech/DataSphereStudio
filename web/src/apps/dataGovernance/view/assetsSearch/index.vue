@@ -129,7 +129,10 @@ export default {
     return {
       searchOption: {
         limit: 10,
-        offset: 0
+        offset: 0,
+        owner: '',
+        classification: '',
+        query: ''
       },
       ownerList: [],
       userList: [],
@@ -142,9 +145,12 @@ export default {
     };
   },
   created() {
-    let searchParams = storage.getItem("searchTbls");
+    let searchParams = storage.getItem("searchTbls")
     if (searchParams) {
-      this.queryForTbls = JSON.parse(searchParams).query;
+      const searchData = JSON.parse(searchParams)
+      this.queryForTbls = searchData.query
+      this.searchOption.classification = searchData.classification
+      this.searchOption.owner = searchData.owner
       getHiveTbls(JSON.parse(searchParams))
         .then(data => {
           if (data.result) {

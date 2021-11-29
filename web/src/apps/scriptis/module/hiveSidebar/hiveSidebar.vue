@@ -36,6 +36,9 @@
         <we-menu-item @select="reflesh">
           {{ $t('message.scripts.constants.refresh') }}
         </we-menu-item>
+        <we-menu-item v-if="sortshow" @select="timeSort">
+          {{sortText}}
+        </we-menu-item>
       </template>
       <template v-if="currentType === 'tb'">
         <we-menu-item
@@ -45,9 +48,9 @@
           @select="openDeleteDialog"
           v-if="!model">{{ $t('message.scripts.database.contextMenu.tb.deleteTable') }}</we-menu-item>
         <we-menu-item v-show="nodekeyshow" @select="describeTable">{{ $t('message.scripts.database.contextMenu.tb.viewTable') }}</we-menu-item>
-        <we-menu-item
+        <!-- <we-menu-item
           v-if="isAllowToExport && !model"
-          @select="openExportDialog">{{ $t('message.scripts.database.contextMenu.tb.exportTable') }}</we-menu-item>
+          @select="openExportDialog">{{ $t('message.scripts.database.contextMenu.tb.exportTable') }}</we-menu-item> -->
         <we-menu-item class="ctx-divider"/>
         <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.tb.copyName') }}</we-menu-item>
         <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.tb.pasteName') }}</we-menu-item>
@@ -111,6 +114,7 @@ export default {
       isPending: false,
       fileTree: [],
       isDeleting: false,
+      sortshow: false,
       loadDataFn: () => {},
       // 用于避免双击和单击的冲突
       dblClickTimer: null,
@@ -119,6 +123,13 @@ export default {
     };
   },
   computed: {
+    sortText(){
+      if(this.currentAcitved.sort){
+        return this.$t('message.scripts.database.contextMenu.db.liststringSort')
+      }else{
+        return this.$t('message.scripts.database.contextMenu.db.listSort')
+      }
+    },
     isAllowToExport() {
       if (!this.currentAcitved) {
         return false;
@@ -132,7 +143,8 @@ export default {
       if (this.node && Object.keys(this.node)) {
         return ['search', 'refresh']
       } else {
-        return ['search', 'newFile', 'refresh', 'export']
+        // return ['search', 'newFile', 'refresh', 'export']
+        return ['search', 'refresh']
       }
     }
   },
@@ -283,7 +295,6 @@ export default {
       });
     },
     asyncGetTableColumns({ item }, cb) {
-      this.currentAcitved = item;
       this.getTableColumns(item).then((item) => {
         cb(item);
       });
@@ -359,9 +370,10 @@ export default {
         });
       }
     },
-    onContextMenu({ ev, item }) {
+    onContextMenu({ ev, item, isOpen }) {
       this.nodekeyshow = item.contextKey ? false : true;
       this.currentType = item.dataType;
+      this.sortshow = isOpen;
       this.$refs.contextMenu.open(ev);
       this.currentAcitved = item;
       this.setHiveCache(this.currentAcitved);
@@ -718,10 +730,7 @@ export default {
     filterNode(node) {
       return !node.isLeaf;
     },
-    exportTable(one, two, columns, tb) {
-      if (!this.currentAcitved) {
-        this.currentAcitved = tb
-      }
+    exportTable(one, two, columns) {
       const part = one.partitions.split('=');
       let separator = one.separator;
       if (one.separator === '%20') {
@@ -758,7 +767,7 @@ export default {
         delete destination.fieldDelimiter;
       }
       const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
-      const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\norg.apache.linkis.engine.imexport.ExportData.exportData(spark,dataInfo,destination)`;
+      const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\ncom.webank.wedatasphere.linkis.engine.imexport.ExportData.exportData(spark,dataInfo,destination)`;
       const md5Path = util.md5(tabName);
       this.dispatch('Workbench:add', {
         id: md5Path,
@@ -767,13 +776,14 @@ export default {
         // saveAs表示临时脚本，需要关闭或保存时另存
         saveAs: true,
         noLoadCache: true,
-        action: 'export_table',
         code,
       }, (f) => {
-        this.currentAcitved = null
         if (!f) {
+          // 清空表格
+          this.currentAcitved = null
           return this.$refs.exportDialog.close();
         }
+        this.currentAcitved = null
         this.$refs.exportDialog.close();
         this.$nextTick(() => {
           this.dispatch('Workbench:run', {
@@ -825,9 +835,11 @@ export default {
     },
     cacheHiveTree() {
       this.dispatch('IndexedDB:appendTree', { treeId: 'hiveTree', value: this.tableList })
-    },
-  }
-}
+    }
+  },
+
+};
+
 </script>
 <style src="@/apps/scriptis/assets/styles/sidebar.scss" lang="scss">
 </style>

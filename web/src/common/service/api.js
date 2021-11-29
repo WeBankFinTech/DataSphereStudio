@@ -23,6 +23,8 @@ import axios from 'axios';
 import router from '@/router';
 import { Message } from 'iview';
 import cache from './apiCache';
+import qs from './querystring'
+import storage from "./storage"
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -58,6 +60,27 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
+  if (/\/application\//.test(config.url)) {
+    config.url = `http://${window.location.host}` + config.url
+  }
+
+  // 增加token
+  if (/dolphinscheduler/.test(config.url)) {
+    config.headers['token'] = api.getToken()
+    config.url = `http://${window.location.host}/` + config.url
+    if (config.useForm) {
+      let formData = new FormData()
+      Object.keys(config.data).forEach(key => {
+        formData.append(key, config.data[key])
+      })
+      config.data = formData
+    }
+    // fallback application/json to application/x-www-form-urlencoded
+    if (config.useFormQuery) {
+      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+      config.data = qs(config.data)
+    }
+  }
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -151,10 +174,22 @@ const success = function(response) {
   }
   let data;
   if (response) {
+    if (response.status === 401 && !(response.data && response.data.status === -1)) {
+      router.push('/newhome');
+      throw new Error('token失效，请重新进入之前页面!');
+    }
     if (util.isString(response.data)) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {
-      data = response.data;
+      // 兼容ds blob流下载
+      if (response.status === 200 && !response.data.data && !response.data.msg && response.data.code != api.constructionOfResponse.successCode) {
+        data = {}
+        data.data = response
+        data.msg = 'success'
+        data.code = api.constructionOfResponse.successCode
+      } else {
+        data = response.data
+      }
     } else {
       throw new Error('后台接口异常，请联系开发处理！');
     }
@@ -162,12 +197,24 @@ const success = function(response) {
     let code = res.codePath;
     let message = res.messagePath;
     let result = res.resultPath;
-    if (code != api.constructionOfResponse.successCode) {
-      if (api.error[code]) {
-        api.error[code](response);
-        throw new Error('');
-      } else {
-        throw new Error(message || '后台接口异常，请联系开发处理！');
+    // 兼容 dolphin 返回数据结构
+    if (data.msg) {
+      if (data.code != api.constructionOfResponse.successCode) {
+        if (api.error[data.code]) {
+          api.error[data.code](response);
+          throw new Error('');
+        } else {
+          throw new Error(data.msg || '后台接口异常，请联系开发处理！');
+        }
+      }
+    } else {
+      if (code != api.constructionOfResponse.successCode) {
+        if (api.error[code]) {
+          api.error[code](response);
+          throw new Error('');
+        } else {
+          throw new Error(message || '后台接口异常，请联系开发处理！');
+        }
       }
     }
     if (result) {
@@ -182,14 +229,14 @@ const success = function(response) {
         console.log(response.data, '潜在性能问题大数据量', len)
       }
     }
-
-    return result || {};
+    return result
   }
 };
 
 const fail = function(error) {
   let _message = '';
   let response = error.response;
+  console.log('error', error);
   if (response && api.error[response.status]) {
     api.error[response.status].forEach((fn) => fn(response));
   } else {
@@ -267,6 +314,7 @@ const action = function(url, data, option) {
     })
     .catch(function(error) {
       error.message && Message.error(error.message);
+      error.msg && Message.error(error.msg);
       throw error;
     });
 };
@@ -297,4 +345,7 @@ api.setResponse = function(constructionOfResponse) {
   this.constructionOfResponse = constructionOfResponse;
 };
 
+api.getToken = function() {
+  return storage.get("token", true);
+}
 export default api;

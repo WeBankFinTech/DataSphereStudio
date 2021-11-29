@@ -51,7 +51,7 @@ public class AssetTblRestful {
 
     private static final String DEFAULT_DIRECTION = "BOTH";
     private static final String DEFAULT_DEPTH     = "3";
-    private static final String DEFAULT_LIMIT     = "25";
+    private static final String DEFAULT_LIMIT     = "10";
     private static final String DEFAULT_OFFSET     = "0";
 
     private AssetService assetService;
@@ -78,7 +78,7 @@ public class AssetTblRestful {
     @GET
     @Path("/search")
     public Response searchHiveTbl(@QueryParam("classification") String classification,
-                                  @QueryParam("query")  String query,
+                                  @QueryParam("query") @DefaultValue("") String query,
                                   @QueryParam("owner") @DefaultValue("")  String keyword,
                                   @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) int limit,
                                   @QueryParam("offset") @DefaultValue(DEFAULT_OFFSET) int offset) throws Exception {

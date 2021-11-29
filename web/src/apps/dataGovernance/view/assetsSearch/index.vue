@@ -71,7 +71,7 @@
             v-model="searchOption.classification"
             clearable
             style="width:167px"
-            @on-select="selectSubject"
+            @on-change="selectSubject"
           >
             <OptionGroup label="主题域">
               <Option
@@ -152,7 +152,7 @@ export default {
           console.log("Search", err);
         });
     } else {
-      getHiveTbls({})
+      getHiveTbls({query: '', limit: 10, offset: 0})
         .then(data => {
           if (data.result) {
             this.cardTabs = data.result;
@@ -330,7 +330,11 @@ export default {
 
     // 搜索主題域/分層
     selectSubject(value) {
-      this.searchOption.classification = value;
+      if (value) {
+        this.searchOption.classification = value
+      } else {
+        delete this.searchOption.classification
+      }
       this.onSearch();
     }
   }

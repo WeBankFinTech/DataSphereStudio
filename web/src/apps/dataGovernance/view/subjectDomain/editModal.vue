@@ -7,7 +7,7 @@
       label-position="top"
     >
       <FormItem label="名称" prop="name">
-        <Input v-model="formState.name" placeholder="名称" :disabled="mode === 'edit'"></Input>
+        <Input v-model="formState.name" placeholder="名称" :disabled="mode === 'edit'" :maxlength="30" /><span>最多30字</span>
       </FormItem>
       <!--<FormItem label="英文名" prop="enName">
         <Input v-model="formState.enName" placeholder="英文名"></Input>
@@ -89,12 +89,25 @@ export default {
     },
   },
   data() {
+    const validateName = (rule, value, callback) => {
+      if (value) {
+        const valid = /\ /.test(value);
+        if (!valid) {
+          callback();
+        } else {
+          callback(new Error('不能包含空格'));
+        }
+      } else {
+        callback(new Error('不能为空'));
+      }
+    };
     return {
       // 验证规则
       ruleValidate: {
         name: [
           {
             required: true,
+            validator: validateName
           },
         ],
         enName: [

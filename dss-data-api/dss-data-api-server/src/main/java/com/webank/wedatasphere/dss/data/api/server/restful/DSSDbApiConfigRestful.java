@@ -24,31 +24,25 @@ import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiExecuteInf
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
-import com.webank.wedatasphere.dss.data.api.server.util.RestfulUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
 
-@Component
-@Path("/dss/data/api")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+@RestController
+@RequestMapping(path = "/dss/data/api", produces = {"application/json"})
 @Slf4j
 public class DSSDbApiConfigRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigRestful.class);
@@ -61,15 +55,14 @@ public class DSSDbApiConfigRestful {
      * @param apiConfig
      * @return
      */
-    @POST
-    @Path("save")
+    @RequestMapping(path = "save", method = RequestMethod.POST)
     public Message saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
         String username = SecurityFilter.getLoginUsername(request);
         apiConfig.setCreateBy(username);
         apiConfig.setUpdateBy(username);
         apiConfigService.saveApi(apiConfig);
         Message message = Message.ok();
-        return Message.messageToResponse(message);
+        return message;
     }
 
     /**
@@ -77,14 +70,14 @@ public class DSSDbApiConfigRestful {
      * @param apiGroup
      * @return
      */
-    @POST
-    @Path("/group/create")
+
+    @RequestMapping(path = "/group/create", method = RequestMethod.POST)
     public Message saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
         String username = SecurityFilter.getLoginUsername(request);
         apiGroup.setCreateBy(username);
         apiConfigService.addGroup(apiGroup);
         Message message = Message.ok().data("groupId", apiGroup.getId());
-        return Message.messageToResponse(message);
+        return message;
     }
 
     /**
@@ -92,12 +85,12 @@ public class DSSDbApiConfigRestful {
      * @param workspaceId
      * @return
      */
-    @GET
-    @Path("/list")
-    public Message getApiList(@QueryParam("workspaceId") String workspaceId) {
+
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+    public Message getApiList(@RequestParam("workspaceId") String workspaceId) {
         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
         Message message = Message.ok().data("list", list);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     /**
@@ -106,12 +99,11 @@ public class DSSDbApiConfigRestful {
      * @return
      */
 
-    @GET
-    @Path("/detail")
-    public Message getApiDetail(@QueryParam("apiId") int apiId) {
+    @RequestMapping(path = "detail", method = RequestMethod.GET)
+    public Message getApiDetail(@RequestParam("apiId") int apiId) {
         ApiConfig apiConfig = apiConfigService.getById(apiId);
         Message message = Message.ok().data("detail", apiConfig);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     /**
@@ -121,18 +113,16 @@ public class DSSDbApiConfigRestful {
      * @param map
      * @return
      */
-
-    @POST
-    @Path("/test/{path:[a-zA-Z0-9_/]+}")
-    public Message testApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
+    @RequestMapping(path ="/test/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
+    public Message testApi(@Context HttpServletRequest request, @PathVariable("path") String path, Map<String, Object> map) {
 
         try {
             ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map,true);
             Message message = Message.ok().data("response", resJo);
-            return Message.messageToResponse(message);
+            return message;
         } catch (Exception exception) {
             log.error("ERROR", "Error found: ", exception);
-            return RestfulUtils.dealError(exception.getMessage());
+            return Message.error(exception.getMessage());
         }
 
     }
@@ -145,16 +135,16 @@ public class DSSDbApiConfigRestful {
      * @param map
      * @return
      */
-    @POST
-    @Path("/execute/{path:[a-zA-Z0-9_/]+}")
-    public Message executeApi(@Context HttpServletRequest request, @PathParam("path") String path, Map<String, Object> map) {
+
+    @RequestMapping(path ="/execute/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
+    public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") String path, Map<String, Object> map) {
         try {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
             Message message = Message.ok().data("response", resJo);
-            return Message.messageToResponse(message);
+            return message;
         } catch (Exception exception) {
             log.error("ERROR", "Error found: ", exception);
-            return RestfulUtils.dealError(exception.getMessage());
+            return Message.error(exception.getMessage());
         }
 
     }

@@ -89,12 +89,25 @@ export default {
     },
   },
   data() {
+    const validateName = (rule, value, callback) => {
+      if (value) {
+        const valid = /\ /.test(value);
+        if (!valid) {
+          callback();
+        } else {
+          callback(new Error('不能包含空格'));
+        }
+      } else {
+        callback(new Error('不能为空'));
+      }
+    };
     return {
       // 验证规则
       ruleValidate: {
         name: [
           {
             required: true,
+            validator: validateName
           },
         ],
         enName: [

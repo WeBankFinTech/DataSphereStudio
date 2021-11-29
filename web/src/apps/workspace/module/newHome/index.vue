@@ -3,8 +3,8 @@
     <!-- 首页标题 -->
     <div class="newHome_header">
       <div class="newHome_info">
-        <h1>{{$t('message.workspace.infoHeader')}}</h1>
-        <p>{{$t('message.workspace.infoBodyFirstRow')}}</p>
+        <h1>{{ $t("message.workspace.infoHeader") }}</h1>
+        <p>{{ $t("message.workspace.infoBodyFirstRow") }}</p>
       </div>
     </div>
     <!-- 内容主体 -->
@@ -15,13 +15,13 @@
         <div class="newHome_title_search">
           <!-- 左侧标题 -->
           <h3 class="left_header">
-            {{ $t('message.workspace.workspaceList') }}
+            {{ $t("message.workspace.workspaceList") }}
           </h3>
           <!-- 左侧搜索框内容和切换按钮 -->
           <div class="left_search">
             <!-- 切换显示方式按钮 -->
             <div class="left_visual" @click="changeVisual">
-              <SvgIcon color="rgba(0,0,0,0.65)" :iconClass="visualCatesIcon"/>
+              <SvgIcon :iconClass="visualCatesIcon" />
               <span>
                 {{ visualCatesTitle }}
               </span>
@@ -32,7 +32,8 @@
                 search
                 class="search-input"
                 :placeholder="$t('message.workspace.searchWorkspace')"
-                @on-search="searchWorkspace"/>
+                @on-search="searchWorkspace"
+              />
             </div>
           </div>
         </div>
@@ -42,22 +43,26 @@
           <ul class="card-content" ref="row" v-show="!visual">
             <!-- 新增工作空间 -->
 
-            <li class="newHome_create" @click="createWorkspace">
+            <li class="newHome_create" @click="createWorkspace" v-if="!noWorkSpace">
               <div class="newHome_create_content">
-                <SvgIcon :style="{ 'font-size': '20px' }" icon-class="fi-addproject" color="#2d8cf0"/>
-                <p class="newHome_create_text" style="color:#2d8cf0">
-                  {{ $t('message.workspace.createWorkspace') }}
+                <SvgIcon
+                  :style="{ 'font-size': '20px' }"
+                  icon-class="fi-addproject"
+                />
+                <p class="newHome_create_text">
+                  {{ $t("message.workspace.createWorkspace") }}
                 </p>
               </div>
             </li>
             <!-- 卡片显示数据 -->
-
-            <li class="newHome_list_item"
+            <li
+              class="newHome_list_item"
               v-for="item in filteredData"
               :key="item.id"
-              @click="gotoWorkspace(item)">
+              @click="gotoWorkspace(item)"
+            >
               <div class="item-header">
-                <span class="name">{{item.name}}</span>
+                <span class="name">{{ item.name }}</span>
               </div>
               <SvgIcon
                 v-if="isAdminAndSingleServe"
@@ -65,9 +70,10 @@
                 class="management-button"
                 :style="{ 'font-size': '20px' }"
                 icon-class="setting"
-                @click.stop="gotoManagement(item.id)"/>
+                @click.stop="gotoManagement(item.id)"
+              />
 
-              <p class="desc">{{item.description}}</p>
+              <p class="desc">{{ item.description }}</p>
               <!-- <ul class="lable-list">
                 <template v-for="(tag, tagIndex) in item.label.split(',')">
                   <li v-if="tag && tagIndex <= 2"  class="item" :key="tagIndex">{{tag}}</li>
@@ -85,19 +91,32 @@
             />
           </div>
         </div>
-      <!-- <caseAndIntroduction /> -->
+        <!-- <caseAndIntroduction /> -->
       </div>
       <div class="newHome_main_right">
         <div class="right_header">
-          <h3 class="title">{{$t('message.workspace.KSRM')}}</h3>
-          <Button type="text" @click="changeVideos">{{$t('message.workspace.HYP')}}</Button>
+          <h3 class="title">{{ $t("message.workspace.KSRM") }}</h3>
+          <!-- <Button type="text" @click="changeVideos">{{
+            $t("message.workspace.HYP")
+          }}</Button> -->
+        </div>
+        <div v-if="isAdmin" class="permissions_wrap">
+          <div class="permissions_entry" @click="gotoManagementPlatform()">
+            <img src="../../assets/images/u111.svg" />
+            <div>{{ $t("message.workspace.managementPlatform") }}</div>
+          </div>
         </div>
         <div class="admin-box-video">
-          <div v-for="(item, index) in videos" :key="index" class="video-item" @click="play(item)">
+          <div
+            v-for="(item, index) in videos"
+            :key="index"
+            class="video-item"
+            @click="play(item)"
+          >
             <video width="100%" height="100" controls>
               <source :src="item.url" type="video/mp4" />
             </video>
-            <h3 class="video-title">{{item.title}}</h3>
+            <h3 class="video-title">{{ item.title }}</h3>
           </div>
         </div>
       </div>
@@ -108,7 +127,8 @@
       :project-data="currentWorkspaceData"
       :add-project-show="workspaceShow"
       @show="workspaceShowAction"
-      @confirm="workspaceConfirm"></WorkspaceForm>
+      @confirm="workspaceConfirm"
+    ></WorkspaceForm>
     <Modal
       v-model="showVideo"
       :title="video.title"
@@ -119,19 +139,21 @@
         <source :src="video.url" type="video/mp4" />
       </video>
     </Modal>
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+    <Spin v-if="loading" size="large" fix />
   </div>
 </template>
 <script>
-import api from '@/common/service/api';
+import api from "@/common/service/api";
 // import caseAndIntroduction from '../caseAndIntroduction';
-import WorkspaceForm from './module/workspaceForm.vue';
-import WorkspaceTable from './module/workspaceTable.vue';
-import { GetBaseInfo, GetWorkspaceList } from '@/common/service/apiCommonMethod.js';
-import util from '@/common/util';
+import WorkspaceForm from "./module/workspaceForm.vue";
+import WorkspaceTable from "./module/workspaceTable.vue";
+import {
+  GetBaseInfo,
+  GetWorkspaceList
+} from "@/common/service/apiCommonMethod.js";
+import util from "@/common/util";
+import storage from "@/common/helper/storage";
+
 
 export default {
   components: {
@@ -143,12 +165,13 @@ export default {
     return {
       loading: false,
       showVideo: false,
-      actionType: '',
+      actionType: "",
       currentWorkspaceData: {
-        name: '',
-        description: '',
-        label: '',
-        department: ''
+        name: "",
+        description: "",
+        label: "",
+        department: "",
+        workspace_type: ""
       },
       workspaceShow: false,
       cacheData: [],
@@ -156,12 +179,12 @@ export default {
       video: {},
       videos: [],
       videoCache: [],
-      visual: false,  // false 为默认值显示卡片模式，反之列表模式
-      visualCatesTitle: this.$t('message.workspace.tableDisplay'),
-      visualCatesIcon: 'fi-table',
+      visual: false, // false 为默认值显示卡片模式，反之列表模式
+      visualCatesTitle: this.$t("message.workspace.tableDisplay"),
+      visualCatesIcon: "fi-table",
       visualCates: [
-        { icon: 'fi-table', title: this.$t('message.workspace.tableDisplay') },
-        { icon: 'menu', title: this.$t('message.workspace.cardDisplay') },
+        { icon: "fi-table", title: this.$t("message.workspace.tableDisplay") },
+        { icon: "menu", title: this.$t("message.workspace.cardDisplay") }
       ],
       total: null,
       pageSize: 6,
@@ -169,98 +192,118 @@ export default {
       pageNum: 1,
       videosClick: 1,
       videosMaxClick: null,
-      listWrap: 0,//屏幕宽度
-      isAdminAndSingleServe: false
-    }
+      listWrap: 0, //屏幕宽度
+      isAdminAndSingleServe: false,
+      isAdmin: false
+    };
   },
   created() {
     this.getWorkspaces();
     this.getVideos();
-    GetBaseInfo().then((res) => {
+    GetBaseInfo().then(res => {
       const currentModules = util.currentModules();
       // 是管理员且是数据服务的微服务
-      this.isAdminAndSingleServe = (res.isAdmin && currentModules.microModule === 'apiServices');
-    })
+      this.isAdmin = res.isAdmin;
+      this.isAdminAndSingleServe =
+        res.isAdmin && currentModules.microModule === "apiServices";
+    });
   },
-  mounted(){
-  },
+  mounted() {},
   computed: {
-
+    noWorkSpace() {
+      return storage.get('noWorkSpace', 'local')
+    }
   },
-  beforeDestroy(){
-  },
-  watch: {
-
-  },
+  beforeDestroy() {},
+  watch: {},
   methods: {
     getWorkspaces() {
       // 获取工作空间数据
       this.loading = true;
-      GetWorkspaceList({}, 'get').then((res) => {
-        this.filteredData = this.cacheData = res.workspaces;
-        this.loading = false;
-      }).catch(() => {
-        this.loading = false;
-      });
+      GetWorkspaceList({}, "get")
+        .then(res => {
+          this.filteredData = this.cacheData = res.workspaces;
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     getVideos() {
       this.loading = true;
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}workspaces/videos`, {}, 'get').then((res) => {
-        this.videoCache = res.videos;
-        this.initVideos();
-        this.loading = false;
-      }).catch(() => {
-        this.loading = false;
-      });
+      api
+        .fetch(`${this.$API_PATH.WORKSPACE_PATH}workspaces/videos`, {}, "get")
+        .then(res => {
+          this.videoCache = res.videos;
+          this.initVideos();
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     createWorkspace() {
-      this.actionType = 'add';
+      this.actionType = "add";
       this.workspaceShow = true;
       this.currentWorkspaceData = {
-        name: '',
-        description: '',
-        label: '',
-        department: '',
-      }
+        name: "",
+        description: "",
+        label: "",
+        department: "",
+        workspace_type: ""
+      };
     },
     editor(workspace) {
-      this.actionType = 'editor';
+      this.actionType = "editor";
       this.workspaceShow = true;
       this.currentWorkspaceData = workspace;
     },
     searchWorkspace(value) {
       // 通过名称模糊搜索
-      value = value.trim()
+      value = value.trim();
       if (value) {
-        this.filteredData = this.cacheData.filter((item) => item.name.indexOf(value) != -1);
+        this.filteredData = this.cacheData.filter(
+          item => item.name.indexOf(value) != -1
+        );
       } else {
         this.filteredData = this.cacheData;
       }
     },
     gotoWorkspace(workspace) {
+      storage.set("curWorkspace", workspace, "local");
       const workspaceId = workspace.workspaceId || workspace.id;
       const currentModules = util.currentModules();
-      if (currentModules.microModule === 'apiServices') {
-        this.$router.push({ path: '/apiservices', query: { workspaceId: workspaceId}});
+      if (currentModules.microModule === "apiServices") {
+        this.$router.push({
+          path: "/apiservices",
+          query: { workspaceId: workspaceId }
+        });
       } else {
-        this.$router.push({ path: '/workspaceHome', query: { workspaceId: workspaceId}});
+        this.$router.push({
+          path: "/workspaceHome",
+          query: { workspaceId: workspaceId }
+        });
       }
     },
     workspaceShowAction(val) {
       this.workspaceShow = val;
     },
-    workspaceConfirm(params) {
-      GetWorkspaceList(params, 'post').then((res) => {
-        this.$Message.success(this.$t('message.workspace.createdSuccess'));
-        // 创建成功后跳到工作空间首页
-        this.gotoWorkspace(res);
-      }).catch(() => {
-        this.$Message.error(this.$t('message.workspace.createdFailed'));
-      })
+    workspaceConfirm(params, callback) {
+      GetWorkspaceList(params, "post")
+        .then(res => {
+          typeof callback == 'function' && callback();
+          this.$Message.success(this.$t("message.workspace.createdSuccess"));
+          // 创建成功后跳到工作空间首页
+          this.gotoWorkspace(res);
+        })
+        .catch(() => {
+          typeof callback == 'function' && callback();
+          this.$Message.error(this.$t("message.workspace.createdFailed"));
+        });
     },
     changeVisual() {
       this.visual = !this.visual;
-      if(this.visual) {
+      if (this.visual) {
         this.visualCatesTitle = this.visualCates[1].title;
         this.visualCatesIcon = this.visualCates[1].icon;
       } else {
@@ -270,8 +313,9 @@ export default {
     },
     changeVideos() {
       this.videosClick += 1;
-      this.videosClick = this.videosClick > this.videosMaxClick ? 1 : this.videosClick;
-      const start = ( this.videosClick - 1 ) * this.videoSize;
+      this.videosClick =
+        this.videosClick > this.videosMaxClick ? 1 : this.videosClick;
+      const start = (this.videosClick - 1) * this.videoSize;
       const end = this.videosClick * this.videoSize;
       this.videos = this.videoCache.slice(start, end);
     },
@@ -286,13 +330,19 @@ export default {
     },
     play(item) {
       this.showVideo = true;
-      this.video = item
+      this.video = item;
     },
     // 跳转管理页
     gotoManagement(id) {
-      this.$router.push({ path: '/workspaceManagement/productsettings', query: { workspaceId: id}});
+      this.$router.push({
+        path: "/workspaceManagement/productsettings",
+        query: { workspaceId: id }
+      });
+    },
+    gotoManagementPlatform() {
+      this.$router.push({ path: "/managementPlatform" });
     }
   }
-}
+};
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

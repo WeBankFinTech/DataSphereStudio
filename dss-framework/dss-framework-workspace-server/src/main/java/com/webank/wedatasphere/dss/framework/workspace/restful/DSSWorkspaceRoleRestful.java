@@ -80,7 +80,7 @@ public class DSSWorkspaceRoleRestful {
         for (DSSApplication application : applicationList) {
             String redirectUrl = application.getRedirectUrl();
             String enhanceJson = application.getEnhanceJson();
-            if (redirectUrl != null) {
+            if (redirectUrl != null && redirectUrl.startsWith("http")) {
                 application.setHomepageUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getHomepageUrl()));
                 application.setProjectUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getProjectUrl()));
                 if (StringUtils.isNotEmpty(enhanceJson) && enhanceJson.contains("scheduleHistory")) {

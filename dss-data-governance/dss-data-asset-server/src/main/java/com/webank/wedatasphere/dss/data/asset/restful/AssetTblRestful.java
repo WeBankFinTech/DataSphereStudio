@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @Classname HiveTblRestful
@@ -49,7 +51,7 @@ public class AssetTblRestful {
 
     private static final String DEFAULT_DIRECTION = "BOTH";
     private static final String DEFAULT_DEPTH     = "3";
-    private static final String DEFAULT_LIMIT     = "25";
+    private static final String DEFAULT_LIMIT     = "10";
     private static final String DEFAULT_OFFSET     = "0";
 
     private AssetService assetService;
@@ -76,22 +78,17 @@ public class AssetTblRestful {
     @GET
     @Path("/search")
     public Response searchHiveTbl(@QueryParam("classification") String classification,
-                                  @QueryParam("query")  String query,
-                                  @QueryParam("owner") @DefaultValue("")  String owner,
+                                  @QueryParam("query") @DefaultValue("") String query,
+                                  @QueryParam("owner") @DefaultValue("")  String keyword,
                                   @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) int limit,
                                   @QueryParam("offset") @DefaultValue(DEFAULT_OFFSET) int offset) throws Exception {
         List<HiveTblSimpleInfo> hiveTblBasicList = assetService.searchHiveTable(classification,'*'+query+'*',limit,offset);
-        if(owner.equals(null)||owner.equals("")||owner.equals(" ")||owner.equals("undefined")){
+        if(hiveTblBasicList ==null || keyword ==null || keyword.trim().equals("")) {
             return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList));
         }
         else {
-            List<HiveTblSimpleInfo> res=new ArrayList<>();
-            for (HiveTblSimpleInfo hiveTblSimpleInfo : hiveTblBasicList) {
-                if(hiveTblSimpleInfo.getOwner().equals(owner)){
-                    res.add(hiveTblSimpleInfo);
-                }
-            }
-            return Message.messageToResponse(Message.ok().data("result",res));
+            Pattern regex = Pattern.compile(keyword);
+            return Message.messageToResponse(Message.ok().data("result",hiveTblBasicList.stream().filter(ele -> regex.matcher(ele.getOwner()).find()).collect(Collectors.toList())));
         }
     }
 

@@ -94,7 +94,7 @@
       </div>
 
       <!-- right -->
-      <div class="assets-index-b-r">
+      <div class="assets-index-b-r" v-if="cardTabs.length">
         <template v-for="model in cardTabs">
           <tab-card
             :model="model"
@@ -102,6 +102,9 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </template>
+      </div>
+      <div class="assets-index-b-r" v-else>
+        <div style="text-align: center; margin-top:50px; font-weight: bolder;">暂无数据</div>
       </div>
     </div>
   </div>
@@ -194,6 +197,7 @@ export default {
       this.searchOption["limit"] = 10;
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
+      this.isLoading = false
       getHiveTbls(params)
         .then(data => {
           if (data.result) {

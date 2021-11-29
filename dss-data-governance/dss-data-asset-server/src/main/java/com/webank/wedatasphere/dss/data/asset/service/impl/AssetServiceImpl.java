@@ -82,12 +82,16 @@ public class AssetServiceImpl implements AssetService {
                 hiveTblBasic.setGuid(atlasEntityHeader.getGuid());
                 hiveTblBasic.setName(atlasEntityHeader.getAttribute("name").toString());
                 hiveTblBasic.setQualifiedName(atlasEntityHeader.getAttribute("qualifiedName").toString());
-                hiveTblBasic.setOwner(atlasEntityHeader.getAttribute("owner").toString());
+                Object owner =atlasEntityHeader.getAttribute("owner");
+                if(owner !=null) {
+                    hiveTblBasic.setOwner(owner.toString());
+                }
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
                 }
                 String dbName = (atlasEntityHeader.getAttribute("qualifiedName").toString().split("\\."))[0];
+                hiveTblBasic.setDbName(dbName);
 
                 try {
                     AtlasEntity atlasEntity = atlasService.getHiveTblByGuid(atlasEntityHeader.getGuid());
@@ -97,8 +101,6 @@ public class AssetServiceImpl implements AssetService {
                     throw new DataGovernanceException(ex.getMessage());
                 }
 
-
-                hiveTblBasic.setDbName(dbName);
                 return hiveTblBasic;
             }).collect(Collectors.toList());
         }

@@ -18,15 +18,78 @@
 .workflow-wrap {
     width: 100%;
     height: 100%;
-    background: $workspace-background;
+    // background: $workspace-background;
+    @include bg-color($workspace-background, $dark-workspace-background);
+    .workflow-nav-tree {
+        display: flex;
+        position: fixed;
+        left: 0;
+        top: 54px;
+        bottom: 0;
+        width: 304px;
+        // background: #F8F9FC;
+        @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
+        transition: all .3s;
+        &.tree-fold {
+            width: 54px;
+            .project-nav-tree {
+                transform: translateX(-304px);
+            }
+        }
+        .project-nav-menu {
+            z-index: 1;
+            width: 54px;
+            // background: #F8F9FC;
+            @include bg-color(#F8F9FC, $dark-menu-base-color);
+            border-right: 1px solid #DEE4EC;
+            @include border-color($border-color-base, $dark-active-menu-item);
+            &-item {
+                height: 44px;
+                line-height: 44px;
+                text-align: center;
+                cursor: pointer;
+                @include font-color(#333, $dark-workflow-font-color);
+                &:hover {
+                    // background: #ECEFF4;
+                    @include bg-color($hover-color-base, $dark-hover-color-base);
+
+                }
+                .nav-icon {
+                    font-size: 26px;
+                }
+            }
+            .active {
+                // background: #ECEFF4;
+                @include bg-color($active-menu-item, $dark-active-menu-item);
+                border-left: 3px solid #2E92F7;
+                @include border-color($primary-color, $dark-primary-color);
+            }
+        }
+        .project-nav-tree {
+            position: absolute;
+            width: 250px;
+            left: 54px;
+            top: 0;
+            bottom: 0;
+            transition: all .3s;
+            padding: 10px 0;
+            overflow-y: auto;
+            border-right: 1px solid #DEE4EC;
+            @include border-color($border-color-base, $dark-menu-base-color);
+            @include bg-color($light-base-color, $dark-workspace-background);
+        }
+    }
     .workflowListContainer {
         display: flex;
         margin: 0 $padding-25;
-        min-height: 685px;
+        min-height: 100%;
         padding: $padding-25;
         border: $border-width-base  $border-style-base $border-color-base;
-        background: $body-background;
+        @include border-color($border-color-base, $dark-workspace-body-bg-color);
+        // background: $body-background;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         .workflowListLeft {
+            position: relative;
             flex: 1;
             .tabs-content {
                 /deep/ .ivu-tabs-tab {
@@ -45,14 +108,17 @@
         position: relative;
         color: $text-color;
         border-bottom: $border-width-base $border-style-base $border-color-base;
+        @include border-color($border-color-base, $dark-border-color-base);
         padding: 0 5px;
         .workflow-tabs-item {
             margin: 0;
             height: 31px;
             padding: 5px 16px 4px;
             border-bottom: $border-width-base $border-style-base $border-color-base;
+            @include border-color($border-color-base, $dark-border-color-base);
             border-radius: 4px 4px 0 0;
-            background: #f8f8f9;
+            // background: #f8f8f9;
+            @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
             display: inline-block;
             cursor: pointer;
             position: relative;
@@ -63,7 +129,8 @@
                 transform: translateZ(0);
                 border: 1px solid #dcdee2;
                 border-bottom:1px solid #fff;
-                color: #2d8cf0;
+                // color: #2d8cf0;
+                @include font-color($primary-color, $dark-primary-color);
             }
             .workflow-tabs-name {
                 display: inline-block;

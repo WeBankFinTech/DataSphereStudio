@@ -106,7 +106,7 @@ export default {
     },
     goConsole() {
       const url =
-        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console'
       this.$router.push({
         name: 'commonIframe',
         query: {

@@ -26,17 +26,20 @@
     }
     .center-panel{
         border-left: $border-width-base $border-style-base $border-color-base;
+        @include border-color($border-color-base, $dark-menu-base-color);
     }
 
     .right-panel{
         border-left: $border-width-base $border-style-base $border-color-base;
+        @include border-color($border-color-base, $dark-menu-base-color);
     }
 
     .nav-list{
         width: 44px;
         height: 100%;
         border-right: $border-width-base $border-style-base $border-color-base;
-        background: $table-thead-bg;
+        @include border-color($border-color-base, $dark-base-color);
+        @include bg-color($table-thead-bg, $dark-base-color);
         .nav-warp{
             position: $absolute;
             height: 100%;
@@ -49,16 +52,16 @@
             padding: 32px 4px;
             text-align: center;
             cursor: pointer;
+            @include font-color($primary-color, $dark-text-color);
             &.actived{
                 width: 44px;
                 border-left: 3px solid $primary-color;
-                border-bottom: $border-width-base $border-style-base $border-color-base;
-                border-top: $border-width-base $border-style-base $border-color-base;
-                background: #fff;
-                color: $primary-color;
+                @include border-color($primary-color, $dark-primary-color);
+                @include bg-color($light-base-color, $dark-menu-base-color);
+                @include font-color($primary-color, $dark-primary-color);
             }
             &:hover{
-                color: $primary-color;
+                @include font-color($primary-color, $dark-primary-color);
             }
             .nav-icon{
                 font-size: $font-size-large;

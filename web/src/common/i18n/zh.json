@@ -19,11 +19,11 @@
       "path": "请选择路径",
       "resultList": "结果集",
       "process": "执行耗时：",
-      "ok": "确认", 
+      "ok": "确认",
       "cancel": "取消",
       "delete": "删除",
       "failedNotice": "验证项未通过，请检查后再试！",
-      "logoName": "DataSphere Studio",
+      "logoName": "鲁班",
       "project": "工程",
       "home": "首页",
       "management": "管理台",
@@ -236,6 +236,15 @@
         "ZYSYPHB": "资源使用排行榜",
         "ZW": "暂无"
       },
+      "headerNavBar": {
+        "Workflow": "工作流开发",
+        "Exchangis": "数据交换组件",
+        "Scriptis": "数据开发组件",
+        "Qualitis": "数据治理组件",
+        "Visualis": "可视化组件",
+        "Schedulis": "工作流调度组件",
+        "LinkisConsole": "Linkis 管理台"
+      },
       "userMenu": {
         "title": "警告",
         "content": "<p>此操作将清空本地数据库缓存，这样会丢失您的脚本日志、历史和结果集等相关信息，请确认是否有未保存的脚本！</p><p>点击确认按钮继续操作？</p>",
@@ -243,7 +252,7 @@
         "comingSoon": "尚未开源，敬请期待！"
       },
       "login": {
-        "loginTitle": "欢迎登录DataSphere Studio系统！",
+        "loginTitle": "欢迎登录鲁班系统！",
         "userName": "请输入用户名",
         "remenber": "记住当前用户",
         "login": "登录",
@@ -255,10 +264,10 @@
       },
       "dynamicForm": {
         "rule": {
-            "emptyKey": "key为空",
-            "lengthLimit": "长度超过128字符",
-            "nameVaild": "仅支持以字母开头，且不得存在空格和中文",
-            "emptyValue": "value为空"
+          "emptyKey": "key为空",
+          "lengthLimit": "长度超过128字符",
+          "nameVaild": "仅支持以字母开头，且不得存在空格和中文",
+          "emptyValue": "value为空"
         },
         "namePlaceholder": "请输入{title}名称",
         "placeholderInput": "请输入值",
@@ -266,8 +275,9 @@
       },
       "deleteDialog": {
         "waring": "警告",
-        "action": "是",
+        "action": "要{label}",
         "isNext": "是否继续？",
+        "over": "结束{type}",
         "overThe": "结束该",
         "engine": "引擎",
         "task": "任务",
@@ -299,7 +309,7 @@
         "downloadMode": "下载方式：",
         "deepAnalysis": "分 析 进 阶",
         "success": {
-            "download": "下载成功，请到本地的download文件夹查看！"
+          "download": "下载成功，请到本地的download文件夹查看！"
         },
         "rowToColumn": "行转列",
         "rowToColumnTitle": "查看当前行详情"

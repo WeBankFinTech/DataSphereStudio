@@ -38,11 +38,14 @@
         align-items: center;
         flex-wrap: nowrap;
         height: 54px;
+        &:hover {
+            color:#fff;
+        }
     }
     .proj-list {
         height: 400px;
         overflow-y: auto;
-        background-color: $background-color-header;
+        @include bg-color($background-color-header, $dark-menu-base-color);
         padding: 0 15px;
         .proj-name {
             padding:7px 15px;
@@ -50,6 +53,7 @@
             line-height: 30px;
             font-size: $font-size-large;
             border-bottom: 1px solid rgba(255,255,255,0.08);
+            @include border-color(rgba(255,255,255,0.08), $dark-border-color-base);
             padding-bottom: 35px;
             color: $text-tille-light-color;
             font-size: 16px;
@@ -91,4 +95,26 @@
 .workspace-icon {
     margin: 0 10px 0 25px;
     display: inline-block;
+}
+
+.luban-menu-trigger {
+    display: block;
+    margin-left: -20px;
+    width: 54px;
+    height: 54px;
+    line-height: 54px;
+    // background: #061528;
+    @include bg-color(#061528, $dark-menu-base-color);
+    text-align: center;
+    cursor: pointer;
+    &:hover {
+    //   background: #2E92F7;
+      @include bg-color($primary-color, $dark-primary-color);
+    }
+    img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+
 }

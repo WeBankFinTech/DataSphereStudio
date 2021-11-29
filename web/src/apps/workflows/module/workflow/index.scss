@@ -43,14 +43,16 @@
     width: 100%;
     text-align: center;
     font-size: $font-size-large;
+    @include font-color($light-text-color, $dark-text-color);
     .no-data-img {
         width: 200px;
         margin-top: 150px;
     }
 }
 .page-bgc {
-    background-color: $body-background;
-    overflow: auto;
+    // background-color: $body-background;
+    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+    // overflow: auto;
     .process-bar {
         height: calc(100% - 4px);
     }
@@ -68,3 +70,8 @@
         width: 350px;
     }
 }
+.upload-box {
+    padding: 120px 0;
+    @include font-color(#515a6e, $dark-text-color);
+}
+

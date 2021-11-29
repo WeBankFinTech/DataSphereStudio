@@ -57,6 +57,12 @@
                     top: 5px;
                     font-size: $font-size-small;
                 }
+                .err-badge {
+                    background: $error-color !important;
+                }
+                .warn-badge {
+                    background: $yellow-color !important;
+                }
             }
         }
     }

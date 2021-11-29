@@ -9,6 +9,10 @@ import util from '@/common/util/index';
 
 export default {
   props: {
+    parametes: {
+      type: [String, Object],
+      default: null
+    },
     node: {
       type: [String, Object],
       default: null

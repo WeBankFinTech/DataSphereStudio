@@ -28,6 +28,12 @@
 └─src
     ├─apps               # dss各应用存放目录，每个应用独立
     │  ├─apiServices     # 数据服务相关功能
+    │  ├─linkis          # linkis相关功能
+    │  │  ├─assets       # 应用所需的图片、css等资源
+    │  │  ├─components   # 应用所需的组件
+    │  │  ├─i18n         # 国际化的中英文json
+    │  │  ├─module       # 当前应用所需的模块，每个模块相对独立，模块私有资源内置
+    │  │  └─view         # 当前应用的页面，路由在同级目录下router.js下配置
     │  ├─scriptis        # scriptis相关功能
     │  │  ├─assets       # 应用所需的图片、css等资源
     │  │  ├─config       #

@@ -8,18 +8,14 @@ import com.webank.wedatasphere.dss.data.api.server.service.ApiMonitorService;
 import com.webank.wedatasphere.dss.data.api.server.util.TimeUtil;
 import org.apache.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,19 +26,17 @@ import java.util.List;
  * @Created by suyc
  */
 
-@Component
-@Path("/dss/data/api/apimonitor")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(path = "/dss/data/api/apimonitor", produces = {"application/json"})
 public class DSSDbApiMonitorRestful {
     @Autowired
     private ApiMonitorService apiMonitorService;
     @Autowired
     private ApiManagerService apiManagerService;
 
-    @GET
-    @Path("/list")
-    public Response getApiList(@Context HttpServletRequest request,
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+
+    public Message getApiList(@Context HttpServletRequest request,
                                @QueryParam("workspaceId") Long workspaceId, @QueryParam("apiName") String apiName,
                                @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
         if(pageNow == null){
@@ -54,78 +48,77 @@ public class DSSDbApiMonitorRestful {
 
         List<Long> totals = new ArrayList<>();
         List<ApiInfo> apiInfoList = apiManagerService.getOnlineApiInfoList(workspaceId,apiName,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("list",apiInfoList).data("total", totals.get(0)));
-    }
-
-    @GET
-    @Path("onlineApiCnt")
-    public Response getOnlineApiCnt(@QueryParam("workspaceId") Long workspaceId){
-        return Message.messageToResponse(Message.ok().data("onlineApiCnt",apiMonitorService.getOnlineApiCnt(workspaceId)));
-    }
-
-    @GET
-    @Path("offlineApiCnt")
-    public Response getOfflineApiCnt(@QueryParam("workspaceId") Long workspaceId){
-        return Message.messageToResponse(Message.ok().data("offlineApiCnt",apiMonitorService.getOfflineApiCnt(workspaceId)));
+        return Message.ok().data("list",apiInfoList).data("total", totals.get(0));
     }
 
 
+    @RequestMapping(path = "onlineApiCnt", method = RequestMethod.GET)
 
-    @GET
-    @Path("callTotalCnt")
-    public Response getCallTotalCnt(@BeanParam CallMonitorResquest callMonitorResquest){
-        return Message.messageToResponse(Message.ok().data("callTotalCnt",apiMonitorService.getCallTotalCnt(callMonitorResquest)));
+    public Message getOnlineApiCnt(@QueryParam("workspaceId") Long workspaceId){
+        return Message.ok().data("onlineApiCnt",apiMonitorService.getOnlineApiCnt(workspaceId));
     }
 
-    @GET
-    @Path("callTotalTime")
-    public Response getCallTotalTime(@BeanParam CallMonitorResquest callMonitorResquest){
-        return Message.messageToResponse(Message.ok().data("callTotalTime",apiMonitorService.getCallTotalTime(callMonitorResquest)));
+
+    @RequestMapping(path = "offlineApiCnt", method = RequestMethod.GET)
+    public Message getOfflineApiCnt(@QueryParam("workspaceId") Long workspaceId){
+        return Message.ok().data("offlineApiCnt",apiMonitorService.getOfflineApiCnt(workspaceId));
     }
 
-    @GET
-    @Path("callListByCnt")
-    public Response getCallListByCnt(@BeanParam CallMonitorResquest callMonitorResquest){
-        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallListByCnt(callMonitorResquest)));
+
+
+    @RequestMapping(path = "callTotalCnt", method = RequestMethod.GET)
+    public Message getCallTotalCnt(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.ok().data("callTotalCnt",apiMonitorService.getCallTotalCnt(callMonitorResquest));
     }
 
-    @GET
-    @Path("callListByFailRate")
-    public Response getCallListByFailRate(@BeanParam CallMonitorResquest callMonitorResquest){
-        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallListByFailRate(callMonitorResquest)));
+
+    @RequestMapping(path = "callTotalTime", method = RequestMethod.GET)
+    public Message getCallTotalTime(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.ok().data("callTotalTime",apiMonitorService.getCallTotalTime(callMonitorResquest));
     }
 
+
+    @RequestMapping(path = "callListByCnt", method = RequestMethod.GET)
+    public Message getCallListByCnt(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.ok().data("list",apiMonitorService.getCallListByCnt(callMonitorResquest));
+    }
+
+
+    @RequestMapping(path = "callListByFailRate", method = RequestMethod.GET)
+    public Message getCallListByFailRate(@BeanParam CallMonitorResquest callMonitorResquest){
+        return Message.ok().data("list",apiMonitorService.getCallListByFailRate(callMonitorResquest));
+    }
 
     /**
      * 过去24小时内每小时请求次数（平均QPS）
      */
-    @GET
-    @Path("callCntForPast24H")
-    public Response getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId) throws Exception {
-        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallCntForPast24H(workspaceId)));
+
+    @RequestMapping(path = "callCntForPast24H", method = RequestMethod.GET)
+    public Message getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId) throws Exception {
+        return Message.ok().data("list",apiMonitorService.getCallCntForPast24H(workspaceId));
     }
 
     /**
      * 单个API每小时的平均响应时间
      */
-    @GET
-    @Path("callTimeForSinleApi")
-    public Response getCallTimeForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
+
+    @RequestMapping(path = "callTimeForSinleApi", method = RequestMethod.GET)
+    public Message getCallTimeForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
         long hourCnt = TimeUtil.getHourCnt(singleCallMonitorRequest.getStartTime(),singleCallMonitorRequest.getEndTime());
         singleCallMonitorRequest.setHourCnt(hourCnt);
 
-        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallTimeForSinleApi(singleCallMonitorRequest)));
+        return Message.ok().data("list",apiMonitorService.getCallTimeForSinleApi(singleCallMonitorRequest));
     }
 
     /**
      *单个API每小时的调用次数
      */
-    @GET
-    @Path("callCntForSinleApi")
-    public Response getCallCntForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
+
+    @RequestMapping(path = "callCntForSinleApi", method = RequestMethod.GET)
+    public Message getCallCntForSinleApi(@BeanParam SingleCallMonitorRequest singleCallMonitorRequest) throws Exception {
         long hourCnt = TimeUtil.getHourCnt(singleCallMonitorRequest.getStartTime(),singleCallMonitorRequest.getEndTime());
         singleCallMonitorRequest.setHourCnt(hourCnt);
 
-        return Message.messageToResponse(Message.ok().data("list",apiMonitorService.getCallCntForSinleApi(singleCallMonitorRequest)));
+        return Message.ok().data("list",apiMonitorService.getCallCntForSinleApi(singleCallMonitorRequest));
     }
 }

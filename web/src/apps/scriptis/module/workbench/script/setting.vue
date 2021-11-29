@@ -54,8 +54,9 @@ export default {
 .editor-setting {
   width: 20%;
   min-width: 200px;
-  background: $background-color-base;
+  @include bg-color($light-base-color, $dark-base-color);
   border-left: $border-width-base $border-style-base $border-color-base;
+  @include border-color($border-color-base, $dark-workspace-background);
   overflow-y: auto;
   position: $absolute;
   top: 32px;
@@ -63,18 +64,21 @@ export default {
   bottom: 0;
   .editor-setting-header {
     border-bottom: $border-width-base $border-style-base #e8eaec;
+    @include border-color($border-color-base, $dark-border-color-base);
     padding: 10px 16px;
     line-height: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
     span {
-      color: #17233d;
+      // color: #17233d;
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
       font-size: $font-size-base;
     }
     i {
       font-size: 26px;
-      color: #999;
+      // color: #999;
+      @include font-color(#999, $dark-text-color);
       cursor: pointer;
     }
   }
@@ -94,7 +98,7 @@ export default {
   .runtime-args {
     padding: 10px 10px 2px;
     margin: 10px;
-    background: $menu-dark-subsidiary-color;
+    @include bg-color($menu-dark-subsidiary-color, $dark-base-color);
     border-radius: $border-radius-small;
   }
 }

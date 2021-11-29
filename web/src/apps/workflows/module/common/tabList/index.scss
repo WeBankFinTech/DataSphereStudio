@@ -1,11 +1,18 @@
 @import '@/common/style/variables.scss';
 .workflowTabContainer {
+    margin-left: 304px;
+    transition: margin-left .3s;
+    position: relative;
     height: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    &.tree-fold {
+        margin-left: 54px;
+    }
     .tap-bar {
-        background: #fff;
+        // background: #fff;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         margin-bottom: $padding-25;
         .topTabList {
             padding: 25px $padding-25 0px;
@@ -20,7 +27,8 @@
                 .ivu-breadcrumb {
                     font-size: 21px;
                     /deep/.ivu-breadcrumb-item-separator {
-                        color: rgba(0,0,0,0.65);
+                        // color: rgba(0,0,0,0.65);
+                        @include font-color($light-text-color, $dark-text-color);
                     }
                 }
             }
@@ -37,6 +45,8 @@
         .bottomTapList {
             padding: 0px $padding-25;
             border-bottom: $border-width-base $border-style-base $border-color-base;
+            @include border-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
             margin-top: 12px;
             flex: none;
             display: flex;
@@ -53,6 +63,7 @@
                 &::after {
                     content: "";
                     border-left: 1px solid #DEE4EC;
+                    @include border-color($border-color-base, $dark-border-color-base);
                     width: 0;
                     position: absolute;
                     right: -15px;
@@ -63,6 +74,7 @@
             }
             .active {
                 border-bottom: 2px solid $primary-color;
+                @include border-color($primary-color, $dark-primary-color);
             }
             .bottomRightContainer {
                 flex: 1;
@@ -79,7 +91,8 @@
     display: inline-block;
     height: 40px;
     line-height: 40px;
-    color: $title-color;
+    // color: $title-color;
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
     cursor: pointer;
     min-width: 100px;
     max-width: 200px;
@@ -87,9 +100,11 @@
     margin-right: 2px;
     &.active {
         height: 40px;
-        color: $primary-color;
+        // color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
         border-radius: 4px 4px 0 0;
         border-bottom: 2px solid $primary-color;
+        @include border-color($primary-color, $dark-primary-color);
         line-height: 38px;
     }
 }

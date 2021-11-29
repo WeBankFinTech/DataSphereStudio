@@ -2,7 +2,8 @@
 .workspace-home {
   display: flex;
   height: 100%;
-  background-color: rgba(242, 242, 242, 1);
+  // background-color: rgba(242, 242, 242, 1);
+  @include bg-color(rgba(242, 242, 242, 1), $dark-workspace-background);
   min-width: 100px;
   overflow: hidden;
   width: 100%;
@@ -11,7 +12,8 @@
   }
   .mune-bar {
     .ivu-layout-sider {
-      background-color: #fff;// 将侧边栏的背景色样式重新改为白色
+      // background-color: #fff;// 将侧边栏的背景色样式重新改为白色
+      @include bg-color($workspace-body-bg-color, $dark-workspace-background);
     }
     .menu-item span{
       display: inline-block;
@@ -43,9 +45,6 @@
       font-weight: 600;
       padding: 10px 20px 10px 25px;
     }
-    .ivu-menu-light{
-      background-color: rgba(242, 242, 242, 1);
-    }
     .overview-box {
       text-align: left;
       padding: 0px 23px;
@@ -61,14 +60,25 @@
         font-weight: 700;
         // float: left;
         padding-top: 2px;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+      }
+    }
+    .left-mune {
+      .left-menuItem {
+        @include font-color($light-text-color, $dark-text-color);
+        @include bg-color($light-base-color, $dark-menu-base-color);
+      }
+      .ivu-menu-item-active {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
       }
     }
   }
 
   .right {
-    padding: 20px;
+    margin: 20px;
     flex: 1;
-    background-color: #fff;
+    // background-color: #fff;
+    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
     min-width: 780px;
     overflow: auto;
   }
@@ -76,7 +86,9 @@
     width: 0;
   }
   .active {
-    color: $primary-color 
+    // color: $primary-color;
+    @include font-color($primary-color, $dark-primary-color);
+
   }
 }
 

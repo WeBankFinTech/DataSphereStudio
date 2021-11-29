@@ -1,7 +1,7 @@
 <template>
   <div v-if="isExternal" :style="styleExternalIcon" class="svg-external-icon svg-icon" v-on="$listeners" />
   <span v-else class="svg-container" :style="{color}">
-    <svg :class="svgClass" aria-hidden="true" v-on="$listeners">
+    <svg :class="svgClass" :style="svgVerticalAlign" aria-hidden="true" v-on="$listeners">
       <use :xlink:href="iconName" />
     </svg>
   </span>
@@ -33,6 +33,10 @@ export default {
     color: {
       type: String,
       default: 'currentColor'
+    },
+    verticalAlign: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -50,10 +54,24 @@ export default {
       }
     },
     styleExternalIcon() {
+      if (this.verticalAlign) {
+        return {
+          backgroundColor: this.color,
+          mask: `url(${this.iconClass}) no-repeat 50% 50%`,
+          '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`,
+          'vertical-align': this.verticalAlign
+        }
+      } else {
+        return {
+          backgroundColor: this.color,
+          mask: `url(${this.iconClass}) no-repeat 50% 50%`,
+          '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
+        }
+      }
+    },
+    svgVerticalAlign() {
       return {
-        backgroundColor: this.color,
-        mask: `url(${this.iconClass}) no-repeat 50% 50%`,
-        '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
+        'vertical-align': this.verticalAlign
       }
     }
   }

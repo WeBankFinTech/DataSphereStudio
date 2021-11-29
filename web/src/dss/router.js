@@ -2,20 +2,29 @@ export const subAppRoutes = {
   path: '',
   name: 'layout',
   component: () => import('./view/layout.vue'),
-  redirect: '/newHome',
+  redirect: '/login', // newhome要求管理员权限，这里redirect不能直接到newhome，到login然后自动跳转到自己的首页
   meta: {
-    title: 'DataSphere Studio',
+    title: '鲁班',
     publicPage: true, // 权限公开
   },
   children: [{
     path: 'commonIframe',
     name: 'commonIframe',
     meta: {
-      title: 'DSS Component',
+      title: '鲁班组件',
       publicPage: true,
     },
     component: () =>
       import('./view/commonIframe/index.vue'),
+  },
+  // 新增一个redirect路由mock路由刷新效果，放在这里共享layout可保持header不会unmount，减少ajax
+  {
+    path: '/redirect/:path(.*)',
+    meta: {
+      title: '鲁班组件',
+      publicPage: true,
+    },
+    component: () => import('./view/redirect/index.vue')
   }]
 }
 
@@ -86,7 +95,7 @@ export default [
   {
     path: '*',
     meta: {
-      title: 'DataSphere Studio',
+      title: '鲁班',
       publicPage: true,
     },
     component: () =>

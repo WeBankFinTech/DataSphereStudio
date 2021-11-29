@@ -1,7 +1,8 @@
 <template>
   <div class="user-serchbar-box">
-    <h3>{{$t('message.workspaceManagemnet.userManagement')}}</h3>
+    <h3 style="margin-bottom: 20px;" class="user-table-title">{{$t('message.workspaceManagemnet.userManagement')}}</h3>
     <formserch
+      v-if="canAdd()"
       @click-serach="search"
       @click-creater="creater"
       :searchBar="searchBar"
@@ -17,11 +18,13 @@
       <template slot-scope="{ row }" slot="role">
         <span>{{ rolelist(row) }}</span>
       </template>
+      <template slot-scope="{ row }" slot="department">
+        <span>{{row.office + '-' + row.department}}</span>
+      </template>
       <template slot-scope="{ row, index }" slot="action">
-        <Button type="error" size="small" @click="remove(row, index)"
-        >{{$t('message.workspaceManagemnet.delete')}}</Button
-        >
+        <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagemnet.delete')}}</Button>
         <Button
+          v-if="canEdit(row)"
           type="primary"
           size="small"
           style="margin-left: 10px"
@@ -57,17 +60,18 @@
     </Modal>
     <Modal class-name="adduser-box" :closable="false" v-model="creatershow" :title="$t('message.workspaceManagemnet.addUser')">
       <Form ref="addUser" :model="useradd" :rules="addrule" :label-width="80">
-        <FormItem :label="$t('message.workspaceManagemnet.user')" prop="name">
+        <FormItem :label="$t('message.workspaceManagemnet.user')" prop="id">
           <Row>
             <Col span="12" style="width: 196px" size="small">
-            <Select
-              v-model="useradd.name"
-              filterable
-              remote
-              :remote-method="remoteMethod1"
-              :loading="loading1">
-              <Option v-for="(option, index) in options" :value="option.value" :key="index">{{option.label}}</Option>
-            </Select>
+              <Select
+                v-model="useradd.id"
+                filterable
+                remote
+                :remote-method="remoteMethod1"
+                @on-open-change="queryWhenOpen"
+                :loading="loading1">
+                <Option v-for="(option, index) in options" :value="option.id" :key="index" :disabled="option.disabled">{{option.userName}}</Option>
+              </Select>
             </Col>
           </Row>
         </FormItem>
@@ -77,6 +81,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
+              :disabled="isSuperAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -103,6 +108,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
+              :disabled="isSuperAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -123,7 +129,7 @@ import storage from "@/common/helper/storage";
 import api from "@/common/service/api";
 import moment from 'moment';
 import formserch from "../component/formsechbar";
-import { GetWorkspaceUserManagement } from '@/common/service/apiCommonMethod.js';
+import { GetWorkspaceUserManagement, GetWorkspaceData } from '@/common/service/apiCommonMethod.js';
 
 export default {
   components: {
@@ -131,6 +137,7 @@ export default {
   },
   data() {
     return {
+      workspaceData: null,
       delshow: false,
       creatershow: false,
       editusershow: false,
@@ -147,7 +154,8 @@ export default {
       workspaceRoles: [],
       data: {
         columns: [],
-        datalist: []
+        datalist: [],
+        datalistAll: [],
       },
       useradd: {},
       edituser: {},
@@ -155,9 +163,12 @@ export default {
         role: [{ required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' }]
       },
       addrule: {
-        name: [
-          { required: true, message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: "blur" },
+        id: [
+          { required: true, type: 'number', message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: 'change' }
         ],
+        //name: [
+        //  { required: true, message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: "blur" },
+        //],
         role: [
           { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' },
         ]
@@ -179,27 +190,87 @@ export default {
     this.workspaceId =parseInt(this.$route.query.workspaceId);
   },
   mounted() {
-    this.username()
-    this.init();
+    this.init()
+    GetWorkspaceData(this.$route.query.workspaceId).then(data=>{
+      this.workspaceData = data.workspace;
+      this.deptId = this.workspaceData.workspaceType !== "project" ? storage.get("curWorkspace", 'local').department : ''
+    })
+    this.getUserList()
   },
   methods: {
+    isSuperAdmin(item){
+      //管理+创建人才能赋权管理员权限
+      // return item.roleId===1&&this.row.creator!==this.getUserName();
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      return item.roleId===1 && !currentUser.isAdmin;
+    },
+    canAdd(){
+      //管理员可以add
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      if (currentUser.isAdmin || workspaceRoles.indexOf('admin') > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    canDelete(row = {}){
+      //创建者和超级管理员可以删除
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      if (row.creator === currentUser.username || currentUser.isAdmin) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    canEdit(row = {}){
+      //创建者,超级管理员isAdmin,空间管理员可以edit(非isAdmin的空间管理员帐号不能修改其他空间管理员)
+      const currentUser = storage.get("baseInfo", 'local') || {};
+      if (row.creator === currentUser.username || currentUser.isAdmin) {
+        return true;
+      } else {
+        // 非isAdmin的空间管理员帐号不能修改其他空间管理员
+        const workspaceRoles = storage.get(`workspaceRoles`) || [];
+        if (workspaceRoles.indexOf('admin') > -1 && row.roles.indexOf(1) == -1) {
+          return true;
+        }
+        return false;
+      }
+    },
+    getUserName() {
+      return  storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
+    },
+    queryWhenOpen(isOpen) {
+      if (isOpen) {
+        this.getUserList()
+      }
+    },
+    getUserList(query) {
+      this.loading1 = true
+      api.fetch(`${this.$API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/user/list`,{
+        deptId: this.deptId,
+        userName: query,
+        pageSize: 1000,
+        pageNum: 1
+      },'get').then((res)=>{
+        this.loading1 = false
+        let list = res.userList
+        this.data.datalist.forEach(item => {
+          for (let i = 0; i < list.length; i++) {
+            if (list[i].userName === item.name) {
+              list[i].disabled = true
+              break
+            }
+          }
+        })
+        this.options = list
+      })
+    },
     remoteMethod1(query) {
       if (query !== "") {
-        this.loading1 = true;
-        setTimeout(() => {
-          this.loading1 = false;
-          const list = this.usernamelist.map(item => {
-            return {
-              value: item,
-              label: item
-            };
-          });
-          this.options = list.filter(
-            item => item.label.toLowerCase().indexOf(query.toLowerCase()) > -1
-          );
-        }, 200);
+        this.getUserList(query)
       } else {
-        this.options = [];
+        this.options = []
       }
     },
     init() {
@@ -214,32 +285,37 @@ export default {
       // },'get').then((rst)=>{
       //   this.optionType.engine = this.departmentlist(rst.departments)
       // })
-      this.search()
+      this.pageSetting = {
+        total: 0,
+        pageSize: 10,
+        current: 1
+      }
+      this.search();
     },
     search() {
       const params = this.getParams();
       this.data.columns  = this.getColumns();
       GetWorkspaceUserManagement(params).then((rst) => {
         this.pageSetting.total = rst.total;
-        this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
+        this.data.datalistAll = this.renderFormatTime(rst.workspaceUsers);
+        this.data.datalist = this.data.datalistAll.slice(0, this.pageSetting.pageSize);
       }).catch(() => {
 
       });
     },
-    username(){
+    /*username(){
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`,{
       },'get').then((rst)=>{
         rst.users.forEach(item=>{
           this.usernamelist.push(item.username)
         })
       })
-    },
+    },*/
     getColumns(){
       const column = [
         { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
         { title: this.$t('message.workspaceManagemnet.role'), slot: "role", align: "center",width: 250 },
-        { title: this.$t('message.workspaceManagemnet.department'), key: "department", align: "center" },
-        { title: this.$t('message.workspaceManagemnet.office'), key: "office", align: "center" },
+        { title: this.$t('message.workspaceManagemnet.department'), slot: "department", align: "center" },
         { title: this.$t('message.workspaceManagemnet.creator'), key: "creator", align: "center" },
         { title: this.$t('message.workspaceManagemnet.joinTime'), key: "joinTime", align: "center" },
         { title: this.$t('message.workspaceManagemnet.action'), slot: "action", width: 150, align: "center" }
@@ -271,13 +347,16 @@ export default {
       return params
     },
     changePage(page){
-      const params = this.getParams(page);
+      // const params = this.getParams(page);
       this.column = this.getColumns();
-      GetWorkspaceUserManagement(params).then((rst) => {
-        this.pageSetting.total = rst.total;
-        this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
-      }).catch(() => {
-      });
+      // GetWorkspaceUserManagement(params).then((rst) => {
+      //   this.pageSetting.total = rst.total;
+      //   this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
+      // }).catch(() => {
+      // });
+      // 由于接口没有做分页，所以由前端模拟分页效果（用户不会特别多，现在后端设置的上限是每页500条）
+      const start = (page - 1) * this.pageSetting.pageSize;
+      this.data.datalist = this.data.datalistAll.slice(start, start + this.pageSetting.pageSize);
     },
     remove(row) {
       this.delshow = true;
@@ -286,6 +365,9 @@ export default {
     del() {
       const userInfoName = storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
       const username = userInfoName
+      if(this.row.creator === this.row.name){
+        return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
+      }
       if(username === this.row.name){
         return this.$Message.error(this.$t('message.workspaceManagemnet.notDeleteMsg'));
       }
@@ -301,7 +383,7 @@ export default {
     },
     edit(row) {
       // 如果是当前用户修改自己的权限，提示用户不能修改
-      if (this.getUserName() === row.name) return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
+      if (row.name === row.creator) return this.$Message.warning(this.$t("message.workspaceManagemnet.notsupported"));
       this.edituser = {
         role: [...row.roles]
       }
@@ -310,6 +392,7 @@ export default {
     },
     creater() {
       this.useradd = {
+        id: "",
         name: "",
         role: []
       }
@@ -318,8 +401,12 @@ export default {
     Ok(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          if(name === 'addUser')  this.createuser()
-          if(name === 'editUser') this.editrole()
+          if(name === 'addUser') {
+            this.useradd.id ? this.createuser() : this.$Message.error(this.$t("message.workspaceManagemnet.addruleMsg"));
+          }
+          if(name === 'editUser') {
+            this.editrole()
+          }
         } else {
           this.$Message.warning(this.$t("message.workspaceManagemnet.failedNotice"));
         }
@@ -331,18 +418,29 @@ export default {
       this.options = [];
     },
     createuser(){
-      let name = this.useradd.name
+      let id = this.useradd.id
+      let userName
+      for (let i = 0; i < this.options.length; i++) {
+        let option = this.options[i]
+        if (option.id === id) {
+          userName = option.userName
+          break
+        }
+      }
       const params = {
         roles: this.useradd.role,
         workspaceId: this.workspaceId,
-        username: name,
+        userId: id,
+        userName: userName
       }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}addWorkspaceUser`, params).then(() => {
         this.init()
-        this.$Message.success(this.$t('message.workspaceManagemnet.addSuccess'));
+        this.$Message.success(this.$t('message.workspaceManagemnet.addSuccess'))
+        this.options = []
       }).catch(() => {
-        this.$Message.warning(this.$t('message.workspaceManagemnet.addFail'));
-      });
+        this.$Message.warning(this.$t('message.workspaceManagemnet.addFail'))
+        this.options = []
+      })
       this.creatershow = false;
     },
     editrole(){
@@ -414,12 +512,18 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/common/style/variables.scss';
 .user-serchbar-box {
   padding: 10px 15px;
   min-width: 1217px;
+  .user-table-title {
+    @include font-color($workspace-title-color, $dark-workspace-title-color);
+  }
+
   .user-table-page {
     text-align: center;
     padding-top: 10px;
+    @include font-color($light-text-desc-color, $dark-text-desc-color);
   }
 }
 </style>

@@ -70,7 +70,8 @@ export default {
           h('Badge', {
             props: {
               count: this.errorNum,
-              type: 'error',
+              className: 'err-badge',
+              type: 'error'
             },
           }),
         ]);
@@ -81,6 +82,7 @@ export default {
           h('Badge', {
             props: {
               count: this.warnNum,
+              className: 'warn-badge',
               type: 'warning'
             },
           }),
@@ -186,6 +188,12 @@ export default {
                     left: 350px;
                     top: 5px;
                     font-size: $font-size-small;
+                }
+                .err-badge {
+                    background: $error-color !important;
+                }
+                .warn-badge {
+                    background: $yellow-color !important;
                 }
             }
         }

@@ -35,7 +35,7 @@
         <module>dss-apps/dss-datapipe-server</module>-->
 <!--        <module>plugins/azkaban/linkis-jobtype</module>-->
         <module>plugins/linkis/dss-gateway-support</module>
-<!--        <module>dss-data-api</module>-->
+        <module>dss-data-api</module>
 <!--        <module>dss-data-governance</module>-->
         <module>assembly</module>
     </modules>

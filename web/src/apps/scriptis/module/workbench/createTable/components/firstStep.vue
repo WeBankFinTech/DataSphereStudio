@@ -297,20 +297,18 @@ export default {
       if (!this.dbList.length) {
         return;
       }
-      const list = this.dbList.filter((item) => /(_ind|_qml)$/.test(item.name))
-      this.info[0].map[0].opt = list.map((item) => {
+      const list = this.info[0].map[0].opt = this.dbList.filter((item) => /(_ind|_qml|_default)$/.test(item.name)).map((item) => {
         return {
           label: item.name,
           value: item.name,
         };
       });
       this.attrInfo.basic.database = list[0].value;
-      this.filteredDblist = list
       this.currentDb = 0;
     },
     handleTbInput: debounce((val, cb, that) => {
-      const tbList = that.filteredDblist[that.currentDb].children;
-      const isDupl = tbList && tbList.find((el) => el.name === val);
+      const tbList = that.dbList[that.currentDb].children;
+      const isDupl = tbList.find((el) => el.name === val);
       if (isDupl) {
         return cb(new Error(that.$t('message.scripts.createTable.canned')));
       }

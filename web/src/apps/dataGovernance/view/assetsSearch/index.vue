@@ -71,7 +71,7 @@
             v-model="searchOption.classification"
             clearable
             style="width:167px"
-            @on-select="selectSubject"
+            @on-change="selectSubject"
           >
             <OptionGroup label="主题域">
               <Option
@@ -94,7 +94,7 @@
       </div>
 
       <!-- right -->
-      <div class="assets-index-b-r">
+      <div class="assets-index-b-r" v-if="cardTabs.length">
         <template v-for="model in cardTabs">
           <tab-card
             :model="model"
@@ -102,6 +102,9 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </template>
+      </div>
+      <div class="assets-index-b-r" v-else>
+        <div style="text-align: center; margin-top:50px; font-weight: bolder;">暂无数据</div>
       </div>
     </div>
   </div>
@@ -152,7 +155,7 @@ export default {
           console.log("Search", err);
         });
     } else {
-      getHiveTbls({})
+      getHiveTbls({query: '', limit: 10, offset: 0})
         .then(data => {
           if (data.result) {
             this.cardTabs = data.result;
@@ -194,6 +197,7 @@ export default {
       this.searchOption["limit"] = 10;
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
+      this.isLoading = false
       getHiveTbls(params)
         .then(data => {
           if (data.result) {
@@ -330,7 +334,11 @@ export default {
 
     // 搜索主題域/分層
     selectSubject(value) {
-      this.searchOption.classification = value;
+      if (value) {
+        this.searchOption.classification = value
+      } else {
+        delete this.searchOption.classification
+      }
       this.onSearch();
     }
   }

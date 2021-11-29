@@ -127,6 +127,7 @@ export default {
               }
               return {
                 id: 'group' + n.groupId, // 防止group和api的id一样导致同时active的问题
+                groupId: n.groupId,
                 name: n.groupName,
                 type: "project",
                 canWrite: () => true,

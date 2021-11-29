@@ -8,6 +8,7 @@
       :ctx-menu-options="nodeMenuOptions"
       :view-options="viewOptions"
       :disabled="workflowIsExecutor || myReadonly"
+      @toggle-shape="toggleShape"
       @change="change"
       @message="message"
       @node-click="click"
@@ -24,99 +25,90 @@
       @ctx-menu-console="openConsole"
       @link-delete="linkDelete"
       @link-add="linkAdd">
-      <template v-if="!myReadonly">
-        <div
-          class="button"
-          :title="$t('message.workflow.process.params')"
-          ref="paramButton"
-          @click.stop="showParamView">
-          <SvgIcon class="icon" icon-class="params" color="#666"/>
-          <span>{{$t('message.workflow.process.params')}}</span>
+      <template >
+        <!-- 这里需要做控制，只读和发布的区别-->
+        <div>
+          <div v-if="!myReadonly">
+            <div
+              class="button"
+              :title="$t('message.workflow.process.params')"
+              ref="paramButton"
+              @click.stop="showParamView">
+              <SvgIcon class="icon" icon-class="params"/>
+              <span>{{$t('message.workflow.process.params')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              class="button"
+              ref="resourceButton"
+              :title="$t('message.workflow.process.resource')"
+              @click.stop="showResourceView">
+              <SvgIcon class="icon" icon-class="fi-export"/>
+              <span>{{$t('message.workflow.process.resource')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              v-if="!workflowIsExecutor"
+              :title="$t('message.workflow.process.run')"
+              class="button"
+              @click="clickswitch">
+              <SvgIcon class="icon" icon-class="play-2"/>
+              <span>{{$t('message.workflow.process.run')}}</span>
+            </div>
+            <div
+              v-if="workflowIsExecutor"
+              :title="$t('message.workflow.process.stop')"
+              class="button"
+              @click="clickswitch">
+              <SvgIcon class="icon" className='stop' icon-class="stop-2" />
+              <span>{{$t('message.workflow.process.stop')}}</span>
+            </div>
+            <div class="devider" />
+            <div
+              :title="$t('message.workflow.process.save')"
+              class="button"
+              @click="handleSave">
+              <SvgIcon class="icon" icon-class="save-2" />
+              <span>{{$t('message.workflow.process.save')}}</span>
+            </div>
+            <div v-if="type==='flow'" class="devider" />
         </div>
-        <div class="devider" />
-        <div
-          class="button"
-          ref="resourceButton"
-          :title="$t('message.workflow.process.resource')"
-          @click.stop="showResourceView">
-          <SvgIcon class="icon" icon-class="fi-export" color="#666"/>
-          <span>{{$t('message.workflow.process.resource')}}</span>
+          <!-- 预留运维发布的区别-->
+        <div v-if="publish">
+            <div
+              v-if="type==='flow'"
+              :title="$t('message.workflow.process.publish')"
+              class="button"
+              @click="workflowPublishIsShow">
+              <template v-if="!isFlowPubulish">
+                <SvgIcon class="icon" icon-class="publish" />
+                <span>{{$t('message.workflow.process.publish')}}</span>
+              </template>
+              <Spin v-else class="public_loading">
+                <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
+                <span>{{$t('message.workflow.publishing')}}</span>
+              </Spin>
+            </div>
+            <div class="devider"></div>
+            <div
+              v-if="schedulingStatus.published"
+              class="button"
+              @click.stop="linkToDispatch">
+              <SvgIcon class="icon" icon-class="ds-center" />
+              <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
+            </div>
         </div>
-        <div class="devider" />
-        <!-- <div
-          :title="$t('message.workflow.process.import')"
-          class="button"
-          @click="showImportJsonView">
-          <SvgIcon class="icon" icon-class="fi-download" color="#666"/>
-          <span>{{$t('message.workflow.process.import')}}</span>
-        </div>
-        <div class="devider" />-->
-        <div
-          v-if="!workflowIsExecutor"
-          :title="$t('message.workflow.process.run')"
-          class="button"
-          @click="clickswitch">
-          <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-          <span>{{$t('message.workflow.process.run')}}</span>
-        </div>
-        <div
-          v-if="workflowIsExecutor"
-          :title="$t('message.workflow.process.stop')"
-          class="button"
-          @click="clickswitch">
-          <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
-          <span>{{$t('message.workflow.process.stop')}}</span>
-        </div>
-        <div class="devider" />
-        <div
-          :title="$t('message.workflow.process.save')"
-          class="button"
-          @click="handleSave">
-          <SvgIcon class="icon" icon-class="save-2" color="#666"/>
-          <span>{{$t('message.workflow.process.save')}}</span>
-        </div>
-        <div v-if="type==='flow' && priv == '3'" class="devider" />
-        <div
-          v-if="type==='flow' && priv == '3'"
-          :title="$t('message.workflow.process.publish')"
-          class="button"
-          @click="workflowPublishIsShow">
-          <template v-if="!isFlowPubulish">
-            <SvgIcon class="icon" icon-class="publish" color="#666"/>
-            <span>{{$t('message.workflow.process.publish')}}</span>
-          </template>
-          <Spin v-else class="public_loading">
-            <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
-            <span>{{$t('message.workflow.publishing')}}</span>
-          </Spin>
-        </div>
-        <!-- <div v-if="type==='flow'" class="devider"></div>
-        <div
-          v-if="type==='flow'"
-          :title="$t('message.workflow.process.publish')"
-          class="button"
-          @click="exportWorkflow">
-          <svg class="icon" width="200px" height="185.84px" viewBox="0 0 1102 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path fill="#333333" d="M894.424615 970.121846l-305.624615-137.924923c-22.606769-10.24-32.531692-35.603692-20.952615-56.477538 5.513846-10.24 14.887385-17.801846 26.466461-21.425231a49.703385 49.703385 0 0 1 35.288616 2.048l250.486153 113.427692 107.52-682.929231-486.557538 538.466462v250.407385c0 23.394462-20.401231 42.220308-45.686154 42.220307-25.442462 0-45.843692-18.825846-45.843692-42.220307V711.601231c0-2.048 0-4.647385 0.551384-6.616616a40.566154 40.566154 0 0 1 10.476308-22.44923l458.436923-507.352616-735.389538 351.625846 173.292307 82.944c22.606769 11.264 31.980308 36.706462 20.401231 58.052923a43.559385 43.559385 0 0 1-25.442461 20.873847 46.788923 46.788923 0 0 1-34.185847-2.048L26.781538 566.035692a48.049231 48.049231 0 0 1-21.504-20.873846 40.644923 40.644923 0 0 1-3.308307-32.059077 43.874462 43.874462 0 0 1 22.055384-24.969846L1033.924923 4.726154a42.062769 42.062769 0 0 1 22.055385-4.568616c22.685538-0.472615 41.984 14.257231 45.843692 34.658462a36.627692 36.627692 0 0 1-1.102769 20.322462l-139.579077 882.451692c-2.756923 18.904615-19.298462 33.083077-39.148308 36.155077a47.419077 47.419077 0 0 1-27.569231-3.544616z" /></svg>
-          <span>导出</span>
-        </div>
-        <div class="devider"></div> -->
-        <!-- <div class="button" @click="changeModule">
-          <SvgIcon class="icon" icon-class="change" color="#666"/>
-          <span>
-            {{$t('message.workflow.process.mapModel')}}
-          </span>
-        </div>-->
+      </div>
       </template>
-
+      <!-- 生产中心保留执行和地图模式 -->
       <template v-if="myReadonly">
-        <div class="devider"></div> 
         <template v-if="product && isLatest">
           <div
             v-if="!workflowIsExecutor"
             :title="$t('message.workflow.process.run')"
             class="button"
             @click="clickswitch">
-            <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+            <SvgIcon class="icon" icon-class="play-2" />
             <span>{{$t('message.workflow.process.run')}}</span>
           </div>
           <div
@@ -124,17 +116,11 @@
             :title="$t('message.workflow.process.stop')"
             class="button"
             @click="clickswitch">
-            <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
+            <SvgIcon class="icon" className='stop' icon-class="stop-2" />
             <span>{{$t('message.workflow.process.stop')}}</span>
           </div>
-          <!-- <div class="devider" /> -->
+          <div class="devider" />
         </template>
-        <!-- <div class="button" @click="changeModule">
-          <SvgIcon class="icon" icon-class="change" color="#666"/>
-          <span>
-            {{$t('message.workflow.process.mapModel')}}
-          </span>
-        </div> -->
       </template>
     </vueProcess>
     <nodeMap
@@ -378,8 +364,7 @@
       :node="openningNode"
       :stop="workflowIsExecutor"
       class="process-console"
-      :height="consoleHeight"
-      :style="{'left': shapeWidth + 'px', 'width': `calc(100% - ${shapeWidth}px)`}"
+      :style="getConsoleStyle"
       @close-console="closeConsole"></console>
   </div>
 </template>
@@ -401,6 +386,7 @@ import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
+import { getPublishStatus, getSchedulingStatus } from '@/apps/workflows/service/api.js';
 export default {
   components: {
     vueProcess,
@@ -432,6 +418,10 @@ export default {
     readonly: {
       type: [String, Boolean],
       default: false,
+    },
+    publish: {
+      type: Boolean,
+      default: false
     },
     priv: {
       type: Number
@@ -504,6 +494,7 @@ export default {
       },
       // 是否有改变
       jsonChange: false,
+      publishChangeCount: 0,
       loading: false,
       repetitionNameShow: false,
       repeatTitles: [],
@@ -546,10 +537,39 @@ export default {
       changeNum: 0,
       consoleParams: [],
       appId: null,
-      consoleHeight: 250
+      newOrchestratorVersionId: this.orchestratorVersionId,
+      schedulingStatus: {
+        published: false,
+        releaseStatus: ''
+      },
+      // 工作流icon
+      workFlowImage: {
+        'sql': require('./images/workflow/sql.png'),
+        'python': require('./images/workflow/python.png'),
+        'pyspark': require('./images/workflow/pyspark.png'),
+        'scala': require('./images/workflow/scala.png'),
+        'hql': require('./images/workflow/hql.png'),
+        'shell': require('./images/workflow/shell.png'),
+        'display': require('./images/workflow/display.png'),
+        'dashboard': require('./images/workflow/dashboard.png'),
+        'widget': require('./images/workflow/widget.png'),
+        'mlss': require('./images/workflow/mlss.png'),
+        'eventreceiver': require('./images/workflow/eventreceiver.png'),
+        'eventsender': require('./images/workflow/eventsender.png'),
+        'datachecker': require('./images/workflow/datachecker.png'),
+        'connector': require('./images/workflow/connector.png'),
+        'subFlow': require('./images/workflow/subflow.png'),
+        'sendemail': require('./images/workflow/sendemail.png'),
+      }
     };
   },
   computed: {
+    getConsoleStyle() {
+      return {
+        'left': this.shapeWidth + 'px',
+        'width': `calc(100% - ${this.shapeWidth}px)`
+      }
+    },
     // 获取新建节点时需要的参数列表
     createNodeParamsList() {
       return this.clickCurrentNode.nodeUiVOS ? this.clickCurrentNode.nodeUiVOS.filter((item) => !item.nodeMenuType) : [];
@@ -637,9 +657,15 @@ export default {
   },
   created() {
     this.viewOptions.shapeView = !this.myReadonly;
+    // if(this.isCurrentOrchestrator()){
+    //   const taskId = this.getTaskId();
+    //   this.checkPublishStatus(taskId, 5000);
+    // }
+    this.refreshSchedulingStatus();
   },
   watch: {
     jsonChange(val) {
+      this.publishChangeCount += 1;
       this.$emit('isChange', val);
     },
     workflowExecutorCache() {
@@ -671,7 +697,6 @@ export default {
     //   }, 1000 * 60);
     // }
     document.addEventListener('keyup', this.onKeyUp)
-    this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
   },
   beforeDestroy() {
     if (this.timer) {
@@ -686,9 +711,24 @@ export default {
     document.removeEventListener('keyup', this.onKeyUp)
   },
   methods: {
+    refreshSchedulingStatus(){
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+      }).catch(() => {
+
+      })
+    },
     // 保存node参数修改
     saveNodeParameter() {
       this.$refs.nodeParameter.save();
+    },
+    // 前往调度中心
+    goScheduleCenter() {
+      let workspaceId = storage.get('currentWorkspace').id;
+      this.$router.push({
+        path: '/scheduleCenter',
+        query: {workspaceId}
+      })
     },
     // 右键判断是否支持复制
     nodeCopy(node) {
@@ -795,6 +835,10 @@ export default {
       this.showDispatchHistoryModel = true;
 
     },
+    // 跳转内嵌ds
+    linkToDispatch() {
+      this.$emit('showDolphinscheduler')
+    },
     // 显示调度配置弹框
     dispatchSetShow() {
       if (this.workflowIsExecutor) return;
@@ -838,7 +882,6 @@ export default {
       // 创建工作流之后就有值
       this.contextID = json.contextID;
       // 保存节点才有的值
-      window.console.log(json,'json')
       if (json && json.nodes) {
         this.originalData = this.json = JSON.parse(JSON.stringify(json));
         this.resources = json.resources;
@@ -900,10 +943,14 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}listNodeType`, {
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
-        this.shapes = res.nodeTypes.map((item) => {
+        // 暂时隐藏数据开发以外的节点
+        this.shapes = res.nodeTypes.filter(i => i.title == '数据开发').map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
-              if (subItem.image) {
+              // svg绘制的点太多，导致动画卡顿，使用图片代替
+              if (this.workFlowImage[subItem.title]) {
+                subItem.image = this.workFlowImage[subItem.title];
+              } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               }
               return subItem
@@ -1489,6 +1536,12 @@ export default {
         this.isParamModalShow = false;
       }
     },
+    handleOutsideClickNode(e) {
+      if (e.target.className === 'node-box-content' || e.target.className === 'node-box') return;
+      if (this.nodebaseinfoShow) {
+        this.nodebaseinfoShow = false;
+      }
+    },
     updateResources(res) {
       this.resources = res.map((item) => {
         return {
@@ -1502,6 +1555,7 @@ export default {
     async nodeDelete(node) {
       node = this.bindNodeBasicInfo(node);
       if (node.type === NODETYPE.FLOW && node.jobContent && node.jobContent.embeddedFlowId) {
+        // 不用调用删除接口改为记录
         const params = {
           id: +node.jobContent.embeddedFlowId,
           sure: false,
@@ -1840,6 +1894,14 @@ export default {
     closeConsole() {
       this.openningNode = null;
     },
+    toggleShape(shapeFold) {
+      // 工作流icon是否收起
+      if (shapeFold) {
+        this.shapeWidth = 0;
+      } else {
+        this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth;
+      }
+    },
     saveCommonIframe(node, cb) {
       if (!(node.supportJump && node.shouldCreationBeforeNode)) return;
       this.loading = true;
@@ -1945,7 +2007,7 @@ export default {
        * 2.禁用操作：左侧菜单，保存，参数修改，工具栏，更具状态来操作右键
        * 3.轮询接口获取节点状态
       */
-
+      // 如果是生产中心的只读模式不需要保存
       let a = null;
       if (!this.myReadonly) {
         a = await this.autoSave('执行保存', false);
@@ -2188,11 +2250,24 @@ export default {
         })
       })
     },
-    workflowPublishIsShow() {
-      // 已经在发布不能再点击
-      if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
-      this.pubulishShow = true;
-      this.pubulishFlowComment = ''
+    workflowPublishIsShow(event) {
+      getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
+        this.schedulingStatus = data;
+        // 已经在发布不能再点击
+        // if(this.publishChangeCount < 1 && this.schedulingStatus.published) {
+        //   event.preventDefault();
+        //   event.stopPropagation();
+        //   this.$Message.warning(this.$t('message.workflow.warning.unChange'));
+        //   return;
+        // }
+        if(this.schedulingStatus.published && this.schedulingStatus.releaseStatus === 'ONLINE'){
+          this.$Message.warning(this.$t('message.workflow.warning.publishOnlineTips'));
+          return;
+        }
+        if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.warning.api'))
+        this.pubulishShow = true;
+        this.pubulishFlowComment = '';
+      })
     },
     async workflowPublish() {
       // 发布之前先保存
@@ -2200,22 +2275,46 @@ export default {
       if (!a) return;
       // 调用发布接口
       const params = {
+        orchestratorId: this.orchestratorId,
+        orchestratorVersionId: this.newOrchestratorVersionId,
+        dssLabel: this.getCurrentDsslabels(),
+        // workflowId: Number(this.flowId),
+        // labels: this.getCurrentDsslabels(),
         workflowId: Number(this.flowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }
       // 记录工作流是否在发布
       this.isFlowPubulish = true;
+      //api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishToScheduler`, params, 'post').then((res) => {
       api.fetch(`/dss/workflow/publishWorkflow`, params, 'post').then((res) => {
         this.pubulishShow = false;
         // 发布之后需要轮询结果
         let queryTime = 0;
         this.checkResult(res.releaseTaskId, queryTime, 'publish');
-
+        this.setTaskId(res.releaseTaskId);
       }).catch(() => {
         this.pubulishShow = false;
         this.$Message.error(this.$t('message.workflow.projectDetail.publishFailed'));
       })
+    },
+    checkPublishStatus(taskId, delay){
+      this.isFlowPubulish = true;
+      const check = ()=>{
+        getPublishStatus(taskId, this.getCurrentDsslabels()).then(res=>{
+          if(res.status === 'init' || res.status === 'running'){
+            this.checkPublishStatus(taskId)
+          }else {
+            this.isFlowPubulish = false;
+            clearTimeout(time);
+          }
+        }).catch(()=>{
+          clearTimeout(time);
+          this.isFlowPubulish = false;
+        })
+      };
+      check();
+      let time = setTimeout(check, delay);
     },
     // 发布和导出共用查询接口
     checkResult(id, timeoutValue, type = 'publish') {
@@ -2224,9 +2323,10 @@ export default {
         typeName = this.$t('message.workflow.process.publish')
       }
       const timer = setTimeout(() => {
-        timeoutValue += 8000;
-        api.fetch(`/dss/workflow/getReleaseStatus`, { releaseTaskId: +id, labels: this.getCurrentDsslabels() }, 'get').then((res) => {
+        timeoutValue += 2000;
+        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
+            this.refreshSchedulingStatus();
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);
               this.checkResult(id, timeoutValue, type);
@@ -2249,6 +2349,7 @@ export default {
                 });
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
+              this.publishChangeCount = 0;
               // this.getBaseInfo();
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
               // this.$emit('publishSuccess', this.getBaseInfo);
@@ -2272,7 +2373,7 @@ export default {
             this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
           }
         });
-      }, 8000);
+      }, 2000);
     },
     // 发布成功，更新appId
     publishSuccess(cb) {
@@ -2287,6 +2388,7 @@ export default {
         this.loading = false;
         if (openOrchestrator) {
           this.appId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.appId;
+          this.newOrchestratorVersionId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
           if(cb) {
             cb();
           }
@@ -2361,6 +2463,23 @@ export default {
       const workspaceData = storage.get("currentWorkspace");
       return workspaceData ? workspaceData.name : ''
     },
+    getTaskKey(){
+      const username = this.getUserName();
+      const key = `${username}-workflow-${this.orchestratorId}-taskId`;
+      return key
+    },
+    isCurrentOrchestrator(){
+      const username = this.getUserName();
+      return this.getTaskKey().replace(this.orchestratorId, '') ===  `${username}-workflow--taskId`;
+    },
+    setTaskId(taskId) {
+      const key = this.getTaskKey();
+      storage.set(key, taskId);
+    },
+    getTaskId(){
+      const key = this.getTaskKey();
+      return storage.get(key);
+    },
     onKeyUp(e) {
       if (e.keyCode === 46 && this.$parent.active === 0 && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
         let selectNodes = this.$refs.process.getSelectedNodes();
@@ -2386,7 +2505,7 @@ export default {
         }
       }
     }
-  },
-};
+  }
+}
 </script>
 <style src="./index.scss" lang="scss"></style>

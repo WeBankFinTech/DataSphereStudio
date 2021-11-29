@@ -17,7 +17,7 @@
 
 @import '@/common/style/variables.scss';
 .workflow-item {
-    overflow: hidden;
+    // overflow: hidden;
 }
 .content-item {
     margin: 2px 0px 25px 0px;
@@ -32,14 +32,27 @@
         height: 142px;
         margin-right: 25px;
         margin-bottom: 25px;
-        background: #fff;
+        // background: #fff;
+        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
         max-width: 430px;
+        min-width: 320px;
         border-radius: 2px;
         border: 1px solid #dcdee2;
+        @include border-color($border-color-base, $dark-border-color-base);
         padding: 20px;
         cursor: pointer;
         &:hover {
           box-shadow: 0 2px 12px 0 $shadow-color;
+        }
+        .project-add {
+          display: flex;
+          height: 100%;
+          align-items: center;
+          justify-content: center;
+          @include font-color($light-text-color, $dark-text-color);
+          span {
+            font-size: 20px;
+          }
         }
         .project-main {
           height: 100%;
@@ -48,6 +61,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            /deep/.ivu-btn {
+              @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+              @include border-color($border-color-base, $dark-border-color-base);
+              @include font-color($light-text-color, $dark-text-color);
+            }
             .project-title {
               flex: 1;
               font-size: $font-size-large;
@@ -56,7 +74,8 @@
               text-overflow: ellipsis;
               overflow: hidden;
               font-family: PingFangSC-Medium;
-              color: $text-title-color;
+              // color: $text-title-color;
+              @include font-color($workspace-title-color, $dark-workspace-title-color);
               letter-spacing: 0;
             }
             .menu-bar {
@@ -72,14 +91,17 @@
                 padding: 5px 0;
                 box-shadow: 0 1px 6px rgba(0,0,0,.2);
                 z-index: 999;
-                background-color: #fff;
+                // background-color: #fff;
+                @include bg-color($menu-list-bg-color, $dark-menu-list-bg-color);
                 cursor: pointer;
                 .list-item {
                   width: 60px;
                   padding: 5px 8px;
                   text-align: center;
+                  @include font-color($light-text-color, $dark-text-color);
                   &:hover {
-                    background-color: #f3f3f3;
+                    // background-color: #f3f3f3;
+                    @include bg-color($hover-color-base, $dark-hover-color-base);
                   }
                 }
               }
@@ -96,7 +118,8 @@
             text-overflow: ellipsis;
             overflow: hidden;
             font-size: $font-size-14;
-            color: rgba(0,0,0,0.5);
+            // color: rgba(0,0,0,0.5);
+            @include font-color($light-text-desc-color, $dark-text-desc-color);
             margin: 10px 0;
           }
           .bottom-bar {
@@ -106,10 +129,13 @@
             width: 100%;
             .tag-item {
               color: $text-desc-color;
+              @include font-color($light-text-color, $dark-text-color);
               padding: 2px 10px;
               margin-right: 10px;
               border-radius: 14px;
-              background-color:#F3F3F3;
+              @include bg-color(#F3F3F3, $dark-base-color);
+              border: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
               white-space: nowrap;
               text-overflow: ellipsis;
               overflow: hidden;
@@ -128,7 +154,9 @@
       font-size: $font-size-large;
       line-height: 102px;
       border: 1px dashed  #dcdee2;
-      background: #F8F9FC;
+      // background: #F8F9FC;
+      @include border-color($border-color-base, $dark-border-color-base);
+      @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
       .add-icon {
         margin-top: -2px;
         margin-right: 5px;
@@ -142,16 +170,19 @@
     font-weight: bold;
     padding-left: 5px;
     border-left: 3px solid $primary-color;
+    @include border-color($primary-color, $dark-primary-color);
 }
 
 .page-bar {
     padding: 0 30px;
     margin-bottom: 30px;
+    @include font-color($light-text-desc-color, $dark-text-desc-color);
 }
 
 .no-data {
     text-align: center;
     padding: 20px;
+    @include font-color($light-text-color, $dark-text-color);
 }
 
 .queue-manager-status {

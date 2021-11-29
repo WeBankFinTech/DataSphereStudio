@@ -107,8 +107,8 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
-        String userName = updateWorkspaceUserRequest.getUsername();
-        String userId = "";
+        String userName = updateWorkspaceUserRequest.getUserName();
+        String userId = updateWorkspaceUserRequest.getUserId();
 
         dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator,userId);
         return Message.ok();
@@ -119,7 +119,7 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
-        String userName = updateWorkspaceUserRequest.getUsername();
+        String userName = updateWorkspaceUserRequest.getUserName();
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
     }

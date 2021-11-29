@@ -7,15 +7,15 @@
       slot="header"
       class="delete-modal-header">
       <Icon type="ios-information-circle"/>
-      <span>{{$t('message.common.deleteDialog.waring')}}</span>
+      <span>{{ label }}{{$t('message.common.deleteDialog.waring')}}</span>
     </p>
     <div class="delete-modal-content">
       <p>
-        <span>{{ label }}</span>
-        <span class="delete-modal-content-type">{{ type }}</span>
-        <span class="delete-modal-content-name">{{ name }}</span>
+        <span>您真的确定{{$t('message.common.deleteDialog.action', {label:label})}}</span>
+        <span class="delete-modal-content-name"> {{ name }} </span>
+        <span class="delete-modal-content-type">{{ type }}嘛？</span>
       </p>
-      <p>{{$t('message.common.deleteDialog.isNext')}}</p>
+      <!-- <p>{{$t('message.common.deleteDialog.isNext')}}</p> -->
     </div>
     <div slot="footer">
       <Button

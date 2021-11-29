@@ -1,7 +1,21 @@
 <template>
   <div class="workflow-item">
-    <slot></slot>
-    <Row v-if="dataList.length > 0" class="content-item">
+    <!-- <slot></slot> -->
+    <Row class="content-item">
+      <i-col
+        class="project-item"
+        :xs="12"
+        :sm="8"
+        :md="6"
+        :xl="5"
+        @click.native="add"
+        v-if="canWrite"
+      >
+        <div class="project-add">
+          <Icon :size="32" type="ios-add"></Icon>
+          <span>新建编排</span>
+        </div>
+      </i-col>
       <i-col
         class="project-item"
         :xs="12"
@@ -23,10 +37,11 @@
               <ul class="menu-list">
                 <li class="list-item" @click.stop="deleteProject(subitem)">{{$t('message.workflow.workflowItem.delete')}}</li>
                 <li class="list-item" @click.stop="modify(currentData.id, subitem)">{{$t('message.workflow.workflowItem.config')}}</li>
+                <!-- <li class="list-item" @click.stop="Export(subitem)">导出</li> -->
                 <!-- <li v-if="!isPercent(subitem.orchestratorId)" class="list-item" @click.stop="publish(subitem)">{{$t('message.workflow.workflowItem.publish')}}</li> -->
               </ul>
             </div>
-            <Button size="small" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
+            <Button size="small" v-if="checkEditable(subitem)" style="margin-right: 8px" @click.stop="Export(subitem)">{{ $t('message.orchestratorModes.export') }}</Button>
             <Button size="small" @click.stop="detail(currentData.id, subitem)">{{$t('message.workflow.workflowItem.viewVersion')}}</Button>
           </div>
           <div class="mid-bar" :title="subitem.description">
@@ -48,9 +63,8 @@
         </Tooltip>
       </i-col>
     </Row>
-    <div class="no-data" v-else>{{$t('message.workflow.workflowItem.nodata')}}</div>
     <Page
-      v-if="dataList.length > 0 && pagination.size < dataList.length "
+      v-if="dataList.length > 0"
       class="page-bar"
       :total="dataList.length"
       show-sizer
@@ -63,7 +77,7 @@
   </div>
 </template>
 <script>
-import mixin from '@/common/service/mixin';
+import mixin from '@/common/service/mixin'
 export default {
   name: "WorkflowContentItem",
   props: {
@@ -92,6 +106,10 @@ export default {
     applicationAreaMap: {
       type: Array,
       default: () => []
+    },
+    canWrite: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -100,7 +118,7 @@ export default {
         size: 10,
         current: 1,
         total: 0,
-        opts: [10, 30, 45, 60]
+        opts: [10, 20, 30]
       },
       isToolbarShow: false,
       cardShowNum: 4,
@@ -130,11 +148,15 @@ export default {
   methods: {
     checkEditable(item) {
       // 编排权限由后台的priv字段判断，1-查看， 2-编辑， 3-发布
-      if ([2, 3].includes(item.priv)) {
-        return true
-      } else {
-        return false
-      }
+      return item.editable;  //后端新增字段
+      // if ([2, 3].includes(item.priv)) {
+      //   return true
+      // } else {
+      //   return false
+      // }
+    },
+    add() {
+      this.$emit("add");
     },
     modify(classifyId, project) {
       this.$emit("modify", classifyId, project);

@@ -16,38 +16,42 @@
  */
 
 // vue.config.js
-const path = require('path')
-const fs = require('fs')
-const FileManagerPlugin = require('filemanager-webpack-plugin');
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const VirtualModulesPlugin = require('webpack-virtual-modules');
-const apps = require('./src/config.json')
+const path = require("path");
+const fs = require("fs");
+const FileManagerPlugin = require("filemanager-webpack-plugin");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+const CspHtmlWebpackPlugin = require("csp-html-webpack-plugin");
+const VirtualModulesPlugin = require("webpack-virtual-modules");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const webpack = require("webpack");
+const apps = require("./src/config.json");
 
 const getVersion = () => {
-  const pkgPath = path.join(__dirname, './package.json')
+  const pkgPath = path.join(__dirname, "./package.json");
   let pkg = fs.readFileSync(pkgPath);
   pkg = JSON.parse(pkg);
   return pkg.version;
-}
+};
 
 // 指定module打包, 不指定则打包全部子应用
 // npm run serve --module=scriptis
-let modules = process.env.npm_config_module || ''
+let modules = process.env.npm_config_module || "";
 if (modules) {
-  modules = modules.split(',')
+  modules = modules.split(",");
   Object.keys(apps).forEach(m => {
     if (modules.indexOf(m) < 0) {
-      delete apps[m]
+      delete apps[m];
     }
-  })
+  });
 } else {
-  modules = Object.keys(apps)
+  modules = Object.keys(apps);
 }
-let requireComponent = []
-let requireComponentVue = []
-let appsRoutes = []
-let appsI18n = []
-let headers = []
+let requireComponent = [];
+let requireComponentVue = [];
+let appsRoutes = [];
+let appsI18n = [];
+let headers = [];
 
 Object.entries(apps).forEach(item => {
   if (item[1].module) {
@@ -88,12 +92,16 @@ const virtualModules = new VirtualModulesPlugin({
 });
 
 const plugins = [
-  virtualModules
-]
+  virtualModules,
+  new webpack.ProvidePlugin({
+    jQuery: "jquery/dist/jquery.min.js",
+    $: "jquery/dist/jquery.min.js"
+  })
+];
 
-// scriptis 有使用编辑器组件, 需要Monaco Editor
-if (modules.indexOf('scriptis') > -1) {
-  plugins.push(new MonacoWebpackPlugin())
+// scriptis linkis 有使用编辑器组件, 需要Monaco Editor
+if (modules.indexOf("scriptis") > -1 || modules.indexOf("linkis") > -1) {
+  plugins.push(new MonacoWebpackPlugin());
 }
 
 /**
@@ -101,71 +109,162 @@ if (modules.indexOf('scriptis') > -1) {
  * @param {*} dir
  */
 function resolve(dir) {
-  return path.join(__dirname, dir)
+  return path.join(__dirname, dir);
 }
 
+if (process.env.NODE_ENV !== "dev") {
+  plugins.push(
+    new CspHtmlWebpackPlugin(
+      {
+        "base-uri": "'self'",
+        "object-src": "'none'",
+        "child-src": "'none'",
+        "script-src": ["'self'", "'unsafe-eval'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "frame-src": "*",
+        "worker-src": "'self'",
+        "connect-src": ["'self'", "ws:", "http://adm.webank.io"],
+        "img-src": ["data:", "'self'"]
+      },
+      {
+        enabled: true,
+        nonceEnabled: {
+          "style-src": false
+        }
+      }
+    )
+  );
+}
+
+const smp = new SpeedMeasurePlugin();
+const configWrap = config => {
+  if (process.env.NODE_ENV === "dev") {
+    return config;
+  } else {
+    return smp.wrap(config);
+  }
+};
 module.exports = {
-  publicPath: './',
-  outputDir: 'dist/dist',
-  chainWebpack: (config) => {
-    // set svg-sprite-loader
-    config.module
-      .rule('svg')
-      .exclude.add(resolve('src/components/svgIcon'))
-      .end()
-    config.module
-      .rule('icons')
-      .test(/\.svg$/)
-      .include.add(resolve('src/components/svgIcon'))
-      .end()
-      .use('svg-sprite-loader')
-      .loader('svg-sprite-loader')
-      .options({
-        symbolId: 'icon-[name]'
-      })
-      .end()
-    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'sandbox' || process.env.NODE_ENV === 'bdp') {
-      config.plugin('compress').use(FileManagerPlugin, [{
-        onEnd: {
-          copy: [
-            { source: './config.sh', destination: `./dist` },
-            { source: './install.sh', destination: `./dist` }
-          ],
-          // 先删除根目录下的zip包
-          delete: [`./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip`],
-          // 将dist文件夹下的文件进行打包
-          archive: [
-            { source: './dist', destination: `./wedatasphere-DataSphereStudio-${getVersion()}-dist.zip` },
-          ]
-        },
-      }])
+  publicPath: "./",
+  outputDir: "dist/dist",
+  lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
+  productionSourceMap: process.env.NODE_ENV === "dev", // 生产环境无需source map加速构建
+  css: {
+    loaderOptions: {
+      less: {
+        lessOptions: {
+          javascriptEnabled: true
+        }
+      }
     }
   },
-  configureWebpack: {
+  chainWebpack: config => {
+    // set svg-sprite-loader
+    config.module
+      .rule("svg")
+      .exclude.add(resolve("src/components/svgIcon"))
+      .end();
+    config.module
+      .rule("icons")
+      .test(/\.svg$/)
+      .include.add(resolve("src/components/svgIcon"))
+      .end()
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]"
+      })
+      .end();
+    if (
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "sandbox" ||
+      process.env.NODE_ENV === "bdp"
+    ) {
+      config
+        .plugin("compress")
+        .use(FileManagerPlugin, [
+          {
+            onEnd: {
+              copy: [
+                { source: "./config.sh", destination: `./dist` },
+                { source: "./install.sh", destination: `./dist` }
+              ],
+              // 先删除根目录下的zip包
+              delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
+              // 将dist文件夹下的文件进行打包
+              archive: [
+                {
+                  source: "./dist",
+                  destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip`
+                }
+              ]
+            }
+          }
+        ]);
+      // 移除UglifyJsPlugin(之前的写法也并未生效)，使用默认的terser-webpack-plugin，build更快；
+      // 如果想设置drop_console，升级@vue-cli再设置，否则会增加build时间
+      config.performance.set("hints", false);
+    }
+  },
+  configureWebpack: configWrap({
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
-        '@component': path.resolve(__dirname, './src/components')
+        "@": path.resolve(__dirname, "./src"),
+        "@component": path.resolve(__dirname, "./src/components")
       }
     },
     plugins
-  },
+    // optimization: {
+    //   minimizer: [
+    //     new UglifyJsPlugin({
+    //       uglifyOptions: {
+    //         // output: {
+    //         //   comments: false
+    //         // },
+    //         warnings: false,
+    //         compress: {
+    //           drop_debugger: true, // 去掉debugger
+    //           drop_console: true,  // 去掉console
+    //           pure_funcs: ['console.log']// 移除console
+    //         }
+    //       }
+    //     })
+    //   ]
+    // }
+  }),
   // 选项...
   pluginOptions: {
     mock: {
-      entry: 'mock.js',
+      entry: "mock.js",
       power: false
     }
   },
   devServer: {
     proxy: {
-      '/api': {
-        target: 'x.x.x.x',
+      "/api": {
+        target: "http://***REMOVED***:8088",
+        //target: 'http://***REMOVED***:9202', //yichao
+        // target: "http://***REMOVED***:9202", //jiawei
+        //target: "http://luban.ctyun.cn:8088",
+        //target: 'http://devluban.ctyun.cn:8088',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': '/api'
+          "^/api": "/api"
         }
+      },
+      "/dolphinscheduler": {
+        target: "http://***REMOVED***:12345",
+        //target: "https://dolphin.ctyun.cn:10002",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/dolphinscheduler": "/dolphinscheduler"
+        }
+      },
+      "/application": {
+        target: "http://***REMOVED***:3022",
+        changeOrigin: true
       }
     }
   }
-}
+};
+

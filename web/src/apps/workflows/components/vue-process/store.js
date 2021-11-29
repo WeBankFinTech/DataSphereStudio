@@ -59,7 +59,7 @@ export function createStore() {
       },
       // shape配置信息--工具栏的图形
       shapeOptions: {
-        viewWidth: 250,
+        viewWidth: 180,
         width: 36,
         height: 36
       },

@@ -295,6 +295,7 @@
 <script>
 import api from "@/common/service/api";
 import Test from "../common/test.vue";
+import _ from "lodash";
 
 const compareItems = [
   {
@@ -630,20 +631,24 @@ export default {
       this.getTableCols(tblName, true);
     }
   },
-  mounted() {},
   methods: {
     handleToolShow(item) {
+      const { data, originData } = this.apiData;
       const { type } = item;
       if (type === "property") {
         this.$emit("showApiForm", this.apiData);
       } else if (type === "save") {
-        this.saveApi();
+        this.validateApi(type);
       } else if (type === "test") {
-        if (!this.apiData.data.id) {
+        if (!data.id) {
           this.$Message.info("请先保存API");
           return;
         }
-        this.showTestPanel = true;
+        if (!_.isEqual(data, originData)) {
+          this.$Message.info("api内容有更改，请先保存API");
+          return;
+        }
+        this.validateApi(type);
       } else if (type === "release") {
         if (!this.hadTestSuccess) {
           this.$Message.info("请先测试API");
@@ -658,9 +663,10 @@ export default {
     setTestSuccess() {
       this.hadTestSuccess = true;
     },
-    saveApi() {
+    validateApi(action) {
       const { data } = this.apiData;
       const { apiType } = data;
+      const isSave = action === "save";
       const {
         name,
         type,
@@ -763,14 +769,27 @@ export default {
             this.$refs["pageForm"].validate(valid2 => {
               if (valid2) {
                 reqParams.pageSize = parseInt(this.pageForm.pageSize);
-                this.executeSaveApi(reqParams);
+                isSave
+                  ? this.executeSaveApi(reqParams)
+                  : this.showTest(reqParams);
               }
             });
             return;
           }
-          this.executeSaveApi(reqParams);
+          isSave ? this.executeSaveApi(reqParams) : this.showTest(reqParams);
         }
       });
+    },
+    showTest(reqParams) {
+      const { originData } = this.apiData;
+      const isSame = Object.keys(reqParams).every(
+        key => originData[key] + "" === reqParams[key] + ""
+      );
+      if (!isSame) {
+        this.$Message.info("api内容有更改，请先保存API");
+        return;
+      }
+      this.showTestPanel = true;
     },
     executeSaveApi(reqParams) {
       const { data } = this.apiData;

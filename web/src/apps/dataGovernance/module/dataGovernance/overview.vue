@@ -210,9 +210,9 @@ export default {
         .then(data => {
           if (data.result) {
             data.result.forEach(item => {
-              let tempLen = Math.floor(item.storage.length / 3)
+              let tempLen = Math.floor(item.storage.length / 4)
               let len = tempLen > 2 ? 3 : tempLen
-              item.storage = (item.storage / (1024 * (len + 1))).toFixed(2)
+              item.storage = (item.storage / Math.pow(1024, len + 1)).toFixed(2)
               switch(len){
                 case 0:
                   item.storage = item.storage + 'KB'

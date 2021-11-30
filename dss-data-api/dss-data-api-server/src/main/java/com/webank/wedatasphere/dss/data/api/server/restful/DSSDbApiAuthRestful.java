@@ -103,7 +103,6 @@ public class DSSDbApiAuthRestful {
     public Message deleteApiAuth(@PathVariable("id") Long id){
         log.info("-------delete apiauth:    " + id + ", begin");
         apiAuthService.deleteApiAuth(id);
-
         Message message = Message.ok("删除成功");
         return message;
     }

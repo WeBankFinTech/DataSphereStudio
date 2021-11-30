@@ -209,7 +209,26 @@ export default {
       getTopStorage()
         .then(data => {
           if (data.result) {
-            that.data1 = data.result.slice(0);
+            data.result.forEach(item => {
+              let tempLen = Math.floor(item.storage.length / 3)
+              let len = tempLen > 2 ? 3 : tempLen
+              item.storage = (item.storage / (1024 * (len + 1))).toFixed(2)
+              switch(len){
+                case 0:
+                  item.storage = item.storage + 'KB'
+                  break
+                case 1:
+                  item.storage = item.storage + 'MB'
+                  break
+                case 2:
+                  item.storage = item.storage + 'GB'
+                  break
+                default:
+                  item.storage = item.storage + 'TB'
+                  break
+              }
+            })
+            that.data1 = data.result
           }
         })
         .catch(err => {

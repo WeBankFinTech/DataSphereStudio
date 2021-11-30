@@ -305,9 +305,9 @@ export default {
               classifications
             } = data.result;
             if (parseInt(basic.store)) {
-              let tempLen = Math.floor(basic.store.length / 3)
+              let tempLen = Math.floor(basic.store.length / 4)
               let len = tempLen > 2 ? 3 : tempLen
-              basic.store = (basic.store / (1024 * (len + 1))).toFixed(2)
+              basic.store = (basic.store /  Math.pow(1024, len + 1)).toFixed(2)
               switch(len){
                 case 0:
                   basic.store = basic.store + 'KB'

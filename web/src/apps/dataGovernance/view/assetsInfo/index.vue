@@ -304,6 +304,25 @@ export default {
               partitionKeys,
               classifications
             } = data.result;
+            if (parseInt(basic.store)) {
+              let tempLen = Math.floor(basic.store.length / 3)
+              let len = tempLen > 2 ? 3 : tempLen
+              basic.store = (basic.store / (1024 * (len + 1))).toFixed(2)
+              switch(len){
+                case 0:
+                  basic.store = basic.store + 'KB'
+                  break
+                case 1:
+                  basic.store = basic.store + 'MB'
+                  break
+                case 2:
+                  basic.store = basic.store + 'GB'
+                  break
+                default:
+                  basic.store = basic.store + 'TB'
+                  break
+              }
+            }
             this.basicData = basic;
             this.isParTbl = basic["isParTbl"];
             this.labelOptions = basic["labels"];

@@ -473,6 +473,7 @@
                 "publishing": "发布中",
                 "resource": "资源",
                 "viewVersion": "查看版本",
+                "move": "移动",
                 "config": "配置",
                 "action": "操作",
                 "readonly": "只读",

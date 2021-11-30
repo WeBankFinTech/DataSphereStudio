@@ -185,27 +185,25 @@ module.exports = {
       process.env.NODE_ENV === "sandbox" ||
       process.env.NODE_ENV === "bdp"
     ) {
-      config
-        .plugin("compress")
-        .use(FileManagerPlugin, [
-          {
-            onEnd: {
-              copy: [
-                { source: "./config.sh", destination: `./dist` },
-                { source: "./install.sh", destination: `./dist` }
-              ],
-              // 先删除根目录下的zip包
-              delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
-              // 将dist文件夹下的文件进行打包
-              archive: [
-                {
-                  source: "./dist",
-                  destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip`
-                }
-              ]
-            }
+      config.plugin("compress").use(FileManagerPlugin, [
+        {
+          onEnd: {
+            copy: [
+              { source: "./config.sh", destination: `./dist` },
+              { source: "./install.sh", destination: `./dist` }
+            ],
+            // 先删除根目录下的zip包
+            delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
+            // 将dist文件夹下的文件进行打包
+            archive: [
+              {
+                source: "./dist",
+                destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip`
+              }
+            ]
           }
-        ]);
+        }
+      ]);
       // 移除UglifyJsPlugin(之前的写法也并未生效)，使用默认的terser-webpack-plugin，build更快；
       // 如果想设置drop_console，升级@vue-cli再设置，否则会增加build时间
       config.performance.set("hints", false);
@@ -248,18 +246,18 @@ module.exports = {
     proxy: {
       "/api": {
         // target: "http://172.24.2.230:8088",
-        //target: 'http://172.24.2.29:9202', //yichao
+        // target: "http://172.24.2.29:9202", //yichao
         // target: "http://172.24.2.83:9202", //jiawei
         target: "http://luban.ctyun.cn:8088",
-        //target: 'http://devluban.ctyun.cn:8088',
+        //target: "http://devluban.ctyun.cn:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api"
         }
       },
       "/dolphinscheduler": {
-        //target: "http://172.24.2.233:12345",
-        target: "https://dolphin.ctyun.cn:10002",
+        target: "http://172.24.2.233:12345",
+        // target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"

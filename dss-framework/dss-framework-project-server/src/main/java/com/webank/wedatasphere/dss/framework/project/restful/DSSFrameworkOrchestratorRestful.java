@@ -146,7 +146,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path ="deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator(@Context HttpServletRequest httpServletRequest, @Valid OrchestratorDeleteRequest deleteRequest) {
+    public Message deleteOrchestrator(@Context HttpServletRequest httpServletRequest,@RequestBody OrchestratorDeleteRequest deleteRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());

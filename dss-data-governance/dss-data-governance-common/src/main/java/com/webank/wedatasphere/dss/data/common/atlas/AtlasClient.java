@@ -144,8 +144,8 @@ public class AtlasClient extends AtlasClientV2 {
         queryParams.add("excludeDeletedEntities", String.valueOf(excludeDeletedEntities));
         queryParams.add(LIMIT, String.valueOf(limit));
         queryParams.add(OFFSET, String.valueOf(offset));
-        queryParams.add("sortBy", "createTime");
-        queryParams.add("sortOrder", String.valueOf(SortOrder.DESCENDING));
+        queryParams.add("sortBy", "name");
+        queryParams.add("sortOrder", String.valueOf(SortOrder.ASCENDING));
 
         return callAPI(API_V2.BASIC_SEARCH, String.class, queryParams);
     }

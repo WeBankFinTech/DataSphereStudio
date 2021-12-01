@@ -8,7 +8,7 @@ export const subAppRoutes = {
     publicPage: true, // 权限公开
   },
   children: [{
-    path: 'commonIframe',
+    path: 'commonIframe/:appName',
     name: 'commonIframe',
     meta: {
       title: '鲁班组件',

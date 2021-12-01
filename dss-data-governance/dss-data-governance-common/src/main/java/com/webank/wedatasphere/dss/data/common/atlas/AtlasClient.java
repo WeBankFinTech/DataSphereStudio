@@ -5,6 +5,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.atlas.ApplicationProperties;
 import org.apache.atlas.AtlasClientV2;
 import org.apache.atlas.AtlasServiceException;
+import org.apache.atlas.SortOrder;
 import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
@@ -143,6 +144,8 @@ public class AtlasClient extends AtlasClientV2 {
         queryParams.add("excludeDeletedEntities", String.valueOf(excludeDeletedEntities));
         queryParams.add(LIMIT, String.valueOf(limit));
         queryParams.add(OFFSET, String.valueOf(offset));
+        queryParams.add("sortBy", "createTime");
+        queryParams.add("sortOrder", String.valueOf(SortOrder.DESCENDING));
 
         return callAPI(API_V2.BASIC_SEARCH, String.class, queryParams);
     }

@@ -16,7 +16,7 @@
             <div class="step" :class="{'step-expand': step.expand}" v-for="step in guide.steps" :key="step.seq">
               <div class="step-head" @click="toggleStep(step)">
                 <span class="step-seq">{{step.seq}}</span>
-                <span class="step-divider"></span>
+                <span class="step-divider" v-if="step.seq"></span>
                 <span class="step-title">{{step.title}}</span>
                 <span class="step-arrow">
                   <SvgIcon icon-class="close" v-if="step.expand" />

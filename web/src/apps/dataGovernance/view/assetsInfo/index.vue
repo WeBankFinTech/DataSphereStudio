@@ -123,7 +123,7 @@
             <Icon
               type="md-checkmark"
               v-else
-              @click="changeClassifications"
+              @click.once="changeClassifications"
               style="position: absolute; right:0; top: -15px;cursor: pointer;"
             ></Icon>
             <label>分层</label>

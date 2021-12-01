@@ -153,8 +153,14 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             while (rs.next()){
                 HivePartInfo part  =new HivePartInfo();
                 part.setPartName(rs.getString(1));
-                part.setCreateTime(DateUtil.unixToTimeStr(Long.valueOf(rs.getInt(2))*1000));
-                part.setLastAccessTime(DateUtil.unixToTimeStr(Long.valueOf(rs.getInt(3))*1000));
+                Long lastAccessTime = Long.valueOf(rs.getInt(3));
+                if(lastAccessTime !=null && lastAccessTime !=0L) {
+                    part.setLastAccessTime(DateUtil.unixToTimeStr(lastAccessTime * 1000));
+                }
+                Long createTime = Long.valueOf(rs.getInt(2));
+                if(createTime !=null && createTime !=0L) {
+                    part.setCreateTime(DateUtil.unixToTimeStr(createTime * 1000));
+                }
                 part.setReordCnt(rs.getInt(4));
                 part.setStore(rs.getInt(5));
                 hivePartInfos.add(part);

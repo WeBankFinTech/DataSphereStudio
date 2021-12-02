@@ -245,7 +245,7 @@ export default {
               .step-divider {
                 display: block;
                 margin: 0 20px;
-                width: 1px; 
+                width: 1px;
                 height: 16px;
                 @include bg-color(#979797, #4B576E);
               }

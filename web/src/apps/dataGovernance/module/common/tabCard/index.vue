@@ -86,7 +86,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .tab-card-wrap {
-  min-height: 99px;
+  min-height: 10.5vh;
   padding-left: 24px;
   padding-right: 24px;
   border: 1px solid #dee4ec;

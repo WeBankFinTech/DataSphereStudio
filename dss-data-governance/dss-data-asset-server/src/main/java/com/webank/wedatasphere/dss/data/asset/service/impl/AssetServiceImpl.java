@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -77,34 +78,43 @@ public class AssetServiceImpl implements AssetService {
         }
 
         if (atlasEntityHeaders != null) {
-            return atlasEntityHeaders.parallelStream().map(atlasEntityHeader -> {
+            return atlasEntityHeaders.parallelStream().filter(Objects::nonNull).map(atlasEntityHeader -> {
                 HiveTblSimpleInfo hiveTblBasic = new HiveTblSimpleInfo();
                 hiveTblBasic.setGuid(atlasEntityHeader.getGuid());
-                hiveTblBasic.setName(atlasEntityHeader.getAttribute("name").toString());
-                hiveTblBasic.setQualifiedName(atlasEntityHeader.getAttribute("qualifiedName").toString());
-                Object owner =atlasEntityHeader.getAttribute("owner");
-                if(owner !=null) {
-                    hiveTblBasic.setOwner(owner.toString());
-                }
+                hiveTblBasic.setName(stringValueOfObject(atlasEntityHeader.getAttribute("name")));
+                String qualifiedName =stringValueOfObject(atlasEntityHeader.getAttribute("qualifiedName"));
+                hiveTblBasic.setQualifiedName(qualifiedName);
+                hiveTblBasic.setOwner(stringValueOfObject(atlasEntityHeader.getAttribute("owner")));
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
                 }
-                String dbName = (atlasEntityHeader.getAttribute("qualifiedName").toString().split("\\."))[0];
-                hiveTblBasic.setDbName(dbName);
+                if(null != qualifiedName && qualifiedName.split("\\.").length >0){
+                    String dbName = qualifiedName.split("\\.")[0];
+                    hiveTblBasic.setDbName(dbName);
+                }
 
                 try {
                     AtlasEntity atlasEntity = atlasService.getHiveTblByGuid(atlasEntityHeader.getGuid());
                     List<HiveTblDetailInfo.HiveClassificationInfo> classificationInfoList = getClassificationInfoList(atlasEntity);
                     hiveTblBasic.setClassifications(classificationInfoList);
                 } catch (AtlasServiceException ex) {
-                    throw new DataGovernanceException(ex.getMessage());
+                    logger.error(ex.getMessage());
                 }
 
                 return hiveTblBasic;
             }).collect(Collectors.toList());
         }
         return null;
+    }
+
+    private String stringValueOfObject(Object obj){
+        if(null !=obj) {
+            return obj.toString();
+        }
+        else {
+            return null;
+        }
     }
 
     @Override

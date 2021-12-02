@@ -51,22 +51,6 @@ if (apps.requireComponentVue) {
   })
 }
 
-// Icon
-import './components/svgIcon/index.js'
-import './dss/module/index.js'
-
-// moduleMixin
-if (apps.requireComponent) {
-  apps.requireComponent.forEach(item=>{
-    mixinDispatch(item)
-  })
-}
-if (apps.requireComponentVue) {
-  apps.requireComponentVue.forEach(item=>{
-    mixinDispatch(undefined, item)
-  })
-}
-
 Vue.use(VueRouter)
 Vue.use(component)
 Vue.use(iView, {

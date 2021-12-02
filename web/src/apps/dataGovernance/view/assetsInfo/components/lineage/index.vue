@@ -22,6 +22,11 @@ export default {
       required: true
     }
   },
+  watch: {
+    lineageData() {
+      this.createOrUpdateCanvas(this.convertData())
+    }
+  },
   methods: {
     convertData() {
       let data = {
@@ -93,7 +98,7 @@ export default {
         })
         this.canvas.draw(data);
       } else {
-        this.canvas.drageReDraw(data);
+        this.canvas.redraw(data);
       }
     }
   },

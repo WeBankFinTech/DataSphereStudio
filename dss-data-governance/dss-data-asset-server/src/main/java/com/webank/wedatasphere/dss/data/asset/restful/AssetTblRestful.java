@@ -192,7 +192,12 @@ public class AssetTblRestful {
         Optional.ofNullable(hiveTblClassificationInfo.getNewClassifications()).orElseGet(()-> {
             logger.warn("hive table uid is %s, newClassifications is null",guid);
             return new ArrayList<>();
-        }).stream().filter(Objects::nonNull).forEach(typeName -> newClassifications.add(new AtlasClassification(typeName)));
+        }).stream().filter(Objects::nonNull).forEach(typeName -> {
+            AtlasClassification atlasClassification =new AtlasClassification(typeName);
+            atlasClassification.setPropagate(false);
+            atlasClassification.setRemovePropagationsOnEntityDelete(true);
+            newClassifications.add(atlasClassification);
+        });
         assetService.removeAndAddClassifications(guid, newClassifications);
 
         return Message.messageToResponse(Message.ok().data("result","更新成功"));

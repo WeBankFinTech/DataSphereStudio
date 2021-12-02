@@ -1,5 +1,7 @@
 package com.webank.wedatasphere.dss.data.common.utils;
 
+import org.apache.atlas.SortOrder;
+
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -355,7 +357,7 @@ public class DateUtil {
     }
 
     public static String unixToTimeStr(Long unixtime) {
-        return new SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(new Date (unixtime));
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date (unixtime));
     }
 
     public static String unixToTimeStr(Double unixtime){

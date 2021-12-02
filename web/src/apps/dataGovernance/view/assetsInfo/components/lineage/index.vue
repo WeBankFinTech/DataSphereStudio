@@ -13,7 +13,7 @@ export default {
   name: 'lineage',
   data() {
     return {
-      canvas: null
+      canvas: null,
     }
   },
   props: {

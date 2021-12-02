@@ -11,7 +11,7 @@ export const guideConfig = {
         url: ''
       },
       {
-        title: '什么情况下可以删除工作空间？', 
+        title: '什么情况下可以删除工作空间？',
         url: ''
       }
     ]
@@ -21,7 +21,7 @@ export const guideConfig = {
     desc: '管理员首页是工作空间管理员才可进入的页面，组织的主账号默认为工作空间管理员。管理员有如下权限：（1）在管理台对整个大数据平台的用户和资源进行管理；（2）规划工作空间，如新建、编辑、删除工作空间。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '管理台',
         content: [
           {
@@ -33,7 +33,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '创建工作空间',
         content: [
           {
@@ -55,15 +55,15 @@ export const guideConfig = {
         url: ''
       },
       {
-        title: '什么情况下可以删除工作空间？', 
+        title: '什么情况下可以删除工作空间？',
         url: ''
       },
       {
-        title: '非管理员账号能否创建工作空间？', 
+        title: '非管理员账号能否创建工作空间？',
         url: ''
       },
       {
-        title: '普通用户是否可以进入管理台?', 
+        title: '普通用户是否可以进入管理台?',
         url: ''
       }
     ]
@@ -73,7 +73,7 @@ export const guideConfig = {
     desc: '管理员可在部门管理页面新增、删除、编辑、查询部门及其子部门。注意：元公司不可删除，仅可编辑相关信息',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '新增部门',
         content: [
           {
@@ -85,7 +85,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '删除部门',
         content: [
           {
@@ -97,7 +97,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '编辑部门信息',
         content: [
           {
@@ -109,7 +109,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '查询部门',
         content: [
           {
@@ -137,7 +137,7 @@ export const guideConfig = {
     desc: '管理员可在用户管理页面新增用户、编辑用户信息、修改用户密码、查询用户等。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '新增用户',
         content: [
           {
@@ -149,7 +149,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '编辑用户信息',
         content: [
           {
@@ -161,7 +161,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '修改用户密码',
         content: [
           {
@@ -173,7 +173,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '查询用户',
         content: [
           {
@@ -201,7 +201,7 @@ export const guideConfig = {
     desc: '控制台是管理整个工作空间相关信息的页面，可查看全局历史、资源使用情况、参数配置、全局变量等信息。还可以进行EMC管理以及查看常见问题。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '全局历史',
         content: [
           {
@@ -213,7 +213,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '资源管理',
         content: [
           {
@@ -225,7 +225,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '参数配置',
         content: [
           {
@@ -237,7 +237,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '全局变量',
         content: [
           {
@@ -249,7 +249,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第五步',
         title: 'ECM管理',
         content: [
           {
@@ -277,7 +277,7 @@ export const guideConfig = {
     desc: '部门和用户管理是对于整个组织架构的设置和管理页，工作空间管理员可以在本页新增和调整部门层级，以及创建、修改和删除用户',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '创建部门',
         content: [
           {
@@ -289,7 +289,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '创建用户',
         content: [
           {
@@ -321,7 +321,7 @@ export const guideConfig = {
     desc: '工作空间首页是各个角色用户进行数据开发和管理的主要页面，工作空间首页主要有如下主要功能：(1) 菜单栏；(2)项目列表；(3)应用商店；(4)工作空间管理。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '菜单栏',
         content: [
           {
@@ -333,7 +333,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '项目列表',
         content: [
           {
@@ -345,7 +345,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '应用商店',
         content: [
           {
@@ -357,7 +357,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '工作空间管理',
         content: [
           {
@@ -393,7 +393,7 @@ export const guideConfig = {
     desc: '工作空间管理是管理员对工作空间进行人员管理、角色分配的页面，还可以在本页面查看工作空间的基本信息或管理数据源。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '基本信息',
         content: [
           {
@@ -405,7 +405,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '用户信息',
         content: [
           {
@@ -417,7 +417,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '权限信息',
         content: [
           {
@@ -429,7 +429,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '数据源管理',
         content: [
           {
@@ -653,7 +653,7 @@ export const guideConfig = {
     desc: 'Scriptis是一款一站式交互式数据探索分析工具，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '新建脚本文件',
         content: [
           {
@@ -665,7 +665,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '上传自定义函数或资源',
         content: [
           {
@@ -677,7 +677,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '运行脚本文件',
         content: [
           {
@@ -833,7 +833,7 @@ export const guideConfig = {
     desc: '服务管理页面可对已发布的数据服务API进行管理、监控、测试和调用等。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: 'API管理',
         content: [
           {
@@ -842,7 +842,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: 'API监控',
         content: [
           {
@@ -851,7 +851,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: 'API测试',
         content: [
           {
@@ -860,7 +860,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: 'API调用',
         content: [
           {
@@ -889,7 +889,7 @@ export const guideConfig = {
     desc: '数据治理提供数据处理全生命周期过程的数据管理功能。基于高安全级的架构进行设计，可对用户数据的进行全方位的数据资产管控。',
     steps: [
       {
-        seq: '',
+        seq: '第一步',
         title: '数据资产',
         content: [
           {
@@ -898,7 +898,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第二步',
         title: '元数据管理',
         content: [
           {
@@ -907,7 +907,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第三步',
         title: '数据权限',
         content: [
           {
@@ -916,7 +916,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第四步',
         title: '数仓规划',
         content: [
           {
@@ -925,7 +925,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第五步',
         title: '数据质量',
         content: [
           {
@@ -934,7 +934,7 @@ export const guideConfig = {
         ]
       },
       {
-        seq: '',
+        seq: '第六步',
         title: '数据安全',
         content: [
           {

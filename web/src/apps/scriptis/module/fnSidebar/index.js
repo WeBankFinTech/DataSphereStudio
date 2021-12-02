@@ -20,6 +20,7 @@ export default {
   name: 'fnSidebar',
   events: ['getAllLoadedFunction'],
   dispatchs: ['WorkSidebar:showTree', 'Workbench:pasteInEditor', 'IndexedDB:updateGlobalCache', 'Workbench:getWorksLangList', 'IndexedDB:getTree', 'IndexedDB:appendTree'],
+  //dispatchs: ['WorkSidebar:showTree', 'IndexedDB:updateGlobalCache', 'Workbench:getWorksLangList'],
   data: {},
   methods: {
     getAllLoadedFunction() {

@@ -95,13 +95,14 @@
 
       <!-- right -->
       <div class="assets-index-b-r" v-if="cardTabs.length">
-        <template v-for="model in cardTabs">
+        <Scroll :on-reach-bottom="handleReachBottom" height="100vh">
           <tab-card
+            v-for="model in cardTabs"
             :model="model"
             :key="model.guid"
             @on-choose="onChooseCard"
           ></tab-card>
-        </template>
+        </Scroll>
       </div>
       <div class="assets-index-b-r" v-else>
         <div style="text-align: center; margin-top:50px; font-weight: bolder;">暂无数据</div>
@@ -175,9 +176,10 @@ export default {
   mounted() {
     let _this = this;
     this.throttleLoad = throttle(() => {
+      console.log('scroll')
       _this.scrollHander();
     }, 300);
-    window.addEventListener("scroll", this.throttleLoad);
+    window.addEventListener("scroll", this.throttleLoad, false);
     getThemedomains().then(res => {
       let { result } = res;
       this.subjectList = result;
@@ -315,7 +317,8 @@ export default {
         } else {
           clientHeight = Math.max(
             document.body.clientHeight,
-            document.documentElement.clientHeight
+            document.documentElement.clientHeight,
+            document.querySelector('.layout').clientHeight
           );
         }
         return clientHeight;
@@ -326,7 +329,11 @@ export default {
           document.documentElement.scrollHeight
         );
       };
-      if (getScrollTop() + getClientHeight() === getScrollHeight()) {
+      let st = getScrollTop();
+      let ch = getClientHeight();
+      let sh = getScrollHeight();
+      console.log(st,ch,sh)
+      if (st + ch + 54 >= sh) {
         // 拉数据
         this.handleReachBottom();
       }

@@ -123,7 +123,7 @@
             <Icon
               type="md-checkmark"
               v-else
-              @click="changeClassifications"
+              @click.once="changeClassifications"
               style="position: absolute; right:0; top: -15px;cursor: pointer;"
             ></Icon>
             <label>分层</label>
@@ -149,8 +149,7 @@
 
       <div class="assets-info-b-r">
         <Tabs type="card" class="assets-tabs" v-model="curTab">
-          <TabPane label="字段信息"
-                   name="info"
+          <TabPane label="字段信息" name="info"
             ><field-info
               :fieldInfo="fieldInfo"
               :rangeFieldInfo="rangeFieldInfo"
@@ -194,8 +193,8 @@ import {
   getLayersAll,
   updateClassifications
 } from "../../service/api";
-import util from '@/common/util'
-import { EventBus } from "../../module/common/eventBus/event-bus"
+import util from "@/common/util";
+import { EventBus } from "../../module/common/eventBus/event-bus";
 
 export default {
   name: "assetsInfo",
@@ -227,7 +226,7 @@ export default {
       layerList: [],
       isChangingClassifications: false,
       editable: false,
-      curTab: 'info'
+      curTab: "info"
     };
   },
   watch: {
@@ -248,21 +247,21 @@ export default {
       this.layerList = result;
     });
 
-    util.Hub.$on('register_click_hive_table', data => {
-      this.$nextTick(()=> {
-        $(`#${data.guid}`).on('click', () => {
-          this.curTab = 'info'
+    util.Hub.$on("register_click_hive_table", data => {
+      this.$nextTick(() => {
+        $(`#${data.guid}`).on("click", () => {
+          this.curTab = "info";
           EventBus.$emit("on-choose-card", data);
           const workspaceId = this.$route.query.workspaceId,
-            guid = data.guid
+            guid = data.guid;
           this.$router.push({
             name: "dataGovernance/assets/info",
             params: { guid },
             query: { workspaceId }
           });
-        })
-      })
-    })
+        });
+      });
+    });
   },
   methods: {
     init() {
@@ -305,22 +304,22 @@ export default {
               classifications
             } = data.result;
             if (parseInt(basic.store)) {
-              let tempLen = Math.floor(basic.store.length / 4)
-              let len = tempLen > 2 ? 3 : tempLen
-              basic.store = (basic.store /  Math.pow(1024, len + 1)).toFixed(2)
-              switch(len){
+              let tempLen = Math.floor(basic.store.length / 4);
+              let len = tempLen > 2 ? 3 : tempLen;
+              basic.store = (basic.store / Math.pow(1024, len + 1)).toFixed(2);
+              switch (len) {
                 case 0:
-                  basic.store = basic.store + 'KB'
-                  break
+                  basic.store = basic.store + "KB";
+                  break;
                 case 1:
-                  basic.store = basic.store + 'MB'
-                  break
+                  basic.store = basic.store + "MB";
+                  break;
                 case 2:
-                  basic.store = basic.store + 'GB'
-                  break
+                  basic.store = basic.store + "GB";
+                  break;
                 default:
-                  basic.store = basic.store + 'TB'
-                  break
+                  basic.store = basic.store + "TB";
+                  break;
               }
             }
             this.basicData = basic;
@@ -364,6 +363,28 @@ export default {
         .then(data => {
           if (data.result) {
             this.rangeInfo = data.result;
+            this.rangeInfo.forEach(item => {
+              item.store = item.store + "";
+              let tempLen = Math.floor(item.store.length / 4);
+              let len = tempLen > 2 ? 3 : tempLen;
+              item.store = (
+                item.store / Math.pow(1024, len + 1)
+              ).toFixed(2);
+              switch (len) {
+                case 0:
+                  item.store = item.store + "KB";
+                  break;
+                case 1:
+                  item.store = item.store + "MB";
+                  break;
+                case 2:
+                  item.store = item.store + "GB";
+                  break;
+                default:
+                  item.store = item.store + "TB";
+                  break;
+              }
+            });
           }
         })
         .catch(err => {

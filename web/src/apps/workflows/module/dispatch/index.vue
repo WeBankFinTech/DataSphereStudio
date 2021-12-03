@@ -923,7 +923,8 @@ export default {
       startData: {},
       timingData: {
         item: {},
-        type: ''
+        type: '',
+        id: ''
       },
       pagination: {
         size: 10,
@@ -1142,6 +1143,7 @@ export default {
         tempData.type = 'timing'
         id = this.list[index].id
       }
+      this.timingData.id = id
       this.getReceiver(id, (res) => {
         this.timingData.item = {
           ...tempData.item,
@@ -1278,7 +1280,8 @@ export default {
     closeRun() {
       this.showRunTaskModal = false
     },
-    setTiming() {
+    setTiming(id) {
+      this.schedulerId = id
       this.showTimingTaskModal = false
       this.activeList(3)
     },

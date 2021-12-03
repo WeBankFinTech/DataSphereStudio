@@ -41,7 +41,7 @@
           <div class="assets-info-b-l-content-item">
             <label for="comment">描述</label>
             <span v-show="!isCommentEdit">{{ basicData.comment }}</span>
-            <Input
+            <!-- <Input
               v-show="isCommentEdit"
               v-model="basicData.comment"
               size="small"
@@ -59,7 +59,7 @@
               v-else
               @click="editSingleComment"
               style="float:right;cursor: pointer;"
-            ></Icon>
+            ></Icon> -->
           </div>
           <div class="assets-info-b-l-content-item" style="overflow: hidden">
             <label for="labels">标签</label>
@@ -77,10 +77,17 @@
               <Input
                 v-show="isLabelEdit"
                 v-model="singleLabel"
+                style="width: 135px;"
                 size="small"
                 placeholder=""
                 @on-enter="editSingleLabel"
               />
+              <Icon
+                type="md-checkmark"
+                v-show="isLabelEdit"
+                @click="editSingleLabel"
+                style="margin-left: 8px; cursor: pointer;"
+              ></Icon>
               <span
                 v-for="label in labelOptions"
                 :key="label"
@@ -163,7 +170,7 @@
             <div class="dagreLayout-page" v-if="lineageData">
               <lineage
                 class="flow-canvas"
-                id="dag-canvas"
+                id='dag-canvas'
                 :lineageData="lineageData"
               ></lineage>
             </div>
@@ -367,9 +374,7 @@ export default {
               item.store = item.store + "";
               let tempLen = Math.floor(item.store.length / 4);
               let len = tempLen > 2 ? 3 : tempLen;
-              item.store = (
-                item.store / Math.pow(1024, len + 1)
-              ).toFixed(2);
+              item.store = (item.store / Math.pow(1024, len + 1)).toFixed(2);
               switch (len) {
                 case 0:
                   item.store = item.store + "KB";

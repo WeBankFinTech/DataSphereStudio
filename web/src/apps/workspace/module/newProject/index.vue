@@ -255,7 +255,6 @@ export default {
             setVirtualRoles(item, this.getUserName());
           });
           this.dataList[0].dwsProjectList = res.projects;
-
           this.cacheData = this.dataList;
           this.dataList.forEach(item => {
             this.sortType[item.id] = this.$t(

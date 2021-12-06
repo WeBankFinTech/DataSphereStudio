@@ -38,6 +38,7 @@
         </div>
         <Tree
           class="tree-container"
+          ref="projectTree"
           :nodes="projectsTree"
           :load="getFlow"
           :currentTreeId="currentTreeId"
@@ -51,6 +52,12 @@
           @on-move-flow="onMoveFlow"
           @on-view-version="onViewVersion"
         />
+        <div class="project-nav-tree-bottom">
+          <div class="project-nav-add" @click.stop="createProject">
+            <Icon type="md-add" />
+            <span style="margin-left: 8px">添加项目</span>
+          </div>
+        </div>
         <Spin v-show="loadingTree" size="large" fix />
       </div>
       <WorkflowModal
@@ -84,9 +91,15 @@
       @menuHandleChangeButton="menuHandleChangeButton"
     >
       <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
+        <!-- 空项目 -->
+        <VoidPage
+          v-show="projectsTree.length === 0"
+          tipTitle="你还没有项目，请先添加一个项目"
+          :buttonClick="createProject"
+        />
         <div
           class="workflowListContainer"
-          v-show="textColor || tabList.length < 1"
+          v-show="textColor || (tabList.length < 1 && projectsTree.length > 0)"
         >
           <Workflow
             class="workflowListLeft"
@@ -111,6 +124,7 @@
             </Tabs>
           </Workflow>
         </div>
+
         <template
           v-for="(item, index) in tabList.filter(
             i => i.type === DEVPROCESS.DEVELOPMENTCENTER
@@ -162,10 +176,11 @@
     </WorkflowTabList>
     <ProjectForm
       ref="projectForm"
-      action-type="modify"
+      :action-type="actionType"
       :project-data="currentProjectData"
       :add-project-show="ProjectShow"
       :applicationAreaMap="applicationAreaMap"
+      :classify-list="cacheData"
       :framework="true"
       :orchestratorModeList="orchestratorModeList"
       @getDevProcessData="getDevProcessData"
@@ -201,6 +216,7 @@ import Tree from "@/apps/workflows/module/common/workflowTree/tree.vue";
 import WorkflowTabList from "@/apps/workflows/module/common/tabList/index.vue";
 import MakeUp from "@/apps/workflows/module/makeUp";
 import ProjectForm from "@/components/projectForm/index.js";
+import VoidPage from "../../module/common/voidPage/index.vue";
 import api from "@/common/service/api";
 import { DEVPROCESS, ORCHESTRATORMODES } from "@/common/config/const.js";
 import {
@@ -220,7 +236,8 @@ export default {
     WorkflowTabList,
     makeUp: MakeUp.component,
     ProjectForm,
-    DS
+    DS,
+    VoidPage
   },
   data() {
     return {
@@ -266,7 +283,16 @@ export default {
       currentTreeProject: null, // 点击哪个project的添加
       refreshFlow: false, // 左侧树添加工作流后通知右侧刷新
       deleteProjectShow: false, // 删除工程弹窗展示
-      deleteProjectItem: "" // 删除的工程项
+      deleteProjectItem: "", // 删除的工程项
+      actionType: "", // add || modify
+      dataList: [
+        {
+          id: 1,
+          name: this.$t("message.workflow.projectDetail.WCYDXM"),
+          dwsProjectList: []
+        }
+      ],
+      cacheData: []
     };
   },
   watch: {
@@ -300,7 +326,7 @@ export default {
       this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
     }
     // 获取所有project展示tree
-    this.getAllProjects();
+    this.getAllProjects(this.initClick);
   },
   mounted() {
     // this.getCache();
@@ -313,9 +339,51 @@ export default {
     },
     isScheduler() {
       return this.$route.name === "Scheduler";
-    }
+    },
   },
   methods: {
+    initClick() {
+      if( this.projectsTree.length > 0 ) {
+        const cur = this.projectsTree[0];
+        this.getFlow(cur, (flow) => {
+          if( flow.length > 0 ) {
+            const cur_node = flow[0]
+            this.handleTreeClick(cur_node)
+            this.$refs.projectTree.handleItemToggle(cur)
+          } else {
+            this.handleTreeClick(cur)
+          }
+        })
+      }
+    },
+    createProject() {
+      this.actionType = "add";
+      this.ProjectShow = true;
+      this.currentProjectData = {
+        name: "",
+        description: "",
+        business: "",
+        applicationArea: "",
+        product: "",
+        editUsers: [],
+        accessUsers: [],
+        devProcessList: [],
+        releaseUsers: []
+      };
+      this.orchestratorModeList = {
+        list: this.orchestratorModeList.list.map(i => {
+          if (i.dicKey == "pom_work_flow") {
+            // 编排模式暂时只支持工作流
+            return {
+              ...i,
+              enabled: true
+            };
+          } else {
+            return i;
+          }
+        })
+      };
+    },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
     },
@@ -382,7 +450,7 @@ export default {
         });
     },
     // 获取所有project展示tree
-    getAllProjects() {
+    getAllProjects(callback) {
       this.loadingTree = true;
       api
         .fetch(
@@ -426,6 +494,7 @@ export default {
               };
             });
           }
+          callback()
         });
     },
     // 获取project下工作流
@@ -592,6 +661,7 @@ export default {
       this.deleteProjectItem = project;
     },
     onConfigProject(project) {
+      this.actionType = "modify";
       this.menuHandleChangeButton();
     },
     // 刪除單個項目
@@ -627,7 +697,9 @@ export default {
                         "message.workflow.success"
                       )}`
                     );
-                    this.$router.go(0);
+                    setTimeout(() => {
+                      this.$router.go(0);
+                    }, 1000);
                   })
                   .catch(() => {
                     this.loading = false;
@@ -641,7 +713,9 @@ export default {
                 name: this.deleteProjectItem.name
               })
             );
-            this.$router.go(0);
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
           }
         })
         .catch(() => {
@@ -726,40 +800,92 @@ export default {
       this.getSelectOrchestratorList();
       projectData.workspaceId = +this.$route.query.workspaceId;
       this.loading = true;
-      const projectParams = {
-        name: projectData.name,
-        id: projectData.id,
-        applicationArea: projectData.applicationArea,
-        business: projectData.business,
-        editUsers: projectData.editUsers,
-        accessUsers: projectData.accessUsers,
-        releaseUsers: projectData.releaseUsers,
-        description: projectData.description,
-        product: projectData.product,
-        workspaceId: projectData.workspaceId,
-        devProcessList: projectData.devProcessList,
-        orchestratorModeList: projectData.orchestratorModeList
-      };
-      api
-        .fetch(
-          `${this.$API_PATH.PROJECT_PATH}modifyProject`,
-          projectParams,
-          "post"
-        )
-        .then(() => {
-          typeof callback == "function" && callback();
-          this.getProjectData();
-          this.$Message.success(
-            this.$t("message.workflow.projectDetail.eidtorProjectSuccess", {
-              name: projectData.name
-            })
-          );
-        })
-        .catch(() => {
-          typeof callback == "function" && callback();
-          this.loading = false;
-          this.currentProjectData.business = this.$refs.projectForm.originBusiness;
-        });
+      if (this.actionType === "add") {
+        const project_params = {
+          name: projectData.name,
+          applicationArea: projectData.applicationArea,
+          business: projectData.business,
+          editUsers: projectData.editUsers,
+          accessUsers: projectData.accessUsers,
+          releaseUsers: projectData.releaseUsers,
+          description: projectData.description,
+          product: projectData.product,
+          workspaceId: projectData.workspaceId,
+          devProcessList: projectData.devProcessList,
+          orchestratorModeList: projectData.orchestratorModeList
+        };
+        api
+          .fetch(
+            `${this.$API_PATH.PROJECT_PATH}createProject`,
+            project_params,
+            "post"
+          )
+          .then(() => {
+            typeof callback == "function" && callback();
+            this.$Message.success(
+              `${this.$t(
+                "message.workflow.projectDetail.createProject"
+              )}${this.$t("message.workflow.success")}`
+            );
+            setTimeout(() => {
+              this.$router.go(0);
+            }, 1000);
+            // this.getclassListData().then(data => {
+            //   // 新建完工程进到工作流页
+            //   const currentProject = data[0].dwsProjectList.filter(
+            //     project => project.name === projectData.name
+            //   )[0];
+            //   this.$router.push({
+            //     name: "Workflow",
+            //     query: {
+            //       ...this.$route.query,
+            //       projectID: currentProject.id,
+            //       projectName: currentProject.name,
+            //       notPublish: currentProject.notPublish
+            //     }
+            //   });
+            // });
+          })
+          .catch(() => {
+            typeof callback == "function" && callback();
+            this.loading = false;
+          });
+      } else {
+        const projectParams = {
+          name: projectData.name,
+          id: projectData.id,
+          applicationArea: projectData.applicationArea,
+          business: projectData.business,
+          editUsers: projectData.editUsers,
+          accessUsers: projectData.accessUsers,
+          releaseUsers: projectData.releaseUsers,
+          description: projectData.description,
+          product: projectData.product,
+          workspaceId: projectData.workspaceId,
+          devProcessList: projectData.devProcessList,
+          orchestratorModeList: projectData.orchestratorModeList
+        };
+        api
+          .fetch(
+            `${this.$API_PATH.PROJECT_PATH}modifyProject`,
+            projectParams,
+            "post"
+          )
+          .then(() => {
+            typeof callback == "function" && callback();
+            this.getProjectData();
+            this.$Message.success(
+              this.$t("message.workflow.projectDetail.eidtorProjectSuccess", {
+                name: projectData.name
+              })
+            );
+          })
+          .catch(() => {
+            typeof callback == "function" && callback();
+            this.loading = false;
+            this.currentProjectData.business = this.$refs.projectForm.originBusiness;
+          });
+      }
     },
     ProjectShowAction(val) {
       this.ProjectShow = val;
@@ -1027,6 +1153,34 @@ export default {
           i.tabId !==
           String(params.orchestratorId) + params.orchestratorVersionId
       );
+    },
+    getclassListData() {
+      this.loading = true;
+      return api
+        .fetch(
+          `${this.$API_PATH.PROJECT_PATH}getAllProjects`,
+          { workspaceId: +this.$route.query.workspaceId },
+          "post"
+        )
+        .then(res => {
+          res.projects.map((item, index) => {
+            setVirtualRoles(item, this.getUserName());
+          });
+          this.dataList[0].dwsProjectList = res.projects;
+          this.cacheData = this.dataList;
+          this.dataList.forEach(item => {
+            this.sortType[item.id] = this.$t(
+              "message.workflow.projectDetail.updteTime"
+            );
+          });
+          this.loading = false;
+
+          storage.set("projectList", this.cacheData, "local");
+          return this.cacheData;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     }
   }
 };

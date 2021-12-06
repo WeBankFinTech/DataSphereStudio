@@ -1,7 +1,7 @@
 <template>
   <div class="page-bgc">
-    <div v-if="!dataMapModule">
-      <template v-if="dataList.length > 0">
+    <div v-if="!dataMapModule" style="width: 100%; height: 100%">
+      <template v-if="dataList[0]['dwsFlowList'] && dataList[0]['dwsFlowList'].length > 0">
         <project-content-item
           ref="projectConentItem"
           v-for="item in dataList"
@@ -62,8 +62,15 @@
           <slot name="tagList"></slot>
         </project-content-item>
       </template>
+
       <template v-else>
-        <div class="no-data">
+        <VoidPage
+            tipTitle="该项目下没有工作流，请先添加一个工作流"
+            :buttonClick="ProjectMergeAdd"
+          />
+      </template>
+
+        <div class="no-data" v-show="dataList.length <= 0">
           <img
             class="no-data-img"
             src="../../../../dss/assets/images/no-data.svg"
@@ -71,7 +78,7 @@
           />
           <div>{{ $t("message.workflow.searchWorkflow") }}</div>
         </div>
-      </template>
+
     </div>
     <div class="process-bar" v-else>
       <dataMap
@@ -168,6 +175,7 @@ import commonModule from "@/apps/workflows/module/common";
 import WorkflowForm from "./module/workflowForm.vue";
 import WorkflowFormNew from "./module/workflowFormNew.vue";
 import VersionDetail from "./module/versionDetail.vue";
+import VoidPage from '../common/voidPage/index.vue'
 import storage from "@/common/helper/storage";
 import api from "@/common/service/api";
 import pinyin from "pinyin";
@@ -204,7 +212,8 @@ export default {
     WorkflowFormNew,
     VersionDetail,
     dataMap,
-    publishComponent
+    publishComponent,
+    VoidPage
   },
   data() {
     return {

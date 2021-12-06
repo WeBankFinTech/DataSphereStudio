@@ -8,7 +8,8 @@ var pool = mysql.createPool({
   host: config[env].database.HOST,
   user: config[env].database.USERNAME,
   password: config[env].database.PASSWORD,
-  database: config[env].database.DATABASE
+  database: config[env].database.DATABASE,
+  port: config[env].database.PORT
 });
 
 class Mysql {

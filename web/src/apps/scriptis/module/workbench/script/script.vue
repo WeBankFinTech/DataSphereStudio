@@ -1439,7 +1439,7 @@ export default {
         width: 100%;
         height: 6px;
         left: 0;
-        bottom: -2px;
+        bottom: -6px;
         z-index: 3;
         border-bottom: 1px solid #dcdee2;
         @include border-color($border-color-base, $dark-base-color);
@@ -1461,7 +1461,7 @@ export default {
     }
   }
   .log-panel {
-    margin-top: 1px;
+    margin-top: 6px;
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);

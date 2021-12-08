@@ -58,13 +58,16 @@
             <Icon :type="(containerInstance && containerInstance.isTopPanelFull)?'md-contract':'md-expand'" />
             <span class="navbar-item-name">{{ (containerInstance && containerInstance.isTopPanelFull) ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}</span>
           </div>
+          <!--apiPublish隐藏-->
+          <!-- 
           <api-publish
             v-if="isApiPublish && showScriptsType && work.filepath"
             :script="script"
             :work="work"
             :script-type="scriptType"
             @on-save="save">
-          </api-publish>
+          </api-publish> 
+          -->
         </div>
       </div>
     </div>
@@ -95,13 +98,11 @@
 import setting from './setting.vue';
 import api from '@/common/service/api';
 import storage from '@/common/helper/storage';
-import apiPublish from '@/apps/scriptis/components/apiPublish'
 import { throttle } from 'lodash';
 import elementResizeEvent from '@/common/helper/elementResizeEvent';
 export default {
   components: {
     setting,
-    apiPublish,
   },
   inject: {
     containerInstance: {

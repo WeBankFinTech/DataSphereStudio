@@ -114,10 +114,10 @@ export default {
 
       const removeAction = () => {
         if (that.currentTab.guid === modal.guid) {
-          const { guid } = that.currentTab;
           const workspaceId = that.$route.query.workspaceId;
           if (len > 1 && idx < len - 1) {
             that.currentTab = topTapList[idx + 1];
+            let guid = that.currentTab.guid;
             that.$router.push({
               name: "dataGovernance/assets/info",
               params: { guid },
@@ -125,6 +125,7 @@ export default {
             });
           } else if (len > 1 && idx == len - 1) {
             that.currentTab = topTapList[idx - 1];
+            let guid = that.currentTab.guid;
             that.$router.push({
               name: "dataGovernance/assets/info",
               params: { guid },

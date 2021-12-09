@@ -43,7 +43,7 @@ export default {
             { id: 12, name: "数据资产目录", pathName: "dataGovernance/assets" }
           ]
         },
-        {
+        /*{
           id: 2,
           name: "元数据管理",
           children: [{ id: 21, name: "元数据采集" }]
@@ -52,7 +52,7 @@ export default {
           id: 3,
           name: "数据权限",
           children: [{ id: 31, name: "数据权限管理" }]
-        },
+        },*/
         {
           id: 4,
           name: "数仓规划",
@@ -65,8 +65,8 @@ export default {
             { id: 42, name: "分层配置", pathName: "dataGovernance/layered" }
           ]
         },
-        { id: 5, name: "数据质量", children: [] },
-        { id: 6, name: "数据安全", children: [] }
+        /*{ id: 5, name: "数据质量", children: [] },
+        { id: 6, name: "数据安全", children: [] }*/
       ],
       currentTreeId: 1,
       title: this.$t("message.dataGovernance.dataOverview")

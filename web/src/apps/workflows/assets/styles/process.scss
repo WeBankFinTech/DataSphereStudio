@@ -46,7 +46,7 @@
 .process-tabs {
     position: $relative;
     height: calc(100%);
-    overflow: hidden;
+    //overflow: hidden;
     &.no-tab{
         .process-tab{
             display: none;

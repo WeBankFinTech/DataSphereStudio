@@ -104,11 +104,16 @@ export default {
   data() {
     const validateName = (rule, value, callback) => {
       if (value) {
-        const valid = /\ /.test(value);
-        if (!valid) {
+        const invalid = /\ /.test(value) || !(/^[a-z|A-Z]/.test(value))
+        if (value.length > 30) {
+          this.formState.name = value.substring(0, 30)
+          callback(new Error('最多30字'))
+          return
+        }
+        if (!invalid) {
           callback();
         } else {
-          callback(new Error('不能包含空格'));
+          callback(new Error('不能包含空格,且必须以字母开头'))
         }
       } else {
         callback(new Error('不能为空'));

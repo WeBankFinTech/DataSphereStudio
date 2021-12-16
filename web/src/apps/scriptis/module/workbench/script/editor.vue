@@ -139,8 +139,8 @@ export default {
       return this.script.running;
     },
     isHdfs() {
-      return false;
-      // return this.work.filepath.indexOf('hdfs') === 0;
+      return false
+      //return this.work.filepath.indexOf('hdfs') === 0;
     },
     isSupport() {
       return this.script.executable;

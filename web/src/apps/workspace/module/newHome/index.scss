@@ -12,12 +12,10 @@
 
   .newHome_header {
     flex: none;
-
     .newHome_info {
       h1 {
         font-size: 21px;
       }
-
       p {
         font-size: $font-size-base;
         margin: 12px 0 24px;
@@ -34,7 +32,6 @@
     min-width: 900px;
     height: 700px;
     padding-bottom: 20px;
-
     .newHome_main_left {
       flex: 1;
       height: 100%;
@@ -50,14 +47,11 @@
       // background: #ffffff;
       @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
       @include border-color($border-color-base, $dark-border-color-base);
-
-
       .newHome_title_search {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
-
         .left_header {
           flex: none;
           font-size: $font-size-large;
@@ -68,20 +62,18 @@
           border-left: 3px solid $primary-color;
           @include border-color($primary-color, $dark-primary-color);
         }
-
         .left_search {
           flex: none;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          
           .header-search {
             flex: 50%;
             /deep/.ivu-input {
               @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
               @include border-color($border-color-base, $dark-border-color-base);
             }
-            
+
           }
         }
 
@@ -96,14 +88,12 @@
           }
         }
       }
-
       .newHome_list {
         .card-content {
           display: flex;
           justify-content: flex-start;
           flex-wrap: wrap;
         }
-
         .newHome_create {
           cursor: pointer;
           min-width: 320px;
@@ -120,19 +110,16 @@
           align-items: center;
           justify-content: center;
           margin-right: 25px;
-
           &:hover {
             box-shadow: 0 2px 12px 0 $shadow-color;
             border-radius: $border-radius-small;
           }
-
           .newHome_create_content {
             flex: none;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-right: 1rem;
-
             .newHome_create_text {
               margin-left: 10px;
               cursor: pointer;
@@ -141,7 +128,6 @@
             }
           }
         }
-
         .newHome_list_item {
           cursor: pointer;
           min-width: 320px;
@@ -161,23 +147,19 @@
           :last-child {
             margin-right: 0;
           }
-
           &:hover {
             box-shadow: 0 2px 12px 0 $shadow-color;
             border-radius: $border-radius-small;
           }
-
           .management-button {
             position: absolute;
             top: 5px;
             right: 10px;
           }
-
           .item-header {
             display: flex;
             justify-content: flex-start;
             align-items: flex-start;
-
             .name {
               flex: 1;
               max-width: 172px;
@@ -218,7 +200,6 @@
             justify-content: flex-start;
             align-items: flex-start;
             width: 100%;
-
             .item {
               display: inline-block;
               font-size: 10px;
@@ -242,14 +223,12 @@
             bottom: 10px;
           }
         }
-
         .page {
           display: flex;
           justify-content: flex-end;
         }
       }
     }
-
     .newHome_main_right {
       flex: 0;
       margin-left: 25px;
@@ -294,13 +273,11 @@
         border-left: 3px solid $primary-color;
         @include border-color($primary-color, $dark-primary-color);
       }
-
       .video-title {
         padding: 5px 0;
         text-align: center;
         font-size: 12px;
       }
-
       .video-item {
         // background: #f2f2f2;
         @include bg-color($workspace-background, $dark-workspace-background);

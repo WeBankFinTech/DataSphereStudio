@@ -106,7 +106,6 @@ import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
 import eventbus from '@/common/helper/eventbus';
 import DS from '@/apps/workflows/module/dispatch'
-
 export default {
   components: {
     Process,

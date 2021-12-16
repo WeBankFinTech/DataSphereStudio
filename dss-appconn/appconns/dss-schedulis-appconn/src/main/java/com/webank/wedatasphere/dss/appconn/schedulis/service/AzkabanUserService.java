@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

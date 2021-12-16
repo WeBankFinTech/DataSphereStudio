@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.conf
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars
+import org.apache.linkis.common.conf.CommonVars
 
 object AppConnLoaderConf {
   val CLASS_LOADER_CLASS_NAME = CommonVars("dss.appconn.loader.classname", "")

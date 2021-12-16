@@ -8,7 +8,7 @@ import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.ws.rs.*;
@@ -27,18 +27,16 @@ import java.util.List;
 //@RestController
 //@RequestMapping("/dss/framework/admin/dept")
 
-@Component
-@Path("/dss/framework/admin/dept")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+
+@RequestMapping(path = "/dss/framework/admin/dept", produces = {"application/json"})
+@RestController
 public class DssFrameworkAdminDeptController {
     @Resource
     private DssAdminDeptService dssAdminDeptService;
 
 
-    @GET
-    @Path("/list")
-    public Message listAll(@QueryParam("parentId") Long parentId, @QueryParam("deptName") String deptName) {
+    @RequestMapping(path ="list", method = RequestMethod.GET)
+    public Message listAll(@RequestParam(value = "parentId",required = false) Long parentId, @RequestParam(value = "deptName",required = false) String deptName) {
 
         DssAdminDept dept=new DssAdminDept();
         dept.setParentId(parentId);
@@ -47,7 +45,7 @@ public class DssFrameworkAdminDeptController {
         return Message.ok().data("deptList", list).message("成功");
     }
 
-    @POST
+    @RequestMapping( method = RequestMethod.POST)
     public Message add(@RequestBody DssAdminDept dssAdminDept) {
 
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dssAdminDept))) {
@@ -71,25 +69,21 @@ public class DssFrameworkAdminDeptController {
     /**
      * 获取部门下拉树列表
      */
-//    @GetMapping("/treeselect")
-    @GET
-    @Path("/treeselect")
+    @RequestMapping(path ="treeselect", method = RequestMethod.GET)
     public Message treeselect(DssAdminDept dept) {
         List<DssAdminDept> depts = dssAdminDeptService.selectDeptList(dept);
         return Message.ok().data("deptTree", dssAdminDeptService.buildDeptTreeSelect(depts)).message("树形部门获取成功");
     }
 
+    
 
-    //    @GetMapping(value = "/{deptId}")
-    @GET
-    @Path("/{deptId}")
-    public Message getInfo(@PathParam("deptId") Long deptId) {
+    @RequestMapping(path ="{deptId}", method = RequestMethod.GET)
+    public Message getInfo(@PathVariable("deptId") Long deptId) {
         return Message.ok().data("deptInfo", dssAdminDeptService.selectDeptById(deptId));
     }
 
-    //    @PostMapping("/edit")
-    @POST
-    @Path("/edit")
+
+    @RequestMapping(path ="edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminDept dept) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dept))) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
@@ -108,9 +102,9 @@ public class DssFrameworkAdminDeptController {
     /**
      * 删除部门
      */
-    @POST
-    @Path("/{deptId}")
-    public Message remove(@PathParam("deptId") Long deptId) {
+
+    @RequestMapping(path ="{deptId}", method = RequestMethod.POST)
+    public Message remove(@PathVariable("deptId") Long deptId) {
         if (dssAdminDeptService.hasChildById(deptId)) {
             return Message.error().message("存在下级部门,不允许删除");
         }

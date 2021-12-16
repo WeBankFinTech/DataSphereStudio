@@ -27,8 +27,8 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecuti
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef
-import com.webank.wedatasphere.linkis.common.exception.ErrorException
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.common.exception.ErrorException
+import org.apache.linkis.common.utils.{Logging, Utils}
 import org.springframework.mail.javamail.JavaMailSender
 
 import scala.collection.JavaConversions._

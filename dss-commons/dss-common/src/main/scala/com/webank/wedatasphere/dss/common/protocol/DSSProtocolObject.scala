@@ -18,13 +18,6 @@ package com.webank.wedatasphere.dss.common.protocol
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel
 
-
-/**
- * Created by v_wbjftang on 2019/11/8.
- */
-
-
-
 case class ResponseCreateOrchestrator(orchestratorId: Long,
                                       orchestratorVersionId: Long)
 

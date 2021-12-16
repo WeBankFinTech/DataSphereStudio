@@ -224,7 +224,11 @@ Execute.prototype.execute = function() {
 
 Execute.prototype.httpExecute = function() {
   this.trigger('execute');
-  const method = this.data.method.slice(this.data.method.indexOf('entrance'), this.data.method.length);
+  const model = this.data.method.slice(this.data.method.lastIndexOf('/') + 1, this.data.method.length);
+  let method = this.data.method;
+  if (model !== 'backgroundservice') {
+    method = this.data.method.slice(this.data.method.indexOf('entrance'), this.data.method.length);
+  }
   api.fetch(method, this.data.data)
     .then((ret) => {
       deconstructExecute(this, ret);
@@ -276,12 +280,19 @@ Execute.prototype.queryProgress = function() {
 };
 
 Execute.prototype.queryLog = function() {
+  const fromLine = this.fromLine
   return api.fetch(`/entrance/${this.id}/log`, {
-    fromLine: this.fromLine,
+    fromLine,
     size: -1,
   }, 'get')
     .then((rst) => {
       this.fromLine = rst.fromLine;
+      this.handleLines = this.handleLines || {}
+      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
+        return  Promise.resolve();
+      } else if(this.fromLine) {
+        this.handleLines[fromLine+'_'+this.fromLine] = 1
+      }
       this.trigger('log', rst.log);
       return Promise.resolve();
     }).catch(() => {
@@ -351,6 +362,10 @@ Execute.prototype.getResultList = function() {
       msg: i18n.t('message.common.execute.error.getResultList'),
       autoJoin: true,
     });
+    const log = '**result tips: empty!';
+    this.trigger('log', log);
+    this.trigger('steps', 'Completed');
+    this.run = false;
   }
 };
 

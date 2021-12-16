@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 /**
  * The interface Dolphin scheduler conf.

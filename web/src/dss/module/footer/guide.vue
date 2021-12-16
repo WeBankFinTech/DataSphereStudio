@@ -13,10 +13,10 @@
           <div class="guide-box-title">{{guide.title}}</div>
           <div class="guide-box-desc">{{guide.desc}}</div>
           <div class="guide-steps">
-            <div class="step" :class="{'step-expand': step.expand}" v-for="step in guide.steps" :key="step.seq">
+            <div class="step" :class="{'step-expand': step.expand}" v-for="step in guide.steps" :key="step.title">
               <div class="step-head" @click="toggleStep(step)">
                 <span class="step-seq">{{step.seq}}</span>
-                <span class="step-divider"></span>
+                <span class="step-divider" v-if="step.seq"></span>
                 <span class="step-title">{{step.title}}</span>
                 <span class="step-arrow">
                   <SvgIcon icon-class="close" v-if="step.expand" />
@@ -245,7 +245,7 @@ export default {
               .step-divider {
                 display: block;
                 margin: 0 20px;
-                width: 1px; 
+                width: 1px;
                 height: 16px;
                 @include bg-color(#979797, #4B576E);
               }

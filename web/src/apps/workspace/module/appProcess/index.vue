@@ -122,6 +122,9 @@ export default {
         .link {
           margin-top: 15px;
         }
+        .title {
+          color:$primary-color;
+        }
       }
     }
     .icon-item {

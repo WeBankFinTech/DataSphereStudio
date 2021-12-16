@@ -22,12 +22,12 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
-import com.webank.wedatasphere.linkis.manager.label.constant.LabelKeyConstant;
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineTypeLabel;
-import com.webank.wedatasphere.linkis.manager.label.utils.EngineTypeLabelCreator;
-import com.webank.wedatasphere.linkis.protocol.utils.TaskUtils;
-import com.webank.wedatasphere.linkis.ujes.client.request.JobExecuteAction;
-import com.webank.wedatasphere.linkis.ujes.client.request.JobSubmitAction;
+import org.apache.linkis.manager.label.constant.LabelKeyConstant;
+import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
+import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
+import org.apache.linkis.protocol.utils.TaskUtils;
+import org.apache.linkis.ujes.client.request.JobExecuteAction;
+import org.apache.linkis.ujes.client.request.JobSubmitAction;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.model;
 
-import com.webank.wedatasphere.linkis.httpclient.request.GetAction;
-import com.webank.wedatasphere.linkis.httpclient.request.UserAction;
+import org.apache.linkis.httpclient.request.GetAction;
+import org.apache.linkis.httpclient.request.UserAction;
 
 public class VisualisGetAction extends GetAction implements UserAction {
 

@@ -8,7 +8,7 @@ if [ -n "$1" ]; then
       imageName="nm.hub.com/luban/${line}:$1"
       echo "build image: ${imageName}"
 
-      docker build -t $imageName -f k8s/dockerfile/${line}.Dockerfile assembly/dss-package/target/out/dss-1.0.0
+      docker build -t $imageName -f k8s/dockerfile/${line}.Dockerfile assembly/dss-package/target/out/dss-1.0.1
       docker push ${imageName}
     }
   done

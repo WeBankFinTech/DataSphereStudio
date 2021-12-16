@@ -144,7 +144,7 @@ export default {
         return ['search', 'refresh']
       } else {
         // return ['search', 'newFile', 'refresh', 'export']
-        return ['search', 'refresh']
+        return ['search', 'newFile', 'refresh']
       }
     }
   },
@@ -839,6 +839,7 @@ export default {
   },
 
 };
+
 </script>
 <style src="@/apps/scriptis/assets/styles/sidebar.scss" lang="scss">
 </style>

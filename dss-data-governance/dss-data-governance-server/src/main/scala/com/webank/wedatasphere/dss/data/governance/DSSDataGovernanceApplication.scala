@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -19,8 +19,8 @@
 package com.webank.wedatasphere.dss.data.governance
 
 import com.webank.wedatasphere.dss.common.utils.DSSMainHelper
-import com.webank.wedatasphere.linkis.DataWorkCloudApplication
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.DataWorkCloudApplication
+import org.apache.linkis.common.utils.{Logging, Utils}
 
 
 object DSSDataGovernanceApplication extends Logging {

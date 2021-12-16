@@ -22,13 +22,13 @@ import java.util
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus,ResponseOperateOrchestrator}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
 import com.webank.wedatasphere.dss.workflow.common.protocol._
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam
-import com.webank.wedatasphere.linkis.rpc.{Receiver, Sender}
+import org.apache.linkis.rpc.{Receiver, Sender}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 

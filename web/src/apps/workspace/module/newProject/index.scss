@@ -25,16 +25,16 @@
    color: #FFF;
    text-align: center;
    cursor: pointer;
- 
+
    &:hover {
      font-weight: 600;
- 
+
      .icon-blod {
        font-weight: 600;
      }
    }
  }
- 
+
  .no-data-bgc {
    font-size: $font-size-base;
    position: absolute;
@@ -44,40 +44,40 @@
    flex-direction: column;
    align-items: center;
    justify-content: center;
- 
+
    .no-data-img {
      width: 200px;
      margin-top: 150px;
    }
- 
+
    .bg-text {
      width: 60%;
      text-align: left;
      display: block;
      line-height: 40px;
- 
+
      &.weight {
        margin-top: 10px;
        font-weight: bold;
      }
- 
+
      &.indent {
        text-indent: 2em;
      }
    }
  }
- 
+
  .icon-blod {
    margin-right: 2px;
  }
- 
+
  .page-bgc {
    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
    min-width: 500px;
- 
+
    .project-header {
      height: 32px;
- 
+
      .header-title {
        font-size: $font-size-large;
        font-weight: bold;
@@ -86,12 +86,12 @@
        @include border-color($primary-color, $dark-primary-color);
        @include font-color($workspace-title-color,$dark-workspace-title-color);
      }
- 
+
      .header-tool {
        float: right;
        @include font-color($primary-color, $dark-primary-color);
        cursor: pointer;
- 
+
        .sort-icon {
          font-size: 14px;
          margin-right: 20px;
@@ -101,7 +101,7 @@
            @include font-color($primary-color, $dark-primary-color);
          }
        }
- 
+
        .search-input {
          width: 200px;
          line-height: 100%;
@@ -109,14 +109,14 @@
      }
    }
  }
- 
+
  .radio-box .ivu-radio .ivu-radio-inner {
    border: 1px solid $primary-color;
  }
- 
+
  .create-item {
    text-align: center;
    cursor: pointer;
    line-height: 25px;
  }
- 
+

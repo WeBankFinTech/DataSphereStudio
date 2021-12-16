@@ -27,7 +27,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
-import com.webank.wedatasphere.linkis.rpc.{Receiver, Sender}
+import org.apache.linkis.rpc.{Receiver, Sender}
 
 import scala.concurrent.duration.Duration
 

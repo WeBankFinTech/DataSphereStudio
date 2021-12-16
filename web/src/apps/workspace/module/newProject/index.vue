@@ -178,7 +178,7 @@ export default {
   watch: {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
-      this.getclassListData();
+      this.getclassListData()
       // this.getFlowData();
     }
   },
@@ -233,7 +233,7 @@ export default {
           setVirtualRoles(item, this.getUserName())
         });
         this.dataList[0].dwsProjectList = res.projects;
-        
+
         this.cacheData = this.dataList;
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t('message.workflow.projectDetail.updteTime');
@@ -646,5 +646,6 @@ export default {
     },
   },
 };
+
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

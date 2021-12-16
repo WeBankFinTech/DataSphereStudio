@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-import com.webank.wedatasphere.linkis.manager.label.entity.Label;
+import org.apache.linkis.manager.label.entity.Label;
 import java.util.List;
 import java.util.Map;
 

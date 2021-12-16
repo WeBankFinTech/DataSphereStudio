@@ -4,7 +4,8 @@
     :title="actionType === 'add' ? $t('message.workflow.projectDetail.createProject') : $t('message.workflow.projectDetail.editorProject')"
     :closable="false">
     <Form
-      :label-width="80"
+      :label-width="100"
+      label-position="left"
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"
@@ -89,7 +90,6 @@
             :key="index"/>
         </luban-select>
       </FormItem>
-      
       <FormItem :label="$t('message.workflow.projectDetail.devProcess')" prop="devProcessList">
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
           <Checkbox v-for="item in devProcess" :label="item.dicValue" :key="item.dicKey">

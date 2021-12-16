@@ -274,7 +274,8 @@
       "modifyPwdSuccess": "修改密码成功！",
       "pwdCheckError": "以字母开头，必须含有大小写字母、数字和特殊字符，且8到26位",
       "pwdKeyboardError": "不能连续三位是键盘序，例如含有123,987,abc,cba,qwe,poi之类的字符"
-    
+
     }
   }
 }
+

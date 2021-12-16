@@ -39,6 +39,9 @@
  */
 import virtualList from '@/components/virtualList';
 import item from './item';
+
+let clickTimer = null;
+
 export default {
   name: 'VirtualTree',
   components: {
@@ -81,29 +84,26 @@ export default {
   },
   methods: {
     clickNode(index) {
-      let item = this.showData[index];
-      let now = Date.now();
-      // 双击
-      if (this.lastClick === item[this.keyText] && (now - this.lastClickTime || now) < 300) {
-        return
-      }
-      this.lastClickTime = Date.now();
-      this.lastClick = item[this.keyText];
-      let openNode = {...this.open}
-      if (!item.isLeaf) {
-        if (openNode[item[this.keyText]]) {
-          delete openNode[item[this.keyText]]
-        } else {
-          openNode[item[this.keyText]] = true
+      clearTimeout(clickTimer)
+      clickTimer = setTimeout(()=>{
+        let item = this.showData[index];
+        let openNode = {...this.open}
+        if (!item.isLeaf) {
+          if (openNode[item[this.keyText]]) {
+            delete openNode[item[this.keyText]]
+          } else {
+            openNode[item[this.keyText]] = true
+          }
+          this.$emit('we-open-node', openNode)
         }
-        this.$emit('we-open-node', openNode)
-      }
-      if (item.loaded) {
-        this.refresData(openNode)
-      }
-      this.$emit('we-click', {item})
+        if (item.loaded) {
+          this.refresData(openNode)
+        }
+        this.$emit('we-click', {item})
+      }, 300)
     },
     dbClickNode(index) {
+      clearTimeout(clickTimer)
       let item = this.showData[index];
       this.$emit('we-dblclick', {item})
     },

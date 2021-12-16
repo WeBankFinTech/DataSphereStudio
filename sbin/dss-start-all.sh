@@ -91,12 +91,12 @@ sleep 1
 
 
 function startDssProject(){
-  loadConfig  
+  loadConfig
 
 	SERVER_NAME=dss-framework-project-server
 	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
 	startApp		
-	
+
 	SERVER_NAME=dss-framework-orchestrator-server
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
 	startApp
@@ -104,11 +104,11 @@ function startDssProject(){
 	SERVER_NAME=dss-apiservice-server
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	startApp
-	
+
 	SERVER_NAME=dss-workflow-server
 	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
 	startApp
-	
+
 	SERVER_NAME=dss-flow-execution-server
 	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
 	startApp

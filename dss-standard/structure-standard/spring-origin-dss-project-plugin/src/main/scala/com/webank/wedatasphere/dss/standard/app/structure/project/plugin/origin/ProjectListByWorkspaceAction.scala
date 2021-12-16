@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.origin
 
-import com.webank.wedatasphere.linkis.httpclient.dws.request.DWSHttpAction
-import com.webank.wedatasphere.linkis.httpclient.request.POSTAction
+import org.apache.linkis.httpclient.dws.request.DWSHttpAction
+import org.apache.linkis.httpclient.request.POSTAction
 
 
 class ProjectListByWorkspaceAction extends POSTAction with DWSHttpAction {

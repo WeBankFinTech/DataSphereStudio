@@ -508,16 +508,16 @@ export default {
         partition = find(this.activeTB.partitions, (o) => {
           return o.title = this.stepOne.partitions;
         });
+        this.parseSize(partition).then((size) => {
+          const largerThenOneGb = this.determinesSizeOverflow(size, 1);
+          const largerThenFiveGb = this.determinesSizeOverflow(size, 5);
+          this.$set(this.stepOne, 'isLargerThenOneGb', largerThenOneGb);
+          this.$set(this.stepOne, 'isLargerThenFiveGb', largerThenFiveGb);
+          if (largerThenFiveGb) {
+            return this.$Message.warning(this.$t('message.scripts.hiveTableExport.BDXCG'));
+          }
+        });
       }
-      this.parseSize(partition).then((size) => {
-        const largerThenOneGb = this.determinesSizeOverflow(size, 1);
-        const largerThenFiveGb = this.determinesSizeOverflow(size, 5);
-        this.$set(this.stepOne, 'isLargerThenOneGb', largerThenOneGb);
-        this.$set(this.stepOne, 'isLargerThenFiveGb', largerThenFiveGb);
-        if (largerThenFiveGb) {
-          return this.$Message.warning(this.$t('message.scripts.hiveTableExport.BDXCG'));
-        }
-      });
     },
 
     parseSize(partition) {
@@ -552,7 +552,7 @@ export default {
       const columnList = this.stepOne.column;
       const columns = columnList.length === this.activeTB.children.length ? '*' : columnList.toString();
       this.stepOne.isPartition = this.activeTB.isPartition;
-      this.$emit('export', this.stepOne, this.stepTwo, columns);
+      this.$emit('export', this.stepOne, this.stepTwo, columns,this.activeTB);
     },
     setNode(node) {
       this.stepTwo.path = node.path;

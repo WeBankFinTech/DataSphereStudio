@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.exception
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException
+import org.apache.linkis.common.exception.ErrorException
 
 
 class FlowExecutionErrorException(errorCode: Int, desc: String) extends ErrorException(errorCode, desc){

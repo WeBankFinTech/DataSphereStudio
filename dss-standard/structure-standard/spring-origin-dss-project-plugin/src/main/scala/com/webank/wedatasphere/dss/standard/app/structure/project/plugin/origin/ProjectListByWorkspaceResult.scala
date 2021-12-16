@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.origin
 
 import java.util
 
-import com.webank.wedatasphere.linkis.httpclient.dws.annotation.DWSHttpMessageResult
-import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
+import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
+import org.apache.linkis.httpclient.dws.response.DWSResult
 
 import scala.beans.BeanProperty
 

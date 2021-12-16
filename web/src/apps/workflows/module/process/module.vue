@@ -90,9 +90,9 @@
               </Spin>
             </div>
             <div class="devider"></div>
-            <div 
-              v-if="schedulingStatus.published" 
-              class="button" 
+            <div
+              v-if="schedulingStatus.published"
+              class="button"
               @click.stop="linkToDispatch">
               <SvgIcon class="icon" icon-class="ds-center" />
               <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
@@ -123,6 +123,14 @@
         </template>
       </template>
     </vueProcess>
+    <nodeMap
+      v-else
+      ref="nodeMap"
+      :map-origin-data="originalData"
+      :dataMapModuleValue="isNodeMap"
+      @changeMode="changeMode"
+      @nodeClick="click"
+    ></nodeMap>
     <div
       class="process-module-param"
       v-clickoutside="handleOutsideClick"
@@ -373,12 +381,12 @@ import { throttle, debounce } from 'lodash';
 import { NODETYPE, ext } from '@/apps/workflows/service/nodeType';
 import { setTimeout, clearTimeout } from 'timers';
 import storage from '@/common/helper/storage';
+import nodeMap from './component/nodeMap.vue';
 import util from '@/common/util/index.js';
 import mixin from '@/common/service/mixin';
 import module from './component/modal.vue';
 import moment from 'moment';
 import { getPublishStatus, getSchedulingStatus } from '@/apps/workflows/service/api.js';
-
 export default {
   components: {
     vueProcess,
@@ -387,6 +395,7 @@ export default {
     nodeParameter,
     associateScript,
     console,
+    nodeMap,
     module
   },
   mixins: [mixin],
@@ -413,6 +422,9 @@ export default {
     publish: {
       type: Boolean,
       default: false
+    },
+    priv: {
+      type: Number
     },
     product: {
       type: [Boolean],
@@ -684,6 +696,7 @@ export default {
     //     }
     //   }, 1000 * 60);
     // }
+    document.addEventListener('keyup', this.onKeyUp)
   },
   beforeDestroy() {
     if (this.timer) {
@@ -695,6 +708,7 @@ export default {
     if (this.executorStatusTimer) {
       clearTimeout(this.executorStatusTimer);
     }
+    document.removeEventListener('keyup', this.onKeyUp)
   },
   methods: {
     refreshSchedulingStatus(){
@@ -821,12 +835,10 @@ export default {
       this.showDispatchHistoryModel = true;
 
     },
-
     // 跳转内嵌ds
     linkToDispatch() {
       this.$emit('showDolphinscheduler')
     },
-
     // 显示调度配置弹框
     dispatchSetShow() {
       if (this.workflowIsExecutor) return;
@@ -1777,6 +1789,9 @@ export default {
       let pageSize = this.$refs.process.getState().baseOptions.pageSize;
       const key = '' + new Date().getTime() + Math.ceil(Math.random() * 100);
       this.cacheNode.key = key;
+      this.cacheNode.id = key;
+      this.cacheNode.selected = true;
+      this.cacheNode.title = this. cacheNode.title+'_copy'
       this.cacheNode.createTime = Date.now();
       this.cacheNode.layout = {
         height: this.cacheNode.height,
@@ -1792,9 +1807,13 @@ export default {
       if(this.cacheNode.runState) {
         delete this.cacheNode.runState;
       }
+      this.json.nodes = this.json.nodes.map((subItem) => {
+        subItem.selected = false;
+        return subItem;
+      });
       this.json.nodes.push(this.cacheNode);
-      this.nodeSelectedFalse(this.cacheNode);
       this.originalData = this.json;
+      this.click(this.cacheNode)
     },
     // 由于插件的selected不是响应式，所以得手动改变
     nodeSelectedFalse(node = {}) {
@@ -1810,13 +1829,39 @@ export default {
     },
     clickBaseInfo() {
       this.nodeSelectedFalse(this.clickCurrentNode);
-    },
-    // 批量删除选中节点
-    allDelete() {
+    },    // 批量删除选中节点
+    async allDelete() {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.noDelete'));
-      const selectNodes = this.$refs.process.getSelectedNodes().map((item) => item.key);
+      let selectNodes = this.$refs.process.getSelectedNodes();
+      const selectNodeLength = selectNodes.length
+      if (selectNodeLength < 1) return
+      // 批量删除跳过子工作流节点
+      selectNodes = selectNodes.filter(node => node.type !== NODETYPE.FLOW)
+      const selectNodeKeys = selectNodes.map((item) => item.key);
+      selectNodes = selectNodes.map((item) => this.bindNodeBasicInfo(item));
+      const nodes = [];
+      selectNodes.forEach(node=>{
+        if (node.supportJump && node.shouldCreationBeforeNode && node.jobContent) {
+          nodes.push({
+            nodeType: node.type,
+            name: node.title,
+            description: node.desc,
+            projectID: +this.$route.query.projectID,
+            params: node.jobContent,
+            labels: {
+              route: this.getCurrentDsslabels()
+            }
+          })
+        }
+      })
+      await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}batchDeleteAppConnNode`, {nodes}, 'post').then(() => {
+        this.$Message.success(this.$t('message.workflow.deleteSuccess'));
+      })
+      selectNodes.forEach(node=>{
+        this.$emit('deleteNode', node);
+      })
       this.json.nodes = this.json.nodes.filter((item) => {
-        if (selectNodes.includes(item.key)) {
+        if (selectNodeKeys.includes(item.key)) {
           this.json.edges = this.json.edges.filter((link) => {
             return !(link.source === item.key || link.target === item.key);
           });
@@ -1826,6 +1871,9 @@ export default {
         }
       });
       this.originalData = this.json;
+      if (selectNodeLength > selectNodes.length) {
+        this.$Message.warning('子工作流不支持批量删除！');
+      }
       this.autoSave('allDelete', false);
     },
     /**
@@ -2018,11 +2066,13 @@ export default {
       })
     },
     queryWorkflowExecutor(execID, taskID) {
+      this.retryTimes = this.retryTimes || 0;
       api.fetch(`/dss/flow/entrance/${execID}/status`,
         {
           taskID,
           labels: this.getCurrentDsslabels()
         }, 'get').then((res) => {
+        this.retryTimes = 0
         this.flowExecutorNode(execID);
         // 根据执行状态判断是否轮询
         const status = res.status;
@@ -2057,6 +2107,20 @@ export default {
             return item.flowId !== this.newFlowId;
           });
         }
+      }).catch(() => {
+        // 失败重试5次
+        if (this.retryTimes < 5) {
+          clearTimeout(this.excuteTimer);
+          this.excuteTimer = null;
+          this.excuteTimer = setTimeout(() => {
+            this.retryTimes = this.retryTimes + 1;
+            this.queryWorkflowExecutor(execID, taskID);
+          }, 1000)
+        } else {
+          this.retryTimes = 0
+          this.flowExecutorNode(execID, true);
+        }
+        this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunFail'))
       })
     },
     flowExecutorNode(execID, end = false) {
@@ -2169,7 +2233,23 @@ export default {
         })
       })
     },
-    
+    changeMode(value) {
+      this.isNodeMap = value;
+    },
+    async changeModule() {
+      // 先保存json,  然后再重新拉数据
+      const a = await this.autoSave('切换地图', false);
+      // 存在重复阻止跳转
+      if (!a) return;
+      await this.getOriginJson()
+      this.isNodeMap = true;
+      this.$nextTick(() => {
+        this.$refs.nodeMap.$refs.process.format({
+          linkType: 'straight',
+          nodeWidth: 200
+        })
+      })
+    },
     workflowPublishIsShow(event) {
       getSchedulingStatus(storage.get('currentWorkspace').id, this.orchestratorId).then(data=>{
         this.schedulingStatus = data;
@@ -2188,7 +2268,6 @@ export default {
         this.pubulishShow = true;
         this.pubulishFlowComment = '';
       })
-      
     },
     async workflowPublish() {
       // 发布之前先保存
@@ -2199,14 +2278,16 @@ export default {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-
         // workflowId: Number(this.flowId),
         // labels: this.getCurrentDsslabels(),
+        workflowId: Number(this.flowId),
+        labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }
       // 记录工作流是否在发布
       this.isFlowPubulish = true;
-      api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishWorkflow`, params, 'post').then((res) => {
+      //api.fetch(`${this.$API_PATH.PUBLISH_PATH}publishToScheduler`, params, 'post').then((res) => {
+      api.fetch(`/dss/workflow/publishWorkflow`, params, 'post').then((res) => {
         this.pubulishShow = false;
         // 发布之后需要轮询结果
         let queryTime = 0;
@@ -2398,8 +2479,33 @@ export default {
     getTaskId(){
       const key = this.getTaskKey();
       return storage.get(key);
+    },
+    onKeyUp(e) {
+      if (e.keyCode === 46 && this.$parent.active === 0 && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
+        let selectNodes = this.$refs.process.getSelectedNodes();
+        const selectNodeKeys = selectNodes.map((item) => item.key);
+        const selectNodeLength = selectNodes.length
+        if (selectNodeLength > 0) {
+          if (selectNodeLength > 1) {
+            this.allDelete();
+          } else {
+            this.json.nodes = this.json.nodes.filter((item) => {
+              if (selectNodeKeys.includes(item.key)) {
+                this.json.edges = this.json.edges.filter((link) => {
+                  return !(link.source === item.key || link.target === item.key);
+                });
+              } else {
+                item.selected = false;
+                return true;
+              }
+            });
+            this.originalData = this.json;
+            this.nodeDelete(selectNodes[0])
+          }
+        }
+      }
     }
-  },
-};
+  }
+}
 </script>
 <style src="./index.scss" lang="scss"></style>

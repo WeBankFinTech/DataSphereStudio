@@ -19,9 +19,9 @@ package com.webank.wedatasphere.dss.flow.execution.entrance
 import java.util
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeRunner
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEventState
-import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEventState.SchedulerEventState
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.scheduler.queue.SchedulerEventState
+import org.apache.linkis.scheduler.queue.SchedulerEventState.SchedulerEventState
 
 
 class FlowContextImpl extends FlowContext with Logging {

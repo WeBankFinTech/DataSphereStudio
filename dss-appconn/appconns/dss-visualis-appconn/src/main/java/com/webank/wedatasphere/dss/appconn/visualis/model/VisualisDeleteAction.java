@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.model;
 
-import com.webank.wedatasphere.linkis.httpclient.request.DeleteAction;
-import com.webank.wedatasphere.linkis.httpclient.request.UserAction;
+import org.apache.linkis.httpclient.request.DeleteAction;
+import org.apache.linkis.httpclient.request.UserAction;
 
 public class VisualisDeleteAction extends DeleteAction implements UserAction {
 

@@ -14,18 +14,18 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.launch
+package org.apache.linkis.manager.engineplugin.appconn.launch
 
 import java.util
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
 import com.webank.wedatasphere.dss.appconn.manager.impl.AbstractAppConnManager
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.manager.common.protocol.bml.BmlResource
-import com.webank.wedatasphere.linkis.manager.common.protocol.bml.BmlResource.BmlResourceVisibility
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.launch.entity.EngineConnBuildRequest
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.launch.process.JavaProcessEngineConnLaunchBuilder
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.manager.common.protocol.bml.BmlResource
+import org.apache.linkis.manager.common.protocol.bml.BmlResource.BmlResourceVisibility
+import org.apache.linkis.manager.engineplugin.common.launch.entity.EngineConnBuildRequest
+import org.apache.linkis.manager.engineplugin.common.launch.process.JavaProcessEngineConnLaunchBuilder
 
 import scala.collection.convert.wrapAsScala._
 import scala.collection.convert.wrapAsJava._

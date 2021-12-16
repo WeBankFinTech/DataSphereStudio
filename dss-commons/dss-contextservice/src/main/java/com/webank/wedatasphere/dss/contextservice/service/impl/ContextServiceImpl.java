@@ -23,30 +23,26 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.ErrorCode;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.cs.client.ContextClient;
-import com.webank.wedatasphere.linkis.cs.client.builder.ContextClientFactory;
-import com.webank.wedatasphere.linkis.cs.client.service.CSWorkService;
-import com.webank.wedatasphere.linkis.cs.client.service.CSWorkServiceImpl;
-import com.webank.wedatasphere.linkis.cs.client.utils.SerializeHelper;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextScope;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextType;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.WorkType;
-import com.webank.wedatasphere.linkis.cs.common.entity.object.CSFlowInfos;
-import com.webank.wedatasphere.linkis.cs.common.entity.object.LinkisVariable;
-import com.webank.wedatasphere.linkis.cs.common.entity.resource.LinkisBMLResource;
-import com.webank.wedatasphere.linkis.cs.common.entity.source.*;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.cs.client.ContextClient;
+import org.apache.linkis.cs.client.builder.ContextClientFactory;
+import org.apache.linkis.cs.client.service.CSWorkService;
+import org.apache.linkis.cs.client.service.CSWorkServiceImpl;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
+import org.apache.linkis.cs.common.entity.enumeration.ContextScope;
+import org.apache.linkis.cs.common.entity.enumeration.ContextType;
+import org.apache.linkis.cs.common.entity.enumeration.WorkType;
+import org.apache.linkis.cs.common.entity.object.CSFlowInfos;
+import org.apache.linkis.cs.common.entity.object.LinkisVariable;
+import org.apache.linkis.cs.common.entity.resource.LinkisBMLResource;
+import org.apache.linkis.cs.common.entity.source.*;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * @Author alexyang
- * @Date 2020-0318
- */
 public class ContextServiceImpl implements ContextService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContextServiceImpl.class);

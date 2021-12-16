@@ -144,7 +144,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    
     .newHome_create_text {
       margin-left: 10px;
       cursor: pointer;

@@ -18,10 +18,12 @@ package com.webank.wedatasphere.dss.appconn.manager.service;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
+
+import java.io.Serializable;
 import java.util.List;
 
 
-public interface AppConnInfoService {
+public interface AppConnInfoService{
 
     List<? extends AppConnInfo> getAppConnInfos();
 

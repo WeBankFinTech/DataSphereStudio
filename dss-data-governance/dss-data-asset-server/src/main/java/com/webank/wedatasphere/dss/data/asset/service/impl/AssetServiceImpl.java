@@ -82,7 +82,10 @@ public class AssetServiceImpl implements AssetService {
                 hiveTblBasic.setGuid(atlasEntityHeader.getGuid());
                 hiveTblBasic.setName(atlasEntityHeader.getAttribute("name").toString());
                 hiveTblBasic.setQualifiedName(atlasEntityHeader.getAttribute("qualifiedName").toString());
-                hiveTblBasic.setOwner(atlasEntityHeader.getAttribute("owner").toString());
+                Object owner =atlasEntityHeader.getAttribute("owner");
+                if(owner !=null) {
+                    hiveTblBasic.setOwner(owner.toString());
+                }
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
                     hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));

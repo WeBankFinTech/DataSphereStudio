@@ -327,10 +327,10 @@ export default {
       });
     },
     handleChange(val, item) {
-      const index = item.opt.findIndex((el) => el.value === val[0]);
       if (item.key !== 'database') {
         return;
       }
+      const index = item.opt.findIndex((el) => el.value === val[0]);
       this.currentDb = index;
       if (!this.dbList[index].length) {
         this.$emit('get-tables', this.dbList[index].name);

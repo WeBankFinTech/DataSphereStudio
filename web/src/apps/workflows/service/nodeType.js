@@ -43,19 +43,19 @@ const NODETYPE = {
   SCALA: 'linkis.spark.scala',
   PYTHON: 'linkis.python.python',
   CONNECTOR: 'linkis.control.empty',
-  DISPLAY: 'linkis.appjoint.visualis.display',
-  DASHBOARD: 'linkis.appjoint.visualis.dashboard',
-  WIDGET: 'linkis.appjoint.visualis.widget',
-  SENDMAIL: 'linkis.appjoint.sendemail',
-  EVENTCHECKERF: 'linkis.appjoint.eventchecker.eventsender',
-  EVENTCHECKERW: 'linkis.appjoint.eventchecker.eventreceiver',
-  DATACHECKER: 'linkis.appjoint.datachecker',
+  DISPLAY: 'linkis.appconn.visualis.display',
+  DASHBOARD: 'linkis.appconn.visualis.dashboard',
+  WIDGET: 'linkis.appconn.visualis.widget',
+  SENDMAIL: 'linkis.appconn.sendemail',
+  EVENTCHECKERF: 'linkis.appconn.eventchecker.eventsender',
+  EVENTCHECKERW: 'linkis.appconn.eventchecker.eventreceiver',
+  DATACHECKER: 'linkis.appconn.datachecker',
   RMBSENDER: 'azkaban.rmbsender',
   FLOW: 'workflow.subflow',
   EXCHANGE: 'linkis.data.exchange',
-  QUALITIS: 'linkis.appjoint.qualitis',
+  QUALITIS: 'linkis.appconn.qualitis',
   PROJECTNODE: 'projectNode',
-  MLSS: 'linkis.appjoint.mlss'
+  MLSS: 'linkis.appconn.mlss'
 }
 const ext = {
   [NODETYPE.SHELL]: 'shell',

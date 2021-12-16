@@ -55,7 +55,6 @@
               </div>
             </li>
             <!-- 卡片显示数据 -->
-
             <li
               class="newHome_list_item"
               v-for="item in filteredData"
@@ -155,10 +154,11 @@ import {
 import util from "@/common/util";
 import storage from "@/common/helper/storage";
 
+
 export default {
   components: {
     WorkspaceForm,
-    WorkspaceTable
+    WorkspaceTable,
     // caseAndIntroduction: caseAndIntroduction.component,
   },
   data() {

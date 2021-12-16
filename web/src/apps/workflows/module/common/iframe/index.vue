@@ -17,6 +17,10 @@ export default {
       type: [String, Object],
       default: null
     },
+    url: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -25,8 +29,13 @@ export default {
     };
   },
   mounted() {
-    this.node.jobContent = this.node.jobContent || {}
-    this.getUrl();
+    if (this.node) {
+      this.node.jobContent = this.node.jobContent || {}
+      this.getUrl();
+    }
+    if (this.url) {
+      this.visualSrc = this.url
+    }
     window.addEventListener('message', this.msgEvent, false)
   },
   methods: {

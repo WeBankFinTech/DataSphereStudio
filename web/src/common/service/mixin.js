@@ -17,9 +17,8 @@
 
 import storage from '@/common/helper/storage';
 import api from '@/common/service/api';
+import util from '@/common/util';
 import SUPPORTED_LANG_MODES from '@/common/config/scriptis';
-import util from '../util/index';
-
 
 export default {
   data: function () {
@@ -104,10 +103,10 @@ export default {
           }else {
             this.$router.push({path: url, query});
           }
-          
+
         } else {
           this.$router.push({
-            name: 'commonIframe',
+            path: `commonIframe/${type}`,
             query: {
               ...query,
               url,
@@ -120,5 +119,20 @@ export default {
     getUserName() {
       return  storage.get("baseInfo") ? storage.get("baseInfo").username : null;
     },
+    getCurrentWorkspaceName() {
+      const workspaceData = storage.get("currentWorkspace");
+      if (this.$route.query.workspaceName){
+        return this.$route.query.workspaceName
+      }
+      return workspaceData ? workspaceData.name : ''
+    },
+    // 获取工作空间Id
+    getCurrentWorkspaceId() {
+      const workspaceData = storage.get("currentWorkspace");
+      if (this.$route.query.workspaceId){
+        return this.$route.query.workspaceId
+      }
+      return workspaceData ? workspaceData.id : ''
+    }
   },
 };

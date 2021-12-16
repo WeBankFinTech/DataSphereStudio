@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -22,7 +22,7 @@ import java.io.{File, InputStream}
 import java.util
 
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf
-import com.webank.wedatasphere.linkis.httpclient.request.{GetAction, HttpAction, POSTAction, UploadAction, UserAction}
+import org.apache.linkis.httpclient.request.{GetAction, HttpAction, POSTAction, UploadAction, UserAction}
 
 /**
  * created by cooperyang on 2020/11/16

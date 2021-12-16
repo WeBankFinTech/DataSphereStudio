@@ -26,8 +26,11 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author allenlliu
@@ -35,23 +38,21 @@ import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
  * @date 2020/08/17 05:37 PM
  */
 
-@Path("/dss/framework/project")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Component
+@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RestController
 public class DSSFrameworkDSTokenRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
 
-    @GET
-    @Path("/ds/token")
-    public Response dsApiServiceTokenCreate(@Context HttpServletRequest req) {
+
+    @RequestMapping(path ="/ds/token", method = RequestMethod.GET)
+    public Message dsApiServiceTokenCreate(@Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
         SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
             .getAppConn(DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (schedulerAppConn == null) {
             logger.error("dolphinscheduler appconn is null, can not get scheduler api access token");
-            return Message.messageToResponse(Message.error("dolphinscheduler appconn is null"));
+            return Message.error("dolphinscheduler appconn is null");
         }
 
         WorkflowConversionIntegrationStandard standard = schedulerAppConn.getOrCreateWorkflowConversionStandard();
@@ -63,10 +64,10 @@ public class DSSFrameworkDSTokenRestfulApi {
         requestRef.setParameter("userName", userName);
         try {
             ResponseRef responseRef = tokenRefQueryOperation.query(requestRef);
-            return Message.messageToResponse(Message.ok().data("token", responseRef.getValue("token"))
-                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time"))));
+            return Message.ok().data("token", responseRef.getValue("token"))
+                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time")));
         } catch (ExternalOperationFailedException e) {
-            return Message.messageToResponse(Message.error("获取token失败:" + e.getMessage()));
+            return Message.error("获取token失败:" + e.getMessage());
         }
     }
 

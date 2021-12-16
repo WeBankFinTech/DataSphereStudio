@@ -230,7 +230,7 @@ export default {
       });
     },
     deleteFavoriteApp(favoriteId, index){
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}workspaces/${this.workspaceId}/favorites/${favoriteId}`, 'delete').then(()=>{
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}workspaces/${this.workspaceId}/favorites/${favoriteId}`, {}, { method: 'delete', data: {}}).then(()=>{
         this.favoriteApps.splice(index, 1);
       })
     },

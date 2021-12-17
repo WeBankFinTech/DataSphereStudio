@@ -38,6 +38,7 @@
         <module>dss-data-api</module>
         <module>dss-data-governance</module>
         <module>assembly</module>
+        <module>dss-guide</module>
     </modules>
 
     <properties>

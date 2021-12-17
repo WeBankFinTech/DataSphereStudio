@@ -3,18 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dss</artifactId>
+        <artifactId>dss-guide</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dss-data-governance-common</artifactId>
+    <artifactId>dss-guide-server</artifactId>
 
-    <properties>
-        <atlas.version>2.1.0</atlas.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.linkis</groupId>
@@ -30,46 +26,20 @@
                     <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
-                <exclusion>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>javax.ws.rs-api</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.atlas</groupId>
-            <artifactId>atlas-client-v2</artifactId>
-            <version>${atlas.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-common</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.16</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
@@ -102,7 +72,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/assembly/distribution.xml</descriptor>
+                                <descriptor>dss-guide-server/src/main/assembly/distribution.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
@@ -113,7 +83,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <descriptors>
-                        <descriptor>src/main/assembly/distribution.xml</descriptor>
+                        <descriptor>dss-guide-server/src/main/assembly/distribution.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
@@ -128,21 +98,20 @@
         </plugins>
         <resources>
             <resource>
-                <directory>src/main/java</directory>
+                <directory>dss-guide-server/src/main/java</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
             </resource>
-<!--            <resource>-->
-<!--                 <directory>src/main/resources</directory>-->
-<!--                 <includes>-->
-<!--                     <include>**/*.xml</include>-->
-<!--                     <include>**/*.properties</include>-->
-<!--                     <include>**/*.yml</include>-->
-<!--                 </includes>-->
-<!--             </resource>-->
+            <!--            <resource>-->
+            <!--                 <directory>src/main/resources</directory>-->
+            <!--                 <includes>-->
+            <!--                     <include>**/*.xml</include>-->
+            <!--                     <include>**/*.properties</include>-->
+            <!--                     <include>**/*.yml</include>-->
+            <!--                 </includes>-->
+            <!--             </resource>-->
         </resources>
     </build>
-
 
 </project>

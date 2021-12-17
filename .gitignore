@@ -86,6 +86,10 @@ dss-data-governance/dss-data-warehouse-dao/target
 dss-data-governance/dss-data-warehouse-service/target
 dss-data-governance/dss-data-warehouse-server/target
 
+#dss-guide
+dss-guide/dss-guide-server/target
+
+
 # plugins
 plugins/azkaban/linkis-jobtype/target
 plugins/linkis/dss-gateway-support/target

@@ -118,7 +118,11 @@ function startDssProject(){
 	startApp
 
   SERVER_NAME=dss-data-governance-server
-	SERVER_IP=$DSS-DATA-GOVERNANCE-SERVER_INSTALL_IP
+	SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+  startApp
+
+  SERVER_NAME=dss-guide-server
+	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
   startApp
 
 	##SERVER_NAME=visualis-server

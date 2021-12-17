@@ -52,19 +52,19 @@
           </Select>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')" prop="name">
-            <Input v-model="addDataSource.name" placeholder="please enter dataSourceName"></Input>
+            <Input v-model="addDataSource.name" :placeholder="$t('message.workspaceManagemnet.dataSourceNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceDesc')" prop="note">
-            <Input v-model="addDataSource.note" placeholder="please enter dataSourceDesc"></Input>
+            <Input v-model="addDataSource.note" :placeholder="$t('message.workspaceManagemnet.dataSourceDescPlaceHolder')"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
             <Input v-model="addDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
-            <Input v-model="addDataSource.username" placeholder="please enter userName"></Input>
+            <Input v-model="addDataSource.username" :placeholder="$t('message.workspaceManagemnet.userNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.password')" prop="pwd">
-            <Input v-model="addDataSource.pwd" placeholder="please enter userName's password"></Input>
+            <Input v-model="addDataSource.pwd" :placeholder="$t('message.workspaceManagemnet.passwordPlaceHolder')"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -90,19 +90,19 @@
           </Select>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')" prop="name">
-            <Input v-model="editDataSource.name" disabled placeholder="please enter dataSourceName"></Input>
+            <Input v-model="editDataSource.name" disabled :placeholder="$t('message.workspaceManagemnet.dataSourceNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceDesc')" prop="note">
-            <Input v-model="editDataSource.note" placeholder="please enter dataSourceDesc"></Input>
+            <Input v-model="editDataSource.note" :placeholder="$t('message.workspaceManagemnet.dataSourceDescPlaceHolder')"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
             <Input v-model="editDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
-            <Input v-model="editDataSource.username" placeholder="please enter userName"></Input>
+            <Input v-model="editDataSource.username" :placeholder="$t('message.workspaceManagemnet.userNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.password')" prop="pwd">
-            <Input v-model="editDataSource.pwd" placeholder="please enter userName's password"></Input>
+            <Input v-model="editDataSource.pwd" :placeholder="$t('message.workspaceManagemnet.passwordPlaceHolder')"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -179,7 +179,7 @@ export default {
           {max: 200, message: this.$t('message.workspaceManagemnet.lengthValidateMsg', {name: this.$t("message.workspaceManagemnet.dataSourceDesc"), len: 200}), trigger: "blur"}
         ],
         url: [
-          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "url"}), trigger: "blur"}
+          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "URL"}), trigger: "blur"}
         ],
         username: [
           {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: this.$t("message.workspaceManagemnet.userName")}), trigger: "blur"},
@@ -204,7 +204,7 @@ export default {
           {max: 200, message: this.$t('message.workspaceManagemnet.lengthValidateMsg', {name: this.$t("message.workspaceManagemnet.dataSourceDesc"), len: 200}), trigger: "blur"}
         ],
         url: [
-          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "url"}), trigger: "blur"}
+          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "URL"}), trigger: "blur"}
         ],
         username: [
           {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: this.$t("message.workspaceManagemnet.userName")}), trigger: "blur"},

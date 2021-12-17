@@ -283,5 +283,16 @@
         <include>**/*</include>
       </includes>
     </fileSet>
+
+    <!--dss-guide-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-guide/dss-guide-server/target/out/dss-guide-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-guide/dss-guide-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
   </fileSets>
 </assembly>

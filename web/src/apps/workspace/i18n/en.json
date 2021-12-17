@@ -176,14 +176,18 @@
       "editDataSour": "Edit dataSource",
       "delDataSour": "Delete dataSource",
       "addDataSour": "Add dataSource",
-      "userName": "Username",
+      "userName": "UserName",
+      "userNamePlaceHolder": "please enter userName",
       "password": "Password",
+      "passwordPlaceHolder": "please enter password",
       "develop": "Develop",
       "produce": "Produce",
       "dataSourceAdministration": "DataSource Administration",
       "dataSourceName": "Data source name",
+      "dataSourceNamePlaceHolder": "please enter dataSourceName",
       "dataSourceType": "Data source type",
       "dataSourceDesc": "Data source desc",
+      "dataSourceDescPlaceHolder": "please enter dataSourceDesc",
       "connectionInfo": "Connection info",
       "environment": "Environment",
       "createTime": "CreateTime",
@@ -206,7 +210,7 @@
         "desc": "Description：",
         "workspaceType": "Workspace Type："
       },
-      "JdbcUrlFormat": "Format like: jdbc:mysql://ServerIP:Port/Database"
+      "JdbcUrlFormat": "please enter URL such as jdbc:mysql://ServerIP:Port/Database"
     },
     "Project": {
       "title": "Project list",

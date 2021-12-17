@@ -311,6 +311,7 @@ export default {
               classifications
             } = data.result;
             if (parseInt(basic.store)) {
+              basic.store = basic.store + ""
               let tempLen = Math.floor(basic.store.length / 4);
               let len = tempLen > 2 ? 3 : tempLen;
               basic.store = (basic.store / Math.pow(1024, len + 1)).toFixed(2);

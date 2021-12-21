@@ -28,7 +28,9 @@
         <span class="management-platform-sidebar-tree-header">
           {{ defaultMenu.title }}
         </span>
+        <guide-menu v-if="defaultMenu.title == '产品文档'" />
         <Tree
+          v-else
           class="management-platform-sidebar-tree-container"
           :nodes="defaultMenu.nodes"
           :currentTreeId="this.currentTreeId"
@@ -58,6 +60,7 @@
 <script>
 import Tree from "./component/tree/tree.vue";
 import TabList from "./component/tabList/index.vue";
+import GuideMenu from "./component/guide/menu.vue";
 import {
   GetMenu,
   QueryAllData,
@@ -115,6 +118,11 @@ const menu = [
     icon: "componentImport",
     nodes: [],
   },
+  {
+    title: "产品文档",
+    icon: "guide",
+    nodes: [],
+  },
 ];
 const tempComponent = {
   onestop_menu_id: 1,
@@ -135,6 +143,7 @@ export default {
   components: {
     Tree,
     "tab-list": TabList,
+    "guide-menu": GuideMenu,
   },
   data() {
     return {
@@ -177,6 +186,9 @@ export default {
       } else {
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
+        if (this.defaultMenu.title == "产品文档") {
+          this.$router.push("guide");
+        }
       }
     },
     // 点击 子树

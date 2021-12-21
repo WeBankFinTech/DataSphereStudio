@@ -106,7 +106,7 @@ export default {
 
         } else {
           this.$router.push({
-            name: 'commonIframe',
+            path: `commonIframe/${type}`,
             query: {
               ...query,
               url,

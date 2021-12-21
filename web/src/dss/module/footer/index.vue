@@ -135,8 +135,10 @@ export default {
     },
     resetChannelPosition() {
       const footerChannel = this.$refs.footerChannel;
-      footerChannel.style.left = document.documentElement.clientWidth - 120 + 'px';
-      footerChannel.style.top = document.documentElement.clientHeight - 60 + 'px';
+      if (footerChannel) {
+        footerChannel.style.left = document.documentElement.clientWidth - 120 + 'px';
+        footerChannel.style.top = document.documentElement.clientHeight - 60 + 'px';
+      }
     }
   },
 };

@@ -31,9 +31,9 @@
                 v-if="top.sortable"
               >
                 <i class="ivu-icon ivu-icon-md-arrow-dropup"
-                  :class="{'on': sortType.index === index && sortType.type === 'asc'}" @click="handleSort(index, 'asc')"></i>
+                   :class="{'on': sortType.index === index && sortType.type === 'asc'}" @click="handleSort(index, 'asc')"></i>
                 <i class="ivu-icon ivu-icon-md-arrow-dropdown"
-                  :class="{'on': sortType.index === index && sortType.type === 'desc'}" @click="handleSort(index, 'desc')"></i>
+                   :class="{'on': sortType.index === index && sortType.type === 'desc'}" @click="handleSort(index, 'desc')"></i>
               </span>
             </td>
           </tr>
@@ -116,6 +116,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 export default {
   name: "WbTable",
   props: {
@@ -290,20 +291,20 @@ export default {
           const dataTopNum = parseInt(this.dataTop / this.tdHeight); //数据顶部条数
           dataTopNum - this.loadNum >= 0
             ? this.dataProcessing(
-              this.loadNum,
-              this.loadedNum - this.loadNum,
-              "top"
-            )
+            this.loadNum,
+            this.loadedNum - this.loadNum,
+            "top"
+          )
             : this.dataProcessing(dataTopNum, dataTopNum, "top");
         } else if (this.scrollTop < maxHeigth) {
           const scrollNum = parseInt(this.scrollTop / this.tdHeight); //滚动的位置在第几条数据
           scrollNum - this.loadNum >= 0
             ? this.dataProcessing(this.loadNum * 2, scrollNum, "topAll")
             : this.dataProcessing(
-              scrollNum + this.loadNum,
-              scrollNum,
-              "topAll"
-            );
+            scrollNum + this.loadNum,
+            scrollNum,
+            "topAll"
+          );
         }
       }
     },
@@ -324,10 +325,10 @@ export default {
           const otherTotal = this.dataTotal - (dataTopNum + this.loadedNum);
           total <= this.dataTotal
             ? this.dataProcessing(
-              this.loadedNum - this.loadNum,
-              this.loadNum,
-              "bottom"
-            )
+            this.loadedNum - this.loadNum,
+            this.loadNum,
+            "bottom"
+          )
             : this.dataProcessing(otherTotal, otherTotal, "bottom");
         }
       } else if (this.scrollTop > maxHeight) {
@@ -335,10 +336,10 @@ export default {
         scrollNum + this.loadNum <= this.dataTotal
           ? this.dataProcessing(scrollNum, this.loadNum * 2, "bottomAll")
           : this.dataProcessing(
-            scrollNum,
-            this.dataTotal - scrollNum + this.loadNum,
-            "bottomAll"
-          );
+          scrollNum,
+          this.dataTotal - scrollNum + this.loadNum,
+          "bottomAll"
+        );
       }
     },
     //滚动条左右滚动
@@ -358,9 +359,11 @@ export default {
         }
         this.loadedNum = this.loadedNum + topNum - bottomNum; //重新计算实际渲染数据条数
         this.dataTop = this.dataTop - topNum * this.tdHeight; //重新计算渲染数据的高度
-        document.getElementById("bottomDiv").scrollTop =
-          document.getElementById("bottomDiv").scrollTop +
-          bottomNum * this.tdHeight;
+        this.$nextTick(() => {
+          document.getElementById("bottomDiv").scrollTop =
+            document.getElementById("bottomDiv").scrollTop +
+            bottomNum * this.tdHeight;
+        })
         // this.scrollTop = document.getElementById("bottomDiv").scrollTop;
       } else if (type == "bottom") {
         this.showTableList.splice(0, topNum); //减去顶部数据
@@ -371,9 +374,11 @@ export default {
         }
         this.loadedNum = this.loadedNum - topNum + bottomNum; //重新计算实际渲染数据条数
         this.dataTop = this.dataTop + topNum * this.tdHeight; //重新计算渲染数据的高度
-        document.getElementById("bottomDiv").scrollTop =
-          document.getElementById("bottomDiv").scrollTop -
-          topNum * this.tdHeight;
+        this.$nextTick(() => {
+          document.getElementById("bottomDiv").scrollTop =
+            document.getElementById("bottomDiv").scrollTop -
+            topNum * this.tdHeight;
+        })
         // this.scrollTop = document.getElementById("bottomDiv").scrollTop;
       } else if (type == "bottomAll") {
         this.showTableList = []; //减去顶部数据
@@ -449,7 +454,7 @@ export default {
     },
     initTable() {
       document.getElementById("bottomDiv") &&
-        (document.getElementById("bottomDiv").scrollTop = 0);
+      (document.getElementById("bottomDiv").scrollTop = 0);
       // 后面如果要做切换tab保存滚动条状态，得记录滚动距离再赋值
       // document.getElementById("bottomDiv") &&
       //   (document.getElementById("bottomDiv").scrollLeft = 0);
@@ -521,5 +526,5 @@ export default {
 };
 </script>
 <style  scoped>
-@import "./table.css";
+  @import "./table.css";
 </style>

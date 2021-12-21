@@ -6,15 +6,16 @@
         <SvgIcon icon-class="plus" />
       </div>
     </div>
-    <div style="padding-left: 10px; padding-right: 10px;">
-    <Input
-      size="small"
-      :value="searchValue"
-      prefix="ios-search"
-      placeholder="请输入API名称搜索"
-      style="width: 220px;border:0;margin-top: 10px;margin-bottom: 10px;"
-      @on-change="handleSearch"
-    /></div>
+    <div style="padding-left: 10px; padding-right: 10px">
+      <Input
+        size="small"
+        :value="searchValue"
+        prefix="ios-search"
+        placeholder="请输入API名称搜索"
+        style="width: 220px; border: 0; margin-top: 10px; margin-bottom: 10px"
+        @on-change="handleSearch"
+      />
+    </div>
     <Tree
       class="tree-container"
       :nodes="projectsTree"
@@ -36,19 +37,19 @@ import _ from "lodash";
 export default {
   name: "TreeMenu",
   components: {
-    Tree
+    Tree,
   },
   props: {
     currentTreeId: {
-      type: Number
-    }
+      type: Number,
+    },
   },
   data() {
     return {
       loadingTree: false,
       projectsTree: [],
       searchValue: "",
-      originDatas: []
+      originDatas: [],
     };
   },
   mounted() {
@@ -56,14 +57,14 @@ export default {
   },
   methods: {
     getFlow(param, resolve) {
-      this.projectsTree = this.projectsTree.map(item => {
+      this.projectsTree = this.projectsTree.map((item) => {
         if (item.id == param.id) {
           return {
             ...item,
             loaded: true,
             loading: false,
             opened: true,
-            isLeaf: false
+            isLeaf: false,
           };
         } else {
           return item;
@@ -71,7 +72,11 @@ export default {
       });
     },
     handleTreeModal(project) {
-      this.$emit("showModal", { type: "api", data: { ...project }, groupDatas: [...this.originDatas] });
+      this.$emit("showModal", {
+        type: "api",
+        data: { ...project },
+        groupDatas: [...this.originDatas],
+      });
       this.treeModalShow = true;
       this.currentTreeProject = project;
     },
@@ -86,7 +91,10 @@ export default {
       this.projectsTree = data;
     },
     handleTreeClick(node) {
-      this.$emit("handleApiChoosed", {...node, allProjectTree: this.originDatas});
+      this.$emit("handleApiChoosed", {
+        ...node,
+        allProjectTree: this.originDatas,
+      });
     },
     getAllApi(type = "", payload = {}) {
       //获取数据服务所有的api
@@ -96,44 +104,44 @@ export default {
           {},
           "get"
         )
-        .then(res => {
+        .then((res) => {
           if (res && res.list) {
             const isUpdate = type === "update";
-            const list = res.list.map(n => {
-              const childs = n.apis.map(item => {
+            const list = res.list.map((n) => {
+              const childs = n.apis.map((item) => {
                 return {
                   ...item,
                   projectId: n.groupId,
                   projectName: n.groupName,
-                  type: "api"
+                  type: "api",
                 };
               });
               let opened = false;
               if (isUpdate) {
-                const hit = this.projectsTree.find(p => p.id === n.groupId);
+                const hit = this.projectsTree.find((p) => p.id === n.groupId);
                 opened = hit ? !!hit.opened : false;
                 if (!payload.id && payload.groupId === n.groupId) {
                   const apiDetail = childs.find(
-                    child =>
+                    (child) =>
                       child.name === payload.apiName &&
                       child.path === payload.apiPath
                   );
                   this.$emit("handleApiChoosed", {
                     type: "saveApi",
                     data: { ...apiDetail },
-                    apiData: { ...payload }
+                    apiData: { ...payload },
                   });
                 }
               }
               return {
-                id: 'group' + n.groupId, // 防止group和api的id一样导致同时active的问题
+                id: "group" + n.groupId, // 防止group和api的id一样导致同时active的问题
                 groupId: n.groupId,
                 name: n.groupName,
                 type: "project",
                 canWrite: () => true,
                 children: childs,
                 apis: childs,
-                opened
+                opened,
               };
             });
             this.projectsTree = list;
@@ -145,12 +153,15 @@ export default {
     },
     addGroup() {
       //添加数据服务api分组
-      this.$emit("showModal", { type: "group", groupDatas: [...this.originDatas] });
+      this.$emit("showModal", {
+        type: "group",
+        groupDatas: [...this.originDatas],
+      });
     },
     addApi(groupId, apiData) {
       //添加数据服务api
       this.searchValue = "";
-      this.projectsTree = this.originDatas.map(item => {
+      this.projectsTree = this.originDatas.map((item) => {
         if (item.id == groupId) {
           return {
             ...item,
@@ -158,7 +169,7 @@ export default {
             loading: false,
             opened: true,
             isLeaf: false,
-            children: [...item.children, apiData]
+            children: [...item.children, apiData],
           };
         } else {
           return item;
@@ -166,7 +177,7 @@ export default {
       });
       this.originDatas = _.cloneDeep(this.projectsTree);
     },
-    handleSearch: _.debounce(function(e) {
+    handleSearch: _.debounce(function (e) {
       const value = e.target.value;
       this.executeSearch(value);
     }, 200),
@@ -175,10 +186,10 @@ export default {
       const temp = _.cloneDeep(this.originDatas);
       const result = !value ? temp : [];
       if (value) {
-        temp.forEach(item => {
+        temp.forEach((item) => {
           item.opened = true;
-          item.children = item.children.filter(
-            child => child.name.includes(value)
+          item.children = item.children.filter((child) =>
+            child.name.includes(value)
           );
           if (item.children.length > 0) {
             result.push(item);
@@ -186,8 +197,8 @@ export default {
         });
       }
       this.projectsTree = result;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -200,6 +211,8 @@ export default {
   & p {
     font-family: PingFangSC-Medium;
     font-size: 14px;
+    line-height: 20px;
+    font-weight: bold;
     @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   }
   & div {

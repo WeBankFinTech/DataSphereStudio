@@ -13,7 +13,15 @@
           :class="{ 'menu-active': item.title == currentHeader }"
           @click="handleSidebarToggle(item.title)"
         >
-          <SvgIcon class="icon" :icon-class="item.icon" verticalAlign="0px" />
+          <Tooltip :content="item.title" placement="right">
+            <div class="menuTooltip">
+              <SvgIcon
+                class="icon"
+                :icon-class="item.icon"
+                verticalAlign="0px"
+              />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <div class="management-platform-sidebar-tree">
@@ -54,7 +62,7 @@ import {
   GetMenu,
   QueryAllData,
   UpdateDataFromId,
-  CreateData
+  CreateData,
 } from "@/common/service/componentAccess";
 import { formatComponentDataForPost } from "./util/fomat";
 import api from "../../../../common/service/api";
@@ -69,15 +77,15 @@ const menu = [
         name: "部门管理",
         type: "permissions",
         id: 1024,
-        pathName: "departManagement"
+        pathName: "departManagement",
       },
       {
         name: "用户管理",
         type: "permissions",
         id: 1023,
-        pathName: "personManagement"
-      }
-    ]
+        pathName: "personManagement",
+      },
+    ],
   },
   {
     title: "控制台",
@@ -87,7 +95,7 @@ const menu = [
         name: "全局历史",
         type: "console",
         id: 1022,
-        pathName: "globalHistory"
+        pathName: "globalHistory",
       },
       { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
       { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
@@ -95,18 +103,18 @@ const menu = [
         name: "全局变量",
         type: "console",
         id: 1019,
-        pathName: "globalValiable"
+        pathName: "globalValiable",
       },
       { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
       // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" }
-    ]
+      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
+    ],
   },
   {
     title: "组件接入",
     icon: "componentImport",
-    nodes: []
-  }
+    nodes: [],
+  },
 ];
 const tempComponent = {
   onestop_menu_id: 1,
@@ -119,14 +127,14 @@ const tempComponent = {
   if_iframe: 1,
   is_active: 1,
   desc_cn: "",
-  desc_en: ""
+  desc_en: "",
   // access_button_en: 'not null',
   // access_button_cn: '不能为空'
 };
 export default {
   components: {
     Tree,
-    "tab-list": TabList
+    "tab-list": TabList,
   },
   data() {
     return {
@@ -149,16 +157,16 @@ export default {
       component_id: 16,
 
       addedFlag: false,
-      menuOptions: []
+      menuOptions: [],
     };
   },
   watch: {
     defaultMenu: {
-      handler: function(newVal) {
+      handler: function (newVal) {
         this.defaultMenu = newVal;
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // 点击 menu
@@ -167,7 +175,7 @@ export default {
       if (title === this.defaultMenu.title) {
         this.sidebarFold = !this.sidebarFold;
       } else {
-        this.defaultMenu = this.menu.find(item => item.title === title);
+        this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
       }
     },
@@ -189,7 +197,7 @@ export default {
       if (node._id) {
         this.currentTreeId = node._id;
         this.current = node;
-        if (this.tabList.every(item => item._id !== node._id)) {
+        if (this.tabList.every((item) => item._id !== node._id)) {
           this.tabList.push(node);
           return this.$router.push({ name: "accessComponents" });
         }
@@ -215,7 +223,7 @@ export default {
         this.header = "组件接入";
         return this.$router.push({ name: "accessComponents" });
       } else {
-        const component_data = this.tabList.filter(tab => tab.isAdded)[0];
+        const component_data = this.tabList.filter((tab) => tab.isAdded)[0];
         component_data.onestop_menu_id = node.id;
         this.current = JSON.parse(JSON.stringify(component_data));
         this.header = "组件接入";
@@ -260,7 +268,7 @@ export default {
     },
     // 点击tab页
     onTabClick(_id) {
-      const currentTab = this.tabList.filter(item => item._id === _id)[0];
+      const currentTab = this.tabList.filter((item) => item._id === _id)[0];
       // tab 页为新增页
       if (currentTab.isAdded) {
         let idx = currentTab.onestop_menu_id;
@@ -281,10 +289,10 @@ export default {
       if (componentItem.id) {
         const updateData = formatComponentDataForPost(componentItem);
         UpdateDataFromId(componentItem.id, updateData)
-          .then(data => {
+          .then((data) => {
             _this.$Message.success("更新成功");
           })
-          .catch(err => {
+          .catch((err) => {
             _this.$Message.fail("更新失败");
           });
       }
@@ -292,10 +300,10 @@ export default {
       if (componentItem.isAdded) {
         const postData = formatComponentDataForPost(componentItem);
         CreateData(postData)
-          .then(data => {
+          .then((data) => {
             _this.$Message.success("新增成功");
           })
-          .catch(err => {
+          .catch((err) => {
             _this.$Message.fail("新增失败");
           });
       }
@@ -305,9 +313,9 @@ export default {
     getMenuForcomponentAccess() {
       let that = this;
       GetMenu()
-        .then(data => {
+        .then((data) => {
           const _menuOptions = [];
-          data.forEach(item => {
+          data.forEach((item) => {
             item.type = "component";
             item.children = [];
             item.opened = true;
@@ -325,14 +333,14 @@ export default {
             "menuOptions",
             JSON.stringify(that.menuOptions)
           );
-          that.getAllComponentData(data, nodes => {
+          that.getAllComponentData(data, (nodes) => {
             if (nodes) {
               menu[2].nodes = nodes;
               that.menu = menu;
             }
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("err", err);
         });
     },
@@ -342,9 +350,9 @@ export default {
       let that = this;
       let component_id = this.component_id;
       QueryAllData()
-        .then(data => {
-          data.forEach(item => {
-            nodes.forEach(node => {
+        .then((data) => {
+          data.forEach((item) => {
+            nodes.forEach((node) => {
               if (node.id === item.onestop_menu_id) {
                 item._id = component_id;
                 node.children.push(item);
@@ -355,7 +363,7 @@ export default {
           that.component_id = component_id;
           callback(nodes);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("getAllComponentData error!", err);
           callback(false);
         });
@@ -365,18 +373,18 @@ export default {
     updateBaseInfo() {
       api
         .fetch(`${API_PATH.WORKSPACE_PATH}getBaseInfo`, "get")
-        .then(res => {
+        .then((res) => {
           storage.set("baseInfo", res, "local");
         })
-        .catch(err => console.log("getBaseInfo", err));
-    }
+        .catch((err) => console.log("getBaseInfo", err));
+    },
   },
   mounted() {
     this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }
-  }
+  },
 };
 </script>
 
@@ -387,6 +395,7 @@ $per-border-color: #dee4ec;
 .management-platform-wrap {
   height: 100%;
   .management-platform-sidebar {
+    z-index: 2;
     display: flex;
     position: fixed;
     left: 0;
@@ -415,9 +424,15 @@ $per-border-color: #dee4ec;
         cursor: pointer;
         font-size: 26px;
         @include font-color(#333, $dark-text-color);
+        border-left: 3px solid transparent;
         &:hover {
           @include bg-color(#eceff4, $dark-menu-base-color);
         }
+      }
+      .menu-active {
+        border-left: 3px solid rgb(45, 140, 240);
+        @include bg-color(#edf1f6, $dark-menu-base-color);
+        @include border-color(#2e92f7, #4b8ff3);
       }
     }
     .management-platform-sidebar-tree {
@@ -442,15 +457,18 @@ $per-border-color: #dee4ec;
     }
   }
   .management-platform-tablist {
+    z-index: 1;
     height: 100%;
   }
   .management-platform-sidebar-tree-header {
     padding-left: 12px;
   }
-  .menu-active {
-    border-left: 3px solid rgb(45, 140, 240);
-    @include bg-color(#edf1f6, $dark-menu-base-color);
-    @include border-color(#2e92f7, #4b8ff3);
+  .menuTooltip {
+    width: 50px;
+    height: 44px;
+  }
+  /deep/.ivu-tooltip-inner {
+    background-color: rgba(70, 76, 91, 1);
   }
 }
 </style>

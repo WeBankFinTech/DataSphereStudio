@@ -13,13 +13,18 @@ export default {
   name: 'lineage',
   data() {
     return {
-      canvas: null
+      canvas: null,
     }
   },
   props: {
     processId: String,
     lineageData: {
       required: true
+    }
+  },
+  watch: {
+    lineageData() {
+      this.createOrUpdateCanvas(this.convertData())
     }
   },
   methods: {
@@ -93,7 +98,7 @@ export default {
         })
         this.canvas.draw(data);
       } else {
-        this.canvas.drageReDraw(data);
+        this.canvas.redraw(data);
       }
     }
   },

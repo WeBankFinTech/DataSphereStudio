@@ -320,7 +320,7 @@ export default {
 
         this.api.fetch(api, searchParams, {useFormQuery: true}).then(res => {
           this.$Message.success(msg)
-          this.$emit('onUpdateTiming')
+          this.$emit('onUpdateTiming', this.timingData.id)
         })
       }
     },

@@ -7,7 +7,7 @@
       "dataAssetsIndex": "Data Assets Index",
       "overallMeasurement": "Overall measurement",
       "menu": "Menu",
-      "pleaseEnterATableName": "Please enter a table name / description to search the database table",
+      "pleaseEnterATableName": "Please enter [database name / table name / field name / table description] to search the data table vaguely",
       "search": "Search"
     }
   }

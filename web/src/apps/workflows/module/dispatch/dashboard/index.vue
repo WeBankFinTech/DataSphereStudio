@@ -17,7 +17,7 @@
               <div class="time-model">
                 <template>
                   <Date-picker
-                    style="width: 250px"
+                    style="width: 430px"
                     v-model="dataTime"
                     type="datetimerange"
                     @on-change="_datepicker"
@@ -380,6 +380,7 @@ export default {
     padding: 0;
     position: relative;
     margin-bottom: 24px;
+    min-width: 570px;
     .dashboard-module-content {
       padding: 30px;
       position: relative;

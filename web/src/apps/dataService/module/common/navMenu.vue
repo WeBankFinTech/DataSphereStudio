@@ -165,7 +165,6 @@ export default {
   .menuTooltip {
     width: 50px;
     height: 44px;
-    opacity: 1;
   }
   /deep/.ivu-tooltip-inner {
     background-color: rgba(70, 76, 91, 1);

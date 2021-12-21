@@ -113,7 +113,7 @@ public class DSSDbApiConfigRestful {
      * @param map
      * @return
      */
-    @RequestMapping(path ="/test/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
+    @RequestMapping(value ="/test/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
     public Message testApi(@Context HttpServletRequest request, @PathVariable("path") String path, @RequestBody Map<String, Object> map) {
 
         try {
@@ -136,7 +136,7 @@ public class DSSDbApiConfigRestful {
      * @return
      */
 
-    @RequestMapping(path ="/execute/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
+    @RequestMapping(value ="/execute/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
     public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") String path, @RequestBody Map<String, Object> map) {
         try {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);

@@ -215,11 +215,11 @@ export default {
     };
     const validateAPIPath = (rule, value, callback) => {
       const result = value && value.trim();
-      const reg = /^\/[\w_-]{3,199}$/g;
+      const reg = /^[\w_-][\/\w_-]{3,199}$/g;
       if (!reg.test(result)) {
         callback(
           new Error(
-            "支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过200个字符，如/user"
+            "支持英文、数字、下划线（_）、连字符（-）、正斜线（/），且不能以正斜线（/）开头，4到200个字符"
           )
         );
       } else {

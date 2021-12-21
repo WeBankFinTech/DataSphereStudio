@@ -61,28 +61,42 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
         ResultSet rs=null;
         List<HiveStorageInfo> hiveStorageInfos = new ArrayList<>();
         try {
-            String sql="select DBS.NAME ,TBLS.TBL_NAME,TABLE_PARAMS.PARAM_VALUE as totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize'  order by totalSize DESC limit 10";
+            String sql="SELECT DBS.NAME ,TBLS.TBL_NAME,CAST(TABLE_PARAMS.PARAM_VALUE AS UNSIGNED) AS totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize'  order by totalSize DESC limit 10";
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
                 HiveStorageInfo tableinfo=new HiveStorageInfo();
                 tableinfo.setTableName(rs.getString(1)+"."+rs.getString(2));
-                tableinfo.setStorage(rs.getString(3));
+                tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
-            String sql2="select DBS.NAME ,TBLS.TBL_NAME,SUM(PARTITION_PARAMS.PARAM_VALUE) as totalSize  from DBS,TBLS,PARTITIONS ,PARTITION_PARAMS where DBS.DB_ID=TBLS.DB_ID AND TBLS.TBL_ID=PARTITIONS.TBL_ID AND  PARTITIONS.PART_ID =PARTITION_PARAMS.PART_ID  AND PARTITION_PARAMS.PARAM_KEY='totalSize'  group by TBLS.TBL_NAME  order by totalSize  desc limit 10";
+            String sql2="SELECT DBS.NAME ,TBLS.TBL_NAME,SUM(CAST(PARTITION_PARAMS.PARAM_VALUE AS UNSIGNED)) AS totalSize from DBS,TBLS,PARTITIONS ,PARTITION_PARAMS where DBS.DB_ID=TBLS.DB_ID AND TBLS.TBL_ID=PARTITIONS.TBL_ID AND  PARTITIONS.PART_ID =PARTITION_PARAMS.PART_ID  AND PARTITION_PARAMS.PARAM_KEY='totalSize'  group by TBLS.TBL_NAME  order by totalSize  desc limit 10";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
             while (rs.next()){
                 HiveStorageInfo tableinfo=new HiveStorageInfo();
                 tableinfo.setTableName(rs.getString(1)+"."+rs.getString(2));
-                tableinfo.setStorage(rs.getString(3));
+                tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
+            /**
+             * 特别注意LONG类型相减超出INT范围
+             * System.out.println((int) (4401131805L -1796673800L))
+             * System.out.println(Long.parseLong("4401131805")-Long.parseLong("1796673800"))
+              */
             Collections.sort(hiveStorageInfos, new Comparator<HiveStorageInfo>() {
                 @Override
                 public int compare(HiveStorageInfo o1, HiveStorageInfo o2) {
-                    return (int) (Long.valueOf(o2.getStorage())-Long.valueOf(o1.getStorage()));
+                    //return (int) (Long.valueOf(o2.getStorage())-Long.valueOf(o1.getStorage()))
+                    if(o2.getStorage() > o1.getStorage()){
+                        return 1;
+                    }
+                    else if(o2.getStorage() < o1.getStorage()){
+                        return -1;
+                    }
+                    else{
+                        return 0;
+                    }
                 }
             });
         } catch (DAOException | SQLException e){
@@ -139,8 +153,14 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             while (rs.next()){
                 HivePartInfo part  =new HivePartInfo();
                 part.setPartName(rs.getString(1));
-                part.setCreateTime(DateUtil.unixToTimeStr(Long.valueOf(rs.getInt(2))*1000));
-                part.setLastAccessTime(DateUtil.unixToTimeStr(Long.valueOf(rs.getInt(3))*1000));
+                Long lastAccessTime = Long.valueOf(rs.getInt(3));
+                if(lastAccessTime !=null && lastAccessTime !=0L) {
+                    part.setLastAccessTime(DateUtil.unixToTimeStr(lastAccessTime * 1000));
+                }
+                Long createTime = Long.valueOf(rs.getInt(2));
+                if(createTime !=null && createTime !=0L) {
+                    part.setCreateTime(DateUtil.unixToTimeStr(createTime * 1000));
+                }
                 part.setReordCnt(rs.getInt(4));
                 part.setStore(rs.getInt(5));
                 hivePartInfos.add(part);

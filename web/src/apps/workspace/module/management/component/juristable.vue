@@ -54,7 +54,7 @@
         <Checkbox v-for="item in userlist.namesign"
           :key="item" style="display:block"
           v-model="userlist[item]"
-          :disabled="item==='admin'">
+        >
           {{username(item)}}
         </Checkbox>
       </div>

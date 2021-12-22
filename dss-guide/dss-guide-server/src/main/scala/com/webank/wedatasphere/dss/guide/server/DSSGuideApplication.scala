@@ -16,7 +16,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.guide
+package com.webank.wedatasphere.dss.guide.server
 
 import com.webank.wedatasphere.dss.common.utils.DSSMainHelper
 import org.apache.linkis.DataWorkCloudApplication

@@ -11,6 +11,7 @@
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"
+          :projectNameList="projectNameList"
           @cancel="ProjectMergeCancel"
           @confirm="ProjectMergeConfirm"></WorkflowFormNew>
       </Tab-pane>
@@ -59,6 +60,10 @@ export default {
       default: null
     },
     selectOrchestratorList: {
+      type: Array,
+      default: () => []
+    },
+    projectNameList: {
       type: Array,
       default: () => []
     }
@@ -136,7 +141,7 @@ export default {
         uses: '',
         orchestratorMode: '',
         orchestratorWays: null,
-        projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
+        projectId: String(this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID),
         workspaceId: this.$route.query.workspaceId
       };
     },

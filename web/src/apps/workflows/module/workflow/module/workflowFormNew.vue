@@ -6,6 +6,15 @@
       :rules="formValid"
       v-if="workflowDataCurrent">
       <FormItem
+        :label="$t('message.orchestratorModes.allowedProject')"
+        prop="projectId">
+        <Select v-model="workflowDataCurrent.projectId">
+          <Option v-for="item in projectNameList" :key="item.id" :value="item.id">
+            {{ item.name}}
+          </Option>
+        </Select>
+      </FormItem>
+      <FormItem
         :label="$t('message.orchestratorModes.orchestratorName')"
         prop="orchestratorName">
         <Input
@@ -103,6 +112,10 @@ export default {
     selectOrchestratorList: {
       type: Array,
       default: () => []
+    },
+    projectNameList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -156,6 +169,7 @@ export default {
         currentData.orchestratorWays = currentData.orchestratorWayArray;
         delete currentData.orchestratorWayArray;
       }
+      currentData['projectId'] = currentData['projectId'] + '';
       return currentData;
     },
     Ok() {

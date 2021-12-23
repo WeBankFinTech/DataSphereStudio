@@ -63,6 +63,13 @@ public class AdminMangerRestful {
         return Message.ok().data("result", guideGroupService.getAllGuideGroupDetails());
     }
 
+    @RequestMapping(path ="/{id}", method = RequestMethod.POST)
+    public Message deleteGroup(@PathVariable("id") Long id) {
+        guideGroupService.deleteGroup(id);
+        Message message = Message.ok("删除成功");
+        return message;
+    }
+
     @RequestMapping(path ="/guidecontent", method = RequestMethod.POST)
     public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent){
         String userName = SecurityFilter.getLoginUsername(request);
@@ -104,5 +111,28 @@ public class AdminMangerRestful {
             logger.error("ERROR", "Error found: ", ex);
             return Message.error(ex.getMessage());
         }
+    }
+
+    @RequestMapping(path ="/{id}", method = RequestMethod.POST)
+    public Message deleteContent(@PathVariable("id") Long id) {
+        guideContentService.deleteContent(id);
+        Message message = Message.ok("删除成功");
+        return message;
+    }
+
+    @RequestMapping(path ="uploadImage", method = RequestMethod.POST)
+    public Message importOrcFile(@Context HttpServletRequest req,
+                                  @RequestParam(required = true, name = "file") List<MultipartFile> files) {
+        if (null == files || files.size() == 0) {
+            return Message.error("upload files is empty");
+        }
+        String imageUrl = "";
+        for (MultipartFile p : files) {
+            InputStream inputStream = p.getInputStream();
+            String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
+            String userName = SecurityFilter.getLoginUsername(req);
+            // 统一重命名image，然后把图片放在指定目录，然后返回图片url(统一加前缀guideAssets，方便nginx代理)
+        }
+        return Message.ok().data("result", imageUrl);
     }
 }

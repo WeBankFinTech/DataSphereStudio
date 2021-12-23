@@ -1,7 +1,7 @@
 <template>
-  <div style="height: 100%;">
+  <div style="height: 100%">
     <navMenu :menuFold="menuFold" @on-menu-toggle="handleMenuToggle" />
-    <div class="ds-main-content" :class="{'ds-main-content-fold': menuFold }">
+    <div class="ds-main-content" :class="{ 'ds-main-content-fold': menuFold }">
       <div class="ds-main-container">
         <router-view></router-view>
       </div>
@@ -9,29 +9,30 @@
   </div>
 </template>
 <script>
-import navMenu from '../common/navMenu.vue';
+import navMenu from "../common/navMenu.vue";
 export default {
   components: {
     navMenu,
   },
   data() {
     return {
-      menuFold: false
-    }
+      menuFold: false,
+    };
   },
   methods: {
     handleMenuToggle() {
       this.menuFold = !this.menuFold;
     },
   },
-}
+};
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .ds-main-content {
+  z-index: 1;
   height: 100%;
   margin-left: 304px;
-  transition: margin-left .3s;
+  transition: margin-left 0.3s;
   /deep/ .monitor-chart-modal {
     left: 304px;
   }

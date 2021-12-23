@@ -42,4 +42,9 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
     public List<GuideGroup> getAllGuideGroupDetails() {
         return guideGroupMapper.getAllGuideGroupDetails();
     }
+
+    @Override
+    public void deleteGroup(Long id){
+        guideGroupMapper.deleteGroup(id);
+    }
 }

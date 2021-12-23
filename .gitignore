@@ -74,10 +74,12 @@ dss-standard/structure-standard/dss-structure-integration-standard
 dss-standard/structure-standard/spring-origin-dss-project-plugin/target
 
 #dss-data-api
+dss-data-api/dss-data-api-server/src/main/resources
 dss-data-api/dss-api-sql-template/target
 dss-data-api/dss-data-api-server/target
 
 #dss-data-governance
+dss-data-governance/dss-data-governance-server/src/main/resources
 dss-data-governance/dss-data-governance-server/target
 dss-data-governance/dss-data-governance-common/target
 dss-data-governance/dss-data-asset-server/target
@@ -85,6 +87,11 @@ dss-data-governance/dss-data-classification-server/target
 dss-data-governance/dss-data-warehouse-dao/target
 dss-data-governance/dss-data-warehouse-service/target
 dss-data-governance/dss-data-warehouse-server/target
+
+#dss-guide
+dss-guide/dss-guide-server/src/main/resources/
+dss-guide/dss-guide-server/target
+
 
 # plugins
 plugins/azkaban/linkis-jobtype/target

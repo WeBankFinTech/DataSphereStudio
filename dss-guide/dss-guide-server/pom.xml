@@ -103,19 +103,19 @@
         </plugins>
         <resources>
             <resource>
-                <directory>dss-guide-server/src/main/java</directory>
+                <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
             </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.yml</include>
-                </includes>
-             </resource>
+            <!--            <resource>-->
+            <!--                 <directory>src/main/resources</directory>-->
+            <!--                 <includes>-->
+            <!--                     <include>**/*.xml</include>-->
+            <!--                     <include>**/*.properties</include>-->
+            <!--                     <include>**/*.yml</include>-->
+            <!--                 </includes>-->
+            <!--             </resource>-->
         </resources>
     </build>
 

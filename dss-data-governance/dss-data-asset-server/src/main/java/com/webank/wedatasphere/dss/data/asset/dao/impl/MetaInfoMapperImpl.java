@@ -61,22 +61,22 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
         ResultSet rs=null;
         List<HiveStorageInfo> hiveStorageInfos = new ArrayList<>();
         try {
-            String sql="select DBS.NAME ,TBLS.TBL_NAME,TABLE_PARAMS.PARAM_VALUE as totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize'  order by totalSize DESC limit 10";
+            String sql="SELECT DBS.NAME ,TBLS.TBL_NAME,CAST(TABLE_PARAMS.PARAM_VALUE AS UNSIGNED) AS totalSize from DBS, TBLS,TABLE_PARAMS where TBLS.TBL_ID=TABLE_PARAMS.TBL_ID AND TBLS.DB_ID=DBS.DB_ID AND TABLE_PARAMS.PARAM_KEY='totalSize'  order by totalSize DESC limit 10";
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
                 HiveStorageInfo tableinfo=new HiveStorageInfo();
                 tableinfo.setTableName(rs.getString(1)+"."+rs.getString(2));
-                tableinfo.setStorage(rs.getString(3));
+                tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
-            String sql2="select DBS.NAME ,TBLS.TBL_NAME,SUM(PARTITION_PARAMS.PARAM_VALUE) as totalSize  from DBS,TBLS,PARTITIONS ,PARTITION_PARAMS where DBS.DB_ID=TBLS.DB_ID AND TBLS.TBL_ID=PARTITIONS.TBL_ID AND  PARTITIONS.PART_ID =PARTITION_PARAMS.PART_ID  AND PARTITION_PARAMS.PARAM_KEY='totalSize'  group by TBLS.TBL_NAME  order by totalSize  desc limit 10";
+            String sql2="SELECT DBS.NAME ,TBLS.TBL_NAME,SUM(CAST(PARTITION_PARAMS.PARAM_VALUE AS UNSIGNED)) AS totalSize from DBS,TBLS,PARTITIONS ,PARTITION_PARAMS where DBS.DB_ID=TBLS.DB_ID AND TBLS.TBL_ID=PARTITIONS.TBL_ID AND  PARTITIONS.PART_ID =PARTITION_PARAMS.PART_ID  AND PARTITION_PARAMS.PARAM_KEY='totalSize'  group by TBLS.TBL_NAME  order by totalSize  desc limit 10";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
             while (rs.next()){
                 HiveStorageInfo tableinfo=new HiveStorageInfo();
                 tableinfo.setTableName(rs.getString(1)+"."+rs.getString(2));
-                tableinfo.setStorage(rs.getString(3));
+                tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
             /**
@@ -88,10 +88,10 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                 @Override
                 public int compare(HiveStorageInfo o1, HiveStorageInfo o2) {
                     //return (int) (Long.valueOf(o2.getStorage())-Long.valueOf(o1.getStorage()))
-                    if(Long.parseLong(o2.getStorage()) > Long.parseLong(o1.getStorage())){
+                    if(o2.getStorage() > o1.getStorage()){
                         return 1;
                     }
-                    else if(Long.parseLong(o2.getStorage()) < Long.parseLong(o1.getStorage())){
+                    else if(o2.getStorage() < o1.getStorage()){
                         return -1;
                     }
                     else{

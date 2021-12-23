@@ -3,7 +3,7 @@
     <div
       v-show="!data.hidden"
       class="tree-content"
-      :class="{ 'tree-content-active': currentTreeId == data.id }"
+      :class="{ 'tree-content-active': currentTreeId == data.treeId }"
     >
       <div class="tree-icon" :class="{ leaf: isLeaf }">
         <SvgIcon
@@ -19,7 +19,7 @@
       <div class="tree-icon" v-if="data.type == 'question'">
         <SvgIcon icon-class="guide-question" />
       </div>
-      <div class="tree-name" @click="handleItemClick(data)">
+      <div class="tree-name" :title="data.title" @click="handleItemClick(data)">
         {{ data.titleAlias || data.title }}
       </div>
       <div class="tree-op" @click="handleAddClick(data)" v-if="data.canAdd">
@@ -43,7 +43,7 @@
     <ul class="tree-children" v-if="isFolder" :style="groupStyle">
       <tree-item
         v-for="item in data.children"
-        :key="item.id"
+        :key="item.treeId"
         :data="item"
         :currentTreeId="currentTreeId"
         :on-item-toggle="onItemToggle"

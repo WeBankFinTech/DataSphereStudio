@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author suyc
@@ -18,7 +20,7 @@ import java.util.Date;
  */
 @Data
 @TableName(value = "dss_guide_group")
-public class GuideGroup {
+public class GuideGroup implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
@@ -37,5 +39,7 @@ public class GuideGroup {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
     private Integer isDelete;
+
+    private List<GuideContent> children;
 
 }

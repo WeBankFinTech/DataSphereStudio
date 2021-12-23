@@ -4,12 +4,14 @@
       v-if="showEditor"
       style="height: 100%; z-index: 1"
       v-model="source"
+      @save="saveContent"
     ></mavon-editor>
     <div v-else>dashboard</div>
   </div>
 </template>
 
 <script>
+import { GetContent, UpdateGuideContent } from "@/common/service/apiGuide";
 import { mavonEditor } from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
 import "mavon-editor/dist/markdown/github-markdown.min.css";
@@ -39,21 +41,20 @@ export default {
       immediate: true,
     },
   },
-  // mounted() {
-  //   console.log("mout", this.$route.query.id);
-  // },
   methods: {
     getChapter() {
-      // this.$route.query.id
-      setTimeout(() => {
-        this.source = "### title" + this.$route.query.id;
-      }, 100);
+      GetContent(this.$route.query.id).then((data) => {
+        this.source = data.result.content || "";
+      });
     },
-    onChooseComponent(tabData) {
-      this.$emit("bandleTapTab", tabData._id);
-    },
-    saveComponent(componentItem) {
-      this.$emit("on-save", componentItem);
+    saveContent(value, render) {
+      UpdateGuideContent({
+        id: this.$route.query.id,
+        content: value,
+        contentHtml: render,
+      }).then((res) => {
+        this.$Message.success("保存成功");
+      });
     },
   },
 };

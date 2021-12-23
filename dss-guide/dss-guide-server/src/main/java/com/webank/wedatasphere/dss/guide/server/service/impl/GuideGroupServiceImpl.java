@@ -7,6 +7,8 @@ import com.webank.wedatasphere.dss.guide.server.service.GuideGroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author suyc
  * @Classname GuideGroupServiceImpl
@@ -34,5 +36,10 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
     @Override
     public GuideGroup queryGuideGroupByPath(String path) {
         return guideGroupMapper.getGuideGroupByPath(path);
+    }
+
+    @Override
+    public List<GuideGroup> getAllGuideGroupDetails() {
+        return guideGroupMapper.getAllGuideGroupDetails();
     }
 }

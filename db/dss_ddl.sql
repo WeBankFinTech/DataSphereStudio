@@ -1311,13 +1311,14 @@ CREATE TABLE IF NOT EXISTS `dss_guide_group` (
 DROP TABLE IF EXISTS `dss_guide_content`;
 CREATE TABLE IF NOT EXISTS `dss_guide_content` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `groupId` BIGINT(50) NOT NULL COMMENT '所属页面ID',
+  `group_id` BIGINT(50) NOT NULL COMMENT '所属页面ID',
   `path` VARCHAR(100) NOT NULL COMMENT '所属页面URL路径',
   `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
-  `titleAlias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
+  `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
   `seq` VARCHAR(20) DEFAULT NULL COMMENT '序号',
   `type` INT(1) DEFAULT '1' COMMENT '类型: 1-步骤step，2-问题question',
   `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
+  `content_html` TEXT DEFAULT NULL COMMENT 'Markdown内容转化为HTML格式',
   `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',

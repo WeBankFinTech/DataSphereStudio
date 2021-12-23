@@ -95,7 +95,7 @@ public class AdminMangerRestful {
     }
 
     @RequestMapping(path ="/guidecontent/{id}/content", method = RequestMethod.POST)
-    public Message updateGuideContent(@PathVariable Long id, Map<String, Object> map) {
+    public Message updateGuideContent(@PathVariable Long id, @RequestBody Map<String, Object> map) {
         try{
             guideContentService.updateContentById(id,map);
             return Message.ok("更新成功");

@@ -19,7 +19,7 @@ import java.util.List;
 @Mapper
 public interface GuideContentMapper extends BaseMapper<GuideContent> {
     @Select("SELECT * FROM dss_guide_content WHERE path=#{path} ORDER BY type,seq")
-    List<GuideContent> getGuideContentListByPath(String path);
+    List<GuideContent> getGuideContentListByPath(@Param("path") String path);
 
     @Select("SELECT content FROM dss_guide_content WHERE id=#{id}")
     String getContentById(@Param("id") long id);

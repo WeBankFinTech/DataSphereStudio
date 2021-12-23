@@ -64,7 +64,7 @@ public class AssetTblRestful {
      * 搜索hive表
      */
     @RequestMapping(method = RequestMethod.GET, path ="/search")
-    public Message searchHiveTbl(@RequestParam String classification,
+    public Message searchHiveTbl(@RequestParam(required = false) String classification,
                                  @RequestParam(defaultValue = "") String query,
                                  @RequestParam(defaultValue = "")  String keyword,
                                  @RequestParam(defaultValue = DEFAULT_LIMIT) int limit,

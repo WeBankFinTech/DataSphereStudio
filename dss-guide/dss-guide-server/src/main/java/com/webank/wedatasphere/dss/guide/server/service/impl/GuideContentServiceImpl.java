@@ -58,4 +58,9 @@ public class GuideContentServiceImpl extends ServiceImpl<GuideContentMapper, Gui
         }
         guideContentMapper.updateContentById(id, content.toString(), contentHtml.toString());
     }
+
+    @Override
+    public void deleteContent(Long id) {
+        guideContentMapper.deleteContent(id);
+    }
 }

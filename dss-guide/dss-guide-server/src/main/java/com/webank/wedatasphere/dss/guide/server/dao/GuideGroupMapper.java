@@ -20,4 +20,7 @@ public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
     GuideGroup getGuideGroupByPath(String path);
 
     List<GuideGroup> getAllGuideGroupDetails();
+
+    @Update("UPDATE dss_guide_group SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
+    void deleteGroup(@Param("id") Long id);
 }

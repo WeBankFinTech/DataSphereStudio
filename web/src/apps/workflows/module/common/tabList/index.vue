@@ -222,7 +222,6 @@ export default {
       });
     },
     handleChangeButton(dicValue) {
-      debugger;
       const btn = this.buttonText.find(item => item.dicValue === dicValue);
       this.$emit("handleChangeButton", btn);
     },

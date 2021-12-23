@@ -8,6 +8,6 @@ import lombok.Data;
 @Data
 public class HiveStorageInfo {
     private  String tableName;
-    private  String storage;
+    private  Long storage;
     private  String guid;
 }

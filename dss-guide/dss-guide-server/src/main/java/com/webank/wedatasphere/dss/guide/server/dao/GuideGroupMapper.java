@@ -3,7 +3,9 @@ package com.webank.wedatasphere.dss.guide.server.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideGroup;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 

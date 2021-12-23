@@ -7,6 +7,25 @@
       </div>
     </div> -->
     <!-- list container -->
+    <!-- 产品文档 -->
+    <div
+      class="management-platform-container-list"
+      v-if="header === '产品文档'"
+    >
+      <!-- tabs -->
+
+      <!-- appmain  -->
+      <div class="management-platform-container-list-appmain">
+        <access-component
+          :topTapList="topTapList"
+          :currentTab="currentTab"
+          @bandleTapTab="tabClick"
+          @handleTabRemove="tabRemove"
+          @on-save="saveComponent"
+        />
+      </div>
+    </div>
+
     <!-- 组件接入 -->
     <div
       class="management-platform-container-list"
@@ -60,29 +79,29 @@ import accessComponent from "../accessComponent/index.vue";
 export default {
   name: "TabList",
   components: {
-    "access-component": accessComponent
+    "access-component": accessComponent,
   },
   props: {
     header: {
       type: String,
-      default: ""
+      default: "",
     },
     breadcrumbName: {
       type: String,
-      default: ""
+      default: "",
     },
     contentHeight: {
       type: Number,
-      default: 400
+      default: 400,
     },
     // 组件接入相关
     topTapList: {
       type: Array,
-      required: true
+      required: true,
     },
     currentTab: {
-      type: null
-    }
+      type: null,
+    },
   },
   watch: {
     header(newVal) {
@@ -92,14 +111,14 @@ export default {
       handler(newVal) {
         this.currentTab = newVal;
       },
-      deep: true
+      deep: true,
     },
     topTapList: {
       handler(newVal) {
         this.topTapList = newVal;
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     skipPath() {
@@ -109,7 +128,7 @@ export default {
       if (this.$route.name === "EngineConnList")
         path = "/managementPlatform/ECM";
       return path;
-    }
+    },
   },
   methods: {
     tabClick(id) {
@@ -120,8 +139,8 @@ export default {
     },
     saveComponent(componentItem) {
       this.$emit("on-save", componentItem);
-    }
-  }
+    },
+  },
 };
 </script>
 

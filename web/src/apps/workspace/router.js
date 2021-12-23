@@ -187,6 +187,15 @@ export const apiServicesRoutes = [
           publicPage: true
         },
         component: () => import('./module/managementPlatform/component/accessComponent/index.vue')
+      },
+      {
+        path: 'guide',
+        name: 'guide',
+        meta: {
+          title: 'Guide',
+          publicPage: true
+        },
+        component: () => import('./module/managementPlatform/component/guide/index.vue')
       }
     ]
   }

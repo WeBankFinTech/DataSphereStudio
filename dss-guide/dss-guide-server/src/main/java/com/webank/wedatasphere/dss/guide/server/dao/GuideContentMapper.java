@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.guide.server.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideContent;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -21,8 +22,8 @@ public interface GuideContentMapper extends BaseMapper<GuideContent> {
     List<GuideContent> getGuideContentListByPath(String path);
 
     @Select("SELECT content FROM dss_guide_content WHERE id=#{id}")
-    String getContentById(long id);
+    String getContentById(@Param("id") long id);
 
     @Update("UPDATE dss_guide_content SET content =#{content},content_html =#{contentHtml} WHERE id =#{id}")
-    void updateContentById(long id,String content,String contentHtml);
+    void updateContentById(@Param("id") long id, @Param("content") String content, @Param("contentHtml") String contentHtml);
 }

@@ -17,4 +17,6 @@ public interface GuideGroupService {
     public GuideGroup queryGuideGroupByPath(String path);
 
     public List<GuideGroup> getAllGuideGroupDetails();
+
+    public void deleteGroup(Long id);
 }

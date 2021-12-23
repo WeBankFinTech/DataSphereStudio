@@ -22,4 +22,6 @@ public interface GuideContentService {
     public List<GuideContent> queryGuideContentByPath(String path);
 
     public void updateContentById(long id, Map<String, Object> map) throws GuideException;
+
+    public void deleteContent(Long id);
 }

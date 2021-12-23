@@ -5,6 +5,8 @@ import com.webank.wedatasphere.dss.guide.server.entity.GuideGroup;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 /**
  * @author suyc
  * @Classname GuideGroupMapper
@@ -16,4 +18,6 @@ import org.apache.ibatis.annotations.Select;
 public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
     @Select("SELECT * FROM dss_guide_group WHERE path = #{path}")
     GuideGroup getGuideGroupByPath(String path);
+
+    List<GuideGroup> getAllGuideGroupDetails();
 }

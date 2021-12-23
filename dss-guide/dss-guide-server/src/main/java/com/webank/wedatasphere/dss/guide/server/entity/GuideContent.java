@@ -25,20 +25,18 @@ public class GuideContent {
     private Long groupId;
     private String path;
 
+    private Integer type;
     private String title;
     private String titleAlias;
     private String seq;
-
-    private Integer type;
     private String content;
+    private String contentHtml;
 
     private String createBy;
     private String updateBy;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;

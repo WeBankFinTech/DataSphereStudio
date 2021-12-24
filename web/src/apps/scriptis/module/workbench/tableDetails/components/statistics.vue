@@ -1,6 +1,6 @@
 <template>
   <div class="statistics">
-    <Split v-model="split">
+    <Split v-model="split" :style="{height:panelHeight+'px'}">
       <Card
         :bordered="false"
         class="statistics-card"
@@ -79,6 +79,7 @@ export default {
   data() {
     return {
       split: 0.5,
+      panelHeight: 400,
       treeArr: [],
       info: [
         {
@@ -103,6 +104,9 @@ export default {
         },
       ],
     };
+  },
+  mounted() {
+    this.panelHeight = this.$parent.$parent.$el.clientHeight - 52
   },
   methods: {
     changeSize(val) {
@@ -176,6 +180,48 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '@/common/style/variables.scss';
+  .statistics {
+      height: calc(100% - 52px);
+      overflow: hidden;
+      width: 100%;
+      .statistics-card {
+          height: 100%;
+          .ivu-card-body {
+              height: calc(100% - 52px);
+          }
+          .statistics-card-item {
+              display: inline-flex;
+              width: 100%;
+              height: 36px;
+              line-height: 36px;
+              padding-left: 10px;
+              align-items: center;
+              .statistics-card-item-title {
+                  display: inline-block;
+                  width: 100px;
+                  font-weight: bold;
+              }
+              .statistics-card-item-value {
+                  display: inline-block;
+                  width: calc(100% - 104px);
+                  overflow: hidden;
+              }
+          }
+          .statistics-card-label {
+              margin-left: 4px;
+          }
+          .statistics-card-tree {
+              overflow-y: auto;
+              height: calc(100% - 50px);
+              margin-left: 20px;
+          }
+          .statistics-page {
+              height: 42px;
+              margin-top: 8px;
+              text-align: center;
+          }
+      }
+  }
   .title {
     color: #333;
   }

@@ -67,7 +67,7 @@ export default {
       this.$emit("versionDetailShow", val);
     },
     versionData(val) {
-      this.versionPage.totalSize = val.length;
+      this.versionPage.totalSize = val ? val.length : 0;
     }
   },
   computed: {

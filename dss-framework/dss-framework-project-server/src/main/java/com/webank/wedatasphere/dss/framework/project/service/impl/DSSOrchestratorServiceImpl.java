@@ -40,7 +40,7 @@ import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -205,8 +205,8 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
         queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
-        if (orchestratorRequest.getOrchestratorId() != null) {
-            queryWrapper.eq("orchestrator_id", orchestratorRequest.getOrchestratorId());
+        if (orchestratorRequest.getId() != null) {
+            queryWrapper.eq("orchestrator_id", orchestratorRequest.getId());
         }
         if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
             queryWrapper.eq("orchestrator_mode", orchestratorRequest.getOrchestratorMode());

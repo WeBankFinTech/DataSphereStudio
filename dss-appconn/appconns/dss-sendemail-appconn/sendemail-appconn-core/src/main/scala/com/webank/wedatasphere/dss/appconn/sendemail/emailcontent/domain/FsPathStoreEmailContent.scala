@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain
 
-import com.webank.wedatasphere.linkis.common.io.FsPath
+import org.apache.linkis.common.io.FsPath
 
 trait FsPathStoreEmailContent {
   private var fsPath: FsPath = _

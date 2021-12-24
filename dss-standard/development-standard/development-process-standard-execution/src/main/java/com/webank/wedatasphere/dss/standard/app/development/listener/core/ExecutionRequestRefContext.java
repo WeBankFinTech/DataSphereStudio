@@ -16,12 +16,12 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-import com.webank.wedatasphere.linkis.common.io.FsPath;
-import com.webank.wedatasphere.linkis.common.io.MetaData;
-import com.webank.wedatasphere.linkis.common.io.Record;
-import com.webank.wedatasphere.linkis.common.io.resultset.ResultSet;
-import com.webank.wedatasphere.linkis.common.io.resultset.ResultSetReader;
-import com.webank.wedatasphere.linkis.common.io.resultset.ResultSetWriter;
+import org.apache.linkis.common.io.FsPath;
+import org.apache.linkis.common.io.MetaData;
+import org.apache.linkis.common.io.Record;
+import org.apache.linkis.common.io.resultset.ResultSet;
+import org.apache.linkis.common.io.resultset.ResultSetReader;
+import org.apache.linkis.common.io.resultset.ResultSetWriter;
 import java.util.HashMap;
 import java.util.Map;
 

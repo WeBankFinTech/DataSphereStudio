@@ -24,8 +24,8 @@ import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutio
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.rpc.Sender
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.rpc.Sender
 import org.apache.commons.lang3.StringUtils
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component

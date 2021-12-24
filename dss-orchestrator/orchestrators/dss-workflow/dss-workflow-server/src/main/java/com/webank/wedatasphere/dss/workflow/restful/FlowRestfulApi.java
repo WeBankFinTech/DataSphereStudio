@@ -16,42 +16,12 @@
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -60,88 +30,71 @@ import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-@Component
-@Path("/dss/workflow")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.Context;
+import java.io.IOException;
+import java.util.*;
+
+@RestController
+@RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 public class FlowRestfulApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowRestfulApi.class);
 
     @Autowired
     private DSSFlowService flowService;
-
-
     private ContextService contextService = ContextServiceImpl.getInstance();
-
     @Autowired
     private PublishService publishService;
-
     @Autowired
     private WorkFlowManager workFlowManager;
-
     @Autowired
     private OrchestratorMapper orchestratorMapper;
-
     ObjectMapper mapper = new ObjectMapper();
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowRestfulApi.class);
-
-    @POST
-    @Path("/addFlow")
-//    @ProjectPrivChecker
-    public Response addFlow(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException, JsonProcessingException {
+    @RequestMapping(value = "addFlow",method = RequestMethod.POST)
+    public Message addFlow(@Context HttpServletRequest req, @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
         //如果是子工作流，那么分类应该是和父类一起的？
         String userName = SecurityFilter.getLoginUsername(req);
         // TODO: 2019/5/23 flowName工程名下唯一校验
-        String name = json.get("name").getTextValue();
-        String workspaceName = json.get("workspaceName").getTextValue();
-        String projectName = json.get("projectName").getTextValue();
-        String version = json.get("version").getTextValue();
-        String description = json.get("description") == null ? null : json.get("description").getTextValue();
-        Long parentFlowID = json.get("parentFlowID") == null ? null : json.get("parentFlowID").getLongValue();
-        String uses = json.get("uses") == null ? null : json.get("uses").getTextValue();
-        JsonNode dssLabelsJsonNode = json.get(DSSCommonUtils.DSS_LABELS_KEY);
+        String name = addFlowRequest.getName();
+        String workspaceName = addFlowRequest.getWorkspaceName();
+        String projectName = addFlowRequest.getProjectName();
+        String version = addFlowRequest.getVersion();
+        String description = addFlowRequest.getDescription();
+        Long parentFlowID = addFlowRequest.getParentFlowID();
+        String uses = addFlowRequest.getUses();
         List<DSSLabel> dssLabelList = new ArrayList<>();
-        if (dssLabelsJsonNode != null && dssLabelsJsonNode.getElements().hasNext()) {
-            Iterator<JsonNode> nodeList = dssLabelsJsonNode.getElements();
-            while (nodeList.hasNext()) {
-                JsonNode objNode =nodeList.next();
-                EnvDSSLabel dssLabel = new EnvDSSLabel(objNode.getTextValue());
-                dssLabelList.add(dssLabel);
-            }
-        }
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
-
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName,name,contextId,description,parentFlowID,uses,null,dssLabelList);
 
         // TODO: 2019/5/16 空值校验，重复名校验
-        return Message.messageToResponse(Message.ok().data("flow", dssFlow));
+        return Message.ok().data("flow", dssFlow);
     }
 
 
-    @POST
-    @Path("/publishWorkflow")
-    public Response publishWorkflow(@Context HttpServletRequest request, JsonNode jsonNode) {
-        Long orchestratorVersionId = jsonNode.get("orchestratorVersionId").getLongValue();
-        DSSOrchestratorVersion orchestratorVersion =
-            orchestratorMapper.getOrchestratorVersionById(orchestratorVersionId);
-        Long workflowId = orchestratorVersion.getAppId();
-        String dssLabel = jsonNode.get("dssLabel").asText();
-        // Long workflowId = jsonNode.get("workflowId").getLongValue();
-        // Map<String, Object> labels = StreamSupport.stream(Spliterators.spliteratorUnknownSize(dssLabel.getFields(),
-        // Spliterator.ORDERED), false).collect(Collectors.toMap(Entry::getKey, entry ->
-        // entry.getValue().getTextValue()));
+    @RequestMapping(value = "publishWorkflow",method = RequestMethod.POST)
+    public Message publishWorkflow(@Context HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) {
+        Long workflowId = publishWorkflowRequest.getWorkflowId();
+//        Map<String, Object> labels = StreamSupport.stream(Spliterators.spliteratorUnknownSize(dssLabel.getFields(),
+//            Spliterator.ORDERED), false).collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getTextValue()));
         //todo modify by front label
-        // JsonNode labelJsonNode = jsonNode.get(DSSCommonUtils.DSS_LABELS_KEY);
-        // String dssLabel = labelJsonNode.get(LabelKeyConvertor.ROUTE_LABEL_KEY).getTextValue();
+        String dssLabel = publishWorkflowRequest.getLabels().getRoute();
         Map<String, Object> labels=new HashMap<>();
         labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY,dssLabel);
-        String comment = jsonNode.get("comment").getTextValue();
+        String comment = publishWorkflowRequest.getComment();
         Workspace workspace = SSOHelper.getWorkspace(request);
         String publishUser = SecurityFilter.getLoginUsername(request);
         Message message;
@@ -158,25 +111,24 @@ public class FlowRestfulApi {
             LOGGER.error("failed to submit publish task for workflow id {}.", workflowId, t);
             message = Message.error("发布工作流失败");
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/getSchedulerWorkflowStatus")
-    public Response getSchedulerWorkflowStatus(@Context HttpServletRequest request,
-        @NotNull(message = "查询的空间id不能为空") @QueryParam("workspaceId") Long workspaceId,
-        @NotNull(message = "查询的编排id不能为空") @QueryParam("orchestratorId") Long orchestratorId) {
+    @RequestMapping(value = "getSchedulerWorkflowStatus",method = RequestMethod.GET)
+    public Message getSchedulerWorkflowStatus(@Context HttpServletRequest request,
+        @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
+        @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
         String username = SecurityFilter.getLoginUsername(request);
         try {
             WorkflowStatus status = publishService.getSchedulerWorkflowStatus(username, orchestratorId);
             Message result = Message.ok("获取调度工作流状态").data("published", status.getPublished()).data("releaseStatus",
                 status.getReleaseState());
             // Message result = Message.ok("获取调度工作流状态").data("published", false).data("releaseStatus", null);
-            return Message.messageToResponse(result);
+            return result;
         } catch (final Throwable t) {
             LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
                 orchestratorId, t);
-            return Message.messageToResponse(Message.error("获取工作流调度状态失败"));
+            return Message.error("获取工作流调度状态失败");
         }
     }
 
@@ -187,10 +139,9 @@ public class FlowRestfulApi {
      * @return
      */
 
-    @GET
-    @Path("/getReleaseStatus")
-    public Response getReleaseStatus(@Context HttpServletRequest request,
-                                     @NotNull(message = "查询的发布id不能为空") @QueryParam("releaseTaskId") Long releaseTaskId) {
+    @RequestMapping(value = "getReleaseStatus",method = RequestMethod.GET)
+    public Message getReleaseStatus(@Context HttpServletRequest request,
+                                    @NotNull(message = "查询的发布id不能为空") @RequestParam(required = false, name = "releaseTaskId") Long releaseTaskId) {
         String username = SecurityFilter.getLoginUsername(request);
         Message message;
         try {
@@ -215,26 +166,25 @@ public class FlowRestfulApi {
             LOGGER.error("Failed to get release status for {}", releaseTaskId, t);
             message = Message.error("发布异常:" + t.getMessage());
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
 
     /**
      * 更新工作流的基本信息，不包括更新Json,BML版本等
      * @param req
-     * @param json
+     * @param updateFlowBaseInfoRequest
      * @return
      * @throws DSSErrorException
      */
 
-    @POST
-    @Path("/updateFlowBaseInfo")
+    @RequestMapping(value = "updateFlowBaseInfo",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Response updateFlowBaseInfo(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException {
-        Long flowID = json.get("id").getLongValue();
-        String name = json.get("name") == null ? null : json.get("name").getTextValue();
-        String description = json.get("description") == null ? null : json.get("description").getTextValue();
-        String uses = json.get("uses") == null ? null : json.get("uses").getTextValue();
+    public Message updateFlowBaseInfo(@Context HttpServletRequest req, UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+        Long flowID = updateFlowBaseInfoRequest.getId();
+        String name = updateFlowBaseInfoRequest.getName();
+        String description = updateFlowBaseInfoRequest.getDescription();
+        String uses = updateFlowBaseInfoRequest.getUses();
 //        ioManager.checkeIsExecuting(projectVersionID);
         // TODO: 2019/6/13  projectVersionID的更新校验
         //这里可以不做事务
@@ -244,7 +194,7 @@ public class FlowRestfulApi {
         dssFlow.setDescription(description);
         dssFlow.setUses(uses);
         flowService.updateFlowBaseInfo(dssFlow);
-        return Message.messageToResponse(Message.ok());
+        return Message.ok();
     }
 
     /**
@@ -255,64 +205,50 @@ public class FlowRestfulApi {
      * @throws DSSErrorException
      */
 
-    @GET
-    @Path("/get")
-    public Response get(@Context HttpServletRequest req, @QueryParam("flowId") Long flowID
+    @RequestMapping(value = "get",method = RequestMethod.GET)
+    public Message get(@Context HttpServletRequest req, @RequestParam(required = false, name = "flowId") Long flowID
     ) throws DSSErrorException {
         // TODO: 2019/5/23 id空值判断
         String username = SecurityFilter.getLoginUsername(req);
         DSSFlow DSSFlow;
         DSSFlow = flowService.getLatestVersionFlow(flowID);
 //        if (!username.equals(DSSFlow.getCreator())) {
-//            return Message.messageToResponse(Message.ok("不可以访问别人工作流"));
+//            return Message.ok("不可以访问别人工作流");
 //        }
-        return Message.messageToResponse(Message.ok().data("flow", DSSFlow));
+        return Message.ok().data("flow", DSSFlow);
     }
 
-
-//    @GET
-//    @Path("/product/get")
-//    public Response productGet(@Context HttpServletRequest req, @QueryParam("id") Long flowID) throws ErrorException {
-//        DSSFlow DSSFlow;
-//        DSSFlow = flowService.getLatestVersionFlow(flowID);
-////        dwsFlow=flowService.genBusinessTagForNode(dwsFlow);
-//        return Message.messageToResponse(Message.ok().data("flow", DSSFlow));
-//    }
-
-
-    @POST
-    @Path("/deleteFlow")
+    @RequestMapping(value = "deleteFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Response deleteFlow(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException {
-        Long flowID = json.get("id").getLongValue();
-        boolean sure = json.get("sure") != null && json.get("sure").getBooleanValue();
+    public Message deleteFlow(@Context HttpServletRequest req, DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+        Long flowID = deleteFlowRequest.getId();
+        boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
         // TODO: 2019/6/13  projectVersionID的更新校验
         //state为true代表曾经发布过
         if (flowService.getFlowByID(flowID).getState() && !sure) {
-            return Message.messageToResponse(Message.ok().data("warmMsg", "该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？"));
+            return Message.ok().data("warmMsg", "该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？");
         }
 //        ioManager.checkeIsExecuting(projectVersionID);
         flowService.batchDeleteFlow(Arrays.asList(flowID));
-        return Message.messageToResponse(Message.ok());
+        return Message.ok();
     }
 
     /**
      * 工作流保存接口，如工作流Json内容有变化，会更新工作流的Json内容
      * @param req
-     * @param json
+     * @param saveFlowRequest
      * @return
      * @throws DSSErrorException
      * @throws IOException
      */
 
-    @POST
-    @Path("/saveFlow")
+    @RequestMapping(value = "saveFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Response saveFlow(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException, IOException {
-        Long flowID = json.get("id").getLongValue();
-        String jsonFlow = json.get("json").getTextValue();
-        String workspaceName = json.get("workspaceName").getTextValue();
-        String projectName = json.get("projectName").getTextValue();
+    public Message saveFlow(@Context HttpServletRequest req, @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
+        Long flowID = saveFlowRequest.getId();
+        String jsonFlow = saveFlowRequest.getJson();
+        String workspaceName = saveFlowRequest.getWorkspaceName();
+        String projectName = saveFlowRequest.getProjectName();
         String userName = SecurityFilter.getLoginUsername(req);
         //String comment = json.get("comment") == null?"保存更新":json.get("comment").getTextValue();
         //目前保存comment不使用了,发布才有comment
@@ -324,7 +260,8 @@ public class FlowRestfulApi {
         synchronized (DSSWorkFlowConstant.saveFlowLock.intern(flowID)) {
             version = flowService.saveFlow(flowID, jsonFlow, comment, userName, workspaceName, projectName);
         }
-        return Message.messageToResponse(Message.ok().data("flowVersion", version).data("flowEditLock", newFlowEditLock));
+        return Message.ok().data("flowVersion", version).data("flowEditLock", newFlowEditLock);
     }
-
 }
+
+

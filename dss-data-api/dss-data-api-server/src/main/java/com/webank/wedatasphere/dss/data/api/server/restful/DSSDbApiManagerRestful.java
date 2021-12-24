@@ -3,21 +3,12 @@ package com.webank.wedatasphere.dss.data.api.server.restful;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiManagerService;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,19 +20,17 @@ import java.util.List;
  * @Created by suyc
  */
 
-@Component
-@Path("/dss/data/api/apimanager")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(path = "/dss/data/api/apimanager", produces = {"application/json"})
 public class DSSDbApiManagerRestful {
     @Autowired
     private ApiManagerService apiManagerService;
 
-    @GET
-    @Path("/list")
-    public Response getApiList(@Context HttpServletRequest request,
-                               @QueryParam("workspaceId") Long workspaceId, @QueryParam("apiName") String apiName,
-                               @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+    public Message getApiList(@Context HttpServletRequest request,
+                              @RequestParam("workspaceId") Long workspaceId, @RequestParam("apiName") String apiName,
+                              @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -51,22 +40,22 @@ public class DSSDbApiManagerRestful {
 
         List<Long> totals = new ArrayList<>();
         List<ApiInfo> apiInfoList = apiManagerService.getApiInfoList(workspaceId,apiName,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("list",apiInfoList).data("total", totals.get(0)));
+        return Message.ok().data("list",apiInfoList).data("total", totals.get(0));
     }
 
-    @POST
-    @Path("/offline/{apiId}")
-    public Response offlineApi(@PathParam("apiId") Long apiId){
+
+    @RequestMapping(path = "/offline/{apiId}", method = RequestMethod.POST)
+    public Message offlineApi(@PathVariable("apiId") Long apiId){
         apiManagerService.offlineApi(apiId);
         ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
 
         Message message = Message.ok("下线API成功").data("apiInfo",apiInfo);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @POST
-    @Path("/online/{apiId}")
-    public Response onlineApi(@PathParam("apiId") Long apiId) throws DataApiException {
+
+    @RequestMapping(path = "/online/{apiId}", method = RequestMethod.POST)
+    public Message onlineApi(@PathVariable("apiId") Long apiId) throws DataApiException {
 
 
         ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
@@ -81,19 +70,19 @@ public class DSSDbApiManagerRestful {
         apiManagerService.onlineApi(apiId);
         apiInfo = apiManagerService.getApiInfo(apiId);
         Message message = Message.ok("上线API成功").data("apiInfo",apiInfo);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/callPath/{apiId}")
-    public Response getApiCallPath(@PathParam("apiId") Long apiId){
+
+    @RequestMapping(path = "/callPath/{apiId}", method = RequestMethod.GET)
+    public Message getApiCallPath(@PathVariable("apiId") Long apiId){
         StringBuilder callPath =new StringBuilder("{protocol}://{host}");
         callPath.append("/api/rest_j/v1/dss/data/api/execute");
         ApiInfo apiInfo = apiManagerService.getApiInfo(apiId);
         callPath.append("/" + apiInfo.getApiPath());
 
         Message message = Message.ok().data("callPathPrefix", callPath.toString());
-        return Message.messageToResponse(message);
+        return message;
     }
 
 

@@ -18,47 +18,42 @@ package com.webank.wedatasphere.dss.workflow.restful;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.workflow.cs.service.CSTableService;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import org.codehaus.jackson.JsonNode;
+import com.webank.wedatasphere.dss.workflow.entity.request.QueryTableMetaRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.TablesRequest;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Component
-@Path("/dss/workflow")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/workflow", produces = {"application/json"})
+@RestController
 public class ContextServiceRestful {
 
     @Autowired
     private CSTableService csTableService;
 
-    @POST
-    @Path("tables")
-    public Response tables(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException {
+    @RequestMapping(value = "tables",method = RequestMethod.POST)
+    public Message tables(@Context HttpServletRequest req, @RequestBody TablesRequest tablesRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
-        String contextIDStr = json.get("contextID").getTextValue();
-        String nodeName = json.get("nodeName").getTextValue();
-        return Message.messageToResponse(Message.ok().data("tables", csTableService.queryTables("default", contextIDStr, nodeName)));
+        String contextIDStr = tablesRequest.getContextID();
+        String nodeName = tablesRequest.getNodeName();
+        return Message.ok().data("tables", csTableService.queryTables("default", contextIDStr, nodeName));
     }
 
 
-    @POST
-    @Path("columns")
-    public Response queryTableMeta(@Context HttpServletRequest req, JsonNode json) throws DSSErrorException {
+    @RequestMapping(value = "columns",method = RequestMethod.POST)
+    public Message queryTableMeta(@Context HttpServletRequest req,@RequestBody QueryTableMetaRequest queryTableMetaRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
-        String contextIDStr = json.get("contextID").getTextValue();
-        String contextKeyStr = json.get("contextKey").getTextValue();
-        return Message.messageToResponse(Message.ok().data("columns", csTableService.queryTableMeta("default", contextIDStr, contextKeyStr)));
+        String contextIDStr = queryTableMetaRequest.getContextID();
+        String contextKeyStr = queryTableMetaRequest.getContextKey();
+        return Message.ok().data("columns", csTableService.queryTableMeta("default", contextIDStr, contextKeyStr));
     }
 
 }

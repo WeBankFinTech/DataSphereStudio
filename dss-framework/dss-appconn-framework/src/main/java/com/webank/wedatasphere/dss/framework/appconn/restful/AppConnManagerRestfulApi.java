@@ -21,29 +21,23 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
-import com.webank.wedatasphere.linkis.server.Message;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
-@Component
-@Path("/dss/framework/project/appconn")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/framework/project/appconn", produces = {"application/json"})
+@RestController
 public class AppConnManagerRestfulApi {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConnManagerRestfulApi.class);
 
     @Autowired
@@ -61,46 +55,42 @@ public class AppConnManagerRestfulApi {
         LOGGER.info("All AppConn plugins has scanned.");
     }
 
-    @GET
-    @Path("listAppConnInfos")
-    public Response listAppConnInfos() {
+    @RequestMapping(path ="listAppConnInfos", method = RequestMethod.GET)
+    public Message listAppConnInfos() {
         List<? extends AppConnInfo> appConnInfos = appConnInfoService.getAppConnInfos();
         Message message = Message.ok("Get AppConnInfo list succeed.");
         message.data("appConnInfos", appConnInfos);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("{appConnName}/get")
-    public Response get(@PathParam("appConnName") String appConnName) {
+    @RequestMapping(path ="{appConnName}/get", method = RequestMethod.GET)
+    public Message get(@PathVariable("appConnName") String appConnName) {
         AppConnInfo appConnInfo = appConnInfoService.getAppConnInfo(appConnName);
         Message message = Message.ok("Get AppConnInfo succeed.");
         message.data("appConnInfo", appConnInfo);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/{appConnName}/getAppInstances")
-    public Response getAppInstancesByAppConnInfo(@PathParam("appConnName") String appConnName) {
+    @RequestMapping(path ="{appConnName}/getAppInstances", method = RequestMethod.GET)
+    public Message getAppInstancesByAppConnInfo(@PathVariable("appConnName") String appConnName) {
         List<? extends AppInstanceInfo> appInstanceInfos = appConnInfoService.getAppInstancesByAppConnName(appConnName);
         Message message = Message.ok("Get AppInstance list succeed.");
         message.data("appInstanceInfos", appInstanceInfos);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/{appConnName}/load")
-    public Response load(@PathParam("appConnName") String appConnName) {
+    @RequestMapping(path ="{appConnName}/load", method = RequestMethod.GET)
+    public Message load(@PathVariable("appConnName") String appConnName) {
         LOGGER.info("Try to load a new AppConn {}.", appConnName);
         try {
             appConnResourceUploadService.upload(appConnName);
         } catch (Exception e) {
             LOGGER.error("Load AppConn " + appConnName + " failed.", e);
             Message message = Message.error("Load AppConn " + appConnName + " failed. Reason: " + ExceptionUtils.getRootCauseMessage(e));
-            return Message.messageToResponse(message);
+            return message;
         }
         Message message = Message.ok("Load AppConn " + appConnName + " succeed.");
-        return Message.messageToResponse(message);
+        return message;
     }
 
 }

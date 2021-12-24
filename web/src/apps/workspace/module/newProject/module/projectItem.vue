@@ -400,7 +400,6 @@ export default {
         position: $absolute;
         left: 0;
         background: $success-color;
-        
         height: 100%;
         border-radius: 10px;
         z-index: 1;

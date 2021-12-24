@@ -16,10 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.exception;
 
-/**
- * @Author alexyang
- * @Date 2020/3/20
- */
 public class ErrorCode {
 
     public static final int INVALID_PARAMS = 71001;

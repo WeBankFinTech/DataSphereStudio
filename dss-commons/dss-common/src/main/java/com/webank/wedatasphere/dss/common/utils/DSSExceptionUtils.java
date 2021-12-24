@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.exception.ThrowingConsumer;
 import com.webank.wedatasphere.dss.common.exception.ThrowingFunction;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.common.exception.WarnException;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.WarnException;
 import java.lang.reflect.Constructor;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -29,9 +29,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by v_wbjftang on 2019/9/24.
- */
 public class DSSExceptionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSExceptionUtils.class);

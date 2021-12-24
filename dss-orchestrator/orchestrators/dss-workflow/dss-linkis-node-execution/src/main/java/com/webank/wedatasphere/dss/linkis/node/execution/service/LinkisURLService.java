@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.linkis.node.execution.service;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionWarnException;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.LinkisURLServiceImpl;
-import com.webank.wedatasphere.linkis.common.utils.ClassUtils;
+import org.apache.linkis.common.utils.ClassUtils;
 import java.util.Optional;
 
 

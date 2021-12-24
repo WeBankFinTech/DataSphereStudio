@@ -289,11 +289,10 @@ export default {
       }, (cache) => {
         this.updateCache(cache);
         this.getWorkListAndOpen().then(() => {
-          let work = null;
-          if(this.lastActive) {
-            work = this.worklist.find(w=>w.id === this.lastActive)
-          } else {
-            work = last(this.worklist);
+          let work = last(this.worklist);
+          const lastActivedWork = this.worklist.find(w=>w.id === this.lastActive)
+          if(lastActivedWork) {
+            work = lastActivedWork
           }
           if(work) {
             this.chooseWork(work)
@@ -533,7 +532,11 @@ export default {
           cb && cb(true);
         } else {
           if (choose !== false) this.chooseWork(repeatWork);
-          cb && cb(false);
+          if (option.action === 'export_table'){
+            cb && cb(true);
+          } else {
+            cb && cb(false);
+          }
         }
       } else {
         work = new Work(option);
@@ -875,6 +878,7 @@ export default {
         } else {
           doRemove();
         }
+        this.dispatch('Workbench:removeTab', this.worklist);
       });
     },
     /**
@@ -1213,7 +1217,7 @@ export default {
           border-bottom: 2px solid $primary-color;
           /deep/.svg-icon {
             @include font-color($primary-color, $dark-primary-color);
-        }
+          }
         }
       }
     }

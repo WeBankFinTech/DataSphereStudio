@@ -20,8 +20,8 @@ import java.util
 
 import com.webank.wedatasphere.dss.standard.app.sso.request.{SSORequestOperation, SSORequestService}
 import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
-import com.webank.wedatasphere.linkis.httpclient.response.HttpResult
+import org.apache.linkis.httpclient.request.HttpAction
+import org.apache.linkis.httpclient.response.HttpResult
 
 
 class OriginSSORequestServiceImpl extends AppServiceImpl with SSORequestService {

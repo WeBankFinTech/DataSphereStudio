@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.TableEmailContent
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.storage.resultset.table.{TableMetaData, TableRecord}
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.storage.resultset.table.{TableMetaData, TableRecord}
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
 

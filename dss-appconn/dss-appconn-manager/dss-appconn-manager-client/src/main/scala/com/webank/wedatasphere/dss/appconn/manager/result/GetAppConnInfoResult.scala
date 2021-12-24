@@ -20,8 +20,8 @@ import java.util
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfoImpl
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.linkis.httpclient.dws.annotation.DWSHttpMessageResult
-import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
+import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
+import org.apache.linkis.httpclient.dws.response.DWSResult
 
 @DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/project/appconn/[a-zA-Z0-9]+/get")
 class GetAppConnInfoResult extends DWSResult {

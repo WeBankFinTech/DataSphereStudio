@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
        <!-- <relativePath>../../pom.xml</relativePath>-->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -68,7 +68,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -90,7 +90,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>commons-lang3</artifactId>
@@ -125,14 +125,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -143,7 +143,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -165,7 +165,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-mybatis</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
@@ -189,7 +189,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -274,6 +274,14 @@
                 </includes>
             </resource>
 
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                </includes>
+            </resource>
         </resources>
     </build>
 </project>

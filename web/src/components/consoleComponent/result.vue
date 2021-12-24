@@ -12,6 +12,7 @@
       :dispatch="dispatch"
       :getResultUrl="getResultUrl"
       :comData="comData"
+      :result-type="resultType"
       @on-analysis="$emit('on-analysis', arguments[0])"
       @on-filter="handleFilterView" />
     <we-filter-view
@@ -331,7 +332,7 @@ export default {
       });
       tmpResult.sortType = this.sortType;
       tmpResult.current = this.page.current;
-      tmpResult.size = this.pagesize;
+      tmpResult.size = this.page.size;
       const resultSet = this.script.resultSet || 0;
       this.$set(this.script.resultList[resultSet], 'result', tmpResult);
       this.dispatch('IndexedDB:updateResult', {
@@ -510,7 +511,7 @@ export default {
       // 分页后的数据进行存储
       const tmpResult = this.getResult();
       tmpResult.current = this.page.current;
-      tmpResult.size = this.pagesize;
+      tmpResult.size = this.page.size;
       const resultSet = this.script.resultSet || 0;
       if(this.script.resultList && this.script.resultList[resultSet]) this.$set(this.script.resultList[resultSet], 'result', tmpResult);
       this.dispatch('IndexedDB:updateResult', {
@@ -528,7 +529,7 @@ export default {
       // 分页后的数据进行存储
       const tmpResult = this.getResult();
       tmpResult.current = this.page.current;
-      tmpResult.size = this.pagesize;
+      tmpResult.size = this.page.size;
       const resultSet = this.script.resultSet || 0;
       this.$set(this.script.resultList[resultSet], 'result', tmpResult);
       this.dispatch('IndexedDB:updateResult', {

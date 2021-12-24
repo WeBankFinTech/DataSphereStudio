@@ -59,7 +59,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 
 @Component
@@ -92,13 +92,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if (dbProject != null) {
             DSSExceptionUtils.dealErrorException(60022, String.format("project name already has the same name %s ", projectCreateRequest.getName()), DSSProjectErrorException.class);
         }
-
+        //todo 创建appconn的相关的工程 还没有调试通过
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, username, workspace);
         if (null == projectMap) {
             LOGGER.error("projectMap is null, it means some appConns create project failed");
             throw new DSSProjectErrorException(71000, "projectMap is null, create project in appconn failed");
         }
-
         //3.保存dss_project
         DSSProjectDO project = projectService.createProject(username, projectCreateRequest);
         //4.保存dss_project_user 工程与用户关系

@@ -22,11 +22,11 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.Email
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.FsPathStoreEmailContent
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.{EmailContent, EmailContentParser}
-import com.webank.wedatasphere.linkis.common.io.resultset.ResultSetReader
-import com.webank.wedatasphere.linkis.common.io.{MetaData, Record}
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.storage.LineRecord
-import com.webank.wedatasphere.linkis.storage.resultset.ResultSetReader
+import org.apache.linkis.common.io.resultset.ResultSetReader
+import org.apache.linkis.common.io.{MetaData, Record}
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.storage.LineRecord
+import org.apache.linkis.storage.resultset.ResultSetReader
 import org.apache.commons.io.IOUtils
 
 abstract class AbstractEmailContentParser[T] extends EmailContentParser {

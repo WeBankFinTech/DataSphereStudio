@@ -60,7 +60,6 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
-
   if (/\/application\//.test(config.url)) {
     config.url = `http://${window.location.host}` + config.url
   }
@@ -82,7 +81,6 @@ instance.interceptors.request.use((config) => {
       config.data = qs(config.data)
     }
   }
-
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -350,5 +348,4 @@ api.setResponse = function(constructionOfResponse) {
 api.getToken = function() {
   return storage.get("token", true);
 }
-
 export default api;

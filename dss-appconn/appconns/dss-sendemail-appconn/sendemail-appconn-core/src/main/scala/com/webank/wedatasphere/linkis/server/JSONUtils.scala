@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.server
+package org.apache.linkis.server
 
 object JSONUtils {
 

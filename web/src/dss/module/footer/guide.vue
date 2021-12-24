@@ -111,13 +111,13 @@ export default {
     this.getGuideConfig();
     this.init();
     // 开发中心和运维中心使用同一个route，所以使用eventbus来监听变化，从而触发产品即文档的更新
-    eventbus.on("workflow.change", this.onWorkflowChange);
+    // eventbus.on("workflow.change", this.onWorkflowChange);
     // 工作流编辑-调度中心切换
     eventbus.on("workflow.orchestratorId", this.onWorkflowSchedulerChange);
   },
   beforeDestroy() {
     this.dispose();
-    eventbus.off("workflow.change", this.onWorkflowChange);
+    // eventbus.off("workflow.change", this.onWorkflowChange);
     eventbus.off("workflow.orchestratorId", this.onWorkflowSchedulerChange);
   },
   methods: {
@@ -142,17 +142,37 @@ export default {
     getGuideConfig(key) {
       // reset guide
       this.guide = {};
-      const path = key || this.$route.path;
-      GetGuideByPath({ path: path }).then((data) => {
-        if (data.result) {
-          this.guide = {
-            title: data.result.title,
-            description: data.result.description,
-            steps: data.result.children.filter((i) => i.type == 1),
-            questions: data.result.children.filter((i) => i.type == 2),
-          };
-        }
-      });
+      // path传参优先级
+      // 1. 指定路径
+      // 2. 当前路径
+      // 3. 父级以及路径，适用于某些二级子页面共享一个父级文档
+      // 4. 降级公共 /common
+      const pathPriority = [];
+      const parentPath = this.$route.path.split("/").slice(0, 2).join("/");
+      key && pathPriority.push(key); // 指定路径
+      pathPriority.push(this.$route.path); // 当前路径
+      parentPath != this.$route.path && pathPriority.push(parentPath); // 父级以及路径
+      pathPriority.push("/common"); // 公共
+
+      this.loadGuide(pathPriority);
+    },
+    loadGuide(pathPriority) {
+      if (pathPriority && pathPriority.length) {
+        const path = pathPriority.shift(); // 从第一个开始
+        GetGuideByPath({ path: path }).then((data) => {
+          if (data.result) {
+            this.guide = {
+              title: data.result.title,
+              description: data.result.description,
+              steps: data.result.children.filter((i) => i.type == 1),
+              questions: data.result.children.filter((i) => i.type == 2),
+            };
+          } else {
+            // 第一优先级path没有找到，继续按第二优先级查找
+            this.loadGuide(pathPriority);
+          }
+        });
+      }
     },
     changeToAnswer(question) {
       this.currentTab = "library";

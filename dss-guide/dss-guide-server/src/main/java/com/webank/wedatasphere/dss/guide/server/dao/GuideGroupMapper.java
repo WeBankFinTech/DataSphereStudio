@@ -18,8 +18,7 @@ import java.util.List;
  */
 @Mapper
 public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
-    @Select("SELECT * FROM dss_guide_group WHERE path = #{path}")
-    GuideGroup getGuideGroupByPath(String path);
+    GuideGroup getGuideGroupByPath(@Param("path") String path);
 
     List<GuideGroup> getAllGuideGroupDetails();
 

@@ -29,7 +29,7 @@ import java.util.UUID;
 
 /**
  * @author suyc
- * @Classname MangerRestful
+ * @Classname GuideAdminRestful
  * @Description TODO
  * @Date 2021/12/17 14:53
  * @Created by suyc
@@ -37,8 +37,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "/dss/guide/admin", produces = {"application/json"})
 @AllArgsConstructor
-public class AdminMangerRestful {
-    private static final Logger logger = LoggerFactory.getLogger(AdminMangerRestful.class);
+public class GuideAdminRestful {
+    private static final Logger logger = LoggerFactory.getLogger(GuideAdminRestful.class);
 
     private GuideGroupService guideGroupService;
     private GuideContentService guideContentService;
@@ -69,7 +69,7 @@ public class AdminMangerRestful {
         return Message.ok().data("result", guideGroupService.getAllGuideGroupDetails());
     }
 
-    @RequestMapping(path ="/guidegroup/{id}", method = RequestMethod.POST)
+    @RequestMapping(path ="/guidegroup/{id}/delete", method = RequestMethod.POST)
     public Message deleteGroup(@PathVariable Long id) {
         guideGroupService.deleteGroup(id);
         Message message = Message.ok("删除成功");
@@ -119,7 +119,7 @@ public class AdminMangerRestful {
         }
     }
 
-    @RequestMapping(path ="/guidecontent/{id}", method = RequestMethod.POST)
+    @RequestMapping(path ="/guidecontent/{id}/delete", method = RequestMethod.POST)
     public Message deleteContent(@PathVariable Long id) {
         guideContentService.deleteContent(id);
         Message message = Message.ok("删除成功");

@@ -124,7 +124,7 @@ export default {
     classifyList: {
       type: Array,
       default: () => []
-    }
+    },
   },
   data() {
     return {

@@ -66,6 +66,7 @@
         :orchestratorModeList="orchestratorModeList"
         :currentMode="currentMode"
         :selectOrchestratorList="selectOrchestratorList"
+        :projectNameList="formatProjectNameList"
         @on-tree-modal-cancel="handleTreeModalCancel"
         @on-tree-modal-confirm="handleTreeModalConfirm"
       >
@@ -91,12 +92,6 @@
       @menuHandleChangeButton="menuHandleChangeButton"
     >
       <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
-        <!-- 空项目 -->
-        <VoidPage
-          v-show="projectsTree.length === 0"
-          tipTitle="你还没有项目，请先添加一个项目"
-          :buttonClick="createProject"
-        />
         <div
           class="workflowListContainer"
           v-show="textColor || (tabList.length < 1 && projectsTree.length > 0)"
@@ -109,6 +104,9 @@
             :orchestratorModeList="orchestratorModeList"
             :currentMode="currentMode"
             :selectOrchestratorList="selectOrchestratorList"
+            :projectsTree="projectsTree"
+            :top-tab-list="tabList"
+            :create-project-handler="createProject"
             @open-workflow="openWorkflow"
             @publishSuccess="publishSuccess"
             @on-tree-modal-confirm="handleTreeModalConfirm"
@@ -216,7 +214,6 @@ import Tree from "@/apps/workflows/module/common/workflowTree/tree.vue";
 import WorkflowTabList from "@/apps/workflows/module/common/tabList/index.vue";
 import MakeUp from "@/apps/workflows/module/makeUp";
 import ProjectForm from "@/components/projectForm/index.js";
-import VoidPage from "../../module/common/voidPage/index.vue";
 import api from "@/common/service/api";
 import { DEVPROCESS, ORCHESTRATORMODES } from "@/common/config/const.js";
 import {
@@ -237,7 +234,6 @@ export default {
     makeUp: MakeUp.component,
     ProjectForm,
     DS,
-    VoidPage,
   },
   data() {
     return {
@@ -296,6 +292,26 @@ export default {
     };
   },
   watch: {
+    tabList(val, oldVal) {
+      let workspaceId = this.$route.query.workspaceId
+      let workFlowLists = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+      val.forEach( item => {
+        if( workFlowLists.every(i => i.id !== item.id) ) {
+          if( workFlowLists.length > 6 ) {
+            workFlowLists.pop()
+          }
+          workFlowLists.unshift(item)
+        } else {
+          let _workFlowLists = workFlowLists.slice()
+          let idx = workFlowLists.findIndex(i => i.id === item.id);
+          let _item = _workFlowLists.splice(idx, 1)[0];
+          _workFlowLists.unshift(_item)
+          workFlowLists = _workFlowLists
+        }
+      })
+      localStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
+      eventbus.emit('tabListChange', workFlowLists)
+    },
     currentVal(val, oldVal) {
       this.lastVal = oldVal;
       this.currentVal = val;
@@ -327,7 +343,7 @@ export default {
       this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
     }
     // 获取所有project展示tree
-    this.getAllProjects(this.initClick);
+    this.getAllProjects(() => {});
   },
   mounted() {
     // this.getCache();
@@ -341,22 +357,33 @@ export default {
     isScheduler() {
       return this.$route.name === "Scheduler";
     },
+    formatProjectNameList() {
+      let res = [];
+      if( this.projectsTree.length > 0 ) {
+        this.projectsTree.forEach(item => {
+          let name = item.name;
+          let id = item.id + '';
+          res.push({name, id})
+        })
+      }
+      return res;
+    }
   },
   methods: {
-    initClick() {
-      if (this.projectsTree.length > 0) {
-        const cur = this.projectsTree[0];
-        this.getFlow(cur, (flow) => {
-          if (flow.length > 0) {
-            const cur_node = flow[0];
-            this.handleTreeClick(cur_node);
-            this.$refs.projectTree.handleItemToggle(cur);
-          } else {
-            this.handleTreeClick(cur);
-          }
-        });
-      }
-    },
+    // initClick() {
+    //   if (this.projectsTree.length > 0) {
+    //     const cur = this.projectsTree[0];
+    //     this.getFlow(cur, (flow) => {
+    //       if (flow.length > 0) {
+    //         const cur_node = flow[0];
+    //         this.handleTreeClick(cur_node);
+    //         this.$refs.projectTree.handleItemToggle(cur);
+    //       } else {
+    //         this.handleTreeClick(cur);
+    //       }
+    //     });
+    //   }
+    // },
     createProject() {
       this.actionType = "add";
       this.ProjectShow = true;
@@ -830,7 +857,7 @@ export default {
             );
             setTimeout(() => {
               this.$router.go(0);
-            }, 1000);
+            }, 500);
             // this.getclassListData().then(data => {
             //   // 新建完工程进到工作流页
             //   const currentProject = data[0].dwsProjectList.filter(
@@ -1063,7 +1090,7 @@ export default {
           query: this.$route.query,
         });
       }
-      this.getAllProjects();
+      this.getAllProjects(()=>{});
     },
     // 选择列表
     selectProject() {

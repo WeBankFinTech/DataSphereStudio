@@ -17,15 +17,14 @@
 package com.webank.wedatasphere.dss.framework.project.conf;
 
 
-
-import com.webank.wedatasphere.linkis.server.Message;
+import com.webank.wedatasphere.dss.common.utils.MessageUtils;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -47,6 +46,6 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
             strBuilder.append(cv.getMessage()).append(";");
         }
         Message message = Message.error(strBuilder.toString());
-        return Message.messageToResponse(message);
+        return MessageUtils.messageToResponse(message);
     }
 }

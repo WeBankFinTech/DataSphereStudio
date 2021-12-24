@@ -475,6 +475,7 @@
         "publishing": "Publishing",
         "resource": "Resource",
         "viewVersion": "View verson",
+        "move": "Move",
         "config": "Config",
         "action": "Action",
         "readonly": "Read-only",
@@ -678,3 +679,4 @@
     }
   }
 }
+

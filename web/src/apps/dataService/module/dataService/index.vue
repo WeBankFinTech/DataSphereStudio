@@ -215,11 +215,11 @@ export default {
     };
     const validateAPIPath = (rule, value, callback) => {
       const result = value && value.trim();
-      const reg = /^[\w_-][\/\w_-]{3,199}$/g;
+      const reg = /^[\w_-]{4,199}$/g;
       if (!reg.test(result)) {
         callback(
           new Error(
-            "支持英文、数字、下划线（_）、连字符（-）、正斜线（/），且不能以正斜线（/）开头，4到200个字符"
+            "支持英文、数字、下划线（_）、连字符（-)，且不能以正斜线（/）开头，4到200个字符"
           )
         );
       } else {
@@ -507,11 +507,13 @@ export default {
           let tmp = { ...item };
           const { data, apiData } = payload;
           if (tmp.isActive) {
+            const newData = { ...apiData, id: data.id, path: apiData.apiPath };
             tmp = {
               ...item,
               apiName: data.name,
               id: data.id,
-              data: { ...apiData, id: data.id, path: apiData.apiPath }
+              data: newData,
+              originData: {...newData}
             };
           }
           return tmp;

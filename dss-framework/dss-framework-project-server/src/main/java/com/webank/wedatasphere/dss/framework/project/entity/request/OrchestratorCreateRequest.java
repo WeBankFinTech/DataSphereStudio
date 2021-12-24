@@ -46,6 +46,15 @@ public class OrchestratorCreateRequest {
      */
     @NotNull(message = "编排方式不能为空")
     private List<String> orchestratorWays;
+    private List<String> dssLabels;
+
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
 
     /**
      * 编排用途
@@ -59,16 +68,6 @@ public class OrchestratorCreateRequest {
     private String projectName;
 
     private String workspaceName;
-
-    public List<String> getDssLabels() {
-        return dssLabels;
-    }
-
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
-    }
-
-    private List<String> dssLabels;
 
     /**
      * labels是通过前端进行传入的，主要是用来进行当前的环境信息

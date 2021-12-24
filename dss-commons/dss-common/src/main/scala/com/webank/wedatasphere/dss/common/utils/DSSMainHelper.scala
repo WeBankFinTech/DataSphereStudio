@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.common.utils
 
-import com.webank.wedatasphere.linkis.common.conf.{BDPConfiguration, CommonVars, DSSConfiguration}
+import org.apache.linkis.common.conf.{BDPConfiguration, CommonVars, DSSConfiguration}
 
 import scala.collection.JavaConversions._
 
-/**
- * @author allenlliu
- * @date 2021/3/9 17:18
- */
+
 object DSSMainHelper {
 
 //  val DSS_DEFAULT_PROPERTY_FILE_NAME = CommonVars("wds.dss.default.property.file", "dss.properties")

@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job
 
-import com.webank.wedatasphere.linkis.scheduler.queue.Job
+import org.apache.linkis.scheduler.queue.Job
 
 
 trait FlowExecutionRequest {

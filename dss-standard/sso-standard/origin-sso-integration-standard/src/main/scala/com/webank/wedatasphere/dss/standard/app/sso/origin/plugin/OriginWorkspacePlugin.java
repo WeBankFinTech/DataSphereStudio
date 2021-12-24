@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.sso.origin.plugin;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.AbstractWorkspacePlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient;
-import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient;
+import org.apache.linkis.httpclient.dws.DWSHttpClient;
 import java.util.List;
 
 

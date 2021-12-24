@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 import java.util.List;
 

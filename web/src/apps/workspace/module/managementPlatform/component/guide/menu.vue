@@ -146,6 +146,8 @@ import {
   GetGuideTree,
   SaveGuideGroup,
   SaveGuideContent,
+  DeleteGuideContent,
+  DeleteGuideGroup,
 } from "@/common/service/apiGuide";
 
 import Tree from "./tree.vue";
@@ -248,8 +250,9 @@ export default {
       return data;
     },
     handleTreeClick(node) {
-      this.currentTreeId = node.treeId;
+      // group节点点击不处理
       if (node.type) {
+        this.currentTreeId = node.treeId;
         this.$router.push({
           path: "/managementPlatform/guide",
           query: { id: node.id },
@@ -284,7 +287,27 @@ export default {
       });
     },
     handleDeleteClick(node) {
-      console.log("delete", node.type ? "content" : "group");
+      this.$Modal.confirm({
+        title: "确认删除吗",
+        content: "",
+        onOk: () => {
+          if (node.type) {
+            DeleteGuideContent(node.id).then((res) => {
+              this.refreshTree();
+            });
+          } else {
+            const group = this.nodes.find((i) => i.id == node.id);
+            if (group && group.children && group.children.length) {
+              this.$Message.info("该页面group还有所属内容，不能删除");
+            } else {
+              DeleteGuideGroup(node.id).then((res) => {
+                this.refreshTree();
+              });
+            }
+          }
+        },
+        onCancel: () => {},
+      });
     },
     handleUpdateClick(node) {
       const type = node.type ? "content" : "group";

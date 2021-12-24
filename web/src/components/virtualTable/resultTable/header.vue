@@ -22,10 +22,10 @@
             v-if="col.sortable"
             class="caret-wrapper">
             <i
-              :class="computeSortClass(col, 'asc')"
+              :class="computeSortClass(col, 'asc', index)"
               @click.stop="handleSortClick($event, {col, index}, 'asc')"/>
             <i
-              :class="computeSortClass(col, 'desc')"
+              :class="computeSortClass(col, 'desc', index)"
               @click.stop="handleSortClick($event, {col, index}, 'desc')"/>
           </span>
         </div>
@@ -77,12 +77,12 @@ export default {
     };
   },
   methods: {
-    computeSortClass(currentHead, type) {
+    computeSortClass(currentHead, type, index) {
       return [
         `${prefixCls}-sort-caret`,
         type,
         {
-          [`${prefixCls}-sort`]: (this.sort.column === currentHead && this.sort.type === type),
+          [`${prefixCls}-sort`]: (this.sort.column && this.sort.index === index && this.sort.column.content === currentHead.content && this.sort.type === type),
         },
       ];
     },

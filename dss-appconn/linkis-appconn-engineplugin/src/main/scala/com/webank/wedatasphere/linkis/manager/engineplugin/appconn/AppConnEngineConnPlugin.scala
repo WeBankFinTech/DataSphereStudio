@@ -14,18 +14,18 @@
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn
+package org.apache.linkis.manager.engineplugin.appconn
 
 import java.util
 
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.factory.AppConnEngineConnFactory
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.launch.AppConnProcessEngineConnLaunchBuilder
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.EngineConnPlugin
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.creation.EngineConnFactory
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.launch.EngineConnLaunchBuilder
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.resource.{EngineResourceFactory, GenericEngineResourceFactory}
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineTypeLabel
+import org.apache.linkis.manager.engineplugin.appconn.factory.AppConnEngineConnFactory
+import org.apache.linkis.manager.engineplugin.appconn.launch.AppConnProcessEngineConnLaunchBuilder
+import org.apache.linkis.manager.engineplugin.common.EngineConnPlugin
+import org.apache.linkis.manager.engineplugin.common.creation.EngineConnFactory
+import org.apache.linkis.manager.engineplugin.common.launch.EngineConnLaunchBuilder
+import org.apache.linkis.manager.engineplugin.common.resource.{EngineResourceFactory, GenericEngineResourceFactory}
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
 
 class AppConnEngineConnPlugin extends EngineConnPlugin {
 

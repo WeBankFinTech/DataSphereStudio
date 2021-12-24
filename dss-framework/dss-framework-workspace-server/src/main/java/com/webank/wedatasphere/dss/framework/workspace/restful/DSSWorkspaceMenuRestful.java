@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -27,11 +27,14 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.info.DSSWorkspace
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -50,10 +53,8 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
  * created by cooperyang on 2020/3/17
  * Description:
  */
-@Component
-@Path("/dss/framework/workspace")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
+@RestController
 public class DSSWorkspaceMenuRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceMenuRestful.class);
@@ -77,9 +78,9 @@ public class DSSWorkspaceMenuRestful {
         components.put(12, DSSWorkspaceWorkflowInfoVO.class);
     }
 
-    @GET
-    @Path("getStatistics")
-    public Response getStatistics(@Context HttpServletRequest request,
+
+    @RequestMapping(path ="getStatistics", method = RequestMethod.GET)
+    public Message getStatistics(@Context HttpServletRequest request,
                                   @QueryParam(WORKSPACE_ID_STR) int workspaceId, @QueryParam("componentId") int componentId){
         Class<? extends AbstractWorkspaceComponentInfoVO> clazz = components.get(componentId);
         AbstractWorkspaceComponentInfoVO vo;
@@ -88,7 +89,7 @@ public class DSSWorkspaceMenuRestful {
             vo = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             LOGGER.info("instantiate a vo failed reason is ",e);
-            return Message.messageToResponse(Message.error("不能获取到相应的信息"));
+            return Message.error("不能获取到相应的信息");
         }
         if(workspaceDBHelper.getComponentUrlsById(componentId) != null){
             vo.setComponentUrl(workspaceDBHelper.getComponentUrlsById(componentId).get(0));
@@ -99,7 +100,7 @@ public class DSSWorkspaceMenuRestful {
             }
         });
         Message message = Message.ok().data("statistic", vo).data("workspaceId", workspaceId);
-        return Message.messageToResponse(message);
+        return message;
     }
 
 }

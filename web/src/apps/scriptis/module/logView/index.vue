@@ -76,6 +76,7 @@ export default {
             props: {
               count: this.errorNum,
               className: 'err-badge',
+              type: 'error'
             },
           }),
         ]);
@@ -87,6 +88,7 @@ export default {
             props: {
               count: this.warnNum,
               className: 'warn-badge',
+              type: 'warning'
             },
           }),
         ]);

@@ -16,11 +16,8 @@
 
 package com.webank.wedatasphere.dss.common.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
-/**
- * Created by v_wbjftang on 2019/11/6.
- */
 public class DSSErrorException extends ErrorException {
 
     public DSSErrorException(int errCode, String desc) {

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2019 WeBank
+  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
+  ~  you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <modules>
         <module>dss-commons</module>
@@ -40,8 +41,8 @@
     </modules>
 
     <properties>
-        <dss.version>1.0.0</dss.version>
-        <linkis.version>1.0.2</linkis.version>
+        <dss.version>1.0.1</dss.version>
+        <linkis.version>1.0.3</linkis.version>
         <scala.version>2.12.10</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
@@ -64,6 +65,7 @@
         <jersey-bean-validation.version>2.21</jersey-bean-validation.version>
         <aspectj.version>1.9.5</aspectj.version>
         <xstream.version>1.4.15</xstream.version>
+        <jersey.version>2.16</jersey.version>
     </properties>
 
     <dependencyManagement>
@@ -94,7 +96,7 @@
                 <version>${commons.lang.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.webank.wedatasphere.linkis</groupId>
+                <groupId>org.apache.linkis</groupId>
                 <artifactId>linkis-common</artifactId>
                 <version>${linkis.version}</version>
             </dependency>

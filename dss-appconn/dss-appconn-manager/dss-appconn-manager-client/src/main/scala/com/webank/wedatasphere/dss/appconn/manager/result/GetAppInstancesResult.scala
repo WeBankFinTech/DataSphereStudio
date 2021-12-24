@@ -20,8 +20,8 @@ import java.util
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.{AppInstanceInfo, AppInstanceInfoImpl}
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.linkis.httpclient.dws.annotation.DWSHttpMessageResult
-import com.webank.wedatasphere.linkis.httpclient.dws.response.DWSResult
+import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
+import org.apache.linkis.httpclient.dws.response.DWSResult
 
 import scala.collection.convert.wrapAsJava._
 import scala.collection.convert.wrapAsScala._

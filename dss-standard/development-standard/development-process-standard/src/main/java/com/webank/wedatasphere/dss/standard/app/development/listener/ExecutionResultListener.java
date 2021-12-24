@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener;
 
-import com.webank.wedatasphere.linkis.common.io.MetaData;
-import com.webank.wedatasphere.linkis.common.io.Record;
+import org.apache.linkis.common.io.MetaData;
+import org.apache.linkis.common.io.Record;
 
 public interface ExecutionResultListener {
 

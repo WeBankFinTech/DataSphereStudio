@@ -121,6 +121,36 @@ export default {
   .title {
     color: #333;
   }
+  .basic-card {
+    margin-bottom: 10px;
+    height: calc(100% - 52px);
+    overflow: hidden;
+    .basic-card-item {
+        display: inline-flex;
+        width: 50%;
+        height: 36px;
+        padding-left: 10px;
+        align-items: center;
+        &.comment {
+            height: 42px;
+            align-items: start;
+        }
+        .basic-card-item-title {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+        .basic-card-item-value {
+            display: inline-block;
+            width: calc(100% - 104px);
+            overflow: hidden;
+            &.comment {
+                overflow-y: auto;
+                height: 100%;
+            }
+        }
+    }
+  }
   .basic-card-item {
     .basic-card-item-title,
     .basic-card-item-value {

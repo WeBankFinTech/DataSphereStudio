@@ -58,7 +58,7 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.AbstractJsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
-import com.webank.wedatasphere.linkis.common.utils.JsonUtils;
+import org.apache.linkis.common.utils.JsonUtils;
 
 /**
  * The type Dolphin scheduler workflow upload operation.

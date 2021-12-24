@@ -19,10 +19,10 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.conf
 import com.webank.wedatasphere.dss.flow.execution.entrance.engine.{FlowEntranceEngine, FlowExecutionExecutorManagerImpl}
 import com.webank.wedatasphere.dss.flow.execution.entrance.entranceparser.FlowExecutionParser
 import com.webank.wedatasphere.dss.flow.execution.entrance.persistence.WorkflowPersistenceEngine
-import com.webank.wedatasphere.linkis.entrance.EntranceParser
-import com.webank.wedatasphere.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation, PersistenceManagerBeanAnnotation}
-import com.webank.wedatasphere.linkis.entrance.persistence.{PersistenceEngine, PersistenceManager}
-import com.webank.wedatasphere.linkis.scheduler.executer.ExecutorManager
+import org.apache.linkis.entrance.EntranceParser
+import org.apache.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation, PersistenceManagerBeanAnnotation}
+import org.apache.linkis.entrance.persistence.{PersistenceEngine, PersistenceManager}
+import org.apache.linkis.scheduler.executer.ExecutorManager
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration

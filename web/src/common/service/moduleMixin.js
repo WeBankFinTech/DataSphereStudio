@@ -107,7 +107,7 @@ let module = function(config) {
       },
       // 获取当前编排的环境
       getCurrentDsslabels() {
-        return storage.get("currentDssLabels") ? storage.get("currentDssLabels") : null;
+        return this.$route.query.label || (storage.get("currentDssLabels") ? storage.get("currentDssLabels") : null);
       }
     },
   };

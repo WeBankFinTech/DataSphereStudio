@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 
 public class AppConnExecutionErrorException extends ErrorException {

@@ -17,15 +17,15 @@
 package com.webank.wedatasphere.dss.appconn.eventchecker.cs;
 
 import com.google.gson.Gson;
-import com.webank.wedatasphere.linkis.cs.client.service.CSVariableService;
-import com.webank.wedatasphere.linkis.cs.client.utils.ContextServiceUtils;
-import com.webank.wedatasphere.linkis.cs.client.utils.SerializeHelper;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextScope;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextType;
-import com.webank.wedatasphere.linkis.cs.common.entity.object.LinkisVariable;
-import com.webank.wedatasphere.linkis.cs.common.entity.source.CommonContextKey;
-import com.webank.wedatasphere.linkis.cs.common.entity.source.ContextKey;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.cs.client.service.CSVariableService;
+import org.apache.linkis.cs.client.utils.ContextServiceUtils;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
+import org.apache.linkis.cs.common.entity.enumeration.ContextScope;
+import org.apache.linkis.cs.common.entity.enumeration.ContextType;
+import org.apache.linkis.cs.common.entity.object.LinkisVariable;
+import org.apache.linkis.cs.common.entity.source.CommonContextKey;
+import org.apache.linkis.cs.common.entity.source.ContextKey;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

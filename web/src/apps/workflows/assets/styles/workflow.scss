@@ -14,97 +14,208 @@
  * limitations under the License.
  *
  */
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 .workflow-wrap {
+  width: 100%;
+  height: 100%;
+  // background: $workspace-background;
+  @include bg-color($workspace-background, $dark-workspace-background);
+  .workflow-nav-tree {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 54px;
+    bottom: 0;
+    width: 250px;
+    // background: #F8F9FC;
+    @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
+    transition: all 0.3s;
+    &-switch {
+      height: 40px;
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-right: 1px solid;
+      border-color: #dee4ec;
+      box-sizing: border-box;
+    }
+    &.tree-fold {
+      width: 40px;
+      height: 40px;
+      z-index: 1;
+      .project-nav-tree {
+        transform: translateX(-304px);
+      }
+    }
+    .project-nav-menu {
+      z-index: 1;
+      width: 54px;
+      // background: #F8F9FC;
+      @include bg-color(#f8f9fc, $dark-menu-base-color);
+      border-right: 1px solid #dee4ec;
+      @include border-color($border-color-base, $dark-active-menu-item);
+      &-item {
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+        cursor: pointer;
+        @include font-color(#333, $dark-workflow-font-color);
+        &:hover {
+          // background: #ECEFF4;
+          @include bg-color($hover-color-base, $dark-hover-color-base);
+        }
+        .nav-icon {
+          font-size: 26px;
+        }
+      }
+      .active {
+        // background: #ECEFF4;
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+        border-left: 3px solid #2e92f7;
+        @include border-color($primary-color, $dark-primary-color);
+      }
+    }
+    .project-nav-tree-bottom {
+      width: 100%;
+      height: 34px;
+      padding: 0 15px;
+      margin-top: 8px;
+      line-height: 34px;
+      .project-nav-add {
+        line-height: 34px;
+        text-align: center;
+        height: 34px;
+        border: 1px dashed #dee4ec;
+        font-family: PingFangSC-Regular;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.65);
+        font-weight: 400;
+        cursor: pointer;
+        &:hover {
+          background-color: #2E92F7;
+          color: #fff;
+        }
+      }
+    }
+    .project-nav-tree {
+      position: absolute;
+      width: 250px;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transition: all 0.3s;
+      padding: 10px 0;
+      overflow-y: auto;
+      border-right: 1px solid #dee4ec;
+      @include border-color($border-color-base, $dark-menu-base-color);
+      @include bg-color($light-base-color, $dark-workspace-background);
+      &-top {
+        display: flex;
+        height: 65px;
+        width: 250px;
+        padding: 0 12px;
+        flex-direction: column;
+        &-t {
+          display: flex;
+          height: 25px;
+          justify-content: space-between;
+          align-items: center;
+          &-txt {
+            font-family: PingFangSC-Medium;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.65);
+            text-align: right;
+            font-weight: 500;
+          }
+          &-icon {
+            cursor: pointer;
+          }
+        }
+        &-b {
+          height: 40px;
+          display: flex;
+          align-items: center;
+          &-input {
+            border: none;
+            border-bottom: 1px solid #dee4ec;
+            display: inline-block;
+            height: 24px;
+            width: 208px;
+            margin-left: 8px;
+            &::placeholder {
+              color: rgba(0, 0, 0, 0.25);
+            }
+          }
+        }
+      }
+    }
+  }
+  .workflowListContainer {
+    display: flex;
+    // margin: 0 $padding-25;
+    min-height: 100%;
+    padding: $padding-25;
+    border: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-workspace-body-bg-color);
+    // background: $body-background;
+    @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+    .workflowListLeft {
+      position: relative;
+      flex: 1;
+      .tabs-content {
+        /deep/ .ivu-tabs-tab {
+          font-size: $font-size-large;
+        }
+      }
+    }
+  }
+  .workflow-tabs {
     width: 100%;
-    height: 100%;
-    // background: $workspace-background;
-    @include bg-color($workspace-background, $dark-workspace-background);
-    .workflow-nav-tree {
-        display: flex;
-        position: fixed;
-        left: 0;
-        top: 54px;
-        bottom: 0;
-        width: 304px;
-        // background: #F8F9FC;
-        @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
-        transition: all .3s;
-        &.tree-fold {
-            width: 54px;
-            .project-nav-tree {
-                transform: translateX(-304px);
-            }
-        }
-        .project-nav-menu {
-            z-index: 1;
-            width: 54px;
-            // background: #F8F9FC;
-            @include bg-color(#F8F9FC, $dark-menu-base-color);
-            border-right: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-active-menu-item);
-            &-item {
-                height: 44px;
-                line-height: 44px;
-                text-align: center;
-                cursor: pointer;
-                @include font-color(#333, $dark-workflow-font-color);
-                &:hover {
-                    // background: #ECEFF4;
-                    @include bg-color($hover-color-base, $dark-hover-color-base);
-
-                }
-                .nav-icon {
-                    font-size: 26px;
-                }
-            }
-            .active {
-                // background: #ECEFF4;
-                @include bg-color($active-menu-item, $dark-active-menu-item);
-                border-left: 3px solid #2E92F7;
-                @include border-color($primary-color, $dark-primary-color);
-            }
-        }
-        .project-nav-tree {
-            position: absolute;
-            width: 250px;
-            left: 54px;
-            top: 0;
-            bottom: 0;
-            transition: all .3s;
-            padding: 10px 0;
-            overflow-y: auto;
-            border-right: 1px solid #DEE4EC;
-            @include border-color($border-color-base, $dark-menu-base-color);
-            @include bg-color($light-base-color, $dark-workspace-background);
-        }
-    }
-    .workflowListContainer {
-        display: flex;
-        margin: 0 $padding-25;
-        min-height: 100%;
-        padding: $padding-25;
-        border: $border-width-base  $border-style-base $border-color-base;
-        @include border-color($border-color-base, $dark-workspace-body-bg-color);
-        // background: $body-background;
-        @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
-        .workflowListLeft {
-            position: relative;
-            flex: 1;
-            .tabs-content {
-                /deep/ .ivu-tabs-tab {
-                    font-size: $font-size-large;
-                }
-            }
-        }
-    }
-    .workflow-tabs {
-        width: 100%;
+    height: 32px;
+    margin: 4px 0;
+    white-space: nowrap;
+    line-height: $line-height-base;
+    font-size: $font-size-base;
+    position: relative;
+    color: $text-color;
+    border-bottom: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
+    padding: 0 5px;
+    .workflow-tabs-item {
+      margin: 0;
+      height: 31px;
+      padding: 5px 16px 4px;
+      border-bottom: $border-width-base $border-style-base $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
+      border-radius: 4px 4px 0 0;
+      // background: #f8f8f9;
+      @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
+      display: inline-block;
+      cursor: pointer;
+      position: relative;
+      &.active {
         height: 32px;
-        margin: 4px 0;
-        white-space: nowrap;
-        line-height: $line-height-base;
-        font-size: $font-size-base;
+        padding-bottom: 5px;
+        background: #fff;
+        transform: translateZ(0);
+        border: 1px solid #dcdee2;
+        border-bottom: 1px solid #fff;
+        // color: #2d8cf0;
+        @include font-color($primary-color, $dark-primary-color);
+      }
+      .workflow-tabs-name {
+        display: inline-block;
+      }
+      .workflow-tabs-close {
+        width: 22px;
+        margin-right: -6px;
+        height: 22px;
+        font-size: 22px;
+        color: #999;
+        text-align: right;
+        vertical-align: middle;
+        overflow: hidden;
         position: relative;
         color: $text-color;
         border-bottom: $border-width-base $border-style-base $border-color-base;
@@ -125,7 +236,7 @@
             &.active {
                 height: 32px;
                 padding-bottom: 5px;
-                background: #fff;   
+                background: #fff;
                 transform: translateZ(0);
                 border: 1px solid #dcdee2;
                 border-bottom:1px solid #fff;
@@ -152,4 +263,6 @@
             }
         }
     }
+  }
+}
 }

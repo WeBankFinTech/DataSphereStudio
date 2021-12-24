@@ -11,7 +11,7 @@ export const guideConfig = {
         url: ''
       },
       {
-        title: '什么情况下可以删除工作空间？', 
+        title: '什么情况下可以删除工作空间？',
         url: ''
       }
     ]
@@ -55,15 +55,15 @@ export const guideConfig = {
         url: ''
       },
       {
-        title: '什么情况下可以删除工作空间？', 
+        title: '什么情况下可以删除工作空间？',
         url: ''
       },
       {
-        title: '非管理员账号能否创建工作空间？', 
+        title: '非管理员账号能否创建工作空间？',
         url: ''
       },
       {
-        title: '普通用户是否可以进入管理台?', 
+        title: '普通用户是否可以进入管理台?',
         url: ''
       }
     ]

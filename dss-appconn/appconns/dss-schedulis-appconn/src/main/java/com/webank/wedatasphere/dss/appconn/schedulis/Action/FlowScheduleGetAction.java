@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 
-import com.webank.wedatasphere.linkis.httpclient.request.GetAction;
-import com.webank.wedatasphere.linkis.httpclient.request.UserAction;
+import org.apache.linkis.httpclient.request.GetAction;
+import org.apache.linkis.httpclient.request.UserAction;
 
 public class FlowScheduleGetAction extends GetAction  implements UserAction {
 

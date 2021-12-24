@@ -22,8 +22,8 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletio
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUrlOperation;
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction;
-import com.webank.wedatasphere.linkis.httpclient.response.HttpResult;
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
 
 public class VisualisProjectService extends ProjectService {
 

@@ -16,12 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
@@ -44,7 +38,11 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PublishServiceImpl implements PublishService {
 
@@ -58,16 +56,16 @@ public class PublishServiceImpl implements PublishService {
     public String submitPublish(String convertUser, Long workflowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception {
         LOGGER.info("User {} begins to convert workflow {}", convertUser, workflowId);
-
+        //1 获取对应的orcId 和 orcVersionId
+        //2.进行提交
         try {
             RequestFrameworkConvertOrchestration requestFrameworkConvertOrchestration = new RequestFrameworkConvertOrchestration();
             requestFrameworkConvertOrchestration.setComment(comment);
             requestFrameworkConvertOrchestration.setOrcAppId(workflowId);
             requestFrameworkConvertOrchestration.setUserName(convertUser);
             requestFrameworkConvertOrchestration.setWorkspace(workspace);
-
             SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
-                .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+                    .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
             if (schedulerAppConn == null) {
                 schedulerAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
             }
@@ -116,7 +114,7 @@ public class PublishServiceImpl implements PublishService {
         }
 
         SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
-            .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+                .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (schedulerAppConn == null) {
             LOGGER.error("DolphinScheduler appconn is null, can not get scheduler workflow status");
             DSSExceptionUtils.dealErrorException(61123, "scheduler appconn is null", DSSErrorException.class);
@@ -127,18 +125,18 @@ public class PublishServiceImpl implements PublishService {
         if (appInstance == null) {
             LOGGER.error("DolphinScheduler app instance is null, can not get scheduler workflow status");
             DSSExceptionUtils.dealErrorException(60059, "scheduler app instance is null",
-                ExternalOperationFailedException.class);
+                    ExternalOperationFailedException.class);
         }
 
         RefQueryOperation operation = (RefQueryOperation)schedulerAppConn.getOrCreateWorkflowConversionStandard()
-            .getDSSToRelConversionService(appInstance).createOperation(RefQueryOperation.class);
+                .getDSSToRelConversionService(appInstance).createOperation(RefQueryOperation.class);
 
         Long projectId = orchestratorMapper.getProjectId(orchestratorId);
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
 
         DSSProject project = (DSSProject)DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-            .ask(projectInfoRequest);
+                .ask(projectInfoRequest);
 
         CommonRequestRef requestRef = new CommonRequestRefImpl();
         requestRef.setWorkspaceName(project.getWorkspaceName());

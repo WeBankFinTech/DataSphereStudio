@@ -10,18 +10,17 @@
       size="small"
       border
       stripe/>
-    <div class="workbench-history-page">
-      <Page
-        :total="PageTotal"
-        :page-size-opts="page.sizeOpts"
-        :page-size="page.size"
-        :current="page.current"
-        show-sizer
-        show-total
-        size="small"
-        @on-change="change"
-        @on-page-size-change="changeSize"/>
-    </div>
+    <Page
+      class="workbench-history-page"
+      :total="PageTotal"
+      :page-size-opts="page.sizeOpts"
+      :page-size="page.size"
+      :current="page.current"
+      show-sizer
+      show-total
+      size="small"
+      @on-change="change"
+      @on-page-size-change="changeSize"/>
   </div>
 </template>
 <script>
@@ -71,7 +70,7 @@ export default {
       return this.history.slice(this.page.start, this.page.end);
     },
     height() {
-      return this.scriptViewState.bottomContentHeight + 9
+      return this.scriptViewState.bottomContentHeight - 34 - 35 // 减去tab及分页高度
     }
   },
   watch: {
@@ -281,14 +280,13 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/style/variables.scss';
 .workbench-history {
-  height: 100%;
 
   .workbench-history-page {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 30px;
-      margin-top: 5px;
+      padding-top: 5px;
   }
   .history-failed {
       color: $error-color;

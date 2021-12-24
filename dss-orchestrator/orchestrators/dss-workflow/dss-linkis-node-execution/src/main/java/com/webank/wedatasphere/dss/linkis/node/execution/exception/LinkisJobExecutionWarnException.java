@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.exception;
 
-import com.webank.wedatasphere.linkis.common.exception.WarnException;
+import org.apache.linkis.common.exception.WarnException;
 
 
 public class LinkisJobExecutionWarnException extends WarnException {

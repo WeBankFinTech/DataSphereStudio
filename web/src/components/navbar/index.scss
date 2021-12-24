@@ -67,7 +67,6 @@
     }
     input::-webkit-input-placeholder {
         @include font-color($input-placeholder-color, $dark-input-placeholder-color);
-        
     }
     &:focus{
         outline: none

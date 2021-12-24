@@ -1,4 +1,4 @@
-FROM nm.hub.com/library/nginx
+FROM nginx
 
 WORKDIR /usr/share/nginx/html
 

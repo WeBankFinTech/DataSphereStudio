@@ -1,8 +1,10 @@
 #!/bin/bash
 
 #当前路径
-workDir=$(cd `dirname $0`; pwd)
-
+workDir=$(
+    cd $(dirname $0)
+    pwd
+)
 
 echo "dss front-end deployment script"
 
@@ -39,8 +41,7 @@ else
 fi
 
 # 区分版本
-version=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
-
+version=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\..*/\1/')
 
 echo "========================================================================配置信息======================================================================="
 
@@ -53,11 +54,10 @@ echo "本机ip：${dss_ipaddr}"
 echo "========================================================================配置信息======================================================================="
 echo ""
 
-
 # 创建文件并配置nginx
-dssConf(){
+dssConf() {
 
-	s_host='$host'
+    s_host='$host'
     s_remote_addr='$remote_addr'
     s_proxy_add_x_forwarded_for='$proxy_add_x_forwarded_for'
     s_http_upgrade='$http_upgrade'
@@ -113,12 +113,11 @@ dssConf(){
             root   /usr/share/nginx/html;
             }
         }
-    " > /etc/nginx/conf.d/dss.conf
+    " >/etc/nginx/conf.d/dss.conf
 
 }
 
-
-centos7(){
+centos7() {
     # nginx是否安装
     #sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
     sudo yum install -y nginx
@@ -147,8 +146,7 @@ centos7(){
 
 }
 
-
-centos6(){
+centos6() {
     # yum
     S_basearch='$basearch'
     S_releasever='$releasever'
@@ -158,7 +156,7 @@ centos6(){
     baseurl=http://nginx.org/packages/centos/$E_releasever/$S_basearch/
     gpgcheck=0
     enabled=1
-    " >> /etc/yum.repos.d/nginx.repo
+    " >>/etc/yum.repos.d/nginx.repo
 
     # install nginx
     yum install nginx -y
@@ -167,15 +165,15 @@ centos6(){
     dssConf
 
     # 防火墙
-    S_iptables=`lsof -i:$dss_port | wc -l`
-    if [ "$S_iptables" -gt "0" ];then
-    # 已开启端口防火墙重启
-    service iptables restart
+    S_iptables=$(lsof -i:$dss_port | wc -l)
+    if [ "$S_iptables" -gt "0" ]; then
+        # 已开启端口防火墙重启
+        service iptables restart
     else
-    # 未开启防火墙添加端口再重启
-    iptables -I INPUT 5 -i eth0 -p tcp --dport $dss_port -m state --state NEW,ESTABLISHED -j ACCEPT
-    service iptables save
-    service iptables restart
+        # 未开启防火墙添加端口再重启
+        iptables -I INPUT 5 -i eth0 -p tcp --dport $dss_port -m state --state NEW,ESTABLISHED -j ACCEPT
+        service iptables save
+        service iptables restart
     fi
 
     # start
@@ -199,10 +197,9 @@ if [[ $version -eq 7 ]]; then
     centos7
 fi
 echo '安装visualis前端,用户自行编译DSS前端安装包，则安装时需要把visualis的前端安装包放置于此'$dss_basepath/dss/visualis'，用于自动化安装:'
-cd $dss_basepath/dss/visualis;unzip -o build.zip  > /dev/null
-<<<<<<< HEAD
-=======
+cd $dss_basepath/dss/visualis
+unzip -o build.zip >/dev/null
 echo '安装linkis管理台,用户自行编译DSS前端安装包，则安装时需要把linkis管理台安装包放置于此'$dss_basepath/dss/linkis'，用于自动化安装:'
-cd $dss_basepath/dss/linkis;unzip -o build.zip  > /dev/null
->>>>>>> b5c29e41490d1200fbd6b32f407ea018def62aec
+cd $dss_basepath/dss/linkis
+unzip -o build.zip >/dev/null
 echo "请浏览器访问：http://${dss_ipaddr}:${dss_port}"

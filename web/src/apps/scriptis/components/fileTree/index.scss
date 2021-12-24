@@ -15,9 +15,7 @@
  *
  */
 
- @import '@/common/style/variables.scss';
 .we-file-tree {
-    @include bg-color($light-base-color, $dark-menu-base-color);
     &.is-empty {
         display: flex;
         justify-content: center;

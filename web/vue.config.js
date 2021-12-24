@@ -55,44 +55,39 @@ let headers = [];
 
 Object.entries(apps).forEach(item => {
   if (item[1].module) {
-    requireComponent.push(
-      `require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`
-    );
-    requireComponentVue.push(
-      `require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`
-    );
+    requireComponent.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`)
+    requireComponentVue.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`)
   }
   // 获取个模块header
   if (item[1].header) {
-    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`);
+    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`)
   }
   // 处理路由
   if (item[1].routes) {
-    appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`);
+    appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`)
   }
   // 处理国际化
   if (item[1].i18n) {
     appsI18n.push(`{
       'zh-CN': require('@/${item[1].i18n["zh-CN"]}'),
-      'en': require('@/${item[1].i18n["en"]}')
-    }`);
+      'en': require('@/${item[1].i18n['en']}')
+    }`)
   }
-});
+})
 
-let buildDynamicModules = Object.values(apps);
-buildDynamicModules = JSON.stringify(buildDynamicModules);
+let buildDynamicModules = Object.values(apps)
+buildDynamicModules = JSON.stringify(buildDynamicModules)
 
 const virtualModules = new VirtualModulesPlugin({
-  "node_modules/dynamic-modules.js": `module.exports = {
+  'node_modules/dynamic-modules.js': `module.exports = {
     apps: ${buildDynamicModules},
     modules: ${JSON.stringify(modules)},
-    appsRoutes: {${appsRoutes.join(",")}},
-    appsI18n: [${appsI18n.join(",")}],
-    requireComponent: [${requireComponent.join(",")}],
-    requireComponentVue: [${requireComponentVue.join(",")}],
-    microModule: ${JSON.stringify(process.env.npm_config_micro_module) ||
-      false},
-    headers:{${headers.join(",")}}
+    appsRoutes: {${appsRoutes.join(',')}},
+    appsI18n: [${appsI18n.join(',')}],
+    requireComponent: [${requireComponent.join(',')}],
+    requireComponentVue: [${requireComponentVue.join(',')}],
+    microModule: ${JSON.stringify(process.env.npm_config_micro_module) || false},
+    headers:{${headers.join(',')}}
   };`
 });
 
@@ -185,27 +180,25 @@ module.exports = {
       process.env.NODE_ENV === "sandbox" ||
       process.env.NODE_ENV === "bdp"
     ) {
-      config
-        .plugin("compress")
-        .use(FileManagerPlugin, [
-          {
-            onEnd: {
-              copy: [
-                { source: "./config.sh", destination: `./dist` },
-                { source: "./install.sh", destination: `./dist` }
-              ],
-              // 先删除根目录下的zip包
-              delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
-              // 将dist文件夹下的文件进行打包
-              archive: [
-                {
-                  source: "./dist",
-                  destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip`
-                }
-              ]
-            }
+      config.plugin("compress").use(FileManagerPlugin, [
+        {
+          onEnd: {
+            copy: [
+              { source: "./config.sh", destination: `./dist` },
+              { source: "./install.sh", destination: `./dist` }
+            ],
+            // 先删除根目录下的zip包
+            delete: [`./luban-DataSphereStudio-${getVersion()}-dist.zip`],
+            // 将dist文件夹下的文件进行打包
+            archive: [
+              {
+                source: "./dist",
+                destination: `./luban-DataSphereStudio-${getVersion()}-dist.zip`
+              }
+            ]
           }
-        ]);
+        }
+      ]);
       // 移除UglifyJsPlugin(之前的写法也并未生效)，使用默认的terser-webpack-plugin，build更快；
       // 如果想设置drop_console，升级@vue-cli再设置，否则会增加build时间
       config.performance.set("hints", false);
@@ -258,8 +251,8 @@ module.exports = {
         }
       },
       "/dolphinscheduler": {
-        //target: "http://127.0.0.1:12345",
-        target: "https://dolphin.ctyun.cn:10002",
+        target: "http://127.0.0.1:12345",
+        // target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"
@@ -272,3 +265,4 @@ module.exports = {
     }
   }
 };
+

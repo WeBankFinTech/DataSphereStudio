@@ -28,8 +28,8 @@ import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecution
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.entrance.execute.EntranceJob
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.entrance.execute.EntranceJob
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 

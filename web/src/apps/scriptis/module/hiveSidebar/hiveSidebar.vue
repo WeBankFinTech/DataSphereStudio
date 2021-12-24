@@ -839,6 +839,7 @@ export default {
   },
 
 };
+
 </script>
 <style src="@/apps/scriptis/assets/styles/sidebar.scss" lang="scss">
 </style>

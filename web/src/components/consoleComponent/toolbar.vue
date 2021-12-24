@@ -27,6 +27,11 @@
                   <Col span="10">
                   <Radio label="1">{{$t('message.common.toolbar.graphAnalysis')}}</Radio>
                   </Col>
+                  <!--<Col
+                    span="10"
+                    offset="4">
+                  <Radio label="2">{{$t('message.common.toolbar.excelAnalysis')}}</Radio>
+                  </Col>-->
                 </RadioGroup>
               </Row>
             </div>
@@ -139,10 +144,16 @@
       <!-- <li
         @click="openPopup('export')"
         v-if="$route.name === 'Home' && analysistext.flag !== 2">
+=======
+      <li
+        @click="openPopup('export')"
+        v-if="$route.name === 'Home' && analysistext.flag !== 2 && resultType === '2'">
+>>>>>>> b5c29e41490d1200fbd6b32f407ea018def62aec
         <SvgIcon :style="{ 'font-size': '20px' }" icon-class="export" color="#515a6e"/>
         <span
           class="v-toolbar-icon"
           v-if="isIconLabelShow">{{ $t('message.common.toolbar.export') }}</span>
+<<<<<<< HEAD
       </li> -->
       <li
         @click="openPopup('rowView')"
@@ -181,6 +192,7 @@ import tableRow from './tableRow.vue';
 import mixin from '@/common/service/mixin';
 import api from '@/common/service/api';
 export default {
+  name: 'toolbar',
   components: {
     resultsExport,
     tableRow,
@@ -211,6 +223,10 @@ export default {
     },
     comData: {
       type: Object
+    },
+    resultType: {
+      type: String,
+      defalut: ''
     }
   },
   data() {

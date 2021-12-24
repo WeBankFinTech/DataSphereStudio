@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.standard.sso.utils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
-import com.webank.wedatasphere.linkis.common.conf.Configuration;
+import org.apache.linkis.common.conf.Configuration;
 import java.util.Arrays;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

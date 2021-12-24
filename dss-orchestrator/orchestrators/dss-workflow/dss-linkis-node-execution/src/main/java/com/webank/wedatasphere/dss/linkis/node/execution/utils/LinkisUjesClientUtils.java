@@ -17,11 +17,11 @@
 package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
-import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
-import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
-import com.webank.wedatasphere.linkis.ujes.client.UJESClientImpl;
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import org.apache.linkis.ujes.client.UJESClient;
+import org.apache.linkis.ujes.client.UJESClientImpl;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

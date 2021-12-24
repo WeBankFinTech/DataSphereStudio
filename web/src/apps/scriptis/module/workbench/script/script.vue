@@ -2,7 +2,7 @@
   <div class="we-panel we-panel-vertical">
     <div ref="topPanel" :class="{'full-screen': scriptViewState.topPanelFull}"  class="editor-panel" :style="{'height': scriptViewState.topPanelHeight}">
       <editor ref="editor" :script="script" :work="work" :script-type="work.type" :readonly="readonly" @on-save="save" @on-run="run"
-        @on-stop="stop"/>
+              @on-stop="stop"/>
       <Spin v-if="saveLoading" size="large" class="new-sidebar-spin" fix />
       <!-- 头部的线 -->
       <div class="script-line" @mousedown.stop="handleMouseDown"></div>
@@ -13,19 +13,19 @@
         <div class="workbench-tab-wrapper">
           <div class="workbench-tab">
             <div v-if="bottomTab.progress" :class="{active: scriptViewState.showPanel == 'progress'}"
-              class="workbench-tab-item" @click="showPanelTab('progress')">
+                 class="workbench-tab-item" @click="showPanelTab('progress')">
               <span>{{ $t('message.scripts.tabs.progress') }}</span>
             </div>
             <div v-if="bottomTab.result" :class="{active: scriptViewState.showPanel == 'result'}"
-              class="workbench-tab-item" @click="showPanelTab('result')">
+                 class="workbench-tab-item" @click="showPanelTab('result')">
               <span>{{ $t('message.scripts.tabs.result') }}</span>
             </div>
             <div v-if="bottomTab.log" :class="{active: scriptViewState.showPanel == 'log'}" class="workbench-tab-item"
-              @click="showPanelTab('log')">
+                 @click="showPanelTab('log')">
               <span>{{ $t('message.scripts.tabs.log') }}</span>
             </div>
             <div v-if="bottomTab.history" :class="{active: scriptViewState.showPanel == 'history'}"
-              class="workbench-tab-item" @click="showPanelTab('history')">
+                 class="workbench-tab-item" @click="showPanelTab('history')">
               <span>{{ $t('message.scripts.tabs.history') }}</span>
             </div>
           </div>
@@ -70,6 +70,7 @@
   </div>
 </template>
 <script>
+/*eslint-disable */
 import {
   isEmpty,
   find,
@@ -273,8 +274,8 @@ export default {
       this.dispatch('IndexedDB:getProgress', {
         tabId: this.script.id,
         cb: ({
-          content
-        }) => {
+               content
+             }) => {
           this.script.progress = {
             current: content.current,
             progressInfo: content.progressInfo,
@@ -298,7 +299,7 @@ export default {
         taskID,
         execID
       } = cacheWork;
-        // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
+      // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
       if (taskID && execID && data && data.running) {
         let dbProgress = JSON.parse(JSON.stringify(this.script.progress));
         this.script = cacheWork.data;
@@ -438,9 +439,9 @@ export default {
       }
     },
     'Workbench:socket'({
-      type,
-      ...args
-    }) {
+                         type,
+                         ...args
+                       }) {
       if (type === 'downgrade') {
         this.postType = 'http';
       }
@@ -587,12 +588,12 @@ export default {
             desc: '',
             render: (h) => {
               return h('span', {
-                style: {
-                  'word-break': 'break-all',
-                  'line-height': '20px',
+                  style: {
+                    'word-break': 'break-all',
+                    'line-height': '20px',
+                  },
                 },
-              },
-              `${this.$t('message.scripts.notice.sendStart.render')} ${this.work.filename} ！`
+                `${this.$t('message.scripts.notice.sendStart.render')} ${this.work.filename} ！`
               );
             },
             name,
@@ -729,10 +730,10 @@ export default {
           });
         });
         this.execute.on('progress', ({
-          progress,
-          progressInfo,
-          waitingSize
-        }) => {
+                                       progress,
+                                       progressInfo,
+                                       waitingSize
+                                     }) => {
           if (this._execute_last_progress === progress) {
             return;
           }
@@ -843,9 +844,9 @@ export default {
           });
         });
         this.execute.on('querySuccess', ({
-          type,
-          task
-        }) => {
+                                           type,
+                                           task
+                                         }) => {
           const costTime = util.convertTimestamp(task.costTime);
           this.script.progress.costTime = costTime;
           const name = this.work.filepath || this.work.filename;
@@ -855,12 +856,12 @@ export default {
             desc: '',
             render: (h) => {
               return h('span', {
-                style: {
-                  'word-break': 'break-all',
-                  'line-height': '20px',
+                  style: {
+                    'word-break': 'break-all',
+                    'line-height': '20px',
+                  },
                 },
-              },
-              `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}：${costTime}！`
+                `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}：${costTime}！`
               );
             },
             name,
@@ -868,10 +869,10 @@ export default {
           });
         });
         this.execute.on('notice', ({
-          type,
-          msg,
-          autoJoin
-        }) => {
+                                     type,
+                                     msg,
+                                     autoJoin
+                                   }) => {
           const name = this.work.filepath || this.work.filename;
           const label = autoJoin ?
             `${this.$root.$t('message.scripts.script')}${this.work.filename} ${msg}` : msg;
@@ -893,27 +894,27 @@ export default {
                   'line-height': '20px',
                 },
               }, label),
-              h('span',{
-                style: {
-                  color: 'red',
-                  position: 'absolute',
-                  right: '10px',
-                  bottom: '0px',
-                  display: 'none',
-                  cursor: 'pointer'
-                },
-                on: {
-                  click: () => {
-                    if (type === 'error') {
-                      // 先根据执行的最新的任务记录获取错误码后查询是否有贴
-                      const failedReason = this.work.data.history[0].failedReason
-                      const errorCode = parseInt(failedReason) || '';
-                      const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
-                      this.checkErrorCode(errorCode, errorDesc);
+                h('span',{
+                  style: {
+                    color: 'red',
+                    position: 'absolute',
+                    right: '10px',
+                    bottom: '0px',
+                    display: 'none',
+                    cursor: 'pointer'
+                  },
+                  on: {
+                    click: () => {
+                      if (type === 'error') {
+                        // 先根据执行的最新的任务记录获取错误码后查询是否有贴
+                        const failedReason = this.work.data.history[0].failedReason
+                        const errorCode = parseInt(failedReason) || '';
+                        const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
+                        this.checkErrorCode(errorCode, errorDesc);
+                      }
                     }
                   }
-                }
-              }, '发布提问')
+                }, '发布提问')
               ])
             },
           });
@@ -1073,7 +1074,7 @@ export default {
           scriptContent: this.script.data,
           params: this.convertSettingParams(this.script.params),
         };
-          // this.work.code = this.script.data;
+        // this.work.code = this.script.data;
         const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
@@ -1082,7 +1083,7 @@ export default {
               const timeout = setTimeout(() => {
                 this.saveLoading = true;
               }, 2000);
-                // 保存时更新下缓存。
+              // 保存时更新下缓存。
               if (this.script.data !== this.work.data.data) {
                 this.work.data.data = this.script.data;
               }
@@ -1199,8 +1200,8 @@ export default {
             });
             cb();
           }).catch(() => {
-            cb();
-          });
+          cb();
+        });
       } else {
         this.script.resultSet = resultSet;
         this.script = {
@@ -1431,112 +1432,112 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
+  @import '@/common/style/variables.scss';
   .editor-panel {
     position: relative;
-    .script-line{
-        position: absolute;
-        width: 100%;
-        height: 6px;
-        left: 0;
-        bottom: -6px;
-        z-index: 3;
-        border-bottom: 1px solid #dcdee2;
-        @include border-color($border-color-base, $dark-base-color);
-        @include bg-color($light-base-color, $dark-base-color);
-        cursor: ns-resize;
-    }
-    &.full-screen {
-        top: 85px;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        position: fixed;
-        z-index: 100;
-        background-color: #fff;
-        height: 100% !important;
-    }
-    .new-sidebar-spin {
-        @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
-    }
+  .script-line{
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    left: 0;
+    bottom: -2px;
+    z-index: 3;
+    border-bottom: 1px solid #dcdee2;
+  @include border-color($border-color-base, $dark-base-color);
+  @include bg-color($light-base-color, $dark-base-color);
+    cursor: ns-resize;
+  }
+  &.full-screen {
+     top: 85px;
+     right: 0;
+     bottom: 0;
+     left: 0;
+     position: fixed;
+     z-index: 100;
+     background-color: #fff;
+     height: 100% !important;
+   }
+  .new-sidebar-spin {
+  @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
+  }
   }
   .log-panel {
     margin-top: 6px;
     border-top: $border-width-base $border-style-base $border-color-base;
-    @include border-color($border-color-base, $dark-border-color-base);
-    @include bg-color($light-base-color, $dark-base-color);
-    .workbench-tabs {
-      position: $relative;
-      height: 100%;
-      overflow: hidden;
-      box-sizing: border-box;
-      z-index: 3;
-      .workbench-tab-wrapper {
-        display: flex;
-        border-top: $border-width-base $border-style-base #dcdcdc;
-        border-bottom: $border-width-base $border-style-base #dcdcdc;
-        @include border-color($border-color-base, $dark-menu-base-color);
-        &.full-screen {
-            position: fixed;
-            left: 0;
-            right: 0;
-            top: 52px;
-            z-index: 1200;
-        }
-        .workbench-tab {
-          flex: 1;
-          display: flex;
-          flex-direction: row;
-          flex-wrap: nowrap;
-          justify-content: flex-start;
-          align-items: flex-start;
-          height: 32px;
-          @include bg-color($light-base-color, $dark-base-color);
-          width: calc(100% - 45px);
-          overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
-          .workbench-tab-item {
-            text-align: center;
-            border-top: none;
-            display: inline-block;
-            height: 32px;
-            line-height: 32px;
-            @include bg-color($light-base-color, $dark-submenu-color);
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
-            cursor: pointer;
-            min-width: 100px;
-            max-width: 200px;
-            overflow: hidden;
-            margin-right: 2px;
-            border: 1px solid #eee;
-            @include border-color($border-color-base, $dark-border-color-base);
-            &.active {
-              margin-top: 1px;
-              @include bg-color($light-base-color, $dark-base-color);
-              @include font-color($primary-color, $dark-primary-color);
-              border-radius: 4px 4px 0 0;
-              border-left: 1px solid $border-color-base;
-              border-right: 1px solid $border-color-base;
-              border-top: 1px solid $border-color-base;
-              @include border-color($border-color-base, $dark-border-color-base);
-            }
-          }
-        }
-      }
-    }
+  @include border-color($border-color-base, $dark-border-color-base);
+  @include bg-color($light-base-color, $dark-base-color);
+  .workbench-tabs {
+    position: $relative;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 3;
+  .workbench-tab-wrapper {
+    display: flex;
+    border-top: $border-width-base $border-style-base #dcdcdc;
+    border-bottom: $border-width-base $border-style-base #dcdcdc;
+  @include border-color($border-color-base, $dark-menu-base-color);
+  &.full-screen {
+     position: fixed;
+     left: 0;
+     right: 0;
+     top: 52px;
+     z-index: 1200;
+   }
+  .workbench-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 32px;
+  @include bg-color($light-base-color, $dark-base-color);
+    width: calc(100% - 45px);
+    overflow: hidden;
+  &.work-list-tab {
+     overflow-x: auto;
+     overflow-y: hidden;
+  &::-webkit-scrollbar {
+     width: 0;
+     height: 0;
+     background-color: transparent;
+   }
+  .list-group>span {
+    white-space: nowrap;
+    display: block;
+    height: 0;
+  }
+  }
+  .workbench-tab-item {
+    text-align: center;
+    border-top: none;
+    display: inline-block;
+    height: 32px;
+    line-height: 32px;
+  @include bg-color($light-base-color, $dark-submenu-color);
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
+    cursor: pointer;
+    min-width: 100px;
+    max-width: 200px;
+    overflow: hidden;
+    margin-right: 2px;
+    border: 1px solid #eee;
+  @include border-color($border-color-base, $dark-border-color-base);
+  &.active {
+     margin-top: 1px;
+   @include bg-color($light-base-color, $dark-base-color);
+   @include font-color($primary-color, $dark-primary-color);
+     border-radius: 4px 4px 0 0;
+     border-left: 1px solid $border-color-base;
+     border-right: 1px solid $border-color-base;
+     border-top: 1px solid $border-color-base;
+   @include border-color($border-color-base, $dark-border-color-base);
+   }
+  }
+  }
+  }
+  }
   }
 </style>
 

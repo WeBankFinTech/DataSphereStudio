@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.generator
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.{ArrayEmailContent, StringEmailContent}
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 
 class MultiEmailContentGenerator extends AbstractEmailContentGenerator with Logging {

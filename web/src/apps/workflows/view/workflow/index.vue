@@ -659,6 +659,11 @@ export default {
           } else {
             this.openWorkflow(param);
           }
+          // 同project下切换flow，应该切换产品文档到开发模式，清除前面的flow进入editor编辑模式而更新的guide，其他情况因为route change可以监测到
+          eventbus.emit("workflow.orchestratorId", {
+            orchestratorId: node.orchestratorId,
+            mod: "auto",
+          });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
@@ -934,10 +939,12 @@ export default {
      * parama 为打开工作流基本信息
      */
     openWorkflow(params) {
-      const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
-      this.getFlow(cur, (flow) => {
-        this.$refs.projectTree.handleItemToggle(cur);
-      });
+      if (params.lastedNode) {
+        const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
+        this.getFlow(cur, (flow) => {
+          this.$refs.projectTree.handleItemToggle(cur);
+        });
+      }
       this.currentTreeId = params.id || undefined
       if (this.loading) return;
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
@@ -1079,8 +1086,6 @@ export default {
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
-      // 开发中心和运维中心使用同一个route，所以使用eventbus来触发产品即文档的更新
-      eventbus.emit("workflow.change", this.modeOfKey);
       this.tabList = [];
       this.textColor = "#2D8CF0";
       this.lastVal = null;

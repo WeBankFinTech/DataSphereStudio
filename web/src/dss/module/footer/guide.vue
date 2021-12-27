@@ -22,7 +22,7 @@
       <div class="guide-body" v-show="currentTab == 'guide'">
         <div
           class="guide-box"
-          v-if="guide.title || guide.description || guide.steps"
+          v-if="guide.title || guide.description || (guide.steps && guide.steps.length)"
         >
           <div class="guide-box-title">{{ guide.title }}</div>
           <div class="guide-box-desc">{{ guide.description }}</div>
@@ -120,14 +120,14 @@ export default {
   methods: {
     onWorkflowSchedulerChange(data) {
       if (data.mod == "scheduler") {
-        this.getGuideConfig("/workflow/scheduler");
+        this.getGuideConfig("/scheduler");
         this.tabModMap[data.orchestratorId] = data.mod;
       } else if (data.mod == "dev") {
         this.getGuideConfig();
         this.tabModMap[data.orchestratorId] = data.mod;
       } else if (data.mod == "auto") {
         if (this.tabModMap[data.orchestratorId] == "scheduler") {
-          this.getGuideConfig("/workflow/scheduler");
+          this.getGuideConfig("/scheduler");
         } else {
           this.getGuideConfig(); // 默认dev
         }

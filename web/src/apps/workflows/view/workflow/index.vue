@@ -659,6 +659,11 @@ export default {
           } else {
             this.openWorkflow(param);
           }
+          // 同project下切换flow，应该切换产品文档到开发模式，清除前面的flow进入editor编辑模式而更新的guide，其他情况因为route change可以监测到
+          eventbus.emit("workflow.orchestratorId", {
+            orchestratorId: node.orchestratorId,
+            mod: "auto",
+          });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
@@ -934,6 +939,13 @@ export default {
      * parama 为打开工作流基本信息
      */
     openWorkflow(params) {
+      if (params.lastedNode) {
+        const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
+        this.getFlow(cur, (flow) => {
+          this.$refs.projectTree.handleItemToggle(cur);
+        });
+      }
+      this.currentTreeId = params.id || undefined
       if (this.loading) return;
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
       const isIn = this.tabList.find(
@@ -1026,6 +1038,7 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index + 1];
+            this.currentTreeId = this.current.id;
           } else if (
             this.tabList.length > 1 &&
             index === this.tabList.length - 1
@@ -1034,10 +1047,12 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index - 1];
+            this.currentTreeId = this.current.id;
           } else {
             this.current = this.currentVal = this.lastVal = {};
             // 没有那就是选中开发中心或者编排中心
             this.textColor = "#2D8CF0";
+            this.currentTreeId = undefined;
           }
         }
         this.tabList.splice(index, 1);
@@ -1071,8 +1086,6 @@ export default {
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
-      // 开发中心和运维中心使用同一个route，所以使用eventbus来触发产品即文档的更新
-      eventbus.emit("workflow.change", this.modeOfKey);
       this.tabList = [];
       this.textColor = "#2D8CF0";
       this.lastVal = null;
@@ -1108,6 +1121,7 @@ export default {
         ...currenTab,
         tabId: currenTab.tabId,
       };
+      this.currentTreeId = currenTab.id
       this.current = currenTab;
       this.tabName = currenTab.id + currenTab.version;
       // 切换工作流将textColor清空，使tab为选中状态

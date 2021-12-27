@@ -655,7 +655,8 @@ export default {
             orchestratorMode: subItem.orchestratorMode,
             releasable: subItem.releasable, // 可发布权限字段
             editable: subItem.editable,
-            priv: subItem.priv // 权限字段
+            priv: subItem.priv, // 权限字段
+            lastedNode: true,
           });
           that.loading = false;
         })

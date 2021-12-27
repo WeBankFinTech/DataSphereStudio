@@ -22,7 +22,7 @@
       <div class="guide-body" v-show="currentTab == 'guide'">
         <div
           class="guide-box"
-          v-if="guide.title || guide.description || guide.steps"
+          v-if="guide.title || guide.description || (guide.steps && guide.steps.length)"
         >
           <div class="guide-box-title">{{ guide.title }}</div>
           <div class="guide-box-desc">{{ guide.description }}</div>
@@ -110,33 +110,27 @@ export default {
   mounted() {
     this.getGuideConfig();
     this.init();
-    // 开发中心和运维中心使用同一个route，所以使用eventbus来监听变化，从而触发产品即文档的更新
-    // eventbus.on("workflow.change", this.onWorkflowChange);
     // 工作流编辑-调度中心切换
     eventbus.on("workflow.orchestratorId", this.onWorkflowSchedulerChange);
   },
   beforeDestroy() {
     this.dispose();
-    // eventbus.off("workflow.change", this.onWorkflowChange);
     eventbus.off("workflow.orchestratorId", this.onWorkflowSchedulerChange);
   },
   methods: {
-    onWorkflowChange(mod) {
-      if (mod == "scheduler") {
-        this.getGuideConfig("/workflow/scheduler");
-      } else if (mod == "dev") {
-        this.getGuideConfig();
-      }
-    },
     onWorkflowSchedulerChange(data) {
       if (data.mod == "scheduler") {
-        this.getGuideConfig("/workflow/scheduler");
+        this.getGuideConfig("/scheduler");
         this.tabModMap[data.orchestratorId] = data.mod;
       } else if (data.mod == "dev") {
         this.getGuideConfig();
         this.tabModMap[data.orchestratorId] = data.mod;
       } else if (data.mod == "auto") {
-        this.onWorkflowChange(this.tabModMap[data.orchestratorId] || "dev"); // 默认dev
+        if (this.tabModMap[data.orchestratorId] == "scheduler") {
+          this.getGuideConfig("/scheduler");
+        } else {
+          this.getGuideConfig(); // 默认dev
+        }
       }
     },
     getGuideConfig(key) {

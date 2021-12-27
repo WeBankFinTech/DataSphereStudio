@@ -227,7 +227,6 @@ export default {
     },
     selectProject() {
       this.$emit("selectProject");
-      eventbus.emit("workflow.change", "dev");
     },
     menuHandleChangeButton() {
       this.$emit("menuHandleChangeButton");

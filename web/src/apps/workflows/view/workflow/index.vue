@@ -659,6 +659,11 @@ export default {
           } else {
             this.openWorkflow(param);
           }
+          // 同project下切换flow，应该切换产品文档到开发模式，清除前面的flow进入editor编辑模式而更新的guide，其他情况因为route change可以监测到
+          eventbus.emit("workflow.orchestratorId", {
+            orchestratorId: node.orchestratorId,
+            mod: "auto",
+          });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
@@ -1071,8 +1076,6 @@ export default {
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
-      // 开发中心和运维中心使用同一个route，所以使用eventbus来触发产品即文档的更新
-      eventbus.emit("workflow.change", this.modeOfKey);
       this.tabList = [];
       this.textColor = "#2D8CF0";
       this.lastVal = null;

@@ -8,7 +8,6 @@
       @save="saveContent"
       @imgAdd="onImgAdd"
     ></mavon-editor>
-    <div v-else>dashboard</div>
   </div>
 </template>
 

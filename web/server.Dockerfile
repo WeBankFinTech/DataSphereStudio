@@ -1,9 +1,9 @@
-FROM nm.hub.com/library/node:lts
+FROM node
 
 WORKDIR /opt/dss
 
 COPY server /opt/dss/
 
-RUN npm install --registry http://10.37.31.58:4873/
+RUN npm install
 
 ENTRYPOINT ["npm", "run", "prd"]

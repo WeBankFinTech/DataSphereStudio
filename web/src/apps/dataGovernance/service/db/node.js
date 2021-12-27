@@ -15,9 +15,8 @@
  *
  */
 
-import {isNil} from 'lodash';
+import { isNil } from 'lodash';
 import { Basic } from '@/common/service/db/index.js';
-import { isArray } from 'util';
 /**
  * @class Globalcache
  * @extends {Basic}
@@ -38,7 +37,7 @@ class Node extends Basic {
      * @param {*} key
      * @return {*}
      */
-  async getNodeCache({nodeId, key}) {
+  async getNodeCache({ nodeId, key }) {
     let caches = await this.get(nodeId);
     if (key) {
       return caches[0][key];
@@ -51,12 +50,12 @@ class Node extends Basic {
      * @param {*} value
      * @return {*}
      */
-  async addNodeCache({nodeId, value}) {
-    let cache = await this.getNodeCache({nodeId});
+  async addNodeCache({ nodeId, value }) {
+    let cache = await this.getNodeCache({ nodeId });
     if (!isNil(cache)) {
       return this.update(nodeId, value)
     }
-    return this.add(Object.assign({nodeId}, value));
+    return this.add(Object.assign({ nodeId }, value));
   }
 
 
@@ -66,10 +65,10 @@ class Node extends Basic {
      * @param {*} value
      * @return {*}
      */
-  async updateNodeCache({nodeId, key, value}) {
+  async updateNodeCache({ nodeId, key, value }) {
     let cache = {};
     if (key) {
-      if (isArray(key)) {
+      if (Array.isArray(key)) {
         key.forEach((k) => {
           cache[k] = value[k];
         })
@@ -87,8 +86,8 @@ class Node extends Basic {
      * @param {*} args
      * @return {*}
      */
-  async removeNodeCache({nodeId, key}) {
-    let cache = await this.getNodeCache({nodeId});
+  async removeNodeCache({ nodeId, key }) {
+    let cache = await this.getNodeCache({ nodeId });
     if (isNil(cache)) {
       if (key) {
         cache[key] = null;

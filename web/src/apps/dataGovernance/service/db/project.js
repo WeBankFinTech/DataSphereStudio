@@ -15,9 +15,8 @@
  *
  */
 
-import {isNil} from 'lodash';
+import { isNil } from 'lodash';
 import { Basic } from '@/common/service/db/index.js';
-import { isArray } from 'util';
 /**
  * @class Globalcache
  * @extends {Basic}
@@ -38,7 +37,7 @@ class Project extends Basic {
      * @param {*} key
      * @return {*}
      */
-  async getProjectCache({projectID, key}) {
+  async getProjectCache({ projectID, key }) {
     projectID = Number(projectID);
     let caches = await this.get(projectID);
     if (key) {
@@ -52,13 +51,13 @@ class Project extends Basic {
      * @param {*} value
      * @return {*}
      */
-  async addProjectCache({projectID, value}) {
+  async addProjectCache({ projectID, value }) {
     projectID = Number(projectID);
-    let cache = await this.getProjectCache({projectID});
+    let cache = await this.getProjectCache({ projectID });
     if (!isNil(cache)) {
       return this.update(projectID, value)
     }
-    return this.add(Object.assign({projectID}, value));
+    return this.add(Object.assign({ projectID }, value));
   }
 
 
@@ -69,12 +68,12 @@ class Project extends Basic {
      * @param {*} isDeep 是否要对第二层数据进行修改，如果需要的话，就需要在value中携带
      * @return {*}
      */
-  async updateProjectCache({projectID, key, value, isDeep}) {
+  async updateProjectCache({ projectID, key, value, isDeep }) {
     projectID = Number(projectID);
     let cache = {};
     if (key) {
       if (isDeep) {
-        cache = await this.getProjectCache({projectID}) || {};
+        cache = await this.getProjectCache({ projectID }) || {};
         let arr = cache && cache[key] || [];
         arr.forEach((item) => {
           if (item[value.token] === Number(value.sValue)) {
@@ -82,7 +81,7 @@ class Project extends Basic {
           }
         })
       } else {
-        if (isArray(key)) {
+        if (Array.isArray(key)) {
           key.forEach((k) => {
             cache[k] = value[k];
           })
@@ -101,9 +100,9 @@ class Project extends Basic {
      * @param {*} args
      * @return {*}
      */
-  async removeProjectCache({projectID, key}) {
+  async removeProjectCache({ projectID, key }) {
     projectID = Number(projectID);
-    let cache = await this.getProjectCache({projectID});
+    let cache = await this.getProjectCache({ projectID });
     if (isNil(cache)) {
       if (key) {
         cache[key] = null;

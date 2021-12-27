@@ -51,18 +51,8 @@ export default {
       type: Function
     }
   },
-  data() {
-    return {
-      currentTab: { name: "sdfsaf", id: 1 },
-      navFold: false,
-      confirmLoading: false,
-      modalType: "",
-      modalVisible: false
-    };
-  },
   computed: {
     choosedData() {
-      console.log(12333);
       return this.tabDatas.find(item => item.isActive);
     }
   },

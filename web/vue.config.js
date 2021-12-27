@@ -243,11 +243,20 @@ module.exports = {
         target: "http://172.24.2.230:8088",
         //target: 'http://172.24.2.29:9202', //yichao
         // target: "http://172.24.2.83:9202", //jiawei
-        //target: "http://luban.ctyun.cn:8088",
+        // target: "http://luban.ctyun.cn:8088",
         //target: "http://devluban.ctyun.cn:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api"
+        }
+      },
+      "/guideAssets": {
+        target: "http://172.24.2.230:8088", // 产品文档后台上传的图片代理
+        // target: "http://luban.ctyun.cn:8088",
+        //target: "http://devluban.ctyun.cn:8088",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/guideAssets": "/guideAssets"
         }
       },
       "/dolphinscheduler": {

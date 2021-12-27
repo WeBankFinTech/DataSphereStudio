@@ -146,6 +146,8 @@ import {
   GetGuideTree,
   SaveGuideGroup,
   SaveGuideContent,
+  DeleteGuideContent,
+  DeleteGuideGroup,
 } from "@/common/service/apiGuide";
 
 import Tree from "./tree.vue";
@@ -157,9 +159,9 @@ export default {
   data() {
     const validateGroupPath = (rule, value, callback) => {
       const result = value && value.trim();
-      const reg = /^\/[\w_]*$/;
+      const reg = /^\/[\w_\/]*$/;
       if (!reg.test(result)) {
-        callback(new Error("path以/开头，支持英文、数字、下划线（_）"));
+        callback(new Error("path以/开头，支持英文、数字、下划线（_）和斜线（/）"));
       } else {
         const path_not_change = this.nodes.find(
           (item) => item.path.trim() === result && item.id == this.groupForm.id
@@ -195,8 +197,7 @@ export default {
       groupRule: {
         path: [
           { required: true, validator: validateGroupPath, trigger: "blur" },
-        ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        ]
       },
       contentForm: {
         type: "", // 类型: 1-步骤step，2-问题question
@@ -222,15 +223,16 @@ export default {
       });
     },
     mergeTree(source = [], nodes) {
-      // 新的nodes合并到source，保留source中的canAdd，opened等属性，path，title属性及新的节点取自nodes
+      // 以新的nodes为主，但要保留source中的opened等属性，path，title属性及新的节点取自nodes
       const data = [];
       for (let i = 0, len = nodes.length; i < len; i++) {
-        let merge = source[i] || nodes[i] || {};
+        const origin = source.find(item => item.id == nodes[i].id)
         data.push({
-          ...merge,
+          ...nodes[i],
+          opened: origin ? origin.opened : false,
           treeId: `group_${nodes[i].id}`,
           path: nodes[i].path,
-          title: nodes[i].title,
+          title: nodes[i].title || nodes[i].path,
           canAdd: true,
           canDelete: true,
           canUpdate: true,
@@ -248,8 +250,9 @@ export default {
       return data;
     },
     handleTreeClick(node) {
-      this.currentTreeId = node.treeId;
+      // group节点点击不处理
       if (node.type) {
+        this.currentTreeId = node.treeId;
         this.$router.push({
           path: "/managementPlatform/guide",
           query: { id: node.id },
@@ -284,7 +287,27 @@ export default {
       });
     },
     handleDeleteClick(node) {
-      console.log("delete", node.type ? "content" : "group");
+      this.$Modal.confirm({
+        title: "确认删除吗",
+        content: "",
+        onOk: () => {
+          if (node.type) {
+            DeleteGuideContent(node.id).then((res) => {
+              this.refreshTree();
+            });
+          } else {
+            const group = this.nodes.find((i) => i.id == node.id);
+            if (group && group.children && group.children.length) {
+              this.$Message.info("该页面group还有所属内容，不能删除");
+            } else {
+              DeleteGuideGroup(node.id).then((res) => {
+                this.refreshTree();
+              });
+            }
+          }
+        },
+        onCancel: () => {},
+      });
     },
     handleUpdateClick(node) {
       const type = node.type ? "content" : "group";

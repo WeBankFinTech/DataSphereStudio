@@ -27,8 +27,8 @@ export default {
       default: () => [],
     },
     currentTreeId: {
-      type: Number,
-      default: 0,
+      type: String,
+      default: "",
     },
   },
   data() {

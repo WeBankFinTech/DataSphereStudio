@@ -433,10 +433,10 @@ export default {
     font-size: 16px;
     cursor: pointer;
     border: 1px solid transparent;
-    color: #657180;
+    @include font-color(#333, $dark-workspace-title-color);
     &:hover {
+      @include bg-color(#fff, $dark-menu-base-color);
       color: #5cadff;
-      background-color: #fff;
       border-color: #5cadff;
     }
   }

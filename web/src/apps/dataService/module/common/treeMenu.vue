@@ -13,7 +13,9 @@
       prefix="ios-search"
       placeholder="请输入API名称搜索"
       style="width: 220px;border:0;margin-top: 10px;margin-bottom: 10px;"
-      @on-change="handleSearch"
+      @on-enter="handleSearch"
+      clearable
+      @on-clear="handleReset"
     /></div>
     <Tree
       class="tree-container"
@@ -167,9 +169,12 @@ export default {
       this.originDatas = _.cloneDeep(this.projectsTree);
     },
     handleSearch: _.debounce(function(e) {
-      const value = e.target.value;
+      const value = e.target.value.trim();
       this.executeSearch(value);
     }, 200),
+    handleReset() {
+      this.executeSearch('');
+    },
     executeSearch(value) {
       this.searchValue = value;
       const temp = _.cloneDeep(this.originDatas);

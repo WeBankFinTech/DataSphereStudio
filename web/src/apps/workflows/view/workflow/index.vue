@@ -325,7 +325,6 @@ export default {
       this.getProjectData();
       this.tryOpenWorkFlow();
       this.updateBread();
-      //if (this.topTabList[1]) this.topTabList[1].name = this.$route.query.projectName;
     },
     selectOrchestratorList(val) {
       if (val.length > 0) {
@@ -1073,6 +1072,9 @@ export default {
     },
     // 切换开发流程
     handleChangeButton(item) {
+      if ( item.dicValue !=  this.modeOfKey ) {
+        this.getAllProjects(()=>{});
+      }
       if (
         item.dicValue === DEVPROCESS.OPERATIONCENTER &&
         this.currentProjectData.id == this.$route.query.projectID &&
@@ -1103,7 +1105,6 @@ export default {
           query: this.$route.query,
         });
       }
-      this.getAllProjects(()=>{});
     },
     // 选择列表
     selectProject() {

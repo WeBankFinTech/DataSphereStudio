@@ -3,7 +3,8 @@
     <div class="manage-head">{{ $t("message.dataService.apiCall.apiCall") }}</div>
     <div class="filter-box">
       <div class="filter-input">
-        <Input v-model="apiCaller" icon="ios-search" :placeholder='$t("message.dataService.apiCall.col_caller")' @on-click="handleSearch" @on-enter="handleSearch" />
+        <Input v-model="apiCaller" icon="ios-search" :placeholder='$t("message.dataService.apiCall.col_caller")'
+               @on-click="handleSearch" @on-enter="handleSearch" clearable @on-clear="handleSearch" />
       </div>
       <div class="filter-area">
         <Button type="primary" size="large" @click="addAuthorize">
@@ -227,7 +228,7 @@ export default {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
-        caller: this.apiCaller
+        caller: this.apiCaller.trim()
       }, 'get').then((res) => {
         if (res.list) {
           this.loading = false;

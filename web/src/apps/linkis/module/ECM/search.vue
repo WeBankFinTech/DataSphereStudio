@@ -22,6 +22,7 @@
       </Select>
     </FormItem>
     <FormItem>
+      <Button type="default" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
       <Button type="primary" @click="search">
         {{ $t('message.linkis.search') }}
       </Button>
@@ -64,6 +65,14 @@ export default {
   methods: {
     search() {
       this.$emit("search", this.searchBar)
+    },
+    reset() {
+      this.searchBar = {
+        engineInstance: "",
+        status: "",
+        owner: "",
+      };
+      this.$emit("reset", this.searchBar)
     }
   },
 };

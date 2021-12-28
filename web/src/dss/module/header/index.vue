@@ -124,7 +124,7 @@
           class="menu-item"
           @click="goCollectedUrl"
         >
-          {{ app.name }}
+          {{ app.title }}
         </li>
       </ul>
       <div class="icon-group">
@@ -362,6 +362,7 @@ export default {
       }
     },
     removeFavorite(app) {
+
       if (this.$route.query.workspaceId) {
         RemoveFavorite({
           workspaceId: this.$route.query.workspaceId,
@@ -371,12 +372,21 @@ export default {
             (i) => i.menuApplicationId !== app.menuApplicationId
           );
         });
+
+        this.collections = this.collections.filter(
+          (i) => i.id !== app.id
+        );
       }
     },
     addCollection(app) {
       let _this = this;
       if (_this.$route.query.workspaceId) {
-        _this.collections = this.collections.concat(app);
+        if ( _this.collections.length < 5 ) {
+          _this.collections = this.collections.concat(app);
+        } else {
+          _this.$Message.warning('目前只支持钉五个快捷入口')
+        }
+
       }
     },
     removeCollection(app) {

@@ -939,6 +939,13 @@ export default {
      * parama 为打开工作流基本信息
      */
     openWorkflow(params) {
+      if (params.lastedNode) {
+        const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
+        this.getFlow(cur, (flow) => {
+          this.$refs.projectTree.handleItemToggle(cur);
+        });
+      }
+      this.currentTreeId = params.id || undefined
       if (this.loading) return;
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
       const isIn = this.tabList.find(
@@ -1031,6 +1038,7 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index + 1];
+            this.currentTreeId = this.current.id;
           } else if (
             this.tabList.length > 1 &&
             index === this.tabList.length - 1
@@ -1039,10 +1047,12 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index - 1];
+            this.currentTreeId = this.current.id;
           } else {
             this.current = this.currentVal = this.lastVal = {};
             // 没有那就是选中开发中心或者编排中心
             this.textColor = "#2D8CF0";
+            this.currentTreeId = undefined;
           }
         }
         this.tabList.splice(index, 1);
@@ -1111,6 +1121,7 @@ export default {
         ...currenTab,
         tabId: currenTab.tabId,
       };
+      this.currentTreeId = currenTab.id
       this.current = currenTab;
       this.tabName = currenTab.id + currenTab.version;
       // 切换工作流将textColor清空，使tab为选中状态

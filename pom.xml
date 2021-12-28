@@ -37,8 +37,8 @@
         <module>plugins/linkis/dss-gateway-support</module>
         <module>dss-data-api</module>
         <module>dss-data-governance</module>
-        <module>assembly</module>
         <module>dss-guide</module>
+        <module>assembly</module>
     </modules>
 
     <properties>

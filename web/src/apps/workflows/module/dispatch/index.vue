@@ -1600,6 +1600,7 @@ export default {
   min-height: 80vh;
   float: left;
   width: 100%;
+  overflow-y: hidden;
 
   .scheduler-menu{
     float: left;

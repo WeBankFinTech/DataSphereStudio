@@ -13,7 +13,15 @@
           :class="{ 'menu-active': item.title == currentHeader }"
           @click="handleSidebarToggle(item.title)"
         >
-          <SvgIcon class="icon" :icon-class="item.icon" verticalAlign="0px" />
+          <Tooltip :content="item.title" placement="right">
+            <div class="menuTooltip">
+              <SvgIcon
+                class="icon"
+                :icon-class="item.icon"
+                verticalAlign="0px"
+              />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <div class="management-platform-sidebar-tree">
@@ -399,6 +407,7 @@ $per-border-color: #dee4ec;
 .management-platform-wrap {
   height: 100%;
   .management-platform-sidebar {
+    z-index: 2;
     display: flex;
     position: fixed;
     left: 0;
@@ -427,9 +436,15 @@ $per-border-color: #dee4ec;
         cursor: pointer;
         font-size: 26px;
         @include font-color(#333, $dark-text-color);
+        border-left: 3px solid transparent;
         &:hover {
           @include bg-color(#eceff4, $dark-menu-base-color);
         }
+      }
+      .menu-active {
+        border-left: 3px solid rgb(45, 140, 240);
+        @include bg-color(#edf1f6, $dark-menu-base-color);
+        @include border-color(#2e92f7, #4b8ff3);
       }
     }
     .management-platform-sidebar-tree {
@@ -454,15 +469,18 @@ $per-border-color: #dee4ec;
     }
   }
   .management-platform-tablist {
+    z-index: 1;
     height: 100%;
   }
   .management-platform-sidebar-tree-header {
     padding-left: 12px;
   }
-  .menu-active {
-    border-left: 3px solid rgb(45, 140, 240);
-    @include bg-color(#edf1f6, $dark-menu-base-color);
-    @include border-color(#2e92f7, #4b8ff3);
+  .menuTooltip {
+    width: 50px;
+    height: 44px;
+  }
+  /deep/.ivu-tooltip-inner {
+    background-color: rgba(70, 76, 91, 1);
   }
 }
 </style>

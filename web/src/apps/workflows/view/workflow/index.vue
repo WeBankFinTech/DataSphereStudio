@@ -66,6 +66,7 @@
         :orchestratorModeList="orchestratorModeList"
         :currentMode="currentMode"
         :selectOrchestratorList="selectOrchestratorList"
+        :projectNameList="formatProjectNameList"
         @on-tree-modal-cancel="handleTreeModalCancel"
         @on-tree-modal-confirm="handleTreeModalConfirm"
       >
@@ -91,12 +92,6 @@
       @menuHandleChangeButton="menuHandleChangeButton"
     >
       <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
-        <!-- 空项目 -->
-        <VoidPage
-          v-show="projectsTree.length === 0"
-          tipTitle="你还没有项目，请先添加一个项目"
-          :buttonClick="createProject"
-        />
         <div
           class="workflowListContainer"
           v-show="textColor || (tabList.length < 1 && projectsTree.length > 0)"
@@ -109,6 +104,9 @@
             :orchestratorModeList="orchestratorModeList"
             :currentMode="currentMode"
             :selectOrchestratorList="selectOrchestratorList"
+            :projectsTree="projectsTree"
+            :top-tab-list="tabList"
+            :create-project-handler="createProject"
             @open-workflow="openWorkflow"
             @publishSuccess="publishSuccess"
             @on-tree-modal-confirm="handleTreeModalConfirm"
@@ -216,7 +214,6 @@ import Tree from "@/apps/workflows/module/common/workflowTree/tree.vue";
 import WorkflowTabList from "@/apps/workflows/module/common/tabList/index.vue";
 import MakeUp from "@/apps/workflows/module/makeUp";
 import ProjectForm from "@/components/projectForm/index.js";
-import VoidPage from "../../module/common/voidPage/index.vue";
 import api from "@/common/service/api";
 import { DEVPROCESS, ORCHESTRATORMODES } from "@/common/config/const.js";
 import {
@@ -237,7 +234,6 @@ export default {
     makeUp: MakeUp.component,
     ProjectForm,
     DS,
-    VoidPage,
   },
   data() {
     return {
@@ -296,6 +292,26 @@ export default {
     };
   },
   watch: {
+    tabList(val, oldVal) {
+      let workspaceId = this.$route.query.workspaceId
+      let workFlowLists = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+      val.forEach( item => {
+        if( workFlowLists.every(i => i.id !== item.id) ) {
+          if( workFlowLists.length > 6 ) {
+            workFlowLists.pop()
+          }
+          workFlowLists.unshift(item)
+        } else {
+          let _workFlowLists = workFlowLists.slice()
+          let idx = workFlowLists.findIndex(i => i.id === item.id);
+          let _item = _workFlowLists.splice(idx, 1)[0];
+          _workFlowLists.unshift(_item)
+          workFlowLists = _workFlowLists
+        }
+      })
+      localStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
+      eventbus.emit('tabListChange', workFlowLists)
+    },
     currentVal(val, oldVal) {
       this.lastVal = oldVal;
       this.currentVal = val;
@@ -309,7 +325,6 @@ export default {
       this.getProjectData();
       this.tryOpenWorkFlow();
       this.updateBread();
-      //if (this.topTabList[1]) this.topTabList[1].name = this.$route.query.projectName;
     },
     selectOrchestratorList(val) {
       if (val.length > 0) {
@@ -327,7 +342,7 @@ export default {
       this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
     }
     // 获取所有project展示tree
-    this.getAllProjects(this.initClick);
+    this.getAllProjects(() => {});
   },
   mounted() {
     // this.getCache();
@@ -341,22 +356,33 @@ export default {
     isScheduler() {
       return this.$route.name === "Scheduler";
     },
+    formatProjectNameList() {
+      let res = [];
+      if( this.projectsTree.length > 0 ) {
+        this.projectsTree.forEach(item => {
+          let name = item.name;
+          let id = item.id + '';
+          res.push({name, id})
+        })
+      }
+      return res;
+    }
   },
   methods: {
-    initClick() {
-      if (this.projectsTree.length > 0) {
-        const cur = this.projectsTree[0];
-        this.getFlow(cur, (flow) => {
-          if (flow.length > 0) {
-            const cur_node = flow[0];
-            this.handleTreeClick(cur_node);
-            this.$refs.projectTree.handleItemToggle(cur);
-          } else {
-            this.handleTreeClick(cur);
-          }
-        });
-      }
-    },
+    // initClick() {
+    //   if (this.projectsTree.length > 0) {
+    //     const cur = this.projectsTree[0];
+    //     this.getFlow(cur, (flow) => {
+    //       if (flow.length > 0) {
+    //         const cur_node = flow[0];
+    //         this.handleTreeClick(cur_node);
+    //         this.$refs.projectTree.handleItemToggle(cur);
+    //       } else {
+    //         this.handleTreeClick(cur);
+    //       }
+    //     });
+    //   }
+    // },
     createProject() {
       this.actionType = "add";
       this.ProjectShow = true;
@@ -632,6 +658,11 @@ export default {
           } else {
             this.openWorkflow(param);
           }
+          // 同project下切换flow，应该切换产品文档到开发模式，清除前面的flow进入editor编辑模式而更新的guide，其他情况因为route change可以监测到
+          eventbus.emit("workflow.orchestratorId", {
+            orchestratorId: node.orchestratorId,
+            mod: "auto",
+          });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
@@ -830,7 +861,7 @@ export default {
             );
             setTimeout(() => {
               this.$router.go(0);
-            }, 1000);
+            }, 500);
             // this.getclassListData().then(data => {
             //   // 新建完工程进到工作流页
             //   const currentProject = data[0].dwsProjectList.filter(
@@ -907,6 +938,13 @@ export default {
      * parama 为打开工作流基本信息
      */
     openWorkflow(params) {
+      if (params.lastedNode) {
+        const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
+        this.getFlow(cur, (flow) => {
+          this.$refs.projectTree.handleItemToggle(cur);
+        });
+      }
+      this.currentTreeId = params.id || undefined
       if (this.loading) return;
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
       const isIn = this.tabList.find(
@@ -999,6 +1037,7 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index + 1];
+            this.currentTreeId = this.current.id;
           } else if (
             this.tabList.length > 1 &&
             index === this.tabList.length - 1
@@ -1007,10 +1046,12 @@ export default {
               this.currentVal =
               this.lastVal =
                 this.tabList[index - 1];
+            this.currentTreeId = this.current.id;
           } else {
             this.current = this.currentVal = this.lastVal = {};
             // 没有那就是选中开发中心或者编排中心
             this.textColor = "#2D8CF0";
+            this.currentTreeId = undefined;
           }
         }
         this.tabList.splice(index, 1);
@@ -1031,6 +1072,9 @@ export default {
     },
     // 切换开发流程
     handleChangeButton(item) {
+      if ( item.dicValue !=  this.modeOfKey ) {
+        this.getAllProjects(()=>{});
+      }
       if (
         item.dicValue === DEVPROCESS.OPERATIONCENTER &&
         this.currentProjectData.id == this.$route.query.projectID &&
@@ -1044,8 +1088,6 @@ export default {
       this.modeOfKey = item.dicValue;
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
-      // 开发中心和运维中心使用同一个route，所以使用eventbus来触发产品即文档的更新
-      eventbus.emit("workflow.change", this.modeOfKey);
       this.tabList = [];
       this.textColor = "#2D8CF0";
       this.lastVal = null;
@@ -1063,7 +1105,6 @@ export default {
           query: this.$route.query,
         });
       }
-      this.getAllProjects();
     },
     // 选择列表
     selectProject() {
@@ -1081,6 +1122,7 @@ export default {
         ...currenTab,
         tabId: currenTab.tabId,
       };
+      this.currentTreeId = currenTab.id
       this.current = currenTab;
       this.tabName = currenTab.id + currenTab.version;
       // 切换工作流将textColor清空，使tab为选中状态

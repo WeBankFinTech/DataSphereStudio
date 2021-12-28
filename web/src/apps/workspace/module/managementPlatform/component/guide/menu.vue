@@ -16,7 +16,7 @@
           <SvgIcon icon-class="guide-step" />
         </div>
       </Tooltip>
-      <Tooltip content="添加页面" placement="top">
+      <Tooltip content="添加页面(group)" placement="top">
         <div class="btn-op" @click="handleAddGroup">
           <SvgIcon icon-class="guide-add" />
         </div>
@@ -50,7 +50,7 @@
           <Input
             type="text"
             v-model="groupForm.path"
-            placeholder="请输入文档path"
+            placeholder="请输入文档path，path以/开头"
             style="width: 300px"
           ></Input>
         </FormItem>
@@ -62,10 +62,10 @@
             style="width: 300px"
           ></Input>
         </FormItem>
-        <FormItem label="文档描述" prop="desc">
+        <FormItem label="文档描述" prop="description">
           <Input
             type="textarea"
-            v-model="groupForm.desc"
+            v-model="groupForm.description"
             placeholder="请输入描述"
             style="width: 300px"
           >
@@ -90,8 +90,8 @@
         </FormItem>
         <FormItem label="节点类型" prop="type">
           <RadioGroup v-model="contentForm.type">
-            <Radio label="step">步骤</Radio>
-            <Radio label="question">问题</Radio>
+            <Radio label="1" :disabled="!!contentForm.id">步骤</Radio>
+            <Radio label="2" :disabled="!!contentForm.id">问题</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem label="内容标题" prop="title">
@@ -113,7 +113,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem label="标题前缀" prop="seq" v-if="contentForm.type == 'step'">
+        <FormItem label="标题前缀" prop="seq" v-if="contentForm.type == 1">
           <Input
             type="text"
             v-model="contentForm.seq"
@@ -142,6 +142,14 @@
 </template>
 
 <script>
+import {
+  GetGuideTree,
+  SaveGuideGroup,
+  SaveGuideContent,
+  DeleteGuideContent,
+  DeleteGuideGroup,
+} from "@/common/service/apiGuide";
+
 import Tree from "./tree.vue";
 export default {
   name: "guideMenu",
@@ -151,75 +159,31 @@ export default {
   data() {
     const validateGroupPath = (rule, value, callback) => {
       const result = value && value.trim();
-      const reg = /^\/[\w_]*$/;
+      const reg = /^\/[\w_\/]*$/;
       if (!reg.test(result)) {
-        callback(new Error("path以/开头，支持英文、数字、下划线（_）"));
+        callback(new Error("path以/开头，支持英文、数字、下划线（_）和斜线（/）"));
       } else {
-        if (this.nodes.some((item) => item.path.trim() === result)) {
-          callback(new Error("该path已经存在"));
-          return;
-        } else {
+        const path_not_change = this.nodes.find(
+          (item) => item.path.trim() === result && item.id == this.groupForm.id
+        );
+        if (this.groupForm.id && path_not_change) {
+          // 如果是修改，且修改的group的path没有变化，说明只修改了title等属性
           callback();
+        } else {
+          // 修改path，检查不能和其他group重复
+          if (this.nodes.some((item) => item.path.trim() === result)) {
+            callback(new Error("该path已经存在"));
+            return;
+          } else {
+            callback();
+          }
         }
       }
     };
     return {
       mode: "all",
-      currentTreeId: 1,
-      nodes: [
-        {
-          id: 1,
-          path: "/",
-          title: "工作空间",
-          canAdd: true,
-          canDelete: true,
-          canUpdate: true,
-          children: [
-            {
-              id: 11,
-              type: "question",
-              title: "工作空间",
-              titleAlias: "工作空间",
-              canDelete: true,
-              canUpdate: true,
-            },
-            {
-              id: 12,
-              type: "step",
-              title: "工作空间2",
-              titleAlias: "工作空间2",
-              canDelete: true,
-              canUpdate: true,
-            },
-          ],
-        },
-        {
-          id: 2,
-          path: "/ab",
-          title: "控制台",
-          canAdd: true,
-          canDelete: true,
-          canUpdate: true,
-          children: [
-            {
-              id: 21,
-              type: "question",
-              title: "观礼台",
-              titleAlias: "观礼台",
-              canDelete: true,
-              canUpdate: true,
-            },
-            {
-              id: 22,
-              type: "step",
-              title: "观礼台2",
-              titleAlias: "观礼台2",
-              canDelete: true,
-              canUpdate: true,
-            },
-          ],
-        },
-      ],
+      currentTreeId: "",
+      nodes: [],
       // modal and form
       modalType: "",
       modalVisible: false,
@@ -228,15 +192,15 @@ export default {
       groupForm: {
         path: "",
         title: "",
-        desc: "",
+        description: "",
       },
       groupRule: {
         path: [
           { required: true, validator: validateGroupPath, trigger: "blur" },
-        ],
+        ]
       },
       contentForm: {
-        type: "",
+        type: "", // 类型: 1-步骤step，2-问题question
         title: "",
         titleAlias: "",
         seq: "",
@@ -249,16 +213,46 @@ export default {
       },
     };
   },
-  watch: {
-    currentTab(newValue) {
-      this.currentTab = newValue;
-    },
+  mounted() {
+    this.refreshTree();
   },
   methods: {
+    refreshTree() {
+      GetGuideTree().then((data) => {
+        this.nodes = this.mergeTree(this.nodes, data.result || []);
+      });
+    },
+    mergeTree(source = [], nodes) {
+      // 以新的nodes为主，但要保留source中的opened等属性，path，title属性及新的节点取自nodes
+      const data = [];
+      for (let i = 0, len = nodes.length; i < len; i++) {
+        const origin = source.find(item => item.id == nodes[i].id)
+        data.push({
+          ...nodes[i],
+          opened: origin ? origin.opened : false,
+          treeId: `group_${nodes[i].id}`,
+          path: nodes[i].path,
+          title: nodes[i].title || nodes[i].path,
+          canAdd: true,
+          canDelete: true,
+          canUpdate: true,
+          children: nodes[i].children.map((c) => {
+            return {
+              ...c,
+              treeId: `content_${c.id}`,
+              type: c.type == 1 ? "step" : "question", // 类型: 1-步骤step，2-问题question
+              canDelete: true,
+              canUpdate: true,
+            };
+          }),
+        });
+      }
+      return data;
+    },
     handleTreeClick(node) {
-      console.log("node", node);
-      this.currentTreeId = node.id;
+      // group节点点击不处理
       if (node.type) {
+        this.currentTreeId = node.treeId;
         this.$router.push({
           path: "/managementPlatform/guide",
           query: { id: node.id },
@@ -293,7 +287,27 @@ export default {
       });
     },
     handleDeleteClick(node) {
-      console.log("delete", node.type ? "content" : "group");
+      this.$Modal.confirm({
+        title: "确认删除吗",
+        content: "",
+        onOk: () => {
+          if (node.type) {
+            DeleteGuideContent(node.id).then((res) => {
+              this.refreshTree();
+            });
+          } else {
+            const group = this.nodes.find((i) => i.id == node.id);
+            if (group && group.children && group.children.length) {
+              this.$Message.info("该页面group还有所属内容，不能删除");
+            } else {
+              DeleteGuideGroup(node.id).then((res) => {
+                this.refreshTree();
+              });
+            }
+          }
+        },
+        onCancel: () => {},
+      });
     },
     handleUpdateClick(node) {
       const type = node.type ? "content" : "group";
@@ -307,13 +321,13 @@ export default {
           id: node.id,
           path: node.path || "",
           title: node.title || "",
-          desc: node.desc || "",
+          description: node.description || "",
         };
       } else {
         this.contentForm = {
           id: node.id,
           path: node.path,
-          type: node.type || "",
+          type: node.type == "step" ? "1" : "2", // 类型: 1-步骤step，2-问题question
           title: node.title || "",
           titleAlias: node.titleAlias || "",
           seq: node.seq || "",
@@ -348,21 +362,35 @@ export default {
     },
     handleModalCancel() {
       this.modalVisible = false;
+      this.submitLoading = false;
       this.resetForm();
     },
     handleModalOk() {
       const modalType = this.modalType;
       if (modalType === "group") {
         this.$refs["groupForm"].validate((valid) => {
-          this.$refs.navMenu.treeMethod("getApi");
           if (valid) {
             this.submitLoading = true;
+            SaveGuideGroup(this.groupForm).then((res) => {
+              this.submitLoading = false;
+              this.handleModalCancel();
+              this.refreshTree();
+            });
           }
         });
       } else {
         this.$refs["contentForm"].validate((valid) => {
           if (valid) {
-            this.handleModalCancel();
+            this.submitLoading = true;
+            // 类型: 1-步骤step，2-问题question
+            SaveGuideContent({
+              ...this.contentForm,
+              type: +this.contentForm.type,
+            }).then((res) => {
+              this.submitLoading = false;
+              this.handleModalCancel();
+              this.refreshTree();
+            });
           }
         });
       }
@@ -372,8 +400,9 @@ export default {
         this.groupForm = {
           path: "",
           title: "",
-          desc: "",
+          description: "",
         };
+        this.$refs["groupForm"].resetFields();
       } else {
         this.contentForm = {
           type: "",
@@ -381,6 +410,7 @@ export default {
           titleAlias: "",
           seq: "",
         };
+        this.$refs["contentForm"].resetFields();
       }
     },
   },
@@ -403,54 +433,19 @@ export default {
     font-size: 16px;
     cursor: pointer;
     border: 1px solid transparent;
-    color: #657180;
+    @include font-color(#333, $dark-workspace-title-color);
     &:hover {
+      @include bg-color(#fff, $dark-menu-base-color);
       color: #5cadff;
-      background-color: #fff;
       border-color: #5cadff;
     }
   }
 }
 .modalFooter {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding-top: 10px;
-}
-.access-component-headers {
-  padding: 0px $padding-25;
-  border-bottom: $border-width-base $border-style-base $border-color-base;
-  @include border-color($border-color-base, $dark-border-color-base);
-  margin-top: 12px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  font-size: $font-size-large;
-  .active {
-    border-bottom: 2px solid $primary-color;
-  }
-  &-container {
-    flex: 1;
-    height: 40px;
-  }
-}
-.tab-item {
-  display: inline-block;
-  height: 40px;
-  line-height: 40px;
-  @include font-color($title-color, $dark-text-color);
-  cursor: pointer;
-  min-width: 100px;
-  max-width: 200px;
-  overflow: hidden;
-  margin-right: 2px;
-  &.active {
-    height: 40px;
-    color: $primary-color;
-    border-radius: 4px 4px 0 0;
-    border-bottom: 2px solid $primary-color;
-    line-height: 38px;
-  }
 }
 </style>

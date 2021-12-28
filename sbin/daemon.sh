@@ -156,9 +156,15 @@ function setServerName(){
 		SERVER_NAME=dss-flow-execution-server
 	##elif [[ $PROJECT_NAME == *"visualis"* ]]; then
 	##	SERVER_NAME=visualis-server
-    else
+	elif [[ $PROJECT_NAME == *"data-api"* ]]; then
+    SERVER_NAME=dss-data-api-server
+  elif [[ $PROJECT_NAME == *"data-governance"* ]]; then
+    SERVER_NAME=dss-data-governance-server
+  elif [[ $PROJECT_NAME == *"guide"* ]]; then
+    SERVER_NAME=dss-guide-server
+  else
 		echo "please input： sh daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh workspece "
-		echo "server name :  workspace、project、orchestrator、release、apiservice、workflow、execution"
+		echo "server name :  project、orchestrator、apiservice、datapipe、workflow、execution、data-api、data-governance、guide"
 		exit 1
 	fi
 }

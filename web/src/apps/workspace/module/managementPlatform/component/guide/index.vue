@@ -3,6 +3,7 @@
     <mavon-editor
       v-if="showEditor"
       style="height: 100%; z-index: 1"
+      :externalLink="externalLink"
       v-model="source"
       ref="md"
       @save="saveContent"
@@ -24,6 +25,7 @@ export default {
   },
   data() {
     return {
+      externalLink: false, // 禁用自动加载highlight.js，github-markdown-css，katex
       source: "",
     };
   },

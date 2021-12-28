@@ -69,25 +69,37 @@ function startDssProject(){
 	##	SERVER_NAME=visualis-server
 	##	SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
 	##	startApp
-    else
+	elif [[ $PROJECT_NAME == *"data-api"* ]]; then
+    SERVER_NAME=dss-data-api-server
+	  SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+    startApp
+  elif [[ $PROJECT_NAME == *"data-governance"* ]]; then
+    SERVER_NAME=dss-data-governance-server
+	  SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+    startApp
+  elif [[ $PROJECT_NAME == *"guide"* ]]; then
+    SERVER_NAME=dss-guide-server
+    SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
+    startApp
+  else
 		echo "please input： sh dss-daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh workspece "
-		echo "server name :  project、orchestrator、apiservice、workflow、execution"
+		echo "server name :  project、orchestrator、apiservice、datapipe、workflow、execution、data-api、data-governance、guide"
 		exit 1
 	fi
 }
 
 function startApp(){
-if [[ $SERVER_IP == "127.0.0.1" ]]; then
-  SERVER_IP=$local_host
-fi
-echo "<-------------------------------->"
-echo "Begin to $COMMAND $SERVER_NAME"
-SERVER_BIN=$DSS_INSTALL_HOME/sbin
-SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh $SERVER_BIN/daemon.sh $COMMAND $SERVER_NAME > /dev/null 2>&1 &"
-ssh  $SERVER_IP $SERVER_START_CMD
-isSuccess "End to $COMMAND $SERVER_NAME"
-echo "<-------------------------------->"
-sleep 1
+  if [[ $SERVER_IP == "127.0.0.1" ]]; then
+    SERVER_IP=$local_host
+  fi
+  echo "<-------------------------------->"
+  echo "Begin to $COMMAND $SERVER_NAME"
+  SERVER_BIN=$DSS_INSTALL_HOME/sbin
+  SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh $SERVER_BIN/daemon.sh $COMMAND $SERVER_NAME > /dev/null 2>&1 &"
+  ssh  $SERVER_IP $SERVER_START_CMD
+  isSuccess "End to $COMMAND $SERVER_NAME"
+  echo "<-------------------------------->"
+  sleep 1
 }
 
 COMMAND=$1

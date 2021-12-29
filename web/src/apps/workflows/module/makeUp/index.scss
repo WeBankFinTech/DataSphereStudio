@@ -23,7 +23,6 @@
   .text {
       vertical-align: text-top;
       @include font-color($light-text-color, $dark-text-color);
-
   }
 
   .button {
@@ -50,7 +49,6 @@
           vertical-align: middle;
         //   color: #666;
           @include font-color($light-text-color, $dark-text-color);
-
       }
   }
 

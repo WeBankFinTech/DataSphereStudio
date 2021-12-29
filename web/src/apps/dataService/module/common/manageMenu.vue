@@ -41,7 +41,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .manage-menu-wrap {
-  @include bg-color(#f8f9fc, $dark-menu-base-color);
+  @include bg-color(#f8f9fc, $dark-base-color);
   .manage-title {
     padding: 10px 12px;
     font-size: 14px;

@@ -2,6 +2,10 @@
   <div class="manage-wrap">
     <div class="manage-head">{{ $t("message.dataService.apiCall.apiCall") }}</div>
     <div class="filter-box">
+      <div class="filter-input">
+        <Input v-model="apiCaller" icon="ios-search" :placeholder='$t("message.dataService.apiCall.col_caller")'
+               @on-click="handleSearch" @on-enter="handleSearch" clearable @on-clear="handleSearch" />
+      </div>
       <div class="filter-area">
         <Button type="primary" size="large" @click="addAuthorize">
           <SvgIcon icon-class="xinzeng" />
@@ -65,7 +69,7 @@
           prop="caller">
           <Input
             v-model="authFormData.caller"
-            @on-change="changeCaller"
+            :maxlength=21
             :placeholder="$t('message.dataService.apiCall.authForm.holderName')"
           ></Input>
         </FormItem>
@@ -82,7 +86,7 @@
           v-if="authFormData.expire == 'short'"
           prop="expireDate"
         >
-          <Date-picker 
+          <Date-picker
             type="date"
             format="yyyy-MM-dd"
             :options="dateOptions"
@@ -90,10 +94,8 @@
             v-model="authFormData.expireDate"></Date-picker>
         </Form-item>
         <Form-item :label="$t('message.dataService.apiCall.authForm.labelFlow')" prop="groupId">
-          <Select v-model="authFormData.groupId" :disabled="!!authFormData.id">
-            <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">
-              {{ item.groupName}}
-            </Option>
+          <Select filterable v-model="authFormData.groupId" :disabled="!!authFormData.id">
+            <Option v-for="item in groups" :key="item.groupId" :value="`${item.groupId}`">{{ item.groupName}}</Option>
           </Select>
         </Form-item>
       </Form>
@@ -147,6 +149,7 @@ export default {
         }
       ],
       loading: true,
+      apiCaller: '',
       apiCallList: [],
       pageData: {
         total: 0,
@@ -175,6 +178,8 @@ export default {
       return {
         caller: [
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterName'), trigger: 'blur' },
+          { message: `${this.$t('message.dataService.apiCall.authForm.enterNameLength')}20`, max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.dataService.apiCall.authForm.enterNameDesc'), trigger: 'blur' }
         ],
         groupId: [
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterFlow'), trigger: 'change' }
@@ -183,7 +188,7 @@ export default {
           { required: true, message: this.$t('message.dataService.apiCall.authForm.enterExpire'), trigger: 'change' }
         ],
         expireDate: [
-          { 
+          {
             validator: (rule, value, callback) => {
               if (this.authFormData.expire === 'short') {
                 if (!value) {
@@ -194,8 +199,8 @@ export default {
               } else {
                 callback();
               }
-            }, 
-            trigger: 'blur' 
+            },
+            trigger: 'blur'
           }
         ]
       }
@@ -223,6 +228,7 @@ export default {
         workspaceId: this.$route.query.workspaceId,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
+        caller: this.apiCaller.trim()
       }, 'get').then((res) => {
         if (res.list) {
           this.loading = false;
@@ -236,11 +242,6 @@ export default {
     },
     addAuthorize() {
       this.modalAuthShow = true;
-    },
-    changeCaller(e) {
-      this.$nextTick(() => {
-        this.authFormData.caller = this.authFormData.caller.replace(/[\u4e00-\u9fa5]/g,''); // 登录用户名不允许中文
-      })
     },
     authCancel() {
       this.modalAuthShow = false;
@@ -293,6 +294,10 @@ export default {
         expireDate: auth.expire
       }
     },
+    handleSearch() {
+      this.pageData.pageNow = 1;
+      this.getApiCallList();
+    },
     deleteApi(row) {
       this.selectedApi = row;
       this.modalConfirm = true;
@@ -340,9 +345,16 @@ export default {
   .filter-box {
     margin-bottom: 20px;
     overflow: hidden;
-    .filter-area {
-      float: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    .filter-input{
+      width: 200px;
+      margin-right: 12px;
     }
+    //.filter-area {
+    //  float: right;
+    //}
   }
   .operation-wrap {
     margin-left: -10px;

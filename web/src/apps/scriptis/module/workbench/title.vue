@@ -38,6 +38,7 @@
 </template>
 <script>
 export default {
+  name: 'we-title',
   props: {
     work: {
       type: Object,

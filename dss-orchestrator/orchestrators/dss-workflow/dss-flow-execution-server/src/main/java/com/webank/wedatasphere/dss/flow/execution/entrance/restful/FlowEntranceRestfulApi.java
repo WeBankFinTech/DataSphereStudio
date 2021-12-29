@@ -1,53 +1,49 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.common.log.LogUtils;
-import com.webank.wedatasphere.linkis.entrance.EntranceServer;
-import com.webank.wedatasphere.linkis.entrance.annotation.EntranceServerBeanAnnotation;
-import com.webank.wedatasphere.linkis.entrance.execute.EntranceJob;
-import com.webank.wedatasphere.linkis.entrance.restful.EntranceRestfulApi;
-import com.webank.wedatasphere.linkis.entrance.utils.JobHistoryHelper;
-import com.webank.wedatasphere.linkis.governance.common.entity.task.RequestPersistTask;
-import com.webank.wedatasphere.linkis.protocol.constants.TaskConstant;
-import com.webank.wedatasphere.linkis.protocol.task.Task;
-import com.webank.wedatasphere.linkis.protocol.utils.ZuulEntranceUtils;
-import com.webank.wedatasphere.linkis.rpc.Sender;
-import com.webank.wedatasphere.linkis.scheduler.queue.Job;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.common.log.LogUtils;
+import org.apache.linkis.entrance.EntranceServer;
+import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
+import org.apache.linkis.entrance.execute.EntranceJob;
+import org.apache.linkis.entrance.restful.EntranceRestfulApi;
+import org.apache.linkis.entrance.utils.JobHistoryHelper;
+import org.apache.linkis.governance.common.entity.job.JobRequest;
+import org.apache.linkis.protocol.constants.TaskConstant;
+import org.apache.linkis.protocol.utils.ZuulEntranceUtils;
+import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.scheduler.queue.Job;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
 
-@Path("/dss/flow/entrance")
-@Component
+@RequestMapping(path = "/dss/flow/entrance")
+@RestController
 public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 
     private EntranceServer entranceServer;
@@ -68,25 +64,24 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
      * Repsonse
      */
     @Override
-    @POST
-    @Path("/execute")
-    public Response execute(@Context HttpServletRequest req, Map<String, Object> json) {
+    @RequestMapping(value = "/execute",method = RequestMethod.POST)
+    public Message execute(@Context HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
 //        try{
         logger.info("Begin to get an execID");
-        Workspace workspace = SSOHelper.getWorkspace(req);
+        DSSWorkspace workspace = SSOHelper.getWorkspace(req);
         json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         params.put("workspace", workspace);
-        String label = ((Map<String, Object>) json.get("labels")).get("route").toString();
-        params.put("labels", label);
+        String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
+        params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();
-        Task task = ((EntranceJob) job).getTask();
-        Long taskID = ((RequestPersistTask) task).getTaskID();
+        JobRequest task = ((EntranceJob) job).getJobRequest();
+        Long taskID = task.getId();
         pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
         pushLog("************************************SCRIPT CODE************************************", job);
-        pushLog(((RequestPersistTask) task).getCode(), job);
+        pushLog(task.getExecutionCode(), job);
         pushLog("************************************SCRIPT CODE************************************", job);
         pushLog(LogUtils.generateInfo("Your job is accepted,  jobID is " + execID + " and taskID is " + taskID + ". Please wait it to be scheduled"), job);
         execID = ZuulEntranceUtils.generateExecID(execID, Sender.getThisServiceInstance().getApplicationName(), new String[]{Sender.getThisInstance()});
@@ -100,14 +95,13 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 //            message.setStatus(1);
 //            message.setMethod("/api/entrance/execute");
 //        }
-        return Message.messageToResponse(message);
+        return message;
 
     }
 
     @Override
-    @GET
-    @Path("/{id}/status")
-    public Response status(@PathParam("id") String id, @QueryParam("taskID") String taskID) {
+    @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
+    public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = Option.apply(null);
@@ -121,7 +115,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             message = Message.ok();
             message.setMethod("/api/entrance/" + id + "/status");
             message.data("status", status).data("execID", id);
-            return Message.messageToResponse(message);
+            return message;
         }
         if (job.isDefined()) {
             message = Message.ok();
@@ -130,11 +124,10 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         } else {
             message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
     private void pushLog(String log, Job job) {
         entranceServer.getEntranceContext().getOrCreateLogManager().onLogUpdate(job, log);
     }
-
 }

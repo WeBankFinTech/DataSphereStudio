@@ -1,31 +1,15 @@
-/*
- *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *
- */
-
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf;
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
+/**
+ * The interface Dolphin scheduler conf.
+ *
+ * @author yuxin.yuan
+ * @date 2021/10/22
+ */
 public interface DolphinSchedulerConf {
 
-    CommonVars<String> DSS_URL = CommonVars.apply("wds.dss.appconn.dolphinscheduler.dss.url", "http://127.0.0.1:8088/");
-
-    CommonVars<String> APP_NAME = CommonVars.apply("wds.dss.appconn.dolphinscheduler.app.name", "dolphinscheduler");
-
-    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
+    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.admin.token", "fcdd944c03d5792719781f2c6e7b7542");
 
 }

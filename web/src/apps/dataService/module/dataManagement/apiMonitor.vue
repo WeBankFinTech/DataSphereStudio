@@ -196,6 +196,14 @@ export default {
           key: 'createBy'
         },
         {
+          title: this.$t("message.dataService.apiMonitor.col_updateTime"),
+          key: 'updateTime'
+        },
+        {
+          title: this.$t("message.dataService.apiMonitor.col_createTime"),
+          key: 'createTime'
+        },
+        {
           title: this.$t("message.dataService.operation"),
           key: "operation",
           slot: "operation"

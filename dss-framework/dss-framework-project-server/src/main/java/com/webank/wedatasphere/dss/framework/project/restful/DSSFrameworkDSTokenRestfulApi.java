@@ -2,13 +2,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -18,32 +11,26 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.webank.wedatasphere.dss.appconn.schedule.core.SchedulerAppConn;
-import com.webank.wedatasphere.dss.appconn.schedule.core.standard.SchedulerStructureStandard;
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService;
-import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
-import com.webank.wedatasphere.dss.framework.project.utils.DateUtil;
-import com.webank.wedatasphere.dss.framework.project.utils.HttpClientUtil;
-import com.webank.wedatasphere.dss.framework.project.utils.RestfulUtils;
-import com.webank.wedatasphere.dss.framework.release.utils.ReleaseConf;
-import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.framework.project.contant.DSSProjectConstant;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
+import com.webank.wedatasphere.dss.standard.app.development.service.RefQueryService;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author allenlliu
@@ -51,61 +38,40 @@ import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
  * @date 2020/08/17 05:37 PM
  */
 
-@Path("/dss/framework/project")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Component
+@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RestController
 public class DSSFrameworkDSTokenRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
 
-    @Autowired
-    private AppConnService appConnService;
 
-    private SchedulerAppConn schedulerAppConn;
-
-    @PostConstruct
-    public void init() {
-        schedulerAppConn =
-            (SchedulerAppConn)appConnService.getAppConn(ReleaseConf.DSS_SCHEDULE_APPCONN_NAME.getValue());
-    }
-
-    @GET
-    @Path("/ds/token")
-    public Response dsApiServiceTokenCreate(@Context HttpServletRequest req) {
+    @RequestMapping(path ="/ds/token", method = RequestMethod.GET)
+    public Message dsApiServiceTokenCreate(@Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
+        SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
+            .getAppConn(DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (schedulerAppConn == null) {
-            logger.error("scheduler appconn is null, can not get scheduler api access token");
-            return RestfulUtils.dealError("scheduler appconn is null");
+            logger.error("dolphinscheduler appconn is null, can not get scheduler api access token");
+            return Message.error("dolphinscheduler appconn is null");
         }
 
-        SchedulerStructureStandard schedulerStructureStandard =
-            (SchedulerStructureStandard)schedulerAppConn.getAppStandards().stream()
-                .filter(appStandard -> appStandard instanceof SchedulerStructureStandard).findAny().orElse(null);
-        if (schedulerStructureStandard == null) {
-            logger.error("scheduler structure standard is null, can not continue");
-            return RestfulUtils.dealError("scheduler Structure Standard is null");
-        }
-
-        RefQueryService tokenQueryService = schedulerStructureStandard.getQueryService();
+        WorkflowConversionIntegrationStandard standard = schedulerAppConn.getOrCreateWorkflowConversionStandard();
+        AppInstance schedulerInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
+        RefQueryService tokenQueryService = standard.getQueryService(schedulerInstance);
         RefQueryOperation tokenRefQueryOperation = tokenQueryService.getRefQueryOperation();
-        if (tokenRefQueryOperation == null) {
-            logger.error("scheduler token query operation is null, can not continue");
-            return RestfulUtils.dealError("scheduler token query operation is null");
-        }
 
-        CommonRequestRef requestRef = new CommonRequestRef();
+        CommonRequestRef requestRef = new CommonRequestRefImpl();
         requestRef.setParameter("userName", userName);
         try {
             ResponseRef responseRef = tokenRefQueryOperation.query(requestRef);
-            return Message.messageToResponse(Message.ok().data("token", responseRef.getValue("token"))
-                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time"))));
+            return Message.ok().data("token", responseRef.getValue("token"))
+                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time")));
         } catch (ExternalOperationFailedException e) {
-            return RestfulUtils.dealError("获取token失败:" + e.getMessage());
+            return Message.error("获取token失败:" + e.getMessage());
         }
     }
 
-    @GET
+   /* @GET
     @Path("/ds/token1")
     public Response apiServiceTokenQuery(
                                          @Context HttpServletRequest req) {
@@ -165,5 +131,5 @@ public class DSSFrameworkDSTokenRestfulApi {
             }catch (Exception exception){
                 return RestfulUtils.dealError("获取token失败:" + exception.getMessage());
             }
-    }
+    }*/
 }

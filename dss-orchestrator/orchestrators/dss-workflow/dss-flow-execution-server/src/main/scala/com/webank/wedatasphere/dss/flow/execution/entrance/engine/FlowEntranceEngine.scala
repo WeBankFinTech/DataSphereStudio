@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -25,9 +23,9 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.execution.FlowExecuti
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.parser.FlowEntranceJobParser
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.{FlowEntranceJob, FlowExecutionRequest}
 import com.webank.wedatasphere.dss.flow.execution.entrance.resolver.FlowDependencyResolver
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.scheduler.executer.ExecutorState.ExecutorState
-import com.webank.wedatasphere.linkis.scheduler.executer._
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.scheduler.executer.ExecutorState.ExecutorState
+import org.apache.linkis.scheduler.executer._
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 

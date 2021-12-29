@@ -184,7 +184,7 @@ export default {
     },
     getVersionData() {
       api.fetch(`/dss/apiservice/apiVersionQuery?serviceId=${this.$route.query.id}`, {}, 'get').then((res) => {
-        this.originData = this.versionData = res.result;
+        this.originData = this.versionData = res.result || [];
         this.versionPage.totalSize = this.originData && this.originData.length;
       })
     },

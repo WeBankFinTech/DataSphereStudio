@@ -1,68 +1,65 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job
 
-import com.webank.wedatasphere.dss.appconn.schedule.core.entity.{SchedulerFlow, SchedulerNode}
 import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
-import com.webank.wedatasphere.dss.flow.execution.entrance.{FlowContext, FlowContextImpl}
 import com.webank.wedatasphere.dss.flow.execution.entrance.listener.NodeRunnerListener
-import com.webank.wedatasphere.dss.flow.execution.entrance.node.{NodeExecutionState, NodeRunner}
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeExecutionState.NodeExecutionState
-import com.webank.wedatasphere.linkis.common.log.LogUtils
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.entrance.execute.StorePathExecuteRequest
-import com.webank.wedatasphere.linkis.entrance.job.EntranceExecutionJob
-import com.webank.wedatasphere.linkis.governance.common.entity.task.RequestPersistTask
-import com.webank.wedatasphere.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteRequest, SuccessExecuteResponse}
-import com.webank.wedatasphere.linkis.scheduler.queue.{Job, SchedulerEventState}
-import com.webank.wedatasphere.linkis.scheduler.queue.SchedulerEventState.Running
+import com.webank.wedatasphere.dss.flow.execution.entrance.node.{NodeExecutionState, NodeRunner}
+import com.webank.wedatasphere.dss.flow.execution.entrance.{FlowContext, FlowContextImpl}
+import com.webank.wedatasphere.dss.workflow.core.entity.{Workflow, WorkflowNode}
+import org.apache.linkis.common.log.LogUtils
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.entrance.execute.StorePathExecuteRequest
+import org.apache.linkis.entrance.job.EntranceExecutionJob
+import org.apache.linkis.entrance.persistence.PersistenceManager
+import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteRequest, SuccessExecuteResponse}
+import org.apache.linkis.scheduler.queue.SchedulerEventState.Running
+import org.apache.linkis.scheduler.queue.{Job, SchedulerEventState}
 
-import scala.beans.BeanProperty
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
-class FlowEntranceJob extends EntranceExecutionJob with NodeRunnerListener {
+class FlowEntranceJob(persistManager:PersistenceManager) extends EntranceExecutionJob(persistManager) with NodeRunnerListener {
 
-  private var flow: SchedulerFlow = _
+  private var flow: Workflow = _
 
   private val flowContext: FlowContext = new FlowContextImpl
 
 
 //   @BeanProperty   var dwsProject: DWSProject = _
 
-  def setFlow(flow: SchedulerFlow): Unit = this.flow = flow
+  def setFlow(flow: Workflow): Unit = this.flow = flow
 
-  def getFlow: SchedulerFlow = this.flow
+  def getFlow: Workflow = this.flow
 
   def getFlowContext: FlowContext = this.flowContext
 
   private val STATUS_CHANGED_LOCK = "STATUS_CHANGED_LOCK".intern()
 
+  override def  init():Unit = {
+
+  }
 
   override def jobToExecuteRequest(): ExecuteRequest = {
     new ExecuteRequest with StorePathExecuteRequest with FlowExecutionRequest {
-      override val code: String = FlowEntranceJob.this.getTask match {
-        case requestPersistTask: RequestPersistTask => requestPersistTask.getExecutionCode
-        case _ => null
-      }
-      override val storePath: String = FlowEntranceJob.this.getTask match {
-        case requestPersistTask: RequestPersistTask => requestPersistTask.getResultLocation
+      override val code: String = FlowEntranceJob.this.getJobRequest.getExecutionCode
+      override val storePath: String = FlowEntranceJob.this.getJobRequest match {
+//        case requestPersistTask: RequestPersistTask => requestPersistTask.getResultLocation
         case _ => ""
       }
       override val job: Job = FlowEntranceJob.this
@@ -78,7 +75,7 @@ class FlowEntranceJob extends EntranceExecutionJob with NodeRunnerListener {
     }
 
 
-  override def onStatusChanged(fromState: NodeExecutionState, toState: NodeExecutionState, node: SchedulerNode): Unit = {
+  override def onStatusChanged(fromState: NodeExecutionState, toState: NodeExecutionState, node: WorkflowNode): Unit = {
 
     val nodeName = node.getDSSNode.getName
     toState match {

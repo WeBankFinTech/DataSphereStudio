@@ -1,53 +1,52 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor
+package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
+import java.util.Map
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn
-import com.webank.wedatasphere.dss.framework.appconn.service.AppConnService
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentIntegrationStandard
-import com.webank.wedatasphere.dss.standard.app.development.execution._
-import com.webank.wedatasphere.dss.standard.app.development.execution.common.{AsyncExecutionRequestRef, CompletedExecutionResponseRef}
+import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
+import com.webank.wedatasphere.dss.common.label.{EnvDSSLabel, LabelKeyConvertor}
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, CompletedExecutionResponseRef}
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import com.webank.wedatasphere.dss.standard.common.entity.ref.{AsyncResponseRef, DefaultRefFactory, ResponseRef}
-import com.webank.wedatasphere.linkis.DataWorkCloudApplication
-import com.webank.wedatasphere.linkis.common.utils.{OverloadUtils, Utils}
-import com.webank.wedatasphere.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
-import com.webank.wedatasphere.linkis.engineconn.launch.EngineConnServer
-import com.webank.wedatasphere.linkis.governance.common.utils.GovernanceConstant
-import com.webank.wedatasphere.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFailedException
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
-import com.webank.wedatasphere.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
-import com.webank.wedatasphere.linkis.manager.label.entity.Label
-import com.webank.wedatasphere.linkis.manager.label.entity.cluster.ClusterLabel
-import com.webank.wedatasphere.linkis.manager.label.entity.engine.EngineTypeLabel
-import com.webank.wedatasphere.linkis.protocol.UserWithCreator
-import com.webank.wedatasphere.linkis.protocol.engine.JobProgressInfo
-import com.webank.wedatasphere.linkis.scheduler.executer.{AsynReturnExecuteResponse, ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper
+import org.apache.linkis.common.utils.{OverloadUtils, Utils}
+import org.apache.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
+import org.apache.linkis.engineconn.launch.EngineConnServer
+import org.apache.linkis.governance.common.utils.GovernanceConstant
+import org.apache.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
+import org.apache.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFailedException
+import org.apache.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
+import org.apache.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.cluster.ClusterLabel
+import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
+import org.apache.linkis.protocol.UserWithCreator
+import org.apache.linkis.protocol.engine.JobProgressInfo
+import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
+import org.apache.linkis.server.BDPJettyServerHelper
 import org.apache.commons.lang.StringUtils
 
 import scala.beans.BeanProperty
-import scala.collection.JavaConversions._
 
 class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
 
@@ -56,7 +55,7 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
 
   private val executorLabels: util.List[Label[_]] = new util.ArrayList[Label[_]](2)
 
-  private val refFactory = new DefaultRefFactory[ExecutionRequestRef]
+  private val refFactory = new DefaultRefFactory
 
   override def executeLine(engineExecutorContext: EngineExecutionContext, code: String): ExecuteResponse = {
     info("got code:[" + code + "]")
@@ -76,7 +75,7 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
         ref.setOrchestratorName(getValue(source, FLOW_NAME_STR))
         ref.setJobContent(BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
         ref.setName(getValue(source, NODE_NAME_STR))
-        engineExecutorContext.getLables.find(_.isInstanceOf[EngineTypeLabel]).foreach { case engineTypeLabel: EngineTypeLabel =>
+        engineExecutorContext.getLabels.find(_.isInstanceOf[EngineTypeLabel]).foreach { case engineTypeLabel: EngineTypeLabel =>
           ref.setType(engineTypeLabel.getEngineType)
         }
         ref.setExecutionRequestRefContext(new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator))
@@ -86,33 +85,18 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
     val workspace = BDPJettyServerHelper.gson.fromJson(getValue(engineExecutorContext.getProperties, WORKSPACE_NAME_STR), classOf[Workspace])
     requestRef.setWorkspace(workspace)
     val appConnName = getAppConnName(getValue(engineExecutorContext.getProperties, NODE_TYPE))
-    val appConnService = DataWorkCloudApplication.getApplicationContext.getBean(classOf[AppConnService])
-    val appConn: AppConn = appConnService.getAppConn(appConnName)
-    val labels = getDSSLabels(engineExecutorContext.getLables)
+    val appConn = AppConnManager.getAppConnManager.getAppConn(appConnName)
+    //val labels = getDSSLabels(engineExecutorContext.getLabels)
+    var labels = engineExecutorContext.getProperties.get("labels").toString
     getAppInstanceByLabels(labels, appConn) match {
       case Some(appInstance) =>
-        val developmentIntegrationStandard = appConn.getAppStandards.find(_.isInstanceOf[DevelopmentIntegrationStandard]).get.asInstanceOf[DevelopmentIntegrationStandard]
-        val processService = developmentIntegrationStandard.getProcessService(appInstance.getLabels)
-        processService.setAppInstance(appInstance)
-        val refExecutionService = processService.getRefOperationService.find(_.isInstanceOf[RefExecutionService]).get.asInstanceOf[RefExecutionService]
-        val refExecutionOperation  = refExecutionService.createRefExecutionOperation
+        val developmentIntegrationStandard = appConn.asInstanceOf[OnlyDevelopmentAppConn].getOrCreateDevelopmentStandard
+        val refExecutionService =developmentIntegrationStandard.getRefExecutionService(appInstance)
+        val refExecutionOperation  = refExecutionService.getRefExecutionOperation
         Utils.tryCatch(refExecutionOperation.execute(requestRef) match {
           case asyncResponseRef: AsyncResponseRef =>
-            new AsynReturnExecuteResponse {
-              private var er: ExecuteResponse => Unit = _
-              def tryToNotifyAll(responseRef: ResponseRef): Unit = {
-                val executeResponse = createExecuteResponse(responseRef, appConnName)
-                if (er == null) this synchronized(while(er == null) this.wait(1000))
-                er(executeResponse)
-              }
-              override def notify(rs: ExecuteResponse => Unit): Unit = {
-                er = rs
-                this synchronized notifyAll()
-              }
-              asyncResponseRef.notifyMe(new java.util.function.Consumer[ResponseRef]{
-                override def accept(t: ResponseRef): Unit = tryToNotifyAll(t)
-              })
-            }
+            asyncResponseRef.waitForCompleted()
+            createExecuteResponse(asyncResponseRef.getResponse, appConnName)
           case responseRef: ResponseRef =>
             createExecuteResponse(responseRef, appConnName)
         })(ErrorExecuteResponse("Failed to execute appconn", _))
@@ -126,7 +110,7 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
       .getOrElse(throw AppConnExecuteFailedException(510000, "Cannot Find AppInstance by labels " + labels.toList))
 
   private def createExecuteResponse(responseRef: ResponseRef, appConnName: String): ExecuteResponse =
-    if(responseRef.getStatus == 200) SuccessExecuteResponse()
+    if(responseRef.isSucceed) SuccessExecuteResponse()
     else {
       val exception = responseRef match {
         case response: CompletedExecutionResponseRef => response.getException
@@ -140,13 +124,15 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
     StringUtils.split(nodeType,".")(0)
   }
 
-  private def getAppInstanceByLabels(labels : String, appConn: AppConn): Option[AppInstance] = {
-    appConn.getAppDesc.getAppInstances.foreach{ appInstance =>
-      appInstance.getLabels.foreach{ label =>
-        if(StringUtils.containsIgnoreCase(label.getStringValue, labels)){
-          return Some(appInstance)
-        }
-      }
+  private def getAppInstanceByLabels(labels: String, appConn: AppConn): Option[AppInstance] = {
+    var labelStr = labels
+    if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+      val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
+      labelStr = labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
+    }
+    val appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labelStr)));
+    if (appInstanceList != null && appInstanceList.size() > 0) {
+      return Some(appInstanceList.get(0))
     }
     None
   }

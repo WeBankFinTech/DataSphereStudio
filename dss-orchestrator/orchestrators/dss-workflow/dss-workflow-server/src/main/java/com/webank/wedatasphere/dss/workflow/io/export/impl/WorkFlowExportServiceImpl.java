@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -23,6 +21,7 @@ import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -36,22 +35,17 @@ import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/03/05 02:41 PM
- */
 @Service
 public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
@@ -77,7 +71,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
 
     @Override
-    public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace) throws Exception {
+    public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         //获取rootFlow,和所有子Flow
         DSSFlow rootFlow = flowMapper.selectFlowByID(rootFlowId);
         List<DSSFlow> dssFlowList = new ArrayList<>();
@@ -104,8 +98,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!dssFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", dssFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, dssProjectId, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace);
-                    exportAllSubFlows(userName, dssFlow, dssProjectId, flowExportSaveBasePath, workspace);
+                    exportFlowResources(userName, dssProjectId, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace,dssLabels);
+                    exportAllSubFlows(userName, dssFlow, dssProjectId, flowExportSaveBasePath, workspace,dssLabels);
                     dssFlows.add(dssFlow);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, dssFlow.getName(), dssFlow.getBmlVersion());
@@ -122,7 +116,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     }
 
 
-    private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectExportBasePath, Workspace workspace) throws Exception {
+    private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectExportBasePath, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
         List<? extends DSSFlow> subFlows = dssFlowParent.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
@@ -132,8 +126,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!subFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", subFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, projectId, projectExportBasePath, flowJson, subFlow.getName(), workspace);
-                    exportAllSubFlows(userName, subFlow, projectId, projectExportBasePath, workspace);
+                    exportFlowResources(userName, projectId, projectExportBasePath, flowJson, subFlow.getName(), workspace,dssLabels);
+                    exportAllSubFlows(userName, subFlow, projectId, projectExportBasePath, workspace,dssLabels);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, subFlow.getName(), subFlow.getBmlVersion());
                     logger.info(warnMsg);
@@ -149,10 +143,10 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     }
 
     @Override
-    public void exportFlowResources(String userName, Long projectId, String projectSavePath, String flowJson, String flowName, Workspace workspace) throws Exception {
+    public void exportFlowResources(String userName, Long projectId, String projectSavePath, String flowJson, String flowName, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
         String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
         String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
-        String appjointResourceSavePath = workFlowExportPath + File.separator + "appjoint-resource";
+        String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";
         if (StringUtils.isNotEmpty(workFlowExportPath)) {
             //导出工作流资源文件
             List<Resource> resources = workFlowParser.getWorkFlowResources(flowJson);
@@ -162,12 +156,12 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 });
             }
 
-            //导出工作流节点资源文件,工作流节点appjoint文件
+            //导出工作流节点资源文件,工作流节点appconn文件
             List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
             if (nodes != null) {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                    nodeExportService.downloadAppjointResourceToLocal(userName, projectId, node, appjointResourceSavePath, workspace);
+                    nodeExportService.downloadAppConnResourceToLocal(userName, projectId, node, appConnResourceSavePath, workspace,dssLabels);
                 }
             }
 

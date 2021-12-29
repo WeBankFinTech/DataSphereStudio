@@ -13,13 +13,18 @@ export default {
   name: 'lineage',
   data() {
     return {
-      canvas: null
+      canvas: null,
     }
   },
   props: {
     processId: String,
     lineageData: {
       required: true
+    }
+  },
+  watch: {
+    lineageData() {
+      this.createOrUpdateCanvas(this.convertData())
     }
   },
   methods: {
@@ -41,11 +46,16 @@ export default {
         } else if (cur.typeName === 'spark_process') {
           icon = 'icon-a-sparkprocess'
         }
+
         data.nodes.push({
           id: item,
           name: cur.displayText,
           icon: icon,
           status: cur.status,
+          model: {
+            name: cur.displayText,
+            ...cur
+          },
           Class: node,
           className: 'nodeBackground-color'
         })
@@ -88,7 +98,7 @@ export default {
         })
         this.canvas.draw(data);
       } else {
-        this.canvas.drageReDraw(data);
+        this.canvas.redraw(data);
       }
     }
   },

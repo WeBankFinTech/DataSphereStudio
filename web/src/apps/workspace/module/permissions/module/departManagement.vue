@@ -11,6 +11,7 @@
             v-model="queries.deptName"
             :placeholder="$t('message.permissions.departPlaceholder')"
             style="width: 272px"
+            @on-enter="handleQuery()"
           >
           </Input>
         </FormItem>
@@ -199,9 +200,12 @@
       </Form>
       <slot name="footer">
         <div class="modalFooter">
-          <Button @click="handleModalCancel()" size="large" class="cancle-btn">{{
-            $t("message.workspace.cancel")
-          }}</Button>
+          <Button
+            @click="handleModalCancel()"
+            size="large"
+            class="cancle-btn"
+            >{{ $t("message.workspace.cancel") }}</Button
+          >
           <Button
             type="primary"
             size="large"
@@ -382,7 +386,7 @@ export default {
           this.loading = false;
           const depts = (data && data.deptList) || [];
           if (isQuery && query) {
-            if(depts.length == 0){
+            if (depts.length == 0) {
               this.departmentList = [];
               return;
             }
@@ -603,7 +607,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 .main-content {
   padding-top: 20px;
   @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
@@ -619,13 +623,16 @@ export default {
       @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
     /deep/.ivu-input {
-      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include bg-color(
+        $workspace-body-bg-color,
+        $dark-workspace-body-bg-color
+      );
       border: 1px solid $border-color-base;
       @include border-color($border-color-base, $dark-border-color-base);
     }
     .cancle-btn {
       @include border-color($border-color-base, $dark-border-color-base);
-      @include font-color($light-text-color, #FFF);
+      @include font-color($light-text-color, #fff);
       &:hover {
         @include bg-color($active-menu-item, $dark-active-menu-item);
       }
@@ -669,7 +676,6 @@ export default {
     padding-top: 10px;
   }
 }
-
 </style>
 <style>
 .ivu-table .table-department-hit td {

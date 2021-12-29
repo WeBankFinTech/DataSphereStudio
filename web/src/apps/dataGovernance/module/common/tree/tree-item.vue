@@ -1,16 +1,24 @@
 <template>
   <div class="tree-item">
-    <div class="tree-content">
+    <div
+      class="tree-content"
+      @click="handleItemToggle"
+      :class="{
+        'tree-content-active': currentTreeId == model.id,
+        'tree-content-children': !model.children
+      }"
+    >
       <div class="tree-icon" v-if="model.id < 10">
-        <SvgIcon
-          v-if="model.opened"
-          icon-class="open"
-          @click="handleItemToggle"
-        />
-        <SvgIcon v-else icon-class="close" @click="handleItemToggle" />
+        <SvgIcon v-if="model.opened" icon-class="open" />
+        <SvgIcon v-else icon-class="close" />
       </div>
       <div class="tree-icon tree-children-icon" v-if="model.id > 10">
-        <SvgIcon icon-class="flow" />
+        <!-- <SvgIcon icon-class="flow" :color="'#2e92f7'" /> -->
+        <SvgIcon
+          icon-class="flow"
+          :class="{ 'tree-icon-active': currentTreeId == model.id }"
+          :color="currentTreeId == model.id ? '#2e92f7' : ''"
+        />
       </div>
       <div
         class="tree-name"
@@ -52,7 +60,8 @@ export default {
   data() {
     return {
       model: this.data,
-      maxHeight: 0
+      maxHeight: 0,
+      itemClickid: 0
     };
   },
   computed: {
@@ -73,6 +82,8 @@ export default {
   },
   methods: {
     handleItemClick(e) {
+      const { id } = this.model;
+      this.itemClickid = id;
       this.onItemClick(this.model);
     },
     handleItemToggle(e) {
@@ -82,7 +93,7 @@ export default {
     },
     handleGroupMaxHeight() {
       if (this.model.opened && this.model.children) {
-        this.maxHeight = this.model.children.length * 32;
+        this.maxHeight = this.model.children.length * 42;
       } else {
         this.maxHeight = 0;
       }
@@ -97,6 +108,7 @@ export default {
   outline: none;
   @include font-color($light-text-color, $dark-text-color);
   .tree-content {
+    height: 34px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -105,6 +117,14 @@ export default {
       // background-color: #EDF1F6;
       @include bg-color(#edf1f6, $dark-active-menu-item);
     }
+  }
+  .tree-content-active {
+    @include bg-color(#e0edff, $dark-base-color);
+    border-right: 3px solid #2e92f7;
+    @include border-color(#2e92f7, $dark-border-color-base);
+  }
+  .tree-content-children {
+    margin-bottom: 8px;
   }
   .leaf {
     color: transparent;
@@ -144,7 +164,7 @@ export default {
   .tree-name {
     display: block;
     flex: 1;
-    line-height: 32px;
+    line-height: 34px;
     padding: 0 6px;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -155,6 +175,10 @@ export default {
     // @include bg-color(#edf1f6, $dark-active-menu-item);
     // color: rgb(45, 140, 240);
     @include font-color($primary-color, $dark-primary-color);
+  }
+
+  .tree-icon-active {
+    @include font-color(#2e92f7, $dark-text-color);
   }
   .tree-children {
     transition: max-height 0.3s;

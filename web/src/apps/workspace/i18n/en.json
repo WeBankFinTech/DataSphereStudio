@@ -279,6 +279,7 @@
       "modifyPwdSuccess": "Modify password Success!",
       "pwdCheckError": "Begin with a letter, must contain upper and lower case letters, numbers and special characters, and between 8 to 26 bits",
       "pwdKeyboardError": "The keyboard sequence cannot be three consecutive characters, such as 123,987, ABC,cba,qwe,poi, etc"
-    } 
+    }
   }
 }
+

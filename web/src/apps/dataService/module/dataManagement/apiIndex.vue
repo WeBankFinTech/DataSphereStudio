@@ -3,7 +3,7 @@
     <Tab-pane :label='$t("message.dataService.apiIndex.publishApi")' name="publish">
       <div class="filter-box">
         <div class="filter-input">
-          <Input v-model="apiName" icon="ios-search" :placeholder='$t("message.dataService.apiIndex.apiName")' @on-click="handleSearch" @on-enter="handleSearch" />
+          <Input v-model="apiName" icon="ios-search" :placeholder='$t("message.dataService.apiIndex.apiName")' clearable @on-clear="handleSearch" @on-click="handleSearch" @on-enter="handleSearch" />
         </div>
       </div>
       <Table :columns="columns" :data="apiList" size="large">
@@ -121,7 +121,7 @@ export default {
       this.loading = true;
       api.fetch('/dss/data/api/apimanager/list', {
         workspaceId: this.$route.query.workspaceId,
-        apiName: this.apiName,
+        apiName: this.apiName.trim(),
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }, 'get').then((res) => {
@@ -144,6 +144,7 @@ export default {
       this.getApiList();
     },
     handleSearch() {
+      this.pageData.pageNow = 1;
       this.getApiList();
     },
     test(row) {
@@ -199,7 +200,7 @@ export default {
         document.body.appendChild(inputEl);
         inputEl.select(); // 选择对象;
         document.execCommand("Copy"); // 执行浏览器复制命令
-        this.$Message.success(this.$t('message.dataService.apiIndex.copied')); 
+        this.$Message.success(this.$t('message.dataService.apiIndex.copied'));
         inputEl.remove();
       }).catch((err) => {
         console.error(err)

@@ -82,6 +82,7 @@ export default {
       this.clientWidth = this.$el.clientWidth;
       this.clientHeight = this.$el.clientHeight;
       this.initItem();
+      this.$emit('on-resize', this.items);
     },
     initItem() {
       if (!this.clientWidth && !this.clientHeight) {
@@ -265,6 +266,7 @@ export default {
           this.currentX = null;
           this.currentY = null;
           this.currentChange = null;
+          this.$emit('on-resized');
         });
         this.requestFrameIds.push(AnimationFrameId);
       }

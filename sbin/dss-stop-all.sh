@@ -62,59 +62,67 @@ fi
 
 local_host="`hostname --fqdn`"
 function stopApp(){
-echo "<-------------------------------->"
-echo "Begin to stop $SERVER_NAME"
-if test -z "$SERVER_IP"
-then
-  SERVER_IP=$local_host
-fi
-
-#echo "Is local "$flag
-#if [ $flag == "0" ];then
-#   eval $SERVER_stop_CMD
-#else
-#   SERVER_BIN=$INSTALL_HOME/sbin
-#   SERVER_stop_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh $INSTALL_HOME/sbin/daemon.sh $COMMAND $SERVER_NAME > /dev/null 2>&1 &"
-#   ssh  $SERVER_IP $SERVER_stop_CMD
-#fi
-
-if [[ $SERVER_IP == "127.0.0.1" ]];then
+  echo "<-------------------------------->"
+  echo "Begin to stop $SERVER_NAME"
+  if test -z "$SERVER_IP"
+  then
     SERVER_IP=$local_host
-fi
-SERVER_BIN=$DSS_INSTALL_HOME/sbin
-SERVER_stop_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/$SERVER_NAME/* > /dev/null 2>&1;sh daemon.sh stop $SERVER_NAME > /dev/null 2>&1 &"
-ssh  $SERVER_IP $SERVER_stop_CMD
-isSuccess "End to stop $SERVER_NAME"
-echo "<-------------------------------->"
-sleep 1
+  fi
+
+  #echo "Is local "$flag
+  #if [ $flag == "0" ];then
+  #   eval $SERVER_stop_CMD
+  #else
+  #   SERVER_BIN=$INSTALL_HOME/sbin
+  #   SERVER_stop_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh $INSTALL_HOME/sbin/daemon.sh $COMMAND $SERVER_NAME > /dev/null 2>&1 &"
+  #   ssh  $SERVER_IP $SERVER_stop_CMD
+  #fi
+
+  if [[ $SERVER_IP == "127.0.0.1" ]];then
+      SERVER_IP=$local_host
+  fi
+  SERVER_BIN=$DSS_INSTALL_HOME/sbin
+  SERVER_stop_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/$SERVER_NAME/* > /dev/null 2>&1;sh daemon.sh stop $SERVER_NAME > /dev/null 2>&1 &"
+  ssh  $SERVER_IP $SERVER_stop_CMD
+  isSuccess "End to stop $SERVER_NAME"
+  echo "<-------------------------------->"
+  sleep 1
 }
 
 
 function stopDssProject(){
-  loadConfig  
+  loadConfig
 
 	SERVER_NAME=dss-framework-project-server
 	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
-	stopApp		
-	
+	stopApp
+
 	SERVER_NAME=dss-framework-orchestrator-server
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
 	stopApp
-	
+
 	SERVER_NAME=dss-apiservice-server
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	stopApp
-	
+
 	SERVER_NAME=dss-workflow-server
 	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
 	stopApp
-	
+
 	SERVER_NAME=dss-flow-execution-server
 	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
 	stopApp
 
 	SERVER_NAME=dss-data-api-server
 	SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+  stopApp
+
+  SERVER_NAME=dss-data-governance-server
+	SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+  stopApp
+
+  SERVER_NAME=dss-guide-server
+	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
   stopApp
 
 	##SERVER_NAME=visualis-server

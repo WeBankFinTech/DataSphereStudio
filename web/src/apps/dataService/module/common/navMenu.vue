@@ -6,18 +6,30 @@
         :class="{ active: currentTab == '/dataService' }"
         @click="handleTabClick('dataService')"
       >
-        <SvgIcon class="nav-icon" icon-class="data-develop" />
+        <Tooltip content="服务开发" placement="right">
+          <div class="menuTooltip">
+            <SvgIcon class="nav-icon" icon-class="data-develop" />
+          </div>
+        </Tooltip>
       </div>
       <div
         class="ds-nav-menu-item"
         :class="{ active: currentTab.startsWith('/dataManagement') }"
         @click="handleTabClick('dataManagement')"
       >
-        <SvgIcon class="nav-icon" icon-class="project-workflow" />
+        <Tooltip content="服务管理" placement="right">
+          <div class="menuTooltip">
+            <SvgIcon class="nav-icon" icon-class="project-workflow" />
+          </div>
+        </Tooltip>
       </div>
     </div>
-    <div class="ds-nav-panel ds-nav-panel-develop" v-if="currentTab == '/dataService'">
+    <div
+      class="ds-nav-panel ds-nav-panel-develop"
+      v-if="currentTab == '/dataService'"
+    >
       <TreeMenu
+        :currentTreeId="currentTreeId"
         @showModal="showModal"
         @handleApiChoosed="handleApiChoosed"
         ref="treeMenu"
@@ -36,22 +48,24 @@ export default {
   name: "navMenu",
   components: {
     ManageMenu,
-    TreeMenu
+    TreeMenu,
   },
   props: {
     menuFold: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    currentTreeId: {
+      type: Number,
+    },
   },
   data() {
     return {
       currentTab: this.$route.path,
       loadingTree: false,
       projectsTree: [],
-      currentTreeId: +this.$route.query.projectID, // tree中active节点,
       searchValue: 123,
-      originDatas: []
+      originDatas: [],
     };
   },
   mounted() {},
@@ -65,7 +79,7 @@ export default {
       } else {
         this.$router.push({
           name: tab,
-          query: this.$route.query
+          query: this.$route.query,
         });
       }
     },
@@ -84,13 +98,14 @@ export default {
         const { id, data } = payload;
         this.$refs.treeMenu.addApi(id, data);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .ds-nav-menu-wrap {
+  z-index: 2;
   display: flex;
   position: fixed;
   left: 0;
@@ -106,11 +121,11 @@ export default {
     }
   }
   .ds-nav-menu {
-    z-index: 1;
+    z-index: 2;
     width: 54px;
-    @include bg-color(#f8f9fc, $dark-base-color);
+    @include bg-color(#f8f9fc, $dark-menu-base-color);
     border-right: 1px solid #dee4ec;
-    @include border-color(#dee4ec, $dark-menu-base-color);
+    @include border-color(#dee4ec, $dark-base-color);
     &-item {
       height: 44px;
       line-height: 44px;
@@ -118,17 +133,19 @@ export default {
       cursor: pointer;
       font-size: 26px;
       @include font-color(#333, $dark-text-color);
+      border-left: 3px solid transparent;
       &:hover {
-        @include bg-color(#eceff4, $dark-menu-base-color);
+        @include bg-color(#eceff4, $dark-base-color);
       }
     }
     .active {
-      @include bg-color(#eceff4, $dark-menu-base-color);
+      @include bg-color(#eceff4, $dark-base-color);
       border-left: 3px solid #2e92f7;
-      @include border-color(#2e92f7, #4B8FF3);
+      @include border-color(#2e92f7, #4b8ff3);
     }
   }
   .ds-nav-panel {
+    z-index: 1;
     position: absolute;
     width: 250px;
     left: 54px;
@@ -138,12 +155,19 @@ export default {
     padding: 10px;
     overflow-y: auto;
     border-right: 1px solid #dee4ec;
-    @include border-color(#dee4ec, $dark-menu-base-color);
-    @include bg-color(#f8f9fc, $dark-menu-base-color);
+    @include border-color(#dee4ec, $dark-border-color);
+    @include bg-color(#f8f9fc, $dark-base-color);
   }
-  .ds-nav-panel-develop{
+  .ds-nav-panel-develop {
     padding-left: 0;
     padding-right: 0;
+  }
+  .menuTooltip {
+    width: 50px;
+    height: 44px;
+  }
+  /deep/.ivu-tooltip-inner {
+    background-color: rgba(70, 76, 91, 1);
   }
 }
 .develop_nav {

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -31,8 +29,8 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +44,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//import static com.webank.wedatasphere.dss.server.conf.DSSServerConf.DSS_FLOW_EDIT_LOCK_TIMEOUT;
-
-/**
- * Created by v_wbjftang on 2019/5/15.
- */
 @Service
 public class DSSFlowServiceImpl implements DSSFlowService {
 
@@ -288,10 +281,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version) throws DSSErrorException, IOException {
+    public DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version,String contextIdStr) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName);
-        updateFlowJson(userName, workspaceName, projectName, rootFlowWithSubFlows, version, null);
+        updateFlowJson(userName, workspaceName, projectName, rootFlowWithSubFlows, version, null,contextIdStr);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         return copyFlow;
     }
@@ -319,16 +312,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return cyFlow;
     }
 
-    private void updateFlowJson(String userName, String workspaceName, String projectName, DSSFlow rootFlow, String version, Long parentFlowId) throws DSSErrorException, IOException {
+    private void updateFlowJson(String userName, String workspaceName, String projectName, DSSFlow rootFlow, String version, Long parentFlowId,String contextIdStr) throws DSSErrorException, IOException {
         String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextId(userName, workspaceName, projectName, flowJson, rootFlow.getName(), version, parentFlowId);
+        String updateFlowJson = updateFlowContextId(flowJson,contextIdStr);
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
-                updateFlowJson(userName, workspaceName, projectName, subflow, version, rootFlow.getId());
+                updateFlowJson(userName, workspaceName, projectName, subflow, version, rootFlow.getId(),contextIdStr);
             }
         }
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
@@ -357,13 +350,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    private String updateFlowContextId(String userName, String workspace, String projectName, String flowJson, String flowName, String flowVersion, Long parentFlowId) throws DSSErrorException, IOException {
-        String parentFlowIdStr = null;
-        if (parentFlowId != null) {
-            parentFlowIdStr = parentFlowId.toString();
-        }
-        String contextID = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspace, projectName, flowName, flowVersion, userName);
-        String updatedFlowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "contextID", contextID);
+    private String updateFlowContextId(String flowJson,String contextIdStr) throws  IOException {
+//        String parentFlowIdStr = null;
+//        if (parentFlowId != null) {
+//            parentFlowIdStr = parentFlowId.toString();
+//        }
+//        String contextID = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspace, projectName, flowName, flowVersion, userName);
+        String updatedFlowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "contextID", contextIdStr);
         return updatedFlowJson;
     }
 
@@ -383,10 +376,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             for (String nodeJson : nodeJsonList) {
                 String updateNodeJson = nodeJson;
 
-                // TODO: 2020/3/20 暂时注视掉appjoint相关
-//                String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
-//                updateNodeJson =nodeInputService.uploadAppjointResource(userName,projectName, DSSFlow,updateNodeJson,updateContextId,appjointResourceSavePath);
-//
                 Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
                 //更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
@@ -407,6 +396,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                     }
                 } else {
+                    //todo  appconn节点的copy和json更新
                     nodeJsonListRes.add(nodeJsonMap);
                 }
             }

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -31,20 +29,9 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Properties;
 
-/**
- * @author georgeqiao
- * @Title: AbstractEventCheckReceiver
- * @ProjectName Azkaban-EventChecker
- * @date 2019/9/1822:10
- * @Description: TODO
- */
 public class AbstractEventCheckReceiver extends AbstractEventCheck{
     /**
      * Fill the result into the source
-     * @param props
-     * @param log
-     * @param consumedMsgInfo
-     * @return
      */
     String setConsumedMsg(Properties props, Logger log, String[] consumedMsgInfo){
         String vNewMsgID = "";
@@ -71,11 +58,6 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
 
     /**
      * Update consumption status
-     * @param jobId
-     * @param props
-     * @param log
-     * @param consumedMsgInfo
-     * @return
      */
     boolean updateMsgOffset(int jobId, Properties props, Logger log, String[] consumedMsgInfo,String lastMsgId){
         boolean result = false;
@@ -122,10 +104,6 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
 
     /**
      * get consumption progress
-     * @param jobId
-     * @param props
-     * @param log
-     * @return
      */
     String getOffset(int jobId, Properties props, Logger log){
         String sqlForReadMsgID = "SELECT msg_id FROM event_status WHERE receiver=? AND topic=? AND msg_name=?";
@@ -155,11 +133,6 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
 
     /**
      * Consistent entrance to consumer message
-     * @param jobId
-     * @param props
-     * @param log
-     * @param params   params[startQueryTime,endQueryTime,vMsgID]
-     * @return
      */
     String[] getMsg(Properties props, Logger log,String ... params){
         String sqlForReadTMsg = "SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";

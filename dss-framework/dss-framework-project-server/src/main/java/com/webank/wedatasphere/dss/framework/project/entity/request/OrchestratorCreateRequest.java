@@ -1,31 +1,28 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.framework.project.entity.request;
 
+import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/10/16
- * Description:
- */
+
 @XmlRootElement
 public class OrchestratorCreateRequest {
 
@@ -49,6 +46,15 @@ public class OrchestratorCreateRequest {
      */
     @NotNull(message = "编排方式不能为空")
     private List<String> orchestratorWays;
+    private List<String> dssLabels;
+
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
 
     /**
      * 编排用途
@@ -64,9 +70,9 @@ public class OrchestratorCreateRequest {
     private String workspaceName;
 
     /**
-     * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
+     * labels是通过前端进行传入的，主要是用来进行当前的环境信息
      */
-    private List<String> dssLabels;
+    private LabelRouteVo labels;
 
     public Long getWorkspaceId() {
         return workspaceId;
@@ -124,14 +130,13 @@ public class OrchestratorCreateRequest {
         this.description = description;
     }
 
-    public List<String> getDssLabels() {
-        return dssLabels;
+    public LabelRouteVo getLabels() {
+        return labels;
     }
 
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
+    public void setLabels(LabelRouteVo labels) {
+        this.labels = labels;
     }
-
 
     public String getProjectName() {
         return projectName;
@@ -159,7 +164,7 @@ public class OrchestratorCreateRequest {
                 ", arrangeWays=" + orchestratorWays +
                 ", uses='" + uses + '\'' +
                 ", description='" + description + '\'' +
-                ", dssLabels=" + dssLabels +
+                ", labels=" + labels +
                 '}';
     }
 }

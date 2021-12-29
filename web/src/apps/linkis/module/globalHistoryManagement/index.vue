@@ -482,6 +482,7 @@ export default {
         status: 'all',
         shortcut: '',
       };
+      this.search();
     },
     switchAdmin() {
       if (!this.isLoading) {
@@ -567,3 +568,17 @@ export default {
 };
 </script>
 <style src="./index.scss" lang="scss"></style>
+<style>
+.we-table thead th{
+  background-color: #f8f8f9;
+}
+.we-table-wrap .we-table .we-table-thead .we-table-thead-cell{
+  color: #515a6e;
+}
+.we-table-wrap .we-table .we-table-row:nth-child(2n){
+  background-color: #fff;
+}
+.we-table-wrap .we-table .we-table-row:hover{
+  background-color: #ebf7ff;
+}
+</style>

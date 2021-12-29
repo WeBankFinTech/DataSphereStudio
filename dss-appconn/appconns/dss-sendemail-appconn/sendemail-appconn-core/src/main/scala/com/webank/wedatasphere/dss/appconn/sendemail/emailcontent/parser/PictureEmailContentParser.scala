@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -24,14 +22,10 @@ import java.util.{Base64, UUID}
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
-import com.webank.wedatasphere.linkis.common.conf.Configuration
+import org.apache.linkis.common.conf.Configuration
 import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64OutputStream
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration._
-
-/**
-  * Created by enjoyyin on 2019/10/12.
-  */
 
 object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmailContent] {
 
@@ -72,7 +66,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
         iHeight = ((EMAIL_IMAGE_WIDTH.getValue.toDouble / iWidth.toDouble) * iHeight.toDouble).toInt
         iWidth = EMAIL_IMAGE_WIDTH.getValue
       }
-      s"""<img style="width:${iWidth}px; height:${iHeight}px;" src="cid:$imageName"></img>"""
+      s"""<img width="${iWidth}" height="${iHeight}" src="cid:$imageName"></img>"""
     }.toArray
   }
 

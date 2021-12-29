@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -86,7 +84,7 @@ public class DataDruidFactory {
 			username = props.getProperty("job.datachecker.jdo.option.username");
 			password = props.getProperty("job.datachecker.jdo.option.password");
 			loginType = props.getProperty("job.datachecker.jdo.option.login.type");
-
+            log.info("job url is:"+url+"and name is:"+username);
 			try {
 				if("base64".equals(loginType)) {
 					password = new String(Base64.getDecoder().decode(props.getProperty("job.datachecker.jdo.option.password").getBytes()), "UTF-8");
@@ -102,6 +100,7 @@ public class DataDruidFactory {
             username = props.getProperty("bdp.datachecker.jdo.option.username");
             password = props.getProperty("bdp.datachecker.jdo.option.password");
 			loginType = props.getProperty("bdp.datachecker.jdo.option.login.type");
+			log.info("bdp url is:"+url+"and name is:"+username);
             try {
 				if("base64".equals(loginType)) {
 					password = new String(Base64.getDecoder().decode(props.getProperty("bdp.datachecker.jdo.option.password").getBytes()), "UTF-8");

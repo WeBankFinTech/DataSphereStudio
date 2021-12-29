@@ -1,43 +1,38 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
-package com.webank.wedatasphere.linkis.manager.engineplugin.appconn.executor
+package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
 
-import com.webank.wedatasphere.dss.standard.app.development.execution.core.ExecutionRequestRefContext
-import com.webank.wedatasphere.dss.standard.app.development.execution.exception.AppConnExecutionErrorException
-import com.webank.wedatasphere.linkis.common.io.resultset.{ResultSet, ResultSetReader, ResultSetWriter}
-import com.webank.wedatasphere.linkis.common.io.{FsPath, MetaData, Record}
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.engineconn.computation.executor.execute.EngineExecutionContext
-import com.webank.wedatasphere.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
-import com.webank.wedatasphere.linkis.protocol.UserWithCreator
-import com.webank.wedatasphere.linkis.rpc.Sender
-import com.webank.wedatasphere.linkis.storage.FSFactory
-import com.webank.wedatasphere.linkis.storage.fs.FileSystem
-import com.webank.wedatasphere.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
+import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
+import com.webank.wedatasphere.dss.standard.app.development.listener.exception.AppConnExecutionErrorException
+import org.apache.linkis.common.io.resultset.{ResultSet, ResultSetReader, ResultSetWriter}
+import org.apache.linkis.common.io.{FsPath, MetaData, Record}
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.engineconn.computation.executor.execute.EngineExecutionContext
+import org.apache.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
+import org.apache.linkis.protocol.UserWithCreator
+import org.apache.linkis.rpc.Sender
+import org.apache.linkis.storage.FSFactory
+import org.apache.linkis.storage.fs.FileSystem
+import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
 
 import scala.collection.JavaConversions._
 
-/**
-  * Created by enjoyyin on 2021/1/27.
-  */
 abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext, userWithCreator: UserWithCreator)
   extends ExecutionRequestRefContext with Logging {
 
@@ -50,9 +45,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
   override def updateProgress(progress: Float): Unit = engineExecutorContext.pushProgress(progress, Array.empty)
 
   /**
-    * 获取本节点的操作用户
-    *
-    * @return
+    * Get the operation user of this node.
     */
   override def getUser: String = userWithCreator.user
 
@@ -89,15 +82,15 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
     engineExecutorContext.createResultSetWriter(resultSet, resultSetAlias).asInstanceOf[ResultSetWriter[M, R]]
 
   override def getResultSetReader[M <: MetaData, R <: Record](fsPath: FsPath): ResultSetReader[M, R] =
-    ResultSetReader.getResultSetReader(fsPath.getPath).asInstanceOf[ResultSetReader[M, R]]
+    ResultSetReader.getResultSetReader(fsPath.getSchemaPath).asInstanceOf[ResultSetReader[M, R]]
 
   private def createResultSetWriter[M <: MetaData, R <: Record](resultSetType: String, resultSetAlias: String): ResultSetWriter[M, R] =
     engineExecutorContext.createResultSetWriter(resultSetType, resultSetAlias).asInstanceOf[ResultSetWriter[M, R]]
 
-  /**
-    *
-    * @return
-    */
+  override def sendResultSet(resultSetWriter: ResultSetWriter[_ <: MetaData, _ <: Record]): Unit = {
+    engineExecutorContext.sendResultSet(resultSetWriter)
+  }
+
   override def getGatewayUrl: String = {
     val instances = Utils.tryThrow {
       Sender.getInstances(AppConnEngineConnConfiguration.GATEWAY_SPRING_APPLICATION.getValue)

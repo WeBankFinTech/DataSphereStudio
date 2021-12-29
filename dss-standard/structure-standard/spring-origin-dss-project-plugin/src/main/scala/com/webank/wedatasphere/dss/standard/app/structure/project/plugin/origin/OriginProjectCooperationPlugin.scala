@@ -1,34 +1,32 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.origin
 
-import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandard
-import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
+import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg
+import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandardFactory
+import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.{ProjectAuth, ProjectCooperationPlugin}
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
+import org.apache.linkis.httpclient.request.HttpAction
 import javax.servlet.http.HttpServletRequest
 
-/**
-  * Created by enjoyyin on 2020/8/11.
-  */
+
 class OriginProjectCooperationPlugin private() extends ProjectCooperationPlugin {
+ private val ssoIntegrationStandard:SSOIntegrationStandard =new OriginSSOIntegrationStandardFactory().getSSOIntegrationStandard
 
   private def getProjectAuth(action: HttpAction, dssMsg: DSSMsg): ProjectAuthImpl = {
     val dwsHttpClient = HttpClient.getDSSClient(dssMsg.getDSSUrl)
@@ -47,7 +45,7 @@ class OriginProjectCooperationPlugin private() extends ProjectCooperationPlugin 
   }
 
   override def getProjectAuth(request: HttpServletRequest, projectId: String): ProjectAuth = {
-    val dssMsg = OriginSSOIntegrationStandard.getSSOIntegrationStandard.getSSOPluginService
+    val dssMsg = ssoIntegrationStandard.getSSOPluginService
       .createDssMsgCacheOperation().getDSSMsgInSession(request)
     val projectAuthAction = new ProjectAuthByIdAction
     projectAuthAction.setWorkspace(dssMsg.getWorkspaceName)
@@ -59,7 +57,8 @@ class OriginProjectCooperationPlugin private() extends ProjectCooperationPlugin 
   }
 
   override def getProjectAuthByName(request: HttpServletRequest, projectName: String): ProjectAuth = {
-    val dssMsg = OriginSSOIntegrationStandard.getSSOIntegrationStandard.getSSOPluginService
+
+    val dssMsg = ssoIntegrationStandard.getSSOPluginService
       .createDssMsgCacheOperation().getDSSMsgInSession(request)
     val projectAuthAction = new ProjectAuthByNameAction
     projectAuthAction.setProjectName(projectName)

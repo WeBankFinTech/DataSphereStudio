@@ -1,44 +1,37 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
-
-
-
 import java.util.{Properties, UUID}
 
-import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService
-import com.webank.wedatasphere.dss.standard.app.development.execution.{ExecutionLogListener, ExecutionRequestRef, ExecutionResultListener}
-import com.webank.wedatasphere.dss.standard.app.development.execution.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
-import com.webank.wedatasphere.dss.standard.app.development.execution.core.{Killable, LongTermRefExecutionOperation, Procedure}
-import com.webank.wedatasphere.linkis.common.log.LogUtils
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.storage.LineRecord
+import com.webank.wedatasphere.dss.standard.app.development.listener.{ExecutionLogListener, ExecutionResultListener}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
+import org.apache.linkis.common.log.LogUtils
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.storage.LineRecord
 import org.apache.commons.io.IOUtils
+import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import org.slf4j.LoggerFactory;
 
 
-/**
-  * Created by allenlliu on 2019/11/11.
-  */
 class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation with Killable with Procedure{
 
 
@@ -118,6 +111,7 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
   override def state(action: RefExecutionAction): RefExecutionState = {
     action match {
       case action: EventCheckerExecutionAction => {
+        action.getExecutionRequestRefContext.appendLog("EventCheck is running!")
         if (action.state.isCompleted) return action.state
         if (action.eventType.equals("RECEIVE")) {
           Utils.tryCatch(action.ec.receiveMsg())(t => {
@@ -167,8 +161,6 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
       case action: EventCheckerExecutionAction => {
         val response = super.createAsyncResponseRef(requestRef,action)
         response.setAction(action)
-//        response.setAppJointNode(node)
-//        response.setNodeContext(context)
         response.setMaxLoopTime(action.ec.maxWaitTime)
         response.setAskStatePeriod(action.ec.queryFrequency)
         response

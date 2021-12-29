@@ -1,33 +1,33 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext$;
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob;
-import com.webank.wedatasphere.linkis.entrance.EntranceServer;
-import com.webank.wedatasphere.linkis.entrance.annotation.EntranceServerBeanAnnotation;
-import com.webank.wedatasphere.linkis.protocol.utils.ZuulEntranceUtils;
-import com.webank.wedatasphere.linkis.scheduler.queue.Job;
-import com.webank.wedatasphere.linkis.server.Message;
+import org.apache.linkis.entrance.EntranceServer;
+import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
+import org.apache.linkis.protocol.utils.ZuulEntranceUtils;
+import org.apache.linkis.scheduler.queue.Job;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.ws.rs.*;
@@ -36,14 +36,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by johnnwang on 2019/11/5.
- */
-
-@Path("/dss/flow/entrance")
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RequestMapping(path = "/dss/flow/entrance")
+@RestController
 public class FlowExecutionRestfulApi {
 
     private EntranceServer entranceServer;
@@ -55,9 +49,8 @@ public class FlowExecutionRestfulApi {
         this.entranceServer = entranceServer;
     }
 
-    @GET
-    @Path("/{id}/execution")
-    public Response execution(@PathParam("id") String id) {
+    @RequestMapping(value = "/{id}/execution",method = RequestMethod.GET)
+    public Message execution(@PathVariable("id") String id,@RequestParam("labels") String labels) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = entranceServer.getJob(realId);
@@ -88,7 +81,7 @@ public class FlowExecutionRestfulApi {
         } catch (Exception e) {
             message = Message.error("Failed to get job execution info");
         }
-        return Message.messageToResponse(message);
+        return message;
     }
 
 }

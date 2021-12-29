@@ -9,7 +9,7 @@
         </Select>
       </FormItem>
       <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')">
-        <Input v-model="searchBar.name" style="width:300px" search @on-search="search"></Input>
+        <Input v-model="searchBar.name" style="width:300px" search @on-search="search" clearable @on-clear="search"></Input>
       </FormItem>
       <FormItem>
         <Button type="primary" @click="add">{{ $t('message.workspaceManagemnet.addDataSour')}}</Button>
@@ -30,8 +30,8 @@
       </template>
       <template slot-scope="{ row }" slot="action">
         <Button
-          type="error" 
-          size="small" 
+          type="error"
+          size="small"
           @click="edit(row)">
           {{$t('message.workspaceManagemnet.edit')}}
         </Button>
@@ -227,14 +227,14 @@ export default {
   },
   filters: {
     // 时间戳转日期格式
-    timestampToTime(timestamp){ 
-      let date = new Date(timestamp), 
-        Y = date.getFullYear() + '-', 
-        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-', 
-        D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ', 
-        h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':', 
-        m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':', 
-        s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()); 
+    timestampToTime(timestamp){
+      let date = new Date(timestamp),
+        Y = date.getFullYear() + '-',
+        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-',
+        D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ',
+        h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':',
+        m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':',
+        s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
       return Y + M + D + h + m + s
     }
   },
@@ -243,7 +243,7 @@ export default {
       api.fetch(`${this.$API_PATH.DATASOURCE_PATH}list`,{
         workspaceId: this.workspaceId,
         type: this.searchBar.type,
-        name: "%" + this.searchBar.name + "%"
+        name: "%" + this.searchBar.name.trim() + "%"
       },'get').then((ret)=>{
         this.data.datalist = ret.allDs
       })

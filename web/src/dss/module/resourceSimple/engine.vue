@@ -203,6 +203,8 @@ export default {
           return 'PipeLine';
         case 'shell':
           return 'Shell';
+        case 'appconn':
+          return 'AppConn';
         case 'Idle':
           return this.$t('message.common.resourceSimple.KX');
         case 'Error':
@@ -317,6 +319,7 @@ export default {
         { rule: 'python', logo: 'fi-python' },
         { rule: 'spark', logo: 'fi-spark' },
         { rule: 'pipeLine', logo: 'fi-storage' },
+        { rule: 'appconn', logo: 'fi-workflow' },
         { rule: 'pipeline', logo: 'fi-storage' },
       ];
       const color = this.supportColor(item.engineStatus);

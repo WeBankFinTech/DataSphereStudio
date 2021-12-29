@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ /*
-  ~  * Copyright 2019 WeBank
-  ~  *
-  ~  * Licensed under the Apache License, Version 2.0 (the "License");
-  ~  *  you may not use this file except in compliance with the License.
-  ~  * You may obtain a copy of the License at
-  ~  *
-  ~  * http://www.apache.org/licenses/LICENSE-2.0
-  ~  *
-  ~  * Unless required by applicable law or agreed to in writing, software
-  ~  * distributed under the License is distributed on an "AS IS" BASIS,
-  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~  * See the License for the specific language governing permissions and
-  ~  * limitations under the License.
-  ~  */
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -24,26 +23,27 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.0.0-RC1</version>
+    <version>1.0.1</version>
 
     <modules>
-        <module>dss-commons/dss-common</module>
-        <module>dss-commons/dss-contextservice</module>
-        <module>dss-orchestrator</module>
+        <module>dss-commons</module>
         <module>dss-standard</module>
+        <module>dss-orchestrator</module>
         <module>dss-appconn</module>
         <module>dss-framework</module>
-        <module>dss-apps/dss-apiservice-server</module>
-        <module>dss-data-api</module>
+      <!--  <module>dss-apps/dss-apiservice-server</module>
+        <module>dss-apps/dss-datapipe-server</module>-->
 <!--        <module>plugins/azkaban/linkis-jobtype</module>-->
         <module>plugins/linkis/dss-gateway-support</module>
-        <module>plugins/dolphinscheduler/linkis-dolphinscheduler-client</module>
+        <module>dss-data-api</module>
+        <module>dss-data-governance</module>
+        <module>dss-guide</module>
         <module>assembly</module>
     </modules>
 
     <properties>
-        <dss.version>1.0.0-RC1</dss.version>
-        <linkis.version>1.0.0-RC1</linkis.version>
+        <dss.version>1.0.1</dss.version>
+        <linkis.version>1.0.3</linkis.version>
         <scala.version>2.12.10</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
@@ -66,6 +66,7 @@
         <jersey-bean-validation.version>2.21</jersey-bean-validation.version>
         <aspectj.version>1.9.5</aspectj.version>
         <xstream.version>1.4.15</xstream.version>
+        <jersey.version>2.16</jersey.version>
     </properties>
 
     <dependencyManagement>
@@ -96,7 +97,7 @@
                 <version>${commons.lang.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.webank.wedatasphere.linkis</groupId>
+                <groupId>org.apache.linkis</groupId>
                 <artifactId>linkis-common</artifactId>
                 <version>${linkis.version}</version>
             </dependency>
@@ -228,7 +229,8 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <recompileMode>all</recompileMode>
+                        <recompileMode>incremental</recompileMode>
+                        <useZincServer>true</useZincServer>
                     </configuration>
                 </plugin>
                 <plugin>

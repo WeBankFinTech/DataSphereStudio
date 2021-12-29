@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,20 +18,17 @@ package com.webank.wedatasphere.dss.workflow;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webank.wedatasphere.dss.common.entity.DSSLabel;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-/**
- * @author allenlliu
- * @date 2020/10/21 03:25 PM
- */
 
 public interface WorkFlowManager {
 
@@ -93,10 +88,16 @@ public interface WorkFlowManager {
                                      Long flowID,
                                      Long dssProjectId,
                                      String projectName,
-                                     Workspace workspace) throws Exception;
+                                     Workspace workspace,
+                                     List<DSSLabel> dssLabels) throws Exception;
 
    List<DSSFlow>  importWorkflow(String userName,
                                   String resourceId,
                                   String bmlVersion,
                                   DSSFlowImportParam dssFlowImportParam) throws Exception;
+
+    public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
+
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws DSSErrorException;
+
 }

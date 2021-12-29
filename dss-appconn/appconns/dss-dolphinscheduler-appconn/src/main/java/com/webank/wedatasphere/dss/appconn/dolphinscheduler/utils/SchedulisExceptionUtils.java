@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -18,7 +18,7 @@
 
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 import java.lang.reflect.Constructor;
 

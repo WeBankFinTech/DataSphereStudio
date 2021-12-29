@@ -11,6 +11,7 @@
           :workflow-data="currentOrchetratorData"
           :orchestratorModeList="orchestratorModeList"
           :selectOrchestratorList="selectOrchestratorList"
+          :projectNameList="projectNameList"
           @cancel="ProjectMergeCancel"
           @confirm="ProjectMergeConfirm"></WorkflowFormNew>
       </Tab-pane>
@@ -59,6 +60,10 @@ export default {
       default: null
     },
     selectOrchestratorList: {
+      type: Array,
+      default: () => []
+    },
+    projectNameList: {
       type: Array,
       default: () => []
     }
@@ -122,6 +127,7 @@ export default {
     },
     ProjectMergeConfirm(orchestratorData) {
       orchestratorData.dssLabels = [this.getCurrentDsslabels()];
+      orchestratorData.labels = { route: this.getCurrentDsslabels() };
       if (this.checkName(this.flowList, orchestratorData.orchestratorName, orchestratorData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
       api.fetch(`${this.$API_PATH.PROJECT_PATH}createOrchestrator`, orchestratorData, 'post').then(() => {
         this.$Message.success(this.$t('message.workflow.createdSuccess'));
@@ -135,7 +141,7 @@ export default {
         uses: '',
         orchestratorMode: '',
         orchestratorWays: null,
-        projectId: this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID,
+        projectId: String(this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID),
         workspaceId: this.$route.query.workspaceId
       };
     },

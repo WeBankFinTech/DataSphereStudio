@@ -1,12 +1,6 @@
 <template>
   <div class="tree-item">
-    <div
-      :class="{
-        'tree-content': true,
-        'tree-content-leaf': isLeaf,
-        'tree-content-node': !isLeaf
-      }"
-    >
+    <div class="tree-content" :class="{ 'tree-content-active': currentTreeId == model.id }">
       <div class="tree-icon" :class="{ leaf: isLeaf }">
         <SvgIcon v-if="model.opened" icon-class="open" @click="handleItemToggle"/>
         <SvgIcon v-else icon-class="close" @click="handleItemToggle"/>
@@ -19,7 +13,6 @@
       </div>
       <div
         class="tree-name"
-        :class="{ 'tree-name-active': currentTreeId == model.id }"
         @click="handleItemClick"
       >
         {{ model.name }}
@@ -124,26 +117,21 @@ export default {
 .tree-item {
   white-space: nowrap;
   outline: none;
-  @include font-color($light-text-color, $dark-text-color);
-  overflow: hidden;
   .tree-content {
     display: flex;
     align-items: center;
     cursor: pointer;
     padding: 0 10px;
+    @include font-color($light-text-color, $dark-text-color);
     &:hover {
-      // background-color: #EDF1F6;
-      @include bg-color(#edf1f6, $dark-active-menu-item);
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
+      .tree-add {
+        visibility: visible;
+      }
     }
-  }
-  .tree-content-leaf {
-    padding-left: 26px;
-  }
-  .tree-content-node {
-    width: 280px;
-    transition: width 0.1s;
-    &:hover {
-      width: 249px;
+    &-active {
+      @include bg-color(#EDF1F6, $dark-active-menu-item);
+      @include font-color($primary-color, $dark-primary-color);
     }
   }
   .leaf {
@@ -170,6 +158,9 @@ export default {
   }
   .tree-add {
     display: block;
+    visibility: hidden;
+    font-size: 16px;
+    @include font-color($light-text-color, $dark-text-color);
   }
   .tree-hold {
     display: block;
@@ -185,19 +176,15 @@ export default {
     text-overflow: ellipsis;
     overflow: hidden;
   }
-  .tree-name-active {
-    // background-color: #EDF1F6;
-    @include bg-color(#edf1f6, $dark-active-menu-item);
-    // color: rgb(45, 140, 240);
-    @include font-color($primary-color, $dark-primary-color);
-  }
   .tree-children {
-    margin-left: 0px;
     transition: max-height 0.3s;
     max-height: 0;
     overflow: hidden;
     .leaf {
       display: none;
+    }
+    .tree-content {
+      padding-left: 36px;
     }
   }
 }

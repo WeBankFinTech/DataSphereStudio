@@ -10,7 +10,7 @@ import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiAuthService;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,9 +44,18 @@ public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> impl
     }
 
     @Override
-    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, List<Long> totals, Integer pageNow, Integer pageSize){
+    public List<ApiAuthInfo> getApiAuthList(Long workspaceId, String caller, List<Long> totals, Integer pageNow, Integer pageSize){
         PageHelper.startPage(pageNow, pageSize, true);
-        List<ApiAuthInfo> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId);
+        // MYSQL LIKE % _:  LIKE '%\_%', LIKE '%\%%'
+        if(caller !=null) {
+            if ("_".equalsIgnoreCase(caller.trim())) {
+                caller = "\\_";
+            }
+            if ("%".equalsIgnoreCase(caller.trim())) {
+                caller = "\\%";
+            }
+        }
+        List<ApiAuthInfo> apiAuthList = apiAuthMapper.getApiAuthList(workspaceId,caller);
         PageInfo<ApiAuthInfo> pageInfo = new PageInfo<>(apiAuthList);
         totals.add(pageInfo.getTotal());
 

@@ -1,10 +1,5 @@
 <template>
-  <div>
-    <div class="page-fc-header">
-      <p>数据服务</p>
-      <div class="divider">/</div>
-      <p class="header-subTitle">服务开发</p>
-    </div>
+  <div class="apiConfigWrap">
     <div class="emptyGuideWrap" v-if="tabDatas.length === 0">
       <empty-guide />
     </div>
@@ -96,31 +91,18 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
-.page-fc-header {
-  padding: 25px 0px 25px 10px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  font-size: 21px;
-  @include font-color($text-title-color, $dark-text-color);
-  font-family: PingFangSC-Regular;
-  .divider {
-    padding: 0 10px;
-  }
-  .header-subTitle {
-    font-family: PingFangSC-Medium;
-  }
-} 
+.apiConfigWrap {
+  padding-top: 10px;
+}
 .emptyGuideWrap{
   width: 100%;
   min-height: 400px;
   height: calc( 100vh - 140px );
   min-width: 600px;
-  border-top: 1px solid #DEE4EC;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #fff;
+  @include bg-color(#fff, $dark-base-color);
 }
 .tabWrap {
   padding-left: 10px;

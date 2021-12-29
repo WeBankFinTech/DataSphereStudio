@@ -60,7 +60,7 @@
     </Modal>
     <Modal class-name="adduser-box" :closable="false" v-model="creatershow" :title="$t('message.workspaceManagemnet.addUser')">
       <Form ref="addUser" :model="useradd" :rules="addrule" :label-width="80">
-        <FormItem :label="$t('message.workspaceManagemnet.user')" prop="name">
+        <FormItem :label="$t('message.workspaceManagemnet.user')" prop="id">
           <Row>
             <Col span="12" style="width: 196px" size="small">
               <Select
@@ -144,6 +144,7 @@ export default {
       loading: true,
       row: '',
       loading1: false,
+      usernamelist: [],
       options: [],
       pageSetting: {
         total: 0,
@@ -153,7 +154,8 @@ export default {
       workspaceRoles: [],
       data: {
         columns: [],
-        datalist: []
+        datalist: [],
+        datalistAll: [],
       },
       useradd: {},
       edituser: {},
@@ -161,6 +163,12 @@ export default {
         role: [{ required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' }]
       },
       addrule: {
+        id: [
+          { required: true, type: 'number', message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: 'change' }
+        ],
+        //name: [
+        //  { required: true, message: this.$t('message.workspaceManagemnet.addruleMsg'), trigger: "blur" },
+        //],
         role: [
           { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagemnet.selectRoleMsg'), trigger: 'change' },
         ]
@@ -277,18 +285,32 @@ export default {
       // },'get').then((rst)=>{
       //   this.optionType.engine = this.departmentlist(rst.departments)
       // })
-      this.search()
+      this.pageSetting = {
+        total: 0,
+        pageSize: 10,
+        current: 1
+      }
+      this.search();
     },
     search() {
       const params = this.getParams();
       this.data.columns  = this.getColumns();
       GetWorkspaceUserManagement(params).then((rst) => {
         this.pageSetting.total = rst.total;
-        this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
+        this.data.datalistAll = this.renderFormatTime(rst.workspaceUsers);
+        this.data.datalist = this.data.datalistAll.slice(0, this.pageSetting.pageSize);
       }).catch(() => {
 
       });
     },
+    /*username(){
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`,{
+      },'get').then((rst)=>{
+        rst.users.forEach(item=>{
+          this.usernamelist.push(item.username)
+        })
+      })
+    },*/
     getColumns(){
       const column = [
         { title: this.$t('message.workspaceManagemnet.name'), key: "name", align: "center" },
@@ -325,13 +347,16 @@ export default {
       return params
     },
     changePage(page){
-      const params = this.getParams(page);
+      // const params = this.getParams(page);
       this.column = this.getColumns();
-      GetWorkspaceUserManagement(params).then((rst) => {
-        this.pageSetting.total = rst.total;
-        this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
-      }).catch(() => {
-      });
+      // GetWorkspaceUserManagement(params).then((rst) => {
+      //   this.pageSetting.total = rst.total;
+      //   this.data.datalist = this.renderFormatTime(rst.workspaceUsers);
+      // }).catch(() => {
+      // });
+      // 由于接口没有做分页，所以由前端模拟分页效果（用户不会特别多，现在后端设置的上限是每页500条）
+      const start = (page - 1) * this.pageSetting.pageSize;
+      this.data.datalist = this.data.datalistAll.slice(start, start + this.pageSetting.pageSize);
     },
     remove(row) {
       this.delshow = true;
@@ -368,6 +393,7 @@ export default {
     creater() {
       this.useradd = {
         id: "",
+        name: "",
         role: []
       }
       this.creatershow = true;

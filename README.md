@@ -33,19 +33,21 @@ Please be patient, it will take some time to load gif.
  
  &nbsp; &nbsp; &nbsp; &nbsp;c. [Qualitis](https://github.com/WeBankFinTech/Qualitis) - Data Quality Management Tool
  
- &nbsp; &nbsp; &nbsp; &nbsp;d. [Azkaban](https://azkaban.github.io/) - Batch workflow job scheduler
+ &nbsp; &nbsp; &nbsp; &nbsp;d. [Schedulis](https://github.com/WeBankFinTech/Schedulis) - Batch workflow job scheduler
+
+ &nbsp; &nbsp; &nbsp; &nbsp;f. [Exchangis](https://github.com/WeBankFinTech/Exchangis) - Data Exchange Tool
  
 ![DSS one-stop video](images/en_US/readme/onestop.gif) 
 
-### 2. AppJoint, based on Linkis，defines a unique design concept
+### 2. AppConn, based on Linkis，defines a unique design concept
 
- &nbsp; &nbsp; &nbsp; &nbsp;AppJoint——application joint, defining unified front-end and back-end 
+ &nbsp; &nbsp; &nbsp; &nbsp;AppConn——application connector, defining unified front-end and back-end 
                             integration specifications, can quickly and easily integrate with external data application systems, 
                             making them as part of DSS data application development.
 
- &nbsp; &nbsp; &nbsp; &nbsp;DSS arranges multiple AppJoints in series to form a workflow that supports real-time execution and scheduled execution. Users can complete the entire process development of data applications with simple drag and drop operations.
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS arranges multiple AppConns in series to form a workflow that supports real-time execution and scheduled execution. Users can complete the entire process development of data applications with simple drag and drop operations.
 
- &nbsp; &nbsp; &nbsp; &nbsp;Since AppJoint is integrated with Linkis, the external data application system shares the capabilities of resource management, concurrent limiting, and high performance. AppJoint also allows sharable context across system level and completely gets away from application silos.
+ &nbsp; &nbsp; &nbsp; &nbsp;Since AppConn is integrated with Linkis, the external data application system shares the capabilities of resource management, concurrent limiting, and high performance. AppConn also allows sharable context across system level and completely gets away from application silos.
 
 ### 3. Project, as the management unit
 
@@ -53,55 +55,55 @@ Please be patient, it will take some time to load gif.
 
 ### 4. Integrated data application components
 
- &nbsp; &nbsp;&nbsp; &nbsp;a. Azkaban AppJoint —— Batch workflow job scheduler
+ &nbsp; &nbsp;&nbsp; &nbsp;a. Schedulis AppConn —— Batch workflow job scheduler
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Many data applications developed by users usually require periodic scheduling capability.
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;At present, the open source scheduling system in the community is pretty unfriendly to integrate with other data application systems.
                                                  
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS implements Azkaban AppJoint, which allows users to publish DSS workflows to Azkaban for regular scheduling.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS implements Schedulis AppConn, which allows users to publish DSS workflows to Azkaban for regular scheduling.
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DSS also defines standard and generic workflow parsing and publishing specifications for scheduling systems, allowing other scheduling systems to easily achieve low-cost integration with DSS.
                                                  
 ![Azkaban](images/en_US/readme/Azkaban_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;b. Scriptis AppJoint —— Data Development IDE Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;b. Scriptis AppConn —— Data Development IDE Tool
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Scriptis](https://github.com/WeBankFinTech/Scriptis)?
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis is for interactive data analysis with script development(SQL, Pyspark, HiveQL), task submission(Spark, Hive), UDF, function, resource management and intelligent diagnosis.
                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis AppJoint integrates the data development capabilities of Scriptis to DSS, and allows various script types of Scriptis to serve as nodes in the DSS workflow to participate in the application development process.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Scriptis AppConn integrates the data development capabilities of Scriptis to DSS, and allows various script types of Scriptis to serve as nodes in the DSS workflow to participate in the application development process.
                                                 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Currently supports HiveSQL, SparkSQL, Pyspark, Scala and other script node types.
                                                 
 ![Scriptis](images/en_US/readme/Scriptis_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;c. Visualis AppJoint —— Data Visualization Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;c. Visualis AppConn —— Data Visualization Tool
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;What is [Visualis](https://github.com/WeBankFinTech/Visualis)?
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis is a BI tool for data visualization. It provides financial-grade data visualization capabilities on the basis of data security and permissions, based on the open source project Davinci contributed by CreditEase.
                                                 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis AppJoint integrates data visualization capabilities to DSS, and allows displays and dashboards, as nodes of DSS workflows, to be associated with upstream data market.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Visualis AppConn integrates data visualization capabilities to DSS, and allows displays and dashboards, as nodes of DSS workflows, to be associated with upstream data market.
                                                 
 ![Visualis](images/en_US/readme/Visualis_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;d. Qualitis AppJoint —— Data quality management Tool
+ &nbsp; &nbsp;&nbsp; &nbsp;d. Qualitis AppConn —— Data quality management Tool
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Qualitis AppJoint integrates data quality verification capabilities for DSS, allows Qualitis as a node in DSS workflow
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Qualitis AppConn integrates data quality verification capabilities for DSS, allows Qualitis as a node in DSS workflow
                                                 
 ![Qualitis](images/en_US/readme/Qualitis_AppJoint.gif)
 
- &nbsp; &nbsp;&nbsp; &nbsp;e. Data Sender——Sender AppJoint
+ &nbsp; &nbsp;&nbsp; &nbsp;e. Data Sender——Sender AppConn
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sender AppJoint provides data delivery capability for DSS. Currently it supports the SendEmail node type, and the result sets of all other nodes can be sent via email.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Sender AppConn provides data delivery capability for DSS. Currently it supports the SendEmail node type, and the result sets of all other nodes can be sent via email.
                                                  
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;For example, the SendEmail node can directly send the screen shot of a display as an email.  
 
- &nbsp; &nbsp;&nbsp; &nbsp;f. Signal AppJoint —— Signal Nodes
+ &nbsp; &nbsp;&nbsp; &nbsp;f. Signal AppConn —— Signal Nodes
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signal AppJoint is used to strengthen the correlation between business and process while keeping them decoupled.
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signal AppConn is used to strengthen the correlation between business and process while keeping them decoupled.
                                                 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;DataChecker Node：Checks whether a table or partition exists.
                                                     

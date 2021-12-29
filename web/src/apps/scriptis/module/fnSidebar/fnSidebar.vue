@@ -641,25 +641,28 @@ export default {
       return new Promise((resolve) => {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         let id = this.currentNode.data && this.currentNode.data.id;
+        let parent = this.currentNode.parent
         // 编辑或删除时要去刷新上一级目录
-        if (this.currentNode.isLeaf) {
-          id = this.currentNode.parent.data.id;
-        } else if (type === 'edit' || type === 'delete') {
+        if (this.currentNode.isLeaf || type === 'edit' || type === 'delete') {
           id = this.currentNode.parent.data.id;
         }
-        const parent = this.lookForChangeNode(id, this.fnTree, 'tree');
+        if (type === 'new') {
+          parent = this.currentNode
+          this.currentNode.data.expanded = true
+        }
         if (parent) {
           this.treeLoading = true;
           this.compLoading = true;
           api.fetch('/udf/list', {
-            type: parent.type,
-            treeId: parent.id,
+            type: parent.type || parent.data.type,
+            treeId: id,
             category: this.FNTYPE,
           }).then((rst) => {
             this.treeLoading = false;
             this.compLoading = false;
             const children = this.handleTree(rst.udfTree).childrens;
             this.$set(parent, 'childrens', children);
+            this.$set(parent.data, 'childrens', children);
             // 加载完数据后等待重新渲染，拿到渲染后的node
             this.$nextTick(() => {
               let node = this.$refs.weFileTree.$refs.tree.root._childNodes;

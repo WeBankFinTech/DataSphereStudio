@@ -18,10 +18,10 @@
 export default {
   name: 'Workbench',
   // 规范模块监测什么事件
-  events: ['Workbench:add', 'Workbench:deleteDirOrFile', 'Workbench:save', 'Workbench:socket', 'Workbench:openFile', 'Workbench:run', 'Workbench:pasteInEditor', 'Workbench:saveAs', 'Workbench:updateTab', 'Workbench:setResultCache', 'Workbench:setResult', 'Workbench:insertValue', 'Workbench:checkExist', 'Workbench:getWorksLangList', 'Workbench:setEditorPanelSize', 'Workbench:setTabPanelSize', 'Workbench:updateFlowsTab', 'Workbench:resetScriptData', 'Workbench:removeWork', 'Workbench:updateFlowsNodeName', 'Workbench:isOpenTab'],
+  events: ['Workbench:add', 'Workbench:deleteDirOrFile', 'Workbench:save', 'Workbench:socket', 'Workbench:openFile', 'Workbench:run', 'Workbench:pasteInEditor', 'Workbench:saveAs', 'Workbench:updateTab', 'Workbench:setResultCache', 'Workbench:setResult', 'Workbench:insertValue', 'Workbench:checkExist', 'Workbench:getWorksLangList', 'Workbench:setEditorPanelSize', 'Workbench:setTabPanelSize', 'Workbench:updateFlowsTab', 'Workbench:resetScriptData', 'Workbench:removeWork', 'Workbench:updateFlowsNodeName', 'Workbench:isOpenTab', 'Workbench:removeTab'],
   // 规范模块能够触发什么事件
   dispatchs: {
-    Workbench: ['save', 'saveAs', 'run', 'add', 'setResultCache', 'setResult', 'insertValue', 'openFile', 'checkExist', 'setEditorPanelSize', 'setTabPanelSize', 'resetScriptData', 'removeWork', 'repeatWork'],
+    Workbench: ['save', 'saveAs', 'run', 'add', 'setResultCache', 'setResult', 'insertValue', 'openFile', 'checkExist', 'setEditorPanelSize', 'setTabPanelSize', 'resetScriptData', 'removeWork', 'repeatWork', 'removeTab'],
     IndexedDB: [
       'appendLog', 'clearLog', 'getLog', 'changeLogKey',
       'updateHistory', 'appendHistory', 'getHistory', 'clearHistory', 'changeHistoryKey',

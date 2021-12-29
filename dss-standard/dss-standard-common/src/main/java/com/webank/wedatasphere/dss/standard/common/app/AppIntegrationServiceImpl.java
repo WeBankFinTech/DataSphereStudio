@@ -1,40 +1,49 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.standard.common.app;
 
 
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.common.service.AppService;
 import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 
-/**
- * Created by enjoyyin on 2020/9/10.
- */
-public class AppIntegrationServiceImpl extends AppServiceImpl implements AppIntegrationService {
 
-    private AppDesc appDesc;
+public class AppIntegrationServiceImpl<T extends AppService> extends AppServiceImpl implements AppIntegrationService<T> {
+
+    private T ssoRequestService;
+    private AppInstance appInstance;
 
     @Override
-    public void setAppDesc(AppDesc appDesc) {
-        this.appDesc = appDesc;
+    public void setSSORequestService(T ssoRequestService) {
+        this.ssoRequestService = ssoRequestService;
     }
 
-    public AppDesc getAppDesc() {
-        return appDesc;
+    @Override
+    public T getSSORequestService() {
+        return ssoRequestService;
+    }
+
+    @Override
+    public AppInstance getAppInstance() {
+        return appInstance;
+    }
+
+    @Override
+    public void setAppInstance(AppInstance appInstance) {
+        this.appInstance = appInstance;
     }
 }

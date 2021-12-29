@@ -19,6 +19,7 @@ let logoList = [
   { rule: /\.(bi)$/i, logo: 'fi-bi' },
   { rule: /\.(sql)$/i, logo: 'fi-spark' },
   { rule: /\.(hql)$/i, logo: 'fi-hive' },
+  { rule: /\.(fql)$/i, logo: 'fi-flink-sql' },
   { rule: /\.(out)$/i, logo: 'fi-storage' },
   { rule: /\.scala$/i, logo: 'fi-scala' },
   { rule: /\.jdbc$/i, logo: 'fi-jdbc' },

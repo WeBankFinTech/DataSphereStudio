@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerTokenOperation;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.crud.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.query.RefQueryService;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
@@ -15,9 +15,9 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
  * The type Dolphin scheduler security service.
  *
  * @author yuxin.yuan
- * @date 2021/06/08
+ * @date 2021/10/19
  */
-public final class DolphinSchedulerSecurityService implements RefQueryService {
+public final class DolphinSchedulerSecurityService extends AbstractRefQueryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerSecurityService.class);
 
@@ -41,7 +41,7 @@ public final class DolphinSchedulerSecurityService implements RefQueryService {
     }
 
     public String getUserToken(String user) throws ExternalOperationFailedException {
-        CommonRequestRef requestRef = new CommonRequestRef();
+        CommonRequestRef requestRef = new CommonRequestRefImpl();
         requestRef.setParameter("userName", user);
 
         ResponseRef responseRef = getRefQueryOperation().query(requestRef);
@@ -53,17 +53,8 @@ public final class DolphinSchedulerSecurityService implements RefQueryService {
     }
 
     @Override
-    public RefQueryOperation getRefQueryOperation() {
+    protected RefQueryOperation createRefQueryOperation() {
         return DolphinSchedulerTokenOperation.getInstance(baseUrl);
     }
 
-    @Override
-    public DevelopmentService getDevelopmentService() {
-        return null;
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService developmentService) {
-
-    }
 }

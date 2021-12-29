@@ -29,7 +29,7 @@ export default {
   },
   data () {
     return {
-      
+
     };
   },
   computed: {
@@ -38,7 +38,7 @@ export default {
         transition: 'all .2s ease-in-out',
         overflow: 'hidden',
         width: (this.value ? this.collapsedWidth : this.width) + 'px'
-      } 
+      }
     },
     triggerStyle() {
       return {

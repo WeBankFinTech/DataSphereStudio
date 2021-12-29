@@ -10,48 +10,56 @@
             <Option v-for="item in projectList" :value="item.id" :key="item.id">{{item.name}}</Option>
           </Select>
         </div>-->
-        <div class="time-model">
-          <template>
-            <Date-picker
-              style="width: 450px"
-              v-model="dataTime"
-              type="datetimerange"
-              @on-change="_datepicker"
-              range-separator="-"
-              :start-placeholder="$t('message.scheduler.runTask.startDate')"
-              :end-placeholder="$t('message.scheduler.runTask.endDate')"
-              format="yyyy-MM-dd HH:mm:ss">
-            </Date-picker>
-          </template>
-        </div>
         <div class="row" >
-          <div class="col-md-6">
+          <div class="col-md-6 dashboard-module">
             <div class="chart-title">
               <span>{{$t('message.scheduler.processStatusStatistics')}}</span>
+              <div class="time-model">
+                <template>
+                  <Date-picker
+                    style="width: 430px"
+                    v-model="dataTime"
+                    type="datetimerange"
+                    @on-change="_datepicker"
+                    range-separator="-"
+                    :start-placeholder="$t('message.scheduler.runTask.startDate')"
+                    :end-placeholder="$t('message.scheduler.runTask.endDate')"
+                    format="yyyy-MM-dd HH:mm:ss">
+                  </Date-picker>
+                </template>
+              </div>
             </div>
-            <div class="row">
+            <div class="row dashboard-module-content">
               <m-process-state-count :search-params="searchParams" @goToList="goToList">
               </m-process-state-count>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="chart-title">
-              <span>{{$t('message.scheduler.taskStatusStatistics')}}</span>
-            </div>
-            <div class="row">
-              <m-task-status-count :search-params="searchParams" @goToList="goToList">
-              </m-task-status-count>
+              <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
-            <div class="chart-title" style="margin-bottom: -20px;margin-top: 30px">
+          <div class="col-md-12 dashboard-module">
+            <div class="chart-title">
+              <!--<span>{{$t('message.scheduler.taskStatusStatistics')}}</span>-->
+              <span>工作流实例与成功率统计</span>
+              <div class="day-change">
+                <div :class="daySelected === 1?'selected': ''" @click="changeDay(1)">今日</div>
+                <div :class="daySelected === 2?'selected': ''" @click="changeDay(2)">昨日</div>
+              </div>
+            </div>
+            <div class="dashboard-module-content">
+              <div id="mixedBarLine" style="height: 500px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 dashboard-module">
+            <div class="chart-title">
               <span>{{$t('message.scheduler.processDefinitionStatistics')}}</span>
             </div>
-            <div>
+            <div class="dashboard-module-content">
               <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
               </m-define-user-count>
+              <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
         </div>
@@ -65,9 +73,12 @@ import util from "@/common/util"
 //import dayjs from 'dayjs'
 import mDefineUserCount from './source/defineUserCount'
 import mProcessStateCount from './source/processStateCount'
-import mTaskStatusCount from './source/taskStatusCount'
+//import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
+import {formatDate} from '../convertor'
+
+import echarts from 'echarts'
 
 export default {
   name: 'projects-index-index',
@@ -82,13 +93,38 @@ export default {
       workspaceName: '',
       projectId: '',
       dataTime: [],
-      projectList: []
+      projectList: [],
+
+      mixedBarLineChart: null,
+      daySelected: 1,
+      loading: false
     }
   },
   props: {
 
   },
   methods: {
+    changeDay(day){
+      if (day)
+        this.daySelected = day
+      let dd = new Date(),
+        tYear, tMonth, tDay
+      if (this.daySelected === 1) {
+        tYear = dd.getFullYear(),
+        tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
+        tDay = dd.getDate()
+      } else if (this.daySelected === 2) {
+        dd.setDate(dd.getDate() - 1)
+        tYear = dd.getFullYear(),
+        tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
+        tDay = dd.getDate()
+      }
+      if (this.daySelected) {
+        this.getMixedBarLineData(`${tYear}-${tMonth}-${tDay}`, (dd) => {
+          this.buildMixedBarLineChart(dd)
+        })
+      }
+    },
     getFullName() {
       for (let i = 0; i < this.projectList.length; i++) {
         if (this.projectList[i].id === this.projectId) {
@@ -118,6 +154,7 @@ export default {
       if (this.projectId) {
         return cb(this.projectId)
       } else {
+        this.loading = true
         let searchVal = `${this.workspaceName}-${this.projectName}`
         api.fetch(`dolphinscheduler/projects/list-paging`, {
           pageSize: 100,
@@ -125,6 +162,7 @@ export default {
           searchVal: ''
         }, 'get').then(res => {
           this.projectList = res.totalList
+          this.loading = false
           for (let i = 0; i < res.totalList.length; i++) {
             if (res.totalList[i].name === searchVal) {
               this.projectId = res.totalList[i].id
@@ -135,6 +173,128 @@ export default {
           return cb(this.projectId)
         })
       }
+    },
+    getMixedBarLineData(currentDay, cb) {
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-paging`, {
+          pageSize: 1000,
+          pageNo: 1,
+          startDate: `${currentDay} 00:00:00`,
+          endDate: `${currentDay} 23:59:59`,
+        }, 'get').then((res) => {
+          let objTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            successTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            failureTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            successPercent = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+          res.totalList.forEach(item => {
+            item.startTime = formatDate(item.startTime)
+            item.endTime = formatDate(item.endTime)
+            let curHour = new Date(item.startTime).getHours() + 1
+            objTotal[curHour] = objTotal[curHour] + 1
+            let curState = item.state
+            if (curState === 'SUCCESS') {
+              successTotal[curHour] = successTotal[curHour] + 1
+            }
+            if (curState === 'FAILURE') {
+              failureTotal[curHour] = failureTotal[curHour] + 1
+            }
+          })
+          successTotal.forEach((success, index) => {
+            if (objTotal[index]) {
+              successPercent[index] = (success / objTotal[index]).toFixed(1)
+            } else {
+              successPercent[index] = 0
+            }
+          })
+          cb && cb({
+            objTotal,
+            successTotal,
+            failureTotal,
+            successPercent
+          })
+        })
+      })
+    },
+    buildMixedBarLineChart(data) {
+      this.mixedBarLineChart = echarts.init(document.getElementById('mixedBarLine'))
+
+      let option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#999'
+            }
+          }
+        },
+        /*toolbox: {
+          feature: {
+            dataView: {show: true, readOnly: false},
+            magicType: {show: true, type: ['line', 'bar']},
+            restore: {show: true},
+            saveAsImage: {show: true}
+          }
+        },*/
+        legend: {
+          data: ['实例数', '成功率']
+        },
+        xAxis: [
+          {
+            type: 'category',
+            data: ['1时', '2时', '3时', '4时', '5时', '6时', '7时', '8时', '9时', '10时', '11时', '12时',
+              '13时', '14时', '15时', '16时', '17时', '18时', '19时', '20时', '21时', '22时', '23时', '24时'],
+            axisPointer: {
+              type: 'shadow'
+            }
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            name: '实例数',
+            /*min: 0,
+            max: 250,
+            interval: 50,*/
+            axisLabel: {
+              formatter: '{value} 个'
+            }
+          },
+          {
+            type: 'value',
+            name: '成功率',
+            /*min: 0,
+            max: 25,
+            interval: 5,*/
+            axisLabel: {
+              formatter: '{value} %'
+            }
+          }
+        ],
+        series: [
+          {
+            name: '实例数',
+            type: 'bar',
+            data: data.objTotal,
+            color: '#87AEFA'
+          },
+          {
+            name: '成功率',
+            type: 'line',
+            yAxisIndex: 1,
+            data: data.successPercent,
+            color: '#5AD8A6'
+          },
+          {
+            name: '失败数',
+            type: 'line',
+            yAxisIndex: 1,
+            data: data.failureTotal,
+            color: 'rgba(0,0,0,0)'
+          },
+        ]
+      };
+      this.mixedBarLineChart.setOption(option)
     }
   },
   created () {
@@ -148,14 +308,18 @@ export default {
           this.searchParams.startDate = this.dataTime[0]
           this.searchParams.endDate = this.dataTime[1]
         })
+        this.$nextTick(() => {
+          this.changeDay()
+        })
       })
     })
+
   },
   components: {
     mListConstruction,
     mDefineUserCount,
     mProcessStateCount,
-    mTaskStatusCount
+    //mTaskStatusCount
   }
 }
 </script>
@@ -174,17 +338,17 @@ export default {
     .time-model {
       position: absolute;
       right: 8px;
-      top: -40px;
+      top: 0;
     }
     .chart-title {
-      text-align: center;
+      padding: 0 30px;
+      text-align: left;
       height: 60px;
       line-height: 60px;
+      border-bottom: 1px solid #DEE4EC;
       span {
-        font-size: 22px;
-        // color: #333;
+        font-size: 16px;
         @include font-color($workspace-title-color, $dark-workspace-title-color);
-        font-weight: bold;
       }
     }
   }
@@ -206,6 +370,34 @@ export default {
       text-overflow: ellipsis;
       white-space:  nowrap;
       display: block;
+    }
+  }
+
+  .dashboard-module{
+    background: #FFFFFF;
+    border: 1px solid #DEE4EC;
+    border-radius: 2px;
+    padding: 0;
+    position: relative;
+    margin-bottom: 24px;
+    min-width: 570px;
+    .dashboard-module-content {
+      padding: 30px;
+      position: relative;
+      margin:0 0 24px;
+    }
+    .day-change {
+      float: right;
+      >div {
+        height: 60px;
+        margin: 0 10px;
+        padding: 0 3px;
+        display: inline-block;
+        cursor: pointer;
+        &.selected {
+           border-bottom: 2px solid #2A6F97;
+        }
+      }
     }
   }
 </style>

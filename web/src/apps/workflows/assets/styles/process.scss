@@ -15,32 +15,32 @@
  *
  */
 
-@import '@/common/style/variables.scss';
-.page-process{
-    height: 100%;
-    width: 100%;
-    @include bg-color($light-base-color, $dark-base-color);
-    position: relative;
-    .bread-crumb{
-        margin: 5px;
+@import "@/common/style/variables.scss";
+.page-process {
+  height: 100%;
+  width: 100%;
+  @include bg-color($light-base-color, $dark-base-color);
+  position: relative;
+  .bread-crumb {
+    margin: 5px;
+  }
+  .process-readonly-tip-card {
+    @include font-color(#fff, #000);
+    font-size: $font-size-small;
+    position: absolute;
+    font-weight: 700;
+    z-index: 9999;
+    top: 0;
+    right: 1rem;
+    background-color: $error-color;
+    .tipClose {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      // color: #080808;
+      @include font-color(#fff, #000);
     }
-    .process-readonly-tip-card {
-        @include font-color(#fff, #000);
-        font-size: $font-size-small;
-        position: absolute;
-        font-weight: 700;
-        z-index: 9999;
-        top: 0;
-        right: 1rem;
-        background-color: $error-color;
-        .tipClose {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            // color: #080808;
-            @include font-color(#fff, #000);
-        }
-    }
+  }
 }
 
 .process-tabs {
@@ -57,103 +57,111 @@
         }
     }
     .process-tab {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        align-items: flex-start;
-        height: 32px;
-        padding: 0 20px;
-        box-sizing: border-box;
-        border-top: $border-width-base $border-style-base $border-color-split;
-        border-bottom: $border-width-base $border-style-base $border-color-split;
-        @include border-color($border-color-split, $dark-workspace-background);
-        @include bg-color($body-background, $dark-base-color);
-        .process-tab-item {
-            position: $relative;
-            height: 30px;
-            line-height: 30px;
-            padding: 0 20px;
-            padding-left: 25px;
-            border-right: $border-width-base $border-style-base $border-color-split;
-            @include border-color($border-color-split, $dark-base-color);
-            @include bg-color($background-color-base, $dark-base-color);
-            @include font-color($title-color, $dark-workflow-font-color);
-            cursor: pointer;
-            min-width: 100px;
-            max-width: 200px;
-            overflow: hidden;
-            text-align: center;
-            &:first-child{
-                border-left: $border-width-base $border-style-base $border-color-split;
-                @include border-color($border-color-split, $dark-base-color);
-            }
-            &.active {
-                margin-top: -1px;
-                &:before{
-                    content: "";
-                    position: absolute;
-                    top: -1px;
-                    left: 0;
-                    right: 0;
-                    height: 3px;
-                    @include bg-color($primary-color, $dark-primary-color);
-                }
-                height: 32px;
-                line-height: 31px;
-                @include bg-color($body-background, $dark-base-color);
-                @include font-color($primary-color, $dark-primary-color);
-                .tab-icon {
-                    top: 9px;
-                }
-            }
-            .process-tab-name{
-                width: 100%;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                padding-right: 5px;
-                padding-left: 5px;
-                font-size: $font-size-large;
-            }
-            .process-tab-unsave-icon {
-                position: absolute;
-                top: 50%;
-                right: 10px;
-                transform: translateY(-50%);
-            }
-            .ivu-icon{
-                position: absolute;
-                right: 10px;
-                top: 10px;
-            }
-            .tab-icon {
-                position: absolute;
-                left: 7px;
-                top: 8px;
-                width: 15px;
-                height: 15px;
-                vertical-align: middle;
-            }
-            // .flow {
-            //     width: 12px;
-            //     height: 12px;
-            // }
-            .hivesql {
-                width: 16px;
-                height: 16px;
-            }
-            // .display {
-            //     width: 13px;
-            //     height: 13px;
-            // }
-            .dashboard {
-                width: 14px;
-                height: 14px;
-            }
-        }
+      display: none;
+      @include bg-color($light-base-color, $dark-base-color);
     }
     .process-container {
-        height: calc(100% - 32px);
+      height: 100%;
     }
-}
+  }
+  .process-tab {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 32px;
+    // padding: 0 20px;
+    box-sizing: border-box;
+    border-top: $border-width-base $border-style-base $border-color-split;
+    border-bottom: $border-width-base $border-style-base $border-color-split;
+    @include border-color($border-color-split, $dark-workspace-background);
+    @include bg-color($body-background, $dark-base-color);
+    .process-tab-item {
+      position: $relative;
+      height: 30px;
+      line-height: 30px;
+      padding: 0 20px;
+      padding-left: 25px;
+      border-right: $border-width-base $border-style-base $border-color-split;
+      @include border-color($border-color-split, $dark-base-color);
+      @include bg-color(#ffffff, $dark-base-color);
+      @include font-color($title-color, $dark-workflow-font-color);
+      cursor: pointer;
+      min-width: 100px;
+      max-width: 200px;
+      overflow: hidden;
+      text-align: center;
+      &:first-child {
+        border-left: $border-width-base $border-style-base $border-color-split;
+        @include border-color($border-color-split, $dark-base-color);
+      }
+      &.active {
+        margin-top: -1px;
+        &:before {
+          content: "";
+          position: absolute;
+          top: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          @include bg-color($primary-color, $dark-primary-color);
+        }
+        height: 32px;
+        line-height: 31px;
+        @include bg-color(#ebf5ff, $dark-base-color);
+        @include font-color($primary-color, $dark-primary-color);
+        .tab-icon {
+          top: 9px;
+        }
+      }
+      .process-tab-name {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-right: 5px;
+        padding-left: 5px;
+        font-size: 14px;
+      }
+      .process-tab-unsave-icon {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+      }
+      .ivu-icon {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
+      .tab-icon {
+        position: absolute;
+        left: 7px;
+        top: 8px;
+        width: 15px;
+        height: 15px;
+        vertical-align: middle;
+      }
+      // .flow {
+      //     width: 12px;
+      //     height: 12px;
+      // }
+      .hivesql {
+        width: 16px;
+        height: 16px;
+      }
+      // .display {
+      //     width: 13px;
+      //     height: 13px;
+      // }
+      .dashboard {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+  .process-container {
+    height: calc(100% - 32px);
+  }
+

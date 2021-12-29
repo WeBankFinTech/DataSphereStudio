@@ -1286,3 +1286,4 @@ CREATE TABLE `dss_orchestrator_release_info`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
+ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';

@@ -122,6 +122,7 @@ export default {
     },
     ProjectMergeConfirm(orchestratorData) {
       orchestratorData.dssLabels = [this.getCurrentDsslabels()];
+      orchestratorData.labels = { route: this.getCurrentDsslabels() };
       if (this.checkName(this.flowList, orchestratorData.orchestratorName, orchestratorData.id)) return this.$Message.warning(this.$t('message.workflow.nameUnrepeatable'));
       api.fetch(`${this.$API_PATH.PROJECT_PATH}createOrchestrator`, orchestratorData, 'post').then(() => {
         this.$Message.success(this.$t('message.workflow.createdSuccess'));

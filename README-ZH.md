@@ -21,7 +21,7 @@ DataSphere Studio（简称 DSS）是微众银行自研的数据应用开发管�
 
 请您耐心等待，加载 gif 需要一些时间。
 
-![DSS-V1.0 GIF](images/en_US/readme/DSS_gif.gif)
+![DSS-V1.0 GIF](images/zh_CN/readme/DSS-V1.0.mp4)
 
 ## 核心特点
 

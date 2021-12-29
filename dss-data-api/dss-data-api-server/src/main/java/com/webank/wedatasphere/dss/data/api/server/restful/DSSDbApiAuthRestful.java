@@ -1,4 +1,4 @@
-/*
+ /*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -24,27 +24,15 @@ import com.webank.wedatasphere.dss.data.api.server.entity.ApiAuth;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiAuthInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiAuthService;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,18 +44,15 @@ import java.util.UUID;
  * @Date 2021/7/14 10:44
  * @Created by suyc
  */
-@Component
-@Path("/dss/data/api/apiauth")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(path = "/dss/data/api/apiauth", produces = {"application/json"})
 @Slf4j
 public class DSSDbApiAuthRestful {
     @Autowired
     private ApiAuthService apiAuthService;
-
-    @POST
-    @Path("/save")
-    public Response saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
+    
+    @RequestMapping(path ="save", method = RequestMethod.POST)
+    public Message saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
         if(apiAuth.getId() ==null) {
             String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
@@ -84,22 +69,23 @@ public class DSSDbApiAuthRestful {
 
         boolean flag = apiAuthService.saveApiAuth(apiAuth);
         if(flag) {
-            return Message.messageToResponse(Message.ok("保存成功"));
+            return Message.ok("保存成功");
         }else{
-            return Message.messageToResponse(Message.error("保存失败"));
+            return Message.error("保存失败");
         }
     }
 
-    @GET
-    @Path("/token")
-    public Response generateToken( ) {
+  
+    @RequestMapping(path = "token", method = RequestMethod.GET)
+    public Message generateToken( ) {
         String token = DigestUtils.md5Hex(UUID.randomUUID().toString());
-        return Message.messageToResponse(Message.ok().data("token",token));
+        return Message.ok().data("token",token);
     }
 
-    @GET
-    @Path("/list")
-    public Response getApiAuthList(@QueryParam("workspaceId") Long workspaceId, @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+  
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+    public Message getApiAuthList(@RequestParam("workspaceId") Long workspaceId, @RequestParam("caller") String caller,
+                                   @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -108,27 +94,26 @@ public class DSSDbApiAuthRestful {
         }
 
         List<Long> totals = new ArrayList<>();
-        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,totals,pageNow,pageSize);
-        return Message.messageToResponse(Message.ok().data("list",apiAuths).data("total", totals.get(0)));
+        List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,caller,totals,pageNow,pageSize);
+        return Message.ok().data("list",apiAuths).data("total", totals.get(0));
     }
 
-    @POST
-    @Path("/{id}")
-    public Response deleteApiAuth(@PathParam("id") Long id){
+
+    @RequestMapping(path ="/{id}", method = RequestMethod.POST)
+    public Message deleteApiAuth(@PathVariable("id") Long id){
         log.info("-------delete apiauth:    " + id + ", begin");
         apiAuthService.deleteApiAuth(id);
-
         Message message = Message.ok("删除成功");
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/apigroup")
-    public Response getApiGroup(@QueryParam("workspaceId") Long workspaceId){
+ 
+    @RequestMapping(path = "apigroup", method = RequestMethod.GET)
+    public Message getApiGroup(@RequestParam("workspaceId") Long workspaceId){
         List<ApiGroupInfo> apiGroupInfoList = apiAuthService.getApiGroupList(workspaceId);
 
         Message message = Message.ok().data("list",apiGroupInfoList);
-        return Message.messageToResponse(message);
+        return message;
     }
 }
 

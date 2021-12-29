@@ -923,7 +923,8 @@ export default {
       startData: {},
       timingData: {
         item: {},
-        type: ''
+        type: '',
+        id: ''
       },
       pagination: {
         size: 10,
@@ -1142,6 +1143,7 @@ export default {
         tempData.type = 'timing'
         id = this.list[index].id
       }
+      this.timingData.id = id
       this.getReceiver(id, (res) => {
         this.timingData.item = {
           ...tempData.item,
@@ -1278,7 +1280,8 @@ export default {
     closeRun() {
       this.showRunTaskModal = false
     },
-    setTiming() {
+    setTiming(id) {
+      this.schedulerId = id
       this.showTimingTaskModal = false
       this.activeList(3)
     },
@@ -1595,9 +1598,9 @@ export default {
 .scheduler-wrapper{
   @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
   min-height: 80vh;
-  // padding-top: 16px;
   float: left;
   width: 100%;
+  overflow-y: hidden;
 
   .scheduler-menu{
     float: left;
@@ -1607,6 +1610,8 @@ export default {
     min-height: calc(80vh - 16px);
     border-right: 1px solid #DEE4EC;
     border-left: 1px solid #DEE4EC;
+    padding-bottom: 3000px;
+    margin-bottom: -3000px;
     @include border-color($border-color-base, $dark-workspace-background);
     @include bg-color($light-base-color, $dark-base-color);
     @include font-color($light-text-color, $dark-text-color);

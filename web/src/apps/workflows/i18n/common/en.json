@@ -475,6 +475,7 @@
         "publishing": "Publishing",
         "resource": "Resource",
         "viewVersion": "View verson",
+        "move": "Move",
         "config": "Config",
         "action": "Action",
         "readonly": "Read-only",
@@ -518,6 +519,7 @@
       "publishLoading": "There is already an orchestrator in publishing, please try again later",
       "modeifyOrchestrator": "Modify orchesstrator",
       "orchestratorName": "Orchestrator name",
+      "allowedProject": "Project",
       "orchestratorMode": "orchestrator modes",
       "orchestratorMethod": "orchestrator method",
       "FailedOpenOrchestrator": "Failed to open orchestrator",
@@ -530,7 +532,8 @@
       "exportSuccess": "Export success",
       "exportFail": "Export fail",
       "importSuccess": "import succeeded. Please close the opened choreography to open refresh again.",
-      "importFail": "Import failed"
+      "importFail": "Import failed",
+      "noProjectWarning": "There is currently no project in the development center. Please create a project first"
     },
     "scheduler": {
       "selectState": "Select State",
@@ -678,3 +681,4 @@
     }
   }
 }
+

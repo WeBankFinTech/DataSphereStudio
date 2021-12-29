@@ -89,7 +89,8 @@ export default {
     },
     stop: {
       type: Boolean,
-    }
+    },
+    height: Number
   },
   data() {
     return {
@@ -97,7 +98,7 @@ export default {
       scriptViewState: {
         showPanel: 'progress',
         cacheLogScroll: 0,
-        bottomContentHeight: '250'
+        bottomContentHeight: this.height || '250'
       },
       isBottomPanelFull: false,
       isLogShow: false,
@@ -128,8 +129,6 @@ export default {
     }
   },
   mounted() {
-    let heigth = this.$parent.$refs.processModule.offsetHeight;
-    this.scriptViewState.bottomContentHeight = heigth / 2 - 75;
   },
   methods: {
     killExecute(flag = false) {
@@ -239,7 +238,7 @@ export default {
             }
           });
         } else {
-          progressInfo = [];
+          this.script.progress.progressInfo = [];
         }
 
         if (progress == 1) {
@@ -288,7 +287,10 @@ export default {
       });
       this.execute.on('querySuccess', ({ type, task }) => {
         const costTime = util.convertTimestamp(task.costTime);
-        this.script.progress.costTime = costTime;
+        this.script.progress = {
+          ...this.script.progress,
+          costTime
+        };
         const name = this.script.title;
         this.$Notice.close(name);
         this.$Notice.success({
@@ -531,7 +533,10 @@ export default {
       overflow: hidden;
       box-sizing: border-box;
       z-index: 3;
+      display: flex;
+      flex-flow: column;
       .workbench-tab-wrapper {
+        height: 34px;
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
@@ -597,9 +602,7 @@ export default {
       }
       .workbench-container {
         height: calc(100% - 36px);
-        &.node {
-            height: 100%;
-        }
+        flex: 1;
         @keyframes ivu-progress-active {
             0% {
                 opacity: .3;

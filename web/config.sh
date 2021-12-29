@@ -5,4 +5,4 @@ dss_port="8088"
 linkis_url="http://localhost:20401"
 
 #dss ip address
-dss_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+dss_ipaddr=$(hostname -i)

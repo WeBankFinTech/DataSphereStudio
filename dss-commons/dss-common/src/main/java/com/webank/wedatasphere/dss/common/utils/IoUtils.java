@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -31,11 +29,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/03/11 11:18 AM
- */
 public class IoUtils {
 
     private static Logger logger = LoggerFactory.getLogger(IoUtils.class);
@@ -112,7 +105,7 @@ public class IoUtils {
     }
 
     public static IOEnv getDSSServerEnv(){
-        //dssserverEnv 是当前dsss服务启动的env环境
+        //dssserverEnv 是当前dss服务启动的env环境
         return IOEnv.valueOf(DSSCommonConf.DSS_IO_ENV.getValue());
     }
 

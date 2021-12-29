@@ -37,7 +37,7 @@
           </template>
         </i-col>
       </Row>
-      <results ref="currentConsole" getResultUrl="dss/apiservice"  :comData="apiData" :dispatch="dispatch" heigth="500" @executRun="executRun"></results>
+      <results ref="currentConsole" getResultUrl="dss/apiservice"  :comData="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
     </div>
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">
@@ -64,6 +64,7 @@ export default {
       apiData: null,
       excuteLoading: false,
       tip: {},
+      height: 500
     }
   },
   created() {
@@ -77,6 +78,9 @@ export default {
     conditionResult() {
       return {items: this.showConditionList}
     }
+  },
+  mounted() {
+    this.height = this.$el.clientHeight - 325
   },
   methods: {
     // 验证发布和更新的默认值是否满足条件
@@ -219,11 +223,12 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/style/variables.scss';
   .dataServicesContent {
-    display: flex;
-    flex-direction: column;
-    width: $percent-all;
-    height: $percent-all;
-    background-color: #F4F7FB;
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*width: $percent-all;*/
+    /*height: $percent-all;*/
+    /*background-color: #F4F7FB;*/
+    height: 100%;
     .tap-bar {
       background: #fff;
       margin-bottom: $padding-25;
@@ -331,7 +336,6 @@ export default {
     }
   }
   .execute-content {
-    // height: 500px;
     border: $border-width-base $border-style-base  #dcdee2;
     border-radius: 2px;
     overflow: hidden;

@@ -181,6 +181,44 @@ const tasksStateList = [
   }
 ]
 
+const dashboardStateList = [
+  {
+    id: 1,
+    desc: i18n.$t('message.scheduler.tasksState.RUNNING_EXECUTION'),
+    icon: 'icon-running-execution',
+    code: 'RUNNING_EXEUTION',
+    color: '#73A0FA'
+  },
+  {
+    id: 3,
+    desc: i18n.$t('message.scheduler.tasksState.PAUSE'),
+    icon: 'icon-pause',
+    code: 'PAUSE',
+    color: '#F9D66F'
+  },
+  {
+    id: 5,
+    desc: i18n.$t('message.scheduler.tasksState.STOP'),
+    icon: 'icon-stop',
+    code: 'STOP',
+    color: '#EB7E65'
+  },
+  {
+    id: 6,
+    desc: i18n.$t('message.scheduler.tasksState.FAILURE'),
+    icon: 'icon-failure',
+    code: 'FAILURE',
+    color: '#838383'
+  },
+  {
+    id: 7,
+    desc: i18n.$t('message.scheduler.tasksState.SUCCESS'),
+    icon: 'icon-success',
+    code: 'SUCCESS',
+    color: '#73DEB3'
+  }
+]
+
 const publishStatus = {
   'NOT_RELEASE': i18n.$t('message.scheduler.Unpublished'),
   'ONLINE': i18n.$t('message.scheduler.online'),
@@ -312,5 +350,6 @@ export {
   tasksStateList,
   publishStatus,
   runningType,
-  tasksType
+  tasksType,
+  dashboardStateList
 }

@@ -11,6 +11,7 @@
               $t('message.permissions.login')
           "
           style="width: 272px"
+          @on-enter="handleQuery()"
         >
         </Input>
       </div>
@@ -24,6 +25,7 @@
               $t('message.permissions.phone')
           "
           style="width: 272px"
+          @on-enter="handleQuery()"
         >
         </Input>
       </div>
@@ -767,6 +769,7 @@ export default {
   // @include border-color($border-color-base, $dark-border-color-base);
   display: flex;
   flex-wrap: wrap;
+  border-bottom: 1px solid #dee4ec;
   @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
   padding-bottom: 24px;
   padding-left: 24px;

@@ -138,9 +138,6 @@ export default {
         project_url: [
           { required: true, message: "项目页不能为空", trigger: "blur" }
         ],
-        redirect_url: [
-          { required: true, message: "单点接口不能为空", trigger: "blur" }
-        ],
         desc_cn: [{ required: true, message: "描述不能为空", trigger: "blur" }],
         desc_en: [
           { required: true, message: "英文描述不能为空", trigger: "blur" }
@@ -168,8 +165,6 @@ export default {
       let _this = this;
       _this.$refs["formValidate"].validate(valid => {
         if (valid) {
-          _this.$Message.success("Success!");
-          // 提交
           _this.$emit("on-save", postData);
         } else {
           _this.$Message.error("Fail!");

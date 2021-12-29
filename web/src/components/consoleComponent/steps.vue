@@ -264,7 +264,6 @@ export default {
               background: $subsidiary-color;
               text-align: center;
               .we-steps-circle-checkmark {
-                // color: $body-background;
                 @include font-color(#fff, #000);
               }
               &.loading {

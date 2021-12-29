@@ -38,7 +38,7 @@ export default {
           value: v.count
         }
       })
-      const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
+      const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {barColor: '#89C2D9'})
       myChart.echart.setOption(bar)
       // Jump not allowed on home page
       if (this.projectId) {
@@ -57,6 +57,7 @@ export default {
       handler () {
         this.isSpin = true
         this.parameter.projectId = this.projectId
+        if (!this.projectId) return
         util.checkToken(() => {
           api.fetch(`dolphinscheduler/projects/analysis/define-user-count`, this.parameter, 'get').then(res => {
             this.msg = res.count > 0

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -25,19 +23,17 @@ import java.util.Date
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.httpclient.Client
-import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.httpclient.Client
+import org.apache.linkis.httpclient.dws.DWSHttpClient
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder
+import org.apache.linkis.httpclient.request.HttpAction
 import org.apache.commons.io.IOUtils
 import org.apache.http.impl.cookie.BasicClientCookie
 
 import scala.collection.JavaConversions._
 
-/**
-  * Created by enjoyyin on 2020/8/10.
-  */
+
 object HttpClient extends Logging {
 
   private val dssClients = new util.HashMap[String, DWSHttpClient]
@@ -66,7 +62,8 @@ object HttpClient extends Logging {
     cacheMap.get(baseUrl)
   }
 
-  def getHttpClient(url: String, appName: String): Client = getClient(url, httpClients, baseUrl => {
+  def getHttpClient(url: String, appName: String): Client = {
+    val baseUrl = getBaseUrl(url)
     val clientConfig = DWSClientConfigBuilder.
       newBuilder().
       addServerUrl(baseUrl).
@@ -76,7 +73,7 @@ object HttpClient extends Logging {
       maxConnectionSize(maxConnection).
       readTimeout(readTimeout).build()
     new DWSHttpClient(clientConfig, appName + "-SSO-Client")
-  })
+  }
 
   def getDSSClient(dssUrl: String): DWSHttpClient = getClient(dssUrl, dssClients, baseUrl => {
     val clientConfig = DWSClientConfigBuilder.newBuilder().setDWSVersion(dssVersion)
@@ -92,6 +89,7 @@ object HttpClient extends Logging {
       basicClientCookie.setDomain(domain)
       basicClientCookie.setPath("/")
       basicClientCookie.setExpiryDate(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30L))
+      info("Add cookie for get user info "+basicClientCookie.toString)
       action.addCookie(basicClientCookie)
     }
 
@@ -101,9 +99,9 @@ object HttpClient extends Logging {
   }
 
   private var dssVersion = "v1"
-  private var maxConnection = 5
-  private var connectTimeout = 30000
-  private var readTimeout = 30000
+  private var maxConnection = 50
+  private var connectTimeout = 300000
+  private var readTimeout = 300000
 
   //TODO 切换为linkis-common的JsonUtils
   val objectMapper = new ObjectMapper().setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"))

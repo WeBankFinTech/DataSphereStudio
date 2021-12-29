@@ -35,13 +35,13 @@ module.exports = {
     "keyword-spacing": 0,
     "no-useless-escape": 0,
     "operator-linebreak": 0,
-    // 'indent': [
-    //     'error',
-    //     2,
-    //     {
-    //         'SwitchCase': 1
-    //     }
-    // ],
+    indent: [
+      "error",
+      2,
+      {
+        SwitchCase: 1
+      }
+    ],
     "no-const-assign": "warn",
     "no-this-before-super": "warn",
     "no-irregular-whitespace": 0,

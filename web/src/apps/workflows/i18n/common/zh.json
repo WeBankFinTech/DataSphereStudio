@@ -34,10 +34,10 @@
             "confirmDelete": "确认删除工作流{name}",
             "nameUnrepeatable": "名称不可重复！",
             "createdSuccess": "创建成功！",
-            "eitorSuccess": "修改工作流{name}成功！",
+            "eitorSuccess": "修改编排{name}成功！",
             "notDelete": "子工作流不可删除！",
             "mandatoryDelete": "强制删除",
-            "deleteSuccessName": "删除工作流{name}成功！",
+            "deleteSuccessName": "删除编排{name}成功！",
             "versionDetail": "版本详情",
             "open": "打开",
             "editorWorkflow": "修改工作流",
@@ -473,6 +473,7 @@
                 "publishing": "发布中",
                 "resource": "资源",
                 "viewVersion": "查看版本",
+                "move": "移动",
                 "config": "配置",
                 "action": "操作",
                 "readonly": "只读",
@@ -516,6 +517,7 @@
             "publishLoading": "已有编排在发布，稍后再试",
             "modeifyOrchestrator": "修改编排",
             "orchestratorName": "编排名称",
+            "allowedProject": "所属项目",
             "orchestratorMode": "编排模式",
             "orchestratorMethod": "编排方式",
             "FailedOpenOrchestrator": "打开编排失败",
@@ -528,7 +530,8 @@
             "exportSuccess": "导出成功",
             "exportFail": "导出失败",
             "importSuccess": "导入成功，请关闭已打开编排以便再次打开刷新。",
-            "importFail": "导入失败"
+            "importFail": "导入失败",
+            "noProjectWarning": "开发中心当前无项目，请先创建一个项目"
         },
         "scheduler": {
             "selectState": "选择状态",

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -25,30 +23,26 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.ErrorCode;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.cs.client.ContextClient;
-import com.webank.wedatasphere.linkis.cs.client.builder.ContextClientFactory;
-import com.webank.wedatasphere.linkis.cs.client.service.CSWorkService;
-import com.webank.wedatasphere.linkis.cs.client.service.CSWorkServiceImpl;
-import com.webank.wedatasphere.linkis.cs.client.utils.SerializeHelper;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextScope;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.ContextType;
-import com.webank.wedatasphere.linkis.cs.common.entity.enumeration.WorkType;
-import com.webank.wedatasphere.linkis.cs.common.entity.object.CSFlowInfos;
-import com.webank.wedatasphere.linkis.cs.common.entity.object.LinkisVariable;
-import com.webank.wedatasphere.linkis.cs.common.entity.resource.LinkisBMLResource;
-import com.webank.wedatasphere.linkis.cs.common.entity.source.*;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.cs.client.ContextClient;
+import org.apache.linkis.cs.client.builder.ContextClientFactory;
+import org.apache.linkis.cs.client.service.CSWorkService;
+import org.apache.linkis.cs.client.service.CSWorkServiceImpl;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
+import org.apache.linkis.cs.common.entity.enumeration.ContextScope;
+import org.apache.linkis.cs.common.entity.enumeration.ContextType;
+import org.apache.linkis.cs.common.entity.enumeration.WorkType;
+import org.apache.linkis.cs.common.entity.object.CSFlowInfos;
+import org.apache.linkis.cs.common.entity.object.LinkisVariable;
+import org.apache.linkis.cs.common.entity.resource.LinkisBMLResource;
+import org.apache.linkis.cs.common.entity.source.*;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * @Author alexyang
- * @Date 2020-0318
- */
 public class ContextServiceImpl implements ContextService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContextServiceImpl.class);

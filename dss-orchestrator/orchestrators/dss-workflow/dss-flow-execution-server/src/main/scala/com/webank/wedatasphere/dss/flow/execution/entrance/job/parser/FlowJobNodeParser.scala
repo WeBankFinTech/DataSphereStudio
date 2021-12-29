@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -29,37 +27,36 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUt
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
-import com.webank.wedatasphere.linkis.common.utils.Logging
-
-import scala.collection.JavaConversions._
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.entrance.execute.EntranceJob
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
-/**
-  * Created by johnnwang on 2019/11/6.
-  */
+import scala.collection.JavaConversions._
 
-@Order(2)
+
+@Order(10)
 @Component
 class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
 
   override def parse(flowEntranceJob: FlowEntranceJob): Unit = {
-    info(s"${flowEntranceJob.getId} Start to parse node of flow")
-//    val project = flowEntranceJob.getDwsProject
+    info(s"${flowEntranceJob.getId} Start to parse node of flow.")
     val flow = flowEntranceJob.getFlow
     val flowContext = flowEntranceJob.getFlowContext
     if(null == flow) throw new FlowExecutionErrorException(90101, "This fow of job is empty ")
-    val nodes = flow.getSchedulerNodes
+    val nodes = flow.getWorkflowNodes
     for (node <- nodes) {
 
       val nodeName = node.getName
       val propsMap = new util.HashMap[String, String]()
       val proxyUser = if (node.getDSSNode.getUserProxy == null) flowEntranceJob.getUser else node.getDSSNode.getUserProxy
-//      propsMap.put(PROJECT_NAME, project.getName)
       propsMap.put(FLOW_NAME, flow.getName)
       propsMap.put(JOB_ID, nodeName)
+      val  projectName =flowEntranceJob.asInstanceOf[EntranceJob].getJobRequest.getSource.get("projectName")
+      propsMap.put(PROJECT_NAME,projectName)
       propsMap.put(FLOW_SUBMIT_USER, flowEntranceJob.getUser)
-      info(s"${flowEntranceJob.getId} nodeName:${nodeName} node:${node.getNodeType}")
+      info(s"Job(${flowEntranceJob.getId}) with nodeName: $nodeName and node: ${node.getNodeType}.")
       propsMap.put(LinkisJobExecutionConfiguration.LINKIS_TYPE, node.getNodeType)
 
       propsMap.put(PROXY_USER, proxyUser)
@@ -80,12 +77,14 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
 
       propsMap.put(FlowExecutionEntranceConfiguration.FLOW_EXEC_ID, flowEntranceJob.getId)
 
-      //update by peaceWong add contextID to Flow properties
-      propsMap.put(CONTEXT_ID, flow.getContextID)
+      flow match {
+        case workflow: WorkflowWithContextImpl =>
+          propsMap.put(CONTEXT_ID, workflow.getContextID)
+        case _ =>
+      }
 
       params.put(PROPS_MAP, propsMap)
       params.put(FLOW_VAR_MAP, flowVar)
-//      params.put(PROJECT_RESOURCES, project.getProjectResources)
       val flowNameAndResources = new util.HashMap[String, util.List[BMLResource]]()
       flowNameAndResources.put("flow." + flow.getName + LinkisJobExecutionConfiguration.RESOURCES_NAME, FlowExecutionUtils.resourcesAdaptation(flow.getFlowResources))
       params.put(FLOW_RESOURCES, flowNameAndResources)

@@ -180,13 +180,6 @@
           </Table>
         </template>
         <template v-if="step === 2">
-          <!-- <FormItem
-            prop="approvalName"
-            :label="$t('message.scripts.apiPublish.addApiModal.approvalName')"
-            :rules="[{ required: true, message: 'The name cannot be empty', trigger: 'blur' }]"
-          >
-            <Input v-model="updateApiData.approvalName"/>
-          </FormItem> -->
           <FormItem
             prop="applyUser"
             :label="$t('message.scripts.apiPublish.addApiModal.applyUser')"
@@ -1060,4 +1053,5 @@ export default {
   }
 }
 </style>
+
 

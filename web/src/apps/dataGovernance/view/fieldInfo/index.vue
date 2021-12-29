@@ -42,7 +42,13 @@
       <Modal v-model="DDLflag" title="生成DDL语句" width="576">
         <template v-slot:footer>
           <div>
-            <Button data-name="ddl" type="primary" @click="e => copy(e, DDLsql)"
+            <Button
+              data-name="ddl"
+              type="primary"
+              id="copy-button"
+              data-clipboard-action="copy"
+              data-clipboard-target="#copy-button"
+              @click="e => copy(e, DDLsql)"
               >复制</Button
             >
           </div>
@@ -108,6 +114,11 @@ export default {
                     that.fieldInfoData[params.index].comment =
                       event.target.value;
                   }
+                },
+                style: {
+                  border: "1px solid #dee4ec",
+                  "border-radius": "4px",
+                  "padding-left": "12px"
                 }
               });
             } else {
@@ -136,6 +147,11 @@ export default {
                     that.rangeInfoData[params.index].comment =
                       event.target.value;
                   }
+                },
+                style: {
+                  border: "1px solid #dee4ec",
+                  "border-radius": "4px",
+                  "padding-left": "12px"
                 }
               });
             } else {
@@ -246,6 +262,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .field-info-wrap {
   padding-left: 24px;
   padding-right: 24px;
@@ -266,7 +283,7 @@ export default {
     &-header {
       font-family: PingFangSC-Medium;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       line-height: 22px;
       font-weight: bold;
       margin-bottom: 15px;
@@ -276,11 +293,12 @@ export default {
 .field-info-rich-text {
   margin: 8px 24px;
   padding: 5px 12px;
-  background: #ffffff;
+  @include bg-color(#fff, $dark-base-color);
   border: 1px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   border-radius: 4px;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.65);
+  @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
   line-height: 22px;
   overflow-y: auto;
   max-height: 200px;
@@ -291,5 +309,35 @@ export default {
       margin-right: 6px;
     }
   }
+}
+
+::v-deep .ivu-table-wrapper {
+  border: none;
+}
+::v-deep .ivu-table:after {
+  width: 0;
+}
+
+::v-deep .ivu-table-large th {
+  height: 0px;
+}
+
+::v-deep .ivu-table-large td {
+  height: 0px;
+}
+
+::v-deep .ivu-table th {
+  height: 0px;
+}
+
+::v-deep .ivu-table td {
+  height: 0px;
+}
+
+::v-deep .ivu-table-cell {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 </style>

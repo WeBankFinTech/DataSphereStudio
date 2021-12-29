@@ -102,7 +102,7 @@ export default {
       }, 'get').then((rst) => {
         this.loading = false;
         // 剔除requestApplicationName为 "nodeexecution" 的task
-        let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution")
+        let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution" && item.requestApplicationName !== "CLI")
         this.dispatch('Footer:updateRunningJob', tasks.length);
         this.jobTypeList = [
           { 'en': 'IDE', 'cn': this.$t('message.common.resourceSimple.YS') },

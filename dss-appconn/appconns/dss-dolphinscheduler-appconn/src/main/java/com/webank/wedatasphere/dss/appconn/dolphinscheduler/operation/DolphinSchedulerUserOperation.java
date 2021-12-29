@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConn
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.linkis.common.utils.JsonUtils;
 
 /**
  * The type Dolphin scheduler user operation.
@@ -53,11 +54,11 @@ public class DolphinSchedulerUserOperation {
     public DolphinSchedulerUserOperation(String baseUrl) {
         this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
         this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
+
         this.listPagingUrl = baseUrl.endsWith("/") ? baseUrl + "users/list-paging" : baseUrl + "/users/list-paging";
         this.createUserUrl = baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
         this.grantProjectUrl =
             baseUrl.endsWith("/") ? baseUrl + "users/grant-project" : baseUrl + "/users/grant-project";
-
         this.authedProjectUrl =
             baseUrl.endsWith("/") ? baseUrl + "projects/authed-project" : baseUrl + "/projects/authed-project";
     }
@@ -82,7 +83,7 @@ public class DolphinSchedulerUserOperation {
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
                     && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
-                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectMapper mapper = JsonUtils.jackson();
                     JsonNode jsonNode = mapper.readTree(entString);
                     JsonNode data = jsonNode.get("data");
                     JsonNode totalList = data.get("totalList");
@@ -98,7 +99,7 @@ public class DolphinSchedulerUserOperation {
                     }
                     i++;
                 } else {
-                    logger.error("Dolphin Scheduler获取项目列表失败，返回的信息是 {}", entString);
+                    logger.error("DolphinScheduler获取项目列表失败，返回的信息是 {}", entString);
                     throw new ExternalOperationFailedException(90001, "调度中心获取用户列表失败");
                 }
             } catch (ExternalOperationFailedException e) {
@@ -116,14 +117,14 @@ public class DolphinSchedulerUserOperation {
      * @throws ExternalOperationFailedException
      */
     public void createUser(String userName) throws ExternalOperationFailedException {
-        logger.info("Dolphin Scheduler新建用户 {} ", userName);
+        logger.info("DolphinScheduler新建用户 {} ", userName);
         CloseableHttpResponse httpResponse = null;
         try {
             URIBuilder uriBuilder = new URIBuilder(this.createUserUrl);
             uriBuilder.addParameter("userName", userName);
             uriBuilder.addParameter("userPassword", "rz3Lw7yFlKv@8GisM");
             uriBuilder.addParameter("tenantId", "1");
-            uriBuilder.addParameter("email", "xx@qq.com");
+            uriBuilder.addParameter("email", "xx@chinatelecom.cn");
             uriBuilder.addParameter("queue", "default");
             DolphinSchedulerHttpPost httpPost =
                 new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
@@ -134,7 +135,7 @@ public class DolphinSchedulerUserOperation {
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()
                 && Constant.DS_RESULT_CODE_SUCCESS == DolphinAppConnUtils.getCodeFromEntity(entString)) {
-                logger.info("Dolphin Scheduler新建用户 {} 成功, 返回的信息是 {}", userName,
+                logger.info("DolphinScheduler新建用户 {} 成功, 返回的信息是 {}", userName,
                     DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
             } else {
                 throw new ExternalOperationFailedException(90002, "调度中心新建用户失败, 原因:" + entString);
@@ -196,7 +197,7 @@ public class DolphinSchedulerUserOperation {
                 && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
                 return;
             } else {
-                logger.error("Dolphin Scheduler项目授权失败，返回的信息是 {}", entString);
+                logger.error("DolphinScheduler项目授权失败，返回的信息是 {}", entString);
                 throw new ExternalOperationFailedException(90004, "调度中心给用户授权项目失败");
             }
         } catch (ExternalOperationFailedException e) {
@@ -229,7 +230,7 @@ public class DolphinSchedulerUserOperation {
                 }
                 return projectIds;
             } else {
-                logger.error("Dolphin Scheduler获取用户{}的已授权项目列表失败，返回的信息是 {}", userName, entString);
+                logger.error("DolphinScheduler获取用户{}的已授权项目列表失败，返回的信息是 {}", userName, entString);
                 throw new ExternalOperationFailedException(90003, "调度中心获取用户已授权项目列表失败");
             }
         } catch (ExternalOperationFailedException e) {

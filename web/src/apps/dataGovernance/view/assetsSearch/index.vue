@@ -2,17 +2,29 @@
   <div class="assets-index-wrap">
     <!-- top 搜索框 -->
     <div class="assets-index-t">
+      <img
+        src="../../assets/images/搜索框装饰图.png"
+        alt=""
+        style="position: absolute;"
+      />
       <!-- bottom -->
       <div class="assets-index-t-b1">
         <div class="assets-index-t-b1-search">
           <Input
-            search
-            :enter-button="$t(`message.dataGovernance.search`)"
             :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
-            size="large"
-            @on-search="onSearch"
+            size="small"
+            @on-enter="onSearch"
             v-model="queryForTbls"
-          />
+          >
+            <span slot="prepend">
+              <Icon type="md-search" size="16" color="#2e92f7" />
+              <!-- <SvgIcon
+                icon-class="search"
+                style="fontSize: 16px"
+                :color="'#2e92f7'"
+              ></SvgIcon> -->
+            </span>
+          </Input>
         </div>
       </div>
     </div>
@@ -34,6 +46,7 @@
             :remote-method="remoteSearchOwner"
             :loading="owerSerachLoading"
             style="width:167px"
+            @on-change="selectOwner"
           >
             <Option
               v-for="(item, idx) in ownerList"
@@ -58,34 +71,41 @@
             v-model="searchOption.classification"
             clearable
             style="width:167px"
+            @on-change="selectSubject"
           >
             <OptionGroup label="主题域">
               <Option
                 v-for="(item, idx) in subjectList"
                 :value="item.name"
                 :key="idx"
-              >{{ item.name }}</Option>
+                >{{ item.name }}</Option
+              >
             </OptionGroup>
             <OptionGroup label="分层">
               <Option
                 v-for="(item, idx) in layerList"
                 :value="item.name"
                 :key="idx"
-              >{{ item.name }}</Option>
+                >{{ item.name }}</Option
+              >
             </OptionGroup>
           </Select>
         </div>
       </div>
 
       <!-- right -->
-      <div class="assets-index-b-r">
-        <template v-for="model in cardTabs">
+      <div class="assets-index-b-r" v-if="cardTabs.length">
+        <Scroll :on-reach-bottom="handleReachBottom" height="100vh">
           <tab-card
+            v-for="model in cardTabs"
             :model="model"
             :key="model.guid"
             @on-choose="onChooseCard"
           ></tab-card>
-        </template>
+        </Scroll>
+      </div>
+      <div class="assets-index-b-r" v-else>
+        <div style="text-align: center; margin-top:50px; font-weight: bolder;">暂无数据</div>
       </div>
     </div>
   </div>
@@ -93,7 +113,12 @@
 <script>
 //import api from "@/common/service/api";
 import tabCard from "../../module/common/tabCard/index.vue";
-import { getHiveTbls, getWorkspaceUsers, getLayersAll, getThemedomains } from "../../service/api";
+import {
+  getHiveTbls,
+  getWorkspaceUsers,
+  getLayersAll,
+  getThemedomains
+} from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
 import { throttle } from "lodash";
@@ -105,7 +130,10 @@ export default {
     return {
       searchOption: {
         limit: 10,
-        offset: 0
+        offset: 0,
+        owner: '',
+        classification: '',
+        query: ''
       },
       ownerList: [],
       userList: [],
@@ -118,10 +146,23 @@ export default {
     };
   },
   created() {
-    let searchParams = storage.getItem("searchTbls");
+    let searchParams = storage.getItem("searchTbls")
     if (searchParams) {
-      this.queryForTbls = JSON.parse(searchParams).query;
+      const searchData = JSON.parse(searchParams)
+      this.queryForTbls = searchData.query
+      this.searchOption.classification = searchData.classification
+      this.searchOption.owner = searchData.owner
       getHiveTbls(JSON.parse(searchParams))
+        .then(data => {
+          if (data.result) {
+            this.cardTabs = data.result;
+          }
+        })
+        .catch(err => {
+          console.log("Search", err);
+        });
+    } else {
+      getHiveTbls({query: '', limit: 10, offset: 0})
         .then(data => {
           if (data.result) {
             this.cardTabs = data.result;
@@ -135,17 +176,18 @@ export default {
   mounted() {
     let _this = this;
     this.throttleLoad = throttle(() => {
+      console.log('scroll')
       _this.scrollHander();
     }, 300);
-    window.addEventListener("scroll", this.throttleLoad);
+    window.addEventListener("scroll", this.throttleLoad, false);
     getThemedomains().then(res => {
-      let { result } = res
-      this.subjectList = result
-    })
+      let { result } = res;
+      this.subjectList = result;
+    });
     getLayersAll().then(res => {
-      let { result } = res
-      this.layerList = result
-    })
+      let { result } = res;
+      this.layerList = result;
+    });
   },
   destroyed() {
     window.removeEventListener("scroll", this.throttleLoad);
@@ -163,6 +205,7 @@ export default {
       this.searchOption["limit"] = 10;
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
+      this.isLoading = false
       getHiveTbls(params)
         .then(data => {
           if (data.result) {
@@ -274,7 +317,8 @@ export default {
         } else {
           clientHeight = Math.max(
             document.body.clientHeight,
-            document.documentElement.clientHeight
+            document.documentElement.clientHeight,
+            document.querySelector('.layout').clientHeight
           );
         }
         return clientHeight;
@@ -285,10 +329,30 @@ export default {
           document.documentElement.scrollHeight
         );
       };
-      if (getScrollTop() + getClientHeight() === getScrollHeight()) {
+      let st = getScrollTop();
+      let ch = getClientHeight();
+      let sh = getScrollHeight();
+      console.log(st,ch,sh)
+      if (st + ch + 54 >= sh) {
         // 拉数据
         this.handleReachBottom();
       }
+    },
+
+    // 搜索負責人
+    selectOwner(value) {
+      this.searchOption.owner = value;
+      this.onSearch();
+    },
+
+    // 搜索主題域/分層
+    selectSubject(value) {
+      if (value) {
+        this.searchOption.classification = value
+      } else {
+        delete this.searchOption.classification
+      }
+      this.onSearch();
     }
   }
 };
@@ -343,14 +407,13 @@ export default {
   }
 
   .assets-index-t-b1 {
-    height: 80px;
-    background-color: #edf1f6;
+    height: 46px;
+    @include bg-color(#f8f9fc, $dark-base-color);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 11px 0px;
+    padding-left: 12px;
     &-search {
       min-width: 552px;
-      min-height: 40px;
     }
   }
 
@@ -363,10 +426,11 @@ export default {
       padding-right: 16px;
       padding-top: 15px;
       border-right: 1px solid #dee4ec;
+      @include border-color(#dee4ec, $dark-border-color-base);
       &-title {
         font-family: PingFangSC-Medium;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.85);
+        @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         font-weight: bold;
       }
       &-user {
@@ -376,7 +440,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-env {
@@ -386,7 +450,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
       &-label {
@@ -396,7 +460,7 @@ export default {
           margin-bottom: 8px;
           font-family: PingFangSC-Regular;
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.85);
+          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
         }
       }
     }
@@ -404,6 +468,17 @@ export default {
       flex: 1;
       padding-bottom: 10px;
     }
+  }
+  ::v-deep .ivu-input-group-prepend,
+  .ivu-input-group-append {
+    padding: 0px;
+    border: none;
+    background-color: transparent;
+  }
+
+  ::v-deep .ivu-input-group .ivu-input,
+  .ivu-input-group .ivu-input-inner-container {
+    margin-left: 8px;
   }
 }
 </style>

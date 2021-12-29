@@ -39,8 +39,9 @@ export default {
   padding-left: 24px;
   padding-right: 24px;
   border: 1px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   :hover {
-    background: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-base-color);
     box-shadow: 0 2px 12px 0 $shadow-color;
   }
   .tab-card-t {
@@ -49,6 +50,7 @@ export default {
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;
+        @include border-color(#dee4ec, $dark-border-color-base);
         width: 0;
         position: absolute;
         right: -15px;
@@ -60,7 +62,7 @@ export default {
     &-r {
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       text-align: left;
       line-height: 22px;
     }
@@ -69,12 +71,12 @@ export default {
     font-size: 14px;
     font-family: PingFangSC-Regular;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.85);
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     text-align: left;
     line-height: 22px;
     span {
       margin-right: 80px;
-      color: rgba(0, 0, 0, 0.65);
+      @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
     }
   }
 }

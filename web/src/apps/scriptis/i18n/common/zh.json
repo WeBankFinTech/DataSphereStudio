@@ -40,6 +40,7 @@
                 "action": "操作",
                 "delete": "删除",
                 "baseAttr": "表基本属性",
+                "addMore": "批量新增",
                 "add": "新增",
                 "partitionAttr": "分区属性",
                 "selectResource": "请选择来源字段",
@@ -780,6 +781,7 @@
                 },
                 "rule": {
                     "nameRule": "请填写API名称",
+                    "approvalName": "请填写名称",
                     "pathRule": "请填写API路径",
                     "pathRegRule": "API路径不合法",
                     "requestTypeRule": "请选择请求方式",
@@ -807,3 +809,4 @@
         }
     }
 }
+

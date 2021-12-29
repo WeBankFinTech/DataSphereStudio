@@ -62,7 +62,7 @@ export default {
       const timer = setTimeout(() => {
         timeoutValue += 8000;
         // init  running  success failed
-        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getPublishStatus`, { releaseTaskId, dssLabel: this.getCurrentDsslabels() }, 'get').then((res) => {
+        api.fetch(`${this.$API_PATH.PUBLISH_PATH}getReleaseStatus`, { releaseTaskId, dssLabel: this.getCurrentDsslabels() }, 'get').then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(timer);

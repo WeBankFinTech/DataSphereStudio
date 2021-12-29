@@ -6,7 +6,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.Job
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.job.DolphinSchedulerJobBuilder
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 import org.apache.commons.io.IOUtils
 
 import java.io.{FileInputStream, InputStream, InputStreamReader}

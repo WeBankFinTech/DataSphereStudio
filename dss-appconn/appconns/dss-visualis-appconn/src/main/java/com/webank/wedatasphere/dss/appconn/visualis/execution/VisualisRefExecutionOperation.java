@@ -1,56 +1,48 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package com.webank.wedatasphere.dss.appconn.visualis.execution;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.WidgetResultData;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.entity.DashboardCreateResponseRef;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.entity.DisplayCreateResponseRef;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.entity.WidgetCreateResponseRef;
+import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisCommonResponseRef;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisDownloadAction;
-import com.webank.wedatasphere.dss.standard.app.development.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.execution.ExecutionLogListener;
-import com.webank.wedatasphere.dss.standard.app.development.execution.ExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.execution.ExecutionResultListener;
-import com.webank.wedatasphere.dss.standard.app.development.execution.RefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.execution.common.AsyncExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.OriginSSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOIntegrationConf;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.linkis.common.io.resultset.ResultSetWriter;
-import com.webank.wedatasphere.linkis.httpclient.request.HttpAction;
-import com.webank.wedatasphere.linkis.httpclient.response.HttpResult;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
-import com.webank.wedatasphere.linkis.server.conf.ServerConfiguration;
-import com.webank.wedatasphere.linkis.storage.LineMetaData;
-import com.webank.wedatasphere.linkis.storage.LineRecord;
-import com.webank.wedatasphere.linkis.storage.domain.Column;
-import com.webank.wedatasphere.linkis.storage.domain.DataType;
-import com.webank.wedatasphere.linkis.storage.resultset.table.TableMetaData;
-import com.webank.wedatasphere.linkis.storage.resultset.table.TableRecord;
+import org.apache.linkis.common.io.resultset.ResultSetWriter;
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
+import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.conf.ServerConfiguration;
+import org.apache.linkis.storage.LineMetaData;
+import org.apache.linkis.storage.LineRecord;
+import org.apache.linkis.storage.domain.Column;
+import org.apache.linkis.storage.domain.DataType;
+import org.apache.linkis.storage.resultset.table.TableMetaData;
+import org.apache.linkis.storage.resultset.table.TableRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -69,7 +61,11 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
 
     public VisualisRefExecutionOperation(DevelopmentService service) {
         this.developmentService = service;
-        this.ssoRequestOperation = new OriginSSORequestOperation(this.developmentService.getAppDesc().getAppName());
+        this.ssoRequestOperation = this.developmentService.getSSORequestService().createSSORequestOperation(getAppName());
+    }
+
+    private String getAppName() {
+        return VisualisAppConn.VISUALIS_APPCONN_NAME;
     }
 
     @Override
@@ -100,7 +96,7 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
         VisualisDownloadAction visualisDownloadAction = new VisualisDownloadAction();
         visualisDownloadAction.setUser(getUser(ref));
         SSOUrlBuilderOperation ssoUrlBuilderOperation = ref.getWorkspace().getSSOUrlBuilderOperation().copy();
-        ssoUrlBuilderOperation.setAppName(developmentService.getAppDesc().getAppName());
+        ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
         ssoUrlBuilderOperation.setWorkspace(ref.getWorkspace().getWorkspaceName());
         try{
@@ -119,8 +115,13 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
             for (Map<String, Object> recordMap : responseData.getData().getResultList()) {
                 resultSetWriter.addRecord(new TableRecord(recordMap.values().toArray()));
             }
+            resultSetWriter.flush();
+            IOUtils.closeQuietly(resultSetWriter);
+            ref.getExecutionRequestRefContext().sendResultSet(resultSetWriter);
         } catch (Throwable e){
             ref.getExecutionRequestRefContext().appendLog("Failed to debug Widget url " + url);
+            ref.getExecutionRequestRefContext().appendLog(e.getMessage());
+            logger.error("executeWidget error:",e);
             throw new ExternalOperationFailedException(90176, "Failed to debug Widget", e);
         } finally {
             IOUtils.closeQuietly(visualisDownloadAction.getInputStream());
@@ -139,7 +140,8 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
         try{
             logger.info("got workspace" + ref.getWorkspace());
             SSOUrlBuilderOperation ssoUrlBuilderOperation = ref.getWorkspace().getSSOUrlBuilderOperation().copy();
-            ssoUrlBuilderOperation.setAppName(developmentService.getAppDesc().getAppName());
+            ssoUrlBuilderOperation.setAppName(getAppName());
+            ssoUrlBuilderOperation.setAppName(getAppName());
             ssoUrlBuilderOperation.setReqUrl(previewUrl);
             ssoUrlBuilderOperation.setWorkspace(ref.getWorkspace().getWorkspaceName());
             logger.info("got getSSOUrlBuilderOperation:" + SSOIntegrationConf.gson().toJson(ssoUrlBuilderOperation));
@@ -150,17 +152,20 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
             IOUtils.copy(previewDownloadAction.getInputStream(), os);
             String response = new String(Base64.getEncoder().encode(os.toByteArray()));
 
-            ResultSetWriter resultSetWriter = ref.getExecutionRequestRefContext().createPictureResultSetWriter();
-            resultSetWriter.addRecord(new LineRecord(response));
-
             SSOUrlBuilderOperation ssoUrlBuilderOperationMeta = ref.getWorkspace().getSSOUrlBuilderOperation().copy();
-            ssoUrlBuilderOperationMeta.setAppName(developmentService.getAppDesc().getAppName());
+            ssoUrlBuilderOperationMeta.setAppName(getAppName());
+            ssoUrlBuilderOperationMeta.setAppName(getAppName());
             ssoUrlBuilderOperationMeta.setReqUrl(metaUrl);
             ssoUrlBuilderOperationMeta.setWorkspace(ref.getWorkspace().getWorkspaceName());
             metadataDownloadAction.setURL(ssoUrlBuilderOperationMeta.getBuiltUrl());
             HttpResult metaResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperationMeta, metadataDownloadAction);
             String metadata = StringUtils.chomp(IOUtils.toString(metadataDownloadAction.getInputStream(), ServerConfiguration.BDP_SERVER_ENCODING().getValue()));
+            ResultSetWriter resultSetWriter = ref.getExecutionRequestRefContext().createPictureResultSetWriter();
             resultSetWriter.addMetaData(new LineMetaData(metadata));
+            resultSetWriter.addRecord(new LineRecord(response));
+            resultSetWriter.flush();
+            IOUtils.closeQuietly(resultSetWriter);
+            ref.getExecutionRequestRefContext().sendResultSet(resultSetWriter);
         } catch (Throwable e){
             ref.getExecutionRequestRefContext().appendLog("Failed to debug Display url " + previewUrl);
             logger.error(e.getMessage(), e);
@@ -173,7 +178,7 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
     }
 
     private String getUser(AsyncExecutionRequestRef requestRef) {
-        return requestRef.getExecutionRequestRefContext().getRuntimeMap().get("wds.linkis.schedulis.submit.user").toString();
+        return requestRef.getExecutionRequestRefContext().getRuntimeMap().get("wds.dss.workflow.submit.user").toString();
     }
 
     private String getId(AsyncExecutionRequestRef requestRef) {
@@ -181,13 +186,13 @@ public class VisualisRefExecutionOperation implements RefExecutionOperation {
             String executionContent = BDPJettyServerHelper.jacksonJson().writeValueAsString(requestRef.getJobContent());
             String nodeType = requestRef.getExecutionRequestRefContext().getRuntimeMap().get("nodeType").toString();
             if("visualis.display".equalsIgnoreCase(nodeType)){
-                DisplayCreateResponseRef displayCreateResponseRef = new DisplayCreateResponseRef(executionContent);
+                VisualisCommonResponseRef displayCreateResponseRef = new VisualisCommonResponseRef(executionContent);
                 return NumberUtils.parseDoubleString(displayCreateResponseRef.getDisplayId());
             } else if("visualis.dashboard".equalsIgnoreCase(nodeType)){
-                DashboardCreateResponseRef dashboardCreateResponseRef = new DashboardCreateResponseRef(executionContent);
-                return NumberUtils.parseDoubleString(dashboardCreateResponseRef.getDashboardPortalId());
+                VisualisCommonResponseRef dashboardCreateResponseRef = new VisualisCommonResponseRef(executionContent);
+                return NumberUtils.parseDoubleString(dashboardCreateResponseRef.getDashboardId());
             } else if ("visualis.widget".equalsIgnoreCase(nodeType)){
-                WidgetCreateResponseRef widgetCreateResponseRef = new WidgetCreateResponseRef(executionContent);
+                VisualisCommonResponseRef widgetCreateResponseRef = new VisualisCommonResponseRef(executionContent);
                 return NumberUtils.parseDoubleString(widgetCreateResponseRef.getWidgetId());
             }
         } catch (Exception e) {

@@ -49,7 +49,7 @@ export default {
     }
   },
   mounted() {
-    this.getAllApi();
+    // this.getAllApi();
   },
   methods: {
     getFlow(param, resolve) {

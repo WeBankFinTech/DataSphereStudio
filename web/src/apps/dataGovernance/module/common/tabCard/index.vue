@@ -13,9 +13,11 @@
 
     <!-- bottom -->
     <div class="tab-card-b">
-      <span style="width: 110px">负责人：{{ model.owner }}</span>
-      <span style="width: 210px">创建时间：{{ model.createTime }}</span>
-      <!-- <span style="width: 210px">更新时间：{{ model.updateTime }}</span> -->
+      <div :title="model.owner">负责人：{{ model.owner }}</div>
+      <div :title="model.createTime">创建时间：{{ model.createTime }}</div>
+      <div :title="model.dbName">数据库：{{ model.dbName }}</div>
+      <div :title="subject">主题域：{{ subject }}</div>
+      <div :title="layer">分层：{{ layer }}</div>
     </div>
   </div>
 </template>
@@ -29,9 +31,53 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      modal: []
+    };
+  },
   methods: {
     onChoose() {
       this.$emit("on-choose", this.model);
+    }
+  },
+  computed: {
+    subject: function() {
+      let classifications = this.model.classifications;
+      let subject = "";
+      if (classifications && classifications.length) {
+        classifications.forEach(classification => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (classification.superTypeNames[0] === "subject") {
+              subject = classification.typeName;
+            }
+          }
+        });
+      }
+      return subject;
+    },
+    layer: function() {
+      let classifications = this.model.classifications;
+      let layer = "";
+      if (classifications && classifications.length) {
+        classifications.forEach(classification => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (
+              classification.superTypeNames[0] === "layer" ||
+              classification.superTypeNames[0] === "layer_system"
+            ) {
+              layer = classification.typeName;
+            }
+          }
+        });
+      }
+      return layer;
     }
   }
 };
@@ -40,10 +86,11 @@ export default {
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
 .tab-card-wrap {
-  min-height: 99px;
+  min-height: 10.5vh;
   padding-left: 24px;
   padding-right: 24px;
   border: 1px solid #dee4ec;
+  @include border-color(#dee4ec, $dark-border-color-base);
   border-top: none;
   border-left: none;
   display: flex;
@@ -51,16 +98,17 @@ export default {
   justify-content: center;
   cursor: pointer;
   &:hover {
-    background: #f8f9fc;
+    @include bg-color(#f8f9fc, $dark-base-color);
     box-shadow: 0 2px 12px 0 $shadow-color;
   }
   .tab-card-t {
     display: flex;
     &-l {
-      color: #3495f7;
+      @include font-color(#3495f7, $dark-text-color);
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;
+        @include border-color(#dee4ec, $dark-border-color-base);
         width: 0;
         right: -15px;
         top: 12px;
@@ -71,7 +119,7 @@ export default {
     &-r {
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       text-align: left;
       line-height: 22px;
     }
@@ -79,14 +127,18 @@ export default {
   .tab-card-b {
     font-size: 14px;
     font-family: PingFangSC-Regular;
-    color: rgba(0, 0, 0, 0.85);
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
-    display: flex;
-    span {
-      margin-right: 80px;
-      color: rgba(0, 0, 0, 0.65);
+    >div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-break: break-all;
+      overflow: hidden;
+      margin-right: 5px;
+      width: calc(33% - 5px);
+      @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
       display: inline-block;
     }
   }

@@ -1,18 +1,16 @@
 /*
+ * Copyright 2019 WeBank
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  * Copyright 2019 WeBank
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  *  you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -29,7 +27,7 @@ import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/03/10 03:24 PM
- */
 @Service
 public class NodeInputServiceImpl implements NodeInputService {
     @Autowired
@@ -87,7 +80,7 @@ public class NodeInputServiceImpl implements NodeInputService {
     }
 
     @Override
-    public String uploadAppjointResource(String userName, String projectName, DSSFlow dssFlow, String nodeJson, String flowContextId, String appjointResourcePath, Workspace workspace, String orcVersion) throws IOException {
+    public String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow, String nodeJson, String flowContextId, String appConnResourcePath, Workspace workspace, String orcVersion) throws IOException {
         Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
         String nodeType = nodeJsonMap.get("jobType").toString();
 
@@ -105,8 +98,8 @@ public class NodeInputServiceImpl implements NodeInputService {
         Map<String, Object> nodeExportContent = null;
 
         if (nodeService != null) {
-            logger.info("appJoint NodeService is exist");
-            String nodeResourcePath = appjointResourcePath + File.separator + nodeId + ".appjointre";
+            logger.info("appConn NodeService is exist");
+            String nodeResourcePath = appConnResourcePath + File.separator + nodeId + ".appconnre";
             File file = new File(nodeResourcePath);
             if (file.exists()) {
                 InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
@@ -120,7 +113,7 @@ public class NodeInputServiceImpl implements NodeInputService {
                 if (nodeExportContent != null) {
                     if (nodeExportContent.get("project_id") != null) {
                         Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
-                        logger.warn(String.format("new appjoint node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
+                        logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
                         nodeExportContent.remove("project_id");
                     }
                     nodeJsonMap.replace("jobContent", nodeExportContent);

@@ -233,14 +233,16 @@ public class NodeRestfulApi {
         Long projectID = updateExternalNodeRequest.getProjectID();
         String nodeType = updateExternalNodeRequest.getNodeType();
         Map<String, Object> params = updateExternalNodeRequest.getParams();
-        logger.info("DeletepwdExternalNode request params is " + params + ",nodeType:" + nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
-        node.setProjectId(projectID);
-        node.setNodeType(nodeType);
-        String label = updateExternalNodeRequest.getLabels().getRoute();
-        params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
-        params.put("workspace", workspace);
-        functionInvoker.nodeServiceFunction(userName, params, node, FunctionPool.deleteNode);
+        if(params!=null){
+            logger.info("DeletepwdExternalNode request params is " + params + ",nodeType:" + nodeType);
+            node.setProjectId(projectID);
+            node.setNodeType(nodeType);
+            String label = updateExternalNodeRequest.getLabels().getRoute();
+            params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
+            params.put("workspace", workspace);
+            functionInvoker.nodeServiceFunction(userName, params, node, FunctionPool.deleteNode);
+        }
         return Message.ok().data("result", node.getJobContent());
     }
 

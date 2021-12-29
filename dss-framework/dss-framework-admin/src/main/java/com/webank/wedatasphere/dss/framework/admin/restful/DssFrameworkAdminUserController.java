@@ -10,7 +10,7 @@ import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
-import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
+//import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -45,8 +45,8 @@ import java.util.Map;
 public class DssFrameworkAdminUserController extends BaseController {
     @Resource
     private DssAdminUserService dssAdminUserService;
-    @Autowired
-    private LdapService ldapService;
+//    @Autowired
+//    private LdapService ldapService;
     @Autowired
 
     DssUserMapper dssUserMapper;
@@ -72,7 +72,7 @@ public class DssFrameworkAdminUserController extends BaseController {
     //    @PostMapping("/add")
 //    @POST
 //    @Path("/add")
-    @RequestMapping(path ="add", method = RequestMethod.POST)
+/*    @RequestMapping(path ="add", method = RequestMethod.POST)
 
     public Message add(@Validated @RequestBody DssAdminUser user, @Context HttpServletRequest req
     ) {
@@ -107,7 +107,7 @@ public class DssFrameworkAdminUserController extends BaseController {
             return Message.error().data("rows", 0).message(exception.getMessage());
         }
 
-    }
+    }*/
 
 
     //    @GET
@@ -134,7 +134,7 @@ public class DssFrameworkAdminUserController extends BaseController {
 
 //    @POST
 //    @Path("/resetPsw")
-    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
+/*    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
     public Message resetPwd(@RequestBody DssAdminUser user) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
@@ -149,6 +149,6 @@ public class DssFrameworkAdminUserController extends BaseController {
         } catch (Exception exception) {
             return  Message.error().message(exception.getMessage());
         }
-    }
+    }*/
 }
 

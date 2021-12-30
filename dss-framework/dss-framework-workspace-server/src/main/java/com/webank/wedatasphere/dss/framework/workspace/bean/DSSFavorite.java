@@ -27,7 +27,7 @@ public class DSSFavorite extends BaseEntity{
     private Long menuApplicationId;
 
     private Integer order;
-
+    private String type;
     public Long getId() {
         return id;
     }
@@ -66,5 +66,12 @@ public class DSSFavorite extends BaseEntity{
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

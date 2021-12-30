@@ -1289,7 +1289,7 @@ CREATE TABLE `dss_orchestrator_release_info`  (
 
 alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT NULL COMMENT '上下文ID'
 
-
+ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';
 
 /**
  * 鲁班产品及文档 dss-guide
@@ -1326,3 +1326,4 @@ CREATE TABLE IF NOT EXISTS `dss_guide_content` (
   `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面内容详情';
+

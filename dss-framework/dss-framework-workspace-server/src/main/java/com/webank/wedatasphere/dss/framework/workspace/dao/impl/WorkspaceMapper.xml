@@ -34,7 +34,7 @@
     </sql>
 
     <sql id="favorite_main">
-        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`
+        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`,`type`
     </sql>
 
     <resultMap id="dss_workspace_user01_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01">
@@ -194,6 +194,13 @@
         <where>
             dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
             or `dss_onestop_user_favorites`.`workspace_id` = -1
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+
+            <if test="type = null">
+                AND type is null
+            </if>
         </where>
     </select>
 
@@ -204,13 +211,20 @@
         join dss_application on dss_application.id = dss_onestop_menu_application.application_id
         <where>
             dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+
+            <if test="type = null">
+                AND type is null
+            </if>
         </where>
     </select>
 
     <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite">
         INSERT INTO dss_onestop_user_favorites (<include refid = "favorite_main" />)
         VALUES
-        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})
+        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime},#{type})
     </insert>
 
     <delete id="deleteFavorite">
@@ -221,6 +235,14 @@
             menu_application_id = #{applicationId}
             AND username = #{username}
             AND workspace_id = #{workspaceId}
+        <if test="type != null">
+            AND type = #{type}
+        </if>
+
+        <if test="type = null">
+            AND type is null
+        </if>
+
     </delete>
 
 

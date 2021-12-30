@@ -595,12 +595,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese) {
-        return isChinese ? workspaceMapper.getWorkspaceFavoritesCn(username, workspaceId) : workspaceMapper.getWorkspaceFavoritesEn(username, workspaceId);
+    public List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese,String type) {
+        return isChinese ? workspaceMapper.getWorkspaceFavoritesCn(username, workspaceId,type) : workspaceMapper.getWorkspaceFavoritesEn(username, workspaceId,type);
     }
 
     @Override
-    public Long addFavorite(String username, Long workspaceId, Long menuApplicationId) {
+    public Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type) {
         DSSFavorite dssFavorite = new DSSFavorite();
         dssFavorite.setUsername(username);
         dssFavorite.setWorkspaceId(workspaceId);
@@ -609,13 +609,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssFavorite.setOrder(1);
         dssFavorite.setCreateBy(username);
         dssFavorite.setLastUpdateUser(username);
+        dssFavorite.setType(type);
         workspaceMapper.addFavorite(dssFavorite);
         return dssFavorite.getId();
     }
 
     @Override
-    public Long deleteFavorite(String username, Long applicationId, Long workspaceId) {
-        workspaceMapper.deleteFavorite(username, applicationId, workspaceId);
+    public Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type) {
+        workspaceMapper.deleteFavorite(username, applicationId, workspaceId,type);
         return applicationId;
     }
 

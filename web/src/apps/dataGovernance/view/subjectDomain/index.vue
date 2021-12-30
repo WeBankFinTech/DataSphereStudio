@@ -4,10 +4,12 @@
       <Input
         search
         enter-button
+        clearable
         placeholder="输入名称搜索"
         style="width: 300px"
         v-model="searchVal"
         @on-search="handleSearch"
+        @on-clear="handleSearch"
       />
       <Button type="primary" icon="md-add" @click="handleCreate">
         创建主题域
@@ -128,7 +130,7 @@ export default {
     async handleGetData() {
       this.loading = true
       let data = await getThemedomains(
-        this.searchVal
+        this.searchVal.trim()
       )
       this.loading = false
       this.datalist = data.result

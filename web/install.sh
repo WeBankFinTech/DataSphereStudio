@@ -41,17 +41,16 @@ fi
 # 区分版本
 version=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
 
-
-echo "========================================================================配置信息======================================================================="
-
-echo "前端访问端口：${dss_port}"
-echo "后端Linkis的地址：${linkis_url}"
-echo "静态文件地址：${dss_basepath}/dist"
-echo "当前路径：${workDir}"
-echo "本机ip：${dss_ipaddr}"
-
-echo "========================================================================配置信息======================================================================="
-echo ""
+##echo "========================================================================配置信息======================================================================="
+##
+##echo "前端访问端口：${dss_port}"
+##echo "后端Linkis的地址：${linkis_url}"
+##echo "静态文件地址：${dss_basepath}/dist"
+##echo "当前路径：${workDir}"
+##echo "本机ip：${dss_ipaddr}"
+##
+##echo "========================================================================配置信息======================================================================="
+##echo ""
 
 
 # 创建文件并配置nginx
@@ -122,7 +121,7 @@ centos7(){
     # nginx是否安装
     #sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
     sudo yum install -y nginx
-    echo "nginx 安装成功"
+    echo "Nginx installed successfully"
 
     # 配置nginx
     dssConf
@@ -198,8 +197,13 @@ fi
 if [[ $version -eq 7 ]]; then
     centos7
 fi
-echo '安装visualis前端,用户自行编译DSS前端安装包，则安装时需要把visualis的前端安装包放置于此'$dss_basepath/dss/visualis'，用于自动化安装:'
-cd $dss_basepath/dss/visualis;unzip -o build.zip  > /dev/null
-echo '安装linkis管理台,用户自行编译DSS前端安装包，则安装时需要把linkis管理台安装包放置于此'$dss_basepath/dss/linkis'，用于自动化安装:'
-cd $dss_basepath/dss/linkis;unzip -o build.zip  > /dev/null
-echo "请浏览器访问：http://${dss_ipaddr}:${dss_port}"
+#echo '安装visualis前端,用户自行编译DSS前端安装包，则安装时需要把visualis的前端安装包放置于此'$dss_basepath/dss/visualis'，用于自动化安装:'
+if test -e $dss_basepath/dss/visualis/build.zip ; then
+   cd $dss_basepath/dss/visualis;unzip -o build.zip  > /dev/null
+fi
+
+#echo '安装linkis管理台,用户自行编译DSS前端安装包，则安装时需要把linkis管理台安装包放置于此'$dss_basepath/dss/linkis'，用于自动化安装:'
+if test -e $dss_basepath/dss/linkis/build.zip ; then
+   cd $dss_basepath/dss/linkis;unzip -o build.zip  > /dev/null
+fi
+#echo "请浏览器访问：http://${dss_ipaddr}:${dss_port}"

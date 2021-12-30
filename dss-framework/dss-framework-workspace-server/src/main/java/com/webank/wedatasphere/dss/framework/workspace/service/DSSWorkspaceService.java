@@ -84,11 +84,11 @@ public interface DSSWorkspaceService {
 
     DSSWorkspace getWorkspacesById(Long id);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese);
+    List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese,String type);
 
-    Long addFavorite(String username, Long workspaceId, Long menuApplicationId);
+    Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);
 
-    Long deleteFavorite(String username, Long applicationId, Long workspaceId);
+    Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
 
 
 }

@@ -10,11 +10,11 @@ import org.apache.linkis.server.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +37,8 @@ public class DSSDbApiMonitorRestful {
     @RequestMapping(path = "list", method = RequestMethod.GET)
 
     public Message getApiList(@Context HttpServletRequest request,
-                               @QueryParam("workspaceId") Long workspaceId, @QueryParam("apiName") String apiName,
-                               @QueryParam("pageNow") Integer pageNow, @QueryParam("pageSize") Integer pageSize){
+                              @RequestParam("workspaceId") Long workspaceId, @RequestParam(value = "apiName",required = false) String apiName,
+                              @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
         if(pageNow == null){
             pageNow = 1;
         }
@@ -54,13 +54,13 @@ public class DSSDbApiMonitorRestful {
 
     @RequestMapping(path = "onlineApiCnt", method = RequestMethod.GET)
 
-    public Message getOnlineApiCnt(@QueryParam("workspaceId") Long workspaceId){
+    public Message getOnlineApiCnt(@RequestParam("workspaceId") Long workspaceId){
         return Message.ok().data("onlineApiCnt",apiMonitorService.getOnlineApiCnt(workspaceId));
     }
 
 
     @RequestMapping(path = "offlineApiCnt", method = RequestMethod.GET)
-    public Message getOfflineApiCnt(@QueryParam("workspaceId") Long workspaceId){
+    public Message getOfflineApiCnt(@RequestParam("workspaceId") Long workspaceId){
         return Message.ok().data("offlineApiCnt",apiMonitorService.getOfflineApiCnt(workspaceId));
     }
 
@@ -94,7 +94,7 @@ public class DSSDbApiMonitorRestful {
      */
 
     @RequestMapping(path = "callCntForPast24H", method = RequestMethod.GET)
-    public Message getCallCntForPast24H(@QueryParam("workspaceId") Long workspaceId) throws Exception {
+    public Message getCallCntForPast24H(@RequestParam("workspaceId") Long workspaceId) throws Exception {
         return Message.ok().data("list",apiMonitorService.getCallCntForPast24H(workspaceId));
     }
 

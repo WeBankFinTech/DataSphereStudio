@@ -203,6 +203,8 @@ public class NodeRestfulApi {
         String label = createExternalNodeRequest.getLabels().getRoute();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         params.put("workspace", workspace);
+        params.put("projectId", projectID);
+        params.put("nodeId", nodeID.toString());
         functionInvoker.nodeServiceFunction(userName, params, node, FunctionPool.createNode);
         return Message.ok().data("result", node.getJobContent());
     }
@@ -221,7 +223,11 @@ public class NodeRestfulApi {
         node.setProjectId(projectID);
         String label = updateExternalNodeRequest.getLabels().getRoute();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
+        Object nodeID = updateExternalNodeRequest.getParams().get("nodeID");
+        if (null != nodeID)
+            params.put("nodeId", nodeID.toString());
         params.put("workspace", workspace);
+        params.put("projectId", projectID);
         functionInvoker.nodeServiceFunction(userName, params, node, FunctionPool.updateNode);
         return Message.ok().data("result", node.getJobContent());
     }

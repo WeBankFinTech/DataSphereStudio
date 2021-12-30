@@ -35,6 +35,9 @@ import qualitis from '../module/process/images/newIcon/qualitis.svg';
 import python from '../module/process/images/newIcon/python.svg';
 import projectNode from '../module/process/images/newIcon/projectNode.svg'
 import mlss from '../module/process/images/newIcon/mlss.svg'
+import exchangeisSqoop from "../module/process/images/newIcon/exchangeisSqoop.svg";
+import exchangeisDatax from "../module/process/images/newIcon/exchangeisDatax.svg";
+
 const NODETYPE = {
   SHELL: 'linkis.shell.sh',
   HQL: 'linkis.hive.hql',
@@ -55,7 +58,9 @@ const NODETYPE = {
   EXCHANGE: 'linkis.data.exchange',
   QUALITIS: 'linkis.appconn.qualitis',
   PROJECTNODE: 'projectNode',
-  MLSS: 'linkis.appconn.mlss'
+  MLSS: 'linkis.appconn.mlss',
+  EXCHANGEISSQOOP: "linkis.appconn.exchangis.sqoop",
+  EXCHANGEISDATAX: "linkis.appconn.exchangis.datax"
 }
 const ext = {
   [NODETYPE.SHELL]: 'shell',
@@ -146,5 +151,13 @@ const NODEICON = {
     icon: mlss,
     class: {'mlss': true}
   },
+  [NODETYPE.EXCHANGEISSQOOP]: {
+    icon: exchangeisSqoop,
+    class: { exchangeisSqoop: true }
+  },
+  [NODETYPE.EXCHANGEISDATAX]: {
+    icon: exchangeisDatax,
+    class: { exchangeisDatax: true }
+  }
 }
 export { NODETYPE, ext, NODEICON};

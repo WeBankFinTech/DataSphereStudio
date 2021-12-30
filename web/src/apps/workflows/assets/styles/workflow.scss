@@ -110,6 +110,7 @@
       border-right: 1px solid #dee4ec;
       @include border-color($border-color-base, $dark-menu-base-color);
       @include bg-color($light-base-color, $dark-workspace-background);
+      overflow-x: hidden;
       &-top {
         display: flex;
         height: 65px;

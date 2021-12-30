@@ -473,7 +473,7 @@ $mask-color: rgba(55, 55, 55, .6);
   .designer-control {
     position: absolute;
     top: 0;
-    bottom: 0;
+    // bottom: 0; // 防止遮挡
     right: 14px;
     width: 36px;
     z-index: 1000;

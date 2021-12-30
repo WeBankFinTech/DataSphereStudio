@@ -459,7 +459,7 @@
       },
       "navList": {
         "dataStudio": "Data development",
-        "workSpace": "Workspace",
+        "workSpace": "Userspace",
         "database": "Database",
         "udfFunction": "UDF",
         "methodFunction": "Method",

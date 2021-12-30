@@ -17,20 +17,21 @@
 package com.webank.wedatasphere.dss.apiservice.core.restful;
 
 import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceQuery;
+import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
+import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
-import com.webank.wedatasphere.dss.apiservice.core.vo.*;
-import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
-import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
-import org.apache.linkis.server.Message;
-import org.apache.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.dss.apiservice.core.vo.ApiServiceVo;
+import com.webank.wedatasphere.dss.apiservice.core.vo.ApiVersionVo;
+import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
+import com.webank.wedatasphere.dss.apiservice.core.vo.QueryParamVo;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonNode;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +39,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
-import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -453,10 +454,10 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/apiCommentUpdate",method = RequestMethod.POST)
-    public Message apiCommentUpdate(@Context HttpServletRequest req, JsonNode json) {
+    public Message apiCommentUpdate(@Context HttpServletRequest req,
+                                    @RequestParam(required = false, name = "id") Long id,
+                                    @RequestParam(required = false, name = "comment") String comment) {
         //目前暂时不实际删除数据，只做不可见和不可用。
-        Long id = json.get("id").getLongValue();
-        String comment=json.get("comment").getTextValue();
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (null == id) {

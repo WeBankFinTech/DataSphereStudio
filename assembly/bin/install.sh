@@ -13,7 +13,7 @@ SERVER_IP=""
 SERVER_HOME=""
 
 local_host="`hostname --fqdn`"
-LOCAL_IP="`ifconfig | grep 'inet' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}'`"
+LOCAL_IP=$(hostname -I)
 
 #To be compatible with MacOS and Linux
 txt=""

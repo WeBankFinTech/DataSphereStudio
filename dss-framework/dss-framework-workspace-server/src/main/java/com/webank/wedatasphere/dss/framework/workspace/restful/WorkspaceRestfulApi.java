@@ -137,7 +137,17 @@ public class WorkspaceRestfulApi {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese,type);
+        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese,type==null ? "":type);
+        Set<WorkspaceFavoriteVo> favoriteVos = new HashSet<>(favorites);
+        return Message.ok().data("favorites", favoriteVos);
+    }
+
+    @RequestMapping(path ="/workspaces/{workspaceId}/components", method = RequestMethod.GET)
+    public Message getWorkspaceComponent(@Context HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,@RequestParam(value = "type",required = false) String type) {
+        String header = req.getHeader("Content-language").trim();
+        boolean isChinese = "zh-CN".equals(header);
+        String username = SecurityFilter.getLoginUsername(req);
+        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese,type==null ? "":type);
         Set<WorkspaceFavoriteVo> favoriteVos = new HashSet<>(favorites);
         return Message.ok().data("favorites", favoriteVos);
     }
@@ -154,7 +164,7 @@ public class WorkspaceRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
 //        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
         Long menuApplicationId = Long.valueOf(json.get("menuApplicationId"));
-        String type = json.get("type");
+        String type = json.get("type") == null ? "":json.get("type");
         Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId,type);
         return Message.ok().data("favoriteId", favoriteId);
     }
@@ -163,7 +173,7 @@ public class WorkspaceRestfulApi {
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites/{applicationId}", method = RequestMethod.POST)
     public Message deleteFavorite(@Context HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("applicationId") Long applicationId,@RequestBody Map<String,String> json) {
         String username = SecurityFilter.getLoginUsername(req);
-        String type = json.get("type");
+        String type = json.get("type") == null ? "":json.get("type");
         Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId,type);
         return Message.ok().data("favoriteId", favoriteId);
     }

@@ -26,14 +26,12 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceServi
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import java.util.HashSet;
 import java.util.List;
@@ -73,18 +71,18 @@ public class WorkspaceRestfulApi {
     }
 
     @RequestMapping(path ="/workspaces", method = RequestMethod.POST)
-    public Message addWorkspace(@Context HttpServletRequest req, JsonNode json) throws ErrorException {
+    public Message addWorkspace(@Context HttpServletRequest req,
+                                @RequestParam(required = false, name = "name")String name ,
+                                @RequestParam(required = false, name = "department") String department,
+                                @RequestParam(required = false, name = "label") String label,
+                                @RequestParam(required = false, name = "description") String description) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (!dssWorkspaceService.checkAdmin(userName)){
             return Message.error("您好，您不是管理员,没有权限建立工作空间");
         }
-        String name = json.get("name").getTextValue();
         if (dssWorkspaceService.existWorkspaceName(name)) {
             return Message.error("工作空间名重复");
         }
-        String department = json.get("department").getTextValue();
-        String label = json.get("label").getTextValue();
-        String description = json.get("description").getTextValue();
         String productName = "DSS";
         int workspaceId = dssWorkspaceService.createWorkspace(name, label, userName, description, department, productName);
         return Message.ok().data("workspaceId", workspaceId);
@@ -138,13 +136,12 @@ public class WorkspaceRestfulApi {
      * 应用加入收藏，返回收藏后id
      *
      * @param req
-     * @param json
      * @return
      */
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites", method = RequestMethod.POST)
-    public Message addFavorite(@Context HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, JsonNode json) {
+    public Message addFavorite(@Context HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,
+                               @RequestParam(required = false, name = "menuApplicationId") Long menuApplicationId) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
         Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId);
         return Message.ok().data("favoriteId", favoriteId);
     }

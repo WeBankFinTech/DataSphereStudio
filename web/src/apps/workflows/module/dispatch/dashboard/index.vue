@@ -175,6 +175,7 @@ export default {
       }
     },
     getMixedBarLineData(currentDay, cb) {
+      if (!this.projectName) return
       util.checkToken(() => {
         api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-paging`, {
           pageSize: 1000,

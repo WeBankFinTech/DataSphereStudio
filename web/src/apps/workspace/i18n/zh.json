@@ -108,7 +108,7 @@
       "failedNotice": "验证项未通过，请检查后再试！",
       "userManagement": "用户管理",
       "delete": "删除",
-      "editor": "编辑",
+      "edit": "编辑",
       "comfirmDelete": "确认删除",
       "role": "角色",
       "user": "用户",
@@ -177,13 +177,17 @@
       "delDataSour": "删除数据源",
       "addDataSour": "新增数据源",
       "userName": "用户名",
+      "userNamePlaceHolder": "请输入用户名",
       "password": "密码",
+      "passwordPlaceHolder": "请输入密码",
       "develop": "开发",
       "produce": "生产",
       "dataSourceAdministration": "数据源管理",
       "dataSourceName": "数据源名称",
+      "dataSourceNamePlaceHolder": "请输入数据源名称",
       "dataSourceType": "数据源类型",
       "dataSourceDesc": "数据源描述",
+      "dataSourceDescPlaceHolder": "请输入描述信息",
       "connectionInfo": "连接信息",
       "environment": "环境",
       "createTime": "创建时间",
@@ -205,7 +209,8 @@
         "status": "状态：",
         "desc": "描述：",
         "workspaceType": "工作空间类型："
-      }
+      },
+      "JdbcUrlFormat": "请输入URL，例：jdbc:mysql://ServerIP:Port/Database"
     },
     "Project": {
       "title": "项目列表",

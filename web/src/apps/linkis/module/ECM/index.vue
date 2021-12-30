@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Search @search="search" />
+    <Search @search="search" @reset="search" />
     <Table class="table-content" border :width="tableWidth" :columns="columns" :data="tableData">
       <template slot-scope="{row}" slot="engineInstance">
         <a @click="getEngineConnList(row)">{{`${row.engineType}:${row.instance}`}}</a>

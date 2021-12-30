@@ -122,7 +122,7 @@
           v-for="app in collections"
           :key="app.id"
           class="menu-item"
-          @click="goCollectedUrl"
+          @click="goCollectedUrl(app)"
         >
           {{ app.title }}
         </li>
@@ -163,6 +163,7 @@ import {
   GetFavorites,
   AddFavorite,
   RemoveFavorite,
+  GetCollections
 } from "@/common/service/apiCommonMethod.js";
 export default {
   directives: {
@@ -203,6 +204,7 @@ export default {
           this.getApplications();
           this.getWorkspaces();
           this.getWorkspaceFavorites();
+          this.getWorkspaceCollections()
         }
       })
       .catch((err) => {
@@ -258,6 +260,7 @@ export default {
               this.getApplications();
               this.getWorkspaces();
               this.getWorkspaceFavorites();
+              this.getWorkspaceCollections();
             }
           })
           .catch((err) => {
@@ -348,6 +351,17 @@ export default {
         });
       }
     },
+    getWorkspaceCollections() {
+      if (this.$route.query.workspaceId) {
+        GetCollections(this.$route.query.workspaceId).then(data => {
+          let collections = data.favorites || [];
+          collections.forEach(item => {
+            item['collectedId'] = item.menuApplicationId
+          })
+          this.collections = collections || [];
+        })
+      }
+    },
     addFavorite(app) {
       if (this.$route.query.workspaceId) {
         AddFavorite(this.$route.query.workspaceId, {
@@ -362,7 +376,6 @@ export default {
       }
     },
     removeFavorite(app) {
-
       if (this.$route.query.workspaceId) {
         RemoveFavorite({
           workspaceId: this.$route.query.workspaceId,
@@ -374,27 +387,37 @@ export default {
         });
 
         this.collections = this.collections.filter(
-          (i) => i.id !== app.id
+          (i) => i.menuApplicationId !== app.menuApplicationId
         );
       }
     },
     addCollection(app) {
-      let _this = this;
-      if (_this.$route.query.workspaceId) {
-        if ( _this.collections.length < 5 ) {
-          _this.collections = this.collections.concat(app);
+      if (this.$route.query.workspaceId) {
+        if ( this.collections.length < 5 ) {
+          AddFavorite(this.$route.query.workspaceId, {
+            menuApplicationId: app.menuApplicationId,
+            type: 'dingyiding'
+          }).then((data) => {
+            app.collectedId = app.menuApplicationId
+            this.collections = this.collections.concat(app);
+          })
         } else {
-          _this.$Message.warning('目前只支持钉五个快捷入口')
+          this.$Message.warning('目前只支持钉五个快捷入口')
         }
-
       }
     },
     removeCollection(app) {
-      let _this = this;
-      if (_this.$route.query.workspaceId) {
-        _this.collections = _this.collections.filter(
-          (i) => i.collectedId !== app.collectedId
-        );
+      app.collectedId = app.menuApplicationId
+      if (this.$route.query.workspaceId) {
+        RemoveFavorite({
+          workspaceId: this.$route.query.workspaceId,
+          applicationId: app.menuApplicationId,
+          type: 'dingyiding'
+        }).then(() => {
+          this.collections = this.collections.filter(
+            (i) => i.collectedId !== app.collectedId
+          );
+        })
       }
     },
     handleMenuClick(item) {

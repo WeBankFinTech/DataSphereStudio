@@ -1,12 +1,11 @@
 <template>
   <div class="workflow-wrap">
     <div class="workflow-nav-tree" :class="{ 'tree-fold': treeFold }">
-      <div class="workflow-nav-tree-switch">
+      <div class="workflow-nav-tree-switch" @click="handleTreeToggle">
         <span class="project-nav-tree-top-t-icon">
           <SvgIcon
             icon-class="dev_center_flod"
             style="opacity: 0.65"
-            @click="handleTreeToggle"
           />
         </span>
       </div>

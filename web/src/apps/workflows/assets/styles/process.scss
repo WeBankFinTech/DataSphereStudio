@@ -56,13 +56,6 @@
             height: 100%;
         }
     }
-    .process-tab {
-      display: none;
-      @include bg-color($light-base-color, $dark-base-color);
-    }
-    .process-container {
-      height: 100%;
-    }
   }
   .process-tab {
     display: flex;

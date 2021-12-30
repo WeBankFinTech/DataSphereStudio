@@ -1286,4 +1286,44 @@ CREATE TABLE `dss_orchestrator_release_info`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
+
+alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT NULL COMMENT '上下文ID'
+
 ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';
+
+/**
+ * 鲁班产品及文档 dss-guide
+ */
+DROP TABLE IF EXISTS `dss_guide_group`;
+CREATE TABLE IF NOT EXISTS `dss_guide_group` (
+  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
+  `path` VARCHAR(100) NOT NULL COMMENT '页面URL路径',
+  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面';
+
+DROP TABLE IF EXISTS `dss_guide_content`;
+CREATE TABLE IF NOT EXISTS `dss_guide_content` (
+  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
+  `group_id` BIGINT(50) NOT NULL COMMENT '所属页面ID',
+  `path` VARCHAR(100) NOT NULL COMMENT '所属页面URL路径',
+  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
+  `seq` VARCHAR(20) DEFAULT NULL COMMENT '序号',
+  `type` INT(1) DEFAULT '1' COMMENT '类型: 1-步骤step，2-问题question',
+  `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
+  `content_html` TEXT DEFAULT NULL COMMENT 'Markdown内容转化为HTML格式',
+  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面内容详情';
+

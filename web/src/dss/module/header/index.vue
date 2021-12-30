@@ -347,7 +347,12 @@ export default {
     getWorkspaceFavorites() {
       if (this.$route.query.workspaceId) {
         GetFavorites(this.$route.query.workspaceId).then((data) => {
-          this.favorites = data.favorites || [];
+          this.favorites = (data.favorites || []).map(item => {
+            return {
+              ...item,
+              id: item.menuApplicationId
+            }
+          });
         });
       }
     },
@@ -355,10 +360,13 @@ export default {
       if (this.$route.query.workspaceId) {
         GetCollections(this.$route.query.workspaceId).then(data => {
           let collections = data.favorites || [];
-          collections.forEach(item => {
-            item['collectedId'] = item.menuApplicationId
+          this.collections = collections.map(item => {
+            return {
+              ...item,
+              id: item.menuApplicationId,
+              collectedId: item.menuApplicationId
+            }
           })
-          this.collections = collections || [];
         })
       }
     },
@@ -369,7 +377,7 @@ export default {
         }).then((data) => {
           this.favorites = this.favorites.concat({
             ...app,
-            id: data.favoriteId,
+            id: app.id,
             menuApplicationId: app.id,
           });
         });

@@ -263,7 +263,7 @@ export default {
       value = value.trim();
       if (value) {
         this.filteredData = this.cacheData.filter(
-          item => item.name.indexOf(value) != -1
+          item => item.name && (item.name.indexOf(value) != -1)
         );
       } else {
         this.filteredData = this.cacheData;

@@ -159,7 +159,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "updateFlowBaseInfo",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message updateFlowBaseInfo(@Context HttpServletRequest req, UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+    public Message updateFlowBaseInfo(@Context HttpServletRequest req,@RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
@@ -199,7 +199,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "deleteFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message deleteFlow(@Context HttpServletRequest req, DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+    public Message deleteFlow(@Context HttpServletRequest req,@RequestBody  DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
         // TODO: 2019/6/13  projectVersionID的更新校验

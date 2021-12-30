@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.data.api.server.restful;
 
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiConfig;
 import com.webank.wedatasphere.dss.data.api.server.entity.ApiGroup;
+import com.webank.wedatasphere.dss.data.api.server.entity.VariableString;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiExecuteInfo;
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
@@ -113,11 +114,12 @@ public class DSSDbApiConfigRestful {
      * @param map
      * @return
      */
-    @RequestMapping(path ="/test/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
-    public Message testApi(@Context HttpServletRequest request, @PathVariable("path") String path, Map<String, Object> map) {
+
+    @RequestMapping(value ="/test/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
+    public Message testApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
 
         try {
-            ApiExecuteInfo resJo = apiConfigService.apiTest(path, request, map,true);
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path.getPath(), request, map,true);
             Message message = Message.ok().data("response", resJo);
             return message;
         } catch (Exception exception) {
@@ -136,10 +138,10 @@ public class DSSDbApiConfigRestful {
      * @return
      */
 
-    @RequestMapping(path ="/execute/{path:[a-zA-Z0-9_/]+}", method = RequestMethod.POST)
-    public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") String path, Map<String, Object> map) {
+    @RequestMapping(value ="/execute/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
+    public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
         try {
-            ApiExecuteInfo resJo = apiConfigService.apiExecute(path, request, map);
+            ApiExecuteInfo resJo = apiConfigService.apiExecute(path.getPath(), request, map);
             Message message = Message.ok().data("response", resJo);
             return message;
         } catch (Exception exception) {

@@ -166,6 +166,7 @@ export default {
       this.onAddClick(this.model);
     },
     handleItemClick(e) {
+      this.handleItemToggle()
       this.onItemClick(this.model);
     },
     handleItemToggle(e) {

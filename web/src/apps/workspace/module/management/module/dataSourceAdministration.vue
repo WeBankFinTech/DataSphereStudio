@@ -9,7 +9,7 @@
         </Select>
       </FormItem>
       <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')">
-        <Input v-model="searchBar.name" style="width:300px" search @on-search="search"></Input>
+        <Input v-model="searchBar.name" style="width:300px" search @on-search="search" clearable @on-clear="search"></Input>
       </FormItem>
       <FormItem>
         <Button type="primary" @click="add">{{ $t('message.workspaceManagemnet.addDataSour')}}</Button>
@@ -30,10 +30,10 @@
       </template>
       <template slot-scope="{ row }" slot="action">
         <Button
-          type="error" 
-          size="small" 
+          type="error"
+          size="small"
           @click="edit(row)">
-          {{$t('message.workspaceManagemnet.editor')}}
+          {{$t('message.workspaceManagemnet.edit')}}
         </Button>
         <Button
           type="primary"
@@ -52,19 +52,19 @@
           </Select>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')" prop="name">
-            <Input v-model="addDataSource.name" placeholder="please enter dataSourceName"></Input>
+            <Input v-model="addDataSource.name" :placeholder="$t('message.workspaceManagemnet.dataSourceNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceDesc')" prop="note">
-            <Input v-model="addDataSource.note" placeholder="please enter dataSourceDesc"></Input>
+            <Input v-model="addDataSource.note" :placeholder="$t('message.workspaceManagemnet.dataSourceDescPlaceHolder')"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
-            <Input v-model="addDataSource.url" placeholder="please enter JDBC URL"></Input>
+            <Input v-model="addDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
-            <Input v-model="addDataSource.username" placeholder="please enter userName"></Input>
+            <Input v-model="addDataSource.username" :placeholder="$t('message.workspaceManagemnet.userNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.password')" prop="pwd">
-            <Input v-model="addDataSource.pwd" placeholder="please enter userName's password"></Input>
+            <Input v-model="addDataSource.pwd" :placeholder="$t('message.workspaceManagemnet.passwordPlaceHolder')"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -90,19 +90,19 @@
           </Select>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceName')" prop="name">
-            <Input v-model="editDataSource.name" disabled placeholder="please enter dataSourceName"></Input>
+            <Input v-model="editDataSource.name" disabled :placeholder="$t('message.workspaceManagemnet.dataSourceNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.dataSourceDesc')" prop="note">
-            <Input v-model="editDataSource.note" placeholder="please enter dataSourceDesc"></Input>
+            <Input v-model="editDataSource.note" :placeholder="$t('message.workspaceManagemnet.dataSourceDescPlaceHolder')"></Input>
         </FormItem>
         <FormItem label="JDBC URL" prop="url">
-            <Input v-model="editDataSource.url" placeholder="please enter JDBC URL"></Input>
+            <Input v-model="editDataSource.url" :placeholder="$t('message.workspaceManagemnet.JdbcUrlFormat')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.userName')" prop="username">
-            <Input v-model="editDataSource.username" placeholder="please enter userName"></Input>
+            <Input v-model="editDataSource.username" :placeholder="$t('message.workspaceManagemnet.userNamePlaceHolder')"></Input>
         </FormItem>
         <FormItem :label="$t('message.workspaceManagemnet.password')" prop="pwd">
-            <Input v-model="editDataSource.pwd" placeholder="please enter userName's password"></Input>
+            <Input v-model="editDataSource.pwd" :placeholder="$t('message.workspaceManagemnet.passwordPlaceHolder')"></Input>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -179,7 +179,7 @@ export default {
           {max: 200, message: this.$t('message.workspaceManagemnet.lengthValidateMsg', {name: this.$t("message.workspaceManagemnet.dataSourceDesc"), len: 200}), trigger: "blur"}
         ],
         url: [
-          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "url"}), trigger: "blur"}
+          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "URL"}), trigger: "blur"}
         ],
         username: [
           {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: this.$t("message.workspaceManagemnet.userName")}), trigger: "blur"},
@@ -204,7 +204,7 @@ export default {
           {max: 200, message: this.$t('message.workspaceManagemnet.lengthValidateMsg', {name: this.$t("message.workspaceManagemnet.dataSourceDesc"), len: 200}), trigger: "blur"}
         ],
         url: [
-          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "url"}), trigger: "blur"}
+          {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: "URL"}), trigger: "blur"}
         ],
         username: [
           {required: true, message: this.$t('message.workspaceManagemnet.NotNullMsg', {name: this.$t("message.workspaceManagemnet.userName")}), trigger: "blur"},
@@ -227,14 +227,14 @@ export default {
   },
   filters: {
     // 时间戳转日期格式
-    timestampToTime(timestamp){ 
-      let date = new Date(timestamp), 
-        Y = date.getFullYear() + '-', 
-        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-', 
-        D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ', 
-        h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':', 
-        m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':', 
-        s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()); 
+    timestampToTime(timestamp){
+      let date = new Date(timestamp),
+        Y = date.getFullYear() + '-',
+        M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-',
+        D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ',
+        h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':',
+        m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':',
+        s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
       return Y + M + D + h + m + s
     }
   },
@@ -243,7 +243,7 @@ export default {
       api.fetch(`${this.$API_PATH.DATASOURCE_PATH}list`,{
         workspaceId: this.workspaceId,
         type: this.searchBar.type,
-        name: "%" + this.searchBar.name + "%"
+        name: "%" + this.searchBar.name.trim() + "%"
       },'get').then((ret)=>{
         this.data.datalist = ret.allDs
       })

@@ -61,16 +61,30 @@
           </div> -->
           <div class="bottomRightContainer">
             <div class="tap-menu">
-              <Dropdown @on-click="swtichMenu">
-                <a href="javascript:void(0)">
+              <!-- <Dropdown @on-click="swtichMenu">
+                <a href="javascript:void(0)" style="text-decoration: none;">
                   {{ currentMenu }}
                   <Icon type="ios-arrow-down"></Icon>
                 </a>
                 <DropdownMenu slot="list">
-                  <DropdownItem name='dev_center'>开发中心</DropdownItem>
-                  <DropdownItem name='devOps_center'>运维中心</DropdownItem>
+                  <DropdownItem name='dev'>开发中心</DropdownItem>
+                  <DropdownItem name="scheduler">运维中心</DropdownItem>
                   <DropdownItem name='calc_center'>实时计算中心</DropdownItem>
                 </DropdownMenu>
+              </Dropdown> -->
+              <Dropdown @on-click="handleChangeButton">
+                <a href="javascript:void(0)" style="text-decoration: none;">
+                  {{ currentButton.dicName }}
+                  <Icon type="ios-arrow-down"></Icon>
+                </a>
+                <Dropdown-menu slot="list">
+                  <Dropdown-item
+                    v-for="item in buttonText"
+                    :key="item.dicKey"
+                    :name="item.dicValue"
+                    >{{ item.dicName }}</Dropdown-item
+                  >
+                </Dropdown-menu>
               </Dropdown>
             </div>
             <template v-for="(work, index) in bottomTapList">
@@ -164,11 +178,11 @@ export default {
     return {
       currentButton: {},
       menuList: {
-        'dev_center': '开发中心',
-        'devOps_center': '运维中心',
-        'calc_center': '实时计算中心',
+        dev: "开发中心",
+        scheduler: "运维中心",
+        calc_center: "实时计算中心"
       },
-      currentMenu: '开发中心'
+      currentMenu: "开发中心"
     };
   },
   computed: {},
@@ -213,13 +227,13 @@ export default {
     },
     selectProject() {
       this.$emit("selectProject");
-      eventbus.emit("workflow.change", "dev");
     },
     menuHandleChangeButton() {
       this.$emit("menuHandleChangeButton");
     },
     swtichMenu(name) {
-      this.currentMenu = this.menuList[name]
+      this.handleChangeButton(name);
+      this.currentMenu = this.menuList[name];
     }
   }
 };

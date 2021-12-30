@@ -57,6 +57,9 @@ const GetAreaMap = () =>  api.fetch(`${API_PATH.PROJECT_PATH}listApplicationArea
 // 获取常用功能列表
 const GetFavorites = (workspaceId) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, workspaceId, 'get')
 
+// 获奖 钉一钉 功能列表
+const GetCollections = (workspaceId) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/components`, {workspaceId, type: 'dingyiding'}, 'get')
+
 // 添加常用应用
 const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${workspaceId}/favorites`, data, 'post')
 
@@ -79,5 +82,6 @@ export {
   GetWorkspaceBaseInfo,
   GetFavorites,
   AddFavorite,
-  RemoveFavorite
+  RemoveFavorite,
+  GetCollections
 }

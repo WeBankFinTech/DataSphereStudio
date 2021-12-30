@@ -1,7 +1,7 @@
 <template>
   <div class="page-bgc">
     <div v-if="!dataMapModule" style="width: 100%; height: 100%">
-      <template
+      <!-- <template
         v-if="
           dataList[0]['dwsFlowList'] && dataList[0]['dwsFlowList'].length > 0
         "
@@ -25,7 +25,6 @@
           @publish="orchestratorPublish"
           @Export="orchestraorExport"
         >
-          <!--以下header-search部分不再显示，若删除代码需要清理很多相关代码，暂时保留不显示即可-->
           <div class="workflow-header-search">
             <div>
               <Button
@@ -53,24 +52,16 @@
               :placeholder="$t('message.workflow.searchWorkflow')"
               @on-change="searchWorkflow($event, item.id)"
             />
-            <!-- 地图模式先去掉 -->
-            <!-- <Button type="primary" @click="dataMapModule = !dataMapModule" v-if="checkEditable">
-              <Icon type="md-repeat"></Icon>
-              {{dataMapModule ? $t('message.workflow.narmalModel') : $t('message.workflow.mapModel')}}
-            </Button>
-            <Button type="primary" @click="gotoBack">
-              <Icon type="md-arrow-round-back"></Icon>
-              {{$t('message.workflow.backItem')}}
-            </Button> -->
           </div>
           <slot name="tagList"></slot>
         </project-content-item>
-      </template>
+      </template> -->
 
-      <template v-else>
-        <VoidPage
-          tipTitle="该项目下没有工作流，请先添加一个工作流"
-          :buttonClick="ProjectMergeAdd"
+      <template v-if="!topTapList || topTapList.length === 0">
+        <Void
+          :addProject="createProjectHandler"
+          :addWrokFlow="ProjectMergeAdd"
+          :goto="gotoLastWorkflow"
         />
       </template>
 
@@ -143,6 +134,7 @@
             :workflow-data="currentOrchetratorData"
             :orchestratorModeList="orchestratorModeList"
             :selectOrchestratorList="selectOrchestratorList"
+            :projectNameList="formatProjectNameList"
             @cancel="ProjectMergeCancel"
             @confirm="ProjectMergeConfirm"
           ></WorkflowFormNew>
@@ -173,11 +165,11 @@
   </div>
 </template>
 <script>
-import commonModule from "@/apps/workflows/module/common";
+// import commonModule from "@/apps/workflows/module/common";
 import WorkflowForm from "./module/workflowForm.vue";
 import WorkflowFormNew from "./module/workflowFormNew.vue";
 import VersionDetail from "./module/versionDetail.vue";
-import VoidPage from "../common/voidPage/index.vue";
+import Void from "../common/voidPage/void.vue";
 import storage from "@/common/helper/storage";
 import api from "@/common/service/api";
 import pinyin from "pinyin";
@@ -187,35 +179,47 @@ import { GetAreaMap } from "@/common/service/apiCommonMethod.js";
 import axios from "axios";
 export default {
   props: {
+    topTapList: {
+      type: Array,
+      default: () => []
+    },
     projectData: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     orchestratorModeList: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     currentMode: {
       type: String,
-      default: null,
+      default: null
     },
     selectOrchestratorList: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     refreshFlow: {
       type: Boolean,
-      default: false,
+      default: false
     },
+    createProjectHandler: {
+      type: Function,
+      default: () => {}
+    },
+    projectsTree: {
+      type: Array,
+      default: () => []
+    }
   },
   components: {
-    projectContentItem: commonModule.component.workflowContentItem,
+    // projectContentItem: commonModule.component.workflowContentItem,
     WorkflowForm,
     WorkflowFormNew,
     VersionDetail,
     dataMap,
     publishComponent,
-    VoidPage,
+    Void
   },
   data() {
     return {
@@ -230,14 +234,14 @@ export default {
       loading: false,
       projectClassify: {
         name: "",
-        descipte: "",
+        descipte: ""
       },
       dataList: [
         {
           id: 1,
           name: "My workflow",
-          dwsFlowList: [],
-        },
+          dwsFlowList: []
+        }
       ], // 右侧数据过滤后的
       cacheData: [], // 工作流初始树结构，用于搜索过滤
       params: "",
@@ -258,10 +262,22 @@ export default {
   computed: {
     checkEditable() {
       if (this.projectData.editUsers && this.projectData.editUsers.length > 0) {
-        return this.projectData.editUsers.some((e) => e === this.getUserName());
+        return this.projectData.editUsers.some(e => e === this.getUserName());
       } else {
         return false;
       }
+    },
+    // 整理项目列表
+    formatProjectNameList() {
+      let res = [];
+      if( this.projectsTree.length > 0 ) {
+        this.projectsTree.forEach(item => {
+          let name = item.name;
+          let id = item.id + '';
+          res.push({name, id})
+        })
+      }
+      return res;
     },
   },
   watch: {
@@ -286,11 +302,11 @@ export default {
         // 收到通知刷新flow
         this.fetchFlowData();
       }
-    },
+    }
   },
   created() {
     this.fetchFlowData();
-    GetAreaMap().then((res) => {
+    GetAreaMap().then(res => {
       this.applicationAreaMap = res.applicationAreas;
     });
   },
@@ -317,7 +333,7 @@ export default {
       this.params = {
         workspaceId: this.$route.query.workspaceId,
         projectId: this.$route.query.projectID,
-        orchestratorMode: this.currentMode,
+        orchestratorMode: this.currentMode
       };
     },
     // 获取所有分类和工作流
@@ -330,7 +346,7 @@ export default {
           params,
           "post"
         )
-        .then((res) => {
+        .then(res => {
           this.dataList[0].dwsFlowList = res.page;
           this.cacheData = this.dataList;
           this.loading = false;
@@ -340,14 +356,19 @@ export default {
         });
     },
     ProjectMergeAdd() {
-      this.mergeModalShow = true;
-      this.init();
-      this.initUpload();
+      if(!this.projectsTree.length) {
+        this.$Message.warning(this.$t("message.orchestratorModes.noProjectWarning"));
+      } else {
+        this.mergeModalShow = true;
+        this.init();
+        this.initUpload();
+      }
     },
     ProjectMergeCancel() {
       this.mergeModalShow = false;
     },
     ProjectMergeConfirm(orchestratorData) {
+      console.log('orchestratorData', orchestratorData)
       orchestratorData.dssLabels = [this.getCurrentDsslabels()];
       orchestratorData.labels = { route: this.getCurrentDsslabels() };
       if (
@@ -377,7 +398,7 @@ export default {
       // 更新左侧tree，同时父组件会通知刷新flow
       this.$emit("on-tree-modal-confirm", {
         id: this.$route.query.projectID,
-        name: this.$route.query.projectName,
+        name: this.$route.query.projectName
       });
     },
     // 新增工作流
@@ -428,7 +449,7 @@ export default {
           id,
           description,
           uses,
-          labels,
+          labels
         } = orchestratorData;
         api
           .fetch(
@@ -442,7 +463,7 @@ export default {
               id,
               description,
               uses,
-              labels,
+              labels
             },
             "post"
           )
@@ -450,7 +471,7 @@ export default {
             this.loading = false;
             this.$Message.success(
               this.$t("message.workflow.eitorSuccess", {
-                name: orchestratorData.orchestratorName,
+                name: orchestratorData.orchestratorName
               })
             );
             this.getParams();
@@ -461,14 +482,13 @@ export default {
           })
           .catch(() => {
             this.loading = false;
-            this.currentOrchetratorData.uses =
-              this.$refs.workflowForm.originBusiness;
+            this.currentOrchetratorData.uses = this.$refs.workflowForm.originBusiness;
           });
       }
     },
     // 删除单项工作流
     deleteWorkflow(params) {
-      const _params = this.dataList[0]["dwsFlowList"].filter((item) => {
+      const _params = this.dataList[0]["dwsFlowList"].filter(item => {
         return (
           item.orchestratorName == params.orchestratorName &&
           item.orchestratorId == params.orchestratorId
@@ -487,7 +507,7 @@ export default {
         projectId: this.deleteProjectItem.projectId,
         workspaceId: this.deleteProjectItem.workspaceId,
         dssLabels: [this.getCurrentDsslabels()],
-        labels: { route: this.getCurrentDsslabels() },
+        labels: { route: this.getCurrentDsslabels() }
       };
       api
         .fetch(
@@ -495,7 +515,7 @@ export default {
           params,
           "post"
         )
-        .then((res) => {
+        .then(res => {
           this.loading = false;
           if (res.warmMsg) {
             this.$Modal.confirm({
@@ -509,7 +529,7 @@ export default {
                   .then(() => {
                     this.$Message.success(
                       this.$t("message.workflow.deleteSuccessName", {
-                        name: this.deleteProjectItem.name,
+                        name: this.deleteProjectItem.name
                       })
                     );
                     // this.getParams();
@@ -521,12 +541,12 @@ export default {
                   .catch(() => {
                     this.loading = false;
                   });
-              },
+              }
             });
           } else {
             this.$Message.success(
               this.$t("message.workflow.deleteSuccessName", {
-                name: this.deleteProjectItem.name,
+                name: this.deleteProjectItem.name
               })
             );
             // this.getParams();
@@ -548,7 +568,7 @@ export default {
         orchestratorMode: "",
         orchestratorWays: null,
         projectId: this.$route.query.projectID,
-        workspaceId: this.$route.query.workspaceId,
+        workspaceId: this.$route.query.workspaceId
       };
     },
     // 修改编排
@@ -561,7 +581,7 @@ export default {
     },
     workflowModify(params) {
       const classifyId = this.$refs.projectConentItem[0].currentData.id;
-      const _params = this.dataList[0]["dwsFlowList"].filter((item) => {
+      const _params = this.dataList[0]["dwsFlowList"].filter(item => {
         return (
           item.orchestratorName == params.orchestratorName &&
           item.orchestratorId == params.orchestratorId
@@ -580,7 +600,7 @@ export default {
         name: node.title,
         version: "",
         releasable: node.releasable,
-        editable: node.editable,
+        editable: node.editable
       });
     },
     // 点击工程跳转到工作流编辑
@@ -594,15 +614,62 @@ export default {
         orchestratorMode: subItem.orchestratorMode,
         releasable: subItem.releasable, // 可发布权限字段
         editable: subItem.editable,
-        priv: subItem.priv, // 权限字段
+        priv: subItem.priv // 权限字段
       });
+    },
+    // 最近打开点击入口
+    gotoLastWorkflow(workflow) {
+      let that = this;
+      const params = {
+        workspaceId: this.$route.query.workspaceId,
+        projectId:
+          (workflow.query && workflow.query.projectID) ||
+          this.$route.query.projectID,
+        orchestratorMode: this.currentMode
+      };
+      if (!params.projectId) return;
+      this.loading = true;
+      api
+        .fetch(
+          `${this.$API_PATH.PROJECT_PATH}getAllOrchestrator`,
+          params,
+          "post"
+        )
+        .then(res => {
+          let dwsFlowList = res.page;
+          const { id } = workflow;
+          let subItem = null;
+          dwsFlowList.forEach( item => {
+            if( item.orchestratorId == id ) {
+              subItem = item
+            }
+          })
+          // 这里的一定是最新版本
+          that.$emit("open-workflow", {
+            workspaceId: params.workspaceId,
+            projectID: params.projectID,
+            projectName: workflow.query && workflow.query.projectName,
+            id: subItem.orchestratorId,
+            name: subItem.orchestratorName,
+            version: String(subItem.orchestratorVersionId),
+            orchestratorMode: subItem.orchestratorMode,
+            releasable: subItem.releasable, // 可发布权限字段
+            editable: subItem.editable,
+            priv: subItem.priv, // 权限字段
+            lastedNode: true,
+          });
+          that.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     // 查看版本详情
     versionDetail(classifyId, project) {
       this.versionDetailShow = true;
       this.currentOrchetratorData = project;
       const prams = {
-        orchestratorId: project.orchestratorId,
+        orchestratorId: project.orchestratorId
       };
       api
         .fetch(
@@ -610,7 +677,7 @@ export default {
           prams,
           "post"
         )
-        .then((res) => {
+        .then(res => {
           // 新加tab功能需要工作流名称
           this.versionData = res.list || [];
         });
@@ -621,9 +688,9 @@ export default {
     searchWorkflow(event, id) {
       let tepArray = JSON.parse(JSON.stringify(this.cacheData));
       if (event.target.value) {
-        this.dataList = tepArray.map((item) => {
+        this.dataList = tepArray.map(item => {
           if (id === item.id) {
-            item.dwsFlowList = item.dwsFlowList.filter((subItem) => {
+            item.dwsFlowList = item.dwsFlowList.filter(subItem => {
               return subItem.orchestratorName.indexOf(event.target.value) != -1;
             });
           }
@@ -636,7 +703,7 @@ export default {
     // 分类重名检查
     checkName(data, name, id) {
       let flag = false;
-      data.map((item) => {
+      data.map(item => {
         if (item.orchestratorName === name && item.id !== id) {
           flag = true;
         }
@@ -659,7 +726,7 @@ export default {
         orchestratorMode: this.currentOrchetratorData.orchestratorMode,
         readonly: row._index === 0 ? "false" : "true",
         appId: row.appId,
-        orchestratorVersionId: row.id,
+        orchestratorVersionId: row.id
       });
     },
     goBack() {
@@ -701,7 +768,7 @@ export default {
     gotoBack() {
       let workspaceId = this.$route.query.workspaceId;
       this.$router.push({
-        path: `/workspaceHome?workspaceId=${workspaceId}`,
+        path: `/workspaceHome?workspaceId=${workspaceId}`
       });
     },
     // 编排的发布
@@ -725,8 +792,8 @@ export default {
         addOrcVersion: false,
         dssLabels: this.getCurrentDsslabels(),
         labels: {
-          route: this.getCurrentDsslabels(),
-        },
+          route: this.getCurrentDsslabels()
+        }
       };
       // 返回结构不一样
       axios
@@ -734,10 +801,10 @@ export default {
           `http://${window.location.host}/api/rest_j/v1/dss/framework/orchestrator/exportOrchestrator`,
           {
             params,
-            responseType: "arraybuffer",
+            responseType: "arraybuffer"
           }
         )
-        .then((res) => {
+        .then(res => {
           const blob = new Blob([res.data], { type: "application/zip" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -793,16 +860,16 @@ export default {
     commonCancel() {},
     // 清除发布结束的编排
     removeRuning(id) {
-      this.publishingList = this.publishingList.filter((i) => i !== id);
+      this.publishingList = this.publishingList.filter(i => i !== id);
     },
     initUpload() {
       this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`;
       this.uploadData = {
         projectName: this.$route.query.projectName,
         projectID: +this.$route.query.projectID,
-        dssLabels: "dev",
+        dssLabels: "dev"
       };
-      this.$refs.uploadJson.clearFiles();
+      // this.$refs.uploadJson.clearFiles();
     },
 
     orchestratorImport() {
@@ -811,8 +878,8 @@ export default {
         projectName: this.$route.query.projectName,
         projectID: +this.$route.query.projectID,
         labels: JSON.stringify({
-          route: "dev",
-        }),
+          route: "dev"
+        })
       };
       this.importModal = true;
     },
@@ -845,8 +912,8 @@ export default {
           ? storage.get("currentDssLabels")
           : null)
       );
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 @RestController
@@ -46,7 +45,6 @@ public class ContextServiceRestful {
         String nodeName = tablesRequest.getNodeName();
         return Message.ok().data("tables", csTableService.queryTables("default", contextIDStr, nodeName));
     }
-
 
     @RequestMapping(value = "columns",method = RequestMethod.POST)
     public Message queryTableMeta(@Context HttpServletRequest req,@RequestBody QueryTableMetaRequest queryTableMetaRequest) throws DSSErrorException {

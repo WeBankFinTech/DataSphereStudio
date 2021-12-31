@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.restful;
 
+import com.webank.wedatasphere.dss.apiservice.core.bo.ApiCommentUpdateRequest;
 import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceQuery;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
@@ -455,8 +456,9 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiCommentUpdate",method = RequestMethod.POST)
     public Message apiCommentUpdate(@Context HttpServletRequest req,
-                                    @RequestParam(required = false, name = "id") Long id,
-                                    @RequestParam(required = false, name = "comment") String comment) {
+                                    @RequestBody ApiCommentUpdateRequest apiCommentUpdateRequest) {
+        Long id = apiCommentUpdateRequest.getId();
+        String comment = apiCommentUpdateRequest.getComment();
         //目前暂时不实际删除数据，只做不可见和不可用。
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);

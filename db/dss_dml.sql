@@ -59,7 +59,7 @@ DELETE FROM dss_onestop_menu;
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('1','应用开发','application development','应用开发','应用开发描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('2','数据分析','data analysis','数据分析','数据分析描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('3','生产运维','production operation','生产运维','生产运维描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
-INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('4','数据质量','data quality','数据质量','数据质量描述','0',NULL,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('4','数据质量','data quality','数据质量','数据质量描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_onestop_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('5','管理员功能','administrator function','管理员功能','管理员功能描述','0',NULL,NULL,NULL,NULL,NULL,NULL);
 
 DELETE FROM dss_onestop_menu_application;

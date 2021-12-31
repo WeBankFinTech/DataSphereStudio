@@ -14,6 +14,7 @@ SERVER_HOME=""
 
 local_host="`hostname --fqdn`"
 LOCAL_IP=$(hostname -I)
+LOCAL_IP=${LOCAL_IP// /}
 
 #To be compatible with MacOS and Linux
 txt=""
@@ -113,11 +114,11 @@ function replaceCommonIp() {
   fi
 
  if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
-   echo "GATEWAY_INSTALL_IP is equals $GATEWAY_INSTALL_IP ,we will change it to ip address"
+   #echo "GATEWAY_INSTALL_IP is equals $GATEWAY_INSTALL_IP ,we will change it to ip address"
    GATEWAY_INSTALL_IP=$LOCAL_IP
  fi
  if [[ $EUREKA_INSTALL_IP == "127.0.0.1" ]] || [ -z "$EUREKA_INSTALL_IP" ]; then
-    echo "EUREKA_INSTALL_IP is equals $EUREKA_INSTALL_IP ,we will change it to ip address"
+    #echo "EUREKA_INSTALL_IP is equals $EUREKA_INSTALL_IP ,we will change it to ip address"
     EUREKA_INSTALL_IP=$LOCAL_IP
  fi
 }

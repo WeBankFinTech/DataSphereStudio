@@ -21,6 +21,8 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Homepag
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddFavoriteRequest;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import org.apache.linkis.common.exception.ErrorException;
@@ -70,14 +72,15 @@ public class WorkspaceRestfulApi {
         return Message.ok().data("workspaceNameExists", exists);
     }
 
-    @RequestMapping(path ="/workspaces", method = RequestMethod.POST)
+    @RequestMapping(path = "/workspaces", method = RequestMethod.POST)
     public Message addWorkspace(@Context HttpServletRequest req,
-                                @RequestParam(required = false, name = "name")String name ,
-                                @RequestParam(required = false, name = "department") String department,
-                                @RequestParam(required = false, name = "label") String label,
-                                @RequestParam(required = false, name = "description") String description) throws ErrorException {
+                                @RequestBody AddWorkspaceRequest addWorkspaceRequest) throws ErrorException {
+        String name = addWorkspaceRequest.getName();
+        String department = addWorkspaceRequest.getDepartment();
+        String label = addWorkspaceRequest.getLabel();
+        String description = addWorkspaceRequest.getDescription();
         String userName = SecurityFilter.getLoginUsername(req);
-        if (!dssWorkspaceService.checkAdmin(userName)){
+        if (!dssWorkspaceService.checkAdmin(userName)) {
             return Message.error("您好，您不是管理员,没有权限建立工作空间");
         }
         if (dssWorkspaceService.existWorkspaceName(name)) {
@@ -140,9 +143,9 @@ public class WorkspaceRestfulApi {
      */
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites", method = RequestMethod.POST)
     public Message addFavorite(@Context HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,
-                               @RequestParam(required = false, name = "menuApplicationId") Long menuApplicationId) {
+                               @RequestBody AddFavoriteRequest addFavoriteRequest) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId);
+        Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, addFavoriteRequest.getMenuApplicationId());
         return Message.ok().data("favoriteId", favoriteId);
     }
 

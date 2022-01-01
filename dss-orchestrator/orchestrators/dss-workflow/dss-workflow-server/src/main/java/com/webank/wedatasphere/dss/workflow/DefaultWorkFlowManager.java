@@ -128,9 +128,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Override
     public DSSFlow copyRootflowWithSubflows(String userName, long rootFlowId, String workspaceName, String projectName, String contextIdStr, String version, String description) throws DSSErrorException, IOException {
-
         return flowService.copyRootFlow(rootFlowId, userName, workspaceName, projectName, version,contextIdStr);
-
     }
 
     @Override
@@ -176,7 +174,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                String resourceId,
                                String bmlVersion,
                                DSSFlowImportParam dssFlowImportParam) throws DSSErrorException, IOException {
-
         //todo download workflow bml file contains flowInfo and flowRelationInfo
         String inputZipPath = IoUtils.generateIOPath(userName, dssFlowImportParam.getProjectName(), dssFlowImportParam.getProjectName() + ".zip");
         bmlService.downloadToLocalPath(userName, resourceId, bmlVersion, inputZipPath);

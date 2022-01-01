@@ -152,7 +152,6 @@ public class ContextServiceImpl implements ContextService {
                 workTypes.add(WorkType.PROJECT);
                 workTypes.add(WorkType.FLOW);
                 csWorkService.initContextServiceInfo(contextIDStr, workTypes);
-
                 // ②解析和保存新的 UDF、Resource、Variable
                 // 保存Workspace和Project的资源参数等
 //                if (null != project.getProjectResources() && project.getProjectResources().size() > 0) {
@@ -175,6 +174,8 @@ public class ContextServiceImpl implements ContextService {
                     JsonArray nodes = flowObject.get(DSSCommonUtils.FLOW_NODE_NAME).getAsJsonArray();
                     for (JsonElement node : nodes) {
                         JsonObject json = node.getAsJsonObject();
+                        String nodeName =json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString();
+                        initContextNodeVarInfo(contextIDStr,nodeName,contextClient);
                         if (json.has(DSSCommonUtils.NODE_RESOURCE_NAME)) {
                             JsonArray nodeRes = json.get(DSSCommonUtils.NODE_RESOURCE_NAME).getAsJsonArray();
                             saveContextResource(contextIDStr, nodeRes, contextClient,
@@ -182,11 +183,12 @@ public class ContextServiceImpl implements ContextService {
                         }
                         if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
                             JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
-                            if (nodePropObj.has(DSSCommonUtils.NODE_PROP_VARIABLE_NAME)) {
-                                JsonElement nodeVariables = nodePropObj.get(DSSCommonUtils.NODE_PROP_VARIABLE_NAME);
-                                saveContextVariable(contextIDStr, nodeVariables, contextClient,
-                                        CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
-                            }
+                            //节点的CS变量先不做存储，解决脚本节点执行变量没有及时清理问题
+//                            if (nodePropObj.has(DSSCommonUtils.NODE_PROP_VARIABLE_NAME)) {
+//                                JsonElement nodeVariables = nodePropObj.get(DSSCommonUtils.NODE_PROP_VARIABLE_NAME);
+//                                saveContextVariable(contextIDStr, nodeVariables, contextClient,
+//                                        CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
+//                            }
                         }
                     }
                 }
@@ -196,6 +198,15 @@ public class ContextServiceImpl implements ContextService {
         } catch (Exception e) {
             logger.error("CheckAndSaveContext error. jsonFlow : {}, parentFlowId : {}, e : ", jsonFlow, parentFlowID, e);
             throw new DSSErrorException(ErrorCode.INVALID_PARAMS, "CheckAndSaveContext error : " + e.getMessage());
+        }
+    }
+
+    private void initContextNodeVarInfo(String contextIDStr,String nodeName,ContextClient contextClient){
+        try {
+            ContextID contextID  = SerializeHelper.deserializeContextID(contextIDStr);
+            contextClient.removeAllValueByKeyPrefixAndContextType(contextID, ContextType.Variable, CSCommonUtils.NODE_PREFIX + nodeName);
+        } catch (ErrorException e) {
+            logger.error("CheckAndSaveContext error. ContextID : {}, nodeName : {}, e : ", contextIDStr,nodeName, e);
         }
     }
 
@@ -258,7 +269,7 @@ public class ContextServiceImpl implements ContextService {
                 contextKeyPrefix = uniKeyPrefix;
                 break;
             case CSCommonUtils.NODE_PREFIX:
-                contextKeyPrefix = uniKeyPrefix + nodeName + "." + CSCommonUtils.RESOURCE_PREFIX;
+                contextKeyPrefix = uniKeyPrefix + nodeName + "." + CSCommonUtils.VARIABLE_PREFIX;
                 break;
             default:
                 logger.error("Invalid contextKeyPrefix : {}", uniKeyPrefix);
@@ -269,7 +280,7 @@ public class ContextServiceImpl implements ContextService {
         linkisVariable.setValue(entry.getValue().getAsString());
         ContextKey contextKey = new CommonContextKey();
         contextKey.setKey(contextKeyPrefix + linkisVariable.getKey());
-        contextKey.setContextType(ContextType.OBJECT);
+        contextKey.setContextType(ContextType.Variable);
         contextKey.setContextScope(ContextScope.PUBLIC);
         ContextValue contextValue = new CommonContextValue();
         contextValue.setValue(linkisVariable);
@@ -406,7 +417,4 @@ public class ContextServiceImpl implements ContextService {
             logger.error("Set ContextKeyValue error. contextIDStr ");
         }
     }
-
-
-
 }

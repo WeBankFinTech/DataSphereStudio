@@ -72,7 +72,6 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         return nodeInfoMapper.listNodeGroups();
     }
 
-
     @Override
     public Map<String, Object> createNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
@@ -106,7 +105,6 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
             ref.setOrcName(node.getFlowName());
 
             // parse to external ProjectId
-
             ref.setProjectId(parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
             ref.setProjectName(node.getProjectName());
             ref.setNodeType(node.getNodeType());

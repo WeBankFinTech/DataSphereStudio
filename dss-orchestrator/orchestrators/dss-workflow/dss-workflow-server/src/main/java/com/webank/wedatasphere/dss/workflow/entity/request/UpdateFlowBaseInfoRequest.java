@@ -1,11 +1,14 @@
 package com.webank.wedatasphere.dss.workflow.entity.request;
 
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+
 public class UpdateFlowBaseInfoRequest {
 
     private Long id;
     private String name;
     private String description ;
     private String uses;
+    private LabelRouteVO labels;
 
     public Long getId() {
         return id;
@@ -37,5 +40,13 @@ public class UpdateFlowBaseInfoRequest {
 
     public void setUses(String uses) {
         this.uses = uses;
+    }
+
+    public LabelRouteVO getLabels() {
+        return labels;
+    }
+
+    public void setLabels(LabelRouteVO labels) {
+        this.labels = labels;
     }
 }

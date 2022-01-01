@@ -75,11 +75,9 @@ public class FlowRestfulApi {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName,name,contextId,description,parentFlowID,uses,null,dssLabelList);
-
         // TODO: 2019/5/16 空值校验，重复名校验
         return Message.ok().data("flow", dssFlow);
     }
-
 
     @RequestMapping(value = "publishWorkflow",method = RequestMethod.POST)
     public Message publishWorkflow(@Context HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) {
@@ -109,7 +107,6 @@ public class FlowRestfulApi {
         }
         return message;
     }
-
 
     /**
      * 获取发布任务状态
@@ -148,7 +145,6 @@ public class FlowRestfulApi {
         return message;
     }
 
-
     /**
      * 更新工作流的基本信息，不包括更新Json,BML版本等
      * @param req
@@ -156,10 +152,9 @@ public class FlowRestfulApi {
      * @return
      * @throws DSSErrorException
      */
-
     @RequestMapping(value = "updateFlowBaseInfo",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message updateFlowBaseInfo(@Context HttpServletRequest req, UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+    public Message updateFlowBaseInfo(@Context HttpServletRequest req,@RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
@@ -199,7 +194,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "deleteFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message deleteFlow(@Context HttpServletRequest req, DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+    public Message deleteFlow(@Context HttpServletRequest req,@RequestBody  DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
         // TODO: 2019/6/13  projectVersionID的更新校验

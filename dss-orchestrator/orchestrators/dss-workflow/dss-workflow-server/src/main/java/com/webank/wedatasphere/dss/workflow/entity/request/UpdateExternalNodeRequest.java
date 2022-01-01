@@ -5,8 +5,6 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import java.util.Map;
 
 public class UpdateExternalNodeRequest {
-
-
     private Long projectID;
     private String nodeType;
     private LabelRouteVO labels;

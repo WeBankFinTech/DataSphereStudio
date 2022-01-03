@@ -139,9 +139,9 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
 
   override def executeCompletely(engineExecutorContext: EngineExecutionContext, code: String, completedLine: String): ExecuteResponse = null
 
-  override def progress(taskID: String): Float = 0
+  override def progress(): Float = 0
 
-  override def getProgressInfo(taskID: String): Array[JobProgressInfo] = Array.empty
+  override def getProgressInfo(): Array[JobProgressInfo] = Array.empty
 
   override def supportCallBackLogs(): Boolean = false
 

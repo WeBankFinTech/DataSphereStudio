@@ -23,7 +23,6 @@
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>dss-datapipe-server</artifactId>

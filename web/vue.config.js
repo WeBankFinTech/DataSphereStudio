@@ -240,10 +240,10 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://***REMOVED***:8088",
+        //target: "http://***REMOVED***:8088",
         //target: 'http://***REMOVED***:9202', //yichao
         // target: "http://***REMOVED***:9202", //jiawei
-        // target: "http://luban.ctyun.cn:8088",
+         target: "http://luban.ctyun.cn:8088",
         //target: "http://devluban.ctyun.cn:8088",
         changeOrigin: true,
         pathRewrite: {
@@ -251,8 +251,8 @@ module.exports = {
         }
       },
       "/guideAssets": {
-        target: "http://***REMOVED***:8088", // 产品文档后台上传的图片代理
-        // target: "http://luban.ctyun.cn:8088",
+        //target: "http://***REMOVED***:8088", // 产品文档后台上传的图片代理
+        target: "http://luban.ctyun.cn:8088",
         //target: "http://devluban.ctyun.cn:8088",
         changeOrigin: true,
         pathRewrite: {

@@ -219,7 +219,7 @@ export default {
           res.totalList.forEach(item => {
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
-            let curHour = new Date(item.startTime).getHours() + 1
+            let curHour = new Date(item.startTime).getHours()
             objTotal[curHour] = objTotal[curHour] + 1
             let curState = item.state
             if (curState === 'SUCCESS') {

@@ -141,12 +141,12 @@ export default {
       if (this.daySelected === 1) {
         tYear = dd.getFullYear(),
         tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-        tDay = dd.getDate()
+        tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
       } else if (this.daySelected === 2) {
         dd.setDate(dd.getDate() - 1)
         tYear = dd.getFullYear(),
         tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-        tDay = dd.getDate()
+        tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
       }
       if (this.daySelected) {
         this.getMixedBarLineData(`${tYear}-${tMonth}-${tDay}`, (dd) => {
@@ -249,7 +249,7 @@ export default {
       function getFormatDateString(dd) {
         let tYear = dd.getFullYear(),
           tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-          tDay = dd.getDate()
+          tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
         return `${tYear}-${tMonth}-${tDay}`
       }
       if (!this.projectName) return

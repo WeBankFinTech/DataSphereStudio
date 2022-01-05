@@ -73,7 +73,7 @@
                 </DropdownMenu>
               </Dropdown> -->
               <Dropdown @on-click="handleChangeButton">
-                <a href="javascript:void(0)" style="text-decoration: none;">
+                <a style="text-decoration: none;" @click="handleChangeMode">
                   {{ currentButton.dicName }}
                   <Icon type="ios-arrow-down"></Icon>
                 </a>
@@ -210,6 +210,11 @@ export default {
     }
   },
   methods: {
+    handleChangeMode() {
+      let name = this.currentButton.dicValue || '';
+      if ( !name ) return;
+      this.handleChangeButton(name)
+    },
     removeWork(tabData) {
       this.$emit("handleTabRemove", tabData.tabId);
     },

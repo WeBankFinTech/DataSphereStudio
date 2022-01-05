@@ -152,6 +152,10 @@
       }
     }
   }
+  .streamisContainer {
+    display: flex;
+    min-height: 100%;
+  }
   .workflowListContainer {
     display: flex;
     // margin: 0 $padding-25;

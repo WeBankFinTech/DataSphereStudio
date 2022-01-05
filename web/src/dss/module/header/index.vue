@@ -106,13 +106,8 @@
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
       </div>
       <!-- 需要用户可以手动自定义 -->
-      <ul class="menu">
+      <ul class="menu" v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId">
         <li
-          v-if="
-            $route.path !== '/newhome' &&
-            $route.path !== '/bankhome' &&
-            $route.query.workspaceId
-          "
           class="menu-item"
           @click="goSpaceHome"
         >

@@ -117,6 +117,7 @@
           v-for="app in collections"
           :key="app.id"
           class="menu-item"
+          :class="app.menuApplicationId == currentId ? 'header-actived' : '' "
           @click="goCollectedUrl(app)"
         >
           {{ app.title }}
@@ -187,6 +188,7 @@ export default {
       // luban-nav-menu
       favorites: [],
       collections: [],
+      currentId: -1,
     };
   },
   mixins: [mixin],
@@ -247,6 +249,7 @@ export default {
     $route(v) {
       // 设定条件只有切换在工作空间首页时才触发
       if (v.name === "workspaceHome") {
+        this.currentId = -1;
         this.init();
         this.getWorkspacesRoles()
           .then((res) => {
@@ -599,6 +602,7 @@ export default {
     //   // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     // },
     goCollectedUrl(app) {
+      this.currentId = app.menuApplicationId || -1;
       this.gotoCommonIframe(app.name, {
         workspaceId: this.$route.query.workspaceId,
       });

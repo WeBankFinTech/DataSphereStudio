@@ -459,7 +459,7 @@
             },
             "navList": {
                 "dataStudio": "数据开发",
-                "workSpace": "工作空间",
+                "workSpace": "用户空间",
                 "database": "数据库",
                 "udfFunction": "UDF函数",
                 "methodFunction": "方法函数",

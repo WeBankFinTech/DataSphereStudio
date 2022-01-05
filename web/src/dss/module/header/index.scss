@@ -118,3 +118,15 @@
     }
 
 }
+.header-actived {
+  color: $body-background;
+}
+
+.header-actived:before {
+  content: '';
+  height: 2px;
+  width: 16px;
+  background-color: #2E92F7;
+  position: absolute;
+  top: 40px;
+}

@@ -167,6 +167,9 @@
       <template v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
         <DS :activeTab="4" class="scheduler-center"></DS>
       </template>
+      <template v-if="modeOfKey === 'streamis_prod'">
+        <Streamis class="streamisContainer" />
+      </template>
       <template v-else>
         <!-- 其他应用流程 -->
       </template>
@@ -221,7 +224,9 @@ import {
 } from "@/common/service/apiCommonMethod.js";
 import { setVirtualRoles } from "@/common/config/permissions.js";
 import DS from "@/apps/workflows/module/dispatch";
+import Streamis from '@/apps/workflows/module/innerIframe';
 import eventbus from "@/common/helper/eventbus";
+
 
 export default {
   components: {
@@ -233,6 +238,7 @@ export default {
     makeUp: MakeUp.component,
     ProjectForm,
     DS,
+    Streamis: Streamis.component
   },
   data() {
     return {

@@ -78,6 +78,7 @@ export default {
       })
     },
     async gotoCommonIframe(type, query = {}) {
+      debugger
       const baseInfo = storage.get('baseInfo', 'local');
       const info = baseInfo.applications.find((item) => item.name === type) || {};
       // 根据是否有projectid来确定是走首页还是工程页

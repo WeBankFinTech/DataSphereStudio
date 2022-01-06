@@ -51,12 +51,12 @@
           @on-move-flow="onMoveFlow"
           @on-view-version="onViewVersion"
         />
-        <div class="project-nav-tree-bottom">
+        <!-- <div class="project-nav-tree-bottom">
           <div class="project-nav-add" @click.stop="createProject">
             <Icon type="md-add" />
             <span style="margin-left: 8px">添加项目</span>
           </div>
-        </div>
+        </div> -->
         <Spin v-show="loadingTree" size="large" fix />
       </div>
       <WorkflowModal

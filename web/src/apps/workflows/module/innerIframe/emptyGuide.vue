@@ -10,7 +10,8 @@
       </div>
       <div>
         <div v-for="(value, index) in steps" :key="index" class="rightWrap">
-          {{ value }}
+          <span v-html="value"></span>
+          <!-- {{ value }} -->
         </div>
       </div>
     </div>
@@ -21,11 +22,11 @@ export default {
   data() {
     return {
       steps: [
-        "点击左侧菜单-服务开发课表-加号按钮-创建业务流程",
-        "点击业务流程-加号按钮-创建API",
-        "配置API-添加数据源及设置参数，并保存",
-        "测试",
-        "发布-左侧菜单-服务管理，管理已发布API"
+        `Flink SQL 脚本开发调试&nbsp;&nbsp;&nbsp;&nbsp;前往<a href="#/home?workspaceId=${this.$route.query.workspaceId}">即席查询</a>`,
+        `离线创建jar包并配置&nbsp;&nbsp;&nbsp;&nbsp;样例<a href='./streamis/flinkJar.zip' download="flinkJar.zip">下载</a>&nbsp;&nbsp;配置说明下载<a href='./streamis/Streamis流式应用ZIP包上传格式.txt' download="Streamis流式应用ZIP包上传格式.txt">下载</a>`,
+        "导入jar包至实时计算中心",
+        "配置资源及生产环境",
+        "配置Flink参数并运行"
       ]
     };
   },

@@ -358,6 +358,9 @@ export default {
       if (this.$route.query.workspaceId) {
         GetCollections(this.$route.query.workspaceId).then(data => {
           let collections = data.favorites || [];
+          while( collections.length > 5 ) {
+            collections.pop();
+          }
           this.collections = collections.map(item => {
             return {
               ...item,

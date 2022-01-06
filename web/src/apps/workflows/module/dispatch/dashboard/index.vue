@@ -231,7 +231,7 @@ export default {
           })
           successTotal.forEach((success, index) => {
             if (objTotal[index]) {
-              successPercent[index] = (success / objTotal[index]).toFixed(1)
+              successPercent[index] =  parseInt((success / objTotal[index]) * 100)
             } else {
               successPercent[index] = 0
             }
@@ -287,10 +287,12 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['2','4', '6', '8', '10','12','14','16','18','20','22','24']
+          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时']
         },
         yAxis: {
-          type: 'value'
+          type: 'value',
+          minInterval: 1,
+          name: '实例数(个)'
         },
         series: [
           {
@@ -349,6 +351,7 @@ export default {
           {
             type: 'value',
             name: '实例数',
+            minInterval: 1,
             /*min: 0,
             max: 250,
             interval: 50,*/

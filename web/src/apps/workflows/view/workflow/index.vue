@@ -168,7 +168,7 @@
         <DS :activeTab="4" class="scheduler-center"></DS>
       </template>
       <template v-if="modeOfKey === 'streamis_prod'">
-        <Streamis class="streamisContainer" />
+        <Streamis class="streamisContainer" :project-name="pjNameForStreamis"/>
       </template>
       <template v-else>
         <!-- 其他应用流程 -->
@@ -294,6 +294,7 @@ export default {
         },
       ],
       cacheData: [],
+      pjNameForStreamis: '',
     };
   },
   watch: {
@@ -359,6 +360,9 @@ export default {
       return storage.get("currentWorkspace");
     },
     isScheduler() {
+      if (this.modeOfKey == "streamis_prod") {
+        return false
+      }
       return this.$route.name === "Scheduler";
     },
     formatProjectNameList() {
@@ -374,20 +378,6 @@ export default {
     }
   },
   methods: {
-    // initClick() {
-    //   if (this.projectsTree.length > 0) {
-    //     const cur = this.projectsTree[0];
-    //     this.getFlow(cur, (flow) => {
-    //       if (flow.length > 0) {
-    //         const cur_node = flow[0];
-    //         this.handleTreeClick(cur_node);
-    //         this.$refs.projectTree.handleItemToggle(cur);
-    //       } else {
-    //         this.handleTreeClick(cur);
-    //       }
-    //     });
-    //   }
-    // },
     createProject() {
       this.actionType = "add";
       this.ProjectShow = true;
@@ -515,7 +505,28 @@ export default {
               });
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
-          } else {
+          } else if (this.modeOfKey == "streamis_prod") {
+            this.projectsTree = res.projects
+              .filter((n) => {
+                return (
+                  n.devProcessList &&
+                  n.devProcessList.includes("streamis_prod") &&
+                  n.releaseUsers &&
+                  n.releaseUsers.indexOf(this.getUserName()) !== -1
+                );
+              })
+              .map((n) => {
+                setVirtualRoles(n, this.getUserName());
+                return {
+                  id: n.id,
+                  name: n.name,
+                  type: "streamis_prod",
+                  canWrite: n.canWrite(),
+                };
+              });
+            if (!this.$route.query.projectID)
+              this.handleTreeClick(this.projectsTree[0]);
+          }else {
             this.projectsTree = res.projects.map((n) => {
               setVirtualRoles(n, this.getUserName());
               return {
@@ -531,7 +542,7 @@ export default {
     },
     // 获取project下工作流
     getFlow(param, resolve) {
-      if (this.isScheduler) {
+      if (this.isScheduler || this.modeOfKey == 'streamis_prod') {
         return resolve([]);
       }
       api
@@ -621,6 +632,11 @@ export default {
           : DEVPROCESS.DEVELOPMENTCENTER;
       if (this.isScheduler) {
         this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
+      }
+      if ( node.type == "streamis_prod" ) {
+        this.modeOfKey = "streamis_prod"
+        this.pjNameForStreamis = node.name
+        return;
       }
       if (node.type == "flow") {
         if (this.isScheduler) {
@@ -1078,6 +1094,7 @@ export default {
     // 切换开发流程
     handleChangeButton(item) {
       if ( item.dicValue !=  this.modeOfKey ) {
+        this.modeOfKey = item.dicValue;
         this.getAllProjects(()=>{});
       }
       if (
@@ -1099,6 +1116,7 @@ export default {
       this.currentVal = {};
       this.current = null;
       this.tabId = "";
+      this.pjNameForStreamis = "";
       if (item.dicValue === "scheduler" && !this.isScheduler) {
         this.$router.replace({
           name: "Scheduler",

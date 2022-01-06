@@ -38,7 +38,9 @@ export default {
           value: v.count
         }
       })
-      const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {barColor: '#89C2D9'})
+      const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {barColor: '#89C2D9', yAxis: {
+        minInterval: 1
+      }})
       myChart.echart.setOption(bar)
       // Jump not allowed on home page
       if (this.projectId) {

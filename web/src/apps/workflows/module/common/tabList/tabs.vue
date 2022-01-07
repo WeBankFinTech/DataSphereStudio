@@ -54,7 +54,6 @@ export default {
   align-items: center;
   justify-content: flex-start;
   padding: 0 12px;
-  // padding-right: 35px;
   font-size: 14px;
   height: 24px;
   .tabs-title-text {
@@ -66,7 +65,7 @@ export default {
   }
   .tabs-title-button {
     position: $absolute;
-    right: 10px;
+    right: -5px;
     top: 0;
     font-size: $font-size-large;
     margin-top: -1px;

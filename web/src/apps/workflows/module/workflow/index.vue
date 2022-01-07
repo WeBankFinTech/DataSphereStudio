@@ -577,9 +577,11 @@ export default {
       this.ProjectShow = true;
       this.actionType = "modify";
       this.currentOrchetratorData = project;
+      debugger
       this.currentOrchetratorData.taxonomyID = classifyId;
     },
     workflowModify(params) {
+      debugger
       const classifyId = this.$refs.projectConentItem[0].currentData.id;
       const _params = this.dataList[0]["dwsFlowList"].filter(item => {
         return (

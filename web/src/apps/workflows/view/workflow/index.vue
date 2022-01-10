@@ -510,7 +510,6 @@ export default {
               .filter((n) => {
                 return (
                   n.devProcessList &&
-                  n.devProcessList.includes("streamis_prod") &&
                   n.releaseUsers &&
                   n.releaseUsers.indexOf(this.getUserName()) !== -1
                 );

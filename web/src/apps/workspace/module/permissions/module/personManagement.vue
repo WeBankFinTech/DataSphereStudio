@@ -95,9 +95,13 @@
       <div class="tableWrap">
         <div class="addWrap">
           <p>{{ tableTitle }}</p>
-          <Button type="primary" @click="handleAdd()" icon="md-add">{{
-            $t("message.permissions.add")
-          }}</Button>
+          <Button
+            v-if="false"
+            type="primary"
+            @click="handleAdd()"
+            icon="md-add"
+            >{{ $t("message.permissions.add") }}</Button
+          >
         </div>
         <Table :columns="columns" :data="userList" :loading="tableLoading">
           <template slot-scope="{ row, index }" slot="operation">
@@ -105,8 +109,12 @@
               <div class="operation" @click="edit(row, index)">
                 {{ $t("message.permissions.edit") }}
               </div>
-              <Divider type="vertical" />
-              <div class="operation" @click="modifyPassword(row, index)">
+              <Divider v-if="false" type="vertical" />
+              <div
+                class="operation"
+                v-if="false"
+                @click="modifyPassword(row, index)"
+              >
                 {{ $t("message.permissions.modifyPassword") }}
               </div>
               <Divider v-if="false" type="vertical" />
@@ -169,7 +177,7 @@
             </div>
             <label slot="option-label" slot-scope="{ node }">
               <Icon
-                style="font-size: 16px;margin-right:5px;top: -3px;"
+                style="font-size: 16px; margin-right: 5px; top: -3px"
                 :type="
                   node.isBranch ? 'ios-folder-outline' : 'ios-paper-outline'
                 "
@@ -325,8 +333,8 @@ export default {
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
               : tag === "keyboard"
-                ? this.$t("message.permissions.pwdKeyboardError")
-                : this.$t("message.permissions.pwdCheckError")
+              ? this.$t("message.permissions.pwdKeyboardError")
+              : this.$t("message.permissions.pwdCheckError")
           )
         );
       }
@@ -752,7 +760,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 .container {
   width: 100%;
   // height: 100%;
@@ -855,7 +863,8 @@ export default {
   width: 22px;
   @include font-color($light-text-color, $dark-text-color);
 }
-.folder-label, .foldIcon{
+.folder-label,
+.foldIcon {
   @include font-color($light-text-color, $dark-text-color);
 }
 .operation {

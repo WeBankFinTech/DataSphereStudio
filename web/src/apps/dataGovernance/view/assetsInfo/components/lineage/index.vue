@@ -29,12 +29,24 @@ export default {
   },
   methods: {
     convertData() {
+      const guid = this.$route.params.guid
       let data = {
         nodes: [],
         edges: []
       }
+      this.lineageData.relations.forEach(relation => {
+        data.edges.push({
+          source: relation.fromEntityId,
+          target: relation.toEntityId,
+          id: relation.relationshipId
+        })
+      })
       let keys = Object.keys(this.lineageData.guidEntityMap)
       keys.forEach(item => {
+        let isCurrent = false
+        if (guid === item) {
+          isCurrent = true
+        }
         const cur = this.lineageData.guidEntityMap[item]
         let icon
         if (cur.status !== 'ACTIVE') {
@@ -46,10 +58,11 @@ export default {
         } else if (cur.typeName === 'spark_process') {
           icon = 'icon-a-sparkprocess'
         }
-
+        let className = isCurrent ? 'nodeBackground-color current-bg-color' : 'nodeBackground-color'
         data.nodes.push({
           id: item,
           name: cur.displayText,
+          isCurrent,
           icon: icon,
           status: cur.status,
           model: {
@@ -57,13 +70,7 @@ export default {
             ...cur
           },
           Class: node,
-          className: 'nodeBackground-color'
-        })
-      })
-      this.lineageData.relations.forEach(relation => {
-        data.edges.push({
-          source: relation.fromEntityId,
-          target: relation.toEntityId
+          className
         })
       })
       return data

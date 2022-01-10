@@ -11,7 +11,7 @@
           </Select>
         </div>-->
         <div class="row" >
-          <div class="col-md-6 dashboard-module">
+          <div class="col-md-6 dashboard-module" style="margin-right: 10px">
             <div class="chart-title">
               <span>{{$t('message.scheduler.processStatusStatistics')}}</span>
               <div class="time-model">
@@ -35,11 +35,24 @@
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
+
+          <div class="col-md-6 dashboard-module">
+            <div class="chart-title">
+              <span>周期实例完成情况</span>
+              <div class="day-change">
+                <div :class="stateSelected === 1?'selected': ''" @click="changeState(1)">运行成功</div>
+                <div :class="stateSelected === 2?'selected': ''" @click="changeState(2)">运行失败</div>
+              </div>
+            </div>
+            <div class="row dashboard-module-content">
+              <div id="areaChart" style="height: 430px"></div>
+              <Spin size="large" fix v-if="loading"></Spin>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-12 dashboard-module">
             <div class="chart-title">
-              <!--<span>{{$t('message.scheduler.taskStatusStatistics')}}</span>-->
               <span>工作流实例与成功率统计</span>
               <div class="day-change">
                 <div :class="daySelected === 1?'selected': ''" @click="changeDay(1)">今日</div>
@@ -96,7 +109,9 @@ export default {
       projectList: [],
 
       mixedBarLineChart: null,
+      areaChart: null,
       daySelected: 1,
+      stateSelected: 1,
       loading: false
     }
   },
@@ -104,6 +119,20 @@ export default {
 
   },
   methods: {
+    changeState(state) {
+      if (state) {
+        this.stateSelected = state
+      }
+      let curState
+      if (state == 1) {
+        curState = 'SUCCESS'
+      } else if (state == 2) {
+        curState = 'FAILURE'
+      }
+      this.getAreaData((areaData) => {
+        this.buildAreaChart(areaData)
+      }, curState)
+    },
     changeDay(day){
       if (day)
         this.daySelected = day
@@ -112,12 +141,12 @@ export default {
       if (this.daySelected === 1) {
         tYear = dd.getFullYear(),
         tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-        tDay = dd.getDate()
+        tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
       } else if (this.daySelected === 2) {
         dd.setDate(dd.getDate() - 1)
         tYear = dd.getFullYear(),
         tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
-        tDay = dd.getDate()
+        tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
       }
       if (this.daySelected) {
         this.getMixedBarLineData(`${tYear}-${tMonth}-${tDay}`, (dd) => {
@@ -190,7 +219,7 @@ export default {
           res.totalList.forEach(item => {
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
-            let curHour = new Date(item.startTime).getHours() + 1
+            let curHour = new Date(item.startTime).getHours()
             objTotal[curHour] = objTotal[curHour] + 1
             let curState = item.state
             if (curState === 'SUCCESS') {
@@ -202,7 +231,7 @@ export default {
           })
           successTotal.forEach((success, index) => {
             if (objTotal[index]) {
-              successPercent[index] = (success / objTotal[index]).toFixed(1)
+              successPercent[index] =  parseInt((success / objTotal[index]) * 100)
             } else {
               successPercent[index] = 0
             }
@@ -215,6 +244,74 @@ export default {
           })
         })
       })
+    },
+    getAreaData(cb, stateType) {
+      function getFormatDateString(dd) {
+        let tYear = dd.getFullYear(),
+          tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
+          tDay = dd.getDate() > 9 ? dd.getDate() : '0' + dd.getDate()
+        return `${tYear}-${tMonth}-${tDay}`
+      }
+      if (!this.projectName) return
+
+      let dd = new Date(),
+        dd1 = new Date()
+      dd1.setDate(dd.getDate() - 1)
+      let dateString1 = getFormatDateString(dd),
+        dateString2 = getFormatDateString(dd1)
+      util.checkToken(() => {
+        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/statistics`, {
+          dates: dateString1 + ',' + dateString2,
+          step: 2,
+          stateType: stateType || 'SUCCESS'
+        }, 'get').then((data) => {
+          cb && cb([data[dateString2], data[dateString1]])
+        })
+      })
+    },
+    buildAreaChart(data) {
+      this.areaChart = echarts.init(document.getElementById('areaChart'))
+      let option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#999'
+            }
+          }
+        },
+        legend: {
+          data: ['昨日', '今日']
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时']
+        },
+        yAxis: {
+          type: 'value',
+          minInterval: 1,
+          name: '实例数(个)'
+        },
+        series: [
+          {
+            name: '昨日',
+            data: data[0],
+            type: 'line',
+            areaStyle: {},
+            color: '#87AEFA'
+          },
+          {
+            name: '今日',
+            data: data[1],
+            type: 'line',
+            areaStyle: {},
+            color: '#5AD8A6'
+          }
+        ]
+      };
+      this.areaChart.setOption(option)
     },
     buildMixedBarLineChart(data) {
       this.mixedBarLineChart = echarts.init(document.getElementById('mixedBarLine'))
@@ -254,6 +351,7 @@ export default {
           {
             type: 'value',
             name: '实例数',
+            minInterval: 1,
             /*min: 0,
             max: 250,
             interval: 50,*/
@@ -311,6 +409,7 @@ export default {
         })
         this.$nextTick(() => {
           this.changeDay()
+          this.changeState()
         })
       })
     })
@@ -375,6 +474,9 @@ export default {
   }
 
   .dashboard-module{
+    &.col-md-6 {
+      width: calc(50% - 10px);
+    }
     background: #FFFFFF;
     border: 1px solid #DEE4EC;
     border-radius: 2px;

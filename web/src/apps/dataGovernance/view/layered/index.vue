@@ -65,6 +65,16 @@
         <span class="title">
           <span>自定义分层 </span>
         </span>
+        <Input
+          search
+          enter-button
+          clearable
+          placeholder="输入名称搜索"
+          style="width: 300px; float: right"
+          v-model="searchVal"
+          @on-search="handleSearch"
+          @on-clear="handleSearch"
+        />
         <Button type="primary" icon="md-add" @click="handleCreate">
           创建自定义分层
         </Button>
@@ -150,6 +160,9 @@ export default {
     formatDate
   },
   methods: {
+    handleSearch() {
+      this.handleGetLayersCustom()
+    },
     handleModalFinish() {
       this.handleGetLayersCustom();
     },
@@ -192,7 +205,7 @@ export default {
     },
     async handleGetLayersCustom() {
       this.customloading = true;
-      let data = await getLayersCustom();
+      let data = await getLayersCustom(this.searchVal.trim());
       this.customloading = false;
       let { result } = data;
       this.customDataList = result;
@@ -260,7 +273,8 @@ export default {
         mode: "",
         name: "",
         visible: false
-      }
+      },
+      searchVal: ''
     };
   }
 };

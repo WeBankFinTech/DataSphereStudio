@@ -6,7 +6,7 @@
       </div>
     </template>
     <template v-else>
-      <iframe :src="`/streamis/#/?projectName=${projectName}`" width="100%" frameborder="0"></iframe>
+      <iframe :src="`${url}?projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
     </template>
   </div>
 </template>
@@ -16,6 +16,16 @@ import emptyGuide from "./emptyGuide.vue"
 export default {
   components: {
     emptyGuide
+  },
+  mounted() {
+    let baseInfo = JSON.parse(localStorage.getItem('baseInfo'))
+    let applicationItem = baseInfo.applications.filter(item => item.name == 'realTimeJobCenter')[0]
+    this.url = applicationItem.url;
+  },
+  data() {
+    return {
+      url: '',
+    }
   },
   props: {
     projectName: {

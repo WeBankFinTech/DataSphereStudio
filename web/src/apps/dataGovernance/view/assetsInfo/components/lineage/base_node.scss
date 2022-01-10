@@ -23,7 +23,6 @@
       text-align: center;
       margin: auto;
       display: inherit;
-      background: none;
     }
   }
 
@@ -40,5 +39,15 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+  .current-bg-color {
+    background-color: aliceblue;
+  }
+  .should-hide {
+    fill: none !important;
+    stroke: none !important;
+  }
+  .should-lower {
+    opacity: 0.2;
   }
 }

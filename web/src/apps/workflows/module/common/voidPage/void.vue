@@ -60,12 +60,20 @@ export default {
   },
   mounted() {
     let workspaceId = this.$route.query.workspaceId
-    this.lastWorkflowList = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+    let workFlowLists = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+    if ( workFlowLists.length > 5 ) {
+      workFlowLists = workFlowLists.slice(0, 5)
+    }
+    this.lastWorkflowList = workFlowLists;
     eventbus.on("tabListChange", list => {
       if( list.length > 0 ) {
         this.lastWorkflowList = list.slice();
       } else {
-        this.lastWorkflowList = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+        let workFlowLists = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+        if ( workFlowLists.length > 5 ) {
+          workFlowLists = workFlowLists.slice(0, 5)
+        }
+        this.lastWorkflowList = workFlowLists
       }
     });
   },
@@ -86,7 +94,7 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: #fff;
+  @include bg-color(#fff, $dark-workspace-body-bg-color);
   .void-page-left {
     min-width: 240px;
     margin-right: 106px;
@@ -95,10 +103,11 @@ export default {
       height: 33px;
       line-height: 33px;
       text-align: left;
+      @include font-color($light-text-color, $dark-text-color);
 
       font-family: PingFangSC-Regular;
       font-size: 24px;
-      color: rgba(0, 0, 0, 0.65);
+      @include border-color(rgba(0, 0, 0, 0.65), $dark-border-color-base);
       font-weight: 400;
     }
     &-main {
@@ -109,13 +118,14 @@ export default {
       &-tip {
         font-family: PingFangSC-Regular;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.45);
+        @include border-color(rgba(0, 0, 0, 0.65), $dark-border-color-base);
         letter-spacing: 0;
         text-align: center;
         line-height: 28px;
         height: 28px;
         font-weight: 400;
         margin: 16px 0px;
+        @include font-color($light-text-color, $dark-text-color);
       }
       &-button {
         text-align: left;
@@ -131,10 +141,11 @@ export default {
       height: 25px;
       line-height: 25px;
       padding: 16px 0px;
+      @include font-color($light-text-color, $dark-text-color);
 
       font-family: PingFangSC-Regular;
       font-size: 18px;
-      color: rgba(0, 0, 0, 0.65);
+      @include border-color(rgba(0, 0, 0, 0.65), $dark-border-color-base);
       font-weight: 400;
     }
     .void-page-right-main {

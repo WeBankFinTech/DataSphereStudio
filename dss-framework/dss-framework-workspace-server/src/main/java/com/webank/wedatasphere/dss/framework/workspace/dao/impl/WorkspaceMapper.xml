@@ -192,15 +192,10 @@
         on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
         join dss_application on dss_application.id = dss_onestop_menu_application.application_id
         <where>
-            dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
-            or `dss_onestop_user_favorites`.`workspace_id` = -1
-            <if test="type != null">
-                AND type = #{type}
-            </if>
+            (dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+            or `dss_onestop_user_favorites`.`workspace_id` = -1)
+            AND type = #{type}
 
-            <if test="type = null">
-                AND type is null
-            </if>
         </where>
     </select>
 
@@ -211,13 +206,7 @@
         join dss_application on dss_application.id = dss_onestop_menu_application.application_id
         <where>
             dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
-            <if test="type != null">
-                AND type = #{type}
-            </if>
-
-            <if test="type = null">
-                AND type is null
-            </if>
+            AND type = #{type}
         </where>
     </select>
 
@@ -235,13 +224,8 @@
             menu_application_id = #{applicationId}
             AND username = #{username}
             AND workspace_id = #{workspaceId}
-        <if test="type != null">
             AND type = #{type}
-        </if>
 
-        <if test="type = null">
-            AND type is null
-        </if>
 
     </delete>
 

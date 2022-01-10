@@ -26,14 +26,14 @@
               />
             </span>
           </div>
-          <div class="project-nav-tree-top-b">
+          <!-- <div class="project-nav-tree-top-b">
             <SvgIcon icon-class="search-icon" style="opacity: 0.25" />
             <input
               type="text"
               class="project-nav-tree-top-b-input"
               placeholder="请输入"
             />
-          </div>
+          </div> -->
         </div>
         <Tree
           class="tree-container"
@@ -51,12 +51,12 @@
           @on-move-flow="onMoveFlow"
           @on-view-version="onViewVersion"
         />
-        <div class="project-nav-tree-bottom">
+        <!-- <div class="project-nav-tree-bottom">
           <div class="project-nav-add" @click.stop="createProject">
             <Icon type="md-add" />
             <span style="margin-left: 8px">添加项目</span>
           </div>
-        </div>
+        </div> -->
         <Spin v-show="loadingTree" size="large" fix />
       </div>
       <WorkflowModal
@@ -301,11 +301,11 @@ export default {
     tabList(val, oldVal) {
       let workspaceId = this.$route.query.workspaceId
       let workFlowLists = JSON.parse(localStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+      if (workFlowLists.length > 5) {
+        workFlowLists = workFlowLists.slice(0,5)
+      }
       val.forEach( item => {
         if( workFlowLists.every(i => i.id !== item.id) ) {
-          if( workFlowLists.length > 6 ) {
-            workFlowLists.pop()
-          }
           workFlowLists.unshift(item)
         } else {
           let _workFlowLists = workFlowLists.slice()
@@ -775,8 +775,8 @@ export default {
         });
     },
     onConfigFlow(params) {
-      // this.$refs.workflow.projectModify(params.id, params);
-      this.$refs.workflow.workflowModify(params);
+      this.$refs.workflow.projectModify(params.id, params);
+      // this.$refs.workflow.workflowModify(params);
     },
     onDeleteFlow(params) {
       this.$refs.workflow.deleteWorkflow(params);

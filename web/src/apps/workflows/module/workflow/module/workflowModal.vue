@@ -3,18 +3,18 @@
   <Modal
     v-model="mergeModalShow"
     @on-cancel="ProjectMergeCancel"
-    :footer-hide="true">
-    <Tabs value="form">
-      <Tab-pane label="新建编排" name="form">
-        <WorkflowFormNew
-          v-if="mergeModalShow"
-          :workflow-data="currentOrchetratorData"
-          :orchestratorModeList="orchestratorModeList"
-          :selectOrchestratorList="selectOrchestratorList"
-          :projectNameList="projectNameList"
-          @cancel="ProjectMergeCancel"
-          @confirm="ProjectMergeConfirm"></WorkflowFormNew>
-      </Tab-pane>
+    :footer-hide="true"
+    title="添加工作流"
+    >
+      <WorkflowFormNew
+        v-if="mergeModalShow"
+        :workflow-data="currentOrchetratorData"
+        :orchestratorModeList="orchestratorModeList"
+        :selectOrchestratorList="selectOrchestratorList"
+        :projectNameList="projectNameList"
+        @cancel="ProjectMergeCancel"
+        @confirm="ProjectMergeConfirm">
+      </WorkflowFormNew>
       <!-- <Tab-pane label="导入编排" name="upload">
         <Upload
           ref="uploadJson"
@@ -35,7 +35,6 @@
           </div>
         </Upload>
       </Tab-pane> -->
-    </Tabs>
   </Modal>
 </template>
 <script>

@@ -269,8 +269,8 @@ module.exports = {
         }
       },
       "/dolphinscheduler": {
-        target: "http://127.0.0.1:12345",
-        //target: "https://dolphin.ctyun.cn:10002",
+        //target: "http://127.0.0.1:12345",
+        target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"

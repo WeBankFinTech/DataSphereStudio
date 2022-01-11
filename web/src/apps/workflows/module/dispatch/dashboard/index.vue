@@ -68,11 +68,12 @@
               <div class="time-model">
                 <template>
                   <Date-picker
-                    style="width: 430px"
+                    style="width: 520px"
                     v-model="consumptionTime"
                     type="datetimerange"
                     @on-change="changeTime"
                     range-separator="-"
+                    :options="options1"
                     format="yyyy-MM-dd HH:mm:ss">
                   </Date-picker>
                 </template>
@@ -146,7 +147,49 @@ export default {
 
       consumptionList: [],
       consumptionTime: [],
-      consumptionParams: {}
+      consumptionParams: {},
+      options1: {
+        shortcuts: [
+          {
+            text: '今天',
+            value () {
+              const start = new Date();
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              const end = new Date();
+              return [start, end];
+            }
+          },
+          {
+            text: '昨天',
+            value () {
+              const end = new Date();
+              end.setHours(0)
+              end.setMinutes(0)
+              end.setSeconds(0)
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24);
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              return [start, end];
+            }
+          },
+          {
+            text: '最近一周',
+            value () {
+              const end = new Date();
+              const start = new Date();
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              return [start, end];
+            }
+          }
+        ]
+      }
     }
   },
   props: {

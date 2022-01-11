@@ -28,7 +28,7 @@
       </FormItem>
     </Form>
     <div v-if="currentNodeParamsBaseinfoList.length > 0" class="node-module-param-modal-header">
-      <h3>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h3>
+      <h5>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h5>
     </div>
     <Form v-if="currentNodeParamsBaseinfoList.length > 0 && currentNode.jobParams" label-position="top"
       ref="parameterForm"  class="node-parameter-bar" :model="currentNode">

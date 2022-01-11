@@ -9,8 +9,8 @@
     <input v-model="searchValue" :placeholder="$t('message.workflow.vueProcess.search')" class="shape-search">
     <div v-for="(shape, index) in search" :key="index" :class="{ 'top': index==0 }" class="shape-container">
       <div :class="{open: shape.show}" class="shape-title" @click="toggleTitle(shape)">
-        <SvgIcon v-show="!shape.show" class="icon" icon-class="close" verticalAlign="0px" />
-        <SvgIcon v-show="shape.show" class="icon" icon-class="open" verticalAlign="0px" />
+        <SvgIcon v-show="!shape.show" class="icon" icon-class="close" verticalAlign="0px" style="opacity: 0.65;"/>
+        <SvgIcon v-show="shape.show" class="icon" icon-class="open" verticalAlign="0px" style="opacity: 0.65;"/>
         {{ shape.title }}
       </div>
       <div v-show="shape.show" v-if="shape.children && shape.children.length>0" class="shape-content">

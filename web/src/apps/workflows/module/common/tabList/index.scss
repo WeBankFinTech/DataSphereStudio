@@ -153,20 +153,20 @@
   padding: 0 10px;
   overflow: hidden;
   margin-right: 8px;
-  background: #e1e5ea;
+  @include bg-color( #E1E5EA, $dark-workspace-body-bg-color);
   border-radius: 12px;
   &.active {
     height: 24px;
     @include font-color($primary-color, $dark-primary-color);
     line-height: 24px;
-    background: #e1e5ea;
+    @include bg-color(#E8EEF4, $dark-workspace-body-bg-color);
     border-radius: 12px;
   }
   &:hover {
     height: 24px;
     @include font-color($primary-color, $dark-primary-color);
     line-height: 24px;
-    background: #d1d7dd;
     border-radius: 12px;
+    @include bg-color(#D1D7DD, $dark-workspace-body-bg-color);
   }
 }

@@ -10,7 +10,7 @@
       <Icon
         v-show="isHover"
         class="close-icon"
-        size="18"
+        size="12"
         type="md-close"
         @click.stop="remove"
       />

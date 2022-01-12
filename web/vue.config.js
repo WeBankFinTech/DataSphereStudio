@@ -259,8 +259,17 @@ module.exports = {
           "^/guideAssets": "/guideAssets"
         }
       },
+      "/streamis": {
+        target: "http://***REMOVED***:8088",
+        // target: "http://luban.ctyun.cn:8088",
+        //target: "http://devluban.ctyun.cn:8088",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/streamis": "/streamis"
+        }
+      },
       "/dolphinscheduler": {
-        // target: "http://***REMOVED***:12345",
+        //target: "http://***REMOVED***:12345",
         target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {

@@ -87,6 +87,8 @@ export default {
   &-container {
     flex: 1;
     height: 40px;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 }
 .tab-item {

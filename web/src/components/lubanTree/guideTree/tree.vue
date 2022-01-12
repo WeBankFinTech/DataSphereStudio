@@ -17,7 +17,7 @@
 import TreeItem from "./tree-item.vue";
 
 export default {
-  name: "WorkflowTree",
+  name: "GuideAdminTree",
   components: {
     TreeItem,
   },

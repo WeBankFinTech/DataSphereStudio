@@ -18,6 +18,7 @@ import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
+import org.apache.atlas.model.instance.AtlasRelatedObjectId;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -72,37 +74,49 @@ public class AssetServiceImpl implements AssetService {
                                                    int limit, int offset) throws DataGovernanceException {
         List<AtlasEntityHeader> atlasEntityHeaders = null;
         try {
-            atlasEntityHeaders = atlasService.searchHiveTable(classification, query, true, limit, offset);
+            atlasEntityHeaders = atlasService.searchHiveTable(classification, "*" + query + "*", true, limit, offset);
         } catch (AtlasServiceException ex) {
             throw new DataGovernanceException(ex.getMessage());
         }
 
         if (atlasEntityHeaders != null) {
+            //columns  根据keyword来正则匹配过滤
+            Pattern regex = Pattern.compile(query);
             return atlasEntityHeaders.parallelStream().filter(Objects::nonNull).map(atlasEntityHeader -> {
-                HiveTblSimpleInfo hiveTblBasic = new HiveTblSimpleInfo();
-                hiveTblBasic.setGuid(atlasEntityHeader.getGuid());
-                hiveTblBasic.setName(stringValueOfObject(atlasEntityHeader.getAttribute("name")));
+                HiveTblSimpleInfo hiveTblSimpleInfo = new HiveTblSimpleInfo();
+                hiveTblSimpleInfo.setGuid(atlasEntityHeader.getGuid());
+                hiveTblSimpleInfo.setName(stringValueOfObject(atlasEntityHeader.getAttribute("name")));
                 String qualifiedName =stringValueOfObject(atlasEntityHeader.getAttribute("qualifiedName"));
-                hiveTblBasic.setQualifiedName(qualifiedName);
-                hiveTblBasic.setOwner(stringValueOfObject(atlasEntityHeader.getAttribute("owner")));
+                hiveTblSimpleInfo.setQualifiedName(qualifiedName);
+                hiveTblSimpleInfo.setOwner(stringValueOfObject(atlasEntityHeader.getAttribute("owner")));
                 Object createTime = atlasEntityHeader.getAttribute("createTime");
                 if (createTime != null) {
-                    hiveTblBasic.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
+                    hiveTblSimpleInfo.setCreateTime(DateUtil.unixToTimeStr((Double) createTime));
                 }
                 if(null != qualifiedName && qualifiedName.split("\\.").length >0){
                     String dbName = qualifiedName.split("\\.")[0];
-                    hiveTblBasic.setDbName(dbName);
+                    hiveTblSimpleInfo.setDbName(dbName);
                 }
+                hiveTblSimpleInfo.setLabels(atlasEntityHeader.getLabels());
 
                 try {
                     AtlasEntity atlasEntity = atlasService.getHiveTblByGuid(atlasEntityHeader.getGuid());
+
+                    //comment
+                    hiveTblSimpleInfo.setComment(stringValueOfObject(atlasEntity.getAttribute("comment")));
+                    List<Map<String,Object>> atlasRelatedObjectIdListForColumns = (List<Map<String,Object>>)atlasEntity.getRelationshipAttribute("columns");
+                    if(null != query && !query.trim().equalsIgnoreCase("")) {
+                        hiveTblSimpleInfo.setColumns(atlasRelatedObjectIdListForColumns.stream().map(columnMap -> columnMap.getOrDefault("displayText","").toString())
+                                .filter(columnName -> regex.matcher(columnName).find()).collect(Collectors.toList()));
+                    }
+                    //classifications
                     List<HiveTblDetailInfo.HiveClassificationInfo> classificationInfoList = getClassificationInfoList(atlasEntity);
-                    hiveTblBasic.setClassifications(classificationInfoList);
+                    hiveTblSimpleInfo.setClassifications(classificationInfoList);
                 } catch (AtlasServiceException ex) {
                     logger.error(ex.getMessage());
                 }
 
-                return hiveTblBasic;
+                return hiveTblSimpleInfo;
             }).collect(Collectors.toList());
         }
         return null;
@@ -155,8 +169,8 @@ public class AssetServiceImpl implements AssetService {
     }
 
     private HiveTblDetailInfo.HiveTblBasicInfo getBasicInfo(String guid, AtlasEntity atlasEntity) throws AtlasServiceException {
-        Map<String, Object> hiveTblNameAndIsPartById = atlasService.getHiveTblNameAndIsPartById(guid);
-        Boolean isPartTable = (Boolean) hiveTblNameAndIsPartById.get("isPartition");
+        Map<String, Object> hiveTblAttributesMap = atlasService.getHiveTblAttributesByGuid(guid);
+        Boolean isPartTable = (Boolean) hiveTblAttributesMap.get("isPartition");
         int storage = 0;
         String db_name = String.valueOf(atlasEntity.getAttributes().get("qualifiedName")).split("@")[0];
         String tableName = db_name.split("\\.")[1];
@@ -169,14 +183,16 @@ public class AssetServiceImpl implements AssetService {
 
         HiveTblDetailInfo.HiveTblBasicInfo basic = new HiveTblDetailInfo.HiveTblBasicInfo();
         basic.setName(tableName);
-        basic.setOwner(String.valueOf(atlasEntity.getAttributes().get("owner")));
+        basic.setOwner(String.valueOf(atlasEntity.getAttributes().getOrDefault("owner","NULL")));
         basic.setCreateTime(new java.text.SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(atlasEntity.getCreateTime()));
         basic.setStore(String.valueOf(storage));
-        basic.setComment(String.valueOf(atlasEntity.getAttributes().get("comment")));
+        basic.setComment(String.valueOf(atlasEntity.getAttributes().getOrDefault("comment","NULL")));
         Set<String> labels = atlasEntity.getLabels();
         basic.setLabels(labels);
         basic.setIsParTbl(isPartTable);
         basic.setGuid(guid);
+        basic.setTableType(hiveTblAttributesMap.getOrDefault("tableType","NULL").toString());
+        basic.setLocation(hiveTblAttributesMap.getOrDefault("location","NULL").toString());
 
         return basic;
     }
@@ -288,8 +304,8 @@ public class AssetServiceImpl implements AssetService {
             for (AtlasEntity hiveColumnsByGuid : hiveColumnsByGuids) {
                 fields.add((String) hiveColumnsByGuid.getAttributes().get("name"));
             }
-            Map<String, Object> hiveTblNameAndIsPartById = atlasService.getHiveTblNameAndIsPartById(guid);
-            Boolean isPartTable = (Boolean) hiveTblNameAndIsPartById.get("isPartition");
+            Map<String, Object> hiveTblAttributesMap = atlasService.getHiveTblAttributesByGuid(guid);
+            Boolean isPartTable = (Boolean) hiveTblAttributesMap.get("isPartition");
             if (isPartTable == true) {
                 List<String> partguids = new ArrayList<>();
                 List<LinkedTreeMap<String, String>> partitionKeys = (List<LinkedTreeMap<String, String>>) atlasEntity.getAttributes().get("partitionKeys");
@@ -355,8 +371,8 @@ public class AssetServiceImpl implements AssetService {
                 sql.append(field);
             }
             sql.append(") @$ ");
-            Map<String, Object> hiveTblNameAndIsPartById = atlasService.getHiveTblNameAndIsPartById(guid);
-            Boolean isPartTable = (Boolean) hiveTblNameAndIsPartById.get("isPartition");
+            Map<String, Object> hiveTblAttributesMap = atlasService.getHiveTblAttributesByGuid(guid);
+            Boolean isPartTable = (Boolean) hiveTblAttributesMap.get("isPartition");
             if (isPartTable == true) {
                 sql.append("PARTITIONED BY @$  ( @$ ");
                 List<String> partguids = new ArrayList<>();

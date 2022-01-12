@@ -24,6 +24,7 @@ class BaseNode extends Node {
       text = `<span id="${opts.options.model.guid}">${opts.options.name}</span>`
       util.Hub.$emit('register_click_hive_table', opts.options.model)
     }
+    util.Hub.$emit('register_hover', opts.options.model)
     let logoContainer =
       $(`<div class="logo-container" title="${opts.options.name}">
         <svg class="icon" aria-hidden="true" style="float: left;font-size: 34px;">

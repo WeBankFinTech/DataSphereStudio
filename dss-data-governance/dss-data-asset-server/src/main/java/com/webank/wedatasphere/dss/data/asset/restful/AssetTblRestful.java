@@ -69,13 +69,13 @@ public class AssetTblRestful {
                                  @RequestParam(defaultValue = "")  String keyword,
                                  @RequestParam(defaultValue = DEFAULT_LIMIT) int limit,
                                  @RequestParam(defaultValue = DEFAULT_OFFSET) int offset) throws Exception {
-        List<HiveTblSimpleInfo> hiveTblBasicList = assetService.searchHiveTable(classification,'*'+query+'*',limit,offset);
-        if(hiveTblBasicList ==null || keyword ==null || keyword.trim().equals("")) {
-            return Message.ok().data("result",hiveTblBasicList);
+        List<HiveTblSimpleInfo> hiveTblSimpleInfoList = assetService.searchHiveTable(classification,query.trim(),limit,offset);
+        if(hiveTblSimpleInfoList ==null || keyword ==null || keyword.trim().equals("")) {
+            return Message.ok().data("result",hiveTblSimpleInfoList);
         }
         else {
             Pattern regex = Pattern.compile(keyword);
-            return Message.ok().data("result",hiveTblBasicList.stream().filter(ele -> regex.matcher(ele.getOwner()).find()).collect(Collectors.toList()));
+            return Message.ok().data("result",hiveTblSimpleInfoList.stream().filter(ele -> regex.matcher(ele.getOwner()).find()).collect(Collectors.toList()));
         }
     }
 

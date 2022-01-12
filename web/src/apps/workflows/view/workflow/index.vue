@@ -35,7 +35,21 @@
             />
           </div> -->
         </div>
+        <div class="list-container" v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
+          <div
+            class="list-item"
+            v-for="item in projectsTree"
+            :key="item.id"
+          >
+            <div class="list-content" :class="{ 'list-content-active': currentTreeId == item.id }">
+              <div class="list-name" @click="handleTreeClick(item)">
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
         <Tree
+          v-else
           class="tree-container"
           ref="projectTree"
           :nodes="projectsTree"
@@ -1255,6 +1269,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "@/apps/workflows/assets/styles/workflow.scss";
+@import "@/common/style/variables.scss";
 .item-header {
   font-size: $font-size-base;
   margin: 10px 25px;
@@ -1289,6 +1304,33 @@ export default {
       margin-left: 10px;
       font-size: $font-size-base;
       font-weight: 700;
+    }
+  }
+}
+.list-item{
+  white-space: nowrap;
+  outline: none;
+  .list-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 10px;
+    @include font-color($light-text-color, $dark-text-color);
+    &:hover {
+      @include bg-color(#edf1f6, $dark-active-menu-item);
+    }
+    &-active {
+      @include bg-color(#edf1f6, $dark-active-menu-item);
+      @include font-color($primary-color, $dark-primary-color);
+    }
+    .list-name {
+      display: block;
+      flex: 1;
+      line-height: 32px;
+      padding: 0 6px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }

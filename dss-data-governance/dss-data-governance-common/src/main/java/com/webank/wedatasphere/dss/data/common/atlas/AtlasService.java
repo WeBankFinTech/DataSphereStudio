@@ -7,12 +7,14 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.internal.LinkedTreeMap;
 import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.discovery.AtlasSearchResult;
 import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
+import org.apache.atlas.model.instance.AtlasRelatedObjectId;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.apache.atlas.model.typedef.AtlasTypesDef;
@@ -189,17 +191,21 @@ public class AtlasService {
     }
 
     /**
-     * 根据guid来获取hive tbl名称 和 是否分区表
+     * 根据guid来获取hive tbl名称 和 是否分区表、是否外部表、外部表路径
      */
-    public Map<String, Object> getHiveTblNameAndIsPartById(String guid) throws AtlasServiceException {
-        Map<String, Object> result = new HashMap<>(2);
+    public Map<String, Object> getHiveTblAttributesByGuid(String guid) throws AtlasServiceException {
+        Map<String, Object> result = new HashMap<>(4);
 
-        String jsonStr = atlasClient.getEntityByGuidForString(guid, true, false);
+        String jsonStr = atlasClient.getEntityByGuidForString(guid, false, false);
         AtlasEntity.AtlasEntityWithExtInfo atlasEntityWithExtInfo = gson.fromJson(jsonStr, AtlasEntity.AtlasEntityWithExtInfo.class);
 
         result.put("tblName", atlasEntityWithExtInfo.getEntity().getAttribute("qualifiedName").toString().split("@")[0]);
         result.put("isPartition", ((List) atlasEntityWithExtInfo.getEntity().getAttribute("partitionKeys")).size() > 0);
-
+        result.put("tableType",atlasEntityWithExtInfo.getEntity().getAttribute("tableType"));
+        Map<String,Object> sdMap = (LinkedTreeMap)atlasEntityWithExtInfo.getEntity().getRelationshipAttribute("sd");
+        if(null != sdMap) {
+            result.put("location",atlasEntityWithExtInfo.getReferredEntities().get(sdMap.get("guid")).getAttribute("location"));
+        }
         return result;
     }
 

@@ -127,7 +127,7 @@ $mask-color: rgba(55, 55, 55, .6);
       .icon {
         margin-right: 8px;
         @include font-color($toool-button-color, rgba(255,255,255,0.65));
-        font-size: 15px;
+        font-size: 16px;
       }
       .stop {
         color: red;
@@ -585,7 +585,11 @@ $mask-color: rgba(55, 55, 55, .6);
     display: none;
   }
   .node-selected {
-    box-shadow: 0 0 8px #3399ff;
+    // box-shadow: 0 0 8px #3399ff;
+    // background-color: rgba(0, 0, 0, .2) !important;
+    background: #DEE8F4;
+    box-shadow: 1px 4px 6px 1px rgba(106,133,167,0.30);
+    border-radius: 4px;
   }
 }
 

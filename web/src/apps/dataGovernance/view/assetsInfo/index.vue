@@ -269,6 +269,39 @@ export default {
         });
       });
     });
+    util.Hub.$on("register_hover", data => {
+      this.$nextTick(() => {
+        $(`#${data.guid}`).hover(() => {
+          let hoverId = data.guid,
+            needHoverArr = [hoverId]
+          this.lineageData.relations.forEach(relation => {
+            if (relation.fromEntityId === hoverId) {
+              needHoverArr.push(relation.toEntityId)
+            } else if (relation.toEntityId === hoverId) {
+              needHoverArr.push(relation.fromEntityId)
+            } else {
+              $(`#${relation.relationshipId}`).addClass('should-hide')
+              $(`#${relation.relationshipId}`).next().addClass('should-hide')
+            }
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            if (needHoverArr.indexOf(item) === -1) {
+              $(`#${item}`).addClass('should-lower')
+            }
+          })
+        }, () => {
+          this.lineageData.relations.forEach(relation => {
+            $(`#${relation.relationshipId}`).removeClass('should-hide')
+            $(`#${relation.relationshipId}`).next().removeClass('should-hide')
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            $(`#${item}`).removeClass('should-lower')
+          })
+        });
+      });
+    })
   },
   methods: {
     init() {

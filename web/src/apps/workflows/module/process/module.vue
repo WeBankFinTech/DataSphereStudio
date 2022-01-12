@@ -136,7 +136,7 @@
       v-clickoutside="handleOutsideClick"
       v-show="isParamModalShow">
       <div class="process-module-param-modal-header">
-        <h3>{{ isResourceShow ? $t('message.workflow.process.resource') : isDispatch ? $t('message.workflow.process.schedule') : $t('message.workflow.process.params') }}{{$t('message.workflow.process.seting')}}</h3>
+        <h5>{{ isResourceShow ? $t('message.workflow.process.resource') : isDispatch ? $t('message.workflow.process.schedule') : $t('message.workflow.process.params') }}{{$t('message.workflow.process.seting')}}</h5>
       </div>
       <div class="process-module-param-modal-content">
         <argument
@@ -158,7 +158,7 @@
       v-show="nodebaseinfoShow"
       @click="clickBaseInfo">
       <div class="process-module-param-modal-header">
-        <h3>{{$t('message.workflow.process.baseInfo')}}</h3>
+        <h5>{{$t('message.workflow.process.baseInfo')}}</h5>
         <div v-if="!myReadonly" class="save-button">
           <Button size="small" @click.stop="saveNodeParameter"
             :disabled="false">{{$t('message.workflow.process.nodeParameter.BC')}}

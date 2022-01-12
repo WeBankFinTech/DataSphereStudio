@@ -455,9 +455,9 @@ export default {
           {
             type: 'value',
             name: '成功率',
-            /*min: 0,
-            max: 25,
-            interval: 5,*/
+            //min: 0,
+            max: 100,
+            interval: 20,
             axisLabel: {
               formatter: '{value} %'
             }

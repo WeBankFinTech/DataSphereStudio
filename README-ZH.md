@@ -7,33 +7,33 @@
 
 ## 引言
 
-DataSphere Studio（简称 DSS）是微众银行自研的数据应用开发管理集成框架。
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphere Studio（简称 DSS）是微众银行自研的数据应用开发管理集成框架。
 
-基于插拔式的集成框架设计，及计算中间件 [**Linkis**](https://github.com/WeBankFinTech/Linkis) ，可轻松接入上层各种数据应用系统，让数据开发变得简洁又易用。
+ &nbsp; &nbsp; &nbsp; &nbsp;基于插拔式的集成框架设计，及计算中间件 [**Linkis**](https://github.com/WeBankFinTech/Linkis) ，可轻松接入上层各种数据应用系统，让数据开发变得简洁又易用。
 
-在统一的 UI 下，DataSphere Studio 以工作流式的图形化拖拽开发体验，将满足从数据交换、脱敏清洗、分析挖掘、质量检测、可视化展现、定时调度到数据输出应用等，数据应用开发全流程场景需求。
+ &nbsp; &nbsp; &nbsp; &nbsp;在统一的 UI 下，DataSphere Studio 以工作流式的图形化拖拽开发体验，将满足从数据交换、脱敏清洗、分析挖掘、质量检测、可视化展现、定时调度到数据输出应用等，数据应用开发全流程场景需求。
 
-**DSS 通过插拔式的集成框架设计，让用户可以根据需要，简单快速替换 DSS 已集成的各种功能组件，或新增功能组件。**
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS 通过插拔式的集成框架设计，让用户可以根据需要，简单快速替换 DSS 已集成的各种功能组件，或新增功能组件。**
 
-借助于 [**Linkis**](https://github.com/WeBankFinTech/Linkis) 计算中间件的连接、复用与简化能力，DSS 天生便具备了金融级高并发、高可用、多租户隔离和资源管控等执行与调度能力。
+ &nbsp; &nbsp; &nbsp; &nbsp;借助于 [**Linkis**](https://github.com/WeBankFinTech/Linkis) 计算中间件的连接、复用与简化能力，DSS 天生便具备了金融级高并发、高可用、多租户隔离和资源管控等执行与调度能力。
 
 ## 界面预览
 
-请您耐心等待，加载 gif 需要一些时间。
+ &nbsp; &nbsp; &nbsp; &nbsp;请您耐心等待，加载 gif 需要一些时间。
 
 ![DSS-V1.0 GIF](images/en_US/readme/DSS_gif.gif)
 
 ## 核心特点
 
-DSS 主要特点：
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 主要特点：
 
 ### 一、一站式、全流程的应用开发管理界面
 
-&nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有：
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有：
  
  &nbsp; &nbsp; &nbsp; &nbsp;1、数据开发IDE工具——[Scriptis](https://github.com/WeBankFinTech/Scriptis)
  
- &nbsp; &nbsp; &nbsp; &nbsp;2、数据可视化工具——[Visualis](https://github.com/WeBankFinTech/Visualis)（基于宜信[Davinci](https://github.com/edp963/davinci) 二次开发）
+ &nbsp; &nbsp; &nbsp; &nbsp;2、数据可视化工具——[Visualis](https://github.com/WeBankFinTech/Visualis)（基于宜信 [Davinci](https://github.com/edp963/davinci) 二次开发）
  
  &nbsp; &nbsp; &nbsp; &nbsp;3、数据质量管理工具——[Qualitis](https://github.com/WeBankFinTech/Qualitis)
  
@@ -61,7 +61,7 @@ DSS 主要特点：
 
  &nbsp; &nbsp; &nbsp; &nbsp;AppConn ——应用连接器，定义了一套统一的前后台接入协议，总共分为三级规范，可让外部数据应用系统快速简单地接入，成为 DSS 数据应用开发中的一环。
  
- &nbsp; &nbsp; &nbsp; &nbsp;AppConn 的三级规范即：一级SSO规范，二级组织结构规范，三级开发流程规范；
+ &nbsp; &nbsp; &nbsp; &nbsp;AppConn 的三级规范即：一级 SSO 规范，二级组织结构规范，三级开发流程规范；
 
  &nbsp; &nbsp; &nbsp; &nbsp;DSS 通过串联多个 AppConn，编排成一条支持实时执行和定时调度的工作流，用户只需简单拖拽即可完成数据应用的全流程开发。
 
@@ -85,7 +85,7 @@ DSS 主要特点：
 | [**Prophecis**](https://github.com/WeBankFinTech/Prophecis)     | 一站式机器学习平台，集成多种开源机器学习框架。Prophecis 的 MLFlow 通过 AppConn 可以接入到 DSS 工作流中。      | 不支持 | >=1.0.2 | **即将发布集成版本** |
 | [**Streamis**](https://github.com/WeBankFinTech/Streamis)  | 流式应用开发管理工具。支持发布 Flink Jar 和 Flink SQL ，提供流式应用的开发调试和生产管理能力，如：启停、状态监控、checkpoint 等。 | 不支持 | >=1.0.1 | **即将发版** |
 | [**Exchangis**](https://github.com/WeBankFinTech/Exchangis) | 支持对结构化及无结构化的异构数据源之间的数据传输的数据交换平台，即将发布的 Exchangis1.0，将与 DSS 工作流打通 | 不支持 | >=1.0.1 | **筹备中**      |
-| [**Visualis**](https://github.com/WeBankFinTech/Visualis)   | 基于宜信开源项目 Davinci 二次开发的数据可视化BI工具，为用户在数据安全方面提供金融级数据可视化能力。 | >=0.5.0 | >=1.0.2 | **待发布**      |
+| [**Visualis**](https://github.com/WeBankFinTech/Visualis)   | 基于宜信开源项目 Davinci 二次开发的数据可视化 BI 工具，为用户在数据安全方面提供金融级数据可视化能力。 | >=0.5.0 | >=1.0.2 | **待发布**      |
 | [**Qualitis**](https://github.com/WeBankFinTech/Qualitis)   | 数据质量校验工具，提供数据完整性、正确性等数据校验能力 | >=0.5.0 | >=1.0.1 |  **待发布**      |
 | [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DataApiService%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)  | 数据API服务。可快速将SQL脚本发布为一个 Restful 接口，对外提供 Rest 访问能力。    | 不支持 | >=1.0.0 | 已发布 |
 | [**Scriptis**](https://github.com/WeBankFinTech/Scriptis)   | 支持在线写 SQL、Pyspark、HiveQL 等脚本，提交给[Linkis](https://github.com/WeBankFinTech/Linkis)执行的数据分析 Web 工具。 | >=0.5.0 | >=1.0.0 | 已发布      |
@@ -99,11 +99,11 @@ DSS 主要特点：
 
 &nbsp; &nbsp; &nbsp; &nbsp;由于 DataSphereStudio 支持执行脚本风险较高，WeDataSphere Demo 环境的隔离没有做完，考虑到大家都在咨询 Demo 环境，决定向社区先定向发放邀请码，接受企业和组织的试用申请。
 
-&nbsp; &nbsp; &nbsp; &nbsp;如果您想试用 Demo 环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系 **WeDataSphere入群机器人** 获取邀请码。
+&nbsp; &nbsp; &nbsp; &nbsp;如果您想试用 Demo 环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系 **WeDataSphere 入群机器人** 获取邀请码。
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo环境用户注册页面：[点我进入](https://www.ozone.space/wds/dss/#/register)
+&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境用户注册页面：[点我进入](https://www.ozone.space/wds/dss/#/register)
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo环境登录页面：[点我进入](https://www.ozone.space/wds/dss/#/login)
+&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境登录页面：[点我进入](https://www.ozone.space/wds/dss/#/login)
 
 
 ## 下载
@@ -112,19 +112,19 @@ DSS 主要特点：
 
 ## 编译和安装部署
 
-请参照 [编译指引](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3/DSS%E7%BC%96%E8%AF%91%E6%96%87%E6%A1%A3.md) 来编译 DSS 源码。
+ &nbsp; &nbsp; &nbsp; &nbsp;请参照 [编译指引](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3/DSS%E7%BC%96%E8%AF%91%E6%96%87%E6%A1%A3.md) 来编译 DSS 源码。
 
-请参考 [安装部署文档](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/DSS%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3.md) 来部署 DSS。
+ &nbsp; &nbsp; &nbsp; &nbsp;请参考 [安装部署文档](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/DSS%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3.md) 来部署 DSS。
 
 ## 示例和使用指引
 
-请到 [用户使用文档](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DSS%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md) ，了解如何快速使用DSS。
+ &nbsp; &nbsp; &nbsp; &nbsp;请到 [用户使用文档](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DSS%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md) ，了解如何快速使用DSS。
 
 ## 文档
 
-DSS1.0的完整文档列表，请参见 [DSS-Doc](https://github.com/WeBankFinTech/DataSphereStudio-Doc/tree/main/zh_CN)
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS1.0 的完整文档列表，请参见 [DSS-Doc](https://github.com/WeBankFinTech/DataSphereStudio-Doc/tree/main/zh_CN)
 
-以下为 DSS 相关 AppConn 插件的安装指南：
+ &nbsp; &nbsp; &nbsp; &nbsp;以下为 DSS 相关 AppConn 插件的安装指南：
 
 - [DSS的Visualis AppConn插件安装指南](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/VisualisAppConn%E6%8F%92%E4%BB%B6%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
 
@@ -155,22 +155,22 @@ DSS1.0的完整文档列表，请参见 [DSS-Doc](https://github.com/WeBankFinTe
 
 ## 贡献
 
-我们非常欢迎和期待更多的贡献者参与共建 DSS, 不论是代码、文档，或是其他能够帮助到社区的贡献形式。
+ &nbsp; &nbsp; &nbsp; &nbsp;我们非常欢迎和期待更多的贡献者参与共建 DSS, 不论是代码、文档，或是其他能够帮助到社区的贡献形式。
 
 ## 联系我们
 
-对 DSS 的任何问题和建议，敬请提交 issue，以便跟踪处理和经验沉淀共享。
+ &nbsp; &nbsp; &nbsp; &nbsp;对 DSS 的任何问题和建议，敬请提交 issue，以便跟踪处理和经验沉淀共享。
 
-您也可以扫描下面的二维码，加入我们的 微信/QQ群，以获得更快速的响应。
+ &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信/QQ群，以获得更快速的响应。
 
 ![交流](images/zh_CN/readme/communication.png)
 
 ## 谁在使用 DSS
 
-我们创建了 [Who is using DSS](https://github.com/WeBankFinTech/DataSphereStudio/issues/1) issue 以便用户反馈和记录谁在使用 DSS，欢迎您注册登记.
+ &nbsp; &nbsp; &nbsp; &nbsp;我们创建了 [Who is using DSS](https://github.com/WeBankFinTech/DataSphereStudio/issues/1) issue 以便用户反馈和记录谁在使用 DSS，欢迎您注册登记.
 
-DSS 自2019年开源发布以来，累计已有700多家试验企业和1000+沙盒试验用户，涉及金融、电信、制造、互联网等多个行业。
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 自2019年开源发布以来，累计已有700多家试验企业和1000+沙盒试验用户，涉及金融、电信、制造、互联网等多个行业。
 
 ## License
 
-DSS is under the Apache 2.0 license. See the [License](LICENSE) file for details.
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS is under the Apache 2.0 license. See the [License](LICENSE) file for details.

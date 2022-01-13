@@ -47,11 +47,11 @@
  
  &nbsp; &nbsp; &nbsp; &nbsp;8、一站式机器学习平台——[Prophecis](https://github.com/WeBankFinTech/Prophecis)(**即将发布集成版本**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;9、工作流任务调度平台——DolphinScheduler(**集成代码合并中**)
+ &nbsp; &nbsp; &nbsp; &nbsp;9、工作流任务调度平台——**DolphinScheduler**(**集成代码合并中**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;10、帮助文档模块——UserGuide(**集成代码合并中**)
+ &nbsp; &nbsp; &nbsp; &nbsp;10、帮助文档模块——**UserGuide**(**集成代码合并中**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;11、数据模型中心——DataModelCenter(**社区联合共建中，预计春节后**)
+ &nbsp; &nbsp; &nbsp; &nbsp;11、数据模型中心——**DataModelCenter**(**社区联合共建中，预计春节后**)
  
  &nbsp; &nbsp; &nbsp; &nbsp;**DSS 插拔式的框架设计模式，允许用户快速替换DSS已集成的各个 Web 系统**。如：将 Scriptis 替换成 Zeppelin，将 Schedulis 替换成 DolphinScheduler。
  

@@ -1,7 +1,7 @@
 // const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
 // const menuOptions = [];
 // menuInfo.forEach(info => {
-//   menuOptions.push(info.title_en);
+//   menuOptions.push(info.titleEn);
 // });
 // const _menuOptions = new Map();
 // menuOptions.forEach((item, idx) => {
@@ -15,26 +15,26 @@
  */
 function formatComponentData(component) {
   let _component = Object.assign({}, component);
-  if (_component.if_iframe == 1) {
-    _component.if_iframe = true;
+  if (_component.ifIframe == 1) {
+    _component.ifIframe = true;
   } else {
-    _component.if_iframe = false;
+    _component.ifIframe = false;
   }
-  if (_component.is_active == 1) {
-    _component.is_active = true;
+  if (_component.isActive == 1) {
+    _component.isActive = true;
   } else {
-    _component.is_active = false;
+    _component.isActive = false;
   }
   const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
   const menuOptions = [];
   menuInfo.forEach(info => {
-    menuOptions.push(info.title_en);
+    menuOptions.push(info.titleEn);
   });
   const _menuOptions = new Map();
   menuOptions.forEach((item, idx) => {
     _menuOptions.set(item, idx);
   });
-  _component.onestop_menu_id = menuOptions[_component.onestop_menu_id - 1];
+  _component.onestopMenuId = menuOptions[_component.onestopMenuId - 1];
   return _component;
 }
 
@@ -44,27 +44,27 @@ function formatComponentData(component) {
  */
 function formatComponentDataForPost(component) {
   let _component = Object.assign({}, component);
-  if (_component.if_iframe) {
-    _component.if_iframe = 1;
+  if (_component.ifIframe) {
+    _component.ifIframe = '1';
   } else {
-    _component.if_iframe = 0;
+    _component.ifIframe = '0';
   }
-  if (_component.is_active) {
-    _component.is_active = 1;
+  if (_component.isActive) {
+    _component.isActive = '1';
   } else {
-    _component.is_active = 0;
+    _component.isActive = '0';
   }
   const menuInfo = JSON.parse(sessionStorage.getItem("menuOptions")) || [];
   const menuOptions = [];
   menuInfo.forEach(info => {
-    menuOptions.push(info.title_en);
+    menuOptions.push(info.titleEn);
   });
   const _menuOptions = new Map();
   menuOptions.forEach((item, idx) => {
     _menuOptions.set(item, idx);
   });
 
-  _component.onestop_menu_id = _menuOptions.get(_component.onestop_menu_id) + 1;
+  _component.onestopMenuId = (_menuOptions.get(_component.onestopMenuId) + 1) + '';
 
   // 删除多余的属性
   if (Object.keys(_component).includes("_id")) {
@@ -72,6 +72,10 @@ function formatComponentDataForPost(component) {
   }
   if (Object.keys(_component).includes("isAdded")) {
     delete _component.isAdded;
+  }
+
+  if (!_component.id) {
+    _component.id = null
   }
 
   return _component;

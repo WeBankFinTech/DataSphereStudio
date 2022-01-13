@@ -90,29 +90,29 @@ const menu = [
       },
     ],
   },
-  {
-    title: "控制台",
-    icon: "kongzhitai",
-    nodes: [
-      {
-        name: "全局历史",
-        type: "console",
-        id: 1022,
-        pathName: "globalHistory",
-      },
-      { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
-      { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
-      {
-        name: "全局变量",
-        type: "console",
-        id: 1019,
-        pathName: "globalValiable",
-      },
-      { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
-      // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
-    ],
-  },
+  // {
+  //   title: "控制台",
+  //   icon: "kongzhitai",
+  //   nodes: [
+  //     {
+  //       name: "全局历史",
+  //       type: "console",
+  //       id: 1022,
+  //       pathName: "globalHistory",
+  //     },
+  //     { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
+  //     { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
+  //     {
+  //       name: "全局变量",
+  //       type: "console",
+  //       id: 1019,
+  //       pathName: "globalValiable",
+  //     },
+  //     { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
+  //     // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
+  //     { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
+  //   ],
+  // },
   {
     title: "组件接入",
     icon: "componentImport",

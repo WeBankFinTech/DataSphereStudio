@@ -113,6 +113,7 @@
         >
           {{ $t("message.common.home") }}
         </li>
+        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
         <li
           v-for="app in collections"
           :key="app.id"
@@ -593,16 +594,16 @@ export default {
       this.currentProject = {};
     },
     goConsole() {
-      const url =
-        location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
-      this.$router.push({
-        name: "commonIframe",
-        query: {
-          workspaceId: this.$route.query.workspaceId,
-          url
-        }
-      });
-      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+      // const url =
+      //   location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
+      // this.$router.push({
+      //   name: "commonIframe",
+      //   query: {
+      //     workspaceId: this.$route.query.workspaceId,
+      //     url
+      //   }
+      // });
+      this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goCollectedUrl(app) {
       this.currentId = app.menuApplicationId || -1;

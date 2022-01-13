@@ -49,7 +49,9 @@
  
  &nbsp; &nbsp; &nbsp; &nbsp;9、工作流任务调度平台——DolphinScheduler(**集成代码合并中**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;10、数据模型中心——DataModelCenter(**社区联合共建中，预计春节后**)
+ &nbsp; &nbsp; &nbsp; &nbsp;10、帮助文档模块——UserGuide(**集成代码合并中**)
+ 
+ &nbsp; &nbsp; &nbsp; &nbsp;11、数据模型中心——DataModelCenter(**社区联合共建中，预计春节后**)
  
  &nbsp; &nbsp; &nbsp; &nbsp;**DSS 插拔式的框架设计模式，允许用户快速替换DSS已集成的各个 Web 系统**。如：将 Scriptis 替换成 Zeppelin，将 Schedulis 替换成 DolphinScheduler。
  
@@ -80,6 +82,7 @@
 | 应用工具     | 描述                                                          | DSS0.X 版本要求   | DSS1.0 版本要求    | 版本规划 |
 | --------------- | -------------------------------------------------------------------- | --------- | ---------- | ------ |
 | **DolphinScheduler** | Apache DolphinScheduler，分布式易扩展的可视化工作流任务调度平台，支持一键将DSS工作流发布到 DolphinScheduler。    | 不支持 | 规划在1.1.0 | **代码合并中** |
+| **UserGuide**     | 包含帮助文档、新手指引、Dark模式换肤等。      | 不支持 | 规划在1.1.0 | **代码合并中** |
 | **DataModelCenter**     | 主要提供数仓规划、数据模型开发和数据资产管理的能力。数仓规划包含主题域、数仓分层、修饰词等；数据模型开发包含指标、维度、度量、向导式建表等；数据资产打通 Apache Atlas，提供数据血缘能力。      | 不支持 | 规划在1.2.0 | **社区联合共建中，预计春节后** |
 | **UserManager** | 自动初始化一个 DSS 新用户所必须的所有用户环境，包含：创建 Linux 用户、各种用户路径、目录授权等。                 |  >=0.9.1 | >=1.0.2 | **代码合并中** |
 | [**Prophecis**](https://github.com/WeBankFinTech/Prophecis)     | 一站式机器学习平台，集成多种开源机器学习框架。Prophecis 的 MLFlow 通过 AppConn 可以接入到 DSS 工作流中。      | 不支持 | >=1.0.2 | **即将发布集成版本** |

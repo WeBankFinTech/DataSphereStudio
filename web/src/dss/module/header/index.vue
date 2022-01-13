@@ -592,18 +592,18 @@ export default {
       this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
       this.currentProject = {};
     },
-    // goConsole() {
-    //   const url =
-    //     location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
-    //   this.$router.push({
-    //     name: "commonIframe",
-    //     query: {
-    //       workspaceId: this.$route.query.workspaceId,
-    //       url
-    //     }
-    //   });
-    //   // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
-    // },
+    goConsole() {
+      const url =
+        location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
+      this.$router.push({
+        name: "commonIframe",
+        query: {
+          workspaceId: this.$route.query.workspaceId,
+          url
+        }
+      });
+      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+    },
     goCollectedUrl(app) {
       this.currentId = app.menuApplicationId || -1;
       this.gotoCommonIframe(app.name, {

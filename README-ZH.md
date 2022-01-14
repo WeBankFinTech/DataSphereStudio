@@ -53,7 +53,9 @@
  
  &nbsp; &nbsp; &nbsp; &nbsp;11、数据模型中心——**DataModelCenter**(**社区联合共建中，预计春节后**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;**DSS 插拔式的框架设计模式，允许用户快速替换DSS已集成的各个 Web 系统**。如：将 Scriptis 替换成 Zeppelin，将 Schedulis 替换成 DolphinScheduler。
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS 对以上组件的版本兼容性，请访问：[已集成的数据应用组件](README-ZH.md#四已集成的数据应用组件)**。
+ 
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 插拔式的框架设计模式，允许用户快速替换DSS已集成的各个 Web 系统。如：将 Scriptis 替换成 Zeppelin，将 Schedulis 替换成 DolphinScheduler。
  
 ![DSS一站式](images/zh_CN/readme/onestop.gif) 
 
@@ -83,11 +85,11 @@
 | --------------- | -------------------------------------------------------------------- | --------- | ---------- | ------ |
 | **DolphinScheduler** | Apache DolphinScheduler，分布式易扩展的可视化工作流任务调度平台，支持一键将DSS工作流发布到 DolphinScheduler。    | 不支持 | 规划在1.1.0 | **代码合并中** |
 | **UserGuide**     | 包含帮助文档、新手指引、Dark模式换肤等。      | 不支持 | 规划在1.1.0 | **代码合并中** |
-| **DataModelCenter**     | 主要提供数仓规划、数据模型开发和数据资产管理的能力。数仓规划包含主题域、数仓分层、修饰词等；数据模型开发包含指标、维度、度量、向导式建表等；数据资产打通 Apache Atlas，提供数据血缘能力。      | 不支持 | 规划在1.2.0 | **社区联合共建中，预计春节后** |
+| **DataModelCenter**     | 主要提供数仓规划、数据模型开发和数据资产管理的能力。数仓规划包含主题域、数仓分层、修饰词等；数据模型开发包含指标、维度、度量、向导式建表等；数据资产打通 **Apache Atlas**，提供**数据血缘**能力。      | 不支持 | 规划在1.2.0 | **社区联合共建中，预计春节后** |
 | **UserManager** | 自动初始化一个 DSS 新用户所必须的所有用户环境，包含：创建 Linux 用户、各种用户路径、目录授权等。                 |  >=0.9.1 | >=1.0.2 | **代码合并中** |
 | [**Prophecis**](https://github.com/WeBankFinTech/Prophecis)     | 一站式机器学习平台，集成多种开源机器学习框架。Prophecis 的 MLFlow 通过 AppConn 可以接入到 DSS 工作流中。      | 不支持 | >=1.0.2 | **即将发布集成版本** |
 | [**Streamis**](https://github.com/WeBankFinTech/Streamis)  | 流式应用开发管理工具。支持发布 Flink Jar 和 Flink SQL ，提供流式应用的开发调试和生产管理能力，如：启停、状态监控、checkpoint 等。 | 不支持 | >=1.0.1 | **即将发版** |
-| [**Exchangis**](https://github.com/WeBankFinTech/Exchangis) | 支持对结构化及无结构化的异构数据源之间的数据传输的数据交换平台，即将发布的 Exchangis1.0，将与 DSS 工作流打通 | 不支持 | >=1.0.1 | **筹备中**      |
+| [**Exchangis**](https://github.com/WeBankFinTech/Exchangis) | 支持对结构化及无结构化的异构数据源之间的数据传输的数据交换平台，即将发布的 Exchangis1.0，将与 DSS 工作流打通 | 不支持 | >=1.0.2 | **开发实现中**      |
 | [**Visualis**](https://github.com/WeBankFinTech/Visualis)   | 基于宜信开源项目 Davinci 二次开发的数据可视化 BI 工具，为用户在数据安全方面提供金融级数据可视化能力。 | >=0.5.0 | >=1.0.2 | **待发布**      |
 | [**Qualitis**](https://github.com/WeBankFinTech/Qualitis)   | 数据质量校验工具，提供数据完整性、正确性等数据校验能力 | >=0.5.0 | >=1.0.1 |  **待发布**      |
 | [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DataApiService%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)  | 数据API服务。可快速将SQL脚本发布为一个 Restful 接口，对外提供 Rest 访问能力。    | 不支持 | >=1.0.0 | 已发布 |

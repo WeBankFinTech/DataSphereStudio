@@ -42,7 +42,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.util.*;
 
@@ -61,7 +60,7 @@ public class FlowRestfulApi {
     ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "addFlow",method = RequestMethod.POST)
-    public Message addFlow(@Context HttpServletRequest req, @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
+    public Message addFlow(HttpServletRequest req, @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
         //如果是子工作流，那么分类应该是和父类一起的？
         String userName = SecurityFilter.getLoginUsername(req);
         // TODO: 2019/5/23 flowName工程名下唯一校验
@@ -80,7 +79,7 @@ public class FlowRestfulApi {
     }
 
     @RequestMapping(value = "publishWorkflow",method = RequestMethod.POST)
-    public Message publishWorkflow(@Context HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) {
+    public Message publishWorkflow(HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) {
         Long workflowId = publishWorkflowRequest.getWorkflowId();
 //        Map<String, Object> labels = StreamSupport.stream(Spliterators.spliteratorUnknownSize(dssLabel.getFields(),
 //            Spliterator.ORDERED), false).collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().getTextValue()));
@@ -116,7 +115,7 @@ public class FlowRestfulApi {
      */
 
     @RequestMapping(value = "getReleaseStatus",method = RequestMethod.GET)
-    public Message getReleaseStatus(@Context HttpServletRequest request,
+    public Message getReleaseStatus(HttpServletRequest request,
                                     @NotNull(message = "查询的发布id不能为空") @RequestParam(required = false, name = "releaseTaskId") Long releaseTaskId) {
         String username = SecurityFilter.getLoginUsername(request);
         Message message;
@@ -154,7 +153,7 @@ public class FlowRestfulApi {
      */
     @RequestMapping(value = "updateFlowBaseInfo",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message updateFlowBaseInfo(@Context HttpServletRequest req,@RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+    public Message updateFlowBaseInfo(HttpServletRequest req,@RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
@@ -180,7 +179,7 @@ public class FlowRestfulApi {
      */
 
     @RequestMapping(value = "get",method = RequestMethod.GET)
-    public Message get(@Context HttpServletRequest req, @RequestParam(required = false, name = "flowId") Long flowID
+    public Message get(HttpServletRequest req, @RequestParam(required = false, name = "flowId") Long flowID
     ) throws DSSErrorException {
         // TODO: 2019/5/23 id空值判断
         String username = SecurityFilter.getLoginUsername(req);
@@ -194,7 +193,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "deleteFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message deleteFlow(@Context HttpServletRequest req,@RequestBody  DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+    public Message deleteFlow(HttpServletRequest req,@RequestBody  DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
         // TODO: 2019/6/13  projectVersionID的更新校验
@@ -218,7 +217,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "saveFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message saveFlow(@Context HttpServletRequest req, @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
+    public Message saveFlow(HttpServletRequest req, @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
         Long flowID = saveFlowRequest.getId();
         String jsonFlow = saveFlowRequest.getJson();
         String workspaceName = saveFlowRequest.getWorkspaceName();

@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Context;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +60,7 @@ public class DSSWorkspaceRoleRestful {
     private DSSApplicationMapper applicationMapper;
 
     @RequestMapping(path ="getBaseInfo", method = RequestMethod.GET)
-    public Message getBaseInfo(@Context HttpServletRequest req) {
+    public Message getBaseInfo(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         userService.saveWorkspaceUser(username);
         List<DSSApplication> applicationList = applicationMapper.selectList(null);
@@ -100,14 +99,14 @@ public class DSSWorkspaceRoleRestful {
     }
 
     @RequestMapping(path ="getWorkspaceRoles", method = RequestMethod.GET)
-    public Message getWorkspaceRoles(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
+    public Message getWorkspaceRoles(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
         //todo 获取工作空间中所有的角色
         List<DSSWorkspaceRoleVO> workspaceRoles = dssWorkspaceService.getWorkspaceRoles(workspaceId);
         return Message.ok().data("workspaceRoles", workspaceRoles);
     }
 
     @RequestMapping(path ="addWorkspaceRole", method = RequestMethod.POST)
-    public Message addWorkspaceRole(@Context HttpServletRequest request,@RequestBody AddWorkspaceRoleRequest addWorkspaceRoleRequest){
+    public Message addWorkspaceRole(HttpServletRequest request,@RequestBody AddWorkspaceRoleRequest addWorkspaceRoleRequest){
         String username = SecurityFilter.getLoginUsername(request);
         int workspaceId = addWorkspaceRoleRequest.getWorkspaceId();
         String roleName = addWorkspaceRoleRequest.getRoleName();
@@ -118,14 +117,14 @@ public class DSSWorkspaceRoleRestful {
     }
 
     @RequestMapping(path ="deleteWorkspaceRole", method = RequestMethod.POST)
-    public Message deleteWorkspaceRole(@Context HttpServletRequest request){
+    public Message deleteWorkspaceRole(HttpServletRequest request){
 
         return null;
     }
 
     @RequestMapping(path ="getWorkspaceBaseInfo", method = RequestMethod.GET)
-    public Message getWorkspaceInfo(@Context HttpServletRequest request,
-                                     @Context HttpServletResponse response,
+    public Message getWorkspaceInfo(HttpServletRequest request,
+                                     HttpServletResponse response,
                                      @RequestParam(WORKSPACE_ID_STR) Integer workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
         //如果workspaceId为null的话,那么就找到这个用户工作空间

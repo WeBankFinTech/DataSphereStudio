@@ -46,15 +46,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 @RequestMapping(path = "/dss/apiservice", produces = {"application/json"})
 @RestController
@@ -64,24 +61,20 @@ public class ApiServiceExecuteRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(ApiServiceExecuteRestfulApi.class);
     @Autowired
     private ApiServiceQueryService queryService;
-
-
     private static final String SYS_COLUMN_PREFIX = "_";
 
     private static final String requestBodyDemo = "{\"moduleName\":\"aladdin-demo\",\"params\":{\"param1\": \"value1\"}}";
 
-
-
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.POST)
     public Message post(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                         @Context HttpServletRequest req) {
+                         HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.POST);
     }
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.GET)
     public Message get(@PathVariable("path") VariableString path,
-                        @Context HttpServletRequest req) throws JsonProcessingException {
+                        HttpServletRequest req) throws JsonProcessingException {
         String userName = SecurityFilter.getLoginUsername(req);
 
         QueryRequest queryRequest = new QueryRequest();
@@ -114,14 +107,14 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.PUT)
     public Message put(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                        @Context HttpServletRequest req) {
+                        HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.PUT);
     }
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.DELETE)
     public Message delete(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                           @Context HttpServletRequest req) {
+                           HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.DELETE);
     }
@@ -133,7 +126,7 @@ public class ApiServiceExecuteRestfulApi {
     }
 
     @RequestMapping(value = "/getDirFileTrees",method = RequestMethod.GET)
-    public void getDirFileTrees(@Context HttpServletRequest req, @Context HttpServletResponse resp,
+    public void getDirFileTrees(HttpServletRequest req, HttpServletResponse resp,
                                 @RequestParam(required = false, name = "path") String path,
                                 @RequestParam(required = false, name = "taskId") String taskId) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
@@ -160,13 +153,13 @@ public class ApiServiceExecuteRestfulApi {
 
 
     @RequestMapping(value = "/openFile",method = RequestMethod.GET)
-    public void openFile(@Context HttpServletRequest req,
+    public void openFile(HttpServletRequest req,
                              @RequestParam(required = false, name = "path") String path,
                              @RequestParam(required = false, name = "taskId") String taskId,
                              @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
                              @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
                              @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-                             @Context HttpServletResponse resp) throws IOException, ApiServiceQueryException {
+                             HttpServletResponse resp) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
             throw new  ApiServiceQueryException(80004, path);
@@ -189,8 +182,8 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "resultsetToExcel",method = RequestMethod.GET)
     public void resultsetToExcel(
-            @Context HttpServletRequest req,
-            @Context HttpServletResponse resp,
+            HttpServletRequest req,
+            HttpServletResponse resp,
             @RequestParam(required = false, name = "path") String path,
             @RequestParam(required = false, name = "taskId") String taskId,
             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
@@ -248,7 +241,7 @@ public class ApiServiceExecuteRestfulApi {
     }
 
     @RequestMapping(value = "/{id}/get",method = RequestMethod.GET)
-    public Message getTaskByID(@Context HttpServletRequest req, @PathVariable("id") Long taskId) {
+    public Message getTaskByID(HttpServletRequest req, @PathVariable("id") Long taskId) {
         String username = SecurityFilter.getLoginUsername(req);
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId.toString());
         if (null != apiServiceJob && username.equals(apiServiceJob.getSubmitUser())) {

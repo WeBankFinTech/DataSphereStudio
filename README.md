@@ -25,7 +25,7 @@ English | [中文](README-ZH.md)
 
 ### 1. One-stop, full-process application development management UI
 
- &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated systems include:
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated components include(**DSS version compatibility for the above components, please visit: [Integrated data application components](README.md#4-integrated-data-application-components)**):
 
  &nbsp; &nbsp; &nbsp; &nbsp;1. Data Development IDE Tool - [Scriptis](https://github.com/WeBankFinTech/Scriptis)
 

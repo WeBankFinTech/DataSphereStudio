@@ -98,11 +98,11 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;The function of DataSphere Studio supporting script execution has high security risks, and the isolation of the WeDataSphere Demo environment has not been completed. Considering that many users are inquiring about the Demo environment, we decided to first issue invitation codes to the community and accept trial applications from enterprises and organizations.
 
-&nbsp; &nbsp; &nbsp; &nbsp;If you want to try out the Demo environment, please join the DataSphere Studio community user group (**Please refer to the end of the document**), and contact **WeDataSphere Group Robot** to get an invitation code.
+ &nbsp; &nbsp; &nbsp; &nbsp;If you want to try out the Demo environment, please join the DataSphere Studio community user group (**Please refer to the end of the document**), and contact **WeDataSphere Group Robot** to get an invitation code.
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment user registration page: [click me to enter](https://www.ozone.space/wds/dss/#/register)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment user registration page: [click me to enter](https://dss-open.wedatasphere.com/#/register)
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment login page: [click me to enter](https://www.ozone.space/wds/dss/#/login)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment login page: [click me to enter](https://dss-open.wedatasphere.com/#/login)
 
 ##  Download
 

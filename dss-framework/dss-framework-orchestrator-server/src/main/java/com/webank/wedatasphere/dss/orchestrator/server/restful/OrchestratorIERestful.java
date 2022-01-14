@@ -43,9 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -64,7 +61,7 @@ public class OrchestratorIERestful {
     private DSSOrchestratorContext orchestratorContext;
 
     @RequestMapping(path ="importOrchestratorFile", method = RequestMethod.POST)
-    public Message importOrcFile(@Context HttpServletRequest req,
+    public Message importOrcFile(HttpServletRequest req,
                                   @RequestParam(required = false, name = "projectName") String projectName,
                                   @RequestParam(required = false, name = "projectID") Long projectID,
                                   @RequestParam(required = false, name = "labels") String labels,
@@ -107,8 +104,8 @@ public class OrchestratorIERestful {
     }
 
     @RequestMapping(path ="exportOrchestrator", method = RequestMethod.GET)
-    public void exportOrcFile(@Context HttpServletRequest req,
-                              @Context HttpServletResponse resp,
+    public void exportOrcFile(HttpServletRequest req,
+                              HttpServletResponse resp,
                               @RequestParam(defaultValue = "exportOrc",required = false, name = "outputFileName") String outputFileName,
                               @RequestParam(defaultValue = "utf-8",required = false, name = "charset") String charset,
                               @RequestParam(defaultValue = "zip",required = false, name = "outputFileType") String outputFileType,

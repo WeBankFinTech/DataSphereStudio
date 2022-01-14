@@ -102,13 +102,13 @@
 
 ## Demo试用环境
 
-&nbsp; &nbsp; &nbsp; &nbsp;由于 DataSphereStudio 支持执行脚本风险较高，WeDataSphere Demo 环境的隔离没有做完，考虑到大家都在咨询 Demo 环境，决定向社区先定向发放邀请码，接受企业和组织的试用申请。
+ &nbsp; &nbsp; &nbsp; &nbsp;由于 DataSphereStudio 支持执行脚本风险较高，WeDataSphere Demo 环境的隔离没有做完，考虑到大家都在咨询 Demo 环境，决定向社区先定向发放邀请码，接受企业和组织的试用申请。
 
-&nbsp; &nbsp; &nbsp; &nbsp;如果您想试用 Demo 环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系 **WeDataSphere 入群机器人** 获取邀请码。
+ &nbsp; &nbsp; &nbsp; &nbsp;如果您想试用 Demo 环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系 **WeDataSphere 入群机器人** 获取邀请码。
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境用户注册页面：[点我进入](https://www.ozone.space/wds/dss/#/register)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境用户注册页面：[点我进入](https://dss-open.wedatasphere.com/#/register)
 
-&nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境登录页面：[点我进入](https://www.ozone.space/wds/dss/#/login)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境登录页面：[点我进入](https://dss-open.wedatasphere.com/#/login)
 
 
 ## 下载

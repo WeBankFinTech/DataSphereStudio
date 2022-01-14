@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class DSSWorkspaceRestful {
     private WorkspaceDBHelper workspaceDBHelper;
 
     @RequestMapping(path ="createWorkspace", method = RequestMethod.POST)
-    public Message createWorkspace(@Context HttpServletRequest request, @RequestBody CreateWorkspaceRequest createWorkspaceRequest)throws ErrorException {
+    public Message createWorkspace(HttpServletRequest request, @RequestBody CreateWorkspaceRequest createWorkspaceRequest)throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
         if (!dssWorkspaceService.checkAdmin(userName)){
             return Message.error("您好，您不是管理员,没有权限建立工作空间");
@@ -64,14 +63,14 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="listDepartments", method = RequestMethod.GET)
-    public Message listDepartments(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
+    public Message listDepartments(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
         //todo 要从um中获取
         List<DepartmentVO> departments  = dssWorkspaceService.getDepartments();
         return Message.ok().data("departments", departments);
     }
 
     @RequestMapping(path ="getWorkspaces", method = RequestMethod.GET)
-    public Message getWorkspaces(@Context HttpServletRequest request){
+    public Message getWorkspaces(HttpServletRequest request){
         String username = SecurityFilter.getLoginUsername(request);
         List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(username);
         List<DSSWorkspaceVO> dssWorkspaceVOS = new ArrayList<>();
@@ -93,7 +92,7 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="getWorkspaceHomePage", method = RequestMethod.GET)
-    public Message getWorkspaceHomePage(@Context HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName){
+    public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName){
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
@@ -101,7 +100,7 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="getOverview", method = RequestMethod.GET)
-    public Message getOverview(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
+    public Message getOverview(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
         String language = request.getHeader("Content-language");
         boolean isEnglish = "en".equals(language);
@@ -110,7 +109,7 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="refreshCache", method = RequestMethod.GET)
-    public Message refreshCache(@Context HttpServletRequest request){
+    public Message refreshCache(HttpServletRequest request){
         workspaceDBHelper.retrieveFromDB();
         return Message.ok("refresh ok");
     }

@@ -37,7 +37,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;5. Data Exchange Tool - [Exchangis](https://github.com/WeBankFinTech/Exchangis) (**The upcoming Exchangis1.0 will be integrated with the DSS workflow**)
 
- &nbsp; &nbsp; &nbsp; &nbsp;6. Data Api Service - [DataApiService](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/User_Documentation/DataApiService_usage_documentation.md)
+ &nbsp; &nbsp; &nbsp; &nbsp;6. Data Api Service - [DataApiService](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Using_Document/DataApiService_Usage_Documentation.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;7. Streaming Application Development Management Tool - [Streamis](https://github.com/WeBankFinTech/Streamis)
 
@@ -75,11 +75,11 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;DSS has integrated a variety of upper-layer data application systems by implementing multiple AppConns, which can basically meet the data development needs of users.
 
- &nbsp; &nbsp; &nbsp; &nbsp;**If desired, new data application systems can also be easily integrated to replace or enrich DSS's data application development process.** [Click me to learn how to quickly integrate new application systems](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/Development_Guide_for_Third-Party_System_Access_to_DSS.md)
+ &nbsp; &nbsp; &nbsp; &nbsp;**If desired, new data application systems can also be easily integrated to replace or enrich DSS's data application development process.** [Click me to learn how to quickly integrate new application systems](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/Third-party_System_Access_Development_Guide.md)
 
 | Component | Description | DSS0.X Version Requirements | DSS1.0 Version Requirements | Version Planning |
 | --------------- | -------------------------------------------------------------------- | --------- | ---------- | ------ |
-| [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/User_Documentation/DataApiService_usage_documentation.md) | Data API service. The SQL script can be quickly published as a Restful interface, providing Rest access capability to the outside world. | Not supported | >=1.0.0 | Released |
+| [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Using_Document/DataApiService_Usage_Documentation.md) | Data API service. The SQL script can be quickly published as a Restful interface, providing Rest access capability to the outside world. | Not supported | >=1.0.0 | Released |
 | [**Scriptis**](https://github.com/WeBankFinTech/Scriptis) | Support online script writing such as SQL, Pyspark, HiveQL, etc., submit to [Linkis](https://github.com/WeBankFinTech/Linkis ) to perform data analysis web tools. | >=0.5.0 | >=1.0.0 | Released |
 | [**Schedulis**](https://github.com/WeBankFinTech/Schedulis) | Workflow task scheduling system based on Azkaban secondary development, with financial-grade features such as high performance, high availability and multi-tenant resource isolation. | >=0.5.0 | >=1.0.0 | Released |
 | **EventCheck** | Provides cross-business, cross-engineering, and cross-workflow signaling capabilities. | >=0.5.0 | >=1.0.0 | Released |
@@ -112,13 +112,13 @@ English | [中文](README-ZH.md)
 
 ## Compile and deploy
 
- &nbsp; &nbsp; &nbsp; &nbsp;Please follow [Compile Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/DSS_Compilation_Documentation.md) to compile DSS from source code.
+ &nbsp; &nbsp; &nbsp; &nbsp;Please follow [Compile Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/Compilation_Documentation.md) to compile DSS from source code.
 
- &nbsp; &nbsp; &nbsp; &nbsp;Please refer to [Deployment Documents](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_deployment/DSS_single_machine_deployment_document.md) to do the deployment.
+ &nbsp; &nbsp; &nbsp; &nbsp;Please refer to [Deployment Documents](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/DSS_Single-Server_Deployment_Documentation.md) to do the deployment.
 
 ## Examples and Guidance
 
- &nbsp; &nbsp; &nbsp; &nbsp;You can find examples and guidance for how to use DSS in [User Manual](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/User_Documentation/DSS_User_Manual.md).
+ &nbsp; &nbsp; &nbsp; &nbsp;You can find examples and guidance for how to use DSS in [User Manual](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Using_Document/DSS_User_Manual.md).
 
 
 ## Documents
@@ -127,13 +127,13 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;The following is the installation guide for DSS-related AppConn plugins:
 
-- [Visualis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_deployment/VisualisAppConnplugin_installation_document.md)
+- [Visualis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/VisualisAppConn_Plugin_Installation_Documentation.md)
 
-- [Schedulis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_deployment/SchedulisAppConnplugin_installation_document.md)
+- [Schedulis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/SchedulisAppConn_Plugin_Installation_Documentation.md)
 
-- [Qualitis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_deployment/QualitisAppConn_plugin_installation_document.md)
+- [Qualitis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/QualitisAppConn_Plugin_Installation_Documentation.md)
 
-- [Exchangis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_deployment/ExchangisAppConn_plugin_installation_document.md)
+- [Exchangis AppConn Plugin Installation Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/ExchangisAppConn_Plugin_Installation_Documentation.md)
 
 ## Architecture
 

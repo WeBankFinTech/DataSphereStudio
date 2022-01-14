@@ -152,11 +152,6 @@ public class ContextServiceImpl implements ContextService {
                 workTypes.add(WorkType.PROJECT);
                 workTypes.add(WorkType.FLOW);
                 csWorkService.initContextServiceInfo(contextIDStr, workTypes);
-                // ②解析和保存新的 UDF、Resource、Variable
-                // 保存Workspace和Project的资源参数等
-//                if (null != project.getProjectResources() && project.getProjectResources().size() > 0) {
-//                    saveContextResource(contextIDStr, project.getProjectResources(), contextClient, CSCommonUtils.PROJECT_RESOURCE_PREFIX);
-//                }
 
                 // 保存flow的资源
                 if (flowObject.has(DSSCommonUtils.FLOW_RESOURCE_NAME)) {
@@ -183,12 +178,6 @@ public class ContextServiceImpl implements ContextService {
                         }
                         if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
                             JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
-                            //节点的CS变量先不做存储，解决脚本节点执行变量没有及时清理问题
-//                            if (nodePropObj.has(DSSCommonUtils.NODE_PROP_VARIABLE_NAME)) {
-//                                JsonElement nodeVariables = nodePropObj.get(DSSCommonUtils.NODE_PROP_VARIABLE_NAME);
-//                                saveContextVariable(contextIDStr, nodeVariables, contextClient,
-//                                        CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
-//                            }
                         }
                     }
                 }

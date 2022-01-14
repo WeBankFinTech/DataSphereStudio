@@ -40,7 +40,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
-import javax.ws.rs.core.Context;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,7 @@ public class ApiServiceCoreRestfulApi {
     private static final Pattern WRITABLE_PATTERN = Pattern.compile("^\\s*(insert|update|delete|drop|alter|create).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     @RequestMapping(value = "/api",method = RequestMethod.POST)
-    public Message insert(ApiServiceVo apiService, @Context HttpServletRequest req) {
+    public Message insert(@RequestBody ApiServiceVo apiService, HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -139,7 +138,7 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/create",method = RequestMethod.POST)
-    public Message create(ApiServiceVo apiService, @Context HttpServletRequest req) {
+    public Message create(@RequestBody ApiServiceVo apiService, HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -212,9 +211,9 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/api/{api_service_version_id}",method = RequestMethod.PUT)
-    public Message update(ApiServiceVo apiService,
+    public Message update(@RequestBody ApiServiceVo apiService,
                            @PathVariable("api_service_version_id") Long apiServiceVersionId,
-                           @Context HttpServletRequest req) {
+                           HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (StringUtils.isBlank(apiService.getScriptPath())) {
@@ -299,7 +298,7 @@ public class ApiServiceCoreRestfulApi {
                                     @RequestParam(required = false, name = "status") Integer status,
                                     @RequestParam(required = false, name = "creator") String creator,
                                     @RequestParam(required = false, name = "workspaceId") Integer workspaceId,
-                                    @Context HttpServletRequest req) {
+                                    HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
         return ApiUtils.doAndResponse(() -> {
@@ -319,7 +318,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/getUserServices",method = RequestMethod.GET)
     public Message getUserServices(@RequestParam(required = false, name = "workspaceId") Integer workspaceId,
-            @Context HttpServletRequest req){
+            HttpServletRequest req){
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
             if(!this.apiService.checkUserWorkspace(userName,workspaceId) ){
@@ -333,7 +332,7 @@ public class ApiServiceCoreRestfulApi {
 
 
     @RequestMapping(value = "/tags",method = RequestMethod.GET)
-    public Message query( @Context HttpServletRequest req,@RequestParam(required = false, name = "workspaceId") Integer workspaceId) {
+    public Message query( HttpServletRequest req,@RequestParam(required = false, name = "workspaceId") Integer workspaceId) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
 
@@ -347,7 +346,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/query",method = RequestMethod.GET)
     public Message queryByScriptPath(@RequestParam(required = false, name = "scriptPath") String scriptPath,
-                                      @Context HttpServletRequest req) {
+                                      HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (StringUtils.isBlank(scriptPath)) {
@@ -372,7 +371,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/queryById",method = RequestMethod.GET)
     public Message queryById(@RequestParam(required = false, name = "id") Long id,
-                              @Context HttpServletRequest req) {
+                              HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
             if (id==null) {
@@ -416,7 +415,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiDisable",method = RequestMethod.GET)
     public Message apiDisable(@RequestParam(required = false, name = "id") Long id,
-                               @Context HttpServletRequest req) {
+                               HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (null == id) {
@@ -429,7 +428,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiEnable",method = RequestMethod.GET)
     public Message apiEnable(@RequestParam(required = false, name = "id") Long id,
-                              @Context HttpServletRequest req) {
+                              HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (null == id) {
@@ -442,7 +441,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiDelete",method = RequestMethod.GET)
     public Message apiDelete(@RequestParam(required = false, name = "id") Long id,
-                               @Context HttpServletRequest req) {
+                               HttpServletRequest req) {
         //目前暂时不实际删除数据，只做不可见和不可用。
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
@@ -455,7 +454,7 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/apiCommentUpdate",method = RequestMethod.POST)
-    public Message apiCommentUpdate(@Context HttpServletRequest req,
+    public Message apiCommentUpdate(HttpServletRequest req,
                                     @RequestBody ApiCommentUpdateRequest apiCommentUpdateRequest) {
         Long id = apiCommentUpdateRequest.getId();
         String comment = apiCommentUpdateRequest.getComment();
@@ -474,7 +473,7 @@ public class ApiServiceCoreRestfulApi {
     @RequestMapping(value = "/apiParamQuery",method = RequestMethod.GET)
     public Message apiParamQuery(@RequestParam(required = false, name = "scriptPath") String scriptPath,
                                   @RequestParam(required = false, name = "versionId") Long versionId,
-                                  @Context HttpServletRequest req) {
+                                  HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (StringUtils.isEmpty(scriptPath)) {
@@ -490,7 +489,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiVersionQuery",method = RequestMethod.GET)
     public Message apiVersionQuery(@RequestParam(required = false, name = "serviceId") Long serviceId,
-                                    @Context HttpServletRequest req) {
+                                    HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
             String userName = SecurityFilter.getLoginUsername(req);
             if (null == serviceId) {
@@ -505,7 +504,7 @@ public class ApiServiceCoreRestfulApi {
 
     @RequestMapping(value = "/apiContentQuery",method = RequestMethod.GET)
     public Message apiContentQuery(@RequestParam(required = false, name = "versionId") Long versionId,
-                                    @Context HttpServletRequest req) {
+                                    HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
             if (null== versionId) {

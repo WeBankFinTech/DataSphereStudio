@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -45,15 +44,10 @@ import java.util.Date;
 @RestController
 public class ApiServiceTokenRestfulApi {
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceTokenRestfulApi.class);
-
     @Autowired
     TokenQueryService tokenQueryService;
-
-
-
     @Autowired
     TokenAuth tokenAuth;
-
 
     @RequestMapping(value = "/tokenQuery",method = RequestMethod.GET)
     public Message apiServiceTokenQuery(@RequestParam(required = false, name = "apiId") Long apiId,
@@ -63,7 +57,7 @@ public class ApiServiceTokenRestfulApi {
                                          @RequestParam(required = false, name = "endDate") String endDateStr,
                                          @RequestParam(required = false, name = "currentPage") Integer currentPage,
                                          @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                                         @Context HttpServletRequest req) {
+                                         HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
 
@@ -96,7 +90,7 @@ public class ApiServiceTokenRestfulApi {
 
     @RequestMapping(value = "/approvalRefresh",method = RequestMethod.GET)
     public Message refresh(@RequestParam(required = false, name = "approvalNo") String approvalNo,
-                            @Context HttpServletRequest req) {
+                            HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() ->{
             return Message.ok().data("approvalStatus", "success");

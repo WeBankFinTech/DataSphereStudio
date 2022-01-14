@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.Map;
 
 
@@ -65,7 +64,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
      */
     @Override
     @RequestMapping(value = "/execute",method = RequestMethod.POST)
-    public Message execute(@Context HttpServletRequest req, @RequestBody Map<String, Object> json) {
+    public Message execute(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
 //        try{
         logger.info("Begin to get an execID");

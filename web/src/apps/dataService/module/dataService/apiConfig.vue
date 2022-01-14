@@ -5,7 +5,7 @@
     </div>
     <div class="tabWrap" v-if="tabDatas.length > 0">
       <template v-for="(work, index) in tabDatas">
-        <webTab
+        <weTab
           :index="index"
           :work="work"
           :isActive="work.isActive"
@@ -28,13 +28,13 @@
   </div>
 </template>
 <script>
-import webTab from "@component/lubanTab/index.vue"
+import weTab from "@component/lubanTab/index.vue"
 import paramsConfig from "./paramsConfig.vue"
 import emptyGuide from "./emptyGuide.vue"
 // import api from "@/common/service/api";
 export default {
   components: {
-    webTab,
+    weTab,
     paramsConfig,
     emptyGuide,
   },

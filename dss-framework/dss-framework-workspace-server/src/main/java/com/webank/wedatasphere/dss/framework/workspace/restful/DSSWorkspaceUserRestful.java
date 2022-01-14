@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ public class DSSWorkspaceUserRestful {
     private DSSWorkspaceUserService dssWorkspaceUserService;
 
     @RequestMapping(path ="getWorkspaceUsers", method = RequestMethod.GET)
-    public Message getWorkspaceUsers(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId,
+    public Message getWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId,
                                      @RequestParam(required = false, name = "pageNow") Integer pageNow, @RequestParam(required = false, name = "pageSize") Integer pageSize,
                                      @RequestParam(required = false, name = "department") String department, @RequestParam(required = false, name = "username") String username,
                                      @RequestParam(required = false, name = "roleName") String roleName){
@@ -90,14 +89,14 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
+    public Message getAllWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
         String username = SecurityFilter.getLoginUsername(request);
         List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
         return Message.ok().data("users", users);
     }
 
     @RequestMapping(path ="addWorkspaceUser", method = RequestMethod.POST)
-    public Message addWorkspaceUser(@Context HttpServletRequest request,@RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest){
+    public Message addWorkspaceUser(HttpServletRequest request,@RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest){
         //todo 工作空间添加用户
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
@@ -108,7 +107,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="updateWorkspaceUser", method = RequestMethod.POST)
-    public Message updateWorkspaceUser(@Context HttpServletRequest request,@RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest){
+    public Message updateWorkspaceUser(HttpServletRequest request,@RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest){
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
@@ -118,7 +117,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="deleteWorkspaceUser", method = RequestMethod.POST)
-    public Message deleteWorkspaceUser(@Context HttpServletRequest request,@RequestBody DeleteWorkspaceUserRequest deleteWorkspaceUserRequest){
+    public Message deleteWorkspaceUser(HttpServletRequest request,@RequestBody DeleteWorkspaceUserRequest deleteWorkspaceUserRequest){
         //todo 删除工作空间中的用户
         String userName = deleteWorkspaceUserRequest.getUsername();
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
@@ -127,13 +126,13 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="listAllUsers", method = RequestMethod.GET)
-    public Message listAllUsers(@Context HttpServletRequest request){
+    public Message listAllUsers(HttpServletRequest request){
         List<StaffInfoVO> dssUsers = dssWorkspaceUserService.listAllDSSUsers();
         return Message.ok().data("users", dssUsers);
     }
 
     @RequestMapping(path ="getWorkspaceIdByUserName", method = RequestMethod.GET)
-    public Message getWorkspaceIdByUserName(@Context HttpServletRequest request,@RequestParam(required = false, name = "userName") String userName){
+    public Message getWorkspaceIdByUserName(HttpServletRequest request,@RequestParam(required = false, name = "userName") String userName){
         String loginUserName = SecurityFilter.getLoginUsername(request);
         String queryUserName = userName;
         if(StringUtils.isEmpty(userName)){

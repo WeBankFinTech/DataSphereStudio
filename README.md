@@ -25,7 +25,7 @@ English | [中文](README-ZH.md)
 
 ### 1. One-stop, full-process application development management UI
 
- &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated components include(**DSS version compatibility for the above components, please visit: [Integrated data application components](README.md#4-integrated-data-application-components)**):
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS is highly integrated. Currently integrated components include(**DSS version compatibility for the above components, please visit: [Compatibility list of integrated components](README.md#4-integrated-data-application-components)**):
 
  &nbsp; &nbsp; &nbsp; &nbsp;1. Data Development IDE Tool - [Scriptis](https://github.com/WeBankFinTech/Scriptis)
 
@@ -49,7 +49,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;11. Data Model Center - DataModelCenter (**In development**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;**DSS version compatibility for the above components, please visit: [Integrated data application components](README.md#4-integrated-data-application-components)**.
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS version compatibility for the above components, please visit: [Compatibility list of integrated components](README.md#4-integrated-data-application-components)**.
 
  &nbsp; &nbsp; &nbsp; &nbsp;With a pluggable framework architecture, DSS is designed to allow users to quickly integrate new data application tools, or replace various tools that DSS has integrated. For example, replace Scriptis with Zeppelin, and replace Schedulis with DolphinScheduler...
 

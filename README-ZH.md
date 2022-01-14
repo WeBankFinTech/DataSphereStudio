@@ -29,7 +29,7 @@
 
 ### 一、一站式、全流程的应用开发管理界面
 
- &nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有(**DSS 对以上组件的版本兼容性，请访问：[已集成的数据应用组件](README-ZH.md#四已集成的数据应用组件)**)：
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有（**DSS 对以上组件的版本兼容性，请访问：[已集成组件的兼容性列表](README-ZH.md#四已集成的数据应用组件)**）：
  
  &nbsp; &nbsp; &nbsp; &nbsp;1、数据开发IDE工具——[Scriptis](https://github.com/WeBankFinTech/Scriptis)
  
@@ -53,7 +53,7 @@
  
  &nbsp; &nbsp; &nbsp; &nbsp;11、数据模型中心——**DataModelCenter**(**社区联合共建中，预计春节后**)
  
- &nbsp; &nbsp; &nbsp; &nbsp;**DSS 对以上组件的版本兼容性，请访问：[已集成的数据应用组件](README-ZH.md#四已集成的数据应用组件)**。
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS 对以上组件的版本兼容性，请访问：[已集成组件的兼容性列表](README-ZH.md#四已集成的数据应用组件)**。
  
  &nbsp; &nbsp; &nbsp; &nbsp;DSS 插拔式的框架设计模式，允许用户快速替换DSS已集成的各个 Web 系统。如：将 Scriptis 替换成 Zeppelin，将 Schedulis 替换成 DolphinScheduler。
  

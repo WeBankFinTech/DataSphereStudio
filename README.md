@@ -48,6 +48,8 @@ English | [中文](README-ZH.md)
  &nbsp; &nbsp; &nbsp; &nbsp;10. Help documentation and beginner's guide - UserGuide (**In Code Merging**)
 
  &nbsp; &nbsp; &nbsp; &nbsp;11. Data Model Center - DataModelCenter (**In development**)
+ 
+ &nbsp; &nbsp; &nbsp; &nbsp;**DSS version compatibility for the above components, please visit: [Integrated data application components](README.md#4-integrated-data-application-components)**.
 
  &nbsp; &nbsp; &nbsp; &nbsp;With a pluggable framework architecture, DSS is designed to allow users to quickly integrate new data application tools, or replace various tools that DSS has integrated. For example, replace Scriptis with Zeppelin, and replace Schedulis with DolphinScheduler...
 
@@ -77,21 +79,21 @@ English | [中文](README-ZH.md)
 
 | Component | Description | DSS0.X Version Requirements | DSS1.0 Version Requirements | Version Planning |
 | --------------- | -------------------------------------------------------------------- | --------- | ---------- | ------ |
-| **DolphinScheduler** | Apache DolphinScheduler, a distributed and scalable visual workflow task scheduling platform, supports one-click publishing of DSS workflows to DolphinScheduler. | Not supported | Planned in 1.1.0 | **Code merging** |
-| **UserGuide**     | It mainly provides help documentation, beginner's guide, Dark mode skinning, etc.      | Not supported | Planning in 1.1.0 | **Code merging** |
-| **DataModelCenter** | It mainly provides the capabilities of data warehouse planning, data model development and data asset management. Data warehouse planning includes subject domains, data warehouse layers, modifiers, etc.; data model development includes indicators, dimensions, metrics, wizard-based table building, etc.; data assets are connected to Apache Atlas to provide data lineage capabilities. | Not supported | Planning in 1.2.0 | **Community joint construction, expected after the Spring Festival** |
-| **UserManager** | Automatically initialize all user environments necessary for a new DSS user, including: creating Linux users, various user paths, directory authorization, etc. | >=0.9.1 | >=1.0.2 | **Code merging** |
-| [**Prophecis**](https://github.com/WeBankFinTech/Prophecis) | A one-stop machine learning platform that integrates multiple open source machine learning frameworks. Prophecis' MLFlow can be connected to DSS workflow through AppConn. | Not supported | >=1.0.2 | **Combination version coming soon** |
-| [**Streamis**](https://github.com/WeBankFinTech/Streamis) | Streaming application development management tool. It supports the release of Flink Jar and Flink SQL, and provides the development, debugging and production management capabilities of streaming applications, such as: start-stop, status monitoring, checkpoint, etc. | Not supported | >=1.0.1 | **Coming soon** |
-| [**Exchangis**](https://github.com/WeBankFinTech/Exchangis) | A data exchange platform that supports data transmission between structured and unstructured heterogeneous data sources, the upcoming Exchangis1. 0, will be connected with DSS workflow | not supported | >=1.0.2 | **In Development** |
-| [**Visualis**](https://github.com/WeBankFinTech/Visualis) | A data visualization BI tool based on the second development of Davinci, an open source project of CreditEase, provides users with financial-level data visualization capabilities in terms of data security. | >=0.5.0 | >=1.0.2 | **To be released** |
-| [**Qualitis**](https://github.com/WeBankFinTech/Qualitis) | Data quality verification tool, providing data verification capabilities such as data integrity and correctness | >=0.5.0 | >=1.0 .1 | **To be published** |
 | [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DataApiService%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md) | Data API service. The SQL script can be quickly published as a Restful interface, providing Rest access capability to the outside world. | Not supported | >=1.0.0 | Released |
 | [**Scriptis**](https://github.com/WeBankFinTech/Scriptis) | Support online script writing such as SQL, Pyspark, HiveQL, etc., submit to [Linkis](https://github.com/WeBankFinTech/Linkis ) to perform data analysis web tools. | >=0.5.0 | >=1.0.0 | Released |
 | [**Schedulis**](https://github.com/WeBankFinTech/Schedulis) | Workflow task scheduling system based on Azkaban secondary development, with financial-grade features such as high performance, high availability and multi-tenant resource isolation. | >=0.5.0 | >=1.0.0 | Released |
 | **EventCheck** | Provides cross-business, cross-engineering, and cross-workflow signaling capabilities. | >=0.5.0 | >=1.0.0 | Released |
 | **SendEmail** | Provides the ability to send data, all the result sets of other workflow nodes can be sent by email | >=0.5.0 | >=1.0.0 | Released |
-| **Airflow** | Supports publishing DSS workflows to Airflow for scheduling. | >=0.9.1, not yet merged | Not supported | **To be planned** |
+| [**Qualitis**](https://github.com/WeBankFinTech/Qualitis) | Data quality verification tool, providing data verification capabilities such as data integrity and correctness | >=0.5.0 | 1.0.1(Version currently in preparation) | **Expected end of January** |
+| [**Streamis**](https://github.com/WeBankFinTech/Streamis) | Streaming application development management tool. It supports the release of Flink Jar and Flink SQL, and provides the development, debugging and production management capabilities of streaming applications, such as: start-stop, status monitoring, checkpoint, etc. | Not supported | 1.0.1(Version currently in preparation) | **Expected end of January** |
+| [**Exchangis**](https://github.com/WeBankFinTech/Exchangis) | A data exchange platform that supports data transmission between structured and unstructured heterogeneous data sources, the upcoming Exchangis1. 0, will be connected with DSS workflow | not supported | Planned in 1.0.2 | **In Development** |
+| [**Visualis**](https://github.com/WeBankFinTech/Visualis) | A data visualization BI tool based on the second development of Davinci, an open source project of CreditEase, provides users with financial-level data visualization capabilities in terms of data security. | >=0.5.0 | Planned in 1.0.2 | **In Development** |
+| [**Prophecis**](https://github.com/WeBankFinTech/Prophecis) | A one-stop machine learning platform that integrates multiple open source machine learning frameworks. Prophecis' MLFlow can be connected to DSS workflow through AppConn. | Not supported | Planned in 1.0.2 | **In Development** |
+| **UserManager** | Automatically initialize all user environments necessary for a new DSS user, including: creating Linux users, various user paths, directory authorization, etc. | >=0.9.1 | Planned in 1.0.2 | **In Development** |
+| **DolphinScheduler** | Apache DolphinScheduler, a distributed and scalable visual workflow task scheduling platform, supports one-click publishing of DSS workflows to DolphinScheduler. | Not supported | Planned in 1.1.0 | **In Development** |
+| **UserGuide**     | It mainly provides help documentation, beginner's guide, Dark mode skinning, etc.      | Not supported | Planning in 1.1.0 | **In Development** |
+| **DataModelCenter** | It mainly provides the capabilities of data warehouse planning, data model development and data asset management. Data warehouse planning includes subject domains, data warehouse layers, modifiers, etc.; data model development includes indicators, dimensions, metrics, wizard-based table building, etc.; data assets are connected to Apache Atlas to provide data lineage capabilities. | Not supported | Planning in 1.2.0 | **In Development** |
+| **Airflow** | Supports publishing DSS workflows to Airflow for scheduling. | >=0.9.1, not yet merged | Not supported | **No plans yet** |
 
 
 ## Demo Trial environment

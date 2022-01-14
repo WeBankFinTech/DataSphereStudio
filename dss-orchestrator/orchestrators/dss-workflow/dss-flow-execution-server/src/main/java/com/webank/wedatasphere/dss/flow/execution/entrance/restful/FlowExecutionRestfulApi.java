@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
-import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.flow.execution.entrance.FlowContext$;
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob;
 import org.apache.linkis.entrance.EntranceServer;
@@ -26,13 +25,9 @@ import org.apache.linkis.scheduler.queue.Job;
 import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 

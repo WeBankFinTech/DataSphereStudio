@@ -102,11 +102,11 @@ const menu = [
       { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" }
     ]
   },
-  {
-    title: "组件接入",
-    icon: "componentImport",
-    nodes: []
-  }
+//  {
+//    title: "组件接入",
+//    icon: "componentImport",
+//    nodes: []
+//  }
 ];
 const tempComponent = {
   onestop_menu_id: 1,
@@ -372,7 +372,7 @@ export default {
     }
   },
   mounted() {
-    this.getMenuForcomponentAccess();
+    //this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }

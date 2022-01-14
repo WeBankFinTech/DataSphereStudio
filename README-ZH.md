@@ -29,7 +29,7 @@
 
 ### 一、一站式、全流程的应用开发管理界面
 
- &nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有：
+ &nbsp; &nbsp; &nbsp; &nbsp;DSS 集成度极高，目前已集成的系统有(**DSS 对以上组件的版本兼容性，请访问：[已集成的数据应用组件](README-ZH.md#四已集成的数据应用组件)**)：
  
  &nbsp; &nbsp; &nbsp; &nbsp;1、数据开发IDE工具——[Scriptis](https://github.com/WeBankFinTech/Scriptis)
  

@@ -100,7 +100,7 @@
                 $t('message.permissions.superior') +
                 $t('message.permissions.forSelect')
             "
-            defaultExpandLevel="Infinity"
+            :defaultExpandLevel="Infinity"
             search-nested
             required
             style="width: 300px"

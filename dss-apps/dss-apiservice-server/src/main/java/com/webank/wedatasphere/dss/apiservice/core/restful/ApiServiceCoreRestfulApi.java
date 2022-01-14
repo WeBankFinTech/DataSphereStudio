@@ -65,7 +65,7 @@ public class ApiServiceCoreRestfulApi {
     private static final Pattern WRITABLE_PATTERN = Pattern.compile("^\\s*(insert|update|delete|drop|alter|create).*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     @RequestMapping(value = "/api",method = RequestMethod.POST)
-    public Message insert(ApiServiceVo apiService, HttpServletRequest req) {
+    public Message insert(@RequestBody ApiServiceVo apiService, HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -138,7 +138,7 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/create",method = RequestMethod.POST)
-    public Message create(ApiServiceVo apiService, HttpServletRequest req) {
+    public Message create(@RequestBody ApiServiceVo apiService, HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {
 
             if (apiService.getWorkspaceId() == null){
@@ -211,7 +211,7 @@ public class ApiServiceCoreRestfulApi {
     }
 
     @RequestMapping(value = "/api/{api_service_version_id}",method = RequestMethod.PUT)
-    public Message update(ApiServiceVo apiService,
+    public Message update(@RequestBody ApiServiceVo apiService,
                            @PathVariable("api_service_version_id") Long apiServiceVersionId,
                            HttpServletRequest req) {
         return ApiUtils.doAndResponse(() -> {

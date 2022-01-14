@@ -15,6 +15,7 @@
  */
 
 package com.webank.wedatasphere.dss.workflow.restful;
+
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -56,7 +57,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class NodeRestfulApi {
     private WorkflowNodeService workflowNodeService;
 
     @RequestMapping(value = "/listNodeType",method = RequestMethod.GET)
-    public Message listNodeType(@Context HttpServletRequest req) {
+    public Message listNodeType(HttpServletRequest req) {
         DomainSupplier<NodeGroup, String> supplier = internationalization(req, NodeGroup::getNameEn, NodeGroup::getName);
         List<NodeGroupVO> groupVOS = new ArrayList<>();
         //cache
@@ -157,7 +157,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/createAppConnNode",method = RequestMethod.POST)
-    public Message createExternalNode(@Context HttpServletRequest req, @RequestBody CreateExternalNodeRequest createExternalNodeRequest) throws DSSErrorException, IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message createExternalNode(HttpServletRequest req, @RequestBody CreateExternalNodeRequest createExternalNodeRequest) throws DSSErrorException, IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectID = createExternalNodeRequest.getProjectID();
@@ -193,7 +193,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/updateAppConnNode",method = RequestMethod.POST)
-    public Message updateExternalNode(@Context HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message updateExternalNode(HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectID = updateExternalNodeRequest.getProjectID();
@@ -212,7 +212,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/deleteAppConnNode",method = RequestMethod.POST)
-    public Message deleteExternalNode(@Context HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message deleteExternalNode(HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectID = updateExternalNodeRequest.getProjectID();
@@ -232,7 +232,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/batchDeleteAppConnNode",method = RequestMethod.POST)
-    public Message batchDeleteAppConnNode(@Context HttpServletRequest req, @RequestBody BatchDeleteAppConnNodeRequest batchDeleteAppConnNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message batchDeleteAppConnNode(HttpServletRequest req, @RequestBody BatchDeleteAppConnNodeRequest batchDeleteAppConnNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         List<Map<String,Object>>  jsonList = batchDeleteAppConnNodeRequest.getNodes();
@@ -262,7 +262,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/getAppConnNodeUrl",method = RequestMethod.POST)
-    public Message getAppConnNodeUrl(@Context HttpServletRequest req, @RequestBody AppConnNodeUrlRequest appConnNodeUrlRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message getAppConnNodeUrl(HttpServletRequest req, @RequestBody AppConnNodeUrlRequest appConnNodeUrlRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectID = appConnNodeUrlRequest.getProjectID();

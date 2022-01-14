@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 
 
 @RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
@@ -62,7 +61,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path ="createOrchestrator", method = RequestMethod.POST)
-    public Message createOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) {
+    public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
@@ -86,7 +85,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path ="getAllOrchestrator", method = RequestMethod.POST)
-    public Message getAllOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
+    public Message getAllOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
             return Message.ok("获取编排模式成功").data("page", orchestratorService.getListByPage(orchestratorRequest, username));
@@ -104,7 +103,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path ="modifyOrchestrator", method = RequestMethod.POST)
-    public Message modifyOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) {
+    public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
@@ -127,7 +126,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path ="deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator(@Context HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
+    public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());

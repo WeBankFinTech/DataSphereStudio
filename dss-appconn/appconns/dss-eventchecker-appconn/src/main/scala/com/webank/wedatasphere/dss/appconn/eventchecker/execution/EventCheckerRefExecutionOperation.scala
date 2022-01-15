@@ -16,22 +16,19 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
-
-
-
 import java.util.{Properties, UUID}
 
-import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
 import com.webank.wedatasphere.dss.standard.app.development.listener.{ExecutionLogListener, ExecutionResultListener}
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
-import com.webank.wedatasphere.linkis.common.log.LogUtils
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.storage.LineRecord
+import org.apache.linkis.common.log.LogUtils
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.storage.LineRecord
 import org.apache.commons.io.IOUtils
+import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import org.slf4j.LoggerFactory;
 
 
@@ -41,7 +38,7 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
 
   private var service:DevelopmentService = _
   private val logger = LoggerFactory.getLogger(classOf[EventCheckerRefExecutionOperation])
-
+  private var killTag = false
 
 
 
@@ -63,11 +60,14 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
     }
   }
 
-  override def kill(action: RefExecutionAction): Boolean = action match {
-    case longTermAction: EventCheckerExecutionAction =>
-      longTermAction.setKilledFlag(true)
-      longTermAction.setState(RefExecutionState.Killed)
-      true
+  override def kill(action: RefExecutionAction): Boolean = {
+    killTag = true
+    action match {
+      case longTermAction: EventCheckerExecutionAction =>
+        longTermAction.setKilledFlag(true)
+        longTermAction.setState(RefExecutionState.Killed)
+        true
+    }
   }
 
   protected def putErrorMsg(errorMsg: String, t: Throwable, action: EventCheckerExecutionAction): EventCheckerExecutionAction = t match {
@@ -123,6 +123,10 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
             putErrorMsg("EventChecker run failed!" + t.getMessage, t, action)
             false
           })
+          if(killTag) {
+            killTag = false
+            return RefExecutionState.Killed
+          }
         }
         action.state
       }

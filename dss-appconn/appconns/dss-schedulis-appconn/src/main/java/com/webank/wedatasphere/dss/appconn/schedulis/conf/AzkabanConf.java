@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.conf;
 
 
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 
 public class AzkabanConf {
     public static final CommonVars<String> DEFAULT_STORE_PATH = CommonVars.apply("wds.dss.appconn.scheduler.project.store.dir", "/appcom/tmp/wds/dss");

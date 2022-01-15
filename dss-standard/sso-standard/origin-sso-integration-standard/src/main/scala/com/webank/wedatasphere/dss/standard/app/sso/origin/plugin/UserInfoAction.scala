@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.plugin
 
-import com.webank.wedatasphere.linkis.httpclient.dws.request.DWSHttpAction
-import com.webank.wedatasphere.linkis.httpclient.request.GetAction
-import com.webank.wedatasphere.linkis.httpclient.request.POSTAction
+import org.apache.linkis.httpclient.dws.request.DWSHttpAction
+import org.apache.linkis.httpclient.request.GetAction
+import org.apache.linkis.httpclient.request.POSTAction
 
 
 class UserInfoAction extends GetAction with DWSHttpAction {

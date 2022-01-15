@@ -16,17 +16,13 @@
 
 package com.webank.wedatasphere.dss.common.label;
 
-import com.webank.wedatasphere.linkis.manager.label.entity.Label;
+import org.apache.linkis.manager.label.entity.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author: jinyangrao on 2021/7/16
- * @description:
- */
 public class LabelInstanceFactory {
 
     private static final Logger log = LoggerFactory.getLogger(LabelInstanceFactory.class);

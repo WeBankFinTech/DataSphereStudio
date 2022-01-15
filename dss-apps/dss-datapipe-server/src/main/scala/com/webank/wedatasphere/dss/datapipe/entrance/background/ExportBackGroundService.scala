@@ -20,9 +20,9 @@ import java.util
 
 import com.google.gson.internal.LinkedTreeMap
 import com.google.gson.{JsonObject, JsonParser}
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.server._
-import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.server._
+import org.apache.linkis.server.socket.controller.ServerEvent
 
 
 class ExportBackGroundService extends AbstractBackGroundService with Logging{
@@ -52,9 +52,9 @@ class ExportBackGroundService extends AbstractBackGroundService with Logging{
     newExecutionCode += destination
     newExecutionCode += newDataInfo
     if(storePath == null)
-      newExecutionCode += "com.webank.wedatasphere.linkis.engineplugin.spark.imexport.ExportData.exportData(spark,dataInfo,destination)"
+      newExecutionCode += "org.apache.linkis.engineplugin.spark.imexport.ExportData.exportData(spark,dataInfo,destination)"
     else
-      newExecutionCode += "com.webank.wedatasphere.linkis.engineplugin.spark.imexport.ExportData.exportDataByFile(spark,dataInfo,destination)"
+      newExecutionCode += "org.apache.linkis.engineplugin.spark.imexport.ExportData.exportDataByFile(spark,dataInfo,destination)"
     params.put("executionCode", newExecutionCode)
     print(newExecutionCode)
     val map = new util.HashMap[String, Object]()

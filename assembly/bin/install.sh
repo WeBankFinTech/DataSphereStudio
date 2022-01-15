@@ -13,7 +13,8 @@ SERVER_IP=""
 SERVER_HOME=""
 
 local_host="`hostname --fqdn`"
-LOCAL_IP="`ifconfig | grep 'inet' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}'`"
+LOCAL_IP=$(hostname -I)
+LOCAL_IP=${LOCAL_IP// /}
 
 #To be compatible with MacOS and Linux
 txt=""
@@ -54,8 +55,8 @@ function checkJava(){
 
 checkJava
 
-dos2unix ${workDir}/config/*
-dos2unix ${workDir}/bin/*
+dos2unix -q ${workDir}/config/*
+dos2unix -q ${workDir}/bin/*
 
 echo "step1:load config"
 source ${workDir}/config/config.sh
@@ -113,11 +114,11 @@ function replaceCommonIp() {
   fi
 
  if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
-   echo "GATEWAY_INSTALL_IP is equals $GATEWAY_INSTALL_IP ,we will change it to ip address"
+   #echo "GATEWAY_INSTALL_IP is equals $GATEWAY_INSTALL_IP ,we will change it to ip address"
    GATEWAY_INSTALL_IP=$LOCAL_IP
  fi
  if [[ $EUREKA_INSTALL_IP == "127.0.0.1" ]] || [ -z "$EUREKA_INSTALL_IP" ]; then
-    echo "EUREKA_INSTALL_IP is equals $EUREKA_INSTALL_IP ,we will change it to ip address"
+    #echo "EUREKA_INSTALL_IP is equals $EUREKA_INSTALL_IP ,we will change it to ip address"
     EUREKA_INSTALL_IP=$LOCAL_IP
  fi
 }
@@ -150,7 +151,7 @@ function changeConf(){
       sed -i "s#spring.spring.application.name=.*#spring.spring.application.name=$SERVER_FULL_NAME#g" $CONF_SERVER_PROPERTIES
   fi
   sed -i "s#wds.dss.appconn.scheduler.project.store.dir.*#wds.dss.appconn.scheduler.project.store.dir=$WDS_SCHEDULER_PATH#g" $CONF_SERVER_PROPERTIES
-  isSuccess "subsitution $CONF_SERVER_PROPERTIES of $SERVER_NAME"
+  isSuccess "subsitution $CONF_SERVER_PROPERTIES"
 }
 ##function end
 
@@ -204,12 +205,13 @@ fi
 
 ##Install dss projects
 function installDssProject() {
+  echo "step2:update config"
 #  if [ "$DSS_INSTALL_HOME" != "" ]
 #  then
 #	   rm -rf $DSS_INSTALL_HOME
 #  fi
-  echo ""
-  echo "-----------------DSS install start--------------------"
+  #echo ""
+  #echo "-----------------DSS install start--------------------"
   SERVER_HOME=$DSS_INSTALL_HOME
   if [ "$SERVER_HOME" == "" ]
   then
@@ -224,7 +226,7 @@ function installDssProject() {
   sudo mkdir -p $SERVER_HOME;sudo chown -R $deployUser:$deployUser $SERVER_HOME
   isSuccess "Create the dir of  $SERVER_HOME"
 
-  echo ""
+  #echo ""
   SERVER_NAME=dss-framework-project-server
   SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
   SERVER_PORT=$DSS_FRAMEWORK_PROJECT_SERVER_PORT
@@ -237,7 +239,7 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install project-Server
   installPackage
-  echo ""
+  #echo ""
 
   SERVER_NAME=dss-framework-orchestrator-server
   SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
@@ -250,7 +252,7 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install project-Server
   installPackage
-  echo ""
+  #echo ""
 
   SERVER_NAME=dss-apiservice-server
   SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
@@ -263,7 +265,7 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install dss-apiservice-server
   installPackage
-  echo ""
+  #echo ""
 
   SERVER_NAME=dss-datapipe-server
   SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
@@ -276,7 +278,7 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install dss-datapipe-server
   installPackage
-  echo ""
+  #echo ""
 
   ##Flow execution Install
   PACKAGE_DIR=dss
@@ -291,7 +293,7 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###Install flow execution
   installPackage
-  echo ""
+  #echo ""
 
   SERVER_NAME=dss-workflow-server
   SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
@@ -304,10 +306,11 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install dss-workflow-server
   installPackage
-  echo ""
-  echo "-----------------DSS install end--------------------"
-  echo ""
+  #echo "-----------------DSS install end--------------------"
+  #echo ""
 
 }
 ENV_FLAG="dev"
 installDssProject
+
+echo "Congratulations! You have installed DSS $DSS_VERSION successfully, please use sbin/dss-start-all.sh to start it!"

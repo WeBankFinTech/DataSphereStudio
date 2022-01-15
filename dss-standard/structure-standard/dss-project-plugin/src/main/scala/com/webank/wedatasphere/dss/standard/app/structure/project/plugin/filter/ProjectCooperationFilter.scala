@@ -25,9 +25,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.UserIntercepto
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.conf.ProjectCooperateConfiguration
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.filter.ProjectRequestType.{Access, Delete, Edit, Execute}
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.{ProjectAuth, ProjectCooperationPlugin}
-import com.webank.wedatasphere.linkis.common.conf.Configuration
-import com.webank.wedatasphere.linkis.common.utils.{Logging, Utils}
-import com.webank.wedatasphere.linkis.httpclient.exception.HttpClientResultException
+import org.apache.linkis.common.conf.Configuration
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.httpclient.exception.HttpClientResultException
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.lang.StringUtils

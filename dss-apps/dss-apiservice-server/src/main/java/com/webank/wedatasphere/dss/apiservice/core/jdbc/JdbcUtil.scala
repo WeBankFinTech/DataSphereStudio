@@ -18,10 +18,10 @@ package com.webank.wedatasphere.dss.apiservice.core.jdbc
 
 import java.util
 
-import com.webank.wedatasphere.linkis.common.exception.WarnException
-import com.webank.wedatasphere.linkis.common.utils.Logging
-//import com.webank.wedatasphere.linkis.datasourcemanager.common.protocol.{DsInfoQueryRequest, DsInfoResponse}
-import com.webank.wedatasphere.linkis.rpc.Sender
+import org.apache.linkis.common.exception.WarnException
+import org.apache.linkis.common.utils.Logging
+//import org.apache.linkis.datasourcemanager.common.protocol.{DsInfoQueryRequest, DsInfoResponse}
+import org.apache.linkis.rpc.Sender
 
 object JdbcUtil extends Logging {
 

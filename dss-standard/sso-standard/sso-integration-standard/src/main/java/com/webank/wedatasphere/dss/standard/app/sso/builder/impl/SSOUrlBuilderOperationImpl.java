@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.sso.builder.impl;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOIntegrationConf;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;

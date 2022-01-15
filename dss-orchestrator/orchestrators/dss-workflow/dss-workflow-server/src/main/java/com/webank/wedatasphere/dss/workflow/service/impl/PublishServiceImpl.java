@@ -27,7 +27,7 @@ import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.linkis.rpc.Sender;
+import org.apache.linkis.rpc.Sender;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,6 @@ public class PublishServiceImpl implements PublishService {
             LOGGER.debug("{} is asking status of {}.", username, taskId);
         }
         ResponseConvertOrchestrator response =new ResponseConvertOrchestrator();
-
         //通过rpc的方式去获取到最新status
         try {
             RequestFrameworkConvertOrchestrationStatus req = new RequestFrameworkConvertOrchestrationStatus(taskId);

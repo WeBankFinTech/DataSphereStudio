@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.appconn.sendemail.email.sender;
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.EmailSender;
-import com.webank.wedatasphere.linkis.common.utils.Utils;
+import org.apache.linkis.common.utils.Utils;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.Future;

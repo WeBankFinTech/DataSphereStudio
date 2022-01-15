@@ -29,8 +29,8 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import com.webank.wedatasphere.linkis.cs.common.utils.CSCommonUtils;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,23 +51,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Autowired
     private FlowMapper flowMapper;
-
-
     @Autowired
     private NodeInputService nodeInputService;
-
-//    @Autowired
-//    private EventRelationMapper eventRelationMapper;
-
     @Autowired
     private WorkFlowParser workFlowParser;
-
     @Autowired
     private BMLService bmlService;
-
-
-//    @Autowired(required = false)
-//    private LockMapper lockMapper;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -78,18 +67,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public DSSFlow getFlowWithJsonAndSubFlowsByID(Long rootFlowId) {
-
         return genDSSFlowTree(rootFlowId);
     }
 
-
     private DSSFlow genDSSFlowTree(Long parentFlowId) {
         DSSFlow cyFlow = flowMapper.selectFlowByID(parentFlowId);
-
         String userName = cyFlow.getCreator();
         Map<String, Object> query = bmlService.query(userName, cyFlow.getResourceId(), cyFlow.getBmlVersion());
         cyFlow.setFlowJson(query.get("string").toString());
-
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(parentFlowId);
         for (Long subFlowID : subFlowIDs) {
             if (cyFlow.getChildren() == null) {
@@ -101,7 +86,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         return cyFlow;
     }
-
 
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)

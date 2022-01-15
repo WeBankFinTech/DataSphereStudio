@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.manager.action
 
 
-import com.webank.wedatasphere.linkis.httpclient.dws.request.DWSHttpAction
-import com.webank.wedatasphere.linkis.httpclient.request.{GetAction, UserAction}
+import org.apache.linkis.httpclient.dws.request.DWSHttpAction
+import org.apache.linkis.httpclient.request.{GetAction, UserAction}
 
 class GetAppConnInfosAction extends GetAction with DWSHttpAction with UserAction{
 

@@ -47,8 +47,8 @@ import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import com.webank.wedatasphere.linkis.rpc.Sender;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -71,7 +71,6 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         //cache
         return nodeInfoMapper.listNodeGroups();
     }
-
 
     @Override
     public Map<String, Object> createNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
@@ -106,7 +105,6 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
             ref.setOrcName(node.getFlowName());
 
             // parse to external ProjectId
-
             ref.setProjectId(parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
             ref.setProjectName(node.getProjectName());
             ref.setNodeType(node.getNodeType());

@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.scheduler;
 
-import com.webank.wedatasphere.linkis.common.listener.Event;
-import com.webank.wedatasphere.linkis.common.listener.EventListener;
+import org.apache.linkis.common.listener.Event;
+import org.apache.linkis.common.listener.EventListener;
 
 
 public interface AsyncRefExecutionSchedulerListener extends EventListener {

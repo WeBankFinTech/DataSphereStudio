@@ -18,12 +18,6 @@ package com.webank.wedatasphere.dss.contextservice.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-/**
- * Linkis ContextService访问接口工具类
- * 提供创建ContextID、存储状态信息等到CS服务的接口
- * @Author alexyang
- * @Date 2020-0318
- */
 public interface ContextService {
 
     /**

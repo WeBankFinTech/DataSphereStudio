@@ -22,7 +22,7 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEnt
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.{NodeExecutionState, NodeRunner}
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 import org.springframework.stereotype.Service
 
 import scala.collection.JavaConversions._

@@ -17,59 +17,47 @@
 package com.webank.wedatasphere.dss.apiservice.core.restful;
 
 import com.github.pagehelper.PageInfo;
-import com.webank.wedatasphere.dss.apiservice.core.constant.SaveTokenEnum;
-import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
+import com.webank.wedatasphere.dss.apiservice.core.bo.TokenQuery;
 import com.webank.wedatasphere.dss.apiservice.core.service.TokenQueryService;
+import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
 import com.webank.wedatasphere.dss.apiservice.core.util.DateUtil;
-import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.TokenManagerVo;
-import com.webank.wedatasphere.dss.apiservice.core.bo.TokenQuery;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 
 
-@Path("/dss/apiservice")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Component
+@RequestMapping(path = "/dss/apiservice", produces = {"application/json"})
+@RestController
 public class ApiServiceTokenRestfulApi {
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceTokenRestfulApi.class);
-
     @Autowired
     TokenQueryService tokenQueryService;
-
-
-
     @Autowired
     TokenAuth tokenAuth;
 
-
-    @GET
-    @Path("/tokenQuery")
-    public Response apiServiceTokenQuery(@QueryParam("apiId") Long apiId,
-                                         @QueryParam("user") String user,
-                                         @QueryParam("status") Integer status,
-                                         @QueryParam("startDate") String startDateStr,
-                                         @QueryParam("endDate") String endDateStr,
-                                         @QueryParam("currentPage") Integer currentPage,
-                                         @QueryParam("pageSize") Integer pageSize,
-                                         @Context HttpServletRequest req) {
+    @RequestMapping(value = "/tokenQuery",method = RequestMethod.GET)
+    public Message apiServiceTokenQuery(@RequestParam(required = false, name = "apiId") Long apiId,
+                                         @RequestParam(required = false, name = "user") String user,
+                                         @RequestParam(required = false, name = "status") Integer status,
+                                         @RequestParam(required = false, name = "startDate") String startDateStr,
+                                         @RequestParam(required = false, name = "endDate") String endDateStr,
+                                         @RequestParam(required = false, name = "currentPage") Integer currentPage,
+                                         @RequestParam(required = false, name = "pageSize") Integer pageSize,
+                                         HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
 
@@ -100,10 +88,9 @@ public class ApiServiceTokenRestfulApi {
     }
 
 
-    @GET
-    @Path("/approvalRefresh")
-    public Response refresh(@QueryParam("approvalNo") String approvalNo,
-                            @Context HttpServletRequest req) {
+    @RequestMapping(value = "/approvalRefresh",method = RequestMethod.GET)
+    public Message refresh(@RequestParam(required = false, name = "approvalNo") String approvalNo,
+                            HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() ->{
             return Message.ok().data("approvalStatus", "success");

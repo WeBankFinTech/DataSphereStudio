@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.loader.utils;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnException;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.CommonVars;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;

@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.FileEmailContent
-import com.webank.wedatasphere.linkis.common.utils.Utils
-import com.webank.wedatasphere.linkis.storage.LineRecord
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.storage.LineRecord
 import org.apache.commons.io.IOUtils
 
 object FileEmailContentParser extends AbstractEmailContentParser[FileEmailContent] {

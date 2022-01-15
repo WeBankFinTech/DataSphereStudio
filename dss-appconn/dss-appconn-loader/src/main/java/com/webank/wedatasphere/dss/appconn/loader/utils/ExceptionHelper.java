@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.utils;
 
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.exception.ErrorException;
 
 public class ExceptionHelper {
     public static void dealErrorException(int errorCode, String errorMsg, Throwable t) throws ErrorException {

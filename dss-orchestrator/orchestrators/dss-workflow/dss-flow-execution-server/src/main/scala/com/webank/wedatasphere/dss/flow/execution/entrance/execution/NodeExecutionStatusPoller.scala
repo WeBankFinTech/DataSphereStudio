@@ -20,7 +20,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.execution
 import java.util.concurrent.LinkedBlockingQueue
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.NodeRunner
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 
 class NodeExecutionStatusPoller(nodeRunnerQueue: LinkedBlockingQueue[NodeRunner] ) extends Runnable with Logging{

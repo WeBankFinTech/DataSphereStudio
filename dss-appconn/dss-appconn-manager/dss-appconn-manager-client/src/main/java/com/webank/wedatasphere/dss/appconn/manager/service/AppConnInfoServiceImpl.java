@@ -25,12 +25,12 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfoResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfosResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppInstancesResult;
-import com.webank.wedatasphere.linkis.common.conf.Configuration;
-import com.webank.wedatasphere.linkis.httpclient.config.ClientConfig;
-import com.webank.wedatasphere.linkis.httpclient.dws.DWSHttpClient;
-import com.webank.wedatasphere.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfig;
-import com.webank.wedatasphere.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import org.apache.linkis.common.conf.Configuration;
+import org.apache.linkis.httpclient.config.ClientConfig;
+import org.apache.linkis.httpclient.dws.DWSHttpClient;
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import java.util.List;
 
 import static com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerClientConfiguration.LINKIS_ADMIN_USER;

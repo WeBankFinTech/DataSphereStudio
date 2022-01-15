@@ -27,26 +27,25 @@ import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryServic
 import com.webank.wedatasphere.dss.apiservice.core.token.JwtManager;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
-import com.webank.wedatasphere.dss.apiservice.core.vo.*;
-import com.webank.wedatasphere.linkis.server.BDPJettyServerHelper;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
-import com.webank.wedatasphere.linkis.ujes.client.UJESClient;
-import com.webank.wedatasphere.linkis.ujes.client.response.JobExecuteResult;
+import com.webank.wedatasphere.dss.apiservice.core.vo.MessageVo;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.ujes.client.UJESClient;
+import org.apache.linkis.ujes.client.response.JobExecuteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,38 +53,28 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
-@Path("/dss/apiservice")
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Component
+@RequestMapping(path = "/dss/apiservice", produces = {"application/json"})
+@RestController
 public class ApiServiceExecuteRestfulApi {
     public static final String XLSX_RESPONSE_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     private static final Logger logger = LoggerFactory.getLogger(ApiServiceExecuteRestfulApi.class);
     @Autowired
     private ApiServiceQueryService queryService;
-
-
     private static final String SYS_COLUMN_PREFIX = "_";
 
     private static final String requestBodyDemo = "{\"moduleName\":\"aladdin-demo\",\"params\":{\"param1\": \"value1\"}}";
 
-
-
-    @POST
-    @Path("/execute/{path:.*}")
-    public Response post(@PathParam("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                         @Context HttpServletRequest req) {
+    @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.POST)
+    public Message post(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
+                         HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.POST);
     }
 
-    @GET
-    @Path("/execute/{path:.*}")
-    public Response get(@PathParam("path") VariableString path,
-                        @Context HttpServletRequest req) throws JsonProcessingException {
+    @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.GET)
+    public Message get(@PathVariable("path") VariableString path,
+                        HttpServletRequest req) throws JsonProcessingException {
         String userName = SecurityFilter.getLoginUsername(req);
 
         QueryRequest queryRequest = new QueryRequest();
@@ -116,18 +105,16 @@ public class ApiServiceExecuteRestfulApi {
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.GET);
     }
 
-    @PUT
-    @Path("/execute/{path:.*}")
-    public Response put(@PathParam("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                        @Context HttpServletRequest req) {
+    @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.PUT)
+    public Message put(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
+                        HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.PUT);
     }
 
-    @DELETE
-    @Path("/execute/{path:.*}")
-    public Response delete(@PathParam("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                           @Context HttpServletRequest req) {
+    @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.DELETE)
+    public Message delete(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
+                           HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.DELETE);
     }
@@ -138,11 +125,10 @@ public class ApiServiceExecuteRestfulApi {
         AssertUtil.notNull(queryRequest.getParams().get(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue()),"请求token不能为空");
     }
 
-    @GET
-    @Path("/getDirFileTrees")
-    public void getDirFileTrees(@Context HttpServletRequest req, @Context HttpServletResponse resp,
-                                @QueryParam("path") String path,
-                                @QueryParam("taskId") String taskId) throws IOException, ApiServiceQueryException {
+    @RequestMapping(value = "/getDirFileTrees",method = RequestMethod.GET)
+    public void getDirFileTrees(HttpServletRequest req, HttpServletResponse resp,
+                                @RequestParam(required = false, name = "path") String path,
+                                @RequestParam(required = false, name = "taskId") String taskId) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
             throw new  ApiServiceQueryException(80004, path);
@@ -166,15 +152,14 @@ public class ApiServiceExecuteRestfulApi {
     }
 
 
-    @GET
-    @Path("/openFile")
-    public void openFile(@Context HttpServletRequest req,
-                             @QueryParam("path") String path,
-                             @QueryParam("taskId") String taskId,
-                             @DefaultValue("1") @QueryParam("page") Integer page,
-                             @DefaultValue("5000") @QueryParam("pageSize") Integer pageSize,
-                             @DefaultValue("utf-8") @QueryParam("charset") String charset,
-                             @Context HttpServletResponse resp) throws IOException, ApiServiceQueryException {
+    @RequestMapping(value = "/openFile",method = RequestMethod.GET)
+    public void openFile(HttpServletRequest req,
+                             @RequestParam(required = false, name = "path") String path,
+                             @RequestParam(required = false, name = "taskId") String taskId,
+                             @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
+                             @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
+                             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
+                             HttpServletResponse resp) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
             throw new  ApiServiceQueryException(80004, path);
@@ -195,19 +180,18 @@ public class ApiServiceExecuteRestfulApi {
         resp.getWriter().flush();
     }
 
-    @GET
-    @Path("resultsetToExcel")
+    @RequestMapping(value = "resultsetToExcel",method = RequestMethod.GET)
     public void resultsetToExcel(
-            @Context HttpServletRequest req,
-            @Context HttpServletResponse resp,
-            @QueryParam("path") String path,
-            @QueryParam("taskId") String taskId,
-            @DefaultValue("utf-8") @QueryParam("charset") String charset,
-            @DefaultValue("csv") @QueryParam("outputFileType") String outputFileType,
-            @DefaultValue(",") @QueryParam("csvSeperator") String csvSeperator,
-            @DefaultValue("downloadResultset") @QueryParam("outputFileName") String outputFileName,
-            @DefaultValue("result") @QueryParam("sheetName") String sheetName,
-            @DefaultValue("NULL") @QueryParam("nullValue") String nullValue) throws ApiServiceQueryException, IOException {
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            @RequestParam(required = false, name = "path") String path,
+            @RequestParam(required = false, name = "taskId") String taskId,
+            @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
+            @DefaultValue("csv") @RequestParam(required = false, name = "outputFileType") String outputFileType,
+            @DefaultValue(",") @RequestParam(required = false, name = "csvSeperator") String csvSeperator,
+            @DefaultValue("downloadResultset") @RequestParam(required = false, name = "outputFileName") String outputFileName,
+            @DefaultValue("result") @RequestParam(required = false, name = "sheetName") String sheetName,
+            @DefaultValue("NULL") @RequestParam(required = false, name = "nullValue") String nullValue) throws ApiServiceQueryException, IOException {
 
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
@@ -256,9 +240,8 @@ public class ApiServiceExecuteRestfulApi {
         }
     }
 
-    @GET
-    @Path("/{id}/get")
-    public Response getTaskByID(@Context HttpServletRequest req, @PathParam("id") Long taskId) {
+    @RequestMapping(value = "/{id}/get",method = RequestMethod.GET)
+    public Message getTaskByID(HttpServletRequest req, @PathVariable("id") Long taskId) {
         String username = SecurityFilter.getLoginUsername(req);
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId.toString());
         if (null != apiServiceJob && username.equals(apiServiceJob.getSubmitUser())) {
@@ -267,15 +250,14 @@ public class ApiServiceExecuteRestfulApi {
             JobExecuteResult jobExecuteResult = apiServiceJob.getJobExecuteResult();
             jobExecuteResult.setUser(apiServiceJob.getProxyUser());
             Map<String, Object> vo = ExecuteCodeHelper.getTaskInfoById(jobExecuteResult, client);
-            return Message.messageToResponse(Message.ok().data("task", vo));
+            return Message.ok().data("task", vo);
         } else {
-            return Message.messageToResponse(Message.ok().data("task", null));
+            return Message.ok().data("task", null);
         }
     }
 
-    private Response getResponse(String user,String path, QueryRequest queryRequest, String httpMethod) {
-        return ApiUtils.doAndResponse(() -> {
-
+    private Message getResponse(String user,String path, QueryRequest queryRequest, String httpMethod) {
+        Response response = ApiUtils.doAndResponse(() -> {
             validParam(queryRequest);
             String token = queryRequest.getParams().get(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue()).toString();
 
@@ -293,7 +275,6 @@ public class ApiServiceExecuteRestfulApi {
             }
 
             if(tokenDetail.getApplyUser().equals(user)) {
-
                 LinkisExecuteResult query = queryService.query("/" + path,
                         queryRequest.getParams() == null ? new HashMap<>() : queryRequest.getParams(),
                         queryRequest.getModuleName(), httpMethod,tokenDetail,user);
@@ -309,8 +290,26 @@ public class ApiServiceExecuteRestfulApi {
             }else {
                 messageVo = new MessageVo().setData("Token is not correct");
             }
-
             return messageVo;
         });
+        return convertMessage(response);
+    }
+
+    //convert Response to Message
+    public Message convertMessage(Response response) {
+        MessageVo tempVo = (MessageVo) response.getEntity();
+        Message message = null;
+        if (tempVo.getStatus().intValue() == 1) {
+            message = Message.error(tempVo.getMessage());
+        } else {
+            message = Message.ok(tempVo.getMessage());
+        }
+        HashMap<String, Object> queryRes = (HashMap<String, Object>) tempVo.getData();
+        if (!CollectionUtils.isEmpty(queryRes)) {
+            for (String key : queryRes.keySet()) {
+                message.data(key, queryRes.get(key));
+            }
+        }
+        return message;
     }
 }

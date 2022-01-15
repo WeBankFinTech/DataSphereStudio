@@ -19,8 +19,8 @@ package com.webank.wedatasphere.dss.datapipe.entrance.background
 import java.util
 
 import com.google.gson.{JsonObject, JsonParser}
-import com.webank.wedatasphere.linkis.server._
-import com.webank.wedatasphere.linkis.server.socket.controller.ServerEvent
+import org.apache.linkis.server._
+import org.apache.linkis.server.socket.controller.ServerEvent
 
 
 class LoadBackGroundService extends AbstractBackGroundService {
@@ -42,9 +42,9 @@ class LoadBackGroundService extends AbstractBackGroundService {
     newExecutionCode += source
     newExecutionCode += newDestination
     if(storePath == null){
-      newExecutionCode += "com.webank.wedatasphere.linkis.engineplugin.spark.imexport.LoadData.loadDataToTable(spark,source,destination)"
+      newExecutionCode += "org.apache.linkis.engineplugin.spark.imexport.LoadData.loadDataToTable(spark,source,destination)"
     }else{
-      newExecutionCode += "com.webank.wedatasphere.linkis.engineplugin.spark.imexport.LoadData.loadDataToTableByFile(spark,destination,source)"
+      newExecutionCode += "org.apache.linkis.engineplugin.spark.imexport.LoadData.loadDataToTableByFile(spark,destination,source)"
     }
 
     params.put("executionCode", newExecutionCode)

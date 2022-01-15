@@ -19,8 +19,8 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory
-import com.webank.wedatasphere.linkis.common.utils.Logging
-import com.webank.wedatasphere.linkis.governance.common.entity.job.JobRequest
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.governance.common.entity.job.JobRequest
 import org.springframework.core.annotation.Order
 
 import scala.collection.convert.wrapAsScala._

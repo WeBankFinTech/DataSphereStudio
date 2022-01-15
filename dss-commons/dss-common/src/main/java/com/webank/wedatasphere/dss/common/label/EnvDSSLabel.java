@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.common.label;
 
-import com.webank.wedatasphere.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
-import com.webank.wedatasphere.linkis.manager.label.entity.Feature;
-import com.webank.wedatasphere.linkis.manager.label.entity.annon.ValueSerialNum;
+import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
+import org.apache.linkis.manager.label.entity.Feature;
+import org.apache.linkis.manager.label.entity.annon.ValueSerialNum;
 import java.util.HashMap;
 import java.util.Map;
 

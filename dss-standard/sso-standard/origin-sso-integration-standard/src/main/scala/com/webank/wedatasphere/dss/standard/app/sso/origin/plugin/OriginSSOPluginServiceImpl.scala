@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.sso.origin.plugin
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.{SSOMsgParseOperation, SSOPluginService, WorkspacePlugin}
 import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl
-import com.webank.wedatasphere.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.Logging
 
 
 class OriginSSOPluginServiceImpl extends AppServiceImpl with SSOPluginService with Logging {

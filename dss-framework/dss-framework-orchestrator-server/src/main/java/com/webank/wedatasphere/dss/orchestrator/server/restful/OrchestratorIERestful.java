@@ -29,35 +29,28 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import com.webank.wedatasphere.linkis.server.Message;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
 import org.apache.commons.io.IOUtils;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes({MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA})
-@Component
-@Path("/dss/framework/orchestrator")
+@RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
+@RestController
 public class OrchestratorIERestful {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorIERestful.class);
     @Autowired
@@ -67,22 +60,19 @@ public class OrchestratorIERestful {
     @Autowired
     private DSSOrchestratorContext orchestratorContext;
 
-    @POST
-    @Path("/importOrchestratorFile")
-    public Response importOrcFile(@Context HttpServletRequest req,
-                                  @FormDataParam("projectName") String projectName,
-                                  @FormDataParam("projectID") Long projectID,
-                                  @FormDataParam("labels") String labels,
-                                  FormDataMultiPart form) throws DSSErrorException, UnsupportedEncodingException {
-        List<FormDataBodyPart> files = form.getFields("file");
+    @RequestMapping(path ="importOrchestratorFile", method = RequestMethod.POST)
+    public Message importOrcFile(HttpServletRequest req,
+                                  @RequestParam(required = false, name = "projectName") String projectName,
+                                  @RequestParam(required = false, name = "projectID") Long projectID,
+                                  @RequestParam(required = false, name = "labels") String labels,
+                                  @RequestParam(required = false, name = "file") List<MultipartFile> files) throws DSSErrorException, Exception {
         if (null == files || files.size() == 0) {
             throw new DSSErrorException(100788, "Import orchestrator failed for files is empty");
         }
         Long importOrcId = 0L;
-        for (FormDataBodyPart p : files) {
-            InputStream inputStream = p.getValueAs(InputStream.class);
-            FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
-            String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
+        for (MultipartFile p : files) {
+            InputStream inputStream = p.getInputStream();
+            String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
             String userName = SecurityFilter.getLoginUsername(req);
             //调用工具类生产label
             List<DSSLabel> dssLabelList = getDSSLabelList(labels);
@@ -110,21 +100,20 @@ public class OrchestratorIERestful {
                 throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
             }
         }
-        return Message.messageToResponse(Message.ok().data("importOrcId", importOrcId));
+        return Message.ok().data("importOrcId", importOrcId);
     }
 
-    @GET
-    @Path("/exportOrchestrator")
-    public void exportOrcFile(@Context HttpServletRequest req,
-                              @Context HttpServletResponse resp,
-                              @DefaultValue("exportOrc") @QueryParam("outputFileName") String outputFileName,
-                              @DefaultValue("utf-8") @QueryParam("charset") String charset,
-                              @DefaultValue("zip") @QueryParam("outputFileType") String outputFileType,
-                              @QueryParam("projectName") String projectName,
-                              @QueryParam("orchestratorId") Long orchestratorId,
-                              @QueryParam("orcVersionId") Long orcVersionId,
-                              @DefaultValue("false") @QueryParam("addOrcVersion") Boolean addOrcVersion,
-                              @QueryParam("labels") String labels) throws DSSErrorException, IOException {
+    @RequestMapping(path ="exportOrchestrator", method = RequestMethod.GET)
+    public void exportOrcFile(HttpServletRequest req,
+                              HttpServletResponse resp,
+                              @RequestParam(defaultValue = "exportOrc",required = false, name = "outputFileName") String outputFileName,
+                              @RequestParam(defaultValue = "utf-8",required = false, name = "charset") String charset,
+                              @RequestParam(defaultValue = "zip",required = false, name = "outputFileType") String outputFileType,
+                              @RequestParam(required = false, name = "projectName") String projectName,
+                              @RequestParam(required = false, name = "orchestratorId") Long orchestratorId,
+                              @RequestParam(required = false, name = "orcVersionId") Long orcVersionId,
+                              @RequestParam(defaultValue = "false",required = false, name = "addOrcVersion") Boolean addOrcVersion,
+                              @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException, IOException {
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
         resp.setCharacterEncoding(charset);
@@ -165,15 +154,14 @@ public class OrchestratorIERestful {
 
     //生成label list
     public List<DSSLabel> getDSSLabelList(String labels) {
-        //原来的逻辑
-//        List<DSSLabel> dssLabelList = Arrays.asList(dssLabels.split(",")).stream().map(label -> {
-//            DSSLabel dssLabel = new EnvDSSLabel(label);
-//            return dssLabel;
-//        }).collect(Collectors.toList());
         String labelStr = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
-        Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
-        if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
-            labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+        try{
+            Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
+            if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+                labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+            }
+        }catch (Exception e){
+            logger.error("get labels failed for {}", e.getMessage());
         }
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
         return dssLabelList;

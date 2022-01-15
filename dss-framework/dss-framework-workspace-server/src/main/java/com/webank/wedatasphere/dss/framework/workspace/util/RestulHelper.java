@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 
 
 import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceLoginFailException;
-import com.webank.wedatasphere.linkis.common.exception.ErrorException;
-import com.webank.wedatasphere.linkis.server.security.SecurityFilter;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

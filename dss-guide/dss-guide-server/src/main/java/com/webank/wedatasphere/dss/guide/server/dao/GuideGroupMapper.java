@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideGroup;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -22,6 +20,6 @@ public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
 
     List<GuideGroup> getAllGuideGroupDetails();
 
-    @Update("UPDATE dss_guide_group SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
-    void deleteGroup(@Param("id") Long id);
+//    @Update("UPDATE dss_guide_group SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
+//    void deleteGuideGroup(@Param("id") Long id);
 }

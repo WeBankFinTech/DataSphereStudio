@@ -87,23 +87,32 @@
                 </Dropdown-menu>
               </Dropdown>
             </div>
-            <template v-for="(work, index) in bottomTapList">
-              <div
-                :key="work.tabId"
-                :class="{
-                  active: currentTab.tabId === work.tabId && !textColor
-                }"
-                class="tab-item"
-                ref="work_item"
-              >
+            <div class="top-tap-lists" v-if="isScheduler">
+              <template v-for="(work, index) in schedulerList">
                 <we-tab
+                  ref="work_item"
+                  :key="work.id"
                   :index="index"
                   :work="work"
+                  :isActive="currentScheduler.id === work.id"
+                  @on-choose="chooseScheduler"
+                  @on-remove="removeScheduler"
+                />
+              </template>
+            </div>
+            <div class="top-tap-lists" v-else>
+              <template v-for="(work, index) in bottomTapList">
+                <we-tab
+                  ref="work_item"
+                  :key="work.tabId"
+                  :index="index"
+                  :work="work"
+                  :isActive="currentTab.tabId === work.tabId && !textColor"
                   @on-choose="onChooseWork"
                   @on-remove="removeWork"
                 />
-              </div>
-            </template>
+              </template>
+            </div>
           </div>
         </slot>
       </div>
@@ -115,40 +124,41 @@
   </div>
 </template>
 <script>
-import weTab from "./tabs.vue";
-import i18n from "@/common/i18n";
-import eventbus from "@/common/helper/eventbus";
+// import weTab from "./tabs.vue";
+import weTab from "@component/lubanTab/index.vue"
+import i18n from "@/common/i18n"
+import eventbus from "@/common/helper/eventbus"
 export default {
   name: "WorkflowTabList",
   components: {
-    weTab
+    weTab,
   },
   props: {
     // 上方主标题list数据
     treeFold: {
       type: Boolean,
-      default: true
+      default: true,
     },
     topTabList: {
       type: Array,
       default: () => [
         { name: "工作空间名称", url: "" },
-        { name: "工程名称", url: "" }
-      ]
+        { name: "工程名称", url: "" },
+      ],
     },
     // 底部工作流list数据
     bottomTapList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 切换tab显示
     tabName: {
       type: [String, Number],
-      default: "1"
+      default: "1",
     },
     buttonText: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     menuButtonText: {
       type: Array,
@@ -156,91 +166,108 @@ export default {
         {
           id: 1,
           name: i18n.t("message.orchestratorModes.setting"),
-          icon: ""
-        }
-      ]
+          icon: "",
+        },
+      ],
     },
     textColor: {
-      type: String
+      type: String,
     },
     currentTab: {
-      type: null
+      type: null,
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     modeOfKey: {
-      type: String
-    }
+      type: String,
+    },
   },
   data() {
     return {
       currentButton: {},
-      menuList: {
-        dev: "开发中心",
-        scheduler: "运维中心",
-        calc_center: "实时计算中心"
-      },
-      currentMenu: "开发中心"
-    };
+      currentMenu: "开发中心",
+      schedulerList: [],
+      currentScheduler: {},
+    }
   },
-  computed: {},
+  computed: {
+    isScheduler() {
+      return this.$route.name === "Scheduler"
+    },
+  },
+  mounted() {
+    let that = this;
+    this.schedulerList = JSON.parse(
+      sessionStorage.getItem("scheduler_tab_list")
+    )
+    eventbus.on('scheduler_tab_list_change', list => {
+      that.schedulerList = list
+    })
+    eventbus.on('current_scheduler_change', node => {
+      that.currentScheduler = node
+    })
+  },
   watch: {
     buttonText(val, old) {
       // 只有新旧值变化的时候才改变
       if (val.length > 0 && JSON.stringify(val) !== JSON.stringify(old)) {
         if (this.$route.name === "Scheduler") {
-          val.forEach(item => {
+          val.forEach((item) => {
             if (item.dicValue === "scheduler") {
-              this.currentButton = item;
+              this.currentButton = item
             }
-          });
+          })
         } else {
-          this.currentButton = val[0];
+          this.currentButton = val[0]
         }
-        this.$emit("handleChangeButton", this.currentButton);
+        this.$emit("handleChangeButton", this.currentButton)
       }
     },
     modeOfKey(val) {
       if (val)
         this.currentButton = this.buttonText.find(
-          item => item.dicValue === val
-        );
-    }
+          (item) => item.dicValue === val
+        )
+    },
   },
   methods: {
     handleChangeMode() {
-      let name = this.currentButton.dicValue || '';
-      if ( !name ) return;
+      let name = this.currentButton.dicValue || ""
+      if (!name) return
       this.handleChangeButton(name)
     },
     removeWork(tabData) {
-      this.$emit("handleTabRemove", tabData.tabId);
+      this.$emit("handleTabRemove", tabData.tabId)
     },
     onChooseWork(tabData) {
-      this.$emit("bandleTapTab", tabData.tabId);
+      this.$emit("bandleTapTab", tabData.tabId)
       // tabData.id是编排id
       eventbus.emit("workflow.orchestratorId", {
         orchestratorId: tabData.id,
-        mod: "auto"
-      });
+        mod: "auto",
+      })
     },
     handleChangeButton(dicValue) {
-      const btn = this.buttonText.find(item => item.dicValue === dicValue);
-      this.$emit("handleChangeButton", btn);
+      const btn = this.buttonText.find((item) => item.dicValue === dicValue)
+      this.$emit("handleChangeButton", btn)
     },
     selectProject() {
-      this.$emit("selectProject");
+      this.$emit("selectProject")
     },
     menuHandleChangeButton() {
-      this.$emit("menuHandleChangeButton");
+      this.$emit("menuHandleChangeButton")
     },
-    swtichMenu(name) {
-      this.handleChangeButton(name);
-      this.currentMenu = this.menuList[name];
+    chooseScheduler(tabData) {
+      this.$emit('handleChooseScheduler', tabData)
+    },
+    removeScheduler(tabData) {
+      let curList = this.schedulerList.filter(item => item.id != tabData.id)
+      this.schedulerList = curList;
+      sessionStorage.setItem('scheduler_tab_list', JSON.stringify(curList))
     }
-  }
-};
+  },
+}
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

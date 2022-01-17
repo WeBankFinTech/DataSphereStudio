@@ -170,3 +170,8 @@
     @include bg-color(#D1D7DD, $dark-workspace-body-bg-color);
   }
 }
+
+.top-tap-lists {
+  display: flex;
+  align-items: center;
+}

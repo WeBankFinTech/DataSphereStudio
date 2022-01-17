@@ -15,21 +15,15 @@
           </div>
           <div class="top-r-container">
             <template v-for="(work, index) in topTapList">
-              <div
+              <we-tab
                 :key="work.id"
-                :class="{
-                  active: currentTab.guid === work.guid && !textColor
-                }"
-                class="tab-item"
+                :index="index"
+                :work="work"
+                :isActive="currentTab.guid === work.guid && !textColor"
+                @on-choose="onChooseWork"
+                @on-remove="onRemoveWork"
                 ref="work_item"
-              >
-                <we-tab
-                  :index="index"
-                  :work="work"
-                  @on-choose="onChooseWork"
-                  @on-remove="onRemoveWork"
-                />
-              </div>
+              />
             </template>
           </div>
         </slot>
@@ -44,11 +38,11 @@
 </template>
 <script>
 //import api from "@/common/service/api";
-import weTab from "../../../workflows/module/common/tabList/tabs.vue";
-import { EventBus } from "../common/eventBus/event-bus";
+import weTab from "@component/lubanTab/index.vue"
+import { EventBus } from "../common/eventBus/event-bus"
 export default {
   components: {
-    weTab
+    weTab,
   },
   data() {
     return {
@@ -56,99 +50,99 @@ export default {
       index: 0,
       work: {},
       currentTab: {},
-      topTapList: []
-    };
+      topTapList: [],
+    }
   },
   created() {},
   mounted() {
-    EventBus.$on("on-choose-card", model => {
-      let that = this;
-      that.textColor = false;
-      const topTapList = that.topTapList.slice(0);
-      const { guid } = model;
-      that.currentTab = model;
-      if (topTapList.some(model => model.guid === guid)) {
-        return false;
+    EventBus.$on("on-choose-card", (model) => {
+      let that = this
+      that.textColor = false
+      const topTapList = that.topTapList.slice(0)
+      const { guid } = model
+      that.currentTab = model
+      if (topTapList.some((model) => model.guid === guid)) {
+        return false
       }
-      topTapList.push(model);
-      that.topTapList = topTapList;
-    });
+      topTapList.push(model)
+      that.topTapList = topTapList
+    })
   },
   beforeDestroy() {
     // 销毁 eventBus
-    EventBus.$off("on-choose-card");
+    EventBus.$off("on-choose-card")
   },
   methods: {
     // 面包屑相关
     selectProject() {
       // 返回到 目录 即搜索页面
-      const workspaceId = this.$route.query.workspaceId;
+      const workspaceId = this.$route.query.workspaceId
       this.$router.push({
         name: "dataGovernance/assets/search",
-        query: { workspaceId }
-      });
-      this.textColor = true;
+        query: { workspaceId },
+      })
+      this.textColor = true
     },
     onChooseWork(modal) {
-      const workspaceId = this.$route.query.workspaceId;
-      const { guid } = modal;
+      const workspaceId = this.$route.query.workspaceId
+      const { guid } = modal
       this.$router.push({
         name: "dataGovernance/assets/info",
         params: { guid },
-        query: { workspaceId }
-      });
-      this.currentTab = modal;
-      this.textColor = false;
+        query: { workspaceId },
+      })
+      this.currentTab = modal
+      this.textColor = false
     },
     onRemoveWork(modal) {
-      let that = this;
-      let topTapList = that.topTapList.slice(0);
-      let len = topTapList.length;
-      let idx = 0;
+      let that = this
+      let topTapList = that.topTapList.slice(0)
+      let len = topTapList.length
+      let idx = 0
 
       topTapList.forEach((item, index) => {
         if (item.guid === modal.guid) {
-          return (idx = index);
+          return (idx = index)
         }
-      });
+      })
 
       const removeAction = () => {
         if (that.currentTab.guid === modal.guid) {
-          const workspaceId = that.$route.query.workspaceId;
+          const workspaceId = that.$route.query.workspaceId
           if (len > 1 && idx < len - 1) {
-            that.currentTab = topTapList[idx + 1];
-            let guid = that.currentTab.guid;
+            that.currentTab = topTapList[idx + 1]
+            let guid = that.currentTab.guid
             that.$router.push({
               name: "dataGovernance/assets/info",
               params: { guid },
-              query: { workspaceId }
-            });
+              query: { workspaceId },
+            })
           } else if (len > 1 && idx == len - 1) {
-            that.currentTab = topTapList[idx - 1];
-            let guid = that.currentTab.guid;
+            that.currentTab = topTapList[idx - 1]
+            let guid = that.currentTab.guid
             that.$router.push({
               name: "dataGovernance/assets/info",
               params: { guid },
-              query: { workspaceId }
-            });
+              query: { workspaceId },
+            })
           } else {
-            that.currentTab = {};
-            that.textColor = true;
+            that.currentTab = {}
+            that.textColor = true
             that.$router.push({
               name: "dataGovernance/assets/search",
-              query: { workspaceId }
-            });
+              query: { workspaceId },
+            })
           }
         }
-        topTapList.splice(idx, 1);
-        that.topTapList = topTapList;
-      };
+        topTapList.splice(idx, 1)
+        that.topTapList = topTapList
+      }
 
-      removeAction();
-    }
+      removeAction()
+    },
     // 通过 eventBus 获取 面包屑数据
-  }
-};
+  },
+}
 </script>
 <style lang="scss" scoped>
 @import "@/common/style/variables.scss";
@@ -190,23 +184,43 @@ export default {
           margin: 0 15px;
         }
       }
-      .active {
-        border-bottom: 2px solid $primary-color;
-        @include border-color($primary-color, $dark-primary-color);
-      }
       .top-r-container {
         flex: 1;
         height: 40px;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
         .tab-item {
           display: inline-block;
-          height: 40px;
-          line-height: 40px;
-          @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
+          height: 24px;
+          line-height: 24px;
+          // color: $title-color;
+          @include font-color(
+            $workspace-title-color,
+            $dark-workspace-title-color
+          );
           cursor: pointer;
-          min-width: 100px;
+          min-width: 90px;
           max-width: 200px;
+          padding: 0 10px;
           overflow: hidden;
-          margin-right: 2px;
+          margin-right: 8px;
+          @include bg-color(#e1e5ea, $dark-workspace-body-bg-color);
+          border-radius: 12px;
+          &.active {
+            height: 24px;
+            @include font-color($primary-color, $dark-primary-color);
+            line-height: 24px;
+            @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
+            border-radius: 12px;
+          }
+          &:hover {
+            height: 24px;
+            @include font-color($primary-color, $dark-primary-color);
+            line-height: 24px;
+            border-radius: 12px;
+            @include bg-color(#d1d7dd, $dark-workspace-body-bg-color);
+          }
         }
       }
     }

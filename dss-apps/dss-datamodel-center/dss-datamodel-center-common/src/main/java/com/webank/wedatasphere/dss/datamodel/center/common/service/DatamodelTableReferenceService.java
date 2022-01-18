@@ -1,0 +1,5 @@
+package com.webank.wedatasphere.dss.datamodel.center.common.service;
+
+
+public interface DatamodelTableReferenceService extends TableIndicatorReferenceService,TableDimensionReferenceService,TableMeasuredReferenceService,TableLabelReferenceService{
+}

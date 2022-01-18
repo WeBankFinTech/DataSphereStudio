@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.dimension.dao.DssDatamodelDimensionMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_dimension-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="field_identifier" jdbcType="VARCHAR" property="fieldIdentifier" />
+    <result column="formula" jdbcType="VARCHAR" property="formula" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="warehouse_theme_name" jdbcType="VARCHAR" property="warehouseThemeName" />
+    <result column="owner" jdbcType="VARCHAR" property="owner" />
+    <result column="principal_name" jdbcType="VARCHAR" property="principalName" />
+    <result column="is_available" jdbcType="BOOLEAN" property="isAvailable" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `name`, field_identifier, formula, `comment`, warehouse_theme_name, `owner`, 
+    principal_name, is_available, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from dss_datamodel_dimension
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from dss_datamodel_dimension
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into dss_datamodel_dimension (`name`, field_identifier, formula, 
+      `comment`, warehouse_theme_name, `owner`, 
+      principal_name, is_available, create_time, 
+      update_time)
+    values (#{name,jdbcType=VARCHAR}, #{fieldIdentifier,jdbcType=VARCHAR}, #{formula,jdbcType=VARCHAR}, 
+      #{comment,jdbcType=VARCHAR}, #{warehouseThemeName,jdbcType=VARCHAR}, #{owner,jdbcType=VARCHAR}, 
+      #{principalName,jdbcType=VARCHAR}, #{isAvailable,jdbcType=BOOLEAN}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into dss_datamodel_dimension
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="fieldIdentifier != null">
+        field_identifier,
+      </if>
+      <if test="formula != null">
+        formula,
+      </if>
+      <if test="comment != null">
+        `comment`,
+      </if>
+      <if test="warehouseThemeName != null">
+        warehouse_theme_name,
+      </if>
+      <if test="owner != null">
+        `owner`,
+      </if>
+      <if test="principalName != null">
+        principal_name,
+      </if>
+      <if test="isAvailable != null">
+        is_available,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldIdentifier != null">
+        #{fieldIdentifier,jdbcType=VARCHAR},
+      </if>
+      <if test="formula != null">
+        #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseThemeName != null">
+        #{warehouseThemeName,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null">
+        #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="principalName != null">
+        #{principalName,jdbcType=VARCHAR},
+      </if>
+      <if test="isAvailable != null">
+        #{isAvailable,jdbcType=BOOLEAN},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension">
+    <!--@mbg.generated-->
+    update dss_datamodel_dimension
+    <set>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldIdentifier != null">
+        field_identifier = #{fieldIdentifier,jdbcType=VARCHAR},
+      </if>
+      <if test="formula != null">
+        formula = #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        `comment` = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseThemeName != null">
+        warehouse_theme_name = #{warehouseThemeName,jdbcType=VARCHAR},
+      </if>
+      <if test="owner != null">
+        `owner` = #{owner,jdbcType=VARCHAR},
+      </if>
+      <if test="principalName != null">
+        principal_name = #{principalName,jdbcType=VARCHAR},
+      </if>
+      <if test="isAvailable != null">
+        is_available = #{isAvailable,jdbcType=BOOLEAN},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.webank.wedatasphere.dss.datamodel.dimension.entity.DssDatamodelDimension">
+    <!--@mbg.generated-->
+    update dss_datamodel_dimension
+    set `name` = #{name,jdbcType=VARCHAR},
+      field_identifier = #{fieldIdentifier,jdbcType=VARCHAR},
+      formula = #{formula,jdbcType=VARCHAR},
+      `comment` = #{comment,jdbcType=VARCHAR},
+      warehouse_theme_name = #{warehouseThemeName,jdbcType=VARCHAR},
+      `owner` = #{owner,jdbcType=VARCHAR},
+      principal_name = #{principalName,jdbcType=VARCHAR},
+      is_available = #{isAvailable,jdbcType=BOOLEAN},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+<!--auto generated by MybatisCodeHelper on 2021-09-15-->
+  <update id="updateIsAvailableById">
+    update dss_datamodel_dimension
+    set is_available=#{updatedIsAvailable,jdbcType=BOOLEAN}
+    where id=#{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -9,51 +9,51 @@
         span="22"
         class="we-steps-child-col"
       >
-      <div
-        class="we-steps-child"
-        v-for="(child, index) in renderList"
-        :key="index">
-        <span class="we-steps-child-wrapper">
-          <span
-            class="we-steps-circle"
-            :class="getClasses(child)"
-            v-if="!child.isFinish">
+        <div
+          class="we-steps-child"
+          v-for="(child, index) in renderList"
+          :key="index">
+          <span class="we-steps-child-wrapper">
+            <span
+              class="we-steps-circle"
+              :class="getClasses(child)"
+              v-if="!child.isFinish">
+            </span>
+            <Icon
+              v-else
+              size="25"
+              :color="getIconColor(child, index)"
+              :type="getIconType(child)"></Icon>
+            <Tooltip
+              placement="right"
+              theme="light"
+              v-if="child.value==='FailedToGetResult'">
+              <span
+                style="cursor: pointer;"
+                class="we-steps-label"
+                :class="getClasses(child)">{{ child.label }}</span>
+              <div
+                slot="content"
+                style="padding: 6px 10px;">
+                <p style="font-weight: bold;line-height: 24px;">{{ $t('message.common.detail') }}</p>
+                <p
+                  v-for="(p, index1) in hoverList"
+                  :key="index1"
+                  :style="{'color': p.includes('失败') ? 'red' : '#67c23a'}"
+                  style="line-height: 24px;">{{ p }}</p>
+              </div>
+            </Tooltip>
+            <span
+              class="we-steps-label"
+              :class="getClasses(child)"
+              v-else>{{ child.label }}</span>
           </span>
           <Icon
-            v-else
-            size="25"
-            :color="getIconColor(child, index)"
-            :type="getIconType(child)"></Icon>
-          <Tooltip
-            placement="right"
-            theme="light"
-            v-if="child.value==='FailedToGetResult'">
-            <span
-              style="cursor: pointer;"
-              class="we-steps-label"
-              :class="getClasses(child)">{{ child.label }}</span>
-            <div
-              slot="content"
-              style="padding: 6px 10px;">
-              <p style="font-weight: bold;line-height: 24px;">{{ $t('message.common.detail') }}</p>
-              <p
-                v-for="(p, index1) in hoverList"
-                :key="index1"
-                :style="{'color': p.includes('失败') ? 'red' : '#67c23a'}"
-                style="line-height: 24px;">{{ p }}</p>
-            </div>
-          </Tooltip>
-          <span
-            class="we-steps-label"
-            :class="getClasses(child)"
-            v-else>{{ child.label }}</span>
-        </span>
-        <Icon
-          :color="getArrowColor(child, index)"
-          type="md-arrow-round-forward"
-          size="26"
-          v-if="index !== renderList.length - 1 && child.isFinish"/>
-      </div>
+            :color="getArrowColor(child, index)"
+            type="md-arrow-round-forward"
+            size="26"
+            v-if="index !== renderList.length - 1 && child.isFinish"/>
+        </div>
       </Col>
     </Row>
   </div>

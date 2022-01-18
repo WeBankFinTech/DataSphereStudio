@@ -15,18 +15,18 @@
       <Col
         span="2"
         class="title">
-      {{ $t('message.common.progress.title') + '：' }}
+        {{ $t('message.common.progress.title') + '：' }}
       </Col>
       <Col span="12">
-      <Progress
-        :percent="percent"
-        status="active"/>
+        <Progress
+          :percent="percent"
+          status="active"/>
       </Col>
       <Col
         span="10"
         v-if="percent === 100">
-      <span>{{$t('message.common.process')}}</span>
-      <span class="progress-costtime">{{ costTime }}</span>
+        <span>{{$t('message.common.process')}}</span>
+        <span class="progress-costtime">{{ costTime }}</span>
       </Col>
     </Row>
     <Row
@@ -37,7 +37,7 @@
         class="title"
       >{{ $t('message.common.progress.title') + '：' }}</Col>
       <Col span="12">
-      <span>{{ $t('message.common.progress.watingList', { num: waitingSize }) }}</span>
+        <span>{{ $t('message.common.progress.watingList', { num: waitingSize }) }}</span>
       </Col>
     </Row>
     <Table

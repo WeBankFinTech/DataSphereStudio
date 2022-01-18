@@ -17,34 +17,26 @@
 package com.webank.wedatasphere.dss.apiservice.core.restful;
 
 import com.github.pagehelper.PageInfo;
-import com.webank.wedatasphere.dss.apiservice.core.constant.SaveTokenEnum;
-import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
+import com.webank.wedatasphere.dss.apiservice.core.bo.TokenQuery;
 import com.webank.wedatasphere.dss.apiservice.core.service.TokenQueryService;
+import com.webank.wedatasphere.dss.apiservice.core.token.TokenAuth;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
 import com.webank.wedatasphere.dss.apiservice.core.util.DateUtil;
-import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.TokenManagerVo;
-import com.webank.wedatasphere.dss.apiservice.core.bo.TokenQuery;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 
 
@@ -52,15 +44,10 @@ import java.util.List;
 @RestController
 public class ApiServiceTokenRestfulApi {
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceTokenRestfulApi.class);
-
     @Autowired
     TokenQueryService tokenQueryService;
-
-
-
     @Autowired
     TokenAuth tokenAuth;
-
 
     @RequestMapping(value = "/tokenQuery",method = RequestMethod.GET)
     public Message apiServiceTokenQuery(@RequestParam(required = false, name = "apiId") Long apiId,
@@ -70,7 +57,7 @@ public class ApiServiceTokenRestfulApi {
                                          @RequestParam(required = false, name = "endDate") String endDateStr,
                                          @RequestParam(required = false, name = "currentPage") Integer currentPage,
                                          @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                                         @Context HttpServletRequest req) {
+                                         HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() -> {
 
@@ -103,7 +90,7 @@ public class ApiServiceTokenRestfulApi {
 
     @RequestMapping(value = "/approvalRefresh",method = RequestMethod.GET)
     public Message refresh(@RequestParam(required = false, name = "approvalNo") String approvalNo,
-                            @Context HttpServletRequest req) {
+                            HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return ApiUtils.doAndResponse(() ->{
             return Message.ok().data("approvalStatus", "success");

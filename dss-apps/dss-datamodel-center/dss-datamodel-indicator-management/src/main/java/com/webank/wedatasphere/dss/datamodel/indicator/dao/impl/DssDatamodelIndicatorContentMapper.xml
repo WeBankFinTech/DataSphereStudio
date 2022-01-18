@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorContentMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.indicator.entity.DssDatamodelIndicatorContent">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_indicator_content-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="indicator_id" jdbcType="BIGINT" property="indicatorId" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="indicator_type" jdbcType="INTEGER" property="indicatorType" />
+    <result column="measure_id" jdbcType="BIGINT" property="measureId" />
+    <result column="indicator_source_info" jdbcType="VARCHAR" property="indicatorSourceInfo" />
+    <result column="formula" jdbcType="VARCHAR" property="formula" />
+    <result column="business" jdbcType="VARCHAR" property="business" />
+    <result column="business_owner" jdbcType="VARCHAR" property="businessOwner" />
+    <result column="calculation" jdbcType="VARCHAR" property="calculation" />
+    <result column="calculation_owner" jdbcType="VARCHAR" property="calculationOwner" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, indicator_id, version, indicator_type, measure_id, indicator_source_info, formula, 
+    business, business_owner, calculation, calculation_owner, create_time, update_time
+  </sql>
+</mapper>

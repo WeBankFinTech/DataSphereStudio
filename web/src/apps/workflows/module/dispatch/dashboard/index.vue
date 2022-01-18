@@ -17,7 +17,7 @@
               <div class="time-model">
                 <template>
                   <Date-picker
-                    style="width: 430px"
+                    style="width: 250px"
                     v-model="dataTime"
                     type="datetimerange"
                     @on-change="_datepicker"
@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <div id="areaChart" style="height: 430px"></div>
+              <div id="areaChart" style="height: 330px"></div>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
@@ -68,7 +68,7 @@
               <div class="time-model">
                 <template>
                   <Date-picker
-                    style="width: 520px"
+                    style="width: 250px"
                     v-model="consumptionTime"
                     type="datetimerange"
                     @on-change="changeTime"
@@ -380,12 +380,34 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时']
+          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时'],
+          nameTextStyle: {
+            color: 'rgb(150, 150, 150)'
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'rgb(237, 237, 237)'
+            }
+          },
+          axisLabel: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         yAxis: {
           type: 'value',
           minInterval: 1,
-          name: '实例数(个)'
+          name: '实例数(个)',
+          nameTextStyle: {
+            color: 'rgb(150, 150, 150)'
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'rgb(237, 237, 237)'
+            }
+          },
+          axisLabel: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         series: [
           {
@@ -437,6 +459,17 @@ export default {
               '13时', '14时', '15时', '16时', '17时', '18时', '19时', '20时', '21时', '22时', '23时', '24时'],
             axisPointer: {
               type: 'shadow'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
+            },
+            axisLabel: {
+              color: 'rgb(150, 150, 150)'
             }
           }
         ],
@@ -449,7 +482,16 @@ export default {
             max: 250,
             interval: 50,*/
             axisLabel: {
-              formatter: '{value} 个'
+              formatter: '{value} 个',
+              color: 'rgb(150, 150, 150)'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
             }
           },
           {
@@ -459,7 +501,16 @@ export default {
             max: 100,
             interval: 20,
             axisLabel: {
-              formatter: '{value} %'
+              formatter: '{value} %',
+              color: 'rgb(150, 150, 150)'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
             }
           }
         ],
@@ -588,9 +639,9 @@ export default {
       top: -40px;
     }
     .time-model {
-      position: absolute;
-      right: 8px;
-      top: 0;
+      position: relative;
+      top: -60px;
+      left: calc(100% - 230px);
     }
     .chart-title {
       padding: 0 30px;
@@ -660,7 +711,7 @@ export default {
         display: inline-block;
         cursor: pointer;
         &.selected {
-           border-bottom: 2px solid #2A6F97;
+           border-bottom: 2px solid #2E92F7;
         }
       }
     }

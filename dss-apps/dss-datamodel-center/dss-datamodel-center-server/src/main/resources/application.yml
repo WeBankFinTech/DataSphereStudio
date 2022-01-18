@@ -1,0 +1,20 @@
+server:
+  port: 9321
+spring:
+  application:
+    name: datamodel-server
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:20303/eureka/
+  instance:
+    metadata-map:
+      test: wedatasphere
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,info
+logging:
+  config: classpath:log4j2.xml

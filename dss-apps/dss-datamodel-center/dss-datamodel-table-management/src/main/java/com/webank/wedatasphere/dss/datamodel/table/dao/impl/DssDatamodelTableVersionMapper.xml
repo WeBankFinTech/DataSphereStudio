@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableVersionMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableVersion">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_table_version-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="tbl_id" jdbcType="BIGINT" property="tblId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="is_materialized" jdbcType="INTEGER" property="isMaterialized" />
+    <result column="table_code" jdbcType="LONGVARCHAR" property="tableCode" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="table_params" jdbcType="LONGVARCHAR" property="tableParams" />
+    <result column="columns" jdbcType="VARCHAR" property="columns" />
+    <result column="source_type" jdbcType="VARCHAR" property="sourceType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, tbl_id, `name`, is_materialized, table_code, `comment`, version, table_params, 
+    `columns`, source_type, create_time, update_time, creator
+  </sql>
+</mapper>

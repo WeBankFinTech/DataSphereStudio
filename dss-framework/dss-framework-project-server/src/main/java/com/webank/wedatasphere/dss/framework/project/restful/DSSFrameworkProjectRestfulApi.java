@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +65,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path ="getWorkSpaceStr", method = RequestMethod.GET)
-    public Message getWorkSpaceStr(@Context HttpServletRequest request) {
+    public Message getWorkSpaceStr(HttpServletRequest request) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         Message message = Message.ok("").data("workspaceStr", DSSCommonUtils.COMMON_GSON.toJson(workspace));
         return message;
@@ -80,7 +79,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path ="getAllProjects", method = RequestMethod.POST)
-    public Message getAllProjects(@Context HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
+    public Message getAllProjects(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
@@ -92,7 +91,7 @@ public class DSSFrameworkProjectRestfulApi {
      * 新建工程,通过和各个AppConn进行交互，将需要满足工程规范的所有的appconn进行创建工程
      */
     @RequestMapping(path ="createProject", method = RequestMethod.POST)
-    public Message createProject(@Context HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) {
+    public Message createProject(HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         String workspaceName =
@@ -119,7 +118,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path ="modifyProject", method = RequestMethod.POST)
-    public Message modifyProject(@Context HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) {
+    public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         String workspaceName =
                 dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
@@ -141,7 +140,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path ="deleteProject", method = RequestMethod.POST)
-    public Message deleteProject(@Context HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
+    public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         // 删除第三方系统中的项目
@@ -160,7 +159,7 @@ public class DSSFrameworkProjectRestfulApi {
     }
 
     @RequestMapping(path ="listApplicationAreas", method = RequestMethod.GET)
-    public Message listApplicationAreas(@Context HttpServletRequest req) {
+    public Message listApplicationAreas(HttpServletRequest req) {
         String header = req.getHeader("Content-language").trim();
         ApplicationArea[] applicationAreas = ApplicationArea.values();
         List<String> areas = new ArrayList<>();
@@ -175,7 +174,7 @@ public class DSSFrameworkProjectRestfulApi {
     }
 
     @RequestMapping(path ="getProjectAbilities", method = RequestMethod.GET)
-    public Message getProjectAbilities(@Context HttpServletRequest request){
+    public Message getProjectAbilities(HttpServletRequest request){
         //为了获取到此环境的能力，导入 导出  发布等
         String username = SecurityFilter.getLoginUsername(request);
         try{

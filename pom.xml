@@ -35,6 +35,9 @@
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
+        <module>dss-apps/dss-dataasset-management</module>
+        <module>dss-apps/dss-datawarehouse-design</module>
+        <module>dss-apps/dss-datamodel-center</module>
     </modules>
 
     <properties>

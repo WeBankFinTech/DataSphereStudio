@@ -6,22 +6,22 @@
     </h3>
     <Row class="search-bar">
       <Col span="5" class="search-item">
-      <span class="lable">{{$t("message.apiServices.label.name")}}： </span>
-      <Input v-model="searchName" class="input" :placeholder="$t('message.apiServices.placeholder.enterName')"></Input>
+        <span class="lable">{{$t("message.apiServices.label.name")}}： </span>
+        <Input v-model="searchName" class="input" :placeholder="$t('message.apiServices.placeholder.enterName')"></Input>
       </Col>
       <Col span="5" class="search-item">
-      <span class="lable">{{$t("message.apiServices.label.status")}}：</span>
-      <Select v-model="searchStatus" clearable class="input">
-        <Option value="1">{{$t('message.apiServices.enable')}}</Option>
-        <Option value="0">{{$t('message.apiServices.disable')}}</Option>
-      </Select>
+        <span class="lable">{{$t("message.apiServices.label.status")}}：</span>
+        <Select v-model="searchStatus" clearable class="input">
+          <Option value="1">{{$t('message.apiServices.enable')}}</Option>
+          <Option value="0">{{$t('message.apiServices.disable')}}</Option>
+        </Select>
       </Col>
       <Col span="5" class="search-item">
-      <span class="lable">{{$t("message.apiServices.label.submitter")}}：</span>
-      <Input v-model="searchCommitter" class="input" :placeholder="$t('message.apiServices.placeholder.inputSubmitter')"></Input>
+        <span class="lable">{{$t("message.apiServices.label.submitter")}}：</span>
+        <Input v-model="searchCommitter" class="input" :placeholder="$t('message.apiServices.placeholder.inputSubmitter')"></Input>
       </Col>
       <Col span="5">
-      <Button class="search" type="primary" @click="getApiData">{{$t("message.apiServices.label.find")}}</Button>
+        <Button class="search" type="primary" @click="getApiData">{{$t("message.apiServices.label.find")}}</Button>
       </Col>
     </Row>
     <div class="workspace-header-right">
@@ -60,18 +60,18 @@
             v-for="(item, index) in pageDatalist"
             :key="item.id + `${index}`"
           >
-          <!-- 卡片 -->
-          <apiCard
-            :title="item"
-            :desc="item.description"
-            :disabled="item.status === 0 || item.status === 2"
-            :status="getStatusButtonTextAndColor(item.status).status"
-            :button="getStatusButtonTextAndColor(item.status).button"
-            @onButton="holderButton(item)" >
-            <template slot="dropdown" v-if="item.creator === username && item.status !== 2">
-              <dop :dropdownList="getDropdownList(item, index)" @commonAction="commonAction(item, arguments, index)"></dop>
-            </template>
-          </apiCard>
+            <!-- 卡片 -->
+            <apiCard
+              :title="item"
+              :desc="item.description"
+              :disabled="item.status === 0 || item.status === 2"
+              :status="getStatusButtonTextAndColor(item.status).status"
+              :button="getStatusButtonTextAndColor(item.status).button"
+              @onButton="holderButton(item)" >
+              <template slot="dropdown" v-if="item.creator === username && item.status !== 2">
+                <dop :dropdownList="getDropdownList(item, index)" @commonAction="commonAction(item, arguments, index)"></dop>
+              </template>
+            </apiCard>
           </Col>
         </Row>
       </template>

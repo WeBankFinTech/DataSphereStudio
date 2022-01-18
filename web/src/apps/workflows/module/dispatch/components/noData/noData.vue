@@ -2,7 +2,8 @@
   <div class="no-data-model" :style="{height:height + 'px'}">
     <div class="no-data-box">
       <div class="img">
-        <img src="./images/errorTip.png" alt="">
+        <!--<img src="./images/errorTip.png" alt="">-->
+        <img src="./images/void_page.png" alt="">
       </div>
       <div class="text">{{msg || $t('message.scheduler.noData')}}</div>
     </div>

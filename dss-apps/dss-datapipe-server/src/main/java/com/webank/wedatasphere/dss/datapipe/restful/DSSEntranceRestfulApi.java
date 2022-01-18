@@ -47,7 +47,7 @@ public class DSSEntranceRestfulApi {
     private static final Logger logger = LoggerFactory.getLogger(DSSEntranceRestfulApi.class);
 
     @RequestMapping(value = "/backgroundservice",method = RequestMethod.POST)
-    public Message backgroundservice(@Context HttpServletRequest req,@RequestBody Map<String, Object> json) {
+    public Message backgroundservice(HttpServletRequest req,@RequestBody Map<String, Object> json) {
         Message message = null;
         logger.info("Begin to get an execID");
         String backgroundType = (String) json.get("background");

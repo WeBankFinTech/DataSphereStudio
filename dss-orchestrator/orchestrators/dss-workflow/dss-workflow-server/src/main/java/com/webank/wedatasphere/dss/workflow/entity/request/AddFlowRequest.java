@@ -12,6 +12,7 @@ public class AddFlowRequest {
     private Long parentFlowID;
     private String uses;
     private LabelRouteVO labels;
+    private String userName;
 
     public String getName() {
         return name;
@@ -75,5 +76,13 @@ public class AddFlowRequest {
 
     public void setLabels(LabelRouteVO labels) {
         this.labels = labels;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

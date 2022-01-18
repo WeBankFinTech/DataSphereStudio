@@ -19,9 +19,9 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSDictionaryRequestVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSDictionaryService;
-import org.apache.linkis.server.Message;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class DSSDictionaryRestful {
      * @return
      */
     @RequestMapping(path ="getDicList", method = RequestMethod.POST)
-    public Message getDevFlowList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+    public Message getDevFlowList(HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
                 return Message.error("workspaceId(空间id)不能为空");
@@ -73,7 +72,7 @@ public class DSSDictionaryRestful {
     }
 
     @RequestMapping(path ="getDicSecondList", method = RequestMethod.POST)
-    public Message getDicSecondList(@Context HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+    public Message getDicSecondList(HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
                 return Message.error("workspaceId(空间id)不能为空");

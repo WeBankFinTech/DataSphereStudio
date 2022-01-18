@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 
 
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
@@ -41,7 +40,7 @@ public class DSSSideInfoRestful {
     private DSSSideInfoService dssSideInfoService;
 
     @RequestMapping(path ="getSideInfos", method = RequestMethod.GET)
-    public Message getSideInfos(@Context HttpServletRequest request, @RequestParam(required = false, name = "workspaceId") Integer workspaceId){
+    public Message getSideInfos(HttpServletRequest request, @RequestParam(required = false, name = "workspaceID") Integer workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
         try{
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));

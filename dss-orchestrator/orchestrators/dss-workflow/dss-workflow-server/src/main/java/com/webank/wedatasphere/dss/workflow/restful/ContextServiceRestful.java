@@ -29,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 @RestController
@@ -40,16 +38,15 @@ public class ContextServiceRestful {
     private CSTableService csTableService;
 
     @RequestMapping(value = "tables",method = RequestMethod.POST)
-    public Message tables(@Context HttpServletRequest req, @RequestBody TablesRequest tablesRequest) throws DSSErrorException {
+    public Message tables(HttpServletRequest req, @RequestBody TablesRequest tablesRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         String contextIDStr = tablesRequest.getContextID();
         String nodeName = tablesRequest.getNodeName();
         return Message.ok().data("tables", csTableService.queryTables("default", contextIDStr, nodeName));
     }
 
-
     @RequestMapping(value = "columns",method = RequestMethod.POST)
-    public Message queryTableMeta(@Context HttpServletRequest req,@RequestBody QueryTableMetaRequest queryTableMetaRequest) throws DSSErrorException {
+    public Message queryTableMeta(HttpServletRequest req,@RequestBody QueryTableMetaRequest queryTableMetaRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         String contextIDStr = queryTableMetaRequest.getContextID();
         String contextKeyStr = queryTableMetaRequest.getContextKey();

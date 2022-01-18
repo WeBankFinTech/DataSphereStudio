@@ -88,7 +88,6 @@ public class PublishServiceImpl implements PublishService {
             LOGGER.debug("{} is asking status of {}.", username, taskId);
         }
         ResponseConvertOrchestrator response =new ResponseConvertOrchestrator();
-
         //通过rpc的方式去获取到最新status
         try {
             RequestFrameworkConvertOrchestrationStatus req = new RequestFrameworkConvertOrchestrationStatus(taskId);

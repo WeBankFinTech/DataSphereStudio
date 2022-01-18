@@ -8,6 +8,7 @@ import java.util.Map;
 public class BatchDeleteAppConnNodeRequest {
 
     private List<Map<String,Object>> nodes;
+    private LabelRouteVO labels;
 
     public List<Map<String, Object>> getNodes() {
         return nodes;
@@ -15,5 +16,13 @@ public class BatchDeleteAppConnNodeRequest {
 
     public void setNodes(List<Map<String, Object>> nodes) {
         this.nodes = nodes;
+    }
+
+    public LabelRouteVO getLabels() {
+        return labels;
+    }
+
+    public void setLabels(LabelRouteVO labels) {
+        this.labels = labels;
     }
 }

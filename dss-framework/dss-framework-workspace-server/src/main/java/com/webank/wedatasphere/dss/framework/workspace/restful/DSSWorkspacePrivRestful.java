@@ -27,12 +27,10 @@ import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,26 +50,26 @@ public class DSSWorkspacePrivRestful {
     WorkspaceDBHelper workspaceDBHelper;
 
     @RequestMapping(path ="getWorkspaceMenuPrivs", method = RequestMethod.GET)
-    public Message getWorkspaceMenuPrivs(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
+    public Message getWorkspaceMenuPrivs(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
         //todo 返回工作空间中角色对菜单的访问权限
         DSSWorkspacePrivVO workspaceMenuPrivs = dssWorkspaceService.getWorkspaceMenuPrivs(workspaceId);
         return Message.ok().data("workspaceMenuPrivs", workspaceMenuPrivs);
     }
 
     @RequestMapping(path ="getWorkspaceComponentPrivs", method = RequestMethod.GET)
-    public Message getWorkspaceComponentPrivs(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
+    public Message getWorkspaceComponentPrivs(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
         return Message.ok("接口废弃");
     }
 
     @RequestMapping(path ="getWorkspaceHomepageSettings", method = RequestMethod.GET)
-    public Message getWorkspaceHomepageSettings(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
+    public Message getWorkspaceHomepageSettings(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
         DSSWorkspaceHomepageSettingVO dssWorkspaceHomepageSettingVO = dssWorkspaceService.getWorkspaceHomepageSettings(workspaceId);
         return Message.ok().data("homepageSettings", dssWorkspaceHomepageSettingVO);
     }
 
     @RequestMapping(path ="updateRoleMenuPriv", method = RequestMethod.POST)
-    public Message updateRoleMenuPriv(@Context HttpServletRequest request,@RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest){
+    public Message updateRoleMenuPriv(HttpServletRequest request,@RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest){
         String updater = SecurityFilter.getLoginUsername(request);
         int menuId = updateRoleMenuPrivRequest.getMenuId();
         int workspaceId = updateRoleMenuPrivRequest.getWorkspaceId();
@@ -89,7 +87,7 @@ public class DSSWorkspacePrivRestful {
     }
 
     @RequestMapping(path ="updateRoleComponentPriv", method = RequestMethod.POST)
-    public Message updateRoleComponentPriv(@Context HttpServletRequest request,@RequestBody UpdateRoleComponentPrivRequest updateRoleComponentPrivRequest){
+    public Message updateRoleComponentPriv(HttpServletRequest request,@RequestBody UpdateRoleComponentPrivRequest updateRoleComponentPrivRequest){
         //todo 更新工作空间中角色对于component的权限
         String username = SecurityFilter.getLoginUsername(request);
         int menuId = updateRoleComponentPrivRequest.getComponentId();
@@ -108,7 +106,7 @@ public class DSSWorkspacePrivRestful {
     }
 
     @RequestMapping(path ="updateRoleHomepage", method = RequestMethod.POST)
-    public Message updateRoleHomepage(@Context HttpServletRequest request){
+    public Message updateRoleHomepage(HttpServletRequest request){
         return null;
     }
 }

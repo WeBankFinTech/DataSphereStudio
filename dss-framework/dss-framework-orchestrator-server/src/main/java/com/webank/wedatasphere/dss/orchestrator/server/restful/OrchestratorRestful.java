@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class OrchestratorRestful {
     OrchestratorService orchestratorService;
 
     @RequestMapping(path ="addOrchestrator", method = RequestMethod.POST)
-    public Message addOrchestrator(@Context HttpServletRequest req, @RequestBody AddOrchestratorRequest addOrchestratorRequest) throws Exception {
+    public Message addOrchestrator(HttpServletRequest req, @RequestBody AddOrchestratorRequest addOrchestratorRequest) throws Exception {
         String userName = SecurityFilter.getLoginUsername(req);
         String name = addOrchestratorRequest.getName();
         String workspaceName = addOrchestratorRequest.getWorkspaceName();
@@ -76,7 +75,7 @@ public class OrchestratorRestful {
     }
 
     @RequestMapping(path ="rollbackOrchestrator", method = RequestMethod.POST)
-    public Message rollbackOrchestrator(@Context HttpServletRequest request,@RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
+    public Message rollbackOrchestrator(HttpServletRequest request,@RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Long orchestratorId = rollbackOrchestratorRequest.getOrchestratorId();
         String version = rollbackOrchestratorRequest.getVersion();
@@ -96,7 +95,7 @@ public class OrchestratorRestful {
     }
 
     @RequestMapping(path ="openOrchestrator", method = RequestMethod.POST)
-    public Message openOrchestrator(@Context HttpServletRequest req,@RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
+    public Message openOrchestrator(HttpServletRequest req,@RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
         String openUrl = "";
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));

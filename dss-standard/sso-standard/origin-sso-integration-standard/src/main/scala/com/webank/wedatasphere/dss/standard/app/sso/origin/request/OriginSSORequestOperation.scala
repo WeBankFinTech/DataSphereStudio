@@ -16,25 +16,23 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.request
 
-import java.net.{URI, URL, URLDecoder}
-import java.util
-import java.util.Date
-import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
-
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException
+import org.apache.commons.io.IOUtils
+import org.apache.http.impl.cookie.BasicClientCookie
 import org.apache.linkis.common.utils.{ByteTimeUtils, Logging, Utils}
 import org.apache.linkis.httpclient.Client
 import org.apache.linkis.httpclient.request.HttpAction
 import org.apache.linkis.httpclient.response.impl.DefaultHttpResult
 import org.apache.linkis.httpclient.response.{HttpResult, Result}
-import org.apache.commons.io.IOUtils
-import org.apache.commons.lang.StringUtils
-import org.apache.http.impl.cookie.BasicClientCookie
 
+import java.net.URI
+import java.util
+import java.util.Date
+import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import scala.collection.convert.wrapAsScala._
 
 
@@ -42,7 +40,8 @@ class OriginSSORequestOperation private[request](appName: String) extends SSOReq
 
   override def requestWithSSO(urlBuilder: SSOUrlBuilderOperation, req: HttpAction): HttpResult = {
 
-    val httpClient = HttpClient.getHttpClient(urlBuilder.getBuiltUrl, appName)
+    //    val httpClient = HttpClient.getHttpClient(urlBuilder.getBuiltUrl, appName)
+    val httpClient =OriginSSORequestOperation.getHttpClient(urlBuilder, appName)
     urlBuilder match {
       case urlBuilderOperationImpl: SSOUrlBuilderOperationImpl => val cookies = urlBuilderOperationImpl.getCookies
         cookies.foreach {
@@ -56,16 +55,16 @@ class OriginSSORequestOperation private[request](appName: String) extends SSOReq
             req.addCookie(basicClientCookie)
         }
     }
-    Utils.tryFinally({
-      httpClient.execute(req) match {
-        case result: HttpResult => result
-        case result => if (Result.isSuccessResult(result)) {
-          val defaultHttpResult = new DefaultHttpResult
-          defaultHttpResult.set(null, 200, null, null)
-          defaultHttpResult
-        } else throw new AppStandardErrorException(20300, s"Not support Result => ${result.getClass.getName}.")
-      }
-    })(IOUtils.closeQuietly(httpClient))
+
+    httpClient.execute(req) match {
+      case result: HttpResult => result
+      case result => if (Result.isSuccessResult(result)) {
+        val defaultHttpResult = new DefaultHttpResult
+        defaultHttpResult.set(null, 200, null, null)
+        defaultHttpResult
+      } else throw new AppStandardErrorException(20300, s"Not support Result => ${result.getClass.getName}.")
+    }
+
   }
 
 }
@@ -94,7 +93,9 @@ object OriginSSORequestOperation extends Logging {
   def getHttpClient(urlBuilder: SSOUrlBuilderOperation, appName: String): Client = urlBuilder match {
     case builder: SSOUrlBuilderOperationImpl =>
       builder.getCookies.find(_._1 == "bdp-user-ticket-id").foreach { case (_, ticketId) =>
-        val key = getKey(ticketId, appName)
+        val baseUrl = HttpClient.getBaseUrl(builder.getBuiltUrl)
+        val key = getKey(ticketId, appName,baseUrl)
+        info("Get http client key is "+key)
         if (httpClientMap.containsKey(key) && System.currentTimeMillis - httpClientLastAccessMap.get(key) < MAX_ACTIVE_TIME) {
           httpClientLastAccessMap.put(key, System.currentTimeMillis)
           return httpClientMap.get(key)
@@ -122,6 +123,6 @@ object OriginSSORequestOperation extends Logging {
   }
 
 
-  private def getKey(ticketId: String, appName: String): String = appName + ticketId
+  private def getKey(ticketId: String, appName: String,baseUrl: String ): String = appName + ticketId+baseUrl
 
 }

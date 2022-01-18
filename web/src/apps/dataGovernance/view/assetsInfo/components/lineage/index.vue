@@ -49,14 +49,18 @@ export default {
         }
         const cur = this.lineageData.guidEntityMap[item]
         let icon
-        if (cur.status !== 'ACTIVE') {
+        if (cur.status !== 'ACTIVE' && cur.typeName === 'hive_table') {
           icon = 'icon-a-shanchudehivetable'
-        } else if (cur.typeName === 'hive_table') {
+        } else if (cur.status === 'ACTIVE' && cur.typeName === 'hive_table') {
           icon = 'icon-a-hivetable'
-        } else if (cur.typeName === 'hive_process') {
+        } else if (cur.status === 'ACTIVE' && cur.typeName === 'hive_process') {
           icon = 'icon-a-hiveprocess'
-        } else if (cur.typeName === 'spark_process') {
+        } else if (cur.status === 'ACTIVE' && cur.typeName === 'spark_process') {
           icon = 'icon-a-sparkprocess'
+        } else if (cur.status === 'ACTIVE' && cur.typeName === 'hdfs_path') {
+          icon = 'icon-hdfs'
+        } else if (cur.status !== 'ACTIVE' && cur.typeName === 'hdfs_path') {
+          icon = 'icon-hdfs-zhihui'
         }
         let className = isCurrent ? 'nodeBackground-color current-bg-color' : 'nodeBackground-color'
         data.nodes.push({

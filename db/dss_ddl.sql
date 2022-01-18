@@ -1291,6 +1291,7 @@ alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT 
 
 ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';
 
+
 /**
  * 鲁班产品及文档 dss-guide
  */
@@ -1327,11 +1328,13 @@ CREATE TABLE IF NOT EXISTS `dss_guide_content` (
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面内容详情';
 
+
 DROP TABLE IF EXISTS `dss_guide_catalog`;
 CREATE TABLE IF NOT EXISTS `dss_guide_catalog` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `parent_id` BIGINT(13) NOT NULL COMMENT '父级目录ID',
+  `parent_id` BIGINT(13) NOT NULL COMMENT '父级目录ID，-1代表最顶级目录',
   `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
   `create_by` VARCHAR(255) DEFAULT NULL COMMENT '创建者',
   `create_time` DATETIME DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` VARCHAR(255) DEFAULT NULL COMMENT '更新者',
@@ -1345,7 +1348,7 @@ CREATE TABLE IF NOT EXISTS `dss_guide_chapter` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
   `catalog_id` BIGINT(13) NOT NULL COMMENT '目录ID',
   `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
-  `titleAlias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
+  `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
   `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
   `content_html` TEXT DEFAULT NULL COMMENT 'Markdown转换为html内容',
   `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',

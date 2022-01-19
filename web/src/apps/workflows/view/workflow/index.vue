@@ -103,6 +103,7 @@
       @handleChangeButton="handleChangeButton"
       @selectProject="selectProject"
       @menuHandleChangeButton="menuHandleChangeButton"
+      @handleChooseScheduler="handleChooseScheduler"
     >
       <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
         <div
@@ -700,6 +701,14 @@ export default {
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
+        let schedulerTabList = JSON.parse(sessionStorage.getItem('scheduler_tab_list')) || []
+        if( schedulerTabList.findIndex(i => i.id == node.id) < 0 ) {
+          schedulerTabList.push(node)
+          sessionStorage.setItem('scheduler_tab_list', JSON.stringify(schedulerTabList))
+          eventbus.emit('scheduler_tab_list_change', schedulerTabList)
+        }
+        eventbus.emit('current_scheduler_change', node)
+        sessionStorage.setItem('current_scheduler', JSON.stringify(node))
         if (node.id == this.$route.query.projectID) {
           this.selectProject();
         } else {
@@ -717,7 +726,7 @@ export default {
             : this.$router.replace({
               name: "Workflow",
               query,
-            });
+            })
           this.updateBread();
         }
       }
@@ -1264,6 +1273,9 @@ export default {
           this.loading = false;
         });
     },
+    handleChooseScheduler(tabData) {
+      this.handleTreeClick(tabData)
+    }
   },
 };
 </script>

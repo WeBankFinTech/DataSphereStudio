@@ -7,9 +7,9 @@
         :rules="ruleValidate"
         ref="formValidate"
       >
-        <FormItem prop="onestop_menu_id">
+        <FormItem prop="onestopMenuId">
           <span class="form-item-label">接入类别</span>
-          <Select v-model="formItem.onestop_menu_id">
+          <Select v-model="formItem.onestopMenuId">
             <Option
               v-for="item in menuOptions"
               :value="item.value"
@@ -18,51 +18,51 @@
             >
           </Select>
         </FormItem>
-        <FormItem prop="title_cn">
+        <FormItem prop="titleCn">
           <span class="form-item-label">组件/应用名</span>
-          <Input v-model="formItem.title_cn"></Input>
+          <Input v-model="formItem.titleCn"></Input>
         </FormItem>
-        <FormItem prop="title_en">
+        <FormItem prop="titleEn">
           <span class="form-item-label">组件/应用名英文</span>
-          <Input v-model="formItem.title_en"></Input>
+          <Input v-model="formItem.titleEn"></Input>
         </FormItem>
         <FormItem prop="url">
           <span class="form-item-label">baseurl</span>
           <Input v-model="formItem.url"></Input>
         </FormItem>
-        <FormItem prop="homepage_url">
+        <FormItem prop="homepageUrl">
           <span class="form-item-label">首页</span>
-          <Input v-model="formItem.homepage_url"></Input>
+          <Input v-model="formItem.homepageUrl"></Input>
         </FormItem>
-        <FormItem prop="project_url">
+        <FormItem prop="projectUrl">
           <span class="form-item-label">项目页</span>
-          <Input v-model="formItem.project_url"></Input>
+          <Input v-model="formItem.projectUrl"></Input>
         </FormItem>
-        <FormItem prop="redirect_url">
+        <FormItem prop="redirectUrl">
           <span class="form-item-label">单点接口</span>
-          <Input v-model="formItem.redirect_url"></Input>
+          <Input v-model="formItem.redirectUrl"></Input>
         </FormItem>
-        <FormItem prop="if_iframe">
+        <FormItem prop="ifIframe">
           <span class="swith-label">iframe</span>
-          <i-switch v-model="formItem.if_iframe" />
+          <i-switch v-model="formItem.ifIframe" />
         </FormItem>
-        <FormItem prop="is_active">
+        <FormItem prop="isActive">
           <span class="swith-label">激活</span>
-          <i-switch v-model="formItem.is_active" />
+          <i-switch v-model="formItem.isActive" />
         </FormItem>
-        <FormItem prop="desc_cn">
+        <FormItem prop="descCn">
           <span class="form-item-label">描述</span>
           <Input
-            v-model="formItem.desc_cn"
+            v-model="formItem.descCn"
             type="textarea"
             :autosize="{ minRows: 6, maxRows: 10 }"
             placeholder="请输入描述"
           ></Input>
         </FormItem>
-        <FormItem prop="desc_en">
+        <FormItem prop="descEn">
           <span class="form-item-label">英文描述</span>
           <Input
-            v-model="formItem.desc_en"
+            v-model="formItem.descEn"
             type="textarea"
             :autosize="{ minRows: 6, maxRows: 18 }"
             placeholder="请输入英文描述"
@@ -93,17 +93,17 @@
 <script>
 import { formatComponentData } from "../../util/fomat";
 const tempFormItem = {
-  onestop_menu_id: 1,
-  title_cn: "新增组件",
-  title_en: "",
+  onestopMenuId: 1,
+  titleCn: "新增组件",
+  titleEn: "",
   url: "",
-  homepage_url: "",
-  project_url: "",
-  redirect_url: "",
-  if_iframe: 1,
-  is_active: 1,
-  desc_cn: "",
-  desc_en: ""
+  homepageUrl: "",
+  projectUrl: "",
+  redirectUrl: "",
+  ifIframe: 1,
+  isActive: 1,
+  descCn: "",
+  descEn: ""
   // access_button_cn: 'not null',
   // access_button_en: 'not null',
 };
@@ -118,13 +118,13 @@ export default {
     return {
       formItem: formatComponentData(this.componentData),
       ruleValidate: {
-        onestop_menu_id: [
+        onestopMenuId: [
           { required: true, message: "接入类别不能为空", trigger: "blur" }
         ],
-        title_cn: [
+        titleCn: [
           { required: true, message: "组件/应用名不能为空", trigger: "blur" }
         ],
-        title_en: [
+        titleEn: [
           {
             required: true,
             message: "组件/应用名英文不能为空",
@@ -132,14 +132,14 @@ export default {
           }
         ],
         url: [{ required: true, message: "baseurl不能为空", trigger: "blur" }],
-        homepage_url: [
+        homepageUrl: [
           { required: true, message: "首页不能为空", trigger: "blur" }
         ],
-        project_url: [
+        projectUrl: [
           { required: true, message: "项目页不能为空", trigger: "blur" }
         ],
-        desc_cn: [{ required: true, message: "描述不能为空", trigger: "blur" }],
-        desc_en: [
+        descCn: [{ required: true, message: "描述不能为空", trigger: "blur" }],
+        descEn: [
           { required: true, message: "英文描述不能为空", trigger: "blur" }
         ]
       },
@@ -176,8 +176,8 @@ export default {
       let _menuOptions = [];
       temp.forEach(item => {
         let o = Object.create(null);
-        o.value = item.title_en;
-        o.label = item.title_cn;
+        o.value = item.titleEn;
+        o.label = item.titleCn;
         _menuOptions.push(o);
       });
       this.menuOptions = _menuOptions;

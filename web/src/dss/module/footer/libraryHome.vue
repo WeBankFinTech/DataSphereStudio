@@ -64,7 +64,7 @@ export default {
     },
     refreshTree(catalogId) {
       GetCatalogById(catalogId).then((data) => {
-        const childrenCatalog = data.result ? (data.result.childrenCatalog || []).map(i => { return {...i, type: "catalog", isLeaf: false, canAdd: true }}) : []
+        const childrenCatalog = data.result ? (data.result.childrenCatalog || []).map(i => { return {...i, type: "catalog", isLeaf: false }}) : []
         const childrenChapter = data.result ? (data.result.childrenChapter || []).map(i => { return {...i, type: "chapter", isLeaf: true }}) : []
         const children = childrenCatalog.concat(childrenChapter);
         this.nodes = this.mergeTree(this.nodes, catalogId, children);
@@ -75,24 +75,17 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == catalogId) {
+        if (!nodes[i].isLeaf && nodes[i].id == catalogId) {
           item = {
             ...nodes[i],
             loaded: true,
             loading: false,
             opened: true,
             isLeaf: false,
-            children: children.map(c => {
-              return {
-                ...c,
-                id: c.id,
-                title: c.title,
-                isLeaf: true,
-              }
-            })
+            children: children
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.mergeTree(nodes[i].children, catalogId, children)
@@ -109,13 +102,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             opened: !nodes[i].opened
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleToggle(nodes[i].children, node)
@@ -132,13 +125,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             loading: true
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleLoading(nodes[i].children, node)

@@ -1,6 +1,7 @@
 <template>
   <div class="library-detail" >
     <div class="library-detail-title">{{ doc.title }}</div>
+    <div class="library-detail-time">更新时间：{{ doc.updateTime }}</div>
     <div class="library-detail-content" ref="libraryDetail">
       <p v-html="doc.contentHtml"></p>
     </div>
@@ -54,6 +55,11 @@ export default {
     margin: 20px 15px;
     font-size: 20px;
     @include font-color(#333, $dark-workspace-title-color);
+  }
+  .library-detail-time {
+    margin: 15px;
+    font-size: 12px;
+    @include font-color(#999, $dark-workspace-title-color);
   }
   .library-detail-content {
     padding: 0 15px 15px;

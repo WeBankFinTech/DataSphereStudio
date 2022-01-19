@@ -1585,6 +1585,9 @@ export default {
 .scheduler-center{
   position: relative;
   overflow: hidden;
+  margin: 20px 30px 0;
+  border: 1px solid rgb(237,237,237);
+  border-left: none;
   .scheduler-wrapper{
     padding-top: 0;
   .scheduler-menu{
@@ -1604,7 +1607,7 @@ export default {
 
   .scheduler-menu{
     float: left;
-    width: 250px;
+    width: 200px;
     padding-top: 16px;
     font-size: 14px;
     min-height: calc(80vh - 16px);

@@ -78,6 +78,7 @@
         <library-detail :doc="currentDoc" v-show="currentMode == 'detail'" @on-chapter-click="changeToLibraryDetail" />
         <library-search :doc="currentDoc" v-show="currentMode == 'search'" @on-chapter-click="changeToLibraryDetail" @on-page-change="changeSearchPage" />
         <library-home v-show="currentMode == 'home'" @on-chapter-click="changeToLibraryDetail" />
+        <Spin size="large" fix v-if="loading"></Spin>
       </div>
 
       <div class="guide-footer">
@@ -126,6 +127,7 @@ export default {
       currentDoc: {}, // history当前坐标的数据
       keyword: '', // document搜索
       pageSize: 10,
+      loading: false,
 
       selectedImg: "",
       modalImg: false,
@@ -249,16 +251,21 @@ export default {
       }
     },
     changeToLibrarySearch() {
+      if (!this.keyword || !this.keyword.trim()) {
+        return;
+      }
       this.currentMode = "search";
-      if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword) {
+      if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword.trim()) {
         // 最后一条历史记录是search且keyword没有变化，不处理
       } else {
         // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
         this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "search", data: { keyword: this.keyword } });
         this.currentIndex = this.currentIndex + 1;
-        QueryChapter({keyword: this.keyword, pageNow: 1, pageSize: this.pageSize}).then((res) => {
+        this.loading = true;
+        QueryChapter({keyword: this.keyword.trim(), pageNow: 1, pageSize: this.pageSize}).then((res) => {
           const data = this.formatSearchResult(res);
           this.currentDoc = data;
+          this.loading = false;
           // 更新history
           this.history = this.history.map((item, index) => {
             if (index == this.currentIndex) {
@@ -274,10 +281,12 @@ export default {
       }
     },
     changeSearchPage(page) {
+      this.loading = true;
       // search分页不更新history，只更新当前doc
-      QueryChapter({keyword: this.keyword, pageNow: page, pageSize: this.pageSize}).then((res) => {
+      QueryChapter({keyword: this.keyword.trim(), pageNow: page, pageSize: this.pageSize}).then((res) => {
         const data = this.formatSearchResult(res);
         this.currentDoc = data;
+        this.loading = false;
       });
     },
     formatSearchResult(res) {
@@ -287,10 +296,10 @@ export default {
             ...item,
             id: item.id,
             title: item.title,
-            desc: (item.contentHtml || "").replace(/\<\w\>/g, "").replace(/\<[/]\w\>/g, "").substr(0, 100)
+            desc: (item.contentHtml || "").replace(/<[^>]+>/gim, "").substr(0, 100), // 替换html标签
           }
         }),
-        keyword: this.keyword,
+        keyword: this.keyword.trim(),
         total: res.total
       };
     },
@@ -484,6 +493,7 @@ export default {
     }
   }
   .guide-body {
+    position: relative;
     height: calc(100% - 96px);
     padding-bottom: 48px;
     overflow-x: hidden;

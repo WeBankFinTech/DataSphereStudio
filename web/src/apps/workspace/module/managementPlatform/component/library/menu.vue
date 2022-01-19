@@ -20,8 +20,8 @@
       footer-hide
     >
       <Form
-        ref="groupForm"
-        :model="groupForm"
+        ref="catalogForm"
+        :model="catalogForm"
         :label-width="100"
         :rules="groupRule"
         v-show="modalType === 'catalog'"
@@ -29,7 +29,7 @@
         <FormItem label="目录名称" prop="title">
           <Input
             type="text"
-            v-model="groupForm.title"
+            v-model="catalogForm.title"
             placeholder="请输入目录名称"
             style="width: 300px"
           ></Input>
@@ -99,7 +99,7 @@ export default {
       modalVisible: false,
       modalTitle: "",
       submitLoading: false,
-      groupForm: {
+      catalogForm: {
         parentId: -1, // 第一级目录父id为-1
         title: "",
         description: "",
@@ -182,7 +182,7 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == catalogId) {
+        if (!nodes[i].isLeaf && nodes[i].id == catalogId) {
           item = {
             ...nodes[i],
             loaded: true,
@@ -199,7 +199,7 @@ export default {
             })
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.mergeTree(nodes[i].children, catalogId, children)
@@ -216,13 +216,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             opened: !nodes[i].opened
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleToggle(nodes[i].children, node)
@@ -239,13 +239,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             loading: true
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleLoading(nodes[i].children, node)
@@ -301,7 +301,7 @@ export default {
             type: "catalog",
             op: "修改",
           });
-          this.groupForm = {
+          this.catalogForm = {
             id: node.id,
             title: node.title || "",
             description: node.description || "",
@@ -362,11 +362,10 @@ export default {
     handleModalOk() {
       const modalType = this.modalType;
       if (modalType === "catalog") {
-        this.$refs["groupForm"].validate((valid) => {
+        this.$refs["catalogForm"].validate((valid) => {
           if (valid) {
             this.submitLoading = true;
-            console.log('add', this.groupForm)
-            SaveCatalog(this.groupForm).then((res) => {
+            SaveCatalog(this.catalogForm).then((res) => {
               this.submitLoading = false;
               this.handleModalCancel();
               this.initTree();
@@ -412,11 +411,11 @@ export default {
     },
     resetForm() {
       if (this.modalType === "catalog") {
-        this.groupForm = {
+        this.catalogForm = {
           parentId: -1,
           title: "",
         };
-        this.$refs["groupForm"].resetFields();
+        this.$refs["catalogForm"].resetFields();
       } else {
         this.contentForm = {
           type: "",

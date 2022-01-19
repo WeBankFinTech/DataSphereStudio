@@ -14,12 +14,12 @@
 
 <script>
 import axios from "axios";
-import { GetContent, UpdateGuideContent } from "@/common/service/apiGuide";
+import { GetChapter, SaveChapter } from "@/common/service/apiGuide";
 import { mavonEditor } from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
 import "mavon-editor/dist/markdown/github-markdown.min.css";
 export default {
-  name: "guide",
+  name: "library",
   components: {
     mavonEditor,
   },
@@ -47,12 +47,12 @@ export default {
   },
   methods: {
     getChapter() {
-      GetContent(this.$route.query.id).then((data) => {
+      GetChapter(this.$route.query.id).then((data) => {
         this.source = data.result.content || "";
       });
     },
     saveContent(value, render) {
-      UpdateGuideContent({
+      SaveChapter({
         id: this.$route.query.id,
         content: value,
         contentHtml: render,
@@ -65,7 +65,7 @@ export default {
       var formdata = new FormData();
       formdata.append("file", $file);
       axios({
-        url: `http://${window.location.host}/api/rest_j/v1/dss/guide/admin/guidecontent/uploadImage`,
+        url: `http://${window.location.host}/api/rest_j/v1/dss/guide/admin/guidechapter/uploadImage`,
         method: "post",
         data: formdata,
         headers: { "Content-Type": "multipart/form-data" },

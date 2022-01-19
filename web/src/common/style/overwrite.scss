@@ -466,7 +466,11 @@
     color: $dark-text-color !important;
   }
   .designer .node-selected {
-    box-shadow: 0 0 8px #0e1118;
+    // box-shadow: 0 0 8px #0e1118;
+    background: #DEE8F4;
+    // border: 1px solid #234C7F;
+    box-shadow: 1px 4px 6px 1px rgba(106,133,167,0.30);
+    border-radius: 4px;
   }
   .bg-img {
     opacity: 0.3;

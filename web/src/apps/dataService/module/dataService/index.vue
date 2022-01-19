@@ -191,7 +191,7 @@ export default {
         if (isUpdate) {
           isHad = false;
           const groupData = this.allProjectTree.find(item => {
-            return item.id + "" === this.apiForm.groupId + "";
+            return item.groupId + "" === this.apiForm.groupId + "";
           });
           if (groupData) {
             const apis2 = groupData.apis || [];

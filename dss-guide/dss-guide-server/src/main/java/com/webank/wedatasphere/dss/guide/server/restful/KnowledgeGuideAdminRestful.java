@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.guide.server.restful;
 
 import com.webank.wedatasphere.dss.guide.server.conf.GuideConf;
-import com.webank.wedatasphere.dss.guide.server.entity.GuideContent;
-import com.webank.wedatasphere.dss.guide.server.entity.GuideGroup;
-import com.webank.wedatasphere.dss.guide.server.service.GuideContentService;
-import com.webank.wedatasphere.dss.guide.server.service.GuideGroupService;
+import com.webank.wedatasphere.dss.guide.server.entity.GuideCatalog;
+import com.webank.wedatasphere.dss.guide.server.entity.GuideChapter;
+import com.webank.wedatasphere.dss.guide.server.service.GuideCatalogService;
+import com.webank.wedatasphere.dss.guide.server.service.GuideChapterService;
 import com.webank.wedatasphere.dss.guide.server.util.FileUtils;
 import lombok.AllArgsConstructor;
 import org.apache.linkis.server.Message;
@@ -29,34 +29,38 @@ import java.util.UUID;
 
 /**
  * @author suyc
- * @Classname GuideAdminRestful
+ * @Classname KnowledgeGuideAdminRestful
  * @Description TODO
- * @Date 2021/12/17 14:53
+ * @Date 2022/1/17 9:29
  * @Created by suyc
  */
 @RestController
 @RequestMapping(path = "/dss/guide/admin", produces = {"application/json"})
 @AllArgsConstructor
-public class GuideAdminRestful {
-    private static final Logger logger = LoggerFactory.getLogger(GuideAdminRestful.class);
+public class KnowledgeGuideAdminRestful {
+    private static final Logger logger = LoggerFactory.getLogger(KnowledgeGuideAdminRestful.class);
 
-    private GuideGroupService guideGroupService;
-    private GuideContentService guideContentService;
+    private GuideCatalogService guideCatalogService;
+    private GuideChapterService guideChapterService;
 
-    @RequestMapping(path ="/guidegroup", method = RequestMethod.POST)
-    public Message saveGuideGroup(HttpServletRequest request, @RequestBody GuideGroup guideGroup){
+
+    /**
+     * 知识库目录接口
+     */
+    @RequestMapping(path ="/guidecatalog", method = RequestMethod.POST)
+    public Message saveGuideCatalog(HttpServletRequest request, @RequestBody GuideCatalog guideCatalog){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideGroup.getId() ==null) {
-            guideGroup.setCreateBy(userName);
-            guideGroup.setCreateTime(new Date(System.currentTimeMillis()));
-            guideGroup.setUpdateTime(new Date(System.currentTimeMillis()));
+        if(guideCatalog.getId() ==null) {
+            guideCatalog.setCreateBy(userName);
+            guideCatalog.setCreateTime(new Date(System.currentTimeMillis()));
+            guideCatalog.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
-            guideGroup.setUpdateBy(userName);
-            guideGroup.setUpdateTime(new Date(System.currentTimeMillis()));
+            guideCatalog.setUpdateBy(userName);
+            guideCatalog.setUpdateTime(new Date(System.currentTimeMillis()));
         }
 
-        boolean flag = guideGroupService.saveGuideGroup(guideGroup);
+        boolean flag = guideCatalogService.saveGuideCatalog(guideCatalog);
         if(flag) {
             return Message.ok("保存成功");
         }else{
@@ -64,32 +68,42 @@ public class GuideAdminRestful {
         }
     }
 
-    @RequestMapping(path ="/guidegroup", method = RequestMethod.GET)
-    public Message queryGuideGroup( ){
-        return Message.ok().data("result", guideGroupService.getAllGuideGroupDetails());
-    }
-
-    @RequestMapping(path ="/guidegroup/{id}/delete", method = RequestMethod.POST)
+    @RequestMapping(path ="/guidecatalog/{id}/delete", method = RequestMethod.POST)
     public Message deleteGroup(@PathVariable Long id) {
-        guideGroupService.deleteGroup(id);
+        guideCatalogService.deleteGuideCatalog(id);
         Message message = Message.ok("删除成功");
         return message;
     }
 
-    @RequestMapping(path ="/guidecontent", method = RequestMethod.POST)
-    public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent){
+    @RequestMapping(path ="/guidecatalog/top", method = RequestMethod.GET)
+    public Message queryGuideCatalogListForTop( ){
+        return Message.ok().data("result", guideCatalogService.queryGuideCatalogListForTop());
+    }
+
+    @RequestMapping(path ="/guidecatalog/{id}/detail", method = RequestMethod.GET)
+    public Message queryGuideCatalogDetailById(@PathVariable Long id){
+        return Message.ok().data("result", guideCatalogService.queryGuideCatalogDetailById(id));
+    }
+
+
+
+    /**
+     * 知识库文档接口
+     */
+    @RequestMapping(path ="/guidechapter", method = RequestMethod.POST)
+    public Message saveGuideChapter(HttpServletRequest request, @RequestBody GuideChapter guideChapter){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideConent.getId() ==null) {
-            guideConent.setCreateBy(userName);
-            guideConent.setCreateTime(new Date(System.currentTimeMillis()));
-            guideConent.setUpdateTime(new Date(System.currentTimeMillis()));
+        if(guideChapter.getId() ==null) {
+            guideChapter.setCreateBy(userName);
+            guideChapter.setCreateTime(new Date(System.currentTimeMillis()));
+            guideChapter.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
-            guideConent.setUpdateBy(userName);
-            guideConent.setUpdateTime(new Date(System.currentTimeMillis()));
+            guideChapter.setUpdateBy(userName);
+            guideChapter.setUpdateTime(new Date(System.currentTimeMillis()));
         }
 
-        boolean flag = guideContentService.saveGuideContent(guideConent);
+        boolean flag = guideChapterService.saveGuideChapter(guideChapter);
         if(flag) {
             return Message.ok("保存成功");
         }else{
@@ -97,36 +111,19 @@ public class GuideAdminRestful {
         }
     }
 
-    @RequestMapping(path ="/guidecontent", method = RequestMethod.GET)
-    public Message queryGuideContent(@RequestParam String path){
-        return Message.ok().data("result", guideContentService.queryGuideContentByPath(path));
-    }
-
-    @RequestMapping(path ="/guidecontent/{id}", method = RequestMethod.GET)
-    public Message queryGuideContent(@PathVariable Long id){
-        return Message.ok().data("result", guideContentService.getGuideContent(id));
-    }
-
-    @RequestMapping(path ="/guidecontent/{id}/content", method = RequestMethod.POST)
-    public Message updateGuideContent(@PathVariable Long id, @RequestBody Map<String, Object> map) {
-        try{
-            guideContentService.updateContentById(id,map);
-            return Message.ok("更新成功");
-        }
-        catch (Exception ex){
-            logger.error("ERROR", "Error found: ", ex);
-            return Message.error(ex.getMessage());
-        }
-    }
-
-    @RequestMapping(path ="/guidecontent/{id}/delete", method = RequestMethod.POST)
-    public Message deleteContent(@PathVariable Long id) {
-        guideContentService.deleteContent(id);
+    @RequestMapping(path ="/guidechapter/{id}/delete", method = RequestMethod.POST)
+    public Message deleteGuideChapter(@PathVariable Long id) {
+        guideChapterService.deleteGuideChapter(id);
         Message message = Message.ok("删除成功");
         return message;
     }
 
-    @RequestMapping(path ="/guidecontent/uploadImages", method = RequestMethod.POST)
+    @RequestMapping(path ="/guidechapter/{id}", method = RequestMethod.GET)
+    public Message queryGuideChapter(@PathVariable Long id){
+        return Message.ok().data("result", guideChapterService.queryGuideChapterById(id));
+    }
+
+    @RequestMapping(path ="/guidechapter/uploadImages", method = RequestMethod.POST)
     public Message multFileUpload(@RequestParam(required = true) List<MultipartFile> files) {
         if (null == files || files.size() == 0) {
             return Message.error("没有上传文件");
@@ -134,7 +131,7 @@ public class GuideAdminRestful {
 
         List<Map<String,Object>> totalResult=new ArrayList<Map<String,Object>>();
         // 要上传的目标文件存放的绝对路径
-        final String localPath= GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
+        final String localPath= GuideConf.GUIDE_CHAPTER_IMAGES_PATH.getValue();
         for (MultipartFile file : files) {
             Map<String,Object> result =new HashMap<String, Object>();
             String result_msg ="";
@@ -171,13 +168,13 @@ public class GuideAdminRestful {
         return Message.ok().data("result", totalResult);
     }
 
-    @RequestMapping(path ="/guidecontent/uploadImage", method = RequestMethod.POST)
+    @RequestMapping(path ="/guidechapter/uploadImage", method = RequestMethod.POST)
     public Message fileUpload(@RequestParam(required = true) MultipartFile file) {
         if (null == file) {
             return Message.error("没有上传文件");
         }
 
-        final String imagesPath= GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
+        final String imagesPath= GuideConf.GUIDE_CHAPTER_IMAGES_PATH.getValue();
 
         if (file.getSize() > 5 * 1024 * 1024){
             return Message.error("图片大小不能超过5M");

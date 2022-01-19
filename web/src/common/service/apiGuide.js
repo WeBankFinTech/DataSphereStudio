@@ -20,6 +20,30 @@ const UpdateGuideContent = (data) => api.fetch(`/dss/guide/admin/guidecontent/${
 
 const DeleteGuideContent = (id) => api.fetch(`/dss/guide/admin/guidecontent/${id}/delete`, {}, 'post')
 
+// 知识库前端展示
+const GetCatalogTop = () => api.fetch(`/dss/guide/query/guidecatalog/top`, 'get')
+
+const GetCatalogById = (id) => api.fetch(`/dss/guide/query/guidecatalog/${id}/detail`, 'get')
+
+const QueryChapter = (param) => api.fetch(`/dss/guide/query/guidechapter`, param, 'get')
+
+const GetChapterDetail = (id) => api.fetch(`/dss/guide/query/guidechapter/${id}`, 'get')
+
+// 以下是后台管理admin
+const GetLibraryTreeTop = () => api.fetch(`/dss/guide/admin/guidecatalog/top`, 'get')
+
+const GetLibraryTreeById = (id) => api.fetch(`/dss/guide/admin/guidecatalog/${id}/detail`, 'get')
+
+const SaveCatalog = (data) => api.fetch(`/dss/guide/admin/guidecatalog`, data, 'post')
+
+const DeleteCatalog = (id) => api.fetch(`/dss/guide/admin/guidecatalog/${id}/delete`, {}, 'post')
+
+const GetChapter = (id) => api.fetch(`/dss/guide/admin/guidechapter/${id}`, 'get')
+
+const SaveChapter = (data) => api.fetch(`/dss/guide/admin/guidechapter`, data, 'post')
+
+const DeleteChapter = (id) => api.fetch(`/dss/guide/admin/guidechapter/${id}/delete`, {}, 'post')
+
 export {
   GetGuideByPath,
   GetGuideTree,
@@ -29,5 +53,16 @@ export {
   SaveGuideContent,
   UpdateGuideContent,
   GetContent,
-  DeleteGuideContent
+  DeleteGuideContent,
+  GetCatalogTop,
+  GetCatalogById,
+  QueryChapter,
+  GetChapterDetail,
+  GetLibraryTreeTop,
+  GetLibraryTreeById,
+  SaveCatalog,
+  DeleteCatalog,
+  GetChapter,
+  SaveChapter,
+  DeleteChapter
 }

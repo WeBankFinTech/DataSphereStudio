@@ -83,10 +83,6 @@ export default {
     align-items: center;
     cursor: pointer;
     @include font-color($light-text-color, $dark-text-color);
-    &-active {
-      @include bg-color(#edf1f6, $dark-active-menu-item);
-      @include font-color($primary-color, $dark-primary-color);
-    }
   }
   .leaf {
     color: transparent;
@@ -117,6 +113,9 @@ export default {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    &:hover {
+      @include font-color(rgba(0,0,0,0.85), rgba(255,255,255,0.85));
+    }
   }
   .tree-children {
     transition: max-height 0.3s;
@@ -124,6 +123,11 @@ export default {
     overflow: hidden;
     .leaf {
       visibility: hidden;
+      +.tree-name {
+        &:hover {
+          @include font-color($primary-color, $dark-primary-color);
+        }
+      }
     }
     .tree-item {
       padding-left: 20px;

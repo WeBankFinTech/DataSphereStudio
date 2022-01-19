@@ -52,6 +52,10 @@ export default {
       });
     },
     saveContent(value, render) {
+      /**
+       * 备注：因为mavonEditor在把md转换为html时会自动给链接加上target="_blank"，但如果链接本身href是以#开头，则忽略
+       * 所以，如果需要在文章内部继续做链接跳转其他内置文章，可以把href设置为#id的形式
+       */
       SaveChapter({
         id: this.$route.query.id,
         content: value,

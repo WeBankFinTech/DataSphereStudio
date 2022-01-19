@@ -1,12 +1,15 @@
 <template>
   <div class="library-search">
-    <div class="library-search-list" v-for="item in doc.list" :key="item.id" @click="showChapter(item)">
-      <div class="search-item-title">{{ item.title }}</div>
-      <div class="search-item-desc">{{ item.desc }}</div>
-    </div>
-    <div class="library-search-page">
-      <Page :total="doc.total" show-total @on-change="changePage"></Page>
-    </div>
+    <template v-if="doc.list && doc.list.length">
+      <div class="library-search-list" v-for="item in doc.list" :key="item.id" @click="showChapter(item)">
+        <div class="search-item-title">{{ item.title }}</div>
+        <div class="search-item-desc">{{ item.desc }}</div>
+      </div>
+      <div class="library-search-page">
+        <Page :total="doc.total" show-total @on-change="changePage"></Page>
+      </div>
+    </template>
+    <div class="library-search-empty" v-else>没有找到您期望的内容</div>
   </div>
 </template>
 <script>
@@ -58,6 +61,12 @@ export default {
   }
   .library-search-page {
     margin: 12px 15px;
+  }
+  .library-search-empty {
+    text-align: center;
+    margin: 80px 0;
+    font-size: 16px;
+    @include font-color(#333, $dark-text-color);
   }
 }
 </style>

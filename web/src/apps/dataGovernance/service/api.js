@@ -240,10 +240,10 @@ export const getLayersPreset = () =>
  * @params {workspaceId}
  * @returns Array
  */
-export const getLayersCustom = () =>
+export const getLayersCustom = (keyword) =>
   api.fetch(
     `${API_PATH.WAREHOUSE_PATH}layer/subtypes`,
-    {},
+    {keyword},
     'get'
   )
 

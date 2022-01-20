@@ -17,7 +17,7 @@
               <div class="time-model">
                 <template>
                   <Date-picker
-                    style="width: 430px"
+                    style="width: 250px"
                     v-model="dataTime"
                     type="datetimerange"
                     @on-change="_datepicker"
@@ -45,7 +45,49 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <div id="areaChart" style="height: 430px"></div>
+              <div id="areaChart" style="height: 330px"></div>
+              <Spin size="large" fix v-if="loading"></Spin>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 dashboard-module" style="margin-right: 10px">
+            <div class="chart-title">
+              <span>{{$t('message.scheduler.processDefinitionStatistics')}}</span>
+            </div>
+            <div class="dashboard-module-content">
+              <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
+              </m-define-user-count>
+              <Spin size="large" fix v-if="loading"></Spin>
+            </div>
+          </div>
+
+          <div class="col-md-6 dashboard-module">
+            <div class="chart-title">
+              <span>流程耗时排名</span>
+              <div class="time-model">
+                <template>
+                  <Date-picker
+                    style="width: 250px"
+                    v-model="consumptionTime"
+                    type="datetimerange"
+                    @on-change="changeTime"
+                    range-separator="-"
+                    :options="options1"
+                    format="yyyy-MM-dd HH:mm:ss">
+                  </Date-picker>
+                </template>
+              </div>
+              <!--<div class="day-change">-->
+                <!--<div :class="stateSelected === 1?'selected': ''" @click="changeState(1)">运行成功</div>-->
+                <!--<div :class="stateSelected === 2?'selected': ''" @click="changeState(2)">运行失败</div>-->
+              <!--</div>-->
+            </div>
+            <div class="row dashboard-module-content">
+              <Table :columns="columns" :data="consumptionList" style="height: 430px;" class="consumption-table">
+                <!--<template slot-scope="{ row }" slot="operation">-->
+                <!--</template>-->
+              </Table>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
@@ -64,18 +106,6 @@
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-12 dashboard-module">
-            <div class="chart-title">
-              <span>{{$t('message.scheduler.processDefinitionStatistics')}}</span>
-            </div>
-            <div class="dashboard-module-content">
-              <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
-              </m-define-user-count>
-              <Spin size="large" fix v-if="loading"></Spin>
-            </div>
-          </div>
-        </div>
       </div>
     </template>
   </m-list-construction>
@@ -90,6 +120,7 @@ import mProcessStateCount from './source/processStateCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
 import {formatDate} from '../convertor'
+import { tasksState } from '../config'
 
 import echarts from 'echarts'
 
@@ -112,13 +143,75 @@ export default {
       areaChart: null,
       daySelected: 1,
       stateSelected: 1,
-      loading: false
+      loading: false,
+
+      consumptionList: [],
+      consumptionTime: [],
+      consumptionParams: {},
+      options1: {
+        shortcuts: [
+          {
+            text: '今天',
+            value () {
+              const start = new Date();
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              const end = new Date();
+              return [start, end];
+            }
+          },
+          {
+            text: '昨天',
+            value () {
+              const end = new Date();
+              end.setHours(0)
+              end.setMinutes(0)
+              end.setSeconds(0)
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24);
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              return [start, end];
+            }
+          },
+          {
+            text: '最近一周',
+            value () {
+              const end = new Date();
+              const start = new Date();
+              start.setHours(0)
+              start.setMinutes(0)
+              start.setSeconds(0)
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              return [start, end];
+            }
+          }
+        ]
+      }
     }
   },
   props: {
 
   },
   methods: {
+    getConsumptionData() {
+      if (!this.projectName) return
+      api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-order-by-duration`, {
+        pageSize: 10,
+        pageNo: 1,
+        startDate: this.consumptionParams.startDate  || '',
+        endDate: this.consumptionParams.endDate || '',
+      }, 'get').then((res) => {
+        this.consumptionList = res.totalList
+      })
+    },
+    changeTime(val) {
+      this.consumptionParams.startDate = val[0]
+      this.consumptionParams.endDate = val[1]
+      this.getConsumptionData()
+    },
     changeState(state) {
       if (state) {
         this.stateSelected = state
@@ -287,12 +380,34 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时']
+          data: ['2时','4时', '6时', '8时', '10时','12时','14时','16时','18时','20时','22时','24时'],
+          nameTextStyle: {
+            color: 'rgb(150, 150, 150)'
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'rgb(237, 237, 237)'
+            }
+          },
+          axisLabel: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         yAxis: {
           type: 'value',
           minInterval: 1,
-          name: '实例数(个)'
+          name: '实例数(个)',
+          nameTextStyle: {
+            color: 'rgb(150, 150, 150)'
+          },
+          axisLine: {
+            lineStyle: {
+              color: 'rgb(237, 237, 237)'
+            }
+          },
+          axisLabel: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         series: [
           {
@@ -344,6 +459,17 @@ export default {
               '13时', '14时', '15时', '16时', '17时', '18时', '19时', '20时', '21时', '22时', '23时', '24时'],
             axisPointer: {
               type: 'shadow'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
+            },
+            axisLabel: {
+              color: 'rgb(150, 150, 150)'
             }
           }
         ],
@@ -356,17 +482,35 @@ export default {
             max: 250,
             interval: 50,*/
             axisLabel: {
-              formatter: '{value} 个'
+              formatter: '{value} 个',
+              color: 'rgb(150, 150, 150)'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
             }
           },
           {
             type: 'value',
             name: '成功率',
-            /*min: 0,
-            max: 25,
-            interval: 5,*/
+            //min: 0,
+            max: 100,
+            interval: 20,
             axisLabel: {
-              formatter: '{value} %'
+              formatter: '{value} %',
+              color: 'rgb(150, 150, 150)'
+            },
+            nameTextStyle: {
+              color: 'rgb(150, 150, 150)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(237, 237, 237)'
+              }
             }
           }
         ],
@@ -394,6 +538,29 @@ export default {
         ]
       };
       this.mixedBarLineChart.setOption(option)
+    },
+    showDuration(seconds) {
+      let remain = seconds,
+        dayUnit = 60*60*24,
+        hourUnit = 60*60,
+        minuteUnit = 60,
+        str = ''
+      if (remain / dayUnit >= 1) {
+        str += `${parseInt(remain/dayUnit)}天`
+        remain = remain % dayUnit
+      }
+      if (remain / hourUnit >= 1) {
+        str += `${parseInt(remain/hourUnit)}小时`
+        remain = remain % hourUnit
+      }
+      if (remain / minuteUnit >= 1) {
+        str += `${parseInt(remain/minuteUnit)}分`
+        remain = remain % minuteUnit
+      }
+      if (remain >= 1) {
+        str += `${parseInt(remain)}秒`
+      }
+      return str
     }
   },
   created () {
@@ -410,6 +577,7 @@ export default {
         this.$nextTick(() => {
           this.changeDay()
           this.changeState()
+          this.getConsumptionData()
         })
       })
     })
@@ -420,6 +588,41 @@ export default {
     mDefineUserCount,
     mProcessStateCount,
     //mTaskStatusCount
+  },
+  computed: {
+    columns() {
+      return [
+        {
+          type: 'index',
+          width: 60,
+          align: 'center'
+        },
+        {
+          title: '实例名',
+          key: 'name',
+          //width: 240,
+          align: 'center',
+        },
+        {
+          title: this.$t('message.workflow.projectDetail.status'),
+          key: 'state',
+          align: 'center',
+          width: 80,
+          render: (h, scope) => {
+            return h('span', {}, tasksState[scope.row.state].desc);
+          },
+        },
+        {
+          title: '耗时',
+          key: 'duration',
+          width: 210,
+          align: 'center',
+          render: (h, scope) => {
+            return h('span', {}, this.showDuration(scope.row.duration))
+          },
+        }
+      ]
+    }
   }
 }
 </script>
@@ -436,9 +639,9 @@ export default {
       top: -40px;
     }
     .time-model {
-      position: absolute;
-      right: 8px;
-      top: 0;
+      position: relative;
+      top: -60px;
+      left: calc(100% - 230px);
     }
     .chart-title {
       padding: 0 30px;
@@ -450,6 +653,16 @@ export default {
         font-size: 16px;
         @include font-color($workspace-title-color, $dark-workspace-title-color);
       }
+    }
+    .ivu-picker-panel-body {
+      span {
+        font-size: 12px;
+      }
+    }
+    .ivu-btn-primary {
+      >span {
+          color: #fff;
+       }
     }
   }
   .table-small-model {
@@ -498,9 +711,17 @@ export default {
         display: inline-block;
         cursor: pointer;
         &.selected {
-           border-bottom: 2px solid #2A6F97;
+           border-bottom: 2px solid #2E92F7;
         }
       }
+    }
+  }
+  .consumption-table {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    .ivu-table {
+      overflow-y: auto;
+      overflow-x: hidden;
     }
   }
 </style>

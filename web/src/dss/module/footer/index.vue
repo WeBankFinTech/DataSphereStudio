@@ -10,6 +10,7 @@
     </resource-simple>
     <div class="footer-btn footer-channel"
          :title="msg"
+         ref="footerChannel"
          @mousedown.prevent.stop="onMouseDown"
          @mouseup.prevent.stop="oMouseUp"
          @click.prevent.stop="toast">

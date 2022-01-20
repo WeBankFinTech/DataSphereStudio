@@ -18,5 +18,5 @@ public interface GuideGroupService {
 
     public List<GuideGroup> getAllGuideGroupDetails();
 
-    public void deleteGroup(Long id);
+    public void deleteGuideGroup(Long id);
 }

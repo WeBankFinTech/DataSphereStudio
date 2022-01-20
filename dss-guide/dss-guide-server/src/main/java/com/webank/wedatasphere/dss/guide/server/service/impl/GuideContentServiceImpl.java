@@ -47,7 +47,7 @@ public class GuideContentServiceImpl extends ServiceImpl<GuideContentMapper, Gui
 
 
     @Override
-    public void updateContentById(long id, Map<String, Object> map) throws GuideException {
+    public void updateGuideContentById(long id, Map<String, Object> map) throws GuideException {
         Object content = map.get("content");
         if(content == null){
             throw new GuideException("请设置content参数");
@@ -56,11 +56,11 @@ public class GuideContentServiceImpl extends ServiceImpl<GuideContentMapper, Gui
         if(contentHtml == null){
             throw new GuideException("请设置contentHtml参数");
         }
-        guideContentMapper.updateContentById(id, content.toString(), contentHtml.toString());
+        guideContentMapper.updateGuideContentById(id, content.toString(), contentHtml.toString());
     }
 
     @Override
-    public void deleteContent(Long id) {
-        guideContentMapper.deleteContent(id);
+    public void deleteGuideContent(Long id) {
+        this.removeById(id);
     }
 }

@@ -7,18 +7,39 @@
       :class="{ 'guide-show': show }"
     >
       <div class="guide-header">
-        <span
-          class="header-back"
-          @click="changeToGuide"
-          v-show="currentTab == 'library'"
-        >
-          <SvgIcon icon-class="putaway" />
-        </span>
         <span class="header-txt">帮助文档</span>
         <span class="header-close" @click="toggleGuide">
           <SvgIcon icon-class="close2" />
         </span>
       </div>
+
+      <div class="guide-tabs">
+        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'guide'}" @click="changeTab('guide')">学习引导</div>
+        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'library'}" @click="changeTab('library')">知识库</div>
+      </div>
+
+      <div class="guide-navbar" v-show="currentTab == 'library'">
+        <div class="navbar-head">
+          <span class="navbar-head-btn" :class="{'navbar-head-btn-disabled': isFirst}" @click="changeDocument('prev')">
+            <SvgIcon icon-class="putaway" />
+          </span>
+          <span class="navbar-head-btn" :class="{'navbar-head-btn-disabled': isLast}" @click="changeDocument('next')">
+            <SvgIcon icon-class="unfold" />
+          </span>
+          <div class="navbar-head-search">
+            <div class="icon-prefix">
+              <SvgIcon icon-class="search-icon" />
+            </div>
+            <Input v-model="keyword" clearable @on-enter="changeToLibrarySearch" />
+          </div>
+        </div>
+        <div class="navbar-breadcrumb" v-if="currentMode != 'home'">
+          <span class="breadcrumb-home" @click="changeToLibraryHome">文档首页</span>
+          <span class="breadcrumb-divider"></span>
+          <span class="breadcrumb-title">{{ currentMode == 'search' ? "搜索" : currentDoc.title }}</span>
+        </div>
+      </div>
+
       <div class="guide-body" v-show="currentTab == 'guide'">
         <div
           class="guide-box"
@@ -47,17 +68,17 @@
           <div class="guide-box-title">常见问题</div>
           <ul class="guide-questions">
             <li v-for="q in guide.questions" :key="q.title">
-              <a @click="changeToAnswer(q)">{{ q.title }}</a>
+              <a @click="changeToLibraryDetail(q)">{{ q.title }}</a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="guide-body" v-show="currentTab == 'library'">
-        <div class="paper-title">{{ currentPaper.title }}</div>
-        <div class="paper-content">
-          <p v-html="currentPaper.contentHtml"></p>
-        </div>
+      <div class="guide-body" :style="libraryStyle" v-show="currentTab == 'library'">
+        <library-detail :doc="currentDoc" v-show="currentMode == 'detail'" @on-chapter-click="changeToLibraryDetail" />
+        <library-search :doc="currentDoc" v-show="currentMode == 'search'" @on-chapter-click="changeToLibraryDetail" @on-page-change="changeSearchPage" />
+        <library-home v-show="currentMode == 'home'" @on-chapter-click="changeToLibraryDetail" />
+        <Spin size="large" fix v-if="loading"></Spin>
       </div>
 
       <div class="guide-footer">
@@ -77,10 +98,18 @@
 </template>
 <script>
 import eventbus from "@/common/helper/eventbus";
-import { GetGuideByPath } from "@/common/service/apiGuide";
+import { GetGuideByPath, QueryChapter } from "@/common/service/apiGuide";
+import libraryHome from "./libraryHome.vue";
+import librarySearch from "./librarySearch.vue";
+import libraryDetail from "./libraryDetail.vue";
 
 export default {
   name: "Guide",
+  components: {
+    libraryHome,
+    librarySearch,
+    libraryDetail
+  },
   props: {
     show: {
       type: Boolean,
@@ -90,17 +119,48 @@ export default {
   data() {
     return {
       guide: {},
-      currentPaper: {},
       currentTab: "guide", // guide or library
+
+      currentMode: "home", // library 展示的内容有3种模式，文档目录首页home，某一具体文档detail，搜索列表search
+      history: [ { mode: "home", data: {} } ], // document history for prev or next
+      currentIndex: 0, // history当前坐标
+      currentDoc: {}, // history当前坐标的数据
+      keyword: '', // document搜索
+      pageSize: 10,
+      loading: false,
+
       selectedImg: "",
       modalImg: false,
       tabModMap: {}, // 工作流可能同时打开多个，所以缓存起来
     };
   },
+  computed: {
+    libraryStyle() {
+      if (this.currentMode == 'home') {
+        // home模式没有面包屑40px
+        return {
+          height: "calc(100% - 144px)"
+        }
+      } else {
+        return {
+          height: "calc(100% - 184px)"
+        }
+      }
+    },
+    isFirst() {
+      return this.currentIndex == 0
+    },
+    isLast() {
+      return this.currentIndex == this.history.length - 1
+    },
+    lastHistory() {
+      return this.history[this.history.length - 1]
+    }
+  },
   watch: {
     $route(val) {
       this.getGuideConfig();
-    },
+    }
   },
   mounted() {
     this.getGuideConfig();
@@ -163,18 +223,101 @@ export default {
         });
       }
     },
-    changeToAnswer(question) {
-      this.currentTab = "library";
-      this.currentPaper = question;
-    },
-    changeToGuide() {
-      this.currentTab = "guide";
-      this.currentPaper = {};
+    changeTab(tab) {
+      this.currentTab = tab;
     },
     toggleGuide() {
       this.$emit("on-toggle");
       this.currentTab = "guide";
-      this.currentPaper = {};
+    },
+    changeToLibraryHome() {
+      this.currentMode = "home";
+      // 当前元素不等于history最后一个元素，就可以进入队列
+      if (this.lastHistory.mode !== "home") {
+        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "home", data: {} });
+        this.currentIndex = this.currentIndex + 1;
+      }
+    },
+    changeToLibraryDetail(chapter) {
+      this.currentTab = "library";
+      this.currentMode = "detail";
+      this.currentDoc = chapter;
+      // 当前元素不等于history最后一个元素，就可以进入队列
+      if (this.lastHistory.data.id !== chapter.id) {
+        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: chapter });
+        this.currentIndex = this.currentIndex + 1;
+      }
+    },
+    changeToLibrarySearch() {
+      if (!this.keyword || !this.keyword.trim()) {
+        return;
+      }
+      this.currentMode = "search";
+      if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword.trim()) {
+        // 最后一条历史记录是search且keyword没有变化，不处理
+      } else {
+        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "search", data: { keyword: this.keyword } });
+        this.currentIndex = this.currentIndex + 1;
+        this.loading = true;
+        QueryChapter({keyword: this.keyword.trim(), pageNow: 1, pageSize: this.pageSize}).then((res) => {
+          const data = this.formatSearchResult(res);
+          this.currentDoc = data;
+          this.loading = false;
+          // 更新history
+          this.history = this.history.map((item, index) => {
+            if (index == this.currentIndex) {
+              return {
+                ...item,
+                data: data
+              }
+            } else {
+              return item
+            }
+          })
+        });
+      }
+    },
+    changeSearchPage(page) {
+      this.loading = true;
+      // search分页不更新history，只更新当前doc
+      QueryChapter({keyword: this.keyword.trim(), pageNow: page, pageSize: this.pageSize}).then((res) => {
+        const data = this.formatSearchResult(res);
+        this.currentDoc = data;
+        this.loading = false;
+      });
+    },
+    formatSearchResult(res) {
+      return {
+        list: res.result.map(item => {
+          return {
+            ...item,
+            id: item.id,
+            title: item.title,
+            desc: (item.contentHtml || "").replace(/<[^>]+>/gim, "").substr(0, 100), // 替换html标签
+          }
+        }),
+        keyword: this.keyword.trim(),
+        total: res.total
+      };
+    },
+    changeDocument(type) {
+      if (type == "prev" && this.currentIndex == 0) {
+        return;
+      }
+      if (type == "next" && this.currentIndex == this.history.length - 1) {
+        return;
+      }
+      if (type == "prev") {
+        this.currentIndex = this.currentIndex - 1;
+      } else if (type == "next") {
+        this.currentIndex = this.currentIndex + 1;
+      }
+      const currentHistory = this.history[this.currentIndex];
+      this.currentMode = currentHistory.mode;
+      this.currentDoc = currentHistory.data;
     },
     toggleStep(step) {
       this.guide = {
@@ -237,13 +380,6 @@ export default {
       line-height: 48px;
       @include font-color(#333, $dark-workspace-title-color);
     }
-    .header-back {
-      margin-right: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 48px;
-      @include font-color(#333, $dark-workspace-title-color);
-    }
     .header-close {
       position: absolute;
       right: 15px;
@@ -256,8 +392,111 @@ export default {
       @include font-color(#333, $dark-workspace-title-color);
     }
   }
+  .guide-tabs {
+    height: 48px;
+    display: flex;
+    border-top: 1px solid #dee4ec;
+    @include border-color(#dee4ec, #404a5d);
+    .guide-tab {
+      flex: 1;
+      position: relative;
+      font-size: 14px;
+      line-height: 48px;
+      cursor: pointer;
+      text-align: center;
+      @include font-color(#333, $dark-workspace-title-color);
+      &:first-child {
+        border-right: 1px solid #dee4ec;
+        @include border-color(#dee4ec, #404a5d);
+      }
+    }
+    .guide-tab-active {
+      color: #2e92f7;
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 4px;
+        background: #2e92f7;
+      }
+    }
+  }
+  .guide-navbar {
+    .navbar-head {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      padding-right: 16px;
+      @include bg-color(#f8f9fc, #313847);
+      border-top: 1px solid #dee4ec;
+      border-bottom: 1px solid #dee4ec;
+      @include border-color(#dee4ec, #404a5d);
+      .navbar-head-btn {
+        padding: 0 12px;
+        cursor: pointer;
+        font-size: 16px;
+        height: 32px;
+        line-height: 32px;
+        @include font-color(#333, $dark-workspace-title-color);
+      }
+      .navbar-head-btn-disabled {
+        @include font-color(#c0c6cc, #666);
+        cursor: default;
+      }
+      .navbar-head-search {
+        position: relative;
+        flex: 1;
+        height: 32px;
+        line-height: 32px;
+        .icon-prefix {
+          z-index: 2;
+          position: absolute;
+          left: 10px;
+          top: 0;
+          font-size: 16px;
+          @include font-color(#333, $dark-text-color);
+        }
+        /deep/.ivu-input {
+          text-indent: 24px;
+        }
+      }
+    }
+    .navbar-breadcrumb {
+      height: 40px;
+      padding: 10px 15px;
+      overflow: hidden;
+      white-space: nowrap;
+      .breadcrumb-home {
+        display: inline-block;
+        cursor: pointer;
+        vertical-align: middle;
+        @include font-color(#666, $dark-workspace-title-color);
+        &:hover {
+          color: #2e92f7;
+        }
+      }
+      .breadcrumb-divider {
+        display: inline-block;
+        margin: 0 8px;
+        vertical-align: middle;
+        color: #999;
+        &::after {
+          content: "/";
+        }
+      }
+      .breadcrumb-title {
+        display: inline-block;
+        vertical-align: middle;
+        @include font-color(#999, $dark-text-color);
+        cursor: default;
+      }
+    }
+  }
   .guide-body {
-    height: calc(100% - 48px);
+    position: relative;
+    height: calc(100% - 96px);
     padding-bottom: 48px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -374,21 +613,6 @@ export default {
             }
           }
         }
-      }
-    }
-    .paper-title {
-      margin: 20px 15px;
-      font-size: 20px;
-      @include font-color(#333, $dark-workspace-title-color);
-    }
-    .paper-content {
-      padding: 0 15px 15px;
-      @include font-color(#666, $dark-text-color);
-      /deep/img {
-        display: block;
-        border: 0;
-        max-width: 100%;
-        cursor: pointer;
       }
     }
   }

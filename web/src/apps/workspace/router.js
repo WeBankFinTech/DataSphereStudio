@@ -107,78 +107,78 @@ export const apiServicesRoutes = [
         },
         component: () => import('./module/permissions/module/personManagement.vue')
       },
-      {
-        path: 'globalHistory',
-        name: 'globalHistory',
-        meta: {
-          title: 'Global History',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/globalHistoryManagement/index.vue')
-      },
-      {
-        path: 'viewHistory',
-        name: 'viewHistory',
-        meta: {
-          title: 'View History',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/globalHistoryManagement/viewHistory.vue')
-      },
-      {
-        path: 'resource',
-        name: 'resource',
-        meta: {
-          title: 'Resource',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/resourceManagement/index.vue')
-      },
-      {
-        path: 'setting',
-        name: 'setting',
-        meta: {
-          title: 'Setting',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/setting/setting.vue')
-      },
-      {
-        path: 'globalValiable',
-        name: 'globalValiable',
-        meta: {
-          title: 'Global Valiable',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/globalValiable/index.vue')
-      },
-      {
-        path: 'ECM',
-        name: 'ECM',
-        meta: {
-          title: 'ECM',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/ECM/index.vue')
-      },
-      {
-        path: 'EngineConnList',
-        name: 'EngineConnList',
-        meta: {
-          title: 'Engine ConnList',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/ECM/engineConn.vue')
-      },
-      {
-        path: 'FAQ',
-        name: 'FAQ',
-        meta: {
-          title: 'FAQ',
-          publicPage: true
-        },
-        component: () => import('../linkis/module/FAQ/index.vue')
-      },
+      // {
+      //   path: 'globalHistory',
+      //   name: 'globalHistory',
+      //   meta: {
+      //     title: 'Global History',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/globalHistoryManagement/index.vue')
+      // },
+      // {
+      //   path: 'viewHistory',
+      //   name: 'viewHistory',
+      //   meta: {
+      //     title: 'View History',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/globalHistoryManagement/viewHistory.vue')
+      // },
+      // {
+      //   path: 'resource',
+      //   name: 'resource',
+      //   meta: {
+      //     title: 'Resource',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/resourceManagement/index.vue')
+      // },
+      // {
+      //   path: 'setting',
+      //   name: 'setting',
+      //   meta: {
+      //     title: 'Setting',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/setting/setting.vue')
+      // },
+      // {
+      //   path: 'globalValiable',
+      //   name: 'globalValiable',
+      //   meta: {
+      //     title: 'Global Valiable',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/globalValiable/index.vue')
+      // },
+      // {
+      //   path: 'ECM',
+      //   name: 'ECM',
+      //   meta: {
+      //     title: 'ECM',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/ECM/index.vue')
+      // },
+      // {
+      //   path: 'EngineConnList',
+      //   name: 'EngineConnList',
+      //   meta: {
+      //     title: 'Engine ConnList',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/ECM/engineConn.vue')
+      // },
+      // {
+      //   path: 'FAQ',
+      //   name: 'FAQ',
+      //   meta: {
+      //     title: 'FAQ',
+      //     publicPage: true
+      //   },
+      //   component: () => import('../linkis/module/FAQ/index.vue')
+      // },
       {
         path: 'accessComponents',
         name: 'accessComponents',
@@ -196,6 +196,15 @@ export const apiServicesRoutes = [
           publicPage: true
         },
         component: () => import('./module/managementPlatform/component/guide/index.vue')
+      },
+      {
+        path: 'library',
+        name: 'library',
+        meta: {
+          title: 'Library',
+          publicPage: true
+        },
+        component: () => import('./module/managementPlatform/component/library/index.vue')
       }
     ]
   }

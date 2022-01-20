@@ -1071,7 +1071,6 @@ export default {
   .toolBar {
     width: 100%;
     height: 48px;
-    margin-top: -5px;
     @include bg-color(#f8f9fc, $dark-menu-base-color);
     border: 1px solid #dee4ec;
     border-left-width: 0;

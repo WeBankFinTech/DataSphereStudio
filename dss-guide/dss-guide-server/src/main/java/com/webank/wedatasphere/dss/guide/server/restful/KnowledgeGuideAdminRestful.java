@@ -50,10 +50,9 @@ public class KnowledgeGuideAdminRestful {
     @RequestMapping(path ="/guidecatalog", method = RequestMethod.POST)
     public Message saveGuideCatalog(HttpServletRequest request, @RequestBody GuideCatalog guideCatalog){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideCatalog.getId() ==null) {
+        if(null == guideCatalog.getId()) {
             guideCatalog.setCreateBy(userName);
             guideCatalog.setCreateTime(new Date(System.currentTimeMillis()));
-            guideCatalog.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideCatalog.setUpdateBy(userName);
@@ -93,10 +92,9 @@ public class KnowledgeGuideAdminRestful {
     @RequestMapping(path ="/guidechapter", method = RequestMethod.POST)
     public Message saveGuideChapter(HttpServletRequest request, @RequestBody GuideChapter guideChapter){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideChapter.getId() ==null) {
+        if(null == guideChapter.getId()) {
             guideChapter.setCreateBy(userName);
             guideChapter.setCreateTime(new Date(System.currentTimeMillis()));
-            guideChapter.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideChapter.setUpdateBy(userName);
@@ -148,7 +146,7 @@ public class KnowledgeGuideAdminRestful {
                     //获取文件后缀名
                     String suffixName = fileName.substring(fileName.lastIndexOf("."));
                     //重新生成文件名
-                    fileName = UUID.randomUUID() + suffixName;
+                    fileName = "knowledge-" + UUID.randomUUID() + suffixName;
                     if (FileUtils.upload(file, localPath, fileName)) {
                         String relativePath =fileName;
                         result.put("relativePath",relativePath);

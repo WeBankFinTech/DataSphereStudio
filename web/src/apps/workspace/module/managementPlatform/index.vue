@@ -414,7 +414,7 @@ export default {
     },
   },
   mounted() {
-    this.getMenuForcomponentAccess();
+    //this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }

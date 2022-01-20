@@ -9,7 +9,10 @@
         <Page :total="doc.total" show-total @on-change="changePage"></Page>
       </div>
     </template>
-    <div class="library-search-empty" v-else>没有找到您期望的内容</div>
+    <div class="library-search-empty" v-else>
+      <SvgIcon icon-class="empty" width="160px" height="160px" />
+      <div class="empty-tips">没有找到您期望的内容</div>
+    </div>
   </div>
 </template>
 <script>
@@ -63,10 +66,19 @@ export default {
     margin: 12px 15px;
   }
   .library-search-empty {
-    text-align: center;
-    margin: 80px 0;
-    font-size: 16px;
-    @include font-color(#333, $dark-text-color);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    @include font-color(#ebebeb, #3f434c);
+    .empty-tips {
+      @include font-color(#333, $dark-text-color);
+    }
   }
 }
 </style>

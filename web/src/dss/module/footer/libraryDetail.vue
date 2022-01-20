@@ -58,12 +58,12 @@ export default {
   .library-detail-title {
     margin: 20px 15px;
     font-size: 20px;
-    @include font-color(#333, $dark-workspace-title-color);
+    @include font-color(#333, $dark-text-color);
   }
   .library-detail-time {
     margin: 15px;
     font-size: 12px;
-    @include font-color(#999, $dark-workspace-title-color);
+    @include font-color(#999, $dark-text-color);
   }
   .library-detail-content {
     padding: 0 15px 15px;

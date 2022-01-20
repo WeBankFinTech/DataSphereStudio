@@ -439,9 +439,10 @@ export default {
         font-size: 16px;
         height: 32px;
         line-height: 32px;
+        @include font-color(#333, $dark-workspace-title-color);
       }
       .navbar-head-btn-disabled {
-        color: #c0c6cc;
+        @include font-color(#c0c6cc, #666);
         cursor: default;
       }
       .navbar-head-search {
@@ -455,6 +456,7 @@ export default {
           left: 10px;
           top: 0;
           font-size: 16px;
+          @include font-color(#333, $dark-text-color);
         }
         /deep/.ivu-input {
           text-indent: 24px;
@@ -470,7 +472,7 @@ export default {
         display: inline-block;
         cursor: pointer;
         vertical-align: middle;
-        color: #666;
+        @include font-color(#666, $dark-workspace-title-color);
         &:hover {
           color: #2e92f7;
         }
@@ -487,7 +489,7 @@ export default {
       .breadcrumb-title {
         display: inline-block;
         vertical-align: middle;
-        color: #999;
+        @include font-color(#999, $dark-text-color);
         cursor: default;
       }
     }

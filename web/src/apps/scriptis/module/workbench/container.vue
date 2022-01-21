@@ -1325,7 +1325,7 @@ export default {
       &.work-list-tab {
         overflow-x: auto;
         overflow-y: hidden;
-        padding-top: 8px;
+        padding-top: 12px;
         margin-left: 16px;
         &::-webkit-scrollbar {
           width: 0;

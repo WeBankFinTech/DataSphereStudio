@@ -259,8 +259,17 @@ module.exports = {
           "^/guideAssets": "/guideAssets"
         }
       },
+      "/streamis": {
+        target: "http://172.24.2.230:8088",
+        // target: "http://luban.ctyun.cn:8088",
+        //target: "http://devluban.ctyun.cn:8088",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/streamis": "/streamis"
+        }
+      },
       "/dolphinscheduler": {
-        // target: "http://172.24.2.233:12345",
+        //target: "http://172.24.2.233:12345",
         target: "https://dolphin.ctyun.cn:10002",
         changeOrigin: true,
         pathRewrite: {
@@ -268,7 +277,7 @@ module.exports = {
         }
       },
       "/application": {
-        target: "http://172.24.2.230:3022",
+        target: "http://172.24.2.83:9202",
         changeOrigin: true
       }
     }

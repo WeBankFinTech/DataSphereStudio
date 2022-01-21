@@ -150,6 +150,15 @@
             </Select>
             <span v-else>{{ classification.layer }}</span>
           </div>
+
+          <div class="assets-info-b-l-content-item">
+            <label for="tableType">表类型</label>
+            <span>{{ basicData.tableType }}</span>
+          </div>
+          <div class="assets-info-b-l-content-item" v-if="basicData.location">
+            <label for="location">location</label>
+            <span :style="{'word-break': 'break-all'}">{{ basicData.location }}</span>
+          </div>
         </div>
       </div>
       <!-- right -->
@@ -269,6 +278,39 @@ export default {
         });
       });
     });
+    util.Hub.$on("register_hover", data => {
+      this.$nextTick(() => {
+        $(`#${data.guid}`).hover(() => {
+          let hoverId = data.guid,
+            needHoverArr = [hoverId]
+          this.lineageData.relations.forEach(relation => {
+            if (relation.fromEntityId === hoverId) {
+              needHoverArr.push(relation.toEntityId)
+            } else if (relation.toEntityId === hoverId) {
+              needHoverArr.push(relation.fromEntityId)
+            } else {
+              $(`#${relation.relationshipId}`).addClass('should-hide')
+              $(`#${relation.relationshipId}`).next().addClass('should-hide')
+            }
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            if (needHoverArr.indexOf(item) === -1) {
+              $(`#${item}`).addClass('should-lower')
+            }
+          })
+        }, () => {
+          this.lineageData.relations.forEach(relation => {
+            $(`#${relation.relationshipId}`).removeClass('should-hide')
+            $(`#${relation.relationshipId}`).next().removeClass('should-hide')
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            $(`#${item}`).removeClass('should-lower')
+          })
+        });
+      });
+    })
   },
   methods: {
     init() {
@@ -506,6 +548,7 @@ export default {
           font-family: PingFangSC-Regular;
           font-size: 14px;
           margin-top: 16px;
+          padding-right: 8px;
           label {
             font-weight: normal;
             @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);

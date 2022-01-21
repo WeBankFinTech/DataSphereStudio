@@ -20,6 +20,6 @@ public interface GuideChapterMapper extends BaseMapper<GuideChapter> {
     @Select("SELECT * FROM dss_guide_chapter WHERE is_delete =0 AND catalog_id =#{catalogId} ORDER BY id ASC")
     List<GuideChapter> queryGuideChapterListByCatalogId(@Param("catalogId") Long catalogId);
 
-    @Select("SELECT * FROM dss_guide_chapter WHERE is_delete =0 AND content LIKE CONCAT('%', #{keyword}, '%') ORDER BY id ASC")
+    @Select("SELECT * FROM dss_guide_chapter WHERE is_delete =0 AND (content LIKE CONCAT('%', #{keyword}, '%') OR title LIKE CONCAT('%', #{keyword}, '%')) ORDER BY id ASC")
     List<GuideChapter> searchGuideChapterListByKeyword(@Param("keyword") String keyword);
 }

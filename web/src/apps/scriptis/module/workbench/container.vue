@@ -189,6 +189,7 @@ export default {
         return {
           content: '',
           params: {},
+          projects: []
         };
       },
     },

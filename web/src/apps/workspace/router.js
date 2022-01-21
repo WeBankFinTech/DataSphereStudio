@@ -162,6 +162,15 @@ export const apiServicesRoutes = [
         component: () => import('../linkis/module/ECM/index.vue')
       },
       {
+        path: 'DownloadAudit',
+        name: 'DownloadAudit',
+        meta: {
+          title: 'DownloadAudit',
+          publicPage: true
+        },
+        component: () => import('../linkis/module/DownloadAudit/index.vue')
+      },
+      {
         path: 'EngineConnList',
         name: 'EngineConnList',
         meta: {

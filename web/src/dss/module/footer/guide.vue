@@ -68,7 +68,7 @@
           <div class="guide-box-title">常见问题</div>
           <ul class="guide-questions">
             <li v-for="q in guide.questions" :key="q.title">
-              <a @click="changeToLibraryDetail(q)">{{ q.title }}</a>
+              <a @click="changeQuestionToLibraryDetail(q)">{{ q.title }}</a>
             </li>
           </ul>
         </div>
@@ -232,10 +232,20 @@ export default {
     },
     changeToLibraryHome() {
       this.currentMode = "home";
-      // 当前元素不等于history最后一个元素，就可以进入队列
-      if (this.lastHistory.mode !== "home") {
+      // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+      this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "home", data: {} });
+      this.currentIndex = this.currentIndex + 1;
+    },
+    changeQuestionToLibraryDetail(chapter) {
+      this.currentTab = "library";
+      this.currentMode = "detail";
+      this.currentDoc = chapter;
+      // 点击学习tab的问题跳到知识库，然后再次点击同一问题，history不变，currentIndex不变；
+      if (this.lastHistory.data.id == chapter.id && this.isLast && !this.isFirst) {
+        // 内容相同且currentIndex是最后一个且不是第一个，无须重复展示
+      } else {
         // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
-        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "home", data: {} });
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: chapter });
         this.currentIndex = this.currentIndex + 1;
       }
     },
@@ -243,21 +253,19 @@ export default {
       this.currentTab = "library";
       this.currentMode = "detail";
       this.currentDoc = chapter;
-      // 当前元素不等于history最后一个元素，就可以进入队列
-      if (this.lastHistory.data.id !== chapter.id) {
-        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
-        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: chapter });
-        this.currentIndex = this.currentIndex + 1;
-      }
+      // 点击某一文档内置链接，然后点返回，再次点击同一链接，此时currentIndex应该变化，history也最好更新；
+      // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+      this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: chapter });
+      this.currentIndex = this.currentIndex + 1;
     },
     changeToLibrarySearch() {
       if (!this.keyword || !this.keyword.trim()) {
         return;
       }
-      this.currentMode = "search";
       if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword.trim()) {
         // 最后一条历史记录是search且keyword没有变化，不处理
       } else {
+        this.currentMode = "search";
         // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
         this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "search", data: { keyword: this.keyword } });
         this.currentIndex = this.currentIndex + 1;
@@ -304,12 +312,13 @@ export default {
       };
     },
     changeDocument(type) {
-      if (type == "prev" && this.currentIndex == 0) {
+      if (type == "prev" && this.isFirst) {
         return;
       }
-      if (type == "next" && this.currentIndex == this.history.length - 1) {
+      if (type == "next" && this.isLast) {
         return;
       }
+      this.loading = false;
       if (type == "prev") {
         this.currentIndex = this.currentIndex - 1;
       } else if (type == "next") {

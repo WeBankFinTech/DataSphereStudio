@@ -150,6 +150,15 @@
             </Select>
             <span v-else>{{ classification.layer }}</span>
           </div>
+
+          <div class="assets-info-b-l-content-item">
+            <label for="tableType">表类型</label>
+            <span>{{ basicData.tableType }}</span>
+          </div>
+          <div class="assets-info-b-l-content-item" v-if="basicData.location">
+            <label for="location">location</label>
+            <span :style="{'word-break': 'break-all'}">{{ basicData.location }}</span>
+          </div>
         </div>
       </div>
       <!-- right -->
@@ -539,6 +548,7 @@ export default {
           font-family: PingFangSC-Regular;
           font-size: 14px;
           margin-top: 16px;
+          padding-right: 8px;
           label {
             font-weight: normal;
             @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);

@@ -589,9 +589,14 @@ export default {
     },
     goSpaceHome() {
       let workspaceId = this.$route.query.workspaceId;
-      if (!workspaceId) return this.goHome();
-      this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
-      this.currentProject = {};
+      if (!workspaceId) {
+        // workspaceId为空，说明一定是admin，进入了admin的页面，因为workspaceId是一直伴随的
+        // 就无须在调goHome，防止在控制台页面因为isAdmin失效而导致goHome和goSpaceHome来回调用而报错RangeError: Maximum call stack size exceeded
+        this.$router.push("/newhome");
+      } else {
+        this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
+        this.currentProject = {};
+      }
     },
     goConsole() {
       // const url =

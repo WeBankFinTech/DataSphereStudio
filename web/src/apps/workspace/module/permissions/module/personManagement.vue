@@ -161,7 +161,7 @@
                 $t('message.permissions.userDepart') +
                 $t('message.permissions.forSelect')
             "
-            defaultExpandLevel="Infinity"
+            :defaultExpandLevel="Infinity"
             search-nested
             required
             style="width: 300px"
@@ -333,8 +333,8 @@ export default {
             tag === "empty"
               ? this.$t("message.permissions.passwordEmpty")
               : tag === "keyboard"
-              ? this.$t("message.permissions.pwdKeyboardError")
-              : this.$t("message.permissions.pwdCheckError")
+                ? this.$t("message.permissions.pwdKeyboardError")
+                : this.$t("message.permissions.pwdCheckError")
           )
         );
       }

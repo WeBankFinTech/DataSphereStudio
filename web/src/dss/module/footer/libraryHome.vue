@@ -8,8 +8,12 @@
   </div>
 </template>
 <script>
+import {
+  GetCatalogTop,
+  GetCatalogById,
+  GetChapterDetail,
+} from "@/common/service/apiGuide";
 import lubanTree from "@/components/lubanTree";
-import util from "@/common/util";
 
 export default {
   name: "libraryHome",
@@ -28,73 +32,63 @@ export default {
     };
   },
   mounted() {
-    this.nodes = [
-      {
-        id: 1,
-        title: '工作空间首页',
-        isLeaf: false,
-        children: []
-      },
-      {
-        id: 2,
-        title: '应用商店',
-        isLeaf: false,
-        children: []
-      }
-    ]
+    this.initTree();
   },
   methods: {
+    initTree() {
+      GetCatalogTop().then((data) => {
+        this.nodes = (data.result || []).map(item => {
+          return {
+            ...item,
+            id: item.id,
+            title: item.title,
+            isLeaf: false,
+            // children: []
+          }
+        });
+      });
+    },
     handleTreeClick(node) {
       if (node.isLeaf) {
-        console.log('isleaf', node)
+        GetChapterDetail(node.id).then((res) => {
+          this.$emit("on-chapter-click", res.result)
+        });
       } else {
         if (!node.opened && !node.loaded) {
           this.nodes = this.handleLoading(this.nodes, node)
-          setTimeout(() => {
-            this.nodes = this.mockTree(this.nodes, node);
-            console.log(this.nodes, node)
-          }, 200)
+          this.refreshTree(node.id);
         } else {
-          console.log('toggle')
           this.nodes = this.handleToggle(this.nodes, node)
         }
       }
     },
-    mockTree(nodes, node) {
+    refreshTree(catalogId) {
+      GetCatalogById(catalogId).then((data) => {
+        const childrenCatalog = data.result ? (data.result.childrenCatalog || []).map(i => { return {...i, type: "catalog", isLeaf: false }}) : []
+        const childrenChapter = data.result ? (data.result.childrenChapter || []).map(i => { return {...i, type: "chapter", isLeaf: true }}) : []
+        const children = childrenCatalog.concat(childrenChapter);
+        this.nodes = this.mergeTree(this.nodes, catalogId, children);
+      });
+    },
+    mergeTree(nodes, catalogId, children) {
       const arr = [];
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == catalogId) {
           item = {
             ...nodes[i],
             loaded: true,
             loading: false,
             opened: true,
             isLeaf: false,
-            children: [
-              {
-                id: util.guid(),
-                title: '子节点',
-                isLeaf: true,
-              },
-              {
-                id: util.guid(),
-                title: '子节点2',
-                isLeaf: true,
-              },
-              {
-                id: util.guid(),
-                title: '子节点3',
-                isLeaf: false,
-              }
-            ]
+            children: children
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
-            children: this.mockTree(nodes[i].children, node)
+            children: this.mergeTree(nodes[i].children, catalogId, children)
           }
         } else {
           item = nodes[i];
@@ -108,13 +102,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             opened: !nodes[i].opened
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleToggle(nodes[i].children, node)
@@ -131,13 +125,13 @@ export default {
       let matched = false;
       for (let i=0,len=nodes.length; i<len; i++) {
         let item = {};
-        if (nodes[i].id == node.id) {
+        if (!nodes[i].isLeaf && nodes[i].id == node.id) {
           item = {
             ...nodes[i],
             loading: true
           }
           matched = true;
-        } else if (!matched && nodes[i].children && nodes[i].children.length) {
+        } else if (!matched && !nodes[i].isLeaf && nodes[i].children && nodes[i].children.length) {
           item = {
             ...nodes[i],
             children: this.handleLoading(nodes[i].children, node)

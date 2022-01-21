@@ -46,10 +46,9 @@ public class PageGuideAdminRestful {
     @RequestMapping(path ="/guidegroup", method = RequestMethod.POST)
     public Message saveGuideGroup(HttpServletRequest request, @RequestBody GuideGroup guideGroup){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideGroup.getId() ==null) {
+        if(null == guideGroup.getId()) {
             guideGroup.setCreateBy(userName);
             guideGroup.setCreateTime(new Date(System.currentTimeMillis()));
-            guideGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideGroup.setUpdateBy(userName);
@@ -79,10 +78,9 @@ public class PageGuideAdminRestful {
     @RequestMapping(path ="/guidecontent", method = RequestMethod.POST)
     public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideConent.getId() ==null) {
+        if(null == guideConent.getId()) {
             guideConent.setCreateBy(userName);
             guideConent.setCreateTime(new Date(System.currentTimeMillis()));
-            guideConent.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideConent.setUpdateBy(userName);
@@ -151,7 +149,7 @@ public class PageGuideAdminRestful {
                     //获取文件后缀名
                     String suffixName = fileName.substring(fileName.lastIndexOf("."));
                     //重新生成文件名
-                    fileName = UUID.randomUUID() + suffixName;
+                    fileName = "page-" + UUID.randomUUID() + suffixName;
                     if (FileUtils.upload(file, localPath, fileName)) {
                         String relativePath =fileName;
                         result.put("relativePath",relativePath);

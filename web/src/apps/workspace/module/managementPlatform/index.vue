@@ -29,6 +29,7 @@
           {{ defaultMenu.title }}
         </span>
         <guide-menu v-if="defaultMenu.title == '产品文档'" />
+        <library-menu v-else-if="defaultMenu.title == '知识库'" />
         <Tree
           v-else
           class="management-platform-sidebar-tree-container"
@@ -61,6 +62,7 @@
 import lubanTree from "@/components/lubanTree";
 import TabList from "./component/tabList/index.vue";
 import GuideMenu from "./component/guide/menu.vue";
+import LibraryMenu from "./component/library/menu.vue";
 import {
   GetMenu,
   QueryAllData,
@@ -123,6 +125,11 @@ const menu = [
     icon: "guide",
     nodes: [],
   },
+  {
+    title: "知识库",
+    icon: "question",
+    nodes: [],
+  }
 ];
 const tempComponent = {
   onestopMenuId: 1,
@@ -144,6 +151,7 @@ export default {
     Tree: lubanTree.managementTree,
     "tab-list": TabList,
     "guide-menu": GuideMenu,
+    "library-menu": LibraryMenu
   },
   data() {
     return {
@@ -188,6 +196,8 @@ export default {
         this.sidebarFold = false;
         if (this.defaultMenu.title == "产品文档") {
           this.$router.push("guide");
+        } else if (this.defaultMenu.title == "知识库") {
+          this.$router.push("library");
         }
       }
     },

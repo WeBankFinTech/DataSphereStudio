@@ -75,9 +75,10 @@
       </div>
 
       <div class="guide-body" :style="libraryStyle" v-show="currentTab == 'library'">
-        <library-detail :doc="currentDoc" v-show="currentMode == 'detail'" />
-        <library-search :doc="currentDoc" v-show="currentMode == 'search'" />
-        <library-home v-show="currentMode == 'home'" />
+        <library-detail :doc="currentDoc" v-show="currentMode == 'detail'" @on-chapter-click="changeToLibraryDetail" />
+        <library-search :doc="currentDoc" v-show="currentMode == 'search'" @on-chapter-click="changeToLibraryDetail" @on-page-change="changeSearchPage" />
+        <library-home v-show="currentMode == 'home'" @on-chapter-click="changeToLibraryDetail" />
+        <Spin size="large" fix v-if="loading"></Spin>
       </div>
 
       <div class="guide-footer">
@@ -97,7 +98,7 @@
 </template>
 <script>
 import eventbus from "@/common/helper/eventbus";
-import { GetGuideByPath } from "@/common/service/apiGuide";
+import { GetGuideByPath, QueryChapter } from "@/common/service/apiGuide";
 import libraryHome from "./libraryHome.vue";
 import librarySearch from "./librarySearch.vue";
 import libraryDetail from "./libraryDetail.vue";
@@ -125,6 +126,8 @@ export default {
       currentIndex: 0, // history当前坐标
       currentDoc: {}, // history当前坐标的数据
       keyword: '', // document搜索
+      pageSize: 10,
+      loading: false,
 
       selectedImg: "",
       modalImg: false,
@@ -157,9 +160,6 @@ export default {
   watch: {
     $route(val) {
       this.getGuideConfig();
-    },
-    history(val) {
-      console.log(val)
     }
   },
   mounted() {
@@ -230,43 +230,43 @@ export default {
       this.$emit("on-toggle");
       this.currentTab = "guide";
     },
-    changeToLibraryDetail(question) {
+    changeToLibraryHome() {
+      this.currentMode = "home";
+      // 当前元素不等于history最后一个元素，就可以进入队列
+      if (this.lastHistory.mode !== "home") {
+        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "home", data: {} });
+        this.currentIndex = this.currentIndex + 1;
+      }
+    },
+    changeToLibraryDetail(chapter) {
       this.currentTab = "library";
       this.currentMode = "detail";
-      this.currentDoc = question;
+      this.currentDoc = chapter;
       // 当前元素不等于history最后一个元素，就可以进入队列
-      if (this.lastHistory.data.id !== question.id) {
+      if (this.lastHistory.data.id !== chapter.id) {
         // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
-        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: question });
+        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "detail", data: chapter });
         this.currentIndex = this.currentIndex + 1;
       }
     },
     changeToLibrarySearch() {
+      if (!this.keyword || !this.keyword.trim()) {
+        return;
+      }
       this.currentMode = "search";
-      if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword) {
+      if (this.lastHistory.mode == "search" && this.lastHistory.data.keyword == this.keyword.trim()) {
         // 最后一条历史记录是search且keyword没有变化，不处理
       } else {
         // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
         this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "search", data: { keyword: this.keyword } });
         this.currentIndex = this.currentIndex + 1;
-        // ajax and update lastHistory.data
-        setTimeout(() => {
-          const data = {
-            list: [
-              {
-                id: 1,
-                title: '创建ODPS SQL节点',
-                desc: '将业务数据汇聚到数据仓库中进行数据清洗、数据建模、算法开发、数据质量校验，最终将数据结果以服务化输出。'
-              },
-              {
-                id: 2,
-                title: '创建ODPS SQL节点',
-                desc: '将业务数据汇聚到数据仓库中进行数据清洗、数据建模、算法开发、数据质量校验，最终将数据结果以服务化输出。'
-              }
-            ],
-            keyword: this.keyword
-          };
+        this.loading = true;
+        QueryChapter({keyword: this.keyword.trim(), pageNow: 1, pageSize: this.pageSize}).then((res) => {
+          const data = this.formatSearchResult(res);
           this.currentDoc = data;
+          this.loading = false;
+          // 更新history
           this.history = this.history.map((item, index) => {
             if (index == this.currentIndex) {
               return {
@@ -277,17 +277,31 @@ export default {
               return item
             }
           })
-        }, 200)
+        });
       }
     },
-    changeToLibraryHome() {
-      this.currentMode = "home";
-      // 当前元素不等于history最后一个元素，就可以进入队列
-      if (this.lastHistory.mode !== "home") {
-        // history队列a b c d e, 如果当前在c，此时有元素进入队列，那么d e会被remove
-        this.history = this.history.slice(0, this.currentIndex + 1).concat({ mode: "home", data: {} });
-        this.currentIndex = this.currentIndex + 1;
-      }
+    changeSearchPage(page) {
+      this.loading = true;
+      // search分页不更新history，只更新当前doc
+      QueryChapter({keyword: this.keyword.trim(), pageNow: page, pageSize: this.pageSize}).then((res) => {
+        const data = this.formatSearchResult(res);
+        this.currentDoc = data;
+        this.loading = false;
+      });
+    },
+    formatSearchResult(res) {
+      return {
+        list: res.result.map(item => {
+          return {
+            ...item,
+            id: item.id,
+            title: item.title,
+            desc: (item.contentHtml || "").replace(/<[^>]+>/gim, "").substr(0, 100), // 替换html标签
+          }
+        }),
+        keyword: this.keyword.trim(),
+        total: res.total
+      };
     },
     changeDocument(type) {
       if (type == "prev" && this.currentIndex == 0) {
@@ -425,9 +439,10 @@ export default {
         font-size: 16px;
         height: 32px;
         line-height: 32px;
+        @include font-color(#333, $dark-workspace-title-color);
       }
       .navbar-head-btn-disabled {
-        color: #c0c6cc;
+        @include font-color(#c0c6cc, #666);
         cursor: default;
       }
       .navbar-head-search {
@@ -441,6 +456,7 @@ export default {
           left: 10px;
           top: 0;
           font-size: 16px;
+          @include font-color(#333, $dark-text-color);
         }
         /deep/.ivu-input {
           text-indent: 24px;
@@ -456,7 +472,7 @@ export default {
         display: inline-block;
         cursor: pointer;
         vertical-align: middle;
-        color: #666;
+        @include font-color(#666, $dark-workspace-title-color);
         &:hover {
           color: #2e92f7;
         }
@@ -473,12 +489,13 @@ export default {
       .breadcrumb-title {
         display: inline-block;
         vertical-align: middle;
-        color: #999;
+        @include font-color(#999, $dark-text-color);
         cursor: default;
       }
     }
   }
   .guide-body {
+    position: relative;
     height: calc(100% - 96px);
     padding-bottom: 48px;
     overflow-x: hidden;

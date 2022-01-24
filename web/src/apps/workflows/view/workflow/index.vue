@@ -35,7 +35,21 @@
             />
           </div> -->
         </div>
+        <div class="list-container" v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
+          <div
+            class="list-item"
+            v-for="item in projectsTree"
+            :key="item.id"
+          >
+            <div class="list-content" :class="{ 'list-content-active': currentTreeId == item.id }">
+              <div class="list-name" @click="handleTreeClick(item)">
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
         <Tree
+          v-else
           class="tree-container"
           ref="projectTree"
           :nodes="projectsTree"
@@ -89,6 +103,7 @@
       @handleChangeButton="handleChangeButton"
       @selectProject="selectProject"
       @menuHandleChangeButton="menuHandleChangeButton"
+      @handleChooseScheduler="handleChooseScheduler"
     >
       <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
         <div
@@ -167,6 +182,9 @@
       <template v-if="modeOfKey === DEVPROCESS.OPERATIONCENTER">
         <DS :activeTab="4" class="scheduler-center"></DS>
       </template>
+      <template v-if="modeOfKey === 'streamis_prod'">
+        <Streamis class="streamisContainer" :project-name="pjNameForStreamis"/>
+      </template>
       <template v-else>
         <!-- 其他应用流程 -->
       </template>
@@ -221,7 +239,9 @@ import {
 } from "@/common/service/apiCommonMethod.js";
 import { setVirtualRoles } from "@/common/config/permissions.js";
 import DS from "@/apps/workflows/module/dispatch";
+import Streamis from '@/apps/workflows/module/innerIframe';
 import eventbus from "@/common/helper/eventbus";
+
 
 export default {
   components: {
@@ -233,6 +253,7 @@ export default {
     makeUp: MakeUp.component,
     ProjectForm,
     DS,
+    Streamis: Streamis.component
   },
   data() {
     return {
@@ -288,6 +309,7 @@ export default {
         },
       ],
       cacheData: [],
+      pjNameForStreamis: '',
     };
   },
   watch: {
@@ -353,6 +375,9 @@ export default {
       return storage.get("currentWorkspace");
     },
     isScheduler() {
+      if (this.modeOfKey == "streamis_prod") {
+        return false
+      }
       return this.$route.name === "Scheduler";
     },
     formatProjectNameList() {
@@ -368,20 +393,6 @@ export default {
     }
   },
   methods: {
-    // initClick() {
-    //   if (this.projectsTree.length > 0) {
-    //     const cur = this.projectsTree[0];
-    //     this.getFlow(cur, (flow) => {
-    //       if (flow.length > 0) {
-    //         const cur_node = flow[0];
-    //         this.handleTreeClick(cur_node);
-    //         this.$refs.projectTree.handleItemToggle(cur);
-    //       } else {
-    //         this.handleTreeClick(cur);
-    //       }
-    //     });
-    //   }
-    // },
     createProject() {
       this.actionType = "add";
       this.ProjectShow = true;
@@ -509,7 +520,27 @@ export default {
               });
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
-          } else {
+          } else if (this.modeOfKey == "streamis_prod") {
+            this.projectsTree = res.projects
+              .filter((n) => {
+                return (
+                  n.devProcessList &&
+                  n.releaseUsers &&
+                  n.releaseUsers.indexOf(this.getUserName()) !== -1
+                );
+              })
+              .map((n) => {
+                setVirtualRoles(n, this.getUserName());
+                return {
+                  id: n.id,
+                  name: n.name,
+                  type: "streamis_prod",
+                  canWrite: n.canWrite(),
+                };
+              });
+            if (!this.$route.query.projectID)
+              this.handleTreeClick(this.projectsTree[0]);
+          }else {
             this.projectsTree = res.projects.map((n) => {
               setVirtualRoles(n, this.getUserName());
               return {
@@ -525,7 +556,7 @@ export default {
     },
     // 获取project下工作流
     getFlow(param, resolve) {
-      if (this.isScheduler) {
+      if (this.isScheduler || this.modeOfKey == 'streamis_prod') {
         return resolve([]);
       }
       api
@@ -616,6 +647,11 @@ export default {
       if (this.isScheduler) {
         this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
       }
+      if ( node.type == "streamis_prod" ) {
+        this.modeOfKey = "streamis_prod"
+        this.pjNameForStreamis = node.name
+        return;
+      }
       if (node.type == "flow") {
         if (this.isScheduler) {
           return this.$Message.warning("运维中心暂只支持项目级别");
@@ -665,6 +701,14 @@ export default {
         }
       } else if (node.type === "project" || node.type === "scheduler") {
         this.currentTreeId = node.id;
+        let schedulerTabList = JSON.parse(sessionStorage.getItem('scheduler_tab_list')) || []
+        if( schedulerTabList.findIndex(i => i.id == node.id) < 0 ) {
+          schedulerTabList.push(node)
+          sessionStorage.setItem('scheduler_tab_list', JSON.stringify(schedulerTabList))
+          eventbus.emit('scheduler_tab_list_change', schedulerTabList)
+        }
+        eventbus.emit('current_scheduler_change', node)
+        sessionStorage.setItem('current_scheduler', JSON.stringify(node))
         if (node.id == this.$route.query.projectID) {
           this.selectProject();
         } else {
@@ -682,7 +726,7 @@ export default {
             : this.$router.replace({
               name: "Workflow",
               query,
-            });
+            })
           this.updateBread();
         }
       }
@@ -1072,6 +1116,7 @@ export default {
     // 切换开发流程
     handleChangeButton(item) {
       if ( item.dicValue !=  this.modeOfKey ) {
+        this.modeOfKey = item.dicValue;
         this.getAllProjects(()=>{});
       }
       if (
@@ -1093,6 +1138,7 @@ export default {
       this.currentVal = {};
       this.current = null;
       this.tabId = "";
+      this.pjNameForStreamis = "";
       if (item.dicValue === "scheduler" && !this.isScheduler) {
         this.$router.replace({
           name: "Scheduler",
@@ -1227,11 +1273,15 @@ export default {
           this.loading = false;
         });
     },
+    handleChooseScheduler(tabData) {
+      this.handleTreeClick(tabData)
+    }
   },
 };
 </script>
 <style lang="scss" scoped>
 @import "@/apps/workflows/assets/styles/workflow.scss";
+@import "@/common/style/variables.scss";
 .item-header {
   font-size: $font-size-base;
   margin: 10px 25px;
@@ -1266,6 +1316,33 @@ export default {
       margin-left: 10px;
       font-size: $font-size-base;
       font-weight: 700;
+    }
+  }
+}
+.list-item{
+  white-space: nowrap;
+  outline: none;
+  .list-content {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 10px;
+    @include font-color($light-text-color, $dark-text-color);
+    &:hover {
+      @include bg-color(#edf1f6, $dark-active-menu-item);
+    }
+    &-active {
+      @include bg-color(#edf1f6, $dark-active-menu-item);
+      @include font-color($primary-color, $dark-primary-color);
+    }
+    .list-name {
+      display: block;
+      flex: 1;
+      line-height: 32px;
+      padding: 0 6px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }

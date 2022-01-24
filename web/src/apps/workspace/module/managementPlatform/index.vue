@@ -29,6 +29,7 @@
           {{ defaultMenu.title }}
         </span>
         <guide-menu v-if="defaultMenu.title == '产品文档'" />
+        <library-menu v-else-if="defaultMenu.title == '知识库'" />
         <Tree
           v-else
           class="management-platform-sidebar-tree-container"
@@ -58,9 +59,10 @@
 </template>
 
 <script>
-import Tree from "./component/tree/tree.vue";
+import lubanTree from "@/components/lubanTree";
 import TabList from "./component/tabList/index.vue";
 import GuideMenu from "./component/guide/menu.vue";
+import LibraryMenu from "./component/library/menu.vue";
 import {
   GetMenu,
   QueryAllData,
@@ -90,29 +92,29 @@ const menu = [
       },
     ],
   },
-  {
-    title: "控制台",
-    icon: "kongzhitai",
-    nodes: [
-      {
-        name: "全局历史",
-        type: "console",
-        id: 1022,
-        pathName: "globalHistory",
-      },
-      { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
-      { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
-      {
-        name: "全局变量",
-        type: "console",
-        id: 1019,
-        pathName: "globalValiable",
-      },
-      { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
-      // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
-    ],
-  },
+  // {
+  //   title: "控制台",
+  //   icon: "kongzhitai",
+  //   nodes: [
+  //     {
+  //       name: "全局历史",
+  //       type: "console",
+  //       id: 1022,
+  //       pathName: "globalHistory",
+  //     },
+  //     { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
+  //     { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
+  //     {
+  //       name: "全局变量",
+  //       type: "console",
+  //       id: 1019,
+  //       pathName: "globalValiable",
+  //     },
+  //     { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
+  //     // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
+  //     { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
+  //   ],
+  // },
   {
     title: "组件接入",
     icon: "componentImport",
@@ -123,27 +125,33 @@ const menu = [
     icon: "guide",
     nodes: [],
   },
+  {
+    title: "知识库",
+    icon: "question",
+    nodes: [],
+  }
 ];
 const tempComponent = {
-  onestop_menu_id: 1,
-  title_cn: "新增组件",
-  title_en: "",
+  onestopMenuId: 1,
+  titleCn: "新增组件",
+  titleEn: "",
   url: "",
-  homepage_url: "",
-  project_url: "",
-  redirect_url: "",
-  if_iframe: 1,
-  is_active: 1,
-  desc_cn: "",
-  desc_en: "",
+  homepageUrl: "",
+  projectUrl: "",
+  redirectUrl: "",
+  ifIframe: 1,
+  isActive: 1,
+  descCn: "",
+  descEn: "",
   // access_button_en: 'not null',
   // access_button_cn: '不能为空'
 };
 export default {
   components: {
-    Tree,
+    Tree: lubanTree.managementTree,
     "tab-list": TabList,
     "guide-menu": GuideMenu,
+    "library-menu": LibraryMenu
   },
   data() {
     return {
@@ -188,6 +196,8 @@ export default {
         this.sidebarFold = false;
         if (this.defaultMenu.title == "产品文档") {
           this.$router.push("guide");
+        } else if (this.defaultMenu.title == "知识库") {
+          this.$router.push("library");
         }
       }
     },
@@ -228,7 +238,7 @@ export default {
         component_id = component_id + 1;
         this.component_id = component_id;
         componentData._id = component_id;
-        componentData.onestop_menu_id = node.id;
+        componentData.onestopMenuId = node.id;
         this.current = componentData;
         this.tabList.push(componentData);
         this.addedFlag = true;
@@ -236,7 +246,7 @@ export default {
         return this.$router.push({ name: "accessComponents" });
       } else {
         const component_data = this.tabList.filter((tab) => tab.isAdded)[0];
-        component_data.onestop_menu_id = node.id;
+        component_data.onestopMenuId = node.id;
         this.current = JSON.parse(JSON.stringify(component_data));
         this.header = "组件接入";
       }
@@ -283,7 +293,7 @@ export default {
       const currentTab = this.tabList.filter((item) => item._id === _id)[0];
       // tab 页为新增页
       if (currentTab.isAdded) {
-        let idx = currentTab.onestop_menu_id;
+        let idx = currentTab.onestopMenuId;
         if (typeof idx === "number") {
           this.currentTreeId = idx;
         } else {
@@ -300,6 +310,16 @@ export default {
       //更新
       if (componentItem.id) {
         const updateData = formatComponentDataForPost(componentItem);
+        const required_keys = ['id', 'titleEn', 'titleCn', 'url', 'onestopMenuId', 'projectUrl',
+          'homepageUrl', 'ifIframe', 'redirectUrl', 'descEn', 'descCn', 'labelsEn', 'labelsCn',
+          'isActive', 'accessButtonEn', 'accessButtonCn'
+        ]
+        for(let key in updateData ) {
+          if( required_keys.indexOf(key) < 0) {
+            delete updateData[key]
+          }
+        }
+        console.log(updateData)
         UpdateDataFromId(componentItem.id, updateData)
           .then((data) => {
             _this.$Message.success("更新成功");
@@ -327,15 +347,16 @@ export default {
       GetMenu()
         .then((data) => {
           const _menuOptions = [];
-          data.forEach((item) => {
+          let dssOnestopMenuList = data.dssOnestopMenuList
+          dssOnestopMenuList.forEach((item) => {
             item.type = "component";
             item.children = [];
             item.opened = true;
 
             const menu = Object.create(null);
             menu.name = item.name;
-            menu.title_cn = item.title_cn;
-            menu.title_en = item.title_en;
+            menu.titleCn = item.titleCn;
+            menu.titleEn = item.titleEn;
 
             _menuOptions.push(menu);
           });
@@ -345,7 +366,7 @@ export default {
             "menuOptions",
             JSON.stringify(that.menuOptions)
           );
-          that.getAllComponentData(data, (nodes) => {
+          that.getAllComponentData(dssOnestopMenuList, (nodes) => {
             if (nodes) {
               menu[2].nodes = nodes;
               that.menu = menu;
@@ -363,9 +384,10 @@ export default {
       let component_id = this.component_id;
       QueryAllData()
         .then((data) => {
-          data.forEach((item) => {
+          let dssOnestopMenuJoinApplicationList = data.dssOnestopMenuJoinApplicationList
+          dssOnestopMenuJoinApplicationList.forEach((item) => {
             nodes.forEach((node) => {
-              if (node.id === item.onestop_menu_id) {
+              if (node.id === item.onestopMenuId) {
                 item._id = component_id;
                 node.children.push(item);
                 component_id++;
@@ -392,7 +414,7 @@ export default {
     },
   },
   mounted() {
-    this.getMenuForcomponentAccess();
+    //this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }

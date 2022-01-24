@@ -34,7 +34,7 @@
               :title="$t('message.workflow.process.params')"
               ref="paramButton"
               @click.stop="showParamView">
-              <SvgIcon class="icon" icon-class="params"/>
+              <SvgIcon class="icon" icon-class="canshu" style="opacity: 0.65"/>
               <span>{{$t('message.workflow.process.params')}}</span>
             </div>
             <div class="devider" />
@@ -43,7 +43,7 @@
               ref="resourceButton"
               :title="$t('message.workflow.process.resource')"
               @click.stop="showResourceView">
-              <SvgIcon class="icon" icon-class="fi-export"/>
+              <SvgIcon class="icon" icon-class="ziyuan" style="opacity: 0.65"/>
               <span>{{$t('message.workflow.process.resource')}}</span>
             </div>
             <div class="devider" />
@@ -52,7 +52,7 @@
               :title="$t('message.workflow.process.run')"
               class="button"
               @click="clickswitch">
-              <SvgIcon class="icon" icon-class="play-2"/>
+              <SvgIcon class="icon" icon-class="zhihang" style="opacity: 0.65"/>
               <span>{{$t('message.workflow.process.run')}}</span>
             </div>
             <div
@@ -68,7 +68,7 @@
               :title="$t('message.workflow.process.save')"
               class="button"
               @click="handleSave">
-              <SvgIcon class="icon" icon-class="save-2" />
+              <SvgIcon class="icon" icon-class="baocun" style="opacity: 0.65"/>
               <span>{{$t('message.workflow.process.save')}}</span>
             </div>
             <div v-if="type==='flow'" class="devider" />
@@ -81,7 +81,7 @@
               class="button"
               @click="workflowPublishIsShow">
               <template v-if="!isFlowPubulish">
-                <SvgIcon class="icon" icon-class="publish" />
+                <SvgIcon class="icon" icon-class="fabu" style="opacity: 0.65"/>
                 <span>{{$t('message.workflow.process.publish')}}</span>
               </template>
               <Spin v-else class="public_loading">
@@ -136,7 +136,7 @@
       v-clickoutside="handleOutsideClick"
       v-show="isParamModalShow">
       <div class="process-module-param-modal-header">
-        <h3>{{ isResourceShow ? $t('message.workflow.process.resource') : isDispatch ? $t('message.workflow.process.schedule') : $t('message.workflow.process.params') }}{{$t('message.workflow.process.seting')}}</h3>
+        <h5>{{ isResourceShow ? $t('message.workflow.process.resource') : isDispatch ? $t('message.workflow.process.schedule') : $t('message.workflow.process.params') }}{{$t('message.workflow.process.seting')}}</h5>
       </div>
       <div class="process-module-param-modal-content">
         <argument
@@ -158,7 +158,7 @@
       v-show="nodebaseinfoShow"
       @click="clickBaseInfo">
       <div class="process-module-param-modal-header">
-        <h3>{{$t('message.workflow.process.baseInfo')}}</h3>
+        <h5>{{$t('message.workflow.process.baseInfo')}}</h5>
         <div v-if="!myReadonly" class="save-button">
           <Button size="small" @click.stop="saveNodeParameter"
             :disabled="false">{{$t('message.workflow.process.nodeParameter.BC')}}

@@ -135,7 +135,7 @@
       @include font-color($light-text-color, $dark-text-color);
       &:hover {
         // background-color: #ccc;
-        @include bg-color(#ccc, $dark-active-menu-item);
+        // @include bg-color(#ccc, $dark-active-menu-item);
       }
     }
   }
@@ -261,7 +261,11 @@
 }
 
 .node-selected {
-  background-color: rgba(0, 0, 0, .2) !important;
+  // background-color: rgba(0, 0, 0, .2) !important;
+  background: #DEE8F4;
+  // border: 1px solid #234C7F;
+  box-shadow: 1px 4px 6px 1px rgba(106,133,167,0.30);
+  border-radius: 4px;
 }
 
 .ivu-select-dropdown {

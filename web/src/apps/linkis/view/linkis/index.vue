@@ -2,12 +2,11 @@
   <div class="console-page">
     <!-- <div class="ad ad-top">广告位</div> -->
     <div class="console-page-content">
-      <div class="console-page-content-head">
+      <!-- <div class="console-page-content-head">
         <div>
           <span class="console-page-content-title">{{ $t('message.linkis.title') }}</span>
-          <!-- <span class="console-page-content-info">{{ $t('message.linkis.info', {num: '13'}) }}</span> -->
         </div>
-      </div>
+      </div> -->
       <div class="console-page-content-body">
         <div class="content-body-side-nav">
           <Card

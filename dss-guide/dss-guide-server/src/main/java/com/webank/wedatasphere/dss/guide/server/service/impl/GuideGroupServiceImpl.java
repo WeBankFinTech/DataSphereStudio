@@ -44,7 +44,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
     }
 
     @Override
-    public void deleteGroup(Long id){
-        guideGroupMapper.deleteGroup(id);
+    public void deleteGuideGroup(Long id){
+        this.removeById(id);
     }
 }

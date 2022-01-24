@@ -240,44 +240,35 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://***REMOVED***:8088",
-        //target: 'http://***REMOVED***:9202', //yichao
-        // target: "http://***REMOVED***:9202", //jiawei
-        // target: "http://luban.ctyun.cn:8088",
-        //target: "http://devluban.ctyun.cn:8088",
+        target: "http://127.0.0.1:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api"
         }
       },
       "/guideAssets": {
-        //target: "http://***REMOVED***:8088", // 产品文档后台上传的图片代理
-        target: "http://luban.ctyun.cn:8088",
-        //target: "http://devluban.ctyun.cn:8088",
+        target: "http://127.0.0.1:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/guideAssets": "/guideAssets"
         }
       },
       "/streamis": {
-        target: "http://***REMOVED***:8088",
-        // target: "http://luban.ctyun.cn:8088",
-        //target: "http://devluban.ctyun.cn:8088",
+        target: "http://127.0.0.1:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/streamis": "/streamis"
         }
       },
       "/dolphinscheduler": {
-        //target: "http://***REMOVED***:12345",
-        target: "https://dolphin.ctyun.cn:10002",
+        target: "https://127.0.0.1:10002",
         changeOrigin: true,
         pathRewrite: {
           "^/dolphinscheduler": "/dolphinscheduler"
         }
       },
       "/application": {
-        target: "http://***REMOVED***:9202",
+        target: "http://127.0.0.1:9202",
         changeOrigin: true
       }
     }

@@ -22,11 +22,11 @@ public interface GuideContentMapper extends BaseMapper<GuideContent> {
     List<GuideContent> getGuideContentListByPath(@Param("path") String path);
 
     @Select("SELECT content FROM dss_guide_content WHERE id=#{id}")
-    String getContentById(@Param("id") long id);
+    String getGuideContentById(@Param("id") long id);
 
     @Update("UPDATE dss_guide_content SET content =#{content},content_html =#{contentHtml} WHERE id =#{id}")
-    void updateContentById(@Param("id") long id, @Param("content") String content, @Param("contentHtml") String contentHtml);
+    void updateGuideContentById(@Param("id") long id, @Param("content") String content, @Param("contentHtml") String contentHtml);
 
-    @Update("UPDATE dss_guide_content SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
-    void deleteContent(@Param("id") Long id);
+//    @Update("UPDATE dss_guide_content SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
+//    void deleteGuideContent(@Param("id") Long id);
 }

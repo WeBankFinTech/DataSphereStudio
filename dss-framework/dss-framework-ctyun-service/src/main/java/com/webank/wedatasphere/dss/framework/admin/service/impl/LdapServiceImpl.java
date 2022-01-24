@@ -63,11 +63,6 @@ public class LdapServiceImpl implements LdapService {
 
 
     public static void main(String[] args) throws NamingException {
-        LdapService ldapService = new LdapServiceImpl();
-        ldapService.addUser("cn=Manager,dc=example,dc=com","Aaht123@chinanet","ldap://***REMOVED***:389","ou=user,dc=example,dc=com","ht01001","Th34082519861!");
-        ldapService.update("cn=Manager,dc=example,dc=com","Aaht123@chinanet","ldap://***REMOVED***:389","ou=user,dc=example,dc=com","ht02","1Th34082519861!");
-       boolean exist =  ldapService.exist("cn=Manager,dc=example,dc=com","Aaht123@chinanet","ldap://***REMOVED***:389","ou=user,dc=example,dc=com","ht03");
-       System.out.println("==="+exist);
 
     }
 

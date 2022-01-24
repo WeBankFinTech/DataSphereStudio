@@ -164,6 +164,7 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
+        <Divider v-if="isCompleted" orientation="center">到底了</Divider>
       </div>
       <div class="assets-index-b-r" v-else>
         <div style="text-align: center; margin-top: 50px; font-weight: bolder">
@@ -206,6 +207,7 @@ export default {
       isLoading: false,
       subjectList: [],
       layerList: [],
+      isCompleted: false,
     };
   },
   created() {
@@ -218,6 +220,11 @@ export default {
       getHiveTbls(JSON.parse(searchParams))
         .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             this.cardTabs = data.result;
           }
         })
@@ -228,6 +235,11 @@ export default {
       getHiveTbls({ query: "", limit: 10, offset: 0 })
         .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             this.cardTabs = data.result;
           }
         })
@@ -282,6 +294,11 @@ export default {
       getHiveTbls(params)
         .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             if( this.queryForTbls ) {
               this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
             } else {
@@ -327,6 +344,11 @@ export default {
         getHiveTbls(params)
           .then((data) => {
             if (data.result) {
+              if( data.result.length == this.searchOption.limit ) {
+                this.isCompleted = false
+              } else {
+                this.isCompleted = true
+              }
               that.cardTabs = res.concat(data.result);
             } else {
               that.$Message.success("所有数据已加载完成");
@@ -432,22 +454,36 @@ export default {
       this.onSearch();
     },
 
-    // 处理高亮
+    // 处理高亮 并过滤没有 高亮 的结果
     foamtDataToHighLigth(result, query) {
       const _result = result.slice() || []
       const _query = `<span>${query}</span>`
       const reg = new RegExp(query, 'g')
-      _result.forEach(item => {
+      const filter_arr = []
+      _result.forEach((item, idx) => {
+        let flag = false
         Object.keys(item).forEach(key => {
-          if( typeof item[key] == 'string' ) {
-            item[key] = item[key].replace(reg, _query)
+          if( key == 'classifications' && item['classifications'] && item['classifications'].length > 0 ) {
+            item['classifications'].forEach(item => {
+              if( item['typeName'].indexOf(query) > -1 ) {
+                flag = true
+              }
+            })
           }
-          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' ) {
+          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 ) {
+            item[key] = item[key].replace(reg, _query)
+            flag = true
+          }
+          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' && item[key].join('@').indexOf(query) > -1 ) {
             item[key] = item[key].join('@').replace(reg, _query).split('@')
+            flag = true
           }
         })
+        if( !flag ){
+          filter_arr.push(idx)
+        }
       })
-      return _result
+      return  _result.filter((item, idx) => !filter_arr.includes(idx))
     }
   },
 };

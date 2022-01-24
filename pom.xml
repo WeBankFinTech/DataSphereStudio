@@ -133,12 +133,12 @@
         <repository>
             <id>releases</id>
             <name>Releases</name>
-            <url>https://***REMOVED***:8083/repository/maven-releases/</url>
+            <url>https://127.0.0.1/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>Snapshot</name>
-            <url>https://***REMOVED***:8083/repository/maven-snapshots/</url>
+            <url>https://127.0.0.1/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

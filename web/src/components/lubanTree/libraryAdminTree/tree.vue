@@ -5,7 +5,6 @@
       :key="item.id"
       :data="item"
       :currentTreeId="currentTreeId"
-      :on-item-toggle="handleItemToggle"
       :on-item-click="handleItemClick"
       :on-add-click="handleAddClick"
       :on-delete-click="handleDeleteClick"
@@ -17,7 +16,7 @@
 import TreeItem from "./tree-item.vue";
 
 export default {
-  name: "WorkflowTree",
+  name: "libraryAdminTree",
   components: {
     TreeItem,
   },
@@ -53,20 +52,7 @@ export default {
     },
     handleItemClick(node) {
       this.$emit("on-item-click", node);
-    },
-    handleItemToggle(node) {
-      this.$emit("on-item-toggle", node);
-      // this.data = this.data.map((item) => {
-      //   if (item.id == node.id) {
-      //     return {
-      //       ...item,
-      //       opened: !node.opened,
-      //     };
-      //   } else {
-      //     return item;
-      //   }
-      // });
-    },
+    }
   },
 };
 </script>

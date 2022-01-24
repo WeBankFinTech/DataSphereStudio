@@ -6,7 +6,7 @@
       </div>
       <div class="void-page-left-main">
         <div class="void-page-left-main-img">
-          <img src="../../../assets/img/void_page.png" alt="空页面" />
+          <SvgIcon icon-class="empty" width="200px" height="200px" />
         </div>
         <div class="void-page-left-main-tip">
           <span>无打开的工作流，可点击下方按钮添加</span>
@@ -99,7 +99,6 @@ export default {
     min-width: 240px;
     margin-right: 106px;
     &-title {
-      margin-bottom: 40px;
       height: 33px;
       line-height: 33px;
       text-align: left;
@@ -113,7 +112,7 @@ export default {
     &-main {
       &-img {
         text-align: left;
-        height: 130px;
+        @include font-color(#ebebeb, #3f434c);
       }
       &-tip {
         font-family: PingFangSC-Regular;
@@ -124,7 +123,7 @@ export default {
         line-height: 28px;
         height: 28px;
         font-weight: 400;
-        margin: 16px 0px;
+        margin-bottom: 16px;
         @include font-color($light-text-color, $dark-text-color);
       }
       &-button {

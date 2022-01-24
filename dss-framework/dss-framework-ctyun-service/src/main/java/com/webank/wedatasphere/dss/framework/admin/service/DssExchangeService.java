@@ -96,7 +96,7 @@ public class DssExchangeService {
         String shellScript = "str=`curl -X GET --data '{\"project_id\":" + projectId + ",\"task_id\":" + taskId + "}' " +
                 "--header 'Content-Type: application/json' --header 'Accept: application/json' " +
                 "--header 'Cookie:" + ProjectConf.EXCHANGE_ADMIN_COOKIE.getValue() + "' " + ProjectConf.EXCHANGE_URL.getValue() +
-                "/api/v1/jobinfo/runTask/" + taskId + "?userName=admin`;if [[ ${str} =~ 'job execution successed' ]];then exit 0;else exit 1;fi";
+                "/api/v1/jobinfo/runTask/" + taskId + "?userName=admin`;echo $str;if [[ ${str} =~ 'job execution successed' ]];then exit 0;else exit 1;fi";
         return shellScript;
     }
 

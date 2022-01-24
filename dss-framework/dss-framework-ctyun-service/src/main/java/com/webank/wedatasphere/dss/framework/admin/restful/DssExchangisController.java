@@ -53,7 +53,6 @@ public class DssExchangisController {
 
     @RequestMapping(path = "/shell", method = RequestMethod.GET)
     public Message getShellScript(@Context HttpServletRequest request, @RequestParam int taskId,@RequestParam int projectId) {
-        String userName = "admin";
         HashMap<String,String> map = new HashMap<>();
         String shellScript = dssExchangeService.getSellScript(taskId,projectId);
         map.put("shell",shellScript);

@@ -1,7 +1,13 @@
 <template>
   <div style="height: 100%;">
     <scriptView
-      v-if="work.type=='workspaceScript' || work.type=='hdfsScript' || work.type=='node' || work.type=='historyScript'"
+      v-if="work.type=='workspaceScript' || work.type=='hdfsScript' || (work.type=='node' && shellName!='exchangis') || work.type=='historyScript'"
+      :readonly="readonly"
+      :current="current"
+      :node="node"
+      :work="work"/>
+    <exchangisView
+      v-if="work.type=='node' && shellName=='exchangis'"
       :readonly="readonly"
       :current="current"
       :node="node"
@@ -26,6 +32,7 @@
 </template>
 <script>
 import scriptView from './script/script.vue';
+import exchangisView from "./script/exchangis.vue";
 import backgroundScriptView from './script/backgroundScript.vue';
 import detailView from './tableDetails/index.vue';
 import createTableView from './createTable/index.vue';
@@ -37,7 +44,8 @@ export default {
     backgroundScriptView,
     detailView,
     createTableView,
-    dbDetails
+    dbDetails,
+    exchangisView
   },
   props: {
     work: Object,
@@ -54,11 +62,17 @@ export default {
   created() {
   },
   mounted() {
+    console.log("body", this)
   },
   methods: {
     removeWork() {
       this.$emit('remove-work', this.work);
     },
   },
+  computed: {
+    shellName: function(){
+      return this.node.title.split('_')[0];
+    }
+  }
 };
 </script>

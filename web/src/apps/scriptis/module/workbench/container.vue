@@ -199,7 +199,8 @@ export default {
         return {
           content: "",
           params: {},
-        }
+          projects: []
+        };
       },
     },
     node: Object,

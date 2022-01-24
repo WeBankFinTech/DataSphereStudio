@@ -133,9 +133,9 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <configuration>
-                    <addScalacArgs>-target:jvm-1.8</addScalacArgs>
-                </configuration>
+<!--                <configuration>-->
+<!--                    <addScalacArgs>-target:jvm-1.8</addScalacArgs>-->
+<!--                </configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -21,10 +21,10 @@ public class HiveTblDetailInfo implements Serializable {
 
     @Data
     public static class HiveTblBasicInfo extends HiveTblSimpleInfo {
-        private  String store;
-        private  String comment;
-        private Set<String> labels;
-        private Boolean isParTbl;
+        private String store;     //存储量
+        private Boolean isParTbl;     //是否分区表
+        private String tableType;    //Hive表类型 tableType: EXTERNAL_TABLE, MANAGED_TABLE
+        private String location;     //Hive表存储路径
     }
 
     @Data

@@ -4,82 +4,129 @@
     <div class="tab-card-t">
       <div class="tab-card-t-l">
         <SvgIcon icon-class="biao" style="fontSize: 16px;" />
-        <span style="marginLeft: 8px; fontSize: 16px">{{ model.name }}</span>
+        <span style="marginLeft: 8px; fontSize: 16px" v-html="model.name "></span>
       </div>
       <div class="tab-card-t-r">
         <!-- <span>读取次数：{{ model.readCount }}次</span> -->
+        <div>负责人：<span v-html="model.owner" class="content-html"></span></div>
+        <div :title="model.createTime">创建时间：{{ model.createTime }}</div>
       </div>
+
     </div>
 
     <!-- bottom -->
     <div class="tab-card-b">
-      <div :title="model.owner">负责人：{{ model.owner }}</div>
-      <div :title="model.createTime">创建时间：{{ model.createTime }}</div>
-      <div :title="model.dbName">数据库：{{ model.dbName }}</div>
-      <div :title="subject">主题域：{{ subject }}</div>
-      <div :title="layer">分层：{{ layer }}</div>
+      <div :title="model.dbName">数据库：<span v-html="model.dbName" class="content-html"></span></div>
+      <div :title="subject">主题域：<span v-html="subject" class="content-html"></span></div>
+      <div :title="layer">分层：<span v-html="layer" class="content-html"></span></div>
+    </div>
+
+    <div class="tab-card-b">
+      <div v-if="!model.comment">
+        <span>描述：-</span>
+      </div>
+      <div v-else>
+        描述：<span v-html="model.comment" class="content-html"></span>
+      </div>
+    </div>
+
+    <div class="tab-card-b" style="width: 100%">
+      <div v-if="model.labels.length > 0">
+        <span>标签：</span>
+        <span class="tab-card-b-tag content-html" v-for="(label, idx) in model.labels" :key="idx" v-html="label"></span>
+      </div>
+      <div v-else>
+        <span>标签：-</span>
+      </div>
+    </div>
+
+    <div class="tab-card-b" v-if="model.columns && model.columns.length > 0">
+      <div class="tab-card-b-field" style="width: 100%">
+        <span>相关字段：</span>
+        <span
+        v-for="(item, idx) in model.columns"
+        :key="idx"
+        v-html="idx + 1 < model.columns.length ? item+'/' : item"
+        class="content-html"></span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Tag from "../../../../../components/tag/index.vue";
+import { EventBus } from "../../../module/common/eventBus/event-bus";
 export default {
   name: "tabCard",
   props: {
     model: {
       type: Object,
       default: null
-    }
+    },
   },
   data() {
     return {
-      modal: []
-    };
+      modal: [],
+      query: ''
+    }
+  },
+  mounted() {
+    EventBus.$on("onQueryForHighLight", query => {
+      this.query = query
+    });
+  },
+  destroyed() {
+    EventBus.$off("onQueryForHighLight")
   },
   methods: {
     onChoose() {
       this.$emit("on-choose", this.model);
-    }
-  },
-  computed: {
-    subject: function() {
-      let classifications = this.model.classifications;
-      let subject = "";
-      if (classifications && classifications.length) {
-        classifications.forEach(classification => {
-          if (
-            classification.superTypeNames &&
-            classification.superTypeNames.length
-          ) {
-            if (classification.superTypeNames[0] === "subject") {
-              subject = classification.typeName;
-            }
-          }
-        });
       }
-      return subject;
     },
-    layer: function() {
-      let classifications = this.model.classifications;
-      let layer = "";
-      if (classifications && classifications.length) {
-        classifications.forEach(classification => {
-          if (
-            classification.superTypeNames &&
-            classification.superTypeNames.length
-          ) {
-            if (
-              classification.superTypeNames[0] === "layer" ||
-              classification.superTypeNames[0] === "layer_system"
-            ) {
-              layer = classification.typeName;
+    computed: {
+      subject: function () {
+        let classifications = this.model.classifications;
+        let subject = "";
+        if (classifications && classifications.length) {
+          classifications.forEach(classification => {
+            if (classification.superTypeNames &&
+              classification.superTypeNames.length) {
+                if (classification.superTypeNames[0] === "subject") {
+                  subject = classification.typeName;
+                }
             }
-          }
-        });
+          });
+        }
+        if( this.query ) {
+          let reg = new RegExp(this.query, 'g')
+          let _query = `<span>${this.query}</span>`
+          subject = subject.replace(reg, _query)
+        }
+          return subject
+      },
+      layer: function () {
+        let classifications = this.model.classifications;
+        let layer = "";
+        if (classifications && classifications.length) {
+          classifications.forEach(classification => {
+            if (classification.superTypeNames &&
+              classification.superTypeNames.length) {
+                if (classification.superTypeNames[0] === "layer" ||
+                  classification.superTypeNames[0] === "layer_system") {
+                  layer = classification.typeName;
+                }
+              }
+          });
+        }
+        if( this.query ) {
+          let reg = new RegExp(this.query, 'g')
+          let _query = `<span>${this.query}</span>`
+          layer = layer.replace(reg, _query)
+        }
+        return layer;
       }
-      return layer;
-    }
-  }
+  },
+  components: { Tag }
 };
 </script>
 
@@ -122,6 +169,9 @@ export default {
       @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       text-align: left;
       line-height: 22px;
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
     }
   }
   .tab-card-b {
@@ -141,6 +191,30 @@ export default {
       @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
       display: inline-block;
     }
+
+    &-field {
+      height: 40px;
+      line-height: 40px;
+      @include bg-color(#F4F7FB, $dark-border-color-base);
+      padding-left: 12px;
+      font-family: PingFangSC-Regular;
+      font-size: 14px;
+      text-align: left;
+      font-weight: 400;
+    }
+
+    &-tag {
+      background: rgba(0,0,0,0.04);
+      border: 1px solid #DEE4EC;
+      border-radius: 2px;
+      padding: 4px 8px;
+    }
   }
 }
+.content-html {
+  /deep/ span {
+    color: #3495F7;
+  }
+}
+
 </style>

@@ -29,15 +29,15 @@ public interface ProjectConf {
     CommonVars<String> SUPPORT_ABILITY = CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");
     CommonVars<String> SERVICE_NAME = CommonVars.apply("wds.dss.framework.project.service.name", "dss-framework-project-server");
 
-    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "c1f1e5c8c4b5bcdfd5fead493e7b2b41");
-    CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "http://192.168.10.223:12345/dolphinscheduler");
+    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "");
+    CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "");
 
-    CommonVars<String> LDAP_ADMIN_NAME = CommonVars.apply("wds.dss.ldap.admin.name", "cn=Manager,dc=example,dc=com");
-    CommonVars<String> LDAP_ADMIN_PASS = CommonVars.apply("wds.dss.ldap.admin.password", "Aaht123@chinanet");
-    CommonVars<String> LDAP_URL = CommonVars.apply("wds.dss.ldap.url", "ldap://192.168.10.201:389");
-    CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "ou=user,dc=example,dc=com");
-    CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "http://127.0.0.1:9503");
-    CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "UM-SSO-BDP=eyJYLUFVVEgtSUQiOiJhZG1pbiIsInRrLXRpbWUiOiIyMjIxMTIyMzE3MDg1MiIsImFsZyI6Ik1ENSJ9%2CeyJwYXNzd29yZCI6Ikx4bCMjMjMwOTAxMSIsImlkIjoxLCJyb2xlIjoidW5Mb2dpbiIsInVzZXJOYW1lIjoiYWRtaW4iLCJYLUFVVEgtSUQiOiJhZG1pbiJ9%2Cc18bf47cd6d83718a7c52352658484b1");
+    CommonVars<String> LDAP_ADMIN_NAME = CommonVars.apply("wds.dss.ldap.admin.name", "");
+    CommonVars<String> LDAP_ADMIN_PASS = CommonVars.apply("wds.dss.ldap.admin.password", "");
+    CommonVars<String> LDAP_URL = CommonVars.apply("wds.dss.ldap.url", "");
+    CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "");
+    CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "");
+    CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "");
 
 
 }

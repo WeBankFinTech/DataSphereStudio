@@ -5,29 +5,29 @@ const config = {
   // 数据库配置
   dev: {
     database: {
-      DATABASE: 'dss_test',
-      USERNAME: 'root',
-      PASSWORD: '123456',
-      PORT: '3306',
-      HOST: '127.0.0.1'
+      DATABASE: '',
+      USERNAME: '',
+      PASSWORD: '',
+      PORT: '',
+      HOST: ''
     }
   },
   test: {
     database: {
-      DATABASE: 'dss_test',
-      USERNAME: 'root',
-      PASSWORD: '123456',
-      PORT: '3306',
-      HOST: '127.0.0.1'
+      DATABASE: '',
+      USERNAME: '',
+      PASSWORD: '',
+      PORT: '',
+      HOST: ''
     }
   },
   prd: {
     database: {
-      DATABASE: 'dss_test',
-      USERNAME: 'root',
-      PASSWORD: '123456',
-      PORT: '3306',
-      HOST: '127.0.0.1'
+      DATABASE: '',
+      USERNAME: '',
+      PASSWORD: '',
+      PORT: '',
+      HOST: ''
     }
   }
 }

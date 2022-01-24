@@ -22,7 +22,7 @@
         </div>
       </Tooltip>
     </div>
-    <Tree
+    <guide-tree
       class="management-platform-sidebar-tree-container"
       :nodes="nodes"
       :currentTreeId="currentTreeId"
@@ -149,12 +149,11 @@ import {
   DeleteGuideContent,
   DeleteGuideGroup,
 } from "@/common/service/apiGuide";
-
-import Tree from "./tree.vue";
+import lubanTree from "@/components/lubanTree";
 export default {
   name: "guideMenu",
   components: {
-    Tree,
+    guideTree: lubanTree.guideTree,
   },
   data() {
     const validateGroupPath = (rule, value, callback) => {

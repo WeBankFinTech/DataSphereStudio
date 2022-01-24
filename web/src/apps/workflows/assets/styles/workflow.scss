@@ -131,6 +131,7 @@
           }
           &-icon {
             cursor: pointer;
+            font-size: 16px;
           }
         }
         &-b {
@@ -151,6 +152,10 @@
         }
       }
     }
+  }
+  .streamisContainer {
+    display: flex;
+    min-height: 100%;
   }
   .workflowListContainer {
     display: flex;

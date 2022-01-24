@@ -95,7 +95,7 @@ $mask-color: rgba(55, 55, 55, .6);
     height: 36px;
     padding-left: 10px;
     @include bg-color($background-color-base, $dark-workflow-bg-color);
-    border: 1px solid $border-color-base;
+    border-bottom: 1px solid $border-color-base;
     @include border-color($border-color-base, $dark-base-color);
 
     .icon {
@@ -127,7 +127,7 @@ $mask-color: rgba(55, 55, 55, .6);
       .icon {
         margin-right: 8px;
         @include font-color($toool-button-color, rgba(255,255,255,0.65));
-        font-size: 15px;
+        font-size: 16px;
       }
       .stop {
         color: red;
@@ -180,7 +180,7 @@ $mask-color: rgba(55, 55, 55, .6);
       height: 36px;
       align-items: center;
       justify-content: space-between;
-      border-top: 1px solid #DEE4EC;
+      // border-top: 1px solid #DEE4EC;
       border-bottom: 1px solid #DEE4EC;
       @include border-color(#DEE4EC, $dark-base-color);
       .head-title {
@@ -208,7 +208,7 @@ $mask-color: rgba(55, 55, 55, .6);
 
     .shape-container {
       margin-top: 1px;
-      border-bottom: 1px solid $border-color-split;
+      // border-bottom: 1px solid $border-color-split;
       @include border-color($border-color-split, $dark-workflow-bg-color);
 
       &.top {
@@ -249,7 +249,8 @@ $mask-color: rgba(55, 55, 55, .6);
     .shape-box {
       display: flex;
       align-items: center;
-      margin: 10px 0;
+      height: 34px;
+      line-height: 34px;
       padding: 0 10px 0 20px;
       cursor: pointer;
       &:hover {
@@ -584,7 +585,11 @@ $mask-color: rgba(55, 55, 55, .6);
     display: none;
   }
   .node-selected {
-    box-shadow: 0 0 8px #3399ff;
+    // box-shadow: 0 0 8px #3399ff;
+    // background-color: rgba(0, 0, 0, .2) !important;
+    background: #DEE8F4;
+    box-shadow: 1px 4px 6px 1px rgba(106,133,167,0.30);
+    border-radius: 4px;
   }
 }
 

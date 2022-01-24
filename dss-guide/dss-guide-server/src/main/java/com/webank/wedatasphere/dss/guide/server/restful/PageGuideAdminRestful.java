@@ -29,7 +29,7 @@ import java.util.UUID;
 
 /**
  * @author suyc
- * @Classname GuideAdminRestful
+ * @Classname PageGuideAdminRestful
  * @Description TODO
  * @Date 2021/12/17 14:53
  * @Created by suyc
@@ -37,8 +37,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "/dss/guide/admin", produces = {"application/json"})
 @AllArgsConstructor
-public class GuideAdminRestful {
-    private static final Logger logger = LoggerFactory.getLogger(GuideAdminRestful.class);
+public class PageGuideAdminRestful {
+    private static final Logger logger = LoggerFactory.getLogger(PageGuideAdminRestful.class);
 
     private GuideGroupService guideGroupService;
     private GuideContentService guideContentService;
@@ -46,10 +46,9 @@ public class GuideAdminRestful {
     @RequestMapping(path ="/guidegroup", method = RequestMethod.POST)
     public Message saveGuideGroup(HttpServletRequest request, @RequestBody GuideGroup guideGroup){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideGroup.getId() ==null) {
+        if(null == guideGroup.getId()) {
             guideGroup.setCreateBy(userName);
             guideGroup.setCreateTime(new Date(System.currentTimeMillis()));
-            guideGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideGroup.setUpdateBy(userName);
@@ -70,8 +69,8 @@ public class GuideAdminRestful {
     }
 
     @RequestMapping(path ="/guidegroup/{id}/delete", method = RequestMethod.POST)
-    public Message deleteGroup(@PathVariable Long id) {
-        guideGroupService.deleteGroup(id);
+    public Message deleteGuideGroup(@PathVariable Long id) {
+        guideGroupService.deleteGuideGroup(id);
         Message message = Message.ok("删除成功");
         return message;
     }
@@ -79,10 +78,9 @@ public class GuideAdminRestful {
     @RequestMapping(path ="/guidecontent", method = RequestMethod.POST)
     public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent){
         String userName = SecurityFilter.getLoginUsername(request);
-        if(guideConent.getId() ==null) {
+        if(null == guideConent.getId()) {
             guideConent.setCreateBy(userName);
             guideConent.setCreateTime(new Date(System.currentTimeMillis()));
-            guideConent.setUpdateTime(new Date(System.currentTimeMillis()));
         }
         else{
             guideConent.setUpdateBy(userName);
@@ -110,7 +108,7 @@ public class GuideAdminRestful {
     @RequestMapping(path ="/guidecontent/{id}/content", method = RequestMethod.POST)
     public Message updateGuideContent(@PathVariable Long id, @RequestBody Map<String, Object> map) {
         try{
-            guideContentService.updateContentById(id,map);
+            guideContentService.updateGuideContentById(id,map);
             return Message.ok("更新成功");
         }
         catch (Exception ex){
@@ -121,7 +119,7 @@ public class GuideAdminRestful {
 
     @RequestMapping(path ="/guidecontent/{id}/delete", method = RequestMethod.POST)
     public Message deleteContent(@PathVariable Long id) {
-        guideContentService.deleteContent(id);
+        guideContentService.deleteGuideContent(id);
         Message message = Message.ok("删除成功");
         return message;
     }
@@ -151,7 +149,7 @@ public class GuideAdminRestful {
                     //获取文件后缀名
                     String suffixName = fileName.substring(fileName.lastIndexOf("."));
                     //重新生成文件名
-                    fileName = UUID.randomUUID() + suffixName;
+                    fileName = "page-" + UUID.randomUUID() + suffixName;
                     if (FileUtils.upload(file, localPath, fileName)) {
                         String relativePath =fileName;
                         result.put("relativePath",relativePath);

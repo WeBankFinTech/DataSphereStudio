@@ -23,6 +23,7 @@
       <Icon
         v-show="isHover"
         type="md-close"
+        style="opacity: 0.65; color: #000"
         @click.stop="remove"/>
       <SvgIcon v-show="!isHover && work.unsave && work.type !== 'historyScript'" icon-class="fi-radio-on2"/>
       <Spin
@@ -31,6 +32,7 @@
         <Icon
           type="ios-loading"
           size="12"
+          style="opacity: 0.65; color: #000"
           class="we-icon-loading"/>
       </Spin>
     </span>
@@ -91,7 +93,8 @@ export default {
     padding: 0 16px;
     padding-right: 30px;
     font-size: $font-size-base;
-    height: 30px;
+    height: 24px;
+    line-height: 24px;
     .workbench-title-logo {
         font-size: 16px;
         margin-right: 4px;
@@ -111,6 +114,10 @@ export default {
         .fi-radio-on2 {
             font-size: $font-size-small;
         }
+    }
+
+    .workbench-title-hover {
+      @include bg-color(#d1d7dd, $dark-workspace-body-bg-color) ;
     }
   }
 </style>

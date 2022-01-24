@@ -37,6 +37,14 @@ export default {
     verticalAlign: {
       type: String,
       default: ''
+    },
+    width: {
+      type: String,
+      default: ''
+    },
+    height: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -70,8 +78,17 @@ export default {
       }
     },
     svgVerticalAlign() {
-      return {
-        'vertical-align': this.verticalAlign
+      if (this.width && this.height) {
+        // 某些特殊svg需要定制宽高
+        return {
+          'vertical-align': this.verticalAlign,
+          'width': this.width,
+          'height': this.height
+        }
+      } else {
+        return {
+          'vertical-align': this.verticalAlign
+        }
       }
     }
   }

@@ -27,7 +27,7 @@ public class DssScriptDownloadAudit {
     private String  creator;
     private String  tenant;
     private String  path;
-    @TableField("`sql`")
+     @TableField("`sql`")
     @NotEmpty(message = "查询语句不能为空")
     private String  sql;
 

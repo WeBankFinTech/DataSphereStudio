@@ -58,7 +58,11 @@
                b.title_alias AS children_title_alias,
                b.seq AS children_seq,
                b.type AS children_type,
-               b.content_html AS children_content_html
+               b.content_html AS children_content_html,
+               b.create_by AS children_create_by,
+               b.create_time AS children_create_time,
+               b.update_by AS children_update_by,
+               b.update_time AS children_update_time
         FROM dss_guide_group a
         LEFT JOIN (SELECT * FROM dss_guide_content WHERE is_delete =0) b ON a.id = b.group_id
         WHERE a.is_delete =0 AND a.path = #{path}

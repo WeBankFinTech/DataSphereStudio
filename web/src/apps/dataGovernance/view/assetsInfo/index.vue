@@ -38,7 +38,7 @@
             <label for="store">存储量</label>
             <span>{{ basicData.store }}</span>
           </div>
-          <div class="assets-info-b-l-content-item">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="comment">描述</label>
             <span v-show="!isCommentEdit">{{ basicData.comment }}</span>
             <!-- <Input
@@ -61,7 +61,7 @@
               style="float:right;cursor: pointer;"
             ></Icon> -->
           </div>
-          <div class="assets-info-b-l-content-item" style="overflow: hidden">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="labels">标签</label>
             <div
               style="display: inline-block;width: calc(100% - 70px);float: right;line-height: 32px"
@@ -149,6 +149,15 @@
               >
             </Select>
             <span v-else>{{ classification.layer }}</span>
+          </div>
+
+          <div class="assets-info-b-l-content-item">
+            <label for="tableType">表类别</label>
+            <span>{{ basicData.tableType == 'EXTERNAL_TABLE' ? '外部表' : '内部表' }}</span>
+          </div>
+          <div class="assets-info-b-l-content-item" v-if=" basicData.tableType == 'EXTERNAL_TABLE' && basicData.location">
+            <label for="location">表路径</label>
+            <span :style="{'word-break': 'break-all'}">{{ basicData.location }}</span>
           </div>
         </div>
       </div>
@@ -269,6 +278,39 @@ export default {
         });
       });
     });
+    util.Hub.$on("register_hover", data => {
+      this.$nextTick(() => {
+        $(`#${data.guid}`).hover(() => {
+          let hoverId = data.guid,
+            needHoverArr = [hoverId]
+          this.lineageData.relations.forEach(relation => {
+            if (relation.fromEntityId === hoverId) {
+              needHoverArr.push(relation.toEntityId)
+            } else if (relation.toEntityId === hoverId) {
+              needHoverArr.push(relation.fromEntityId)
+            } else {
+              $(`#${relation.relationshipId}`).addClass('should-hide')
+              $(`#${relation.relationshipId}`).next().addClass('should-hide')
+            }
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            if (needHoverArr.indexOf(item) === -1) {
+              $(`#${item}`).addClass('should-lower')
+            }
+          })
+        }, () => {
+          this.lineageData.relations.forEach(relation => {
+            $(`#${relation.relationshipId}`).removeClass('should-hide')
+            $(`#${relation.relationshipId}`).next().removeClass('should-hide')
+          })
+          const keys = Object.keys(this.lineageData.guidEntityMap)
+          keys.forEach(item => {
+            $(`#${item}`).removeClass('should-lower')
+          })
+        });
+      });
+    })
   },
   methods: {
     init() {
@@ -506,6 +548,7 @@ export default {
           font-family: PingFangSC-Regular;
           font-size: 14px;
           margin-top: 16px;
+          padding-right: 8px;
           label {
             font-weight: normal;
             @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);

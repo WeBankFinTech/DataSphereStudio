@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssExchangisProje
 import com.webank.wedatasphere.dss.framework.admin.service.DssExchangeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class DssExchangisController {
 
     @RequestMapping(path = "/project/tree", method = RequestMethod.GET)
     public Message getProjectTree(@Context HttpServletRequest request) throws Exception {
-//        String userName = SecurityFilter.getLoginUsername(request);
-        String userName = "admin";
+        String userName = SecurityFilter.getLoginUsername(request);
+//        String userName = "admin";
         List<DssExchangisProject> dssExchangisProjects = dssExchangeService.queryExchangeProject(userName);
         Message message = Message.ok().data("response", dssExchangisProjects);
         return message;
@@ -43,8 +44,8 @@ public class DssExchangisController {
 
     @RequestMapping(path = "/task/tree", method = RequestMethod.GET)
     public Message getTaskTree(@Context HttpServletRequest request, @RequestParam int projectId, @RequestParam int pageNum,@RequestParam(required = false) String fuzzyName) throws Exception {
-//        String userName = SecurityFilter.getLoginUsername(request);
-        String userName = "admin";
+        String userName = SecurityFilter.getLoginUsername(request);
+//        String userName = "admin";
         DssExchangeTaskRes dssExchangeTaskRes = dssExchangeService.queryExchangeTask(projectId, userName,pageNum,fuzzyName);
         Message message = Message.ok().data("response",dssExchangeTaskRes);
         return message;

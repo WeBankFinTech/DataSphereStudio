@@ -7,6 +7,7 @@ class RelationEdge extends Edge {
     if (this.options.color) {
       $(path).addClass(this.options.color);
     }
+    $(path).attr('id', this.options.id)
     return path;
   }
 

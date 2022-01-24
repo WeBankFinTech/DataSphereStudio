@@ -184,7 +184,7 @@
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-framework-admin</artifactId>
+            <artifactId>dss-framework-ctyun-service</artifactId>
             <version>${dss.version}</version>
             <exclusions>
                 <exclusion>
@@ -209,8 +209,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-
     </dependencies>
 
     <build>

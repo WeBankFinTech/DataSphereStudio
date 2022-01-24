@@ -2,38 +2,99 @@
   <div class="assets-index-wrap">
     <!-- top 搜索框 -->
     <div class="assets-index-t">
-      <img
-        src="../../assets/images/搜索框装饰图.png"
-        alt=""
-        style="position: absolute;"
-      />
       <!-- bottom -->
       <div class="assets-index-t-b1">
-        <div class="assets-index-t-b1-search">
-          <Input
-            :placeholder="$t(`message.dataGovernance.pleaseEnterATableName`)"
-            size="small"
-            @on-enter="onSearch"
-            v-model="queryForTbls"
-          >
-            <span slot="prepend">
-              <Icon type="md-search" size="16" color="#2e92f7" />
-              <!-- <SvgIcon
-                icon-class="search"
-                style="fontSize: 16px"
-                :color="'#2e92f7'"
-              ></SvgIcon> -->
-            </span>
-          </Input>
-        </div>
+        <Row>
+          <Col :span="24" :style="{ display: 'flex' }">
+            <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
+            <div class="assets-index-t-b1-content">
+              <Input
+                :placeholder="
+                  $t(`message.dataGovernance.pleaseEnterATableName`)
+                "
+                v-model="queryForTbls"
+              >
+              </Input>
+            </div>
+          </Col>
+        </Row>
+        <Row :style="{ 'margin-top': '16px' }">
+          <Col :span="8" :style="{ display: 'flex' }">
+            <div class="assets-index-t-b1-label">
+              <span>主题域/分层</span>
+            </div>
+            <div class="assets-index-t-b1-content">
+              <Select
+                v-model="searchOption.classification"
+                clearable
+                style="width: 285px"
+                @on-change="selectSubject"
+              >
+                <OptionGroup label="主题域">
+                  <Option
+                    v-for="(item, idx) in subjectList"
+                    :value="item.name"
+                    :key="idx"
+                    >{{ item.name }}</Option
+                  >
+                </OptionGroup>
+                <OptionGroup label="分层">
+                  <Option
+                    v-for="(item, idx) in layerList"
+                    :value="item.name"
+                    :key="idx"
+                    >{{ item.name }}</Option
+                  >
+                </OptionGroup>
+              </Select>
+            </div>
+          </Col>
+          <Col :span="8" :style="{ display: 'flex' }">
+            <div class="assets-index-t-b1-label"><span>负责人</span></div>
+            <div class="assets-index-t-b1-content">
+              <Select
+                v-model="searchOption.owner"
+                filterable
+                clearable
+                remote
+                :remote-method="remoteSearchOwner"
+                :loading="owerSerachLoading"
+                style="width: 285px"
+                @on-change="selectOwner"
+              >
+                <Option
+                  v-for="(item, idx) in ownerList"
+                  :value="item.value"
+                  :key="idx"
+                  >{{ item.label }}</Option
+                >
+              </Select>
+            </div>
+          </Col>
+          <Col :span="8">
+            <div :style="{ display: 'flex', 'margin-left': '32px' }">
+              <Button @click="onReset">重置</Button>
+              <Button
+                type="primary"
+                :style="{ 'margin-left': '8px' }"
+                @click="onSearch"
+              >查询</Button
+              >
+            </div>
+          </Col>
+        </Row>
       </div>
     </div>
+
+    <!-- <div class="assets-index-t-total">
+      <span>共条信息</span>
+    </div> -->
 
     <!-- bottom 复选框搜索框 + card tabs -->
     <div class="assets-index-b">
       <!-- left -->
-      <div class="assets-index-b-l">
-        <div class="assets-index-b-l-title">
+      <!-- <div class="assets-index-b-l"> -->
+        <!-- <div class="assets-index-b-l-title">
           <span>筛选条件</span>
         </div>
         <div class="assets-index-b-l-user">
@@ -45,7 +106,7 @@
             remote
             :remote-method="remoteSearchOwner"
             :loading="owerSerachLoading"
-            style="width:167px"
+            style="width: 167px"
             @on-change="selectOwner"
           >
             <Option
@@ -55,7 +116,7 @@
               >{{ item.label }}</Option
             >
           </Select>
-        </div>
+        </div> -->
         <!--<div class="assets-index-b-l-env">
           <span>环境</span>
           <Radio v-model="searchOption.env"
@@ -65,12 +126,12 @@
             ></Radio
           >
         </div>-->
-        <div class="assets-index-b-l-label">
+        <!-- <div class="assets-index-b-l-label">
           <span>主题域/分层</span>
           <Select
             v-model="searchOption.classification"
             clearable
-            style="width:167px"
+            style="width: 167px"
             @on-change="selectSubject"
           >
             <OptionGroup label="主题域">
@@ -90,8 +151,8 @@
               >
             </OptionGroup>
           </Select>
-        </div>
-      </div>
+        </div> -->
+      <!-- </div> -->
 
       <!-- right -->
       <div class="assets-index-b-r" v-if="cardTabs.length">
@@ -103,9 +164,12 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
+        <Divider v-if="isCompleted" orientation="center">到底了</Divider>
       </div>
       <div class="assets-index-b-r" v-else>
-        <div style="text-align: center; margin-top:50px; font-weight: bolder;">暂无数据</div>
+        <div style="text-align: center; margin-top: 50px; font-weight: bolder">
+          暂无数据
+        </div>
       </div>
     </div>
   </div>
@@ -117,23 +181,23 @@ import {
   getHiveTbls,
   getWorkspaceUsers,
   getLayersAll,
-  getThemedomains
+  getThemedomains,
 } from "../../service/api";
 import { EventBus } from "../../module/common/eventBus/event-bus";
 import { storage } from "../../utils/storage";
 import { throttle } from "lodash";
 export default {
   components: {
-    tabCard
+    tabCard,
   },
   data() {
     return {
       searchOption: {
         limit: 10,
         offset: 0,
-        owner: '',
-        classification: '',
-        query: ''
+        owner: "",
+        classification: "",
+        query: "",
       },
       ownerList: [],
       userList: [],
@@ -142,33 +206,44 @@ export default {
       owerSerachLoading: false,
       isLoading: false,
       subjectList: [],
-      layerList: []
+      layerList: [],
+      isCompleted: false,
     };
   },
   created() {
-    let searchParams = storage.getItem("searchTbls")
+    let searchParams = storage.getItem("searchTbls");
     if (searchParams) {
-      const searchData = JSON.parse(searchParams)
-      this.queryForTbls = searchData.query
-      this.searchOption.classification = searchData.classification
-      this.searchOption.owner = searchData.owner
+      const searchData = JSON.parse(searchParams);
+      this.queryForTbls = searchData.query;
+      this.searchOption.classification = searchData.classification;
+      this.searchOption.owner = searchData.owner;
       getHiveTbls(JSON.parse(searchParams))
-        .then(data => {
+        .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             this.cardTabs = data.result;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("Search", err);
         });
     } else {
-      getHiveTbls({query: '', limit: 10, offset: 0})
-        .then(data => {
+      getHiveTbls({ query: "", limit: 10, offset: 0 })
+        .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             this.cardTabs = data.result;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("Search", err);
         });
     }
@@ -176,15 +251,15 @@ export default {
   mounted() {
     let _this = this;
     this.throttleLoad = throttle(() => {
-      console.log('scroll')
+      console.log("scroll");
       _this.scrollHander();
     }, 300);
     window.addEventListener("scroll", this.throttleLoad, false);
-    getThemedomains().then(res => {
+    getThemedomains().then((res) => {
       let { result } = res;
       this.subjectList = result;
     });
-    getLayersAll().then(res => {
+    getLayersAll().then((res) => {
       let { result } = res;
       this.layerList = result;
     });
@@ -193,6 +268,13 @@ export default {
     window.removeEventListener("scroll", this.throttleLoad);
   },
   methods: {
+    //  重置
+    onReset() {
+      this.queryForTbls = '';
+      this.searchOption.classification = '';
+      this.searchOption.owner = ''
+      this.searchOption.query = ''
+    },
     // 搜索
     onSearch() {
       const params = {
@@ -200,21 +282,33 @@ export default {
         owner: this.searchOption.owner,
         classification: this.searchOption.classification,
         limit: 10,
-        offset: 0
+        offset: 0,
       };
       this.searchOption["limit"] = 10;
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
-      this.isLoading = false
+      this.isLoading = false;
+      if( this.queryForTbls || params.classification) {
+        EventBus.$emit("onQueryForHighLight", this.queryForTbls);
+      }
       getHiveTbls(params)
-        .then(data => {
+        .then((data) => {
           if (data.result) {
-            this.cardTabs = data.result;
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           } else {
             this.cardTabs = [];
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log("Search", err);
         });
     },
@@ -227,7 +321,7 @@ export default {
       that.$router.push({
         name: "dataGovernance/assets/info",
         params: { guid },
-        query: { workspaceId }
+        query: { workspaceId },
       });
     },
 
@@ -238,18 +332,23 @@ export default {
       if (that.isLoading) {
         return that.$Message.success("所有数据已加载完成");
       }
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const params = {
           query: that.queryForTbls,
           owner: that.searchOption.owner,
           limit: that.searchOption.limit,
           offset: that.searchOption.offset + that.searchOption.limit,
-          classification: that.classification
+          classification: that.classification,
         };
         that.searchOption.offset += that.searchOption.limit;
         getHiveTbls(params)
-          .then(data => {
+          .then((data) => {
             if (data.result) {
+              if( data.result.length == this.searchOption.limit ) {
+                this.isCompleted = false
+              } else {
+                this.isCompleted = true
+              }
               that.cardTabs = res.concat(data.result);
             } else {
               that.$Message.success("所有数据已加载完成");
@@ -257,7 +356,7 @@ export default {
             }
             resolve();
           })
-          .catch(err => {
+          .catch((err) => {
             console.log("handleReachBottom", err);
           });
       });
@@ -270,11 +369,11 @@ export default {
         that.owerSerachLoading = true;
         let workspaceId = that.$route.query.workspaceId;
         getWorkspaceUsers(workspaceId, query)
-          .then(data => {
+          .then((data) => {
             const { result } = data;
             const _res = [];
             if (result) {
-              result.forEach(item => {
+              result.forEach((item) => {
                 let o = Object.create(null);
                 o["value"] = item;
                 o["label"] = item;
@@ -285,7 +384,7 @@ export default {
               console.log("ownerList", that.ownerList);
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log("getWorkspaceUsers", err);
           });
       } else {
@@ -318,7 +417,7 @@ export default {
           clientHeight = Math.max(
             document.body.clientHeight,
             document.documentElement.clientHeight,
-            document.querySelector('.layout').clientHeight
+            document.querySelector(".layout").clientHeight
           );
         }
         return clientHeight;
@@ -332,7 +431,7 @@ export default {
       let st = getScrollTop();
       let ch = getClientHeight();
       let sh = getScrollHeight();
-      console.log(st,ch,sh)
+      console.log(st, ch, sh);
       if (st + ch + 54 >= sh) {
         // 拉数据
         this.handleReachBottom();
@@ -348,13 +447,45 @@ export default {
     // 搜索主題域/分層
     selectSubject(value) {
       if (value) {
-        this.searchOption.classification = value
+        this.searchOption.classification = value;
       } else {
-        delete this.searchOption.classification
+        delete this.searchOption.classification;
       }
       this.onSearch();
+    },
+
+    // 处理高亮 并过滤没有 高亮 的结果
+    foamtDataToHighLigth(result, query) {
+      const _result = result.slice() || []
+      const _query = `<span>${query}</span>`
+      const reg = new RegExp(query, 'g')
+      const filter_arr = []
+      _result.forEach((item, idx) => {
+        let flag = false
+        Object.keys(item).forEach(key => {
+          if( key == 'classifications' && item['classifications'] && item['classifications'].length > 0 ) {
+            item['classifications'].forEach(item => {
+              if( item['typeName'].indexOf(query) > -1 ) {
+                flag = true
+              }
+            })
+          }
+          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 ) {
+            item[key] = item[key].replace(reg, _query)
+            flag = true
+          }
+          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' && item[key].join('@').indexOf(query) > -1 ) {
+            item[key] = item[key].join('@').replace(reg, _query).split('@')
+            flag = true
+          }
+        })
+        if( !flag ){
+          filter_arr.push(idx)
+        }
+      })
+      return  _result.filter((item, idx) => !filter_arr.includes(idx))
     }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -407,14 +538,32 @@ export default {
   }
 
   .assets-index-t-b1 {
-    height: 46px;
-    @include bg-color(#f8f9fc, $dark-base-color);
-    display: flex;
-    padding: 11px 0px;
-    padding-left: 12px;
-    &-search {
-      min-width: 552px;
+    min-height: 112px;
+    @include bg-color(#f4f7fb, $dark-base-color);
+    padding: 16px 24px;
+    &-label {
+      width: 100px;
+      margin-right: 8px;
+      height: 32px;
+      line-height: 32px;
+      font-family: PingFangSC-Regular;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.85);
+      text-align: right;
+      font-weight: 400;
     }
+    &-content {
+      flex: 1;
+    }
+  }
+
+  .assets-index-t-total {
+    height: 38px;
+    line-height: 38px;
+    text-align: right;
+    padding-right: 25px;
+    border-bottom: 1px solid #DEE4EC;
+    border-top: 1px solid #DEE4EC;
   }
 
   .assets-index-b {
@@ -481,4 +630,5 @@ export default {
     margin-left: 8px;
   }
 }
+
 </style>

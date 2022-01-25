@@ -42,7 +42,21 @@
     }
   }
 }
-
+.vertical-center-modal{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .ivu-modal{
+    top: 0;
+  };
+  p{
+    font-size: 14px !important;
+    .exchangis{
+      color: dodgerblue;
+      cursor: pointer;
+    }
+  }
+}
 .process-tabs {
     position: $relative;
     height: calc(100%);

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.framework.admin.xml.DssComponentMapper">
+
+    <insert id="insertApplication" useGeneratedKeys="true" keyProperty="id" parameterType="DssApplicationInfo">
+    insert into dss_application (
+        <if test="name != null and name != ''">name,</if>
+        <if test="url != null and url != ''">url,</if>
+        <if test="projectUrl != null and projectUrl != ''">project_url,</if>
+        <if test="ifIframe != null and ifIframe != ''">if_iframe,</if>
+        <if test="homepageUrl != null and homepageUrl != ''">homepage_url,</if>
+        <if test="redirectUrl != null and redirectUrl != ''">redirect_url,</if>
+        id )values(
+        <if test="name != null and name != ''">#{name},</if>
+        <if test="url != null and url != ''">#{url},</if>
+        <if test="projectUrl != null and projectUrl != ''">#{projectUrl},</if>
+        <if test="ifIframe != null and ifIframe != ''">#{ifIframe},</if>
+        <if test="homepageUrl != null and homepageUrl != ''">#{homepageUrl},</if>
+        <if test="redirectUrl != null and redirectUrl != ''">#{redirectUrl},</if>
+        '0')
+    </insert>
+
+
+    <insert id="insertMenuApplication" >
+        insert into dss_onestop_menu_application(
+        application_id,
+        <if test="dssCreateApplicationData.onestopMenuId != null and dssCreateApplicationData.onestopMenuId != 0">onestop_menu_id,</if>
+        <if test="dssCreateApplicationData.titleEn != null and dssCreateApplicationData.titleEn != ''">title_en,</if>
+        <if test="dssCreateApplicationData.titleCn != null and dssCreateApplicationData.titleCn != ''">title_cn,</if>
+        <if test="dssCreateApplicationData.descEn != null and dssCreateApplicationData.descEn != ''">desc_en,</if>
+        <if test="dssCreateApplicationData.descCn != null and dssCreateApplicationData.descCn != ''">desc_cn,</if>
+        <if test="dssCreateApplicationData.labelsEn != null and dssCreateApplicationData.labelsEn != ''">labels_en,</if>
+        <if test="dssCreateApplicationData.labelsCn != null and dssCreateApplicationData.labelsCn != ''">labels_cn,</if>
+        <if test="dssCreateApplicationData.isActive != null">is_active,</if>
+        <if test="dssCreateApplicationData.accessButtonEn != null and dssCreateApplicationData.accessButtonEn != ''">access_button_en,</if>
+        <if test="dssCreateApplicationData.accessButtonCn != null and dssCreateApplicationData.accessButtonCn != ''">access_button_cn,</if>
+        id
+        )values(
+        #{id},
+        <if test="dssCreateApplicationData.onestopMenuId != null and dssCreateApplicationData.onestopMenuId != 0">#{dssCreateApplicationData.onestopMenuId},</if>
+        <if test="dssCreateApplicationData.titleEn != null and dssCreateApplicationData.titleEn != ''">#{dssCreateApplicationData.titleEn},</if>
+        <if test="dssCreateApplicationData.titleCn != null and dssCreateApplicationData.titleCn != ''">#{dssCreateApplicationData.titleCn},</if>
+        <if test="dssCreateApplicationData.descEn != null and dssCreateApplicationData.descEn != ''">#{dssCreateApplicationData.descEn},</if>
+        <if test="dssCreateApplicationData.descCn != null and dssCreateApplicationData.descCn != ''">#{dssCreateApplicationData.descCn},</if>
+        <if test="dssCreateApplicationData.labelsEn != null and dssCreateApplicationData.labelsEn != ''">#{dssCreateApplicationData.labelsEn},</if>
+        <if test="dssCreateApplicationData.labelsCn != null and dssCreateApplicationData.labelsCn != ''">#{dssCreateApplicationData.labelsCn},</if>
+        <if test="dssCreateApplicationData.isActive != null">#{dssCreateApplicationData.isActive},</if>
+        <if test="dssCreateApplicationData.accessButtonEn != null and dssCreateApplicationData.accessButtonEn != ''">#{dssCreateApplicationData.accessButtonEn},</if>
+        <if test="dssCreateApplicationData.accessButtonCn != null and dssCreateApplicationData.accessButtonCn != ''">#{dssCreateApplicationData.accessButtonCn},</if>
+        '0'
+        )
+    </insert>
+
+
+    <update id="updateApplication" parameterType="DssApplicationInfo">
+        update dss_application
+        <set>
+            <if test="url != null and url != ''">url = #{url},</if>
+            <if test="projectUrl != null and projectUrl != ''">project_url = #{projectUrl},</if>
+            <if test="ifIframe != ifIframe">if_iframe = #{ifIframe},</if>
+            <if test="homepageUrl != null and homepageUrl != ''">homepage_url = #{homepageUrl},</if>
+            <if test="redirectUrl != null and redirectUrl != ''">redirect_url = #{redirectUrl},</if>
+            name = #{name}
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateMenuApplication" parameterType="DssCreateApplicationData">
+        update dss_onestop_menu_application
+        <set>
+            <if test="titleEn != null and titleEn != ''">title_en = #{titleEn},</if>
+            <if test="titleCn != null and titleCn != ''">title_cn = #{titleCn},</if>
+            <if test="descEn != null and descEn != ''">desc_en = #{descEn},</if>
+            <if test="descCn != null">desc_cn = #{descCn},</if>
+            <if test="labelsEn != null">labels_en = #{labelsEn},</if>
+            <if test="labelsCn != null">labels_cn = #{labelsCn},</if>
+            <if test="isActive != null and isActive != ''">is_active = #{isActive},</if>
+            <if test="accessButtonEn != null and accessButtonEn != ''">access_button_en = #{accessButtonEn},</if>
+            <if test="accessButtonCn != null and accessButtonCn != ''">access_button_cn = #{accessButtonCn},</if>
+            onestop_menu_id = #{onestopMenuId}
+        </set>
+        where application_id = #{id}
+    </update>
+</mapper>

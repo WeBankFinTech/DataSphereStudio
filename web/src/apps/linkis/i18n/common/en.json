@@ -25,6 +25,7 @@
       "noDataText": "No data yet",
       "userName": "Username",
       "searchName": "Please enter username to search",
+      "searchUserName": "Please enter username",
       "generalView": "Switch to the common view",
       "manageView": "Switch to the admin view",
       "back": "Back",
@@ -47,6 +48,9 @@
         "day": "Day"
       },
       "tableColumns": {
+        "date": "date",
+        "scriptFilePath": "file path",
+        "sqlContent": "execution code",
         "engineInstance": "Engine instance",
         "engineType": "Engine type",
         "taskID": "Task ID",
@@ -89,6 +93,14 @@
             "dateReport": "Global Variables",
             "globalValiable": "Frequently Asked"
           }
+        }
+      },
+      "downloadAudit": {
+        "userName": {
+            "label": "userName"
+        },
+        "time": {
+            "label": "time"
         }
       },
       "formItems": {

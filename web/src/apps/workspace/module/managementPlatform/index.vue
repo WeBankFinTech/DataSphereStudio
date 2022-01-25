@@ -113,6 +113,7 @@ const menu = [
       { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
       // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
       { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
+      { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
     ],
   },
   {

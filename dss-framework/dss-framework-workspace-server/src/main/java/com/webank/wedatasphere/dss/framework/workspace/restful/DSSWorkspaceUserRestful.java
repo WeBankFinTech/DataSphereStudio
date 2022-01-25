@@ -92,7 +92,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
+    public Message getAllWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
         dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
         dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));

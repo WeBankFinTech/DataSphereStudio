@@ -225,7 +225,11 @@ export default {
             } else {
               this.isCompleted = true
             }
-            this.cardTabs = data.result;
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -240,7 +244,11 @@ export default {
             } else {
               this.isCompleted = true
             }
-            this.cardTabs = data.result;
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -349,7 +357,11 @@ export default {
               } else {
                 this.isCompleted = true
               }
-              that.cardTabs = res.concat(data.result);
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(res.concat(data.result), this.queryForTbls)
+            } else {
+              this.cardTabs = res.concat(data.result);
+            }
             } else {
               that.$Message.success("所有数据已加载完成");
               that.isLoading = true;

@@ -1,10 +1,19 @@
 <template>
   <div class="we-file-navbar">
-    <we-searchbox
-      ref="searchbox"
+<!--    <we-searchbox-->
+<!--      ref="searchbox"-->
+<!--      v-model="searchText"-->
+<!--      :placeholder="placeholder"-->
+<!--      :style="{'width': getWidth()}"/>-->
+    <Input
+      class="searchbox"
       v-model="searchText"
-      :placeholder="placeholder"
-      :style="{'width': getWidth()}"/>
+      clearable
+      @on-enter="onSearch"
+      @on-clear="onSearch"
+      :placeholder="$t('message.common.tableRow.search')"
+      :style="{'width': getWidth()}"
+    />
     <div
       class="we-file-navbar-nav">
       <Icon
@@ -39,12 +48,12 @@
   </div>
 </template>
 <script>
-import weSearchbox from './searchbox.vue';
+// import weSearchbox from './searchbox.vue';
 import Nav from './nav.js';
 export default {
-  components: {
-    weSearchbox,
-  },
+  // components: {
+  //   weSearchbox,
+  // },
   props: {
     navList: {
       type: Array,
@@ -70,11 +79,11 @@ export default {
       searchText: '',
     };
   },
-  watch: {
-    searchText: function(value) {
-      this.$emit('text-change', value);
-    },
-  },
+  // watch: {
+  //   searchText: function(value) {
+  //     this.$emit('text-change', value);
+  //   },
+  // },
   created() {
     this.nav = new Nav({
       navList: this.navList,
@@ -85,6 +94,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.searchbox.onfocus();
       });
+    },
+    onSearch() {
+      this.$emit('text-change', this.searchText.trim());
     },
     refresh() {
       this.$emit('on-refresh');
@@ -112,3 +124,19 @@ export default {
 };
 </script>
 <style lang="scss" src="./index.scss"></style>
+<style lang="scss" scoped>
+  .searchbox{
+   flex: 0 0 auto;
+   border-bottom: 1px solid #eee;
+   ::v-deep i.ivu-input-icon{
+     color: #808695;
+     font-weight: normal;
+   }
+   ::v-deep .ivu-input{
+     border: none;
+   }
+   ::v-deep .ivu-input:focus{
+     box-shadow: none;
+   }
+  }
+</style>

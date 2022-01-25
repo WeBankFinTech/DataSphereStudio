@@ -1,7 +1,7 @@
 <template>
   <div v-if="isExternal" :style="styleExternalIcon" class="svg-external-icon svg-icon" v-on="$listeners" />
   <span v-else class="svg-container" :style="{color}">
-    <svg :class="svgClass" aria-hidden="true" v-on="$listeners">
+    <svg :class="svgClass" :style="svgVerticalAlign" aria-hidden="true" v-on="$listeners">
       <use :xlink:href="iconName" />
     </svg>
   </span>
@@ -33,6 +33,18 @@ export default {
     color: {
       type: String,
       default: 'currentColor'
+    },
+    verticalAlign: {
+      type: String,
+      default: ''
+    },
+    width: {
+      type: String,
+      default: ''
+    },
+    height: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -50,10 +62,33 @@ export default {
       }
     },
     styleExternalIcon() {
-      return {
-        backgroundColor: this.color,
-        mask: `url(${this.iconClass}) no-repeat 50% 50%`,
-        '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
+      if (this.verticalAlign) {
+        return {
+          backgroundColor: this.color,
+          mask: `url(${this.iconClass}) no-repeat 50% 50%`,
+          '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`,
+          'vertical-align': this.verticalAlign
+        }
+      } else {
+        return {
+          backgroundColor: this.color,
+          mask: `url(${this.iconClass}) no-repeat 50% 50%`,
+          '-webkit-mask': `url(${this.iconClass}) no-repeat 50% 50%`
+        }
+      }
+    },
+    svgVerticalAlign() {
+      if (this.width && this.height) {
+        // 某些特殊svg需要定制宽高
+        return {
+          'vertical-align': this.verticalAlign,
+          'width': this.width,
+          'height': this.height
+        }
+      } else {
+        return {
+          'vertical-align': this.verticalAlign
+        }
       }
     }
   }

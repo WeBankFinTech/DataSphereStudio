@@ -1,96 +1,76 @@
 <template>
-  <we-panel class="container" diretion="vertical" @on-resize="resize" @on-resized="resizePanel">
-    <we-panel-item
-      ref="topPanel"
-      :index="1"
-      :min="36"
-      :height="scriptViewState.topPanelHeight"
-      class="editor-panel"
-      :class="{'full-screen': scriptViewState.topPanelFull}"
-    >
+  <div class="we-panel we-panel-vertical">
+    <div ref="topPanel" :class="{'full-screen': scriptViewState.topPanelFull}"  class="editor-panel" :style="{'height': scriptViewState.topPanelHeight}">
       <editor ref="editor" :script="script" :work="work" :script-type="work.type" :readonly="readonly" @on-save="save" @on-run="run"
-        @on-stop="stop"/>
+              @on-stop="stop"/>
       <Spin v-if="saveLoading" size="large" class="new-sidebar-spin" fix />
-    </we-panel-item>
+      <!-- 头部的线 -->
+      <div class="script-line" @mousedown.stop="handleMouseDown"></div>
+    </div>
     <!-- 使用v-if把非当前脚本DOM移除文档防止DOM节点过多影响性能 -->
-    <we-panel-item
-      v-if="current===work.id"
-      :index="2"
-      :min="36"
-      :height="scriptViewState.bottomContentHeight"
-      class="log-panel"
-      :class="{'full-screen': scriptViewState.bottomPanelFull}"
-    >
+    <div v-if="current===work.id" :class="{'full-screen': scriptViewState.bottomPanelFull}" class="log-panel">
       <div class="workbench-tabs">
         <div class="workbench-tab-wrapper">
           <div class="workbench-tab">
             <div v-if="bottomTab.progress" :class="{active: scriptViewState.showPanel == 'progress'}"
-              class="workbench-tab-item" @click="showPanelTab('progress')">
+                 class="workbench-tab-item" @click="showPanelTab('progress')">
               <span>{{ $t('message.scripts.tabs.progress') }}</span>
             </div>
             <div v-if="bottomTab.result" :class="{active: scriptViewState.showPanel == 'result'}"
-              class="workbench-tab-item" @click="showPanelTab('result')">
+                 class="workbench-tab-item" @click="showPanelTab('result')">
               <span>{{ $t('message.scripts.tabs.result') }}</span>
             </div>
             <div v-if="bottomTab.log" :class="{active: scriptViewState.showPanel == 'log'}" class="workbench-tab-item"
-              @click="showPanelTab('log')">
+                 @click="showPanelTab('log')">
               <span>{{ $t('message.scripts.tabs.log') }}</span>
             </div>
             <div v-if="bottomTab.history" :class="{active: scriptViewState.showPanel == 'history'}"
-              class="workbench-tab-item" @click="showPanelTab('history')">
+                 class="workbench-tab-item" @click="showPanelTab('history')">
               <span>{{ $t('message.scripts.tabs.history') }}</span>
             </div>
-            <!-- <div v-if="bottomTab.diagnosis" :class="{active: scriptViewState.showPanel == 'diagnosis'}"
-              class="workbench-tab-item" @click="showPanelTab('diagnosis')">
-              <span>{{ $t('message.scripts.tabs.diagnosis') }}</span>
-            </div> -->
           </div>
         </div>
-        <div class="workbench-container">
-          <we-progress
-            v-if="bottomTab.show_progress"
-            :current="script.progress.current"
-            :waiting-size="script.progress.waitingSize"
-            :steps="script.steps"
-            :status="script.status"
-            :script-view-state="scriptViewState"
-            :application="script.application"
-            :progress-info="script.progress.progressInfo"
-            :cost-time="script.progress.costTime"
-            @open-panel="openPanel" />
-          <result
-            v-if="bottomTab.show_result"
-            ref="result"
-            :script="script"
-            :dispatch="dispatch"
-            :visualShow="visualShow"
-            :script-view-state="scriptViewState"
-            :dataWranglerParams="dataWranglerParams"
-            getResultUrl="filesystem"
-            @on-set-change="changeResultSet"
-            @on-analysis="openAnalysisTab"
-            :visualParams="visualParams" />
-          <log
-            v-if="bottomTab.show_log"
-            :status='script.status'
-            :logs="script.log"
-            :log-line="script.logLine"
-            :script-view-state="scriptViewState"/>
-          <history
-            v-if="bottomTab.show_history"
-            :history="script.history"
-            :script-view-state="scriptViewState"
-            :run-type="script.runType"
-            :node="node" />
-          <!-- <diagnosis
-            v-if="bottomTab.show_diagnosis"
-            :diagnosis="script.diagnosis" /> -->
-        </div>
       </div>
-    </we-panel-item>
-  </we-panel>
+      <we-progress
+        v-if="bottomTab.show_progress"
+        :current="script.progress.current"
+        :waiting-size="script.progress.waitingSize"
+        :steps="script.steps"
+        :status="script.status"
+        :script-view-state="scriptViewState"
+        :application="script.application"
+        :progress-info="script.progress.progressInfo"
+        :cost-time="script.progress.costTime"
+        @open-panel="openPanel" />
+      <result
+        v-if="bottomTab.show_result"
+        ref="result"
+        :script="script"
+        :dispatch="dispatch"
+        :visualShow="visualShow"
+        :script-view-state="scriptViewState"
+        :dataWranglerParams="dataWranglerParams"
+        getResultUrl="filesystem"
+        @on-set-change="changeResultSet"
+        @on-analysis="openAnalysisTab"
+        :visualParams="visualParams" />
+      <log
+        v-if="bottomTab.show_log"
+        :status='script.status'
+        :logs="script.log"
+        :log-line="script.logLine"
+        :script-view-state="scriptViewState"/>
+      <history
+        v-if="bottomTab.show_history"
+        :history="script.history"
+        :script-view-state="scriptViewState"
+        :run-type="script.runType"
+        :node="node" />
+    </div>
+  </div>
 </template>
 <script>
+/*eslint-disable */
 import {
   isEmpty,
   find,
@@ -113,21 +93,19 @@ import {
 
 import editor from './editor.vue';
 import history from './history.vue';
-// import diagnosis from './intelligentDiagnosis.vue';
 import result from '@/components/consoleComponent/result.vue';
 import log from '@/components/consoleComponent/log.vue';
 import weProgress from '@/components/consoleComponent/progress.vue';
+import elementResizeEvent from '@/common/helper/elementResizeEvent';
 import mixin from '@/common/service/mixin';
 
 export default {
-  name: 'editor-script',
   components: {
     result,
     editor,
     log,
     history,
     weProgress,
-    // diagnosis,
   },
   props: {
     work: {
@@ -160,7 +138,7 @@ export default {
       },
       visualParams: {},
       scriptViewState: {
-        topPanelHeight: this.node ? 300 : 450,
+        topPanelHeight: '250px',
         bottomContentHeight: '250',
         topPanelFull: false,
         showPanel,
@@ -197,13 +175,11 @@ export default {
         progress: this.work.type !== 'historyScript',
         result: this.scriptResult.total || (this.script.resultList && this.script.resultList.length),
         log: this.isLogShow || this.work.type === 'historyScript',
-        diagnosis: this.work.type !== 'historyScript' && this.script.diagnosis,
         history: this.work.type !== 'historyScript',
         show_progress: showPanel === 'progress',
         show_result: showPanel === 'result',
         show_log: showPanel === 'log',
         show_history: showPanel === 'history',
-        show_diagnosis: showPanel === 'diagnosis',
         show_visual: showPanel === 'visual'
       }
     }
@@ -238,11 +214,6 @@ export default {
       // 加入用户名来区分不同账户下的tab
       this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
     },
-    current(){
-      if (this.node) {
-        this.resizePanel()
-      }
-    }
   },
   async created() {
     this.userName = this.getUserName();
@@ -303,8 +274,8 @@ export default {
       this.dispatch('IndexedDB:getProgress', {
         tabId: this.script.id,
         cb: ({
-          content
-        }) => {
+               content
+             }) => {
           this.script.progress = {
             current: content.current,
             progressInfo: content.progressInfo,
@@ -328,7 +299,7 @@ export default {
         taskID,
         execID
       } = cacheWork;
-        // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
+      // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
       if (taskID && execID && data && data.running) {
         let dbProgress = JSON.parse(JSON.stringify(this.script.progress));
         this.script = cacheWork.data;
@@ -366,9 +337,11 @@ export default {
     this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
   },
   mounted() {
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('mouseup', this.handleMouseUp);
+    elementResizeEvent.bind(this.$el, this.resize);
     this.$nextTick(() => {
       this.dispatch('WebSocket:init');
-      this.resizePanel();
     });
     window.onbeforeunload = () => {
       if (this.work.unsave || this.script.running) {
@@ -382,6 +355,12 @@ export default {
     // 关闭tab页面不再继续轮询接口
     if (this.execute && this.execute.run !== undefined) {
       this.execute.run = false;
+    }
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleMouseUp);
+    elementResizeEvent.unbind(this.$el);
+    if (this.animationFrameId) {
+      elementResizeEvent.cancelAnimationFrame(this.animationFrameId);
     }
     clearTimeout(this.autoSaveTimer);
     let runningScripts = storage.get(this._running_scripts_key, 'local') || {};
@@ -403,18 +382,55 @@ export default {
     window.onbeforeunload = null;
   },
   methods: {
-    // panel 分割线拖动调整大小
-    resizePanel() {
-      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
-        this.scriptViewState.topPanelHeight = this.$refs.topPanel.$el.clientHeight
-        this.scriptViewState.bottomContentHeight = this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight;
+    // 鼠标位置事件兼容
+    getStdMouseEvent(event) {
+      return {
+        positionX: event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
+        positionY: event.clientY + document.body.scrollTop + document.documentElement.scrollTop,
+      };
+    },
+    // 拖拽的线鼠标按下事件
+    handleMouseDown(e) {
+      // 阻止冒泡事件和默认事件
+      e.stopPropagation();
+      e.preventDefault();
+      // 先记录当前鼠标按下的位置
+      const positionEvent = this.getStdMouseEvent(e);
+      this.startY = positionEvent.positionY;
+      this.mouseDownHeight = this.$refs.topPanel.offsetHeight;
+      this.isMouseDown = true;
+    },
+    handleMouseMove(e) {
+      if (this.isMouseDown) {
+        const positionEvent = this.getStdMouseEvent(e);
+        this.currentY = positionEvent.positionY;
+        // 计算其实位置到移动的距离
+        this.moveResult = this.currentY - this.startY;
+        if (this.animationFrameId) {
+          elementResizeEvent.cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = elementResizeEvent.requestAnimationFrame(() => {
+          let h = this.mouseDownHeight - -this.moveResult
+          this.resize(null, h)
+        })
       }
     },
-    // 浏览器窗口缩放
-    resize() {
-      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
-        this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
-        this.scriptViewState.bottomContentHeight = this.$el.clientHeight * 0.4;
+    resize(evt, h) {
+      h =  (!h || h < 1) ?  (this.$el ? this.$el.clientHeight * 0.618 : 350) : h
+      let bh = this.$el ? this.$el.clientHeight - h - 75 : 0 // 底部内容区高度
+      if (h > this.$el.clientHeight) {
+        h = this.$el.clientHeight - 32 // 保持 tab 栏可见
+        bh = 100 // 应该不可见^_^
+      }
+      this.scriptViewState = {
+        ...this.scriptViewState,
+        topPanelHeight: h + 'px',
+        bottomContentHeight: bh
+      }
+    },
+    handleMouseUp() {
+      if (this.isMouseDown) {
+        this.isMouseDown = false;
       }
     },
     'Workbench:save'(work) {
@@ -423,9 +439,9 @@ export default {
       }
     },
     'Workbench:socket'({
-      type,
-      ...args
-    }) {
+                         type,
+                         ...args
+                       }) {
       if (type === 'downgrade') {
         this.postType = 'http';
       }
@@ -473,14 +489,7 @@ export default {
         })
       }
     },
-    'Workbench:removeTab'() {
-      // fix http://172.0.0.1/#/product/100199/bug/detail/199545
-      if (this.node) {
-        setTimeout(()=>{
-          this.resizePanel() 
-        })
-      }
-    },
+
     getCacheWork(work) {
       let {
         filepath,
@@ -524,14 +533,13 @@ export default {
         },
       };
       if (isStorage) {
-        initData.method = 'dss/datapipe/backgroundservice';
+        initData.method = '/api/rest_j/v1/entrance/backgroundservice';
         initData.data.background = option.backgroundType;
       }
 
       return initData;
     },
     run(option, cb) {
-      this.handleLines = {}
       if (option && option.id === this.script.id) {
         if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
         if (this.scriptViewState.topPanelFull) {
@@ -580,12 +588,12 @@ export default {
             desc: '',
             render: (h) => {
               return h('span', {
-                style: {
-                  'word-break': 'break-all',
-                  'line-height': '20px',
+                  style: {
+                    'word-break': 'break-all',
+                    'line-height': '20px',
+                  },
                 },
-              },
-              `${this.$t('message.scripts.notice.sendStart.render')} ${this.work.filename} ！`
+                `${this.$t('message.scripts.notice.sendStart.render')} ${this.work.filename} ！`
               );
             },
             name,
@@ -625,8 +633,8 @@ export default {
         });
 
         this.execute.on('history', (ret) => {
-          const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
-          const findHis = find(this.script.history, (o) => o.taskID == ret.taskID);
+          const index = findIndex(this.script.history, (o) => o.taskID === ret.taskID);
+          const findHis = find(this.script.history, (o) => o.taskID === ret.taskID);
           let newItem = null;
           // 这里针对的是导入导出脚本，executionCode为object的情况
           const code = typeof (this.script.executionCode) === 'string' && this.script.executionCode ? this.script
@@ -722,10 +730,10 @@ export default {
           });
         });
         this.execute.on('progress', ({
-          progress,
-          progressInfo,
-          waitingSize
-        }) => {
+                                       progress,
+                                       progressInfo,
+                                       waitingSize
+                                     }) => {
           if (this._execute_last_progress === progress) {
             return;
           }
@@ -744,7 +752,7 @@ export default {
               }
             });
           } else {
-            this.script.progress.progressInfo = [];
+            progressInfo = [];
           }
 
           if (progress == 1) {
@@ -812,12 +820,6 @@ export default {
             });
           }
         });
-        this.execute.on('diagnosis', (info) => {
-          this.script.diagnosis = info;
-          // 加入用户名来区分不同账户下的tab
-          this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
-          this.showPanelTab('diagnosis');
-        });
         this.execute.on('WebSocket:send', (data) => {
           this.dispatch('WebSocket:send', data);
         });
@@ -842,14 +844,11 @@ export default {
           });
         });
         this.execute.on('querySuccess', ({
-          type,
-          task
-        }) => {
+                                           type,
+                                           task
+                                         }) => {
           const costTime = util.convertTimestamp(task.costTime);
-          this.script.progress = {
-            ...this.script.progress,
-            costTime
-          };
+          this.script.progress.costTime = costTime;
           const name = this.work.filepath || this.work.filename;
           this.$Notice.close(name);
           this.$Notice.success({
@@ -857,12 +856,12 @@ export default {
             desc: '',
             render: (h) => {
               return h('span', {
-                style: {
-                  'word-break': 'break-all',
-                  'line-height': '20px',
+                  style: {
+                    'word-break': 'break-all',
+                    'line-height': '20px',
+                  },
                 },
-              },
-              `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}：${costTime}！`
+                `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}：${costTime}！`
               );
             },
             name,
@@ -870,10 +869,10 @@ export default {
           });
         });
         this.execute.on('notice', ({
-          type,
-          msg,
-          autoJoin
-        }) => {
+                                     type,
+                                     msg,
+                                     autoJoin
+                                   }) => {
           const name = this.work.filepath || this.work.filename;
           const label = autoJoin ?
             `${this.$root.$t('message.scripts.script')}${this.work.filename} ${msg}` : msg;
@@ -895,27 +894,27 @@ export default {
                   'line-height': '20px',
                 },
               }, label),
-              h('span',{
-                style: {
-                  color: 'red',
-                  position: 'absolute',
-                  right: '10px',
-                  bottom: '0px',
-                  display: 'none',
-                  cursor: 'pointer'
-                },
-                on: {
-                  click: () => {
-                    if (type === 'error') {
-                      // 先根据执行的最新的任务记录获取错误码后查询是否有贴
-                      const failedReason = this.work.data.history[0].failedReason
-                      const errorCode = parseInt(failedReason) || '';
-                      const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
-                      this.checkErrorCode(errorCode, errorDesc);
+                h('span',{
+                  style: {
+                    color: 'red',
+                    position: 'absolute',
+                    right: '10px',
+                    bottom: '0px',
+                    display: 'none',
+                    cursor: 'pointer'
+                  },
+                  on: {
+                    click: () => {
+                      if (type === 'error') {
+                        // 先根据执行的最新的任务记录获取错误码后查询是否有贴
+                        const failedReason = this.work.data.history[0].failedReason
+                        const errorCode = parseInt(failedReason) || '';
+                        const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
+                        this.checkErrorCode(errorCode, errorDesc);
+                      }
                     }
                   }
-                }
-              }, '发布提问')
+                }, '发布提问')
               ])
             },
           });
@@ -963,7 +962,6 @@ export default {
       };
       this.script.logLine = 1;
       this.script.steps = ['Submitted'];
-      this.script.diagnosis = null;
       this.script.resultList = null;
       this._execute_last_progress = null;
     },
@@ -1076,8 +1074,8 @@ export default {
           scriptContent: this.script.data,
           params: this.convertSettingParams(this.script.params),
         };
-          // this.work.code = this.script.data;
-        const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
+        // this.work.code = this.script.data;
+        const isHdfs = false;//this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
           if (this.work.unsave && !isHdfs) {
             if (this.work.filepath) {
@@ -1085,7 +1083,7 @@ export default {
               const timeout = setTimeout(() => {
                 this.saveLoading = true;
               }, 2000);
-                // 保存时更新下缓存。
+              // 保存时更新下缓存。
               if (this.script.data !== this.work.data.data) {
                 this.work.data.data = this.script.data;
               }
@@ -1132,9 +1130,15 @@ export default {
       }
     },
     showPanelTab(type) {
+      let h = this.scriptViewState.topPanelHeight.replace('px', '') - 0
+      let bottomContentHeight = this.scriptViewState.bottomContentHeight
+      if(this.$el && this.$el.clientHeight > 0) {
+        bottomContentHeight = this.$el.clientHeight - h - 75
+      }
       this.scriptViewState = {
         ...this.scriptViewState,
         showPanel: type,
+        bottomContentHeight
       }
       if (type === 'log') {
         this.localLogShow();
@@ -1196,8 +1200,8 @@ export default {
             });
             cb();
           }).catch(() => {
-            cb();
-          });
+          cb();
+        });
       } else {
         this.script.resultSet = resultSet;
         this.script = {
@@ -1391,11 +1395,6 @@ export default {
       if (type === 'log') {
         this.isLogShow = true;
         this.showPanelTab(type);
-      } else if (type === 'diagnosis') {
-        this.getDiagnosis().then((res) => {
-          this.script.diagnosis = res.diagnosticInfo;
-          this.showPanelTab(type);
-        });
       }
     },
     nodeConvertSettingParams(params) {
@@ -1413,9 +1412,6 @@ export default {
         variable,
         configuration,
       };
-    },
-    getDiagnosis() {
-      return api.fetch(`/entrance/${this.execute.id}/runtimeTuning`, 'get');
     },
     convertSettingParams(params) {
       const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
@@ -1436,50 +1432,51 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '@/common/style/variables.scss';
+  @import '@/common/style/variables.scss';
   .editor-panel {
     position: relative;
-    .script-line{
-        position: absolute;
-        width: 100%;
-        height: 6px;
-        left: 0;
-        bottom: -2px;
-        z-index: 3;
-        border-bottom: 1px solid #dcdee2;
-        cursor: ns-resize;
-    }
-    &.full-screen {
-        top: 85px !important;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        position: fixed;
-        z-index: 100;
-        background-color: #fff;
-        height: 100% !important;
-    }
-    .new-sidebar-spin {
-        background-color: rgba(255, 255, 255, .1);
-    }
+  .script-line{
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    left: 0;
+    bottom: -2px;
+    z-index: 3;
+    border-bottom: 1px solid #dcdee2;
+  @include border-color($border-color-base, $dark-base-color);
+  @include bg-color($light-base-color, $dark-base-color);
+    cursor: ns-resize;
+  }
+  &.full-screen {
+     top: 85px;
+     right: 0;
+     bottom: 0;
+     left: 0;
+     position: fixed;
+     z-index: 100;
+     background-color: #fff;
+     height: 100% !important;
+   }
+  .new-sidebar-spin {
+  @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
+  }
   }
   .log-panel {
-    margin-top: 1px;
+    margin-top: 6px;
     border-top: $border-width-base $border-style-base $border-color-base;
-    background-color: $background-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
+    @include bg-color($light-base-color, $dark-base-color);
     .workbench-tabs {
       position: $relative;
       height: 100%;
       overflow: hidden;
       box-sizing: border-box;
       z-index: 3;
-      display: flex;
-      flex-flow: column;
       .workbench-tab-wrapper {
-        height: 34px;
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
+        @include border-color($border-color-base, $dark-menu-base-color);
         &.full-screen {
             position: fixed;
             left: 0;
@@ -1495,7 +1492,7 @@ export default {
           justify-content: flex-start;
           align-items: flex-start;
           height: 32px;
-          background-color: $body-background;
+          @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
           &.work-list-tab {
@@ -1518,21 +1515,24 @@ export default {
             display: inline-block;
             height: 32px;
             line-height: 32px;
-            background-color: $background-color-base;
-            color: $title-color;
+            @include bg-color($light-base-color, $dark-submenu-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
             cursor: pointer;
             min-width: 100px;
             max-width: 200px;
             overflow: hidden;
             margin-right: 2px;
             border: 1px solid #eee;
+            @include border-color($border-color-base, $dark-border-color-base);
             &.active {
               margin-top: 1px;
-              background-color: $body-background;
-              color: $primary-color;
+              @include bg-color($light-base-color, $dark-base-color);
+              @include font-color($primary-color, $dark-primary-color);
               border-radius: 4px 4px 0 0;
-              border: 1px solid $border-color-base;
-              border-bottom: 2px solid $primary-color;
+              border-left: 1px solid $border-color-base;
+              border-right: 1px solid $border-color-base;
+              border-top: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
             }
           }
         }

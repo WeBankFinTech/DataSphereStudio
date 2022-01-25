@@ -22,13 +22,13 @@
           @add-tag="appAddTag"
           @delete-tag="appdDeleteTag"></we-tag>
       </FormItem>
-      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeDesc')">
+      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeDesc')" prop="desc" :rules="descRules">
         <Input v-model="currentNode.desc" type="textarea"
           :placeholder="$t('message.workflow.process.nodeParameter.inputeNodeDesc')" />
       </FormItem>
     </Form>
     <div v-if="currentNodeParamsBaseinfoList.length > 0" class="node-module-param-modal-header">
-      <h3>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h3>
+      <h5>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h5>
     </div>
     <Form v-if="currentNodeParamsBaseinfoList.length > 0 && currentNode.jobParams" label-position="top"
       ref="parameterForm"  class="node-parameter-bar" :model="currentNode">
@@ -128,7 +128,10 @@ export default {
         { required: true, message: this.$t('message.workflow.process.nodeParameter.TXJDMC'), trigger: 'blur' },
         { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.process.nodeParameter.BXYZMKTXHX'), trigger: 'change' },
         { validator: validatorName, trigger: 'blur' },
-        { min: 1, max: 128, message: this.$t('message.workflow.process.nodeParameter.CDZ128ZF'), trigger: 'change' },
+        { min: 1, max: 20, message: this.$t('message.workflow.process.nodeParameter.CDZ20ZF'), trigger: 'change' },
+      ],
+      descRules: [
+        { max: 200, message: `${this.$t('message.workflow.process.nodeParameter.CDZ200ZF')}`,  trigger: 'blur' },
       ],
       resources: [],
       paramsIsChange: false,
@@ -202,11 +205,11 @@ export default {
         if (settings.length > 0) {
           settings.forEach((item) => {
             if (item.key === key) {
-              value =  item.configValue || item.defaultValue;
+              value =  item.value || item.defaultValue;
             }
           });
           if (key === 'wds.linkis.yarnqueue') {
-            value = rst[1].fullTree[0].settings[0].configValue || rst[1].fullTree[0].settings[0].defaultValue;
+            value = rst[1].fullTree[0].settings[0].value || rst[1].fullTree[0].settings[0].defaultValue;
           }
         }
       }

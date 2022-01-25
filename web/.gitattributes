@@ -5,3 +5,5 @@
 *.ttf binary
 *.woff binary
 *.eot binary
+*.woff binary
+*.otf binary

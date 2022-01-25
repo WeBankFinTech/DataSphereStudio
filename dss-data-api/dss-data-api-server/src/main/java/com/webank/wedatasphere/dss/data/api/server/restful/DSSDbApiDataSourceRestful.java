@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;

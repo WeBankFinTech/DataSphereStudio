@@ -1,17 +1,18 @@
 <template>
   <div style="height: 100%" class="exchangisJob">
-    <Row class-name="exchangisContent" :gutter="24">
-      <Col class-name="leftSide" span="4">
+    <Row class-name="exchangisContent" :gutter="32">
+      <Col class-name="leftSide" span="3">
         <Menu mode="vertical" theme="light" width="auto" :active-name="activeProjectId" @on-select="projectSelect">
             <MenuItem :name="project.id" :key="project.id" v-for="project in projects">
                 {{ project.projectName }}
             </MenuItem>
         </Menu>
       </Col>
-      <Col class-name="rightSide" span="16">
+      <Col class-name="rightSide" span="19">
         <Row>
           <div class="title">
             <span>{{ projectTitle + "-任务列表" }}</span>
+            <Button type="primary" @click="handleClick" class="button1">前往Exchangis</Button>
           </div>
           <Table 
             highlight-row 
@@ -143,6 +144,12 @@ export default {
     init(){
       // 获取上次保存的项目ID、任务ID和当前页, 如果不存在则指定项目列表中的第一个值，对应任务列表里的第一个非定时状态任务以及页码
       this.activeProjectId = this.node.params && this.node.params.variable && this.node.params.variable.projectId && (this.node.params.variable.projectId !== '') ? this.node.params.variable.projectId : this.projects[0].id ;
+      let activeProjectId = this.projects.find(item=>{
+        return item.id == this.activeProjectId
+      })
+      if(!activeProjectId){
+        this.activeProjectId = this.projects[0].id
+      }
       this.page.current = this.node.params && this.node.params.variable && this.node.params.variable.current && (this.node.params.variable.current !== '') ? this.node.params.variable.current : 1;
       let params = {
         projectId: this.activeProjectId,
@@ -152,7 +159,13 @@ export default {
         this.page.current = res.response.page
         this.page.total = res.response.totalItems
         this.tableList = res.response.dssExchangeTaskList
-        this.activeJobId = this.node.params && this.node.params.variable && this.node.params.variable.taskId && (this.node.params.variable.taskId !== '') ? this.node.params.variable.taskId : this.tableList.find(item=>{return item.jobStatus == null}).id;
+        this.activeJobId = this.node.params && this.node.params.variable && this.node.params.variable.taskId && (this.node.params.variable.taskId !== '') ? this.node.params.variable.taskId : '';
+        let activeJobId = this.tableList.find(item=>{
+          return item.id == this.activeJobId
+        })
+        if(!activeJobId){
+          this.activeJobId = ''
+        }
         this.tableList = this.tableList.map(item => {
           if(item.id === this.activeJobId){
             item._highlight = true
@@ -339,6 +352,7 @@ export default {
   .exchangisJob{
     height: 100%;
     position: relative;
+    min-width: 1300px;
     .exchangisContent{
       height: 100%;
       .leftSide{
@@ -356,7 +370,12 @@ export default {
           text-align: center;
         }
         .title{
-          margin: 10px 0px 20px 0px;
+          margin: 8px 0px 8px 0px;
+          line-height: 32px;
+          .button1{
+            position: absolute;
+            right: 0;
+          }
         }
         .footer{
           margin-top: 30px;

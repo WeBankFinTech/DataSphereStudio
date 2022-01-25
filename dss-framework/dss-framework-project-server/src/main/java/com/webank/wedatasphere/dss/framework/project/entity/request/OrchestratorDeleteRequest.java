@@ -35,6 +35,16 @@ public class OrchestratorDeleteRequest {
     @NotNull(message = "工程id不能为空")
     private Long projectId;
 
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
+
+    private List<String> dssLabels;
+
     /**
      * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
      */

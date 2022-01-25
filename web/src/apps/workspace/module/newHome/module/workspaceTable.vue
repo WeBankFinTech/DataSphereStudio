@@ -4,8 +4,8 @@
       <div slot="header" @click.stop="createWorkspace">
         <div class="newHome_create">
           <div class="newHome_create_content">
-            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="fi-addproject" color="#2d8cf0"/>
-            <p class="newHome_create_text" style="color:#2d8cf0">
+            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="fi-addproject"/>
+            <p class="newHome_create_text" >
               {{ $t('message.workspace.createWorkspace') }}
             </p>
           </div>
@@ -117,6 +117,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/common/style/variables.scss";
 .workspace-table {
   .desc {
     width: 100%;
@@ -129,7 +130,7 @@ export default {
   cursor: pointer;
   box-sizing: border-box;
   border: 1px dashed #d9d9d9;
-  background:  #F8F9FC;
+  @include border-color($border-color-base, $dark-border-color-base);
   border-radius: 2px;
   position: relative;
   display: flex;

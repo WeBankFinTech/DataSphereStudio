@@ -31,6 +31,15 @@ public class DSSWorkspace {
     private String source;
     private Date lastUpdateTime;
     private String lastUpdateUser;
+    private String workspaceType;
+
+    public String getWorkspaceType() {
+        return workspaceType;
+    }
+
+    public void setWorkspaceType(String workspaceType) {
+        this.workspaceType = workspaceType;
+    }
 
     public int getId() {
         return id;

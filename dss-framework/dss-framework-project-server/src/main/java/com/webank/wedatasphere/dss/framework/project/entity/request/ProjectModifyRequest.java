@@ -34,6 +34,16 @@ public class ProjectModifyRequest {
     @NotNull(message = "应用领域不能为空")
     private String applicationArea;
 
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
+    private String workspaceName;
+
     //业务
     private String business;
 

@@ -66,6 +66,11 @@
             <artifactId>dss-appconn-manager-core</artifactId>
             <version>${dss.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

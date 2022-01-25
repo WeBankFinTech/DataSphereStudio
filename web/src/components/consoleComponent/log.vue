@@ -32,7 +32,7 @@
     <we-editor
       ref="logEditor"
       :value="formattedLogs()"
-      :style="{height: height - 48 + 'px',overflow:'hidden'}"
+      :style="{height: height - 48 + 'px', overflow:'hidden'}"
       @scrollChange="change"
       @onload="editorOnload"
       type="log"/>
@@ -79,6 +79,7 @@ export default {
           h('Badge', {
             props: {
               count: this.errorNum,
+              className: 'err-badge',
               type: 'error'
             },
           }),
@@ -90,6 +91,7 @@ export default {
           h('Badge', {
             props: {
               count: this.warnNum,
+              className: 'warn-badge',
               type: 'warning'
             },
           }),
@@ -111,7 +113,7 @@ export default {
   },
   computed: {
     height() {
-      return this.scriptViewState.bottomContentHeight - 34 // 减去tab高度
+      return this.scriptViewState.bottomContentHeight + 55
     }
   },
   mounted() {
@@ -187,9 +189,10 @@ export default {
       height: 36px;
       line-height: 36px;
       padding-left: 10px;
-      background: $background-color-base;
+      @include bg-color($light-base-color, $dark-submenu-color);
       position: $relative;
       border-bottom: 2px solid $border-color-base;
+      @include border-color($border-color-base, $dark-border-color-base);
       overflow: hidden;
       margin-bottom: -2px;
       .log-tools-control {
@@ -199,6 +202,7 @@ export default {
         .log-tabs {
           display: inline-block;
           position: $absolute;
+          @include font-color($light-text-desc-color, $dark-text-desc-color);
         }
         .log-search {
           width: 100px;
@@ -206,6 +210,12 @@ export default {
           left: 350px;
           top: 5px;
           font-size: $font-size-small;
+        }
+        .err-badge {
+          background: $error-color !important;
+        }
+        .warn-badge {
+          background: $yellow-color !important;
         }
       }
     }

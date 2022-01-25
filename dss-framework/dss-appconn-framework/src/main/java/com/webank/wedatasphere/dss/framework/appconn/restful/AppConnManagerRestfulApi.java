@@ -50,7 +50,9 @@ public class AppConnManagerRestfulApi {
         LOGGER.info("Try to scan AppConn plugins...");
         appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
             LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
-            appConnResourceUploadService.upload(appConnInfo.getAppConnName());
+           if(!"local".equals(System.getProperty("env"))){
+                appConnResourceUploadService.upload(appConnInfo.getAppConnName());
+            }
         }));
         LOGGER.info("All AppConn plugins has scanned.");
     }

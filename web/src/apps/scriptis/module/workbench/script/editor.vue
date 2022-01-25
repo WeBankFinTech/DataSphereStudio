@@ -58,13 +58,16 @@
             <Icon :type="(containerInstance && containerInstance.isTopPanelFull)?'md-contract':'md-expand'" />
             <span class="navbar-item-name">{{ (containerInstance && containerInstance.isTopPanelFull) ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}</span>
           </div>
+          <!--apiPublish隐藏-->
+          <!-- 
           <api-publish
             v-if="isApiPublish && showScriptsType && work.filepath"
             :script="script"
             :work="work"
             :script-type="scriptType"
             @on-save="save">
-          </api-publish>
+          </api-publish> 
+          -->
         </div>
       </div>
     </div>
@@ -95,13 +98,11 @@
 import setting from './setting.vue';
 import api from '@/common/service/api';
 import storage from '@/common/helper/storage';
-import apiPublish from '@/apps/scriptis/components/apiPublish'
 import { throttle } from 'lodash';
 import elementResizeEvent from '@/common/helper/elementResizeEvent';
 export default {
   components: {
     setting,
-    apiPublish,
   },
   inject: {
     containerInstance: {
@@ -139,7 +140,8 @@ export default {
       return this.script.running;
     },
     isHdfs() {
-      return this.work.filepath.indexOf('hdfs') === 0;
+      return false
+      //return this.work.filepath.indexOf('hdfs') === 0;
     },
     isSupport() {
       return this.script.executable;
@@ -293,6 +295,7 @@ export default {
     .editor-content {
       height: calc(100% - 32px);
       display: flex;
+      @include bg-color($light-base-color, $dark-menu-base-color);
     }
   }
   .workbench-body-navbar {
@@ -301,9 +304,10 @@ export default {
     left: 0;
     width: 100%;
     z-index: 2;
-    background-color: #fff;
+    @include bg-color($light-base-color, $dark-menu-base-color);
     padding: 0 4px;
     border-bottom: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-menu-base-color);
     height: 32px;
     line-height: 32px;
     display: flex;
@@ -318,14 +322,14 @@ export default {
   .workbench-body-navbar-item {
     margin: 0 16px;
     cursor: pointer;
-    color: rgba($text-color, 0.8);
+    @include font-color($light-text-color, $dark-text-color);
     &.disabled {
-      color: rgba($text-color, 0.5);
+      @include font-color($light-text-desc-color, $dark-text-desc-color);
     }
     &:hover {
-      color: $link-active-color;
+      @include font-color($primary-color, $dark-primary-color);
         &.disabled {
-          color: rgba($text-color, 0.5);
+          @include font-color($light-text-desc-color, $dark-text-desc-color);
       }
     }
     .ivu-icon {

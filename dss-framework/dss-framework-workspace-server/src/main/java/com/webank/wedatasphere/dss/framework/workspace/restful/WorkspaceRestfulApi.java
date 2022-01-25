@@ -21,27 +21,24 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Homepag
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddFavoriteRequest;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codehaus.jackson.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * Created by schumiyi on 2020/6/19
+ */
 @RestController
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 public class WorkspaceRestfulApi {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkspaceRestfulApi.class);
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
 
@@ -66,27 +63,37 @@ public class WorkspaceRestfulApi {
     }
 
     @RequestMapping(path ="/workspaces/exists", method = RequestMethod.GET)
-    public Message getUsernameExistence(HttpServletRequest req, @RequestParam(required = false, name = "name") String name) {
+    public Message getUsernameExistence(HttpServletRequest req,@RequestParam(required = false, name = "name") String name) {
         boolean exists = dssWorkspaceService.existWorkspaceName(name);
         return Message.ok().data("workspaceNameExists", exists);
     }
 
-    @RequestMapping(path = "/workspaces", method = RequestMethod.POST)
-    public Message addWorkspace(HttpServletRequest req,
-                                @RequestBody AddWorkspaceRequest addWorkspaceRequest) throws ErrorException {
-        String name = addWorkspaceRequest.getName();
-        String department = addWorkspaceRequest.getDepartment();
-        String label = addWorkspaceRequest.getLabel();
-        String description = addWorkspaceRequest.getDescription();
+    @RequestMapping(path ="/workspaces", method = RequestMethod.POST)
+    public Message addWorkspace(HttpServletRequest req, @RequestBody Map<String,String> json) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
-        if (!dssWorkspaceService.checkAdmin(userName)) {
+        if (!dssWorkspaceService.checkAdmin(userName)){
             return Message.error("您好，您不是管理员,没有权限建立工作空间");
+
         }
+    /*    String name = json.get("name").getTextValue();
         if (dssWorkspaceService.existWorkspaceName(name)) {
             return Message.error("工作空间名重复");
         }
+        String department = String.valueOf(json.get("department").getIntValue());
+        String label = json.get("label").getTextValue();
+        String description = json.get("description").getTextValue();
+        String workspaceType = json.get("workspace_type").getTextValue();*/
+        String name = json.get("name");
+        if (dssWorkspaceService.existWorkspaceName(name)) {
+            return Message.error("工作空间名重复");
+        }
+        String department = json.get("department");
+        String label = json.get("label");
+        String description = json.get("description");
+        String workspaceType = json.get("workspace_type");
+
         String productName = "DSS";
-        int workspaceId = dssWorkspaceService.createWorkspace(name, label, userName, description, department, productName);
+        int workspaceId = dssWorkspaceService.createWorkspace(name, label, userName, description, department, productName,workspaceType);
         return Message.ok().data("workspaceId", workspaceId);
     }
 
@@ -125,11 +132,21 @@ public class WorkspaceRestfulApi {
     }
 
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites", method = RequestMethod.GET)
-    public Message getWorkspaceFavorites(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
+    public Message getWorkspaceFavorites(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,@RequestParam(value = "type",required = false) String type) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese);
+        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese,type==null ? "":type);
+        Set<WorkspaceFavoriteVo> favoriteVos = new HashSet<>(favorites);
+        return Message.ok().data("favorites", favoriteVos);
+    }
+
+    @RequestMapping(path ="/workspaces/{workspaceId}/components", method = RequestMethod.GET)
+    public Message getWorkspaceComponent(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,@RequestParam(value = "type",required = false) String type) {
+        String header = req.getHeader("Content-language").trim();
+        boolean isChinese = "zh-CN".equals(header);
+        String username = SecurityFilter.getLoginUsername(req);
+        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese,type==null ? "":type);
         Set<WorkspaceFavoriteVo> favoriteVos = new HashSet<>(favorites);
         return Message.ok().data("favorites", favoriteVos);
     }
@@ -138,22 +155,42 @@ public class WorkspaceRestfulApi {
      * 应用加入收藏，返回收藏后id
      *
      * @param req
+     * @param json
      * @return
      */
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites", method = RequestMethod.POST)
-    public Message addFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId,
-                               @RequestBody AddFavoriteRequest addFavoriteRequest) {
+    public Message addFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @RequestBody Map<String,String> json) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, addFavoriteRequest.getMenuApplicationId());
+//        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
+        Long menuApplicationId = Long.valueOf(json.get("menuApplicationId"));
+        String type = json.get("type") == null ? "":json.get("type");
+        Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId,type);
+        return Message.ok().data("favoriteId", favoriteId);
+    }
+
+
+    @RequestMapping(path ="/workspaces/{workspaceId}/favorites/{applicationId}", method = RequestMethod.POST)
+    public Message deleteFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("applicationId") Long applicationId,@RequestBody Map<String,String> json) {
+        String username = SecurityFilter.getLoginUsername(req);
+        String type = json.get("type") == null ? "":json.get("type");
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId,type);
+        return Message.ok().data("favoriteId", favoriteId);
+    }
+
+
+    @RequestMapping(path ="/workspaces/{workspaceId}/favorites/{applicationId}", method = RequestMethod.GET)
+    public Message deleteFavorite1(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("applicationId") Long applicationId,@RequestParam(value = "type",required = false) String type) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId,type);
         return Message.ok().data("favoriteId", favoriteId);
     }
 
     @RequestMapping(path ="/workspaces/{workspaceId}/favorites/{favouritesId}", method = RequestMethod.DELETE)
-    public Message deleteFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("favouritesId") Long favouritesId) {
-        LOGGER.info("deleteFavorite--workspaceId={}--favouritesId={}",workspaceId,favouritesId);
+    public Message deleteFavorite2(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("favouritesId") Long favouritesId,@RequestParam(value = "type",required = false) String type) {
         String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.deleteFavorite(username, favouritesId);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, favouritesId,workspaceId,type);
         return Message.ok().data("favoriteId", favoriteId);
     }
+
 
 }

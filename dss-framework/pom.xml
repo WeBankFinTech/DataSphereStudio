@@ -35,6 +35,7 @@
         <module>framework-plugins/dss-framework-orchestrator-publish</module>
         <module>dss-framework-orchestrator-server</module>
         <module>dss-framework-project-server</module>
+        <module>dss-framework-ctyun-service</module>
     </modules>
 
 </project>

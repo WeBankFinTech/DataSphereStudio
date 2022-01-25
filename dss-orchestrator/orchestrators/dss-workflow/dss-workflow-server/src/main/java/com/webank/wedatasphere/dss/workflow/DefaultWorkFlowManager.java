@@ -28,8 +28,11 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRefImpl;
@@ -39,12 +42,15 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryU
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +83,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Autowired
     private MetaInputService metaInputService;
+    @Autowired
+    private PublishService publishService;
 
     private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
@@ -201,15 +209,40 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         return rootFlows;
     }
 
+
+    @Autowired
+    private OrchestratorMapper orchestratorMapper;
+
     @Override
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException {
         //TODO try to optimize it by select db in batch.
         List<DSSOrchestration> flows = requestConversionWorkflow.getOrcAppIds().stream().map(flowService::getFlowWithJsonAndSubFlowsByID).collect(Collectors.toList());
-        SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+
+        Map<Long, OrchestratorReleaseInfo> releaseInfoMap = new HashMap<>();
+        Map<Long, Long> schedulerWorkflowIdMap = new HashMap<>();
+        flows.stream().forEach(flow -> {
+            DSSOrchestratorVersion orchestratorVersion =
+                    orchestratorMapper.getOrchestratorVersionByAppId(flow.getId());
+            releaseInfoMap.put(flow.getId(),
+                    OrchestratorReleaseInfo.newInstance(orchestratorVersion.getOrchestratorId(),
+                            orchestratorVersion.getId(), orchestratorVersion.getVersion(), flow.getId()));
+            // 如果发布过，记录调度系统中对应的工作流id
+            OrchestratorReleaseInfo releaseInfo =
+                    orchestratorMapper.getByOrchestratorId(orchestratorVersion.getOrchestratorId());
+            if (releaseInfo != null) {
+                schedulerWorkflowIdMap.put(flow.getId(), releaseInfo.getSchedulerWorkflowId());
+            }
+        });
+
+        SchedulerAppConn appConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
+                .getAppConn(DSSWorkFlowConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+        if (appConn == null) {
+            appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+        }
 //        List<AppInstance> appInstances = appConn.getAppDesc().getAppInstancesByLabels(requestConversionWorkflow.getDSSLabels());
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
         DSSToRelConversionOperation operation = appConn.getOrCreateWorkflowConversionStandard()
-            .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
+                .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
         DSSToRelConversionRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRef(DSSToRelConversionRequestRef.class, appConn.getAppDesc().getAppName());
         if(requestRef instanceof ProjectToRelConversionRequestRefImpl) {
             ProjectToRelConversionRequestRefImpl relConversionRequestRef = (ProjectToRelConversionRequestRefImpl) requestRef;
@@ -217,16 +250,43 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             relConversionRequestRef.setDSSOrcList(flows);
             relConversionRequestRef.setUserName(requestConversionWorkflow.getUserName());
             relConversionRequestRef.setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
+            relConversionRequestRef.setParameter("schedulerWorkflowIdMap", schedulerWorkflowIdMap);
         }
         try{
             ResponseRef responseRef = operation.convert(requestRef);
             if(responseRef.isFailed()) {
                 return ResponseOperateOrchestrator.failed(responseRef.getErrorMsg());
             }
+
+            // 发布成功的工作流信息
+            Map<String, Object> result = responseRef.toMap();
+            result.keySet().stream().forEach(flowId -> {
+                Long workflowId = Long.valueOf(flowId);
+                OrchestratorReleaseInfo releaseInfo = releaseInfoMap.get(workflowId);
+                OrchestratorReleaseInfo latestOrchestratorReleaseInfo =
+                        orchestratorMapper.getByOrchestratorId(releaseInfo.getOrchestratorId());
+
+                Long schedulerWorkflowId = Double.valueOf(String.valueOf(result.get(flowId))).longValue();
+                if (latestOrchestratorReleaseInfo == null) { // 未发布过，插入记录
+                    releaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
+                    orchestratorMapper.insert(releaseInfo);
+                } else {
+                    latestOrchestratorReleaseInfo.setOrchestratorVersionId(releaseInfo.getOrchestratorVersionId());
+                    latestOrchestratorReleaseInfo.setOrchestratorVersion(releaseInfo.getOrchestratorVersion());
+                    latestOrchestratorReleaseInfo.setSchedulerWorkflowId(schedulerWorkflowId);
+                    latestOrchestratorReleaseInfo.setUpdateTime(new Date());
+                    orchestratorMapper.update(latestOrchestratorReleaseInfo);
+                }
+            });
             return ResponseOperateOrchestrator.success();
         }catch (Exception e){
             logger.error("convertWorkflow error:",e);
             return ResponseOperateOrchestrator.failed(e.getMessage());
         }
+    }
+
+    @Override
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws DSSErrorException {
+        return publishService.getSchedulerWorkflowStatus(username, orchestratorId);
     }
 }

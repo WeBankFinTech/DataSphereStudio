@@ -103,7 +103,7 @@ export default {
     },
     confirmAdd() {
       if (this.batchFields) {
-        this.batchFields.split(',').forEach(item => 
+        this.batchFields.split(',').forEach(item =>
           this.target.newFieldsData.fields.push({
             name: item.replace(/(^\s*)|(\s*$)/g,""),
             type: 'string',

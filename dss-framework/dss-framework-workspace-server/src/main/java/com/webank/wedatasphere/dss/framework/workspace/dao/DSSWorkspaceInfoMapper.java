@@ -28,7 +28,7 @@ public interface DSSWorkspaceInfoMapper {
     String getWorkspaceNameById(@Param("workspaceId") int workspaceId);
 
     @Select("select id from dss_workspace where name = #{workspaceName}")
-    int getWorkspaceIdByName(@Param("workspaceName") String workspaceName);
+    Integer getWorkspaceIdByName(@Param("workspaceName") String workspaceName);
 
     @Select("select * from dss_workspace where id = #{workspaceId}")
     @Results({

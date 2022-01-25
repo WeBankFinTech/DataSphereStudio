@@ -32,7 +32,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +51,7 @@ public class DSSDbApiAuthRestful {
     private ApiAuthService apiAuthService;
     
     @RequestMapping(path ="save", method = RequestMethod.POST)
-    public Message saveApiAuth(@Context HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
+    public Message saveApiAuth(HttpServletRequest request, @RequestBody ApiAuth apiAuth) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
         if(apiAuth.getId() ==null) {
             String token = DigestUtils.md5Hex(UUID.randomUUID().toString());

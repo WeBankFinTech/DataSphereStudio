@@ -30,6 +30,7 @@ dss-appconn/dss-scheduler-appconn/target
 
 # dss-apps
 dss-apps/dss-apiservice-server/target
+dss-apps/dss-datapipe-server/target
 
 # dss-commons
 dss-commons/dss-common/target

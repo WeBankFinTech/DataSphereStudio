@@ -72,4 +72,16 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
     @Update("update dss_appconn_project_relation set appconn_instance_project_id = #{schedulisProjectId} WHERE appconn_instance_id = 1 AND  project_id = #{projectId} ")
     int updateSchedulisProjectId(@Param("schedulisProjectId")Long schedulisProjectId,@Param("projectId")Long projectId);
+
+    List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
+
+    void updateDssWorkflowName(@Param("id") Long id, @Param("name") String name);
+
+    @Select("SELECT 1 FROM dss_project_orchestrator WHERE project_id = #{projectId} LIMIT 1")
+    Long hasOrchestrator(Long projectId);
+
+    @Update("DELETE FROM dss_project where `id` = #{projectId}")
+    void deleteProjectInfo(@Param("projectId") Long projectId);
+
+
 }

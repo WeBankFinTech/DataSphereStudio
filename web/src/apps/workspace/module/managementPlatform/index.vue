@@ -112,8 +112,7 @@ const menu = [
       },
       { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
       // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
-      { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
+      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" }
     ],
   },
   {
@@ -129,6 +128,11 @@ const menu = [
   {
     title: "知识库",
     icon: "question",
+    nodes: [],
+  },
+  {
+    title: "下载审计",
+    icon: "audit",
     nodes: [],
   }
 ];
@@ -191,7 +195,9 @@ export default {
     handleSidebarToggle(title) {
       this.currentHeader = title;
       if (title === this.defaultMenu.title) {
-        this.sidebarFold = !this.sidebarFold;
+        if(this.defaultMenu.title !== "下载审计"){
+          this.sidebarFold = !this.sidebarFold;
+        }
       } else {
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
@@ -199,6 +205,10 @@ export default {
           this.$router.push("guide");
         } else if (this.defaultMenu.title == "知识库") {
           this.$router.push("library");
+        }else if(this.defaultMenu.title == "下载审计"){
+          this.sidebarFold = true
+          let node = { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
+          this.handleTreeClick(node)
         }
       }
     },

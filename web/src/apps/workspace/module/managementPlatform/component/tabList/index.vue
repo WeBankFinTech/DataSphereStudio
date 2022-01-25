@@ -46,7 +46,7 @@
     </div>
     <div
       class="management-platform-container-list"
-      :class="{ consoleStyle: header == '控制台' }"
+      :class="{ consoleStyle: header == '控制台' || header == '下载审计'}"
       v-else
     >
       <!-- 面包屑  管理台和组件接入模块拥有 -->
@@ -102,6 +102,9 @@ export default {
     currentTab: {
       type: null,
     },
+  },
+  created(){
+    
   },
   watch: {
     header(newVal) {

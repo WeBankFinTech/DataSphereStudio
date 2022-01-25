@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -58,11 +59,14 @@ public interface WorkspaceMapper {
     List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
     List<OnestopMenuAppInstanceVo> getMenuAppInstancesEn(Long id);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 
     void addFavorite(DSSFavorite dssFavorite);
 
-    void deleteFavorite(Long favouritesId);
+    void deleteFavorite(@Param("username") String username,@Param("applicationId") Long applicationId, @Param("workspaceId") Long workspaceId,@Param("type") String type);
+
+    String getDepartName(@Param("id") Long id);
+    List<DSSWorkspaceUser01> getWorkspaceUsers(@Param("id") Long id);
 }

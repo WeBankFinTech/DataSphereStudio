@@ -1,13 +1,15 @@
-@import '@/common/style/variables.scss';
+@import "@/common/style/variables.scss";
 
 .newHome_page {
-  background-color: #f7f7f7;
-  background: #fff;
+  // background-color: #f4f7fb;
+  // background: #f4f7fb;
+  @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
   height: 100%;
-  color: rgba(0,0,0,0.85);
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
   padding: 25px;
   display: flex;
   flex-direction: column;
+
   .newHome_header {
     flex: none;
     .newHome_info {
@@ -16,18 +18,20 @@
       }
       p {
         font-size: $font-size-base;
-        margin: 25px 0;
-        color: rgba(0,0,0,0.5);
+        margin: 12px 0 24px;
+        // color: rgba(0, 0, 0, 0.5);
+        @include font-color($light-text-desc-color, $dark-text-desc-color);
       }
     }
   }
+
   .newHome_main {
     flex: 1;
     display: flex;
     align-items: flex-start;
     min-width: 900px;
     height: 700px;
-    background: #FFFFFF;
+    padding-bottom: 20px;
     .newHome_main_left {
       flex: 1;
       height: 100%;
@@ -35,9 +39,14 @@
       overflow-y: auto;
       padding: 25px;
       box-sizing: border-box;
-      border: 1px solid #DEE4EC;
+      border: 1px solid #dee4ec;
       border-radius: 2px;
       min-width: 640px;
+
+      // background: #f4f7fb;
+      // background: #ffffff;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include border-color($border-color-base, $dark-border-color-base);
       .newHome_title_search {
         display: flex;
         justify-content: space-between;
@@ -46,10 +55,12 @@
         .left_header {
           flex: none;
           font-size: $font-size-large;
-          color: $text-title-color;
+          // color: $text-title-color;
+          @include font-color($workspace-title-color, $dark-workspace-title-color);
           padding-left: 10px;
           line-height: 1;
           border-left: 3px solid $primary-color;
+          @include border-color($primary-color, $dark-primary-color);
         }
         .left_search {
           flex: none;
@@ -58,13 +69,23 @@
           align-items: center;
           .header-search {
             flex: 50%;
+            /deep/.ivu-input {
+              @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+              @include border-color($border-color-base, $dark-border-color-base);
+            }
+
           }
         }
+
         .left_visual {
           margin-right: 15px;
           font-size: 14px;
-          color: $text-desc-color;
+          // color: $text-desc-color;
+          @include font-color($light-text-color, $dark-text-color);
           cursor: pointer;
+          /deep/.visualCatesIcon {
+            @include font-color($light-text-color, $dark-text-color);
+          }
         }
       }
       .newHome_list {
@@ -75,12 +96,13 @@
         }
         .newHome_create {
           cursor: pointer;
-          width: 345px;
+          min-width: 320px;
           height: 116px;
           margin-bottom: 25px;
           box-sizing: border-box;
           border: 1px dashed #d9d9d9;
-          background:  #F8F9FC;
+          @include border-color($border-color-base, $dark-border-color-base);
+          @include bg-color($workflow-body-bg-color, $dark-workflow-body-bg-color);
           border-radius: 2px;
           padding: 10px;
           position: relative;
@@ -106,19 +128,25 @@
             }
           }
         }
-        .newHome_list_item{
+        .newHome_list_item {
           cursor: pointer;
-          width: 345px;
+          min-width: 320px;
           height: 116px;
           margin-bottom: 25px;
           box-sizing: border-box;
-          border: 1px solid #DEE4EC;
+          border: 1px solid #dee4ec;
+          @include border-color($border-color-base, $dark-border-color-base);
           border-radius: 2px;
           padding: 25px;
           position: relative;
-          background: url("../../assets/images/bgc-imag.svg")  center center no-repeat;
+          background: url("../../assets/images/bgc-imag.svg") center center
+            no-repeat;
           background-size: 100%;
           margin-right: 25px;
+
+          :last-child {
+            margin-right: 0;
+          }
           &:hover {
             box-shadow: 0 2px 12px 0 $shadow-color;
             border-radius: $border-radius-small;
@@ -134,12 +162,15 @@
             align-items: flex-start;
             .name {
               flex: 1;
+              max-width: 172px;
+              white-space: nowrap;
               font-weight: 600;
               overflow: hidden;
               text-overflow: ellipsis;
               font-family: PingFangSC-Medium;
               font-size: 18px;
               color: $text-title-color;
+              @include font-color($workspace-title-color, $dark-workspace-title-color);
               line-height: 24px;
               margin-top: 5px;
             }
@@ -155,7 +186,8 @@
             word-break: break-all;
             font-family: PingFangSC-Regular;
             font-size: 14px;
-            color: rgba(0,0,0,0.45);
+            // color: rgba(0, 0, 0, 0.45);
+            @include font-color($light-text-desc-color, $dark-text-desc-color);
             line-height: 22px;
             margin-top: 8px;
           }
@@ -171,12 +203,14 @@
             .item {
               display: inline-block;
               font-size: 10px;
-              padding: .3em .9em;
-              margin: 0 .5em .5em 0;
+              padding: 0.3em 0.9em;
+              margin: 0 0.5em 0.5em 0;
               white-space: nowrap;
-              background-color: #f1f8ff;
+              // background-color: #f1f8ff;
+              @include bg-color($workspace-background, $dark-workspace-background);
               border-radius: $border-radius-small;
-              color: $primary-color;
+              // color: $primary-color;
+              @include font-color($primary-color, $dark-primary-color);
               overflow: hidden;
               text-overflow: ellipsis;
               max-width: 31%;
@@ -204,19 +238,40 @@
       overflow-y: auto;
       padding: 25px;
       box-sizing: border-box;
-      border: 1px solid #DEE4EC;
+      border: 1px solid #dee4ec;
       border-radius: 2px;
+      // background: #ffffff;
+      @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
+      @include border-color($border-color-base, $dark-border-color-base);
       .right_header {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
+      .permissions_wrap {
+        display: flex;
+        justify-content: flex-start;
+        .permissions_entry {
+          cursor: pointer;
+          text-align: center;
+          padding: 10px 0;
+          & img {
+            width: 80px;
+          }
+          & div {
+            margin-top: 5px;
+          }
+        }
+      }
+
       .title {
         font-size: $font-size-large;
-        color: rgba(0,0,0,0.85);
+        // color: rgba(0, 0, 0, 0.85);
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
         padding-left: 10px;
         line-height: 1;
         border-left: 3px solid $primary-color;
+        @include border-color($primary-color, $dark-primary-color);
       }
       .video-title {
         padding: 5px 0;
@@ -224,14 +279,15 @@
         font-size: 12px;
       }
       .video-item {
-        background: #f2f2f2;
+        // background: #f2f2f2;
+        @include bg-color($workspace-background, $dark-workspace-background);
         margin-bottom: 20px;
         cursor: pointer;
       }
+
       video {
-        pointer-events: none
+        pointer-events: none;
       }
     }
   }
-
 }

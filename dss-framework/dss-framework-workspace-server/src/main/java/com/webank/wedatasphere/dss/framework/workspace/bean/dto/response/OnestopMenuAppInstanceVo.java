@@ -30,6 +30,7 @@ public class OnestopMenuAppInstanceVo {
     private String projectUrl;
     private String name;
     private Boolean isActive;
+    private Boolean accessable;
     private String icon;
     private Integer order;
     private Map<String, String> nameAndUrls;
@@ -154,5 +155,13 @@ public class OnestopMenuAppInstanceVo {
 
     public void setNameAndUrls(Map<String, String> nameAndUrls) {
         this.nameAndUrls = nameAndUrls;
+    }
+
+    public Boolean getAccessable() {
+        return accessable;
+    }
+
+    public void setAccessable(Boolean accessable) {
+        this.accessable = accessable;
     }
 }

@@ -8,7 +8,7 @@ object MessageUtils {
   implicit def messageToResponse(message: Message): Response =
     Response.status(messageToHttpStatus(message)).entity(message).build()
 
-  implicit def responseToMessage(response: Response): Message = response.readEntity(classOf[Message])
+  //implicit def responseToMessage(response: Response): Message = response.readEntity(classOf[Message])
 
   def messageToHttpStatus(message: Message): Int = message.getStatus match {
     case -1 => 401

@@ -43,16 +43,18 @@ export default {
     position: absolute;
     margin-left: -40px;
     padding-top: 10px;
-    background: #fff;
+    @include bg-color($light-base-color, $dark-submenu-color);
     border-right: 1px solid #dcdee2;
+    @include border-color($border-color-base, $dark-submenu-color);
     li {
+      @include font-color($light-text-color, $dark-text-color);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 6px 2px;
       cursor: pointer;
       &:hover {
-        color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
       }
     }
   }

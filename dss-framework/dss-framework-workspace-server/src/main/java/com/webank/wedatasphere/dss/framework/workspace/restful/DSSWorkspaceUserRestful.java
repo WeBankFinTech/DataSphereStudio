@@ -17,10 +17,12 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -66,6 +68,7 @@ public class DSSWorkspaceUserRestful {
             //默认改成20
             pageSize = 20;
         }
+        pageSize = 500;
         if(StringUtils.isNotEmpty(roleName)){
             //如果roleName不是空的话，就按照roleName来吧
             List<Long> totals = new ArrayList<>();
@@ -78,10 +81,10 @@ public class DSSWorkspaceUserRestful {
             return Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0));
         }else{
             List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUserVO> workspaceUsers =
+            List<DSSWorkspaceUser01> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
-            PageInfo<DSSWorkspaceUserVO> pageInfo = new PageInfo<>(workspaceUsers);
-            List<DSSWorkspaceUserVO> list = pageInfo.getList();
+            PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
+            List<DSSWorkspaceUser01> list = pageInfo.getList();
             long total = pageInfo.getTotal();
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
             return Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0));
@@ -89,10 +92,12 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path ="getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
-        String username = SecurityFilter.getLoginUsername(request);
-        List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
-        return Message.ok().data("users", users);
+    public Message getAllWorkspaceUsers(@Context HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId ){
+        DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
+        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
+        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+        return Message.ok().data("users", dssWorkspaceUsersVo);
     }
 
     @RequestMapping(path ="addWorkspaceUser", method = RequestMethod.POST)
@@ -101,8 +106,10 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
-        String userName = updateWorkspaceUserRequest.getUsername();
-        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator);
+        String userName = updateWorkspaceUserRequest.getUserName();
+        String userId = updateWorkspaceUserRequest.getUserId();
+
+        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator,userId);
         return Message.ok();
     }
 
@@ -111,7 +118,7 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
-        String userName = updateWorkspaceUserRequest.getUsername();
+        String userName = updateWorkspaceUserRequest.getUserName();
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
     }

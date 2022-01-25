@@ -45,6 +45,16 @@ public class ProjectResponse implements Serializable {
     //工程修改时间
     private Date updateTime;
 
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    private Boolean editable;
+
     /**
      * 发布用户 list
      */
@@ -217,6 +227,7 @@ public class ProjectResponse implements Serializable {
                 ", accessUsers=" + accessUsers +
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
+                ", editable=" + editable +
                 '}';
     }
 }

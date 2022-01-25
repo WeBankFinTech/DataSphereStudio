@@ -23,12 +23,12 @@
         <we-menu-item
           v-if="!isLeaf && !model"
           @select="openModal(true, 'fn')">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.addFunction') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.addFunction') }}</span> <!-- 新增函数 -->
         </we-menu-item>
         <we-menu-item
           v-if="!isLeaf && !model"
           @select="openModal(true, 'folder')">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.addFolder') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.addFolder') }}</span> <!-- 新增文件夹 -->
         </we-menu-item>
         <we-menu-item
           v-if="!isLeaf"
@@ -36,22 +36,22 @@
         <we-menu-item
           v-if="!isRoot && !model"
           @select="openDeleteModal">
-          <span>{{ $t('message.scripts.constants.delete') }}</span>
+          <span>{{ $t('message.scripts.constants.delete') }}</span> <!-- 删除 -->
         </we-menu-item>
         <we-menu-item
           v-if="isLeaf && !model"
           @select="openModal(false, 'fn')">
-          <span>{{ $t('message.scripts.constants.update') }}</span>
+          <span>{{ $t('message.scripts.constants.update') }}</span> <!-- 更新 -->
         </we-menu-item>
         <we-menu-item
           v-if="!isLeaf && !isRoot && !model"
           @select="openModal(false, 'folder')">
-          <span>{{ $t('message.scripts.constants.rename') }}</span>
+          <span>{{ $t('message.scripts.constants.rename') }}</span> <!-- 重命名 -->
         </we-menu-item>
         <we-menu-item
           v-if="isUdfManager && isUnShare"
           @select="openShareModal(true)">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.share') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwn.share') }}</span> <!-- 共享 -->
         </we-menu-item>
       </template>
       <template v-if="isLeaf">
@@ -59,23 +59,23 @@
           v-if="isOwn"
           class="ctx-divider"/>
         <we-menu-item @select="copyName">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isLeaf.copyName') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isLeaf.copyName') }}</span> <!-- 复制函数名 -->
         </we-menu-item>
         <we-menu-item @select="pasteName">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isLeaf.pasteName') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isLeaf.pasteName') }}</span> <!-- 复制函数并粘贴至脚本 -->
         </we-menu-item>
       </template>
       <template v-if="isLeaf && isOwn && currentNode.data.shared">
         <we-menu-item @select="handleExpired">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwnAndLeaf.updateToExpired') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwnAndLeaf.updateToExpired') }}</span> <!-- 修改为过期 -->
         </we-menu-item>
         <we-menu-item @select="openShareModal(false)">
-          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwnAndLeaf.viewSharedUsers') }}</span>
+          <span>{{ $t('message.scripts.fnSideBar.contextMenu.isOwnAndLeaf.viewSharedUsers') }}</span> <!-- 查看已共享的用户 -->
         </we-menu-item>
       </template>
       <template v-if="!isLeaf">
         <we-menu-item @select="refresh">
-          <span>{{ $t('message.scripts.constants.refresh') }}</span>
+          <span>{{ $t('message.scripts.constants.refresh') }}</span> <!-- 刷新 -->
         </we-menu-item>
       </template>
     </we-menu>
@@ -449,8 +449,8 @@ export default {
         this.loading = false;
       });
     },
-    openShareModal(flag) {
-      if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.waiting'));
+    openShareModal(flag) { // 点击共享显示true 点击查看已共享的用户显示false
+      if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.waiting')); // 请等待接口返回
       this.treeLoading = true;
       this.compLoading = true;
       const node = this.fnTree.find((item) => item.type === 'share');
@@ -470,6 +470,7 @@ export default {
             this.$refs.share.open({ tree: list, node: this.currentNode, isView: !flag, shareUser: rst.shareUsers.toString() });
           });
         }
+        list=[{"name": "共享函数", "id": 3}, {"name": "BDAP函数", "id": 2}]
         this.$refs.share.open({ tree: list, node: this.currentNode, isView: !flag });
       }).catch(() => {
         this.treeLoading = false;

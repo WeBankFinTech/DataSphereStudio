@@ -71,6 +71,12 @@
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -109,6 +115,11 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-appconn-manager-client</artifactId>
             <version>${dss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -174,15 +185,6 @@
                     <include>**/*.yml</include>
                 </includes>
             </resource>
-
-           <!-- <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.yml</include>
-                </includes>
-            </resource>-->
         </resources>
     </build>
 

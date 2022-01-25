@@ -42,6 +42,7 @@ public class DSSMenu implements Serializable {
     private String url;
     private String icon;
     private int applicationId;
+    private int menuApplicationId;
 
     public String getComment() {
         return comment;
@@ -139,6 +140,14 @@ public class DSSMenu implements Serializable {
         this.applicationId = applicationId;
     }
 
+    public int getMenuApplicationId() {
+        return menuApplicationId;
+    }
+
+    public void setMenuApplicationId(int menuApplicationId) {
+        this.menuApplicationId = menuApplicationId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -155,6 +164,7 @@ public class DSSMenu implements Serializable {
                 isActive == dssMenu.isActive &&
                 isComponent == dssMenu.isComponent &&
                 applicationId == dssMenu.applicationId &&
+                menuApplicationId == dssMenu.menuApplicationId &&
                 Objects.equal(name, dssMenu.name) &&
                 Objects.equal(frontName, dssMenu.frontName) &&
                 Objects.equal(description, dssMenu.description) &&
@@ -164,6 +174,6 @@ public class DSSMenu implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, name, level, upperMenuId, frontName, description, isActive, isComponent, url, icon, applicationId);
+        return Objects.hashCode(id, name, level, upperMenuId, frontName, description, isActive, isComponent, url, icon, applicationId, menuApplicationId);
     }
 }

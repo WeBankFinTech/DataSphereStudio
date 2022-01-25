@@ -27,7 +27,7 @@
 .we-tree-node {
   background-color: transparent;
   .we-tree-node__content {
-    color: $text-origin-color;
+    @include font-color($light-text-color, $dark-text-color);
     outline: none;
     user-select: none;
     display: flex;
@@ -119,7 +119,8 @@
       .we-tree-node__view {
         width: 25px;
         height: 25px;
-        background: #fff;
+        // background: #fff;
+        @include bg-color($light-base-color, $dark-menu-base-color);
         float: right;
         position: absolute;
         top: 0;
@@ -152,6 +153,7 @@
         width: 96%;
         height: 20px;
         border: 1px solid $line-color;
+        @include border-color($border-color-base, $dark-border-color-base);
         outline: none;
         box-sizing: border-box;
       }
@@ -160,6 +162,7 @@
         width: 96%;
         height: 20px;
         border: 1px solid $line-color;
+        @include border-color($border-color-base, $dark-border-color-base);
         outline: none;
         box-sizing: border-box;
       }
@@ -211,7 +214,8 @@
 
 .we-tree-node.is-current {
   >.we-tree-node__content {
-    background-color:  $grey-bg-color;
+    // background-color:  $grey-bg-color;
+    @include bg-color($grey-bg-color, $dark-active-menu-item);
   }
 }
 

@@ -16,27 +16,41 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.contant.DSSProjectConstant;
 import com.webank.wedatasphere.dss.framework.project.contant.OrchestratorTypeEnum;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSOrchestratorMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.DefaultOrchestratorCreateRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
@@ -51,16 +65,12 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRe
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.linkis.common.exception.ErrorException;
 
 
 public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestratorService {
@@ -73,6 +83,8 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
     private DSSOrchestratorService orchestratorService;
     @Autowired
     private DSSProjectService projectService;
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -101,6 +113,7 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
         try {
             OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                     getType(OrchestratorTypeEnum.getTypeByKey(orchestratorCreateRequest.getOrchestratorMode()));
+
             List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
             OrchestratorCreateRequestRef orchestratorCreateRequestRef = null;
             String appconnName = "workflow";
@@ -171,6 +184,7 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
             OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                     getType(OrchestratorTypeEnum.getTypeByKey(orchestratorModifyRequest.getOrchestratorMode()));
             List<DSSLabel> dssLabels = Arrays.asList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
+
             String appconnName = "workflow";
             WorkflowOrchestratorUpdateRequestRef orchestratorUpdateRequestRef = new WorkflowOrchestratorUpdateRequestRef();
             switch (orchestratorKindEnum) {
@@ -215,6 +229,49 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
             DSSExceptionUtils.dealErrorException(60034, "failed to create orchestrator", e, DSSProjectErrorException.class);
         }
         return orchestratorVo;
+    }
+
+    @Override
+    public void deleteOrchestrator(String username, DSSOrchestrator dssOrchestrator, Boolean deleteSchedulerWorkflow)
+        throws ErrorException {
+        // 删除调度系统的工作流
+        if (deleteSchedulerWorkflow) {
+            SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
+                .getAppConn(DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+            if (schedulerAppConn == null) {
+                LOGGER.error("DolphinScheduler appconn is null, can not get scheduler workflow status");
+                DSSExceptionUtils.dealErrorException(61123, "scheduler appconn is null", DSSErrorException.class);
+
+            }
+
+            StructureIntegrationStandard schedulerStructureStandard = schedulerAppConn.getOrCreateStructureStandard();
+            AppInstance schedulerInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
+            ProjectDeletionOperation deletionOperation =
+                schedulerStructureStandard.getProjectService(schedulerInstance).getProjectDeletionOperation();
+
+            String workspaceName =
+                dssWorkspaceService.getWorkspaceName(String.valueOf(dssOrchestrator.getWorkspaceId()));
+            DSSProjectDO project = projectService.getProjectById(dssOrchestrator.getProjectId());
+            // 删除调度系统工作流，则发布信息一定存在
+            OrchestratorReleaseInfo orchestratorReleaseInfo =
+                orchestratorMapper.getByOrchestratorId(dssOrchestrator.getOrchestratorId());
+
+            ProjectRequestRefImpl requestRef = new ProjectRequestRefImpl();
+            requestRef.setWorkspaceName(workspaceName);
+            requestRef.setName(project.getName());
+            requestRef.setType("Orchestrator");
+            requestRef.setId(orchestratorReleaseInfo.getSchedulerWorkflowId());
+            requestRef.setCreateBy(username);
+            deletionOperation.deleteProject(requestRef);
+
+            // 删除DSS工作流发布信息
+            orchestratorMapper.removeOrchestratorReleaseInfoById(orchestratorReleaseInfo.getId());
+        }
+
+        // 删除项目-编排信息
+        orchestratorService.removeById(dssOrchestrator.getId());
+
+        // TODO: 2021/6/4 删除编排信息dss_orchestrator_info、版本信息dss_orchestrator_info_version、版本信息对应的工作流信息dss_workflow
     }
 
     @Override

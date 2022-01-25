@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
@@ -96,5 +97,7 @@ public interface WorkFlowManager {
                                   DSSFlowImportParam dssFlowImportParam) throws Exception;
 
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
+
+    public WorkflowStatus getSchedulerWorkflowStatus(String username, Long orchestratorId) throws DSSErrorException;
 
 }

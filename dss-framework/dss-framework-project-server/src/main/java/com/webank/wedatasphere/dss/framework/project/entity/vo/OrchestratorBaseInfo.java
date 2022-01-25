@@ -94,18 +94,34 @@ public class OrchestratorBaseInfo {
 
     private boolean flowEditLockExist=false;
 
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public Boolean getReleasable() {
+        return releasable;
+    }
+
+    public void setReleasable(Boolean releasable) {
+        this.releasable = releasable;
+    }
+
     /**
      * 工程权限等级：0-查看，1-编辑，2-发布
      */
-    private Integer priv;
 
-    public Integer getPriv() {
-        return priv;
-    }
+    private Boolean editable;
 
-    public void setPriv(Integer priv) {
-        this.priv = priv;
-    }
+    /**
+     * 工作流是否可发布
+     */
+    private Boolean releasable;
+
+
 
     public Long getId() {
         return id;

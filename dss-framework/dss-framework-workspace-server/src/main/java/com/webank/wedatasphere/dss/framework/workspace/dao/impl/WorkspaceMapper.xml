@@ -34,8 +34,23 @@
     </sql>
 
     <sql id="favorite_main">
-        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`
+        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`,`type`
     </sql>
+
+    <resultMap id="dss_workspace_user01_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01">
+        <result property="id" column="id"/>
+        <result property="name" column="username"/>
+        <result property="joinTime" column="join_time"/>
+        <result property="creator" column="created_by"/>
+        <result property="department" column="department"/>
+        <result property="office" column="office"/>
+        <collection property="roles" resultMap="roles"/>
+
+    </resultMap>
+
+    <resultMap  id="roles" type="Integer" >
+        <result column="role_id" property="roleId"/>
+    </resultMap>
 
     <select id="getWorkspaces" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
         SELECT *
@@ -44,7 +59,21 @@
     </select>
 
     <select id="getWorkspaceById" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
-        SELECT * FROM dss_workspace WHERE id = #{workspaceId}
+     SELECT
+	     id,
+	    NAME,
+	    label,
+	    description,
+	    create_by,
+	    create_time,
+	    department,
+	    product,
+	    source,
+	    last_update_time,
+	    last_update_user,
+        workspace_type
+    FROM
+	    dss_workspace WHERE id = #{workspaceId}
     </select>
 
     <select id="findByWorkspaceName" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
@@ -66,6 +95,7 @@
     </select>
     <select id="getHomepageDemoMenusEn" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`description`,`icon`,`order`
+
         FROM dss_homepage_demo_menu
         <where>
             `is_active` = 1
@@ -162,8 +192,10 @@
         on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
         join dss_application on dss_application.id = dss_onestop_menu_application.application_id
         <where>
-            dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
-            or `dss_onestop_user_favorites`.`workspace_id` = -1
+            (dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+            or `dss_onestop_user_favorites`.`workspace_id` = -1)
+            AND type = #{type}
+
         </where>
     </select>
 
@@ -174,13 +206,14 @@
         join dss_application on dss_application.id = dss_onestop_menu_application.application_id
         <where>
             dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+            AND type = #{type}
         </where>
     </select>
 
     <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite">
         INSERT INTO dss_onestop_user_favorites (<include refid = "favorite_main" />)
         VALUES
-        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})
+        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime},#{type})
     </insert>
 
     <delete id="deleteFavorite">
@@ -188,6 +221,50 @@
         FROM
             dss_onestop_user_favorites
         WHERE
-            id = #{favouritesId}
+            menu_application_id = #{applicationId}
+            AND username = #{username}
+            AND workspace_id = #{workspaceId}
+            AND type = #{type}
+
+
     </delete>
+
+
+    <select id="getDepartName" resultType="java.lang.String">
+    SELECT
+       CONCAT_WS('-',
+	   t1.dept_name,
+	   t2.dept_name,
+	   t3.dept_name )
+   FROM
+	( SELECT dept_name, parent_id FROM dss_admin_dept WHERE id = #{id} ) t3
+	LEFT JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
+	LEFT JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
+    </select>
+
+
+
+
+
+    <select id="getWorkspaceUsers" resultMap="dss_workspace_user01_map">
+
+
+   		SELECT
+	    t1.id,
+		t2.username,
+		t1.join_time,
+		t1.created_by,
+		t3.dept_name department,
+		t4.dept_name office,
+        t5.role_id
+		FROM
+		( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
+		JOIN dss_user t2 ON t2.username = t1.username
+		JOIN dss_admin_dept t3 ON t3.id = t2.dept_id
+		left JOIN dss_admin_dept t4 ON t4.id = t3.parent_id
+
+	join dss_workspace_user_role t5
+	on t5.username = t1.username and t5.workspace_id=t1.workspace_id
+
+    </select>
 </mapper>

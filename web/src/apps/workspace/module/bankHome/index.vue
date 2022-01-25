@@ -293,7 +293,7 @@ export default {
     // 获取常见问题
     getSideDatas() {
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getSideInfos`, {
-        workspaceID: 106
+        workspaceId: this.workspaceId
       }, 'get').then((res) => {
         this.sideDataList = res.presentations
       })

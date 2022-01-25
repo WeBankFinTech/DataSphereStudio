@@ -36,6 +36,11 @@ export default {
     };
     return {
       src,
+      menuurl: [
+        {title: 'Schedulis',url: '/scheduleCenter',icon: 'fi-schedule'},
+        {title: 'Scriptis',url: '/home',icon: 'fi-scriptis'},
+        {title: 'Workflow',url: '/project',icon: 'fi-workflow1'},
+      ],
       video: {},
       demos: []
     }

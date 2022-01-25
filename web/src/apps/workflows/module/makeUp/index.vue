@@ -7,7 +7,7 @@
         :title="$t('message.workflow.process.params')"
         ref="paramButton"
         @click.stop="showParamView">
-        <SvgIcon class="icon" icon-class="params" color="#666"/>
+        <SvgIcon class="icon" icon-class="icon-canshu"/>
         <span>{{$t('message.workflow.process.params')}}</span>
       </div>
       <div class="devider" />
@@ -16,7 +16,7 @@
         ref="resourceButton"
         :title="$t('message.workflow.process.resource')"
         @click.stop="showResourceView">
-        <SvgIcon class="icon" icon-class="fi-export" color="#666"/>
+        <SvgIcon class="icon" icon-class="icon-ziyuan"/>
         <span>{{$t('message.workflow.process.resource')}}</span>
       </div>
       <div class="devider" />
@@ -25,7 +25,7 @@
         :title="$t('message.workflow.process.run')"
         class="button"
         @click="clickswitch">
-        <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+        <SvgIcon class="icon" icon-class="icon-zhihang"/>
         <span>{{$t('message.workflow.process.run')}}</span>
       </div>
       <div
@@ -41,7 +41,7 @@
         :title="$t('message.workflow.process.save')"
         class="button"
         @click="handleSave">
-        <SvgIcon class="icon" icon-class="save-2" color="#666"/>
+        <SvgIcon class="icon" icon-class="icon-baocun1"/>
         <span>{{$t('message.workflow.process.save')}}</span>
       </div>
       <div class="devider" />
@@ -50,7 +50,7 @@
         class="button"
         @click="workflowPublishIsShow">
         <template v-if="!isFlowPubulish">
-          <SvgIcon class="icon" icon-class="publish" color="#666"/>
+          <SvgIcon class="icon" icon-class="icon-fabu1"/>
           <span>{{$t('message.workflow.process.publish')}}</span>
         </template>
         <Spin v-else class="public_loading">
@@ -71,7 +71,7 @@
         <Button type="primary">下一步</Button>
       </ButtonGroup>
     </div>
-    <iframe></iframe>
+    <!-- <iframe></iframe> -->
   </div>
 </template>
 <script>

@@ -2,29 +2,50 @@
   <div>
     <div class="layout-header">
       <div class="layout-header-menu-icon">
-        <div
-          style="display:inline-block;"
+        <!-- <div style="display:inline-block;"
           v-show="isNavShowMenu"
           @mouseleave="mouseleave"
-          @click="mouseover"
+          @click="mouseover">
+          <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF"/>
+        </div> -->
+
+        <vue-luban-menu
+          v-if="isNavShowMenu"
+          :apps="menuList"
+          :favorites="favorites"
+          :collections="collections"
+          :use-default-action="false"
+          @menu-click="handleMenuClick"
+          @favorite-remove="removeFavorite"
+          @favorite-add="addFavorite"
+          @collect-add="addCollection"
+          @collect-remove="removeCollection"
+          ref="vueLubanMenu"
         >
-          <SvgIcon style="font-size: 28px;" icon-class="menu" color="#00FFFF" />
-        </div>
+          <div class="luban-menu-trigger">
+            <img src="../../assets/images/luban-menu-trigger.png" />
+          </div>
+        </vue-luban-menu>
+
         <div class="logo">
           <img
             @click.stop="goHome"
             class="logo-img"
-            :style="{ cursor: isAdmin ? 'pointer' : 'default' }"
+            :style="{ cursor: 'pointer' }"
             src="../../assets/images/dssLogo5_1.png"
             :alt="$t('message.common.logoName')"
           />
-          <span class="version">{{sysVersion}}</span>
+
+          <span class="version">{{ sysVersion }}</span>
         </div>
       </div>
       <!-- <span v-if="showWorkspaceNav && !currentProject.id" class="workspace-icon" :title="$t('message.common.project')">
         <SvgIcon style="font-size: 2rem;" class="icon selected workspace-svg" icon-class="project" color="#ffffff"/>
       </span>-->
-      <Dropdown class="project-dro" v-if="showWorkspaceNav && !currentProject.id">
+      <Dropdown
+        class="project-dro"
+        v-if="showWorkspaceNav && !currentProject.id"
+      >
         <div class="project">
           {{ currentWorkspace.name }}
           <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
@@ -35,16 +56,17 @@
             <span
               v-for="p in workspaceList"
               :key="p.id"
-              :class="{'active':p.id == currentWorkspace.id}"
+              :class="{ active: p.id == currentWorkspace.id }"
               class="proj-item"
               @click="changeWorkspace(p)"
-            >{{ p.name}}</span>
+              >{{ p.name }}</span
+            >
           </div>
         </DropdownMenu>
       </Dropdown>
       <!-- <span v-if="currentProject.id" class="proj-select" :title="$t('message.common.project')">
         <SvgIcon style="font-size: 2rem;" icon-class="file" color="#1d9cf0"/>
-      </span>&nbsp;-->
+      </span>&nbsp; -->
       <Dropdown class="project-dro" v-if="currentProject.id">
         <div class="project">
           {{ currentProject.name }}
@@ -56,42 +78,59 @@
             <div class="name-bar">
               <span
                 v-for="p in proj.dwsProjectList"
-                @click="changeProj(proj,p)"
-                :key="proj.id+p.id"
-                :class="{'active':p.id == currentProject.id}"
+                @click="changeProj(proj, p)"
+                :key="proj.id + p.id"
+                :class="{ active: p.id == currentProject.id }"
                 class="proj-item"
-              >{{ p.name }}</span>
+                >{{ p.name }}</span
+              >
             </div>
           </div>
         </DropdownMenu>
       </Dropdown>
       <div
         v-clickoutside="handleOutsideClick"
-        :class="{'selected': isUserMenuShow}"
+        :class="{ selected: isUserMenuShow }"
         class="user"
         @click="handleUserClick"
       >
-        <span>{{ userName || 'Null' }}</span>
-        <Icon v-show="!isUserMenuShow" type="ios-arrow-down" class="user-icon" />
-        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon" />
+        <div class="userName">
+          <span>{{ userName || "Null" }}</span>
+          <Icon
+            v-show="!isUserMenuShow"
+            type="ios-arrow-down"
+            class="user-icon"
+          />
+          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon" />
+        </div>
         <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
       </div>
-      <ul class="menu">
+      <!-- 需要用户可以手动自定义 -->
+      <ul class="menu" v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId">
         <li
-          v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId"
           class="menu-item"
           @click="goSpaceHome"
-        >{{$t("message.common.home")}}</li>
+          :class="isHomePage ? 'header-actived' : '' "
+        >
+          {{ $t("message.common.home") }}
+        </li>
         <li
-          class="menu-item"
-          v-if="homeRoles && $route.query.workspaceId"
-          @click="goRolesPath"
-        >{{ homeRoles.name }}</li>
+        class="menu-item"
+        v-if="$route.query.workspaceId"
+        @click="goConsole"
+        :class="isConsolePage ? 'header-actived' : '' "
+        >
+          {{$t("message.common.management")}}
+        </li>
         <li
+          v-for="app in collections"
+          :key="app.id"
           class="menu-item"
-          v-if="$route.query.workspaceId"
-          @click="goConsole"
-        >{{$t("message.common.management")}}</li>
+          :class="app.menuApplicationId == currentId ? 'header-actived' : '' "
+          @click="goCollectedUrl(app)"
+        >
+          {{ app.title }}
+        </li>
       </ul>
       <div class="icon-group">
         <Icon
@@ -113,26 +152,31 @@
   </div>
 </template>
 <script>
-import { isEmpty } from 'lodash'
-import storage from '@/common/helper/storage'
-import userMenu from './userMenu.vue'
-import clickoutside from '@/common/helper/clickoutside'
-import navMenu from './navMenu/index.vue'
-import mixin from '@/common/service/mixin'
-import util from '@/common/util'
+import { isEmpty } from "lodash";
+import storage from "@/common/helper/storage";
+import userMenu from "./userMenu.vue";
+import clickoutside from "@/common/helper/clickoutside";
+import navMenu from "./navMenu/index.vue";
+import mixin from "@/common/service/mixin";
+import util from "@/common/util";
+import eventbus from "@/common/helper/eventbus";
 import {
   GetBaseInfo,
   GetWorkspaceApplications,
   GetWorkspaceList,
-  GetWorkspaceBaseInfo
-} from '@/common/service/apiCommonMethod.js'
+  GetWorkspaceBaseInfo,
+  GetFavorites,
+  AddFavorite,
+  RemoveFavorite,
+  GetCollections
+} from "@/common/service/apiCommonMethod.js";
 export default {
   directives: {
-    clickoutside
+    clickoutside,
   },
   components: {
     userMenu,
-    navMenu
+    navMenu,
   },
   data() {
     return {
@@ -142,226 +186,371 @@ export default {
       homeRoles: null,
       sysVersion: process.env.VUE_APP_VERSION,
       isUserMenuShow: false,
-      userName: '',
+      userName: "",
       isNavMenuShow: false,
       currentProject: {},
       projectList: [],
-      isSandbox: process.env.NODE_ENV === 'sandbox',
+      isSandbox: process.env.NODE_ENV === "sandbox",
       workspaceList: [],
       currentWorkspace: {},
-      menuList: []
-    }
+      menuList: [],
+      // luban-nav-menu
+      favorites: [],
+      collections: [],
+      currentId: -1,
+      isHomePage: true,
+      isConsolePage: false,
+    };
   },
   mixins: [mixin],
   created() {
     this.getWorkspacesRoles()
-      .then(res => {
+      .then((res) => {
         // cookies改变最新后再执行其他方法
         if (res) {
-          this.init()
-          this.getApplications()
-          this.getWorkspaces()
+          this.init();
+          this.getApplications();
+          this.getWorkspaces();
+          this.getWorkspaceFavorites();
+          this.getWorkspaceCollections()
         }
       })
-      .catch(err => {
-        console.error(err)
-      })
+      .catch((err) => {
+        console.error(err);
+      });
   },
   mounted() {
-    this.getCurrentProject()
+    this.getCurrentProject();
   },
   computed: {
     isNavShowMenu() {
-      return !!this.$route.query.workspaceId
+      return !!this.$route.query.workspaceId;
     },
     moudleName() {
       let moudleNameMaps = {
-        '/home': 'Scriptis',
-        '/console': 'Console',
-        '/workflow': 'Workflow',
-        '/process': 'Workflow'
-      }
-      let moudleName
-      Object.keys(moudleNameMaps).forEach(k => {
+        "/home": "Scriptis",
+        "/console": "Console",
+        "/workflow": "Workflow",
+        "/process": "Workflow",
+      };
+      let moudleName;
+      Object.keys(moudleNameMaps).forEach((k) => {
         if (this.$route.path.indexOf(k) > -1) {
-          moudleName = moudleNameMaps[k]
+          moudleName = moudleNameMaps[k];
         }
-      })
-      return moudleName
+      });
+      return moudleName;
     },
     showWorkspaceNav() {
       return (
-        this.$route.path.indexOf('/workspaceHome') !== -1 ||
-        this.$route.path === '/project' ||
-        this.$route.path === '/workspace'
-      )
-    }
+        this.$route.path.indexOf("/workspaceHome") !== -1 ||
+        this.$route.path.indexOf("/dataService") !== -1 ||
+        this.$route.path.indexOf("/dataManagement") !== -1 ||
+        this.$route.path === "/project" ||
+        this.$route.path === "/workspace"
+      );
+    },
   },
   watch: {
-    '$route.query.projectID'(newValue) {
-      this.projectID = newValue
-      this.getCurrentProject()
+    "$route.query.projectID"(newValue) {
+      this.projectID = newValue;
+      this.getCurrentProject();
     },
     // 将以前的'$route.query.workspaceId'监听换成'$route'，之前的无法监听组件之间的切换触发
     $route(v) {
       // 设定条件只有切换在工作空间首页时才触发
-      if (v.name === 'workspaceHome') {
+      if (v.name === "workspaceHome") {
+        // this.currentId = -1;
+        this.init();
         this.getWorkspacesRoles()
-          .then(res => {
+          .then((res) => {
             // cookies改变最新后再执行其他方法
             if (res) {
-              this.getApplications()
-              this.getWorkspaces()
+              this.getApplications();
+              this.getWorkspaces();
+              this.getWorkspaceFavorites();
+              this.getWorkspaceCollections();
             }
           })
-          .catch(err => {
-            console.error(err)
-          })
+          .catch((err) => {
+            console.error(err);
+          });
       }
-    }
+    },
   },
   methods: {
     // 获取进入工作空间的用户权限
     getWorkspacesRoles() {
       // 如果下面接口不通时，默认显示用户名
-      if (storage.get('baseInfo', 'local')) {
-        this.userName = storage.get('baseInfo', 'local').username
+      if (storage.get("baseInfo", "local")) {
+        this.userName = storage.get("baseInfo", "local").username;
       }
       return new Promise((resolve, reject) => {
         if (this.$route.query.workspaceId) {
           GetWorkspaceBaseInfo({
-            workspaceId: this.$route.query.workspaceId || ''
+            workspaceId: this.$route.query.workspaceId || "",
           })
-            .then(res => {
+            .then((res) => {
               // 缓存数据，供其他页面判断使用
-              storage.set(`workspaceRoles`, res.roles, 'session')
+              storage.set(`workspaceRoles`, res.roles, "session");
+              // roles主动触发，防止接口请求和sessionstorge之间的时间差导致角色没有及时转换
+              eventbus.emit("workspace.change", res.roles);
               // 获取顶部的快捷入口
               this.homeRoles = {
                 name: res.topName,
                 path: res.topUrl,
-                id: res.workspaceId
-              }
+                id: res.workspaceId,
+              };
               // 同步改变cookies在请求中的附带
-              resolve(true)
+              resolve(true);
               // 改变了cookies通知其他地方
-              this.$router.app.$emit('getChangeCookies')
+              this.$router.app.$emit("getChangeCookies");
             })
-            .catch(err => {
-              reject(err)
-            })
+            .catch((err) => {
+              reject(err);
+            });
         } else {
-          resolve(false)
+          resolve(false);
         }
-      })
+      });
     },
     isShowWorkspaceMenu() {
       return (
         !this.currentProject.id &&
-        (this.$route.query && this.$route.query.workspaceId) &&
-        this.$route.path.indexOf('workflow') === -1
-      )
+        this.$route.query &&
+        this.$route.query.workspaceId &&
+        this.$route.path.indexOf("workflow") === -1
+      );
     },
     getApplications() {
       if (this.$route.query.workspaceId) {
-        GetWorkspaceApplications(this.$route.query.workspaceId).then(data => {
-          this.menuList = data.applications || []
-        })
+        GetWorkspaceApplications(this.$route.query.workspaceId).then((data) => {
+          this.menuList = data.applications || [];
+          // 展示有权限的实例
+          this.menuList = this.menuList.map((app) => {
+            if (app.appInstances && app.appInstances.length) {
+              return {
+                ...app,
+                appInstances: app.appInstances.filter(
+                  (item) => item.accessable
+                ),
+              };
+            }
+            return app;
+          });
+          // 类别下没有实例则隐藏
+          this.menuList = this.menuList.filter(
+            (app) => app.appInstances.length > 0
+          );
+        });
       }
     },
     getWorkspaces() {
-      GetWorkspaceList({}, 'get')
-        .then(res => {
-          this.workspaceList = res.workspaces
-          this.getCurrentWorkspace()
+      GetWorkspaceList({}, "get")
+        .then((res) => {
+          this.workspaceList = res.workspaces;
+          this.getCurrentWorkspace();
         })
-        .catch(() => {})
+        .catch(() => {});
+    },
+    getWorkspaceFavorites() {
+      if (this.$route.query.workspaceId) {
+        GetFavorites(this.$route.query.workspaceId).then((data) => {
+          this.favorites = (data.favorites || []).map(item => {
+            return {
+              ...item,
+              id: item.menuApplicationId
+            }
+          });
+        });
+      }
+    },
+    getWorkspaceCollections() {
+      if (this.$route.query.workspaceId) {
+        GetCollections(this.$route.query.workspaceId).then(data => {
+          let collections = data.favorites || [];
+          while( collections.length > 5 ) {
+            collections.pop();
+          }
+          this.collections = collections.map(item => {
+            return {
+              ...item,
+              id: item.menuApplicationId,
+              collectedId: item.menuApplicationId
+            }
+          })
+        })
+      }
+    },
+    addFavorite(app) {
+      if (this.$route.query.workspaceId) {
+        AddFavorite(this.$route.query.workspaceId, {
+          menuApplicationId: app.id,
+        }).then((data) => {
+          this.favorites = this.favorites.concat({
+            ...app,
+            id: app.id,
+            menuApplicationId: app.id,
+          });
+        });
+      }
+    },
+    removeFavorite(app) {
+      if (this.$route.query.workspaceId) {
+        RemoveFavorite({
+          workspaceId: this.$route.query.workspaceId,
+          applicationId: app.menuApplicationId,
+        }).then(() => {
+          this.favorites = this.favorites.filter(
+            (i) => i.menuApplicationId !== app.menuApplicationId
+          );
+        });
+
+        this.collections = this.collections.filter(
+          (i) => i.menuApplicationId !== app.menuApplicationId
+        );
+      }
+    },
+    addCollection(app) {
+      if (this.$route.query.workspaceId) {
+        if ( this.collections.length < 5 ) {
+          AddFavorite(this.$route.query.workspaceId, {
+            menuApplicationId: app.menuApplicationId,
+            type: 'dingyiding'
+          }).then((data) => {
+            app.collectedId = app.menuApplicationId
+            this.collections = this.collections.concat(app);
+          })
+        } else {
+          this.$Message.warning('目前只支持钉五个快捷入口')
+        }
+      }
+    },
+    removeCollection(app) {
+      app.collectedId = app.menuApplicationId
+      if (this.$route.query.workspaceId) {
+        RemoveFavorite({
+          workspaceId: this.$route.query.workspaceId,
+          applicationId: app.menuApplicationId,
+          type: 'dingyiding'
+        }).then(() => {
+          this.collections = this.collections.filter(
+            (i) => i.collectedId !== app.collectedId
+          );
+        })
+      }
+    },
+    handleMenuClick(item) {
+      this.gotoCommonIframe(item.name, {
+        workspaceId: this.$route.query.workspaceId,
+      });
     },
     init() {
-      GetBaseInfo().then(rst => {
+      GetBaseInfo().then((rst) => {
         if (!isEmpty(rst)) {
-          this.userName = rst.username
+          this.userName = rst.username;
           // 根据权限来判断是否开启logo跳转(管理员才会开启)
-          this.isAdmin = rst.isAdmin
-          storage.set('baseInfo', rst, 'local')
-          this.$router.app.$emit('username', rst.username)
-          this.$emit('set-init')
+          this.isAdmin = rst.isAdmin;
+          storage.set("baseInfo", rst, "local");
+          this.$router.app.$emit("username", rst.username);
+          this.$emit("set-init");
         }
-      })
+      });
     },
     goto(name) {
       this.$router.push({
-        name: name
-      })
+        name: name,
+      });
     },
     getClass(path) {
-      let arr = []
+      let arr = [];
       if (this.$route.name === path || this.$route.meta.parent === path) {
-        arr.push('selected')
+        arr.push("selected");
       }
-      return arr
+      return arr;
     },
     handleOutsideClick() {
-      this.isUserMenuShow = false
+      if (
+        this.$parent.$refs.newGuidance &&
+        this.$parent.$refs.newGuidance.currentStep !== 6
+      ) {
+        this.isUserMenuShow = false;
+      }
     },
     handleUserClick() {
-      this.isUserMenuShow = !this.isUserMenuShow
+      this.isUserMenuShow = !this.isUserMenuShow;
     },
     clearSession() {
-      this.$emit('clear-session')
+      this.$emit("clear-session");
     },
     handleNavMenuClose() {
-      this.isNavMenuShow = false
+      this.isNavMenuShow = false;
     },
     mouseover() {
       this.isNavMenuShow =
-        this.$route.path != '/newhome' && this.$route.query.workspaceId
+        this.$route.path != "/newhome" && this.$route.query.workspaceId;
     },
     mouseleave() {
-      this.isNavMenuShow = false
+      this.isNavMenuShow = false;
     },
     getCurrentWorkspace() {
-      let workspaceId = +this.$route.query.workspaceId
+      let workspaceId = +this.$route.query.workspaceId;
       if (workspaceId) {
-        this.workspaceList.forEach(item => {
+        this.workspaceList.forEach((item) => {
           if (item.id === workspaceId) {
-            this.currentWorkspace = item
-            storage.set('currentWorkspace', item)
+            this.currentWorkspace = item;
+            storage.set("currentWorkspace", item);
           }
-        })
+        });
       }
     },
     getCurrentProject() {
-      let projList = storage.get('projectList', 'local')
-      this.projectList = projList
-      let projId = this.$route.query.projectID
-      let proj = {}
+      let projList = storage.get("projectList", "local");
+      this.projectList = projList;
+      let projId = this.$route.query.projectID;
+      let proj = {};
       if (projId && this.projectList) {
-        this.projectList.forEach(item => {
+        this.projectList.forEach((item) => {
           if (item.dwsProjectList) {
-            item.dwsProjectList.forEach(p => {
+            item.dwsProjectList.forEach((p) => {
               if (p.id == projId) {
-                proj = { ...p }
+                proj = { ...p };
               }
-            })
+            });
           }
-        })
+        });
       }
-      this.currentProject = proj
+      this.currentProject = proj;
     },
     // 切换工作空间
     changeWorkspace(workspace) {
-      if (workspace.id === this.currentWorkspace.id) return
+      if (workspace.id === this.currentWorkspace.id) return;
+      storage.set("curWorkspace", workspace, "local");
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
-      if (['/process'].includes(this.$route.path)) {
-        this.$router.replace({ path: '/workspace' })
+      if (["/process"].includes(this.$route.path)) {
+        this.$router.replace({ path: "/workspace" });
+      } else if (
+        this.$route.path.indexOf("/dataService") !== -1 ||
+        this.$route.path.indexOf("/dataManagement") !== -1
+      ) {
+        // 数据服务切换workspace通过一个redirect路由来实现页面的刷新，避免在每个页面都watch route
+        this.currentWorkspace = workspace;
+        storage.set("currentWorkspace", workspace);
+        this.$router.replace({
+          path: "/redirect" + this.$route.path,
+          query: {
+            ...this.$route.query,
+            workspaceId: workspace.id,
+          },
+        });
       } else {
         this.$router.replace({
           path: this.$route.path,
           query: {
             ...this.$route.query,
-            workspaceId: workspace.id
-          }
-        })
+            workspaceId: workspace.id,
+          },
+        });
       }
     },
     changeProj(proj, p) {
@@ -369,65 +558,90 @@ export default {
         p.id == this.currentProject.id &&
         proj.id == this.$route.query.projectTaxonomyID
       )
-        return
+        return;
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
-      if (['/process'].includes(this.$route.path)) {
-        this.$router.replace({ path: '/project' })
+      if (["/process"].includes(this.$route.path)) {
+        this.$router.replace({ path: "/project" });
       } else {
         this.$router.replace({
           path: this.$route.path,
           query: {
+            workspaceId: this.$route.query.workspaceId,
             ...this.$route.query,
             projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,
-            notPublish: p.notPublish
-          }
-        })
+            notPublish: p.notPublish,
+          },
+        });
       }
     },
     goHome() {
-      if (this.isAdmin) this.$router.push('/newhome')
+      this.isHomePage = true;
+      if (this.isAdmin) {
+        this.$router.push("/newhome");
+      } else {
+        this.goSpaceHome();
+      }
     },
     linkTo(type) {
-      let url = ''
-      if (type === 'book') {
-        url = `https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md`
-      } else if (type === 'github') {
-        url = `https://github.com/WeBankFinTech/DataSphereStudio`
-      } else if (type === 'freedback') {
-        url = 'https://wj.qq.com/s2/4943071/c037/ '
-        if (localStorage.getItem('locale') === 'en') {
-          url = 'https://wj.qq.com/s2/4943706/5a8b'
+      let url = "";
+      if (type === "book") {
+        url = `https://github.com/WeBankFinTech/DataSphereStudio/blob/master/docs/zh_CN/ch3/DSS_User_Manual.md`;
+      } else if (type === "github") {
+        url = `https://github.com/WeBankFinTech/DataSphereStudio`;
+      } else if (type === "freedback") {
+        url = "https://wj.qq.com/s2/4943071/c037/ ";
+        if (localStorage.getItem("locale") === "en") {
+          url = "https://wj.qq.com/s2/4943706/5a8b";
         }
       }
-      util.windowOpen(url)
+      util.windowOpen(url);
     },
     goSpaceHome() {
-      let workspaceId = this.$route.query.workspaceId
-      if (!workspaceId) return this.goHome()
-      this.$router.push({ path: '/workspaceHome', query: { workspaceId } })
-      this.currentProject = {}
+      this.isHomePage = true;
+      let workspaceId = this.$route.query.workspaceId;
+      this.currentId = -1;
+      if (!workspaceId) {
+        // workspaceId为空，说明一定是admin，进入了admin的页面，因为workspaceId是一直伴随的
+        // 就无须在调goHome，防止在控制台页面因为isAdmin失效而导致goHome和goSpaceHome来回调用而报错RangeError: Maximum call stack size exceeded
+        this.$router.push("/newhome");
+      } else {
+        this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
+        this.currentProject = {};
+      }
     },
     goConsole() {
+      this.isHomePage = false;
+      this.isConsolePage = true;
+      this.currentId = -1;
       const url =
-        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console' 
+        location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
       this.$router.push({
-        name: 'commonIframe',
+        name: "commonIframe",
         query: {
           workspaceId: this.$route.query.workspaceId,
           url
         }
-      })
+      });
+      // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
+    },
+    goCollectedUrl(app) {
+      this.isHomePage = false;
+      this.isConsolePage = false;
+      this.currentId = app.menuApplicationId || -1;
+      this.gotoCommonIframe(app.name, {
+        workspaceId: this.$route.query.workspaceId,
+      });
     },
     goRolesPath() {
       // 根据接口getWorkspaceBaseInfo渲染跳转不同路径
       this.$router.push({
         path: this.homeRoles.path,
-        query: Object.assign({}, this.$route.query)
-      })
-    }
-  }
-}
+        query: Object.assign({}, this.$route.query),
+      });
+    },
+  },
+};
 </script>
 <style lang="scss" scoped src="./index.scss"></style>

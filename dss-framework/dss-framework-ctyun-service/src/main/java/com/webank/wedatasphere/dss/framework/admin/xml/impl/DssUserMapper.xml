@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper">
+    <resultMap type="DssAdminUser" id="DssUserResult">
+        <result property="id" column="id"/>
+        <result property="userName" column="username"/>
+        <result property="name" column="name"/>
+        <result property="isFirstLogin" column="is_first_login"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="isAdmin" column="is_admin"/>
+        <result property="email" column="email"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="password" column="password"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+        <association property="dept" column="id" javaType="DssAdminDept" resultMap="deptResult"/>
+    </resultMap>
+
+    <resultMap id="deptResult" type="DssAdminDept">
+        <id property="deptId" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="leader" column="leader"/>
+        <result property="status" column="dept_status"/>
+    </resultMap>
+
+
+    <sql id="selectUserVo">
+        select u.id, u.username, u.name, u.is_first_login, u.dept_id, u.is_admin, u.email, u.phonenumber, u.password, u.del_flag, u.create_time, u.update_time, u.remark,
+        d.id , d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
+        from dss_user u
+		    left join dss_admin_dept d on u.dept_id = d.id
+
+    </sql>
+
+
+    <select id="selectUserList" parameterType="DssAdminUser" resultMap="DssUserResult">
+        select u.id, u.username, u.name, u.is_first_login, u.dept_id, u.is_admin, u.email, u.phonenumber, u.password,
+        u.del_flag, u.create_time, u.update_time, u.remark,d.dept_name, d.leader from dss_user u
+        left join dss_admin_dept d on u.dept_id = d.id
+        where u.del_flag = '0'
+        <if test="userName != null and userName != ''">
+            AND u.username like concat('%', #{userName}, '%')
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            AND u.phonenumber like concat('%', #{phonenumber}, '%')
+        </if>
+        <if test="params != null and params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params != null and params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.id FROM dss_admin_dept t WHERE find_in_set(#{deptId},
+            ancestors) ))
+        </if>
+        order by u.create_time desc
+    </select>
+
+
+    <select id="selectUserById" parameterType="Long" resultMap="DssUserResult">
+        <include refid="selectUserVo"/>
+        where u.id = #{userId}
+    </select>
+
+
+    <update id="updateUser" parameterType="DssAdminUser">
+        update dss_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+            <if test="password != null">password = #{password},</if>
+
+        </trim>
+        where id = #{id}
+    </update>
+    <select id="checkUserNameUnique" parameterType="String" resultType="int">
+		select count(1) from dss_user where username = #{userName} limit 1
+	</select>
+
+
+    <select id="checkPhoneUnique" parameterType="String" resultMap="DssUserResult">
+		select id, phonenumber from dss_user where phonenumber = #{phonenumber} limit 1
+	</select>
+
+    <select id="checkEmailUnique" parameterType="String" resultMap="DssUserResult">
+		select id, email from dss_user where email = #{email} limit 1
+	</select>
+
+
+    <insert id="insertUser" parameterType="DssAdminUser" useGeneratedKeys="true" keyProperty="id">
+        insert into dss_user(
+        <if test="id != null and id != 0">id,</if>
+        <if test="deptId != null and deptId != 0">dept_id,</if>
+        <if test="userName != null and userName != ''">username,</if>
+        <if test="name != null and name != ''">name,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="phonenumber != null and phonenumber != ''">phonenumber,</if>
+        <if test="password != null and password != ''">password,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="id != null and id != ''">#{id},</if>
+        <if test="deptId != null and deptId != ''">#{deptId},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="name != null and name != ''">#{name},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="phonenumber != null and phonenumber != ''">#{phonenumber},</if>
+        <if test="password != null and password != ''">#{password},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+
+</mapper>

@@ -31,16 +31,16 @@ public interface DSSWorkspaceUserMapper {
 
     String getUserName(Long userID);
 
-    @Insert("insert into dss_workspace_user(workspace_id, username, join_time, created_by)" +
-            "values(#{workspaceId}, #{username}, now(), #{creator})")
+    @Insert("insert into dss_workspace_user(workspace_id, username, join_time, created_by,user_id)" +
+            "values(#{workspaceId}, #{username}, now(), #{creator},#{userId})")
     void insertUser(@Param("username") String username,
-                    @Param("workspaceId") int workspaceId, @Param("creator") String creator);
+                    @Param("workspaceId") int workspaceId, @Param("creator") String creator,@Param("userId") String userId);
 
 
-    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by)" +
-            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy})")
+    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id)" +
+            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy},#{userId})")
     void setUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId,
-                                @Param("username") String username, @Param("createdBy") String createdBy);
+                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") String userId);
 
     @Select("select role_id from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     List<Integer> getRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("username") String username);
@@ -96,4 +96,8 @@ public interface DSSWorkspaceUserMapper {
             @Result(property = "workspaceId", column = "workspace_id")
     })
     List<DSSWorkspaceUser> getWorkspaceUsersByRole(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
+
+    List<String> getWorkspaceEditUsers(int workspaceId);
+
+    List<String> getWorkspaceReleaseUsers(int workspaceId);
 }

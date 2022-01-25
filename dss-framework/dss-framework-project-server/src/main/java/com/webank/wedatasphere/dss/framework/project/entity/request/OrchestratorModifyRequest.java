@@ -58,6 +58,17 @@ public class OrchestratorModifyRequest {
     @NotNull(message = "描述不能为空")
     private String description;
 
+
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
+
+    private List<String> dssLabels;
+
     /**
      * labels是通过前端进行传入的，主要是用来进行当前的环境信息
      */

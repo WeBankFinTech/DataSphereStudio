@@ -25,7 +25,9 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.server.Message;
@@ -51,6 +53,10 @@ public class DSSFrameworkProjectRestfulApi {
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
     private DSSProjectService projectService;
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
+    @Autowired
+    private DSSProjectUserService projectUserService;
 
     /**
      * 获取所有工程或者单个工程
@@ -88,6 +94,9 @@ public class DSSFrameworkProjectRestfulApi {
     public Message createProject(HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        String workspaceName =
+                dssWorkspaceService.getWorkspaceName(String.valueOf(projectCreateRequest.getWorkspaceId()));
+        projectCreateRequest.setWorkspaceName(workspaceName);
         try {
             DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
             if (dssProjectVo != null) {
@@ -111,6 +120,9 @@ public class DSSFrameworkProjectRestfulApi {
     @RequestMapping(path ="modifyProject", method = RequestMethod.POST)
     public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) {
         String username = SecurityFilter.getLoginUsername(request);
+        String workspaceName =
+                dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
+        projectModifyRequest.setWorkspaceName(workspaceName);
         try {
             dssFrameworkProjectService.modifyProject(projectModifyRequest, username);
             return Message.ok("修改工程成功");
@@ -131,8 +143,14 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        // 删除第三方系统中的项目
+        projectDeleteRequest.setIfDelOtherSys(true);
         try{
-            projectService.deleteProject(username, projectDeleteRequest, workspace);
+            // 检查是否具有删除项目权限
+            projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
+
+
+            dssFrameworkProjectService.deleteProject(username, projectDeleteRequest, workspace);
             return  Message.ok("删除工程成功");
         }catch(final Throwable t){
             LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);

@@ -18,7 +18,7 @@
         <div v-for="item in tabsApplication[actionIndex].appInstances" :key="item.name" class="pane-item" >
           <div class="item-main">
             <div class="app-title">
-              <SvgIcon class="app-icon title-sub" :icon-class="item.image||''" color="#000"/>
+              <SvgIcon v-if="!!item.image" class="app-icon title-sub" :icon-class="item.image||''" color="#000"/>
               <span class="label title-sub" :title="item.title">{{item.title}}</span>
               <span class="text-button" @click="navTo(item, item.manualButtonUrl)">{{item.active ? $t('message.workspace.AppStore.demoCase') : $t('message.workspace.AppStore.comingSoon')}}</span>
             </div>
@@ -28,11 +28,12 @@
                 :key="subItem"
                 size="small"
                 type="text"
+                class="goto-button"
                 @click="linkTo(item, item.nameAndUrls[subItem])">{{subItem}}</Button>
             </div>
           </div>
           <!-- <SvgIcon class="app-bgc" :icon-class="item.image ? item.image : 'bgc-imag'"/> -->
-          <SvgIcon class="app-bgc" :icon-class="item.icon||''"/>
+          <SvgIcon v-if="!!item.icon" class="app-bgc" :icon-class="item.icon||''"/>
           <span v-if="!item.active" class="mask">
             {{$t('message.workspace.AppStore.comingSoon')}}
           </span>
@@ -87,7 +88,6 @@ export default {
   mixins: [mixin],
   methods: {
     checkout(val) {
-      console.log(val, 'val')
       this.actionIndex = val;
     },
     iconSplit(icon){
@@ -97,7 +97,6 @@ export default {
       return ['','']
     },
     init(){
-
       GetWorkspaceData(this.workspaceId).then(data=>{
         this.workspaceData = data.workspace;
       })
@@ -165,6 +164,7 @@ export default {
   line-height: 1;
   font-size: $font-size-large;
   margin-bottom: 20px;
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
 }
 .app-content {
   display: flex;
@@ -172,69 +172,89 @@ export default {
   .side-bar {
     flex-basis: 200px;
     border-right: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
     border-radius: $border-radius-small;
     z-index: 1;
+    margin-right: 25px;
+    .left-menuItem {
+      @include bg-color($light-base-color, $dark-base-color);
+    }
+    .ivu-menu-item-active {
+        @include bg-color($active-menu-item, $dark-active-menu-item);
+      }
   }
   .pane-wrap {
     flex: 1;
-    flex-wrap: wrap;
-    display: flex;
-    justify-content: flex-start;
-  .pane-item {
-    margin: 0px 0px 25px 25px;
-    width: 355px;
-    height: 116px;
-    border-radius: 2px;
-    border: 1px solid #dcdee2;
-    position: relative;
-    overflow: hidden;
-    .item-main {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-    }
-    .app-title {
-      margin-top: 25px;
-      margin-left: 22px;
-      font-size: 18px;
-      line-break: 24px;
-      color: $text-title-color;
-      font-family: PingFangSC-Medium;
-      .label {
-        max-width: 200px;
-        display: inline-block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: middle;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-row-gap: 20px;
+    grid-column-gap: 20px;
+    .pane-item {
+      height: 120px;
+      border-radius: 2px;
+      border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
+      position: relative;
+      padding-left: 20px;
+      overflow: hidden;
+      .item-main {
+        position: absolute;
+        z-index: 2;
       }
-      .app-icon {
-        font-size: 20px;
-        margin-right: 8px;
-      }
-      .text-button {
-        margin-left: 22px;
-        font-size: $font-size-base;
-        color: #2E92F7;
-        line-height: 22px;
-        cursor: pointer;
-        max-width: 75px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        display: inline-block;
-        vertical-align: middle;
-      }
+      .app-title {
+        display: flex;
+        align-items: center;
+        margin-top: 25px;
+        font-size: 18px;
+        line-height: 24px;
+        // color: $text-title-color;
+        @include font-color($workspace-title-color, $dark-workspace-title-color);
+        font-family: PingFangSC-Medium;
+        .label {
+          width: 120px;
+          display: inline-block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-family: PingFangSC-Medium;
+          font-size: 18px;
+          // color: rgba(0,0,0,0.85);
+          @include font-color($workspace-title-color, $dark-workspace-title-color);
+          line-height: 24px;
+          vertical-align: middle;
+        }
+        .app-icon {
+          font-size: 20px;
+          line-height: 24px;
+          vertical-align: middle;
+          @include font-color($workspace-title-color, $dark-workspace-title-color);
+        }
+        .text-button {
+          font-family: PingFangSC-Regular;
+          font-size: 14px;
+          // color: #2E92F7;
+          @include font-color($primary-color, $dark-primary-color);
+          line-height: 100%;
+          vertical-align: middle;
+          cursor: pointer;
+          max-width: 75px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          display: inline-block;
+        }
     }
     .goto-button {
-      margin-left: 22px;
-      font-size: $font-size-base;
-      color: rgba(0,0,0,0.65);
+      margin-top: 10px;
+      font-family: PingFangSC-Regular;
+      font-size: 14px;
+      // color: rgba(0,0,0,0.65);
+      @include font-color($light-text-color, $dark-text-color);
       line-height: 22px;
-      margin-top: 15px;
+      text-align: left;
+      border: 1px solid #DEE4EC;
+      @include border-color($border-color-base, $dark-border-color-base);
+      border-radius: 4px;
       cursor: pointer;
     }
     .mask {
@@ -244,20 +264,19 @@ export default {
       width: 100%;
       height: 100%;
       z-index: 3;
-      background: rgba(255,255,255,0.80);
+      // background: rgba(255,255,255,0.80);
+      @include bg-color(rgba(255,255,255,0.80), rgba(255,255,255,0.1));
       text-align: center;
       line-height: 116px;
       font-size: 21px;
       font-family: PingFangSC-Regular;
       color: rgba(0,0,0,0.85);
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
     .app-bgc {
-      width: 140px;
-      height: 120px;
-      display: inline-block;
-      position: absolute;
-      top: 0;
-      right: 20px;
+      height: 100%;
+      float: right;
+      opacity:0.8;
       z-index: 1;
       /deep/.svg-icon {
         width: 140px;
@@ -265,8 +284,6 @@ export default {
       }
     }
   }
-
-
 }
 }
 .item-header {
@@ -274,6 +291,7 @@ export default {
   font-weight: bold;
   padding-left: 12px;
   border-left: 3px solid $primary-color;
+  @include border-color($primary-color, $dark-primary-color);
 }
 
 </style>

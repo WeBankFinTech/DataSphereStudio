@@ -72,6 +72,38 @@
             )
         </foreach>
     </insert>
+    <select id="getListForAdmin"
+            parameterType="com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest"
+            resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo">
+        SELECT * FROM (SELECT b.application_area applicationArea,b.id,b.business,b.create_by
+        createBy,b.description,b.name,
+        b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
+        b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
+        b.visible visible,
+        GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
+        FROM dss_project_user a
+        LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
+        WHERE b.workspace_id = #{workspaceId} AND a.priv >=1
+        <if test="id!=null">
+            AND b.id = #{id}
+        </if>
+        GROUP BY b.id ) c
+        order by updateTime desc
+    </select>
 
+    <update id="updateDssWorkflowName">
+
+   UPDATE dss_workflow
+   SET NAME = #{name}
+   WHERE
+	id in (
+	SELECT
+		t2.app_id
+	FROM
+		( SELECT orchestrator_id FROM dss_project_orchestrator WHERE id = #{id} ) t1
+		JOIN dss_orchestrator_version_info t2 ON t1.orchestrator_id = t2.orchestrator_id
+	)
+
+ </update>
 
 </mapper>

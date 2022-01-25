@@ -16,10 +16,21 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
@@ -29,14 +40,6 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
@@ -48,6 +51,8 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     @Autowired
     @Qualifier("projectServerBMLService")
     private BMLService bmlService;
+    @Autowired
+    private DSSProjectMapper dssProjectMapper;
 
     /**
      * 是否有修改工程权限
@@ -63,7 +68,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         queryWrapper.eq("username",username);
         queryWrapper.ge("priv",ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
         long count = projectUserMapper.selectCount(queryWrapper);
-        if(count == 0){
+        if(count == 0 && !isProjectOwner(projectId, username)){
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(),ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
         }
         return true;
@@ -183,6 +188,35 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         //管理员ID，这里写死
         int roleId = 1;
         return projectUserMapper.isAdminByUsername(workspaceId, username, roleId).longValue() > 0;
+    }
+
+    /**
+     * 根据用户名和工程id获取工程权限
+     *
+     * @param projectId
+     * @param username
+     * @return
+     */
+    @Override
+    public List<DSSProjectUser> getProjectUserPriv(Long projectId, String username) {
+        QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<DSSProjectUser>();
+        queryWrapper.eq("project_id", projectId);
+        queryWrapper.eq("username", username);
+        return projectUserMapper.selectList(queryWrapper);
+    }
+
+    private boolean isProjectOwner(Long projectId, String username) {
+        QueryWrapper<DSSProjectDO> queryWrapper = new QueryWrapper<DSSProjectDO>();
+        queryWrapper.eq("id", projectId);
+        queryWrapper.eq("create_by", username);
+        return dssProjectMapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
+    public List<DSSProjectUser> listByPriv(Long projectId, ProjectUserPrivEnum privEnum) {
+        QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("username").eq("project_id", projectId).ge("priv", privEnum.getRank());
+        return projectUserMapper.selectList(queryWrapper);
     }
 
 }

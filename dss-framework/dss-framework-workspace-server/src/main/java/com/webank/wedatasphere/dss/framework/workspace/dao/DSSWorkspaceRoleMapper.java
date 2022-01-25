@@ -39,6 +39,12 @@ public interface DSSWorkspaceRoleMapper {
     List<String> getAllRoles(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
 
+    @Select("select * from dss_onestop_menu")
+    @Results({
+            @Result(property = "titleCn", column = "title_cn"),
+            @Result(property = "titleEn", column = "title_En")
+    })
+    List<DSSOnestopMenu> getOnestopMenus();
     @Select("select * from dss_menu")
     @Results({
             @Result(property = "upperMenuId", column = "upper_menu_id"),

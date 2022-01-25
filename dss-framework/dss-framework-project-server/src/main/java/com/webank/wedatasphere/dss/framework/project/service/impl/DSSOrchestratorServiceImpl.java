@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.project.contant.OrchestratorTypeEnum;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
+import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSOrchestratorMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
@@ -43,6 +44,8 @@ import org.apache.linkis.rpc.Sender;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -175,7 +178,7 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
      */
     @Override
     public List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username) {
-        QueryWrapper queryWrapper = new QueryWrapper();
+      /*  QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
         queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
         if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
@@ -195,6 +198,40 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
                 BeanUtils.copyProperties(orchestrator, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(ProjectStringUtils.convertList(orchestrator.getOrchestratorWay()));
                 orchestratorBaseInfo.setPriv(priv);
+                retList.add(orchestratorBaseInfo);
+            }
+        }
+        return retList;*/
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
+        queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
+        if (orchestratorRequest.getId() != null) {
+            queryWrapper.eq("orchestrator_id", orchestratorRequest.getId());
+        }
+        if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
+            queryWrapper.eq("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
+        }
+        List<DSSOrchestrator> list = this.list(queryWrapper);
+        List<OrchestratorBaseInfo> retList = new ArrayList<OrchestratorBaseInfo>(list.size());
+        if (!CollectionUtils.isEmpty(list)) {
+            //获取工程的权限等级
+            List<DSSProjectUser> projectUserList = projectUserService.getProjectUserPriv(orchestratorRequest.getProjectId(), username);
+            List<Integer> editPriv = projectUserList.stream()
+                    .map(DSSProjectUser::getPriv)
+                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                    .collect(Collectors.toList());
+            List<Integer> releasePriv = projectUserList.stream()
+                    .map(DSSProjectUser::getPriv)
+                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_RELEASE.getRank())
+                    .collect(Collectors.toList());
+
+            OrchestratorBaseInfo orchestratorBaseInfo = null;
+            for (DSSOrchestrator orchestrator : list) {
+                orchestratorBaseInfo = new OrchestratorBaseInfo();
+                BeanUtils.copyProperties(orchestrator, orchestratorBaseInfo);
+                orchestratorBaseInfo.setOrchestratorWays(ProjectStringUtils.convertList(orchestrator.getOrchestratorWay()));
+                orchestratorBaseInfo.setEditable(!editPriv.isEmpty());
+                orchestratorBaseInfo.setReleasable(!releasePriv.isEmpty());
                 retList.add(orchestratorBaseInfo);
             }
         }

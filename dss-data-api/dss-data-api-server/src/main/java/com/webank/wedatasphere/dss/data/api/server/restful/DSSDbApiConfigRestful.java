@@ -57,7 +57,7 @@ public class DSSDbApiConfigRestful {
      * @return
      */
     @RequestMapping(path = "save", method = RequestMethod.POST)
-    public Message saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
+    public Message saveApi(@Valid @RequestBody ApiConfig apiConfig, HttpServletRequest request) throws JSONException, DataApiException {
         String username = SecurityFilter.getLoginUsername(request);
         apiConfig.setCreateBy(username);
         apiConfig.setUpdateBy(username);
@@ -73,7 +73,7 @@ public class DSSDbApiConfigRestful {
      */
 
     @RequestMapping(path = "/group/create", method = RequestMethod.POST)
-    public Message saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
+    public Message saveGroup(@Valid @RequestBody ApiGroup apiGroup, HttpServletRequest request) {
         String username = SecurityFilter.getLoginUsername(request);
         apiGroup.setCreateBy(username);
         apiConfigService.addGroup(apiGroup);
@@ -116,7 +116,7 @@ public class DSSDbApiConfigRestful {
      */
 
     @RequestMapping(value ="/test/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
-    public Message testApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
+    public Message testApi(HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
 
         try {
             ApiExecuteInfo resJo = apiConfigService.apiTest(path.getPath(), request, map,true);
@@ -139,7 +139,7 @@ public class DSSDbApiConfigRestful {
      */
 
     @RequestMapping(value ="/execute/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
-    public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
+    public Message executeApi(HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
         try {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path.getPath(), request, map);
             Message message = Message.ok().data("response", resJo);

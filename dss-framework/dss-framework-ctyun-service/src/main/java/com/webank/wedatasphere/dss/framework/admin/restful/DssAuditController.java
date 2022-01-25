@@ -15,7 +15,6 @@ import org.apache.linkis.server.Message;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.core.Context;
 import java.util.List;
 
 /**
@@ -34,7 +33,7 @@ public class DssAuditController {
     DssScriptDownloadService dssScriptDownloadService;
 
     @RequestMapping(path = "script/download/save", method = RequestMethod.POST)
-    public Message saveScriptDownload(@RequestBody @Valid DssScriptDownloadAudit dssScriptDownloadAudit, @Context HttpServletRequest request) {
+    public Message saveScriptDownload(@RequestBody @Valid DssScriptDownloadAudit dssScriptDownloadAudit, HttpServletRequest request) {
         String userName = SecurityFilter.getLoginUsername(request);
 //        String userName = "demo";
         dssScriptDownloadAudit.setCreator(userName);

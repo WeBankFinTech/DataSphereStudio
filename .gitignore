@@ -47,7 +47,7 @@ dss-framework/framework-plugins/dss-framework-release-server/target
 dss-framework/dss-framework-admin/target
 dss-framework/dss-framework-sql-template/target
 dss-framework/dss-framework-dbapi-server/target
-dss-framework/dss-framework-ctyun-service/target
+dss-framework/dss-framework-admin-service/target
 
 
 # dss-orchestrator

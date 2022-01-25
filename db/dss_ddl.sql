@@ -1284,7 +1284,7 @@ CREATE TABLE `dss_orchestrator_release_info`  (
   `create_time` datetime NULL DEFAULT NULL,
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='dolphin发布记录';
 
 
 

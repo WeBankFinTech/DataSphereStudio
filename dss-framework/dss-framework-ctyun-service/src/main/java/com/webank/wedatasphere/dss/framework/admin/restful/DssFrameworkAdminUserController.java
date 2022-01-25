@@ -10,7 +10,6 @@ import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
-//import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +71,7 @@ public class DssFrameworkAdminUserController extends BaseController {
 //    @Path("/add")
 /*    @RequestMapping(path ="add", method = RequestMethod.POST)
 
-    public Message add(@Validated @RequestBody DssAdminUser user, @Context HttpServletRequest req
+    public Message add(@Validated @RequestBody DssAdminUser user, HttpServletRequest req
     ) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);

@@ -58,7 +58,7 @@ public class DSSWorkspaceRestful {
         String description = createWorkspaceRequest.getDescription();
         String stringTags = createWorkspaceRequest.getTags();
         String productName = createWorkspaceRequest.getProductName();
-        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName);
+        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName,"");
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName",workSpaceName);
     }
 
@@ -92,7 +92,7 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="getWorkspaceHomePage", method = RequestMethod.GET)
-    public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName){
+    public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName) throws Exception{
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);

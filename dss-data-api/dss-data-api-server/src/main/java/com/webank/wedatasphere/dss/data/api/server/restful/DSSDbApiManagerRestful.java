@@ -28,7 +28,7 @@ public class DSSDbApiManagerRestful {
 
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
-    public Message getApiList(@Context HttpServletRequest request,
+    public Message getApiList(HttpServletRequest request,
                               @RequestParam("workspaceId") Long workspaceId, @RequestParam("apiName") String apiName,
                               @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
         if(pageNow == null){

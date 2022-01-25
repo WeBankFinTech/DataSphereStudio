@@ -80,7 +80,7 @@ public class DSSWorkspaceMenuRestful {
 
 
     @RequestMapping(path ="getStatistics", method = RequestMethod.GET)
-    public Message getStatistics(@Context HttpServletRequest request,
+    public Message getStatistics(HttpServletRequest request,
                                   @QueryParam(WORKSPACE_ID_STR) int workspaceId, @QueryParam("componentId") int componentId){
         Class<? extends AbstractWorkspaceComponentInfoVO> clazz = components.get(componentId);
         AbstractWorkspaceComponentInfoVO vo;

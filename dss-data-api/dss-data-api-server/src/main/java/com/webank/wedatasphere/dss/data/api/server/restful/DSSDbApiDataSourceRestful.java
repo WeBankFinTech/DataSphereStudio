@@ -65,7 +65,7 @@ public class DSSDbApiDataSourceRestful {
 
     @RequestMapping(path ="add", method = RequestMethod.POST)
 
-    public Message addDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
+    public Message addDatasource(@RequestBody DataSource dataSource, HttpServletRequest req) {
 
         dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
         dataSource.setCreateBy(SecurityFilter.getLoginUsername(req));
@@ -89,7 +89,7 @@ public class DSSDbApiDataSourceRestful {
 
     @RequestMapping(path ="edit", method = RequestMethod.POST)
 
-    public Message editDatasource(@RequestBody DataSource dataSource, @Context HttpServletRequest req) {
+    public Message editDatasource(@RequestBody DataSource dataSource, HttpServletRequest req) {
         if (StringUtils.isNotEmpty(dataSource.getPwd())) {
             PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
             dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));

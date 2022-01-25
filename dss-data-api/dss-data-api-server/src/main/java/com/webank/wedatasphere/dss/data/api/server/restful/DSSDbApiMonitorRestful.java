@@ -36,7 +36,7 @@ public class DSSDbApiMonitorRestful {
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
 
-    public Message getApiList(@Context HttpServletRequest request,
+    public Message getApiList(HttpServletRequest request,
                               @RequestParam("workspaceId") Long workspaceId, @RequestParam(value = "apiName",required = false) String apiName,
                               @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
         if(pageNow == null){

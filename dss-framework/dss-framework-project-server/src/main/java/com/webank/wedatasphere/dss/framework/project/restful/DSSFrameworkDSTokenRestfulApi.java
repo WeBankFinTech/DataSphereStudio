@@ -3,13 +3,6 @@
 package com.webank.wedatasphere.dss.framework.project.restful;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +38,7 @@ public class DSSFrameworkDSTokenRestfulApi {
 
 
     @RequestMapping(path ="/ds/token", method = RequestMethod.GET)
-    public Message dsApiServiceTokenCreate(@Context HttpServletRequest req) {
+    public Message dsApiServiceTokenCreate(HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
         SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
@@ -74,7 +67,7 @@ public class DSSFrameworkDSTokenRestfulApi {
    /* @GET
     @Path("/ds/token1")
     public Response apiServiceTokenQuery(
-                                         @Context HttpServletRequest req) {
+                                         HttpServletRequest req) {
 
 
             String userId = SecurityFilter.getLoginUsername(req);

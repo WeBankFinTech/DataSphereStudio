@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import Tag from "../../../../../components/tag/index.vue";
 import { EventBus } from "../../../module/common/eventBus/event-bus";
 export default {
   name: "tabCard",
@@ -148,7 +147,6 @@ export default {
       return layer;
     },
   },
-  components: { Tag },
 };
 </script>
 

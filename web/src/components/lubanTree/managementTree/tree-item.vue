@@ -105,7 +105,7 @@ export default {
     },
     handleGroupMaxHeight() {
       if (this.model.children && this.model.opened) {
-        this.maxHeight = this.model.children.length * 32;
+        this.maxHeight = this.model.children.length * 34;
       } else {
         this.maxHeight = 0;
       }

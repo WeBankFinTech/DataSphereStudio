@@ -10,7 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>dss-framework-ctyun-service</artifactId>
+    <artifactId>dss-framework-admin-service</artifactId>
     <modelVersion>4.0.0</modelVersion>
 
 

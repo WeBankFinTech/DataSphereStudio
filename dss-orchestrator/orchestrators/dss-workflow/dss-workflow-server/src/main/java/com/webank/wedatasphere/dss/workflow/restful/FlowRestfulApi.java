@@ -23,11 +23,13 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
@@ -57,6 +59,8 @@ public class FlowRestfulApi {
     private PublishService publishService;
     @Autowired
     private WorkFlowManager workFlowManager;
+    @Autowired
+    private OrchestratorMapper orchestratorMapper;
     ObjectMapper mapper = new ObjectMapper();
 
     @RequestMapping(value = "addFlow",method = RequestMethod.POST)
@@ -74,9 +78,11 @@ public class FlowRestfulApi {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName,name,contextId,description,parentFlowID,uses,null,dssLabelList);
+
         // TODO: 2019/5/16 空值校验，重复名校验
         return Message.ok().data("flow", dssFlow);
     }
+
 
     @RequestMapping(value = "publishWorkflow",method = RequestMethod.POST)
     public Message publishWorkflow(HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) {
@@ -105,6 +111,24 @@ public class FlowRestfulApi {
             message = Message.error("发布工作流失败");
         }
         return message;
+    }
+
+    @RequestMapping(value = "getSchedulerWorkflowStatus",method = RequestMethod.GET)
+    public Message getSchedulerWorkflowStatus(HttpServletRequest request,
+        @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
+        @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
+        String username = SecurityFilter.getLoginUsername(request);
+        try {
+            WorkflowStatus status = publishService.getSchedulerWorkflowStatus(username, orchestratorId);
+            Message result = Message.ok("获取调度工作流状态").data("published", status.getPublished()).data("releaseStatus",
+                status.getReleaseState());
+            // Message result = Message.ok("获取调度工作流状态").data("published", false).data("releaseStatus", null);
+            return result;
+        } catch (final Throwable t) {
+            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
+                orchestratorId, t);
+            return Message.error("获取工作流调度状态失败");
+        }
     }
 
     /**
@@ -144,6 +168,7 @@ public class FlowRestfulApi {
         return message;
     }
 
+
     /**
      * 更新工作流的基本信息，不包括更新Json,BML版本等
      * @param req
@@ -151,9 +176,10 @@ public class FlowRestfulApi {
      * @return
      * @throws DSSErrorException
      */
+
     @RequestMapping(value = "updateFlowBaseInfo",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message updateFlowBaseInfo(HttpServletRequest req,@RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+    public Message updateFlowBaseInfo(HttpServletRequest req, UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
@@ -193,7 +219,7 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "deleteFlow",method = RequestMethod.POST)
 //    @ProjectPrivChecker
-    public Message deleteFlow(HttpServletRequest req,@RequestBody  DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+    public Message deleteFlow(HttpServletRequest req, DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
         // TODO: 2019/6/13  projectVersionID的更新校验

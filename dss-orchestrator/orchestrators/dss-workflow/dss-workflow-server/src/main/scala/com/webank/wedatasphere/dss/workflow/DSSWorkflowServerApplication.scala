@@ -24,7 +24,7 @@ import org.apache.linkis.common.utils.{Logging, Utils}
 object DSSWorkflowServerApplication extends Logging {
 
   val userName: String = System.getProperty("user.name")
-  val hostName: String = Utils.getComputerName
+  val hostName: String = Utils.getLocalHostname
 
   def main(args: Array[String]): Unit = {
     val serviceName = System.getProperty("serviceName")//ProjectConf.SERVICE_NAME.getValue

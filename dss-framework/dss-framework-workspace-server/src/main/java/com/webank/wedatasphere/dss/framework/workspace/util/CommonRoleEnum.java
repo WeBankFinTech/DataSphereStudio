@@ -26,7 +26,9 @@ public enum CommonRoleEnum {
     DEVELOPER(3, "developer", "开发人员"),
     ANALYSER(4, "analyser", "分析用户"),
     OPERATOR(5, "operator", "运营用户"),
-    BOSS(6, "boss", "领导");
+    BOSS(6, "data_service", "数据服务用户"),
+    VISITOR(7, "data_service", "访客");
+
 
     private int id;
     private String name;

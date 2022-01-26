@@ -33,28 +33,34 @@ public abstract class ProjectService extends AbstractStructureService {
         return true;
     }
 
-   public ProjectCreationOperation getProjectCreationOperation() {
-       return getOrCreate(this::createProjectCreationOperation, ProjectCreationOperation.class);
-   }
+    public ProjectCreationOperation getProjectCreationOperation() {
+        return getOrCreate(this::createProjectCreationOperation, ProjectCreationOperation.class);
+    }
 
-   protected abstract ProjectCreationOperation createProjectCreationOperation();
+    protected abstract ProjectCreationOperation createProjectCreationOperation();
 
-   public ProjectUpdateOperation getProjectUpdateOperation() {
-       return getOrCreate(this::createProjectUpdateOperation, ProjectUpdateOperation.class);
-   }
+    public ProjectUpdateOperation getProjectUpdateOperation() {
+        return getOrCreate(this::createProjectUpdateOperation, ProjectUpdateOperation.class);
+    }
 
-   protected abstract ProjectUpdateOperation createProjectUpdateOperation();
+    protected abstract ProjectUpdateOperation createProjectUpdateOperation();
 
-   public ProjectDeletionOperation getProjectDeletionOperation() {
-       return getOrCreate(this::createProjectDeletionOperation, ProjectDeletionOperation.class);
-   }
+    public ProjectDeletionOperation getProjectDeletionOperation() {
+        return getOrCreate(this::createProjectDeletionOperation, ProjectDeletionOperation.class);
+    }
 
-   protected abstract ProjectDeletionOperation createProjectDeletionOperation();
+    protected abstract ProjectDeletionOperation createProjectDeletionOperation();
 
-   public ProjectUrlOperation getProjectUrlOperation() {
-       return getOrCreate(this::createProjectUrlOperation, ProjectUrlOperation.class);
-   }
+    public ProjectUrlOperation getProjectUrlOperation() {
+        return getOrCreate(this::createProjectUrlOperation, ProjectUrlOperation.class);
+    }
 
-   protected abstract ProjectUrlOperation createProjectUrlOperation();
+    public ProjectGetOperation getProjectGetOperation() {
+        return getOrCreate(this::createProjectGetOperation, ProjectGetOperation.class);
+    }
+
+    protected abstract ProjectGetOperation createProjectGetOperation();
+
+    protected abstract ProjectUrlOperation createProjectUrlOperation();
 
 }

@@ -44,4 +44,7 @@ public interface DSSProjectUserMapper extends BaseMapper<DSSProjectUser> {
     Long isAdminByUsername(@Param("workspaceId")Long workspaceId,@Param("username")String username,@Param("roleId")int roleId);
     List<Long> getUserWorkspaceAdminRole(@Param("workspaceId") Long workspaceId, @Param("username") String username);
 
+
+    @Select("SELECT COUNT(0) FROM dss_workspace_user_role WHERE workspace_id = #{workspaceId} AND username = #{username}")
+    Long isWorkspaceUser(@Param("workspaceId")Long workspaceId,@Param("username")String username);
 }

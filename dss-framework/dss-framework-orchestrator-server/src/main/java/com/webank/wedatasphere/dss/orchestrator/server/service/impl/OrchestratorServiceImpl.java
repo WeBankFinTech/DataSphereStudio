@@ -20,11 +20,13 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyRequestRef;
@@ -38,6 +40,7 @@ import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.loader.utils.OrchestratorLoaderUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.UrlResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
@@ -51,14 +54,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.math3.util.Pair;
+
+import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 
 @Service
 public class OrchestratorServiceImpl implements OrchestratorService {
@@ -86,7 +88,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         //作为Orchestrator的唯一标识，包括跨环境导入导出也不发生变化。
         dssOrchestratorInfo.setUUID(uuid);
         orchestratorMapper.addOrchestrator(dssOrchestratorInfo);
-        Pair<AppInstance, DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+        javafx.util.Pair<AppInstance, DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
                 workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
         AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
@@ -119,6 +121,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                         dssOrchestratorVersion.setUpdater(userName);
                         dssOrchestratorVersion.setVersion(version);
                         dssOrchestratorVersion.setUpdateTime(new Date());
+                        dssOrchestratorVersion.setValidFlag(1);
                         dssOrchestratorVersion.setFormatContextId(contextId);
                         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
                         orchestratorVo.setDssOrchestratorInfo(dssOrchestratorInfo);
@@ -147,7 +150,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                                    DSSOrchestratorInfo dssOrchestratorInfo,
                                    List<DSSLabel> dssLabels) throws Exception {
         orchestratorMapper.updateOrchestrator(dssOrchestratorInfo);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(dssOrchestratorInfo.getId());
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(dssOrchestratorInfo.getId(),1);
 
         //todo 目前写死为工作流，这里应该是要和dssOrchestratorInfo.type作为参数传入
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn("workflow");
@@ -163,8 +166,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorUpdateRef.setDescription(dssOrchestratorInfo.getComment());
             orchestratorUpdateRef.setOrcName(dssOrchestratorInfo.getName());
             orchestratorUpdateRef.setUses(dssOrchestratorInfo.getUses());
+            //插入描述信息
+            //orchestratorUpdateRef.setDescription(dssOrchestratorInfo.getDescription());
             //update ref orchestrator  info
-            Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+            javafx.util.Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
             if (null != standMap ) {
                 RefCRUDService crudService = standMap.getValue().getRefCRUDService(standMap.getKey());
                 if (null != crudService) {
@@ -194,7 +199,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             LOGGER.error("dssOrchestratorInfo is null,no need to  delete");
             return;
         }
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfoId);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorInfoId,1);
 
         //todo 是否需要删除版本信息
 
@@ -214,7 +219,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             LOGGER.error("Failed to create a new ref for {}.", OrchestratorDeleteRequestRef.class, e);
         }
         assert orchestratorDeleteRequestRef != null;
-        Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+        javafx.util.Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
 
         RefCRUDService refCRUDService = standMap.getValue().getRefCRUDService (standMap.getKey());
 
@@ -243,12 +248,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Override
     public String openOrchestrator(String userName, String workspaceName, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception {
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorId);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId,1);
         if (null == dssOrchestratorInfo || null == dssOrchestratorVersion) {
             throw new DSSOrchestratorErrorException(1000856, "can not find orc from db for orcId: " + orchestratorId);
         }
         OrchestratorOpenRequestRef orchestratorOpenRequestRef = null;
-        Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+        javafx.util.Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
 
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
                 workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
@@ -279,7 +284,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     public OrchestratorVo getOrchestratorVoById(Long orchestratorId) {
 
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorId);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId,1);
 
         OrchestratorVo orchestratorVo = new OrchestratorVo();
         orchestratorVo.setDssOrchestratorInfo(dssOrchestratorInfo);
@@ -316,21 +321,24 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
         //3.然后把生产的内容进行update到数据库
-        String latestVersion = orchestratorMapper.getLatestVersion(orchestratorId);
+        String latestVersion = orchestratorMapper.getLatestVersion(orchestratorId,1);
         List<DSSLabel> labels = new ArrayList<>();
         labels.add(dssLabel);
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
-        dssOrchestratorVersion.setId(orchestratorId);
+        dssOrchestratorVersion.setOrchestratorId(orchestratorId);
         dssOrchestratorVersion.setVersion(newVersion);
         dssOrchestratorVersion.setUpdateTime(new Date());
         dssOrchestratorVersion.setProjectId(projectId);
         dssOrchestratorVersion.setUpdater(userName);
         dssOrchestratorVersion.setComment("回滚工作流到版本:" + version);
         dssOrchestratorVersion.setSource("rollback from version :" + version);
-        Long appId = orchestratorMapper.getAppIdByVersion(orchestratorId, version);
-
+        dssOrchestratorVersion.setValidFlag(1);
+        DSSOrchestratorVersion dbOrcVersion = orchestratorMapper.getVersionByOrchestratorIdAndVersion(orchestratorId, version);
+        if (dbOrcVersion == null) {
+            DSSExceptionUtils.dealErrorException(60070, "Rollback version is not exist", DSSOrchestratorErrorException.class);
+        }
         Pair<AppInstance,DevelopmentIntegrationStandard> standMap = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspace.getWorkspaceName(), dssOrchestratorInfo, labels);
 
         if(standMap == null){
@@ -343,13 +351,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 OrchestratorCopyRequestRef orchestratorCopyRequestRef =
                         AppConnRefFactoryUtils.newAppConnRef(OrchestratorCopyRequestRef.class,
                                 refcrudservice.getClass().getClassLoader(), dssOrchestratorInfo.getType());
-                orchestratorCopyRequestRef.setCopyOrcAppId(appId);
-                orchestratorCopyRequestRef.setCopyOrcVersionId(dssOrchestratorVersion.getOrchestratorId());
+                orchestratorCopyRequestRef.setCopyOrcAppId(dbOrcVersion.getAppId());
+                orchestratorCopyRequestRef.setCopyOrcVersionId(dbOrcVersion.getId());
                 orchestratorCopyRequestRef.setUserName(userName);
-                Field field = orchestratorCopyRequestRef.getClass().getDeclaredField("projectName");
-                field.setAccessible(true);
-                field.set(orchestratorCopyRequestRef, projectName);
-
+                orchestratorCopyRequestRef.setProjectName(projectName);
+                //插入版本号
+                orchestratorCopyRequestRef.setParameter("version",dssOrchestratorVersion.getVersion());
                 //5、生成上下文ContextId
                 String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
                 dssOrchestratorVersion.setContextId(contextId);
@@ -363,6 +370,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 dssOrchestratorVersion.setFormatContextId(contextId);
                 //update appConn node contextId
                 orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+                synProjectOrchestratorVersionId(dssOrchestratorVersion,labels);
             } catch (final Throwable t) {
                 LOGGER.error("Faild to copy app in orchestrator server", t);
                 DSSExceptionUtils.dealErrorException(60099, "Faild to copy app in orchestrator server", t, DSSOrchestratorErrorException.class);
@@ -370,6 +378,21 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             return dssOrchestratorVersion.getVersion();
         } else {
             throw new DSSOrchestratorErrorException(10023, "获取第三方应用的Ref为空，不能完成拷贝操作！");
+        }
+    }
+
+
+    public void synProjectOrchestratorVersionId(DSSOrchestratorVersion dssOrchestratorVersion,List<DSSLabel> dssLabels){
+        //Is dev environment
+        if(DSSLabelUtil.isDevEnv(dssLabels)){
+            RequestProjectUpdateOrcVersion updateOrchestratorVersion = new RequestProjectUpdateOrcVersion();
+            updateOrchestratorVersion.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
+            updateOrchestratorVersion.setVersionId(dssOrchestratorVersion.getId());
+            updateOrchestratorVersion.setDssLabels(dssLabels);
+            updateOrchestratorVersion.setProjectId(dssOrchestratorVersion.getProjectId());
+            //将最新的编排版本ID更新到工程编排表
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(updateOrchestratorVersion);
         }
     }
 

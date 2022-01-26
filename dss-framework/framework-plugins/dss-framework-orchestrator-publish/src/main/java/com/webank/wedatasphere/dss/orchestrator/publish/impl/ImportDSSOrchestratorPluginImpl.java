@@ -22,12 +22,15 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
@@ -51,12 +54,14 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import javafx.util.Pair;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.math3.util.Pair;
 
 
 @Component
@@ -75,8 +80,16 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long importOrchestrator(String userName, String workspaceName, String projectName, Long projectId, String resourceId, String version,
-        List<DSSLabel> dssLabels, Workspace workspace) throws Exception {
+    public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
+        String userName = requestImportOrchestrator.getUserName();
+        String workspaceName = requestImportOrchestrator.getWorkspaceName();
+        String projectName = requestImportOrchestrator.getProjectName();
+        Long projectId = requestImportOrchestrator.getProjectId();
+        String resourceId = requestImportOrchestrator.getResourceId();
+        String version = requestImportOrchestrator.getBmlVersion();
+        List<DSSLabel> dssLabels = requestImportOrchestrator.getDssLabels();
+        Workspace workspace = DSSCommonUtils.COMMON_GSON.fromJson(requestImportOrchestrator.getWorkspaceStr(), Workspace.class);
+
         Long appId = null;
         //1、下载BML的Orchestrator的导入包
         String inputZipPath = IoUtils.generateIOPath(userName, projectName, DEFAULT_ORC_NAME + ".zip");
@@ -88,8 +101,15 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         List<DSSOrchestratorInfo> dssOrchestratorInfos = metaInputService.importOrchestrator(inputPath);
         DSSOrchestratorInfo importDssOrchestratorInfo = dssOrchestratorInfos.get(0);
 
+        //复制工程，直接使用新的UUID和复制后的工程ID
+        if (requestImportOrchestrator.getCopyProjectId() != null
+                && StringUtils.isNotBlank(requestImportOrchestrator.getCopyProjectName())) {
+            projectId = requestImportOrchestrator.getCopyProjectId();
+            importDssOrchestratorInfo.setProjectId(projectId);
+            importDssOrchestratorInfo.setUUID(UUID.randomUUID().toString());
+        }
         //根据工程ID和编排名称查询
-        String uuid = orchestratorMapper.getOrcNameByParam(importDssOrchestratorInfo.getProjectId(),importDssOrchestratorInfo.getName());
+        String uuid = orchestratorMapper.getOrcNameByParam(importDssOrchestratorInfo.getProjectId(), importDssOrchestratorInfo.getName());
         //通过UUID查找是否已经导入过
         DSSOrchestratorInfo existFlag = orchestratorMapper.getOrchestratorByUUID(importDssOrchestratorInfo.getUUID());
         //add 和update都需要更新成当前环境id信息，放到新的版本记录中
@@ -98,17 +118,21 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             //判断是否存在相同名称的编排名称
             if (StringUtils.isNotBlank(uuid) && !uuid.equals(importDssOrchestratorInfo.getUUID())) {
                 DSSExceptionUtils
-                        .dealErrorException(61002, "The same orchestration name already exists" ,DSSErrorException.class);
-
+                        .dealErrorException(61002, "The same orchestration name already exists", DSSErrorException.class);
             }
+            importDssOrchestratorInfo.setId(existFlag.getId());
             //如果Orchestrator已经导入过，目前只更新版本信息，并更新基础信息name,其它信息不修改。
             orchestratorMapper.updateOrchestrator(importDssOrchestratorInfo);
         } else {
             //判断是否存在相同名称的编排名称
             if (StringUtils.isNotBlank(uuid)) {
                 DSSExceptionUtils
-                        .dealErrorException(61002, "The same orchestration name already exists" ,DSSErrorException.class);
+                        .dealErrorException(61002, "The same orchestration name already exists", DSSErrorException.class);
             }
+            //使用生产环境的id
+            importDssOrchestratorInfo.setId(null);
+            importDssOrchestratorInfo.setCreator(userName);
+            importDssOrchestratorInfo.setCreateTime(new Date());
             orchestratorMapper.addOrchestrator(importDssOrchestratorInfo);
         }
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
@@ -128,11 +152,13 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setProjectId(projectId);
         dssOrchestratorVersion.setSource("Orchestrator create");
         dssOrchestratorVersion.setUpdater(userName);
+        //生产导入：默认是为无效，开发环境为有效
+        dssOrchestratorVersion.setValidFlag(DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0);
 
-        String oldVersion = orchestratorMapper.getLatestVersion(importDssOrchestratorInfo.getId());
-        if (StringUtils.isNotEmpty(oldVersion)){
+        String oldVersion = orchestratorMapper.getLatestVersion(importDssOrchestratorInfo.getId(), 1);
+        if (StringUtils.isNotEmpty(oldVersion)) {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion));
-        }else{
+        } else {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
 
@@ -146,20 +172,24 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         //6、导出第三方应用信息，如工作流、Visualis、Qualities
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
-            workspaceName, importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
+                workspaceName, importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
         AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
+        if (null == orchestratorAppConn) {
+            DSSExceptionUtils
+                    .dealErrorException(61004, "import workflow failed for orchestratorAppConn is null", DSSErrorException.class);
+        }
         Pair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
-            .getOrcDevelopStandard(userName, workspaceName, importDssOrchestratorInfo, dssLabels);
+                .getOrcDevelopStandard(userName, workspaceName, importDssOrchestratorInfo, dssLabels);
         if (null != standardPair) {
             RefImportService refImportService = standardPair.getValue().getRefImportService(standardPair.getKey());
             OrchestratorImportRequestRef orchestratorImportRequestRef = null;
             try {
                 orchestratorImportRequestRef =
-                    (OrchestratorImportRequestRef) RefFactory.INSTANCE.newRef(OrchestratorImportRequestRef.class,
-                        orchestratorAppConn.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn.workflow.ref");
+                        (OrchestratorImportRequestRef) RefFactory.INSTANCE.newRef(OrchestratorImportRequestRef.class,
+                                orchestratorAppConn.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn.workflow.ref");
             } catch (final Exception e) {
                 DSSExceptionUtils
-                    .dealErrorException(61001, "failed to new ref with class " + OrchestratorImportRequestRef.class.getName(), e, DSSErrorException.class);
+                        .dealErrorException(61001, "failed to new ref with class " + OrchestratorImportRequestRef.class.getName(), e, DSSErrorException.class);
             }
             orchestratorImportRequestRef.setResourceId(orcResourceId);
             orchestratorImportRequestRef.setBmlVersion(orcBmlVersion);
@@ -172,6 +202,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             //todo getSourceEnv
             orchestratorImportRequestRef.setSourceEnv(ioEnv);
             orchestratorImportRequestRef.setOrcVersion(dssOrchestratorVersion.getVersion());
+            orchestratorImportRequestRef.setDSSLabels(dssLabels);
             CommonResponseRef responseRef = (CommonResponseRef) refImportService.getRefImportOperation().importRef(orchestratorImportRequestRef);
             appId = responseRef.getOrcId();
             String appContent = responseRef.getContent();
@@ -180,15 +211,23 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             dssOrchestratorVersion.setAppId(appId);
             dssOrchestratorVersion.setContent(appContent);
             orchestratorMapper.updateOrchestratorVersion(dssOrchestratorVersion);
-
+        } else {
+            DSSExceptionUtils
+                    .dealErrorException(61003, "import workflow failed for standardPair is null", DSSErrorException.class);
         }
-
-        RequestProjectImportOrchestrator projectImportOrchestrator = new RequestProjectImportOrchestrator();
-        BeanUtils.copyProperties(importDssOrchestratorInfo,projectImportOrchestrator);
-        projectImportOrchestrator.setVersionId(dssOrchestratorVersion.getId());
-        //保存工程级别的编排模式
-        DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectImportOrchestrator);
+        synProjectOrchestrator(importDssOrchestratorInfo, dssOrchestratorVersion, dssLabels);
         return dssOrchestratorVersion.getOrchestratorId();
+    }
+
+    public void synProjectOrchestrator(DSSOrchestratorInfo importDssOrchestratorInfo,DSSOrchestratorVersion dssOrchestratorVersion,List<DSSLabel> dssLabels){
+        //Is dev environment
+        if(DSSLabelUtil.isDevEnv(dssLabels)){
+            RequestProjectImportOrchestrator projectImportOrchestrator = new RequestProjectImportOrchestrator();
+            BeanUtils.copyProperties(importDssOrchestratorInfo,projectImportOrchestrator);
+            projectImportOrchestrator.setVersionId(dssOrchestratorVersion.getId());
+            //保存工程级别的编排模式
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(projectImportOrchestrator);
+        }
     }
 }

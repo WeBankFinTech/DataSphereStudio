@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -26,10 +27,12 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFramework
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.utils.Utils;
@@ -55,10 +58,17 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     private OrchestratorMapper orchestratorMapper;
 
     @Autowired
+    private OrchestratorJobMapper orchestratorJobMapper;
+
+    @Autowired
     private DSSOrchestratorContext dssOrchestratorContext;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
-    private Map<String, OrchestratorConversionJob> orchestratorConversionJobMap = new ConcurrentHashMap<>();
+    //    private Map<String, OrchestratorConversionJob> orchestratorConversionJobMap = new ConcurrentHashMap<>();
+    /*private Cache<String, OrchestratorConversionJob> orchestratorConversionJobMap = CacheBuilder.newBuilder()
+            .maximumSize(OrchestratorConf.MAX_ID_INSTANCE_CACHE_SUM)
+            .expireAfterWrite(OrchestratorConf.ORCHESTRATION_ID_EXPIRE_TIMEMILLS.getValue(), TimeUnit.MILLISECONDS)
+            .build();*/
     private AtomicInteger idGenerator = new AtomicInteger();
 
     @Override
@@ -85,19 +95,31 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 publishedOrcIds.add(toPublishOrcId);
             }
             for (Long orcId : publishedOrcIds) {
-                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orcId);
+                int validFlag = 1;
+                if (orcId.longValue() == toPublishOrcId.longValue() && !DSSLabelUtil.isDevEnv(labels)) {
+                    validFlag = 0;
+                }
+                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,validFlag);
+                if (dssOrchestratorVersion == null) {
+                    continue;
+                }
                 refAppIdList.add(dssOrchestratorVersion.getAppId());
             }
         } else {
             publishedOrcIds = new ArrayList<>();
             if(requestConversionOrchestration.getOrcAppId() != null) {
                 publishedOrcIds.add(toPublishOrcId);
-                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(toPublishOrcId);
-                refAppIdList.add(dssOrchestratorVersion.getAppId());
+                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(toPublishOrcId,1);
+                if (dssOrchestratorVersion != null) {
+                    refAppIdList.add(dssOrchestratorVersion.getAppId());
+                }
             }
             if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
                 for (Long orcId : requestConversionOrchestration.getOrcIds()) {
-                    DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orcId);
+                    DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
+                    if (dssOrchestratorVersion == null) {
+                        continue;
+                    }
                     publishedOrcIds.add(orcId);
                     refAppIdList.add(dssOrchestratorVersion.getAppId());
                 }
@@ -118,18 +140,32 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         entity.setProject(dssProject);
         job.setConversionJobEntity(entity);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
-        job.afterConversion(response -> this.updateDBAfterConversion(response, job, requestConversionOrchestration));
+        job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId,response, job, requestConversionOrchestration));
         //submit it
         releaseThreadPool.submit(job);
-        orchestratorConversionJobMap.put(job.getId(), job);
+        DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
+        // todo insert publishJob
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }
 
     @Override
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
-        OrchestratorConversionJob job = orchestratorConversionJobMap.get(id);
+        //OrchestratorConversionJob job = orchestratorConversionJobMap.getIfPresent(id);
+        OrchestratorConversionJob job = DSSOrchestratorConstant.orchestratorConversionJobMap.get(id);
+        /*if (null == job) {
+            OrchestratorPublishJob orchestratorPublishJob = orchestratorJobMapper.getPublishJobByJobId(id);
+            if (null != orchestratorPublishJob && StringUtils.isNotBlank(orchestratorPublishJob.getConversionJobJson())) {
+                // tod check
+                job = BDPJettyServerHelper.gson().fromJson(orchestratorPublishJob.getConversionJobJson(), OrchestratorConversionJob.class);
+                orchestratorConversionJobMap.put(job.getId(), job);
+            } else {
+                return new ResponseConvertOrchestrator(id, new ResponseOperateOrchestrator().setJobStatus(JobStatus.Failed).setMessage("Cannot find jobstatus."));
+            }
+        }*/
+        // todo 找不到从db加载
         if(job.getConversionJobEntity().getResponse().isCompleted()) {
-            orchestratorConversionJobMap.remove(id);
+//            orchestratorConversionJobMap.invalidate(id);
+            DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
         }
         return new ResponseConvertOrchestrator(job.getId(), job.getConversionJobEntity().getResponse());
     }
@@ -139,22 +175,43 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Transactional(rollbackFor = Exception.class)
-    private void updateDBAfterConversion(ResponseOperateOrchestrator response,
-        OrchestratorConversionJob job,
-        RequestFrameworkConvertOrchestration requestConversionOrchestration) {
+    private void updateDBAfterConversion(Long toPublishOrcId,ResponseOperateOrchestrator response,
+                                         OrchestratorConversionJob job,
+                                         RequestFrameworkConvertOrchestration requestConversionOrchestration) {
         LOGGER.info("{} completed with status {}.", job.getId(), response.getJobStatus());
         if(response.isSucceed()) {
             //1. 进行导出,用于升级版本,目的是为了复用原来的代码
             List<Long> orcIdList = job.getConversionJobEntity().getOrcIdList();
-            orcIdList.forEach(DSSExceptionUtils.handling(orcId -> {
-                DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orcId);
-                dssOrchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class)
-                    .orchestratorVersionIncrease(orcId, job.getConversionJobEntity().getUserName(), requestConversionOrchestration.getComment(),
-                        requestConversionOrchestration.getWorkspace().getWorkspaceName(), dssOrchestratorInfo,
-                        job.getConversionJobEntity().getProject().getName(), job.getConversionJobEntity().getLabels());
-            }));
+            // 开发环境才新增版本号
+            if(DSSLabelUtil.isDevEnv(job.getConversionJobEntity().getLabels())){
+                orcIdList.forEach(DSSExceptionUtils.handling(orcId -> {
+                    DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orcId);
+                    dssOrchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class)
+                            .orchestratorVersionIncrease(orcId, job.getConversionJobEntity().getUserName(), requestConversionOrchestration.getComment(),
+                                    requestConversionOrchestration.getWorkspace().getWorkspaceName(), dssOrchestratorInfo,
+                                    job.getConversionJobEntity().getProject().getName(), job.getConversionJobEntity().getLabels());
+                }));
+            }
             //2. 做一个标记表示已经发布过了
             orcIdList.forEach(orchestratorMapper::setPublished);
+            //3.更新当前的提交的发布编排模式版本的common
+            updateCurrentPublishOrchestratorCommon(toPublishOrcId,requestConversionOrchestration.getComment(),job.getConversionJobEntity().getLabels());
         }
+    }
+
+    public void updateCurrentPublishOrchestratorCommon(Long orcId,String realComment,List<DSSLabel> dssLabels) {
+        //DEV环境获取获取最新有效的版本即可
+        int validFlag = 1;
+        if (!DSSLabelUtil.isDevEnv(dssLabels)) {
+            //PROD获取当前编排模式最新版本的ID
+            validFlag = 0;
+        }
+        DSSOrchestratorVersion version = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,validFlag);
+        DSSOrchestratorVersion updateCommentVersion = new DSSOrchestratorVersion();
+        updateCommentVersion.setId(version.getId());
+        updateCommentVersion.setComment(realComment);
+        updateCommentVersion.setUpdateTime(new Date());
+        updateCommentVersion.setValidFlag(1);
+        orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
     }
 }

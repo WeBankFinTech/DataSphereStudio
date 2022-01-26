@@ -52,6 +52,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: RequestQueryOrchestrator => receiver
     case _: RequestFrameworkConvertOrchestration => receiver
     case _: RequestFrameworkConvertOrchestrationStatus => receiver
+    case _: RequestAddVersionAfterPublish => receiver
     case _: RequestOrchestratorVersion => receiver
     case _ => None
   }

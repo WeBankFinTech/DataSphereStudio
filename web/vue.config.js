@@ -147,8 +147,7 @@ const configWrap = config => {
 module.exports = {
   publicPath: "./",
   outputDir: "dist/dist",
-  // lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
-  lintOnSave: false,
+  lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
   productionSourceMap: process.env.NODE_ENV === "dev", // 生产环境无需source map加速构建
   css: {
     loaderOptions: {

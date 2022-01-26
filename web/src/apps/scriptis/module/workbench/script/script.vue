@@ -98,7 +98,6 @@ import log from '@/components/consoleComponent/log.vue';
 import weProgress from '@/components/consoleComponent/progress.vue';
 import elementResizeEvent from '@/common/helper/elementResizeEvent';
 import mixin from '@/common/service/mixin';
-// import { debug } from 'console';
 
 export default {
   components: {

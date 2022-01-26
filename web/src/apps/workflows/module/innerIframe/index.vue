@@ -6,7 +6,7 @@
       </div>
     </template>
     <template v-else>
-      <iframe :src="`${url}?projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
+      <iframe :src="`${url}&projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
     </template>
   </div>
 </template>

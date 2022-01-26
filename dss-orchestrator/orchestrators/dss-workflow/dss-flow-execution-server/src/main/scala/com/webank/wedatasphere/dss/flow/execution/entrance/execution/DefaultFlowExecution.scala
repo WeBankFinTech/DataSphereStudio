@@ -44,14 +44,15 @@ class DefaultFlowExecution extends FlowExecution with Logging {
     info(s"${flowEntranceJob.getId} Start to run executable node")
     val scheduledNodes = flowEntranceJob.getFlowContext.getScheduledNodes
 
-    if( ! scheduledNodes.isEmpty) {
+    if (!scheduledNodes.isEmpty) {
       // get executableNodes
-      flowEntranceJob.getFlowContext synchronized{
+      flowEntranceJob.getFlowContext synchronized {
         val runners = new ArrayBuffer[NodeRunner]()
         runners.addAll(scheduledNodes.values())
         val runningNodes = new ArrayBuffer[NodeRunner]()
-        runners.foreach{ runner =>
-          if ( ! FlowExecutionUtils.isSkippedNode(runner.getNode)){
+        val params = flowEntranceJob.getParams
+        runners.foreach { runner =>
+          if (!FlowExecutionUtils.isSkippedNode(runner.getNode, params.asInstanceOf[java.util.Map[String, Any]])) {
             info(s"scheduled node ${runner.getNode.getName} to running")
             runner.fromScheduledTunToState(NodeExecutionState.Running)
             // submit node runner
@@ -59,22 +60,22 @@ class DefaultFlowExecution extends FlowExecution with Logging {
           }
         }
         //避免skip节点导致任务重复提交，所以先要把所有running节点收集完成，改变状态，再来收集skipped节点，skipped节点被多次提交不受影响。
-        runners.foreach{
-          runner =>{
-            if (FlowExecutionUtils.isSkippedNode(runner.getNode)){
+        runners.foreach {
+          runner => {
+            if (FlowExecutionUtils.isSkippedNode(runner.getNode, params.asInstanceOf[java.util.Map[String, Any]])) {
               info(s"This node ${runner.getNode.getDSSNode.getName} Skipped in execution")
               runner.fromScheduledTunToState(NodeExecutionState.Skipped)
             }
           }
         }
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
-        runningNodes.foreach{ node =>
+        runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
           node.run()
           nodeRunnerQueue.put(node)
-          if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue){
+          if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue) {
             scheduledThreadPool.scheduleAtFixedRate(new NodeExecutionStatusPoller(nodeRunnerQueue), 1,
-              FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_SCHEDULER_TIME.getValue ,TimeUnit.SECONDS)
+              FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_SCHEDULER_TIME.getValue, TimeUnit.SECONDS)
             pollerCount = pollerCount + 1
           }
         }

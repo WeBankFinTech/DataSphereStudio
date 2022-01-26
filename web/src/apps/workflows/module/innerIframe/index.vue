@@ -19,7 +19,7 @@ export default {
   },
   mounted() {
     let baseInfo = JSON.parse(localStorage.getItem('baseInfo'))
-    let applicationItem = baseInfo.applications.filter(item => item.name == 'realTimeJobCenter')[0]
+    let applicationItem = baseInfo.applications.filter(item => item.name == "streamis")[0]
     this.url = applicationItem.projectUrl;
     console.log('this.url', this.url)
   },

@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis;
 
-import com.webank.wedatasphere.dss.appconn.visualis.execution.VisualisExecutionService;
+import com.webank.wedatasphere.dss.appconn.visualis.service.VisualisExecutionService;
 import com.webank.wedatasphere.dss.appconn.visualis.service.*;
 import com.webank.wedatasphere.dss.standard.app.development.service.*;
 import com.webank.wedatasphere.dss.standard.app.development.standard.AbstractDevelopmentIntegrationStandard;

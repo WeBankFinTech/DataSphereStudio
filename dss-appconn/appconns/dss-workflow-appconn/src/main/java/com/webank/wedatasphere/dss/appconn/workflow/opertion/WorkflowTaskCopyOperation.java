@@ -25,6 +25,8 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.RequestCopyWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCopyWorkflow;
 import org.apache.linkis.rpc.Sender;
 
+import java.util.Optional;
+
 
 public class WorkflowTaskCopyOperation implements RefCopyOperation<WorkflowCopyRequestRef> {
     private DevelopmentService service;
@@ -44,7 +46,8 @@ public class WorkflowTaskCopyOperation implements RefCopyOperation<WorkflowCopyR
         String workspaceName = workflowCopyRequestRef.getWorkspaceName();
         String contextIdStr = workflowCopyRequestRef.getContextID();
         String projectName = workflowCopyRequestRef.getProjectName();
-        String version = workflowCopyRequestRef.getVersion();
+        //插入version
+        String version = Optional.ofNullable(workflowCopyRequestRef.getParameter("version")).map(Object::toString).get();
         String description = workflowCopyRequestRef.getDescription();
         RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
                 workspaceName, appId, contextIdStr,

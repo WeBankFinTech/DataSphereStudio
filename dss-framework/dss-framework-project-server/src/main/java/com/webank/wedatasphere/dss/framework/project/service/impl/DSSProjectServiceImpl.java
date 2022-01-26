@@ -35,7 +35,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
@@ -46,6 +48,7 @@ import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
@@ -57,6 +60,11 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProjectDO> implements DSSProjectService {
@@ -115,6 +123,25 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<DSSProjectDO>();
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
+        projectMapper.update(project, updateWrapper);
+    }
+
+    //修改旧dss_project工程字段
+    @Override
+    public void modifyOldProject(DSSProjectDO updateProject, DSSProjectDO dbProject) throws DSSProjectErrorException {
+        //校验当前登录用户是否含有修改权限
+//        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
+        DSSProjectDO project = new DSSProjectDO();
+        //修改的字段
+        project.setUpdateTime(new Date());
+        project.setUpdateByStr(updateProject.getUpdateByStr());
+        project.setDescription(updateProject.getDescription());
+        project.setBusiness(updateProject.getBusiness());
+        project.setApplicationArea(updateProject.getApplicationArea());
+
+        UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<DSSProjectDO>();
+        updateWrapper.eq("id", dbProject.getId());
+        updateWrapper.eq("workspace_id", dbProject.getWorkspaceId());
         projectMapper.update(project, updateWrapper);
     }
 
@@ -282,7 +309,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         List<AppInstance> appInstances = appConn.getAppDesc().getAppInstancesByLabels(dssLabels);
         if (appInstances.get(0) != null) {
             Long appInstanceId = appInstances.get(0).getId();
-            return projectMapper.getAppConnProjectId(appInstanceId, dssProjectId);
+            return getAppConnProjectId(appInstanceId, dssProjectId);
         } else {
             LOGGER.error("appInstances is null {}", appInstances);
             return null;
@@ -290,12 +317,39 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    @Transactional
-    public void deleteProject(Long projectId) {
-        // 删除项目信息
-        projectMapper.deleteProjectInfo(projectId);
-        // 删除项目角色信息
-        projectUserMapper.deleteAllPriv(projectId);
+    public Long getAppConnProjectId(Long appInstanceId, Long dssProjectId) throws Exception {
+        return projectMapper.getAppConnProjectId(appInstanceId, dssProjectId);
+    }
+
+    @Override
+    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace) throws Exception  {
+        LOGGER.warn("user {} begins to delete project {}.", username, projectDeleteRequest);
+        DSSProjectDO dssProjectDO = projectMapper.selectById(projectDeleteRequest.getId());
+        if (dssProjectDO == null) {
+            throw new DSSErrorException(600001, "工程不存在" );
+        }
+        if(!dssProjectDO.getUsername().equalsIgnoreCase(username)){
+            throw new DSSErrorException(600002, "刪除工程失敗，沒有权限操作" );
+        }
+        if(projectDeleteRequest.isIfDelOtherSys()) {
+            ProjectRequestRef projectRequestRef = new ProjectRequestRefImpl();
+            projectRequestRef.setName(dssProjectDO.getName());
+            projectRequestRef.setWorkspace(workspace);
+            AppConnManager.getAppConnManager().listAppConns().stream().filter(appConn -> appConn instanceof OnlyStructureAppConn).forEach(appConn -> {
+                OnlyStructureAppConn structureAppConn = (OnlyStructureAppConn) appConn;
+                appConn.getAppDesc().getAppInstances().forEach(DSSExceptionUtils.handling(appInstance -> {
+                    ProjectService projectService = structureAppConn.getOrCreateStructureStandard().getProjectService(appInstance);
+                    if(projectService != null) {
+                        ProjectDeletionOperation projectDeletionOperation = projectService.getProjectDeletionOperation();
+                        if(projectDeletionOperation != null) {
+                            projectDeletionOperation.deleteProject(projectRequestRef);
+                        }
+                    }
+                }));
+            });
+        }
+        projectMapper.deleteProject(projectDeleteRequest.getId());
+        LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
     }
 
     @Override

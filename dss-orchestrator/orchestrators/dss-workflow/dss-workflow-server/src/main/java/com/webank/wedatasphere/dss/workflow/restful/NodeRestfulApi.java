@@ -66,11 +66,10 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 public class NodeRestfulApi {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     private FunctionInvoker functionInvoker;
     @Autowired
-    private DSSFlowService DSSFlowService;
+    private DSSFlowService dssFlowService;
     @Autowired
     private WorkflowNodeService workflowNodeService;
 
@@ -165,19 +164,18 @@ public class NodeRestfulApi {
         Long flowID = createExternalNodeRequest.getFlowID();
         Map<String, Object> params = createExternalNodeRequest.getParams();
 
-
         logger.info("CreateExternalNode request params is " + params + ",nodeType:" + nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
-        node.setProjectId(projectID);
         node.setNodeType(nodeType);
         node.setFlowId(flowID);
+        node.setProjectId(projectID);
         //update by peaceWong add nodeID to appConnNode
         String nodeID = createExternalNodeRequest.getNodeID();
         if (null != nodeID) {
             node.setId(nodeID.toString());
         }
         //update by shanhuang json中解析获取contextID,然后放到请求参数中
-        DSSFlow DSSFlow = DSSFlowService.getLatestVersionFlow(flowID);
+        DSSFlow DSSFlow = dssFlowService.getLatestVersionFlow(flowID);
         String flowContent = DSSFlow.getFlowJson();
         String ContextIDStr = DSSCSHelper.getContextIDStrByJson(flowContent);
         params.put(CSCommonUtils.CONTEXT_ID_STR, ContextIDStr);

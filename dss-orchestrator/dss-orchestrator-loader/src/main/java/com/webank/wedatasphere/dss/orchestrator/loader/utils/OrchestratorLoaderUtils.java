@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import org.apache.commons.math3.util.Pair;
+import javafx.util.Pair;
 
 @Component
 public class OrchestratorLoaderUtils {

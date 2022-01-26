@@ -8,6 +8,8 @@ public class SaveFlowRequest {
     private String json;
     private String workspaceName;
     private String projectName;
+    private String flowEditLock;
+    private Boolean isNotHaveLock;
     private LabelRouteVO labels;
 
     public Long getId() {
@@ -48,5 +50,21 @@ public class SaveFlowRequest {
 
     public void setLabels(LabelRouteVO labels) {
         this.labels = labels;
+    }
+
+    public String getFlowEditLock() {
+        return flowEditLock;
+    }
+
+    public void setFlowEditLock(String flowEditLock) {
+        this.flowEditLock = flowEditLock;
+    }
+
+    public Boolean getNotHaveLock() {
+        return isNotHaveLock;
+    }
+
+    public void setNotHaveLock(Boolean notHaveLock) {
+        isNotHaveLock = notHaveLock;
     }
 }

@@ -32,9 +32,9 @@ public class DSSFlow implements Flow {
     private Boolean isRootFlow;
     private Integer rank;
     private Long projectID;
-    private String  linkedAppConnNames;
-    private String  dssLabels;
-
+    private String linkedAppConnNames;
+    private String dssLabels;
+    private String flowEditLock;//工作流编辑锁
     /**
      * 0disable 1 enable  0表示工作流从来没存过，发布的时候忽略
      */
@@ -118,7 +118,7 @@ public class DSSFlow implements Flow {
     }
 
     public void addChildren(DSSFlow children) {
-        if (this.children == null){
+        if (this.children == null) {
             this.children = new ArrayList<>();
         }
         this.children.add(children);
@@ -218,5 +218,39 @@ public class DSSFlow implements Flow {
 
     public void setDssLabels(String dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public String getFlowEditLock() {
+        return flowEditLock;
+    }
+
+    public void setFlowEditLock(String flowEditLock) {
+        this.flowEditLock = flowEditLock;
+    }
+
+    @Override
+    public String toString() {
+        return "DSSFlow{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", state=" + state +
+                ", source='" + source + '\'' +
+                ", description='" + description + '\'' +
+                ", createTime=" + createTime +
+                ", creator='" + creator + '\'' +
+                ", isRootFlow=" + isRootFlow +
+                ", rank=" + rank +
+                ", projectID=" + projectID +
+                ", linkedAppConnNames='" + linkedAppConnNames + '\'' +
+                ", dssLabels='" + dssLabels + '\'' +
+                ", flowEditLock='" + flowEditLock + '\'' +
+                ", hasSaved=" + hasSaved +
+                ", uses='" + uses + '\'' +
+                ", children=" + children +
+                ", flowType='" + flowType + '\'' +
+                ", resourceId='" + resourceId + '\'' +
+                ", bmlVersion='" + bmlVersion + '\'' +
+                ", flowJson='" + flowJson + '\'' +
+                '}';
     }
 }

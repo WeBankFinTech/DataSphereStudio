@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.service.WorkflowQuery
 import com.webank.wedatasphere.dss.flow.execution.entrance.status.TaskStatus
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
 import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.governance.common.entity.job.JobRequest
 import org.apache.linkis.governance.common.entity.task._
 import org.apache.linkis.manager.label.utils.LabelUtils
 import org.apache.linkis.protocol.utils.ZuulEntranceUtils
@@ -45,15 +46,18 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
 //  @Autowired
 //  private var queryCacheService: QueryCacheService = _
 
-  override def add(requestInsertTask: RequestInsertTask): ResponsePersist = {
+  override def add(requestInsertTask: RequestInsertTask,jobRequest: JobRequest): ResponsePersist = {
     info("Insert data into the database(往数据库中插入数据)：" + requestInsertTask.toString)
 //    QueryUtils.storeExecutionCode(requestInsertTask)
     val persist = new ResponsePersist
     Utils.tryCatch {
       val queryTask = requestPersistTaskTask2QueryTask(requestInsertTask)
-      taskMapper.insertTask(queryTask)
+      val insertEntity = new WorkflowQueryTask();
+      BeanUtils.copyProperties(queryTask,insertEntity)
+      insertEntity.setExecutionCode(jobRequest.getExecutionCode)
+      taskMapper.insertTask(insertEntity)
       val map = new util.HashMap[String, Object]()
-      map.put("taskID", queryTask.getTaskID())
+      map.put("taskID", insertEntity.getTaskID())
       persist.setStatus(0)
       persist.setData(map)
     } {
@@ -88,7 +92,9 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
         if (oldStatus != null && !shouldUpdate(oldStatus, requestUpdateTask.getStatus))
           throw new FlowQueryErrorException(100639,s"${requestUpdateTask.getTaskID}数据库中的task状态为：${oldStatus}更新的task状态为：${requestUpdateTask.getStatus}更新失败！")
       }
-      taskMapper.updateTask(requestPersistTaskTask2QueryTask(requestUpdateTask))
+      val updateTask = requestPersistTaskTask2QueryTask(requestUpdateTask)
+      updateTask.setUpdatedTime(new Date())
+      taskMapper.updateTask(updateTask)
 
       //updated by shanhuang to write cache
       //todo  add cache

@@ -38,6 +38,8 @@ public abstract class AbstractAppConnNode {
 
     String nodeType;
 
+    String contextId;
+
     Map<String, Object> jobContent;
 
     public AbstractAppConnNode(String projectName, long projectId, String flowName, long flowId,
@@ -55,6 +57,13 @@ public abstract class AbstractAppConnNode {
 
     }
 
+
+    public String getContextId() {
+        return contextId;
+    }
+
+    public void setContextId(String contextId) {
+        this.contextId = contextId;  }
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;

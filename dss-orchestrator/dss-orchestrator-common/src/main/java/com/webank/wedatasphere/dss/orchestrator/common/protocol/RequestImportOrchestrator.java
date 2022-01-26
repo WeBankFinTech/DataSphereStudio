@@ -33,6 +33,8 @@ public class RequestImportOrchestrator {
     private String orchestratorName;
     private List<DSSLabel> dssLabels;
     private String workspaceStr;
+    private Long copyProjectId;
+    private String copyProjectName;
 
     public RequestImportOrchestrator(String userName,
                                      String workspaceName,
@@ -125,5 +127,21 @@ public class RequestImportOrchestrator {
 
     public void setWorkspaceStr(String workspaceStr) {
         this.workspaceStr = workspaceStr;
+    }
+
+    public Long getCopyProjectId() {
+        return copyProjectId;
+    }
+
+    public void setCopyProjectId(Long copyProjectId) {
+        this.copyProjectId = copyProjectId;
+    }
+
+    public String getCopyProjectName() {
+        return copyProjectName;
+    }
+
+    public void setCopyProjectName(String copyProjectName) {
+        this.copyProjectName = copyProjectName;
     }
 }

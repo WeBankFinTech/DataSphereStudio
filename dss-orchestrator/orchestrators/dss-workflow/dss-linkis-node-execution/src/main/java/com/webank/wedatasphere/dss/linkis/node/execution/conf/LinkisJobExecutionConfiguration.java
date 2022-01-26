@@ -16,15 +16,11 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.conf;
 
-
-
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.conf.Configuration;
 import java.util.Map;
 
-
 public class LinkisJobExecutionConfiguration {
-
 
     public static final String LINKIS_TYPE = "linkistype";
 
@@ -68,6 +64,8 @@ public class LinkisJobExecutionConfiguration {
 
     public final static CommonVars<String> LINKIS_JOB_CREATOR = CommonVars.apply("wds.linkis.flow.job.creator","nodeexecution");
 
+    public final static CommonVars<String> LINKIS_JOB_CREATOR_1_X = CommonVars.apply("wds.linkis.flow.job.creator.v1","Schedulis");
+
     public final static CommonVars<String> LINKIS_URL = CommonVars.apply("wds.linkis.gateway.url.v0", Configuration.getGateWayURL());
 
     public final static CommonVars<String> LINKIS_URL_1_X = CommonVars.apply("wds.linkis.gateway.url.v1", Configuration.getGateWayURL());
@@ -82,12 +80,13 @@ public class LinkisJobExecutionConfiguration {
 
     public final static CommonVars<Integer>  REQUEST_MAX_RETRY_TIME = CommonVars.apply("wds.linkis.log.retry.time",10);
 
+    public final static  CommonVars<Integer>  MAX_HTTP_CONNECTION_COUNT = CommonVars.apply("wds.linkis.job.max.http.connection.count",100);
+
     //兼容老版本
     public static final CommonVars<String> LINKIS_DEFAULT_VERSION = CommonVars.apply("wds.dss.workflow.execution.linkis.version",  "1.0.0");
 
     public static boolean isLinkis1_X(Map<String, String> props) {
         return props.getOrDefault(LinkisJobExecutionConfiguration.LINKIS_VERSION_KEY,"")
-            .startsWith("1.");
+                .startsWith("1.");
     }
-
 }

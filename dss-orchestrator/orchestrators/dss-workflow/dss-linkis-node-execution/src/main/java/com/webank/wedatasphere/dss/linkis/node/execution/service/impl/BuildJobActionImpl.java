@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
@@ -41,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.LINKIS_JOB_CREATOR;
+import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.LINKIS_JOB_CREATOR_1_X;
 
 
 public class BuildJobActionImpl implements BuildJobAction {
@@ -87,9 +89,9 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         enrichParams(job);
 
-        Map<String, Object> labels = prepareYarnLabel(job);
-
-        TaskUtils.addLabelsMap(job.getParams(), labels);
+//        Map<String, Object> labels = prepareYarnLabel(job);
+//
+//        TaskUtils.addLabelsMap(job.getParams(), labels);
 
         String code = parseExecutionCode(job);
 
@@ -121,7 +123,7 @@ public class BuildJobActionImpl implements BuildJobAction {
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
 
         labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
-        labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR.getValue());
+        labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue());
         labels.put(LabelKeyConstant.CODE_TYPE_KEY, parseRunType(job.getEngineType(), job.getRunType(), job));
 
 
@@ -129,11 +131,12 @@ public class BuildJobActionImpl implements BuildJobAction {
         if(!isReuseEngine(job.getParams())){
             labels.put("executeOnce", "");
         }
-        JobSubmitAction.Builder builder = JobSubmitAction.builder().setUser(LINKIS_JOB_CREATOR.getValue(job.getJobProps()))
+        Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
+        JobSubmitAction.Builder builder = JobSubmitAction.builder().setUser(LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()))
                 .addExecuteCode(code)
                 .setUser(job.getUser())
                 .addExecuteUser(job.getUser())
-                .setParams(job.getParams())
+                .setParams(paramMapCopy)
                 .setLabels(labels)
                 .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
@@ -141,6 +144,11 @@ public class BuildJobActionImpl implements BuildJobAction {
             source.putAll(((LinkisJob) job).getSource());
             builder = builder.setSource(source);
         }
+        // 将execute接口带来的额外variable参数，带进来  todo check
+        Map<String, Object> propMap = new HashMap<>();
+        propMap.putAll(job.getJobProps());
+        TaskUtils.addVariableMap(paramMapCopy, TaskUtils.getVariableMap(propMap));
+        builder.setParams(paramMapCopy);
         return builder.build();
     }
 

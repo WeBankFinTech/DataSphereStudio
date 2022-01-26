@@ -130,10 +130,16 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
                 updateNodeJson = nodeInputService.uploadAppConnResource(userName, projectName,
                         dssFlow, updateNodeJson, updateContextId, appConnResourceSavePath, workspace, orcVersion);
-
+                //兼容0.x的key修改
+                if(updateNodeJson.contains("wds.linkis.yarnqueue")) {
+                    updateNodeJson = updateNodeJson.replace("wds.linkis.yarnqueue", "wds.linkis.rm.yarnqueue");
+                }
                 Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
                 //更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
+                if(nodeType.contains("appjoint")){
+                    nodeJsonMap.replace("jobType",nodeType.replace("appjoint","appconn"));
+                }
                 if ("workflow.subflow".equals(nodeType)) {
                     String subFlowName = nodeJsonMap.get("title").toString();
                     List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
@@ -194,8 +200,8 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 //        if (resourceId != null) {
 //            bmlReturnMap = bmlService.update(userName, resourceId, flowJson);
 //        } else {
-            //上传文件获取resourceId和version save应该是已经有
-            bmlReturnMap = bmlService.upload(userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
+        //上传文件获取resourceId和version save应该是已经有
+        bmlReturnMap = bmlService.upload(userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
 //        }
 
         dssFlow.setCreator(userName);

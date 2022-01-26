@@ -54,6 +54,14 @@ public interface OrchestratorMapper {
      */
     DSSOrchestratorVersion getLatestOrchestratorVersionById(Long orchestratorId);
 
+    /**
+     * 根据id查找最新的版本信息
+     *
+     * @param orchestratorId
+     * @return
+     */
+    DSSOrchestratorVersion getLatestOrchestratorVersionByIdAndValidFlag(@Param("orchestratorId") Long orchestratorId,@Param("validFlag")Integer validFlag);
+
     void updateOrchestratorVersion(DSSOrchestratorVersion dssOrchestratorVersion);
 
     void deleteOrchestratorVersion(Long versionId);
@@ -72,10 +80,13 @@ public interface OrchestratorMapper {
     @Select("select max(id) from dss_orchestrator_version_info where `orchestrator_id` = #{orchestratorId}")
     Long findLatestOrcVersionId(@Param("orchestratorId") Long orchestratorId);
 
+    @Select("select id from dss_orchestrator_version_info where `orchestrator_id` = #{orchestratorId} and valid_flag = #{validFlag} ORDER BY version DESC LIMIT 1")
+    Long findLatestVIdByOrcIdAndValidFlag(@Param("orchestratorId") Long orchestratorId,@Param("validFlag")Integer validFlag);
+
     List<DSSOrchestratorVersion> getOrchestratorVersions(@Param("projectId") Long projectId, @Param("orchestratorId") Long orchestratorId);
 
-    @Select("select max(`version`) from dss_orchestrator_version_info where orchestrator_id = #{orchestratorId}")
-    String getLatestVersion(@Param("orchestratorId") Long orchestratorId);
+    @Select("select max(`version`) from dss_orchestrator_version_info where orchestrator_id = #{orchestratorId} and valid_flag = #{validFlag}")
+    String getLatestVersion(@Param("orchestratorId") Long orchestratorId,@Param("validFlag")Integer validFlag);
 
 
     @Select("select uuid from dss_orchestrator_info where project_id = #{projectId} and name = #{name}")
@@ -86,6 +97,8 @@ public interface OrchestratorMapper {
 
     @Select("select max(`app_id`) from `dss_orchestrator_version_info` where `orchestrator_id` = #{orchestratorId} and `version` = #{version}")
     Long getAppIdByVersion(@Param("orchestratorId") Long orchestratorId, @Param("version") String version);
+
+    DSSOrchestratorVersion getVersionByOrchestratorIdAndVersion(@Param("orchestratorId") Long orchestratorId, @Param("version") String version);
 
     @Update("update `dss_orchestrator_info` set `is_published` =  1 where id = #{orchestratorId}")
     void setPublished(@Param("orchestratorId")Long orchestratorId);

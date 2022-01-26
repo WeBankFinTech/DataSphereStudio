@@ -16,28 +16,14 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.action
 
-import org.apache.linkis.httpclient.request.{DownloadAction, GetAction}
+import org.apache.linkis.httpclient.request.GetAction
 import org.apache.linkis.ujes.client.request.UJESJobAction
-import org.apache.http.HttpResponse
 
-import scala.tools.nsc.interpreter.InputStream
-
-
-
-class ResultSetDownloadAction extends GetAction with  DownloadAction with UJESJobAction  {
-
-  private var inputStream: InputStream = _
-
-  private var response: HttpResponse = _
-
-  override def write(inputStream: InputStream): Unit = this.inputStream = inputStream
-
-  def getInputStream: InputStream = inputStream
-
-  override def suffixURLs: Array[String] = Array("filesystem", "resultsetToExcel")
-
-
-  override def getResponse: HttpResponse = response
-
-  override def setResponse(response: HttpResponse): Unit = this.response = response
+/**
+ * @author allenlliu
+ * @date 2020/09/14 10:32 AM
+ * @version 2.0.0
+ */
+class ApiServiceGetAction extends GetAction with  UJESJobAction {
+  override def suffixURLs: Array[String] =  Array("dss","framework","workspace", "getWorkspaceIdByUserName")
 }

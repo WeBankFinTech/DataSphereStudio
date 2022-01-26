@@ -32,19 +32,20 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefExportSer
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import org.apache.linkis.rpc.Sender;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -78,6 +79,10 @@ public class NodeExportServiceImpl implements NodeExportService {
 
     @Override
     public void downloadAppConnResourceToLocal(String userName, Long projectId, DSSNode dwsNode, String savePath, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+        //qualitis默认创建是为空
+        if (dwsNode.getJobContent() == null) {
+            return ;
+        }
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(dwsNode.getNodeType());
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
         if (appConn != null) {
@@ -87,7 +92,8 @@ public class NodeExportServiceImpl implements NodeExportService {
                 if (appConn.getAppDesc().getAppInstancesByLabels(dssLabels).size() > 0) {
                     AppInstance appInstance = appConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
                     RefExportService refExportService = devStand.getRefExportService(appInstance);
-                    ExportRequestRef requestRef = RefFactory.INSTANCE.newRef(ExportRequestRef.class, refExportService.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn." + appConn.getAppDesc().getAppName().toLowerCase());
+                    ExportRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRefByPackageName(ExportRequestRef.class,
+                            appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
                     //todo request param def
                     requestRef.setParameter("jobContent", dwsNode.getJobContent());
                     requestRef.setParameter("projectId", parseProjectId(projectId, appConn.getAppDesc().getAppName(), dssLabels));

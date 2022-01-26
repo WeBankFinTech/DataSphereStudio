@@ -28,7 +28,7 @@
     </sql>
 
     <sql id="orchestrator_version">
-        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`
+        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`
     </sql>
 
     <select id="getOrchestrator" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
@@ -70,7 +70,7 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         INSERT INTO dss_orchestrator_version_info (<include refid="orchestrator_version"/>)
         VALUES
-        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId})
+        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId},#{validFlag})
     </insert>
 
 
@@ -79,16 +79,16 @@
         UPDATE dss_orchestrator_version_info
         <trim prefix="set" suffixOverrides=",">
             <if test="source != null">`source` = #{source},</if>
+            <if test="validFlag != null">`valid_flag` = #{validFlag},</if>
             <if test="appId != null">`app_id` = #{appId},</if>
             <if test="content != null">`content`= #{content},</if>
             <if test="comment != null">`comment` = #{comment},</if>
             <if test="contextId != null">`context_id` = #{contextId},</if>
             <if test="updateTime != null">`update_time` = #{updateTime},</if>
-            <if test="updater != null">`updater` = #{updater}</if>
+            <if test="updater != null and updater != ''">`updater` = #{updater}</if>
         </trim>
         WHERE id = #{id}
     </update>
-
 
     <select id="getLatestOrchestratorVersionById"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
@@ -98,8 +98,19 @@
         `dss_orchestrator_version_info`
         WHERE
         orchestrator_id = #{orchestratorId}
-        ORDER BY
-        version DESC
+        and valid_flag = 1
+        ORDER BY id DESC LIMIT 1
+    </select>
+
+    <select id="getLatestOrchestratorVersionByIdAndValidFlag"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT
+        *
+        FROM
+        `dss_orchestrator_version_info`
+        WHERE
+        orchestrator_id = #{orchestratorId} and valid_flag = #{validFlag}
+        ORDER BY id DESC
         LIMIT 1
     </select>
 
@@ -110,7 +121,7 @@
         FROM
         `dss_orchestrator_version_info`
         WHERE
-        id = #{versionId}
+        id = #{versionId} and valid_flag = 1
     </select>
 
     <delete id="deleteOrchestratorVersion">
@@ -123,8 +134,8 @@
     <select id="getVersionByOrchestratorId"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT * FROM dss_orchestrator_version_info
-        WHERE orchestrator_id = #{orchestratorId}
-        ORDER BY version DESC
+        WHERE orchestrator_id = #{orchestratorId} and valid_flag = 1
+        ORDER BY id DESC
     </select>
 
 
@@ -136,7 +147,7 @@
 
 
     <select id="getOrcInfoByAppId" resultMap="orcInfo">
-        select `id`, `orchestrator_id` from dss_orchestrator_version_info where app_id = #{appId}
+        select `id`, `orchestrator_id` from dss_orchestrator_version_info where app_id = #{appId} and valid_flag = 1
     </select>
 
     <resultMap id="orchestrator_version_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
@@ -153,7 +164,7 @@
     </resultMap>
 
     <select id="getOrchestratorVersions" resultMap="orchestrator_version_info_result_map">
-        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` = #{orchestratorId}
+        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` = #{orchestratorId} and valid_flag = 1
     </select>
 
 
@@ -171,6 +182,11 @@
         select * from dss_orchestrator_user  where `orchestrator_id` = #{orchestratorId}
     </select>
 
+    <select id="getVersionByOrchestratorIdAndVersion" resultMap="orchestrator_version_info_result_map">
+        SELECT * FROM dss_orchestrator_version_info
+        WHERE orchestrator_id = #{orchestratorId} and version = #{version} and valid_flag = 1
+        ORDER BY app_id DESC limit 1
+    </select>
 
 
 </mapper>

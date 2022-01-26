@@ -83,10 +83,10 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         synchronized (clientMap) {
             if(!clientMap.containsKey(linkisUrl)) {
                 UJESClient client = LinkisUjesClientUtils.getUJESClient(
-                    linkisUrl,
-                    LinkisJobExecutionConfiguration.LINKIS_ADMIN_USER.getValue(props),
-                    LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
-                    props);
+                        linkisUrl,
+                        LinkisJobExecutionConfiguration.LINKIS_ADMIN_USER.getValue(props),
+                        LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
+                        props);
                 clientMap.put(linkisUrl, client);
                 job.getLogObj().info("Create a new Linkis client by " + linkisUrl);
                 return client;
@@ -289,7 +289,11 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
 
     @Override
     public void cancel(Job job) throws Exception {
-        getClient(job).kill(job.getJobExecuteResult());
+        try {
+            getClient(job).kill(job.getJobExecuteResult());
+        } catch (Exception e) {
+            job.getLogObj().error("linkis execute kill operation failed,reason:" + e.getMessage() + "");
+        }
     }
 
     @Override

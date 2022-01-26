@@ -23,6 +23,7 @@ import org.apache.linkis.common.conf.Configuration;
 import java.util.Arrays;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 public class SSOHelper {
@@ -39,6 +40,24 @@ public class SSOHelper {
         Arrays.stream(cookies).forEach(cookie -> ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue()));
         ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
         ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
+        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
+        return workspace;
+    }
+
+    public static Workspace setWorkspaceId(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
+        response.addCookie(new Cookie("workspaceId", String.valueOf(workspaceId)));
+        SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
+        Cookie[] cookies = request.getCookies();
+        Arrays.stream(cookies).forEach(cookie -> {
+            if (cookie.getName().equals("workspaceId")) {
+                ssoUrlBuilderOperation.addCookie(cookie.getName(), String.valueOf(workspaceId));
+            } else {
+                ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue());
+            }
+        });
+        Workspace workspace = new Workspace();
+        ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
+        ssoUrlBuilderOperation.setWorkspace(workspaceName);
         workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
         return workspace;
     }

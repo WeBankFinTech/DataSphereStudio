@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractRequestRef;
 
+import java.util.List;
 
 public class ProjectRequestRefImpl extends AbstractRequestRef implements ProjectRequestRef {
 
@@ -37,6 +38,12 @@ public class ProjectRequestRefImpl extends AbstractRequestRef implements Project
     private String description;
 
     private Workspace workspace;
+
+    private List<String> accessUsers;
+
+    private List<String> editUsers;
+
+    private List<String> releaseUsers;
 
     @Override
     public String getWorkspaceName() {
@@ -106,5 +113,35 @@ public class ProjectRequestRefImpl extends AbstractRequestRef implements Project
     @Override
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
+    }
+
+    @Override
+    public List<String> getAccessUsers() {
+        return accessUsers;
+    }
+
+    @Override
+    public void setAccessUsers(List<String> accessUsers) {
+        this.accessUsers = accessUsers;
+    }
+
+    @Override
+    public List<String> getEditUsers() {
+        return editUsers;
+    }
+
+    @Override
+    public void setEditUsers(List<String> editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    @Override
+    public List<String> getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    @Override
+    public void setReleaseUsers(List<String> releaseUsers) {
+        this.releaseUsers = releaseUsers;
     }
 }

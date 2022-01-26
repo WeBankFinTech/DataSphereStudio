@@ -154,4 +154,24 @@ public class TestApiServiceDBOperation {
         );
 
     }
+
+    @DisplayName("Token 解析验证")
+    @Test
+    public void testTokenParse() {
+        System.out.println("Token解析验证");
+        final String applyUser = "allenlliu";
+        ApiServiceToken apiServiceToken = new ApiServiceToken();
+        apiServiceToken.setPublisher("allenlliu");
+        apiServiceToken.setApiServiceId(150L);
+        apiServiceToken.setApplyUser("testUser1");
+        apiServiceToken.setApplyTime(new Date());
+        Long duration = 365L;
+        String token = JwtManager.createToken(applyUser, apiServiceToken, duration);
+
+        ApiServiceToken parseToken = JwtManager.parseToken(token);
+
+        Assertions.assertEquals(parseToken.getApiServiceId(), 150L);
+        Assertions.assertEquals(parseToken.getApplyUser(), "testUser1");
+
+    }
 }

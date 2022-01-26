@@ -92,23 +92,49 @@ public class DataCheckerDao {
         }
         removeBlankSpace(props);
         log.info("=============================Data Check Start==========================================");
+
         String dataCheckerInfo = props.getProperty(DataChecker.DATA_OBJECT);
         if(null!=action.getExecutionRequestRefContext()) {
-            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
+            action.getExecutionRequestRefContext().appendLog("=============================Data Check Start==========================================");
+//            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
         }
         log.info("(DataChecker info) database table partition info : " + dataCheckerInfo);
         long waitTime = Long.valueOf(props.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
         int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+//		String timeScape = props.getProperty(DataChecker.TIME_SCAPE, "NULL");
         log.info("(DataChecker info) wait time : " + waitTime);
         log.info("(DataChecker info) query frequency : " + queryFrequency);
+//		log.info("(DataChecker info) time scape : " + timeScape);
         List<Map<String, String>> dataObjectList = extractProperties(props);
+        log.info("DataObjectList size is " + dataObjectList.size());
+        dataObjectList.forEach(checkObject->{
+            log.info(checkObject.keySet().toString());
+        });
+
         try (Connection jobConn = jobDS.getConnection();
              Connection bdpConn = bdpDS.getConnection()) {
-            boolean flag = dataObjectList
+            List<Boolean> allCheckRes  = dataObjectList
                     .stream()
-                    .allMatch(proObjectMap -> getDataCheckResult(proObjectMap, jobConn, bdpConn, props, log));
+                    .map(proObjectMap -> {
+                        log.info("Begin to Check dataObject:"+proObjectMap.entrySet().toString());
+                        boolean checkRes = getDataCheckResult(proObjectMap, jobConn, bdpConn, props, log);
+                        if (null != action.getExecutionRequestRefContext()) {
+                            if (checkRes) {
+                                action.getExecutionRequestRefContext().appendLog("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
+                                log.info("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
+                            } else {
+                                action.getExecutionRequestRefContext().appendLog("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " not arrived");
+                                log.info("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " not arrived");
+                            }
+                        }
+                        return checkRes;
+                    }).collect(Collectors.toList());
+            boolean flag =allCheckRes.stream().allMatch(res ->res.equals(true));
             if (flag) {
                 log.info("=============================Data Check End==========================================");
+                if (null != action.getExecutionRequestRefContext()) {
+                    action.getExecutionRequestRefContext().appendLog("=============================Data Check End==========================================");
+                }
                 return true;
             }
 
@@ -117,6 +143,9 @@ public class DataCheckerDao {
         }
 
         log.info("=============================Data Check End==========================================");
+        if(null!=action.getExecutionRequestRefContext()) {
+            action.getExecutionRequestRefContext().appendLog("=============================Data Check End==========================================");
+        }
         return false;
     }
 

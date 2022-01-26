@@ -52,7 +52,9 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.math3.util.Pair;
+
+import javafx.util.Pair;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +77,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> exportOrchestrator(String userName, String workspaceName, Long orchestratorId, Long orcVersionId, String projectName,
-        List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
+                                                  List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
         if (orcVersionId == null || orcVersionId < 0){
             LOGGER.info("orchestratorVersionId is {}", orcVersionId);
@@ -101,7 +103,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
             //2、导出第三方应用信息，如工作流、Visualis、Qualities
             Pair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
-                .getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+                    .getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
             if (null != standardPair) {
                 RefExportService refExportService = standardPair.getValue().getRefExportService(standardPair.getKey());
 
@@ -110,8 +112,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                     DSSExceptionUtils.dealErrorException(60089, "refExportService is null", DSSErrorException.class);
                 }
                 OrchestratorExportRequestRef orchestratorExportRequestRef =
-                    AppConnRefFactoryUtils.newAppConnRef(OrchestratorExportRequestRef.class,
-                        refExportService.getClass().getClassLoader(), dssOrchestratorInfo.getType());
+                        AppConnRefFactoryUtils.newAppConnRef(OrchestratorExportRequestRef.class,
+                                refExportService.getClass().getClassLoader(), dssOrchestratorInfo.getType());
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("orchestrator Export Request Ref class is {}", orchestratorExportRequestRef.getClass());
                 }
@@ -122,7 +124,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 orchestratorExportRequestRef.setWorkspace(workspace);
                 orchestratorExportRequestRef.setDSSLabels(dssLabels);
                 AbstractResponseRef responseRef = (AbstractResponseRef) refExportService.getRefExportOperation().
-                    exportRef(orchestratorExportRequestRef);
+                        exportRef(orchestratorExportRequestRef);
                 String resourceId = responseRef.getValue("resourceId").toString();
                 String version = responseRef.getValue("version").toString();
                 bmlService.downloadToLocalPath(userName, resourceId, version, orcExportSaveBasePath + "orc_flow.zip");
@@ -134,13 +136,13 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             //3、打包新的zip包上传BML
             InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
-                dssOrchestratorInfo.getName() + ".OrcExport", projectName);
+                    dssOrchestratorInfo.getName() + ".OrcExport", projectName);
 
             //4、判断导出后是否改变Orc的版本
             if (addOrcVersion) {
                 Long orcIncreaseVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
-                    userName, dssOrchestratorInfo.getComment(),
-                    workspaceName, dssOrchestratorInfo, projectName, dssLabels);
+                        userName, dssOrchestratorInfo.getComment(),
+                        workspaceName, dssOrchestratorInfo, projectName, dssLabels);
                 resultMap.put("orcVersionId", orcIncreaseVersionId);
             } else {
                 resultMap.put("orcVersionId", orcVersionId);
@@ -154,15 +156,14 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
     @Override
     public Long orchestratorVersionIncrease(Long orcId,
-        String userName,
-        String comment,
-        String workspaceName,
-        DSSOrchestratorInfo dssOrchestratorInfo,
-        String projectName,
-        List<DSSLabel> dssLabels) throws DSSErrorException {
+                                            String userName,
+                                            String comment,
+                                            String workspaceName,
+                                            DSSOrchestratorInfo dssOrchestratorInfo,
+                                            String projectName,
+                                            List<DSSLabel> dssLabels) throws DSSErrorException {
         //对于导出来说,json需替换 subflowID
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionById(orcId);
-
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
         // TODO: 2020/3/25 set updator(userID 修改为userName后)
         dssOrchestratorVersion.setUpdateTime(new Date());
         Long oldOrcVersionId = dssOrchestratorVersion.getId();
@@ -178,10 +179,14 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         updateCommentVersion.setId(oldOrcVersionId);
         String realComment = comment != null ? comment : "release comment";
         updateCommentVersion.setComment(realComment);
+        if(StringUtils.isNotBlank(userName)){
+            updateCommentVersion.setUpdater(userName);
+            dssOrchestratorVersion.setUpdater(userName);
+        }
+        updateCommentVersion.setUpdateTime(new Date());
         orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
 
         //要求AppConn对应第三方应用拷贝一个新的app出来关联，如工作流，需要新建一个新的工作流进行关联。
-
         Pair<AppInstance,DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
         if(standardPair == null){
             LOGGER.error("dev Process Service is null");
@@ -191,12 +196,14 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         if (null != refcrudservice) {
             try {
                 OrchestratorCopyRequestRef orchestratorCopyRequestRef =
-                    AppConnRefFactoryUtils.newAppConnRef(OrchestratorCopyRequestRef.class,
-                        refcrudservice.getClass().getClassLoader(), dssOrchestratorInfo.getAppConnName());
+                        AppConnRefFactoryUtils.newAppConnRef(OrchestratorCopyRequestRef.class,
+                                refcrudservice.getClass().getClassLoader(), dssOrchestratorInfo.getAppConnName());
                 orchestratorCopyRequestRef.setCopyOrcAppId(dssOrchestratorVersion.getAppId());
                 orchestratorCopyRequestRef.setCopyOrcVersionId(dssOrchestratorVersion.getOrchestratorId());
                 orchestratorCopyRequestRef.setUserName(userName);
                 orchestratorCopyRequestRef.setProjectName(projectName);
+                //插入版本号
+                orchestratorCopyRequestRef.setParameter("version",dssOrchestratorVersion.getVersion());
 
                 //5、生成上下文ContextId
                 String contextId = contextService.createContextID(workspaceName, projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
@@ -204,7 +211,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 LOGGER.info("Create a new ContextId for increase: {} ", contextId);
                 orchestratorCopyRequestRef.setContextID(contextId);
                 OrchestratorCopyResponseRef orchestratorCopyResponseRef =
-                    (OrchestratorCopyResponseRef) refcrudservice.getRefCopyOperation().copyRef(orchestratorCopyRequestRef);
+                        (OrchestratorCopyResponseRef) refcrudservice.getRefCopyOperation().copyRef(orchestratorCopyRequestRef);
                 dssOrchestratorVersion.setAppId(orchestratorCopyResponseRef.getCopyTargetAppId());
                 dssOrchestratorVersion.setContent(orchestratorCopyResponseRef.getCopyTargetContent());
                 //update appconn node contextId
@@ -218,5 +225,24 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         } else {
             throw new DSSOrchestratorErrorException(10023, "获取第三方应用的Ref为空，不能完成拷贝操作！");
         }
+    }
+
+    @Override
+    public Long addVersionAfterPublish(String userName, String workspaceName, Long orchestratorId,
+                                       Long orcVersionId, String projectName,
+                                       List<DSSLabel> dssLabels,String comment) throws DSSErrorException {
+        //发布之后添加一个版本号
+        if (orcVersionId == null || orcVersionId < 0) {
+            LOGGER.info("orchestratorVersionId is {}", orcVersionId);
+            //最简单的就是通过orcId来找到最新的versionId
+            orcVersionId = orchestratorMapper.findLatestOrcVersionId(orchestratorId);
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getOrchestratorVersion(orcVersionId);
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(dssOrchestratorVersion.getOrchestratorId());
+        Long orcIncreaseVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
+                userName, comment,
+                workspaceName, dssOrchestratorInfo, projectName, dssLabels);
+        orcIncreaseVersionId = orcIncreaseVersionId == null ? 0L : orcIncreaseVersionId;
+        return orcIncreaseVersionId;
     }
 }

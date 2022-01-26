@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
@@ -87,14 +88,12 @@ public class OrchestratorIERestful {
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {
-                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(userName,
-                        workspace.getWorkspaceName(),
-                        projectName,
-                        projectID,
-                        resultMap.get("resourceId").toString(),
-                        resultMap.get("version").toString(),
-                        dssLabelList,
-                        workspace);
+                RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName,
+                        workspace.getWorkspaceName(),projectName,
+                        projectID, resultMap.get("resourceId").toString(),
+                        resultMap.get("version").toString(), null, dssLabelList,
+                        DSSCommonUtils.COMMON_GSON.toJson(workspace));
+                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
             } catch (Exception e) {
                 logger.error("Import orchestrator failed for ", e);
                 throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -29,26 +30,13 @@ public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
     /**
      * 导入Orchestrator
-     * @param userName 用户名
-     * @param workspaceName 工作空间名
-     * @param projectName 工程名
-     * @param projectId 工程id
-     * @param resourceId bml resourceId
-     * @param version bml version
-     * @param dssLabels dss标签
-     * @param workspace
+     * @param requestImportOrchestrator
      * @return
      * @throws DSSErrorException
      * @throws IOException
      * @throws ExternalOperationFailedException
      */
-    Long importOrchestrator(String userName,
-        String workspaceName,
-        String projectName,
-        Long projectId,
-        String resourceId,
-        String version,
-        List<DSSLabel> dssLabels,
-        Workspace workspace) throws Exception;
+    Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
+
 
 }

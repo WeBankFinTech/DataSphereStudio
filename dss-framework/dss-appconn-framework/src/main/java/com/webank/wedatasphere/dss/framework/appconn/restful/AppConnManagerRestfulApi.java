@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.framework.appconn.conf.AppconnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
@@ -47,14 +48,16 @@ public class AppConnManagerRestfulApi {
 
     @PostConstruct
     public void init() {
-        LOGGER.info("Try to scan AppConn plugins...");
-        appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
-            LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
-           if(!"local".equals(System.getProperty("env"))){
+        if (AppconnConf.IS_APPCONN_MANAGER.getValue()) {
+            LOGGER.info("Try to scan AppConn plugins...");
+            appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
+                LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
                 appConnResourceUploadService.upload(appConnInfo.getAppConnName());
-            }
-        }));
-        LOGGER.info("All AppConn plugins has scanned.");
+            }));
+            LOGGER.info("All AppConn plugins has scanned.");
+        } else {
+            LOGGER.info("Not appconn manager, will not scan plugins.");
+        }
     }
 
     @RequestMapping(path ="listAppConnInfos", method = RequestMethod.GET)

@@ -79,16 +79,17 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>
-      val importOrcId = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(
-        requestImportOrchestrator.getUserName,
-        requestImportOrchestrator.getWorkspaceName,
-        requestImportOrchestrator.getProjectName,
-        requestImportOrchestrator.getProjectId,
-        requestImportOrchestrator.getResourceId,
-        requestImportOrchestrator.getBmlVersion,
-        requestImportOrchestrator.getDssLabels,
-        DSSCommonUtils.COMMON_GSON.fromJson(requestImportOrchestrator.getWorkspaceStr, classOf[Workspace]))
+      val importOrcId = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
       ResponseImportOrchestrator(importOrcId)
+
+    case addVersionAfterPublish: RequestAddVersionAfterPublish =>
+      orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).addVersionAfterPublish(
+        addVersionAfterPublish.getUserName,
+        addVersionAfterPublish.getWorkspaceName,
+        addVersionAfterPublish.getOrchestratorId,
+        addVersionAfterPublish.getOrcVersionId,
+        addVersionAfterPublish.getProjectName,
+        addVersionAfterPublish.getDssLabels,addVersionAfterPublish.getComment)
 
     case requestQueryOrchestrator: RequestQueryOrchestrator =>
       val requestIdList = requestQueryOrchestrator.getOrchestratorIds
@@ -96,7 +97,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
       new ResponseQueryOrchestrator(queryOrchestratorList)
 
     case requestConversionOrchestration: RequestFrameworkConvertOrchestration =>
-      //发布调度
+      //发布调度,这个地方区分行内和行外的请求，逻辑完全不一样，请注意
       orchestratorPluginService.convertOrchestration(requestConversionOrchestration)
     case requestConversionOrchestrationStatus: RequestFrameworkConvertOrchestrationStatus =>
       orchestratorPluginService.getConvertOrchestrationStatus(requestConversionOrchestrationStatus.getId)

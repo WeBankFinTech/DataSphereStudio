@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 
 
@@ -52,4 +53,12 @@ public interface DSSOrchestratorService extends IService<DSSOrchestrator> {
     DSSOrchestrator getOrchestratorById(Long id);
 
     Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
+
+    /**
+     * 更新编排版本ID
+     * @param projectUpdateOrcVersion
+     * @return
+     * @throws Exception
+     */
+    boolean updateProjectOrcVersionId(RequestProjectUpdateOrcVersion projectUpdateOrcVersion) throws Exception;
 }

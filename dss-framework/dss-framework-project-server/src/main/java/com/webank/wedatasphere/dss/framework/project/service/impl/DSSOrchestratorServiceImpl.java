@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorServ
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import org.apache.linkis.rpc.Sender;
@@ -296,6 +297,17 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
             return insertOrcByImport(projectDO,orchestratorMode,orchestratorWay,orchestratorInfo);
         }
     }
+
+    @Override
+    public boolean updateProjectOrcVersionId(RequestProjectUpdateOrcVersion projectUpdateOrcVersion) throws Exception {
+        UpdateWrapper updateWrapper = new UpdateWrapper<DSSOrchestrator>();
+        updateWrapper.eq("project_id", projectUpdateOrcVersion.getProjectId());
+        updateWrapper.eq("orchestrator_id", projectUpdateOrcVersion.getOrchestratorId());
+        DSSOrchestrator orchestrator = new DSSOrchestrator();
+        orchestrator.setOrchestratorVersionId(projectUpdateOrcVersion.getVersionId());
+        return this.update(orchestrator,updateWrapper);
+    }
+
 
     //导入更新
     public Long updateOrcByImport(DSSOrchestrator dbEntity, String orchestratorMode, String orchestratorWay, RequestProjectImportOrchestrator orchestratorInfo) {

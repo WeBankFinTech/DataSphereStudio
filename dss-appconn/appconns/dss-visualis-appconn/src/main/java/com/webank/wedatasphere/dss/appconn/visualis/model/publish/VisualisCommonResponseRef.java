@@ -14,11 +14,14 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.visualis.ref;
+package com.webank.wedatasphere.dss.appconn.visualis.model.publish;
 
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisNodeUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.development.ref.DSSCommonResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
+import java.util.Map;
 
 public class VisualisCommonResponseRef extends DSSCommonResponseRef {
 
@@ -38,4 +41,19 @@ public class VisualisCommonResponseRef extends DSSCommonResponseRef {
     public String getDashboardId() throws ExternalOperationFailedException {
         return VisualisNodeUtils.getDashboardPortalId(responseBody);
     }
+
+    public String getViewId() throws ExternalOperationFailedException {
+        return VisualisNodeUtils.getViewId(responseBody);
+    }
+
+    public String getDashboardPortalId() throws ExternalOperationFailedException {
+        return VisualisNodeUtils.getDashboardPortalId(responseBody);
+    }
+
+    public void updateResponseBody(Map<String, Object> jobContent) {
+        String jobContentJson = DSSCommonUtils.COMMON_GSON.toJson(jobContent);
+        super.responseBody = jobContentJson;
+        super.init();
+    }
+
 }

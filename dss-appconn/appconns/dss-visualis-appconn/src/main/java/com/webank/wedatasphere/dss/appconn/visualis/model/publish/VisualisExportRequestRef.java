@@ -16,7 +16,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.visualis.publish;
+package com.webank.wedatasphere.dss.appconn.visualis.model.publish;
 
 import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportRequestRef;

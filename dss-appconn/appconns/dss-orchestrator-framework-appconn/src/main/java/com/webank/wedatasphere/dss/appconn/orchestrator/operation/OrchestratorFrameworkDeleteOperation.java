@@ -53,7 +53,7 @@ public class OrchestratorFrameworkDeleteOperation implements
                 DSSExceptionUtils.dealErrorException(60075, "failed to delete ref", ExternalOperationFailedException.class);
             }
         } catch (Exception e) {
-            DSSExceptionUtils.dealErrorException(60015, "delete orchestrator ref failed", ExternalOperationFailedException.class);
+            DSSExceptionUtils.dealErrorException(60015, e.getMessage(), ExternalOperationFailedException.class);
         }
     }
 

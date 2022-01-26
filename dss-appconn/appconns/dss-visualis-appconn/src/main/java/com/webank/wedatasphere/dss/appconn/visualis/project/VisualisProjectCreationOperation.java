@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
-import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
@@ -66,9 +65,9 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
         ssoUrlBuilderOperation.setWorkspace(projectRef.getWorkspace().getWorkspaceName());
-        String response = "";
-        Map<String, Object> resMap = Maps.newHashMap();
-        HttpResult httpResult = null;
+        String response;
+        Map resMap;
+        HttpResult httpResult;
         try {
             visualisPostAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
             httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, visualisPostAction);
@@ -78,6 +77,7 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
             logger.error("Create Visualis Project Exception", e);
             throw new ExternalOperationFailedException(90176, "Create Visualis Project Exception", e);
         }
+        @SuppressWarnings("unchecked")
         Map<String, Object> header = (Map<String, Object>) resMap.get("header");
         int code = (int) header.get("code");
         String errorMsg = "";
@@ -85,8 +85,9 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
             errorMsg = header.toString();
             throw new ExternalOperationFailedException(90176, errorMsg, null);
         }
+        @SuppressWarnings("unchecked")
         Integer projectId = (Integer) ((Map<String, Object>) resMap.get("payload")).get("id");
-        VisualisProjectResponseRef visualisProjectResponseRef = null;
+        VisualisProjectResponseRef visualisProjectResponseRef;
         try {
             visualisProjectResponseRef = new VisualisProjectResponseRef(response, code);
         } catch (Exception e) {

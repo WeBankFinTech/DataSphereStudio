@@ -19,12 +19,14 @@ package com.webank.wedatapshere.dss.appconn.datachecker
 import java.util
 import java.util.{Properties, UUID}
 
+import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
+import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import org.apache.linkis.common.log.LogUtils
-import org.apache.linkis.common.utils.{Utils, VariableUtils}
+import org.apache.linkis.common.utils.Utils
 import org.slf4j.LoggerFactory;
 
 class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation with Killable with Procedure{
@@ -58,54 +60,54 @@ class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation wit
     val variableParams: scala.collection.mutable.Map[String, Object]= asyncExecutionRequestRef.getJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
     val inputParams =runTimeParams++variableParams
     val properties = new Properties()
-      InstanceConfig.foreach {
-        case (key: String, value: Object) =>
-          //避免密码被打印
-          properties.put(key, value.toString)
-      }
+    InstanceConfig.foreach {
+      case (key: String, value: Object) =>
+        //避免密码被打印
+        properties.put(key, value.toString)
+    }
     val tmpProperties = new Properties()
     runTimeParams.foreach(
-        record=>
-          if (null == record._2) {
-            properties.put(record._1, "")
-          }else {
-            if (record._1.equalsIgnoreCase("job.desc")) {
-              val rows = record._2.asInstanceOf[String].split("\n")
-              rows.foreach(row => if (row.contains("=")) {
-                val endLocation = row.indexOf("=");
-                val rowKey = row.substring(0, endLocation)
-                val rowEnd = row.substring(endLocation + 1)
-                tmpProperties.put(rowKey, rowEnd)
-              })
-            } else {
-              tmpProperties.put(record._1, record._2)
-            }
-          }
-      )
-    tmpProperties.foreach { record =>
-        logger.info("request params key : " + record._1 + ",value : " + record._2)
+      record=>
         if (null == record._2) {
           properties.put(record._1, "")
-        }
-        else {
-          if(inputParams.exists(x=>x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
-            val tmp:util.HashMap[String, Any]  = new util.HashMap[String,Any]()
-            tmp.put(VariableUtils.RUN_DATE,inputParams.get(VariableUtils.RUN_DATE).getOrElse(null))
-            properties.put(record._1,VariableUtils.replace(record._2.toString,tmp))
-          }else {
-            properties.put(record._1, VariableUtils.replace(record._2.toString))
+        }else {
+          if (record._1.equalsIgnoreCase("job.desc")) {
+            val rows = record._2.asInstanceOf[String].split("\n")
+            rows.foreach(row => if (row.contains("=")) {
+              val endLocation = row.indexOf("=");
+              val rowKey = row.substring(0, endLocation)
+              val rowEnd = row.substring(endLocation + 1)
+              tmpProperties.put(rowKey, rowEnd)
+            })
+          } else {
+            tmpProperties.put(record._1, record._2)
           }
         }
+    )
+    tmpProperties.foreach { record =>
+      logger.info("request params key : " + record._1 + ",value : " + record._2)
+      if (null == record._2) {
+        properties.put(record._1, "")
       }
-      Utils.tryCatch({
-        val dc = new DataChecker(properties, nodeAction)
-        dc.run()
-        nodeAction.setDc(dc)
-      })(t => {
-        logger.error("DataChecker run failed for " + t.getMessage, t)
-        putErrorMsg("DataChecker run failed! " + t.getMessage, t, nodeAction)
-      })
-      nodeAction
+      else {
+        if(inputParams.exists(x=>x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
+          val tmp:util.HashMap[String, Any]  = new util.HashMap[String,Any]()
+          tmp.put(VariableUtils.RUN_DATE,inputParams.get(VariableUtils.RUN_DATE).getOrElse(null))
+          properties.put(record._1,VariableUtils.replace(record._2.toString,tmp))
+        }else {
+          properties.put(record._1, VariableUtils.replace(record._2.toString))
+        }
+      }
+    }
+    Utils.tryCatch({
+      val dc = new DataChecker(properties, nodeAction)
+      dc.run()
+      nodeAction.setDc(dc)
+    })(t => {
+      logger.error("DataChecker run failed for " + t.getMessage, t)
+      putErrorMsg("DataChecker run failed! " + t.getMessage, t, nodeAction)
+    })
+    nodeAction
 
   }
 

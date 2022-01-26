@@ -22,12 +22,9 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VisualisProjectResponseRef extends AbstractResponseRef implements ProjectResponseRef {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VisualisProjectResponseRef.class);
     private Long projectRefId;
     private AppInstance appInstance;
     private String errorMsg;

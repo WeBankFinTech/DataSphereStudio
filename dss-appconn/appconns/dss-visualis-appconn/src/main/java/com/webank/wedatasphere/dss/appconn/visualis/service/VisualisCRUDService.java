@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
+import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefCopyOperation;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefCreationOperation;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefDeletionOperation;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefUpdateOperation;
@@ -34,7 +35,7 @@ public class VisualisCRUDService extends AbstractRefCRUDService {
 
     @Override
     protected RefCopyOperation createRefCopyOperation() {
-        return null;
+        return new VisualisRefCopyOperation(null,this);
     }
 
     @Override

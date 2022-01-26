@@ -51,14 +51,14 @@ public class OrchestratorFrameworkImportOperation implements
             Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
             importResponse = (ResponseImportOrchestrator) sender.ask(importRequest);
         } catch (final Throwable t) {
-            DSSExceptionUtils.dealErrorException(60015, "import orchestrator ref failed", t,
+            DSSExceptionUtils.dealErrorException(60016, "import orchestrator ref failed", t,
                     ExternalOperationFailedException.class);
         }
         LOGGER.info("End to ask to import orchestrator, responseRef is {}", DSSCommonUtils.COMMON_GSON.toJson(importResponse));
        CommonResponseRef importResponseRef = new CommonResponseRef();
         if (null == importResponse){
             LOGGER.error("importResponse is null it means failed to import Ref");
-            DSSExceptionUtils.dealErrorException(60015, "import ref response is null", ExternalOperationFailedException.class);
+            DSSExceptionUtils.dealErrorException(60016, "import ref response is null", ExternalOperationFailedException.class);
         }
         importResponseRef.setOrcId(importResponse.orcId());
         return importResponseRef;

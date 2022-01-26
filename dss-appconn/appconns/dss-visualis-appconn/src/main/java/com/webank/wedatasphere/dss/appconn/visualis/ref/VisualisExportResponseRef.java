@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.visualis.publish;
+package com.webank.wedatasphere.dss.appconn.visualis.ref;
 
 import com.webank.wedatasphere.dss.standard.app.development.ref.DSSCommonResponseRef;
 

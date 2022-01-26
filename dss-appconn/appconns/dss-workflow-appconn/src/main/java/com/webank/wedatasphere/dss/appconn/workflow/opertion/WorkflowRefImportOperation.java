@@ -53,7 +53,7 @@ public class WorkflowRefImportOperation implements
                 DSSCommonUtils.COMMON_GSON.toJson(requestRef.getWorkspace()),
                 requestRef.getContextID());
 
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getSchedulerWorkflowSender();
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
         if (null != sender) {
             ResponseImportWorkflow responseImportWorkflow = (ResponseImportWorkflow) sender.ask(requestImportWorkflow);
             workflowImportResponseRef = new WorkflowImportResponseRef();

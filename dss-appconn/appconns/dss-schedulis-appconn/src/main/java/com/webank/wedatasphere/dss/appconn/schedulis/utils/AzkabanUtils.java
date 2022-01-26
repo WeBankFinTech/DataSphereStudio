@@ -25,6 +25,18 @@ import java.util.Map;
 public class AzkabanUtils {
     public static String handleAzkabanEntity(String entityString) throws IOException {
         Gson gson = new Gson();
+        if(StringUtils.isNotBlank(entityString)){
+            if(entityString.startsWith("{") && entityString.endsWith("}")){
+                Map resMap = gson.fromJson(entityString, Map.class);
+                if(resMap.containsKey("error")){
+                    return (String)resMap.get("error");
+                }
+            }
+            if(entityString.contains("<div class=\"container-full\">") && entityString.contains("<div class=\"login\">")){
+                return "The SSO login status is invalid.Please refresh the browser and log in again!";
+            }
+        }
+
         Object object = gson.fromJson(entityString, Object.class);
         String status = null;
         String message = null;

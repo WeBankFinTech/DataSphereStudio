@@ -65,6 +65,10 @@
                     <artifactId>linkis-common</artifactId>
                     <groupId>org.apache.linkis</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>xstream</artifactId>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

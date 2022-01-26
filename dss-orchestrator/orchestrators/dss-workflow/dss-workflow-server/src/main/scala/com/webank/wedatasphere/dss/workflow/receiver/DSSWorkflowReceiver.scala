@@ -16,32 +16,24 @@
 
 package com.webank.wedatasphere.dss.workflow.receiver
 
-
 import java.util
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus,ResponseOperateOrchestrator}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
 import com.webank.wedatasphere.dss.workflow.common.protocol._
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam
-import org.apache.linkis.rpc.{Receiver, Sender}
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 
 import scala.concurrent.duration.Duration
 
-
-@Component
-class DSSWorkflowReceiver extends Receiver {
-
-  @Autowired
-  var workflowManager: WorkFlowManager = _
-
-
+/**
+ * Created by allenlliu on 2020/10/21.
+ */
+class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
   override def receive(message: Any, sender: Sender): Unit = {}
 
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
@@ -112,10 +104,6 @@ class DSSWorkflowReceiver extends Receiver {
 
     case requestConvertOrchestrator: RequestConvertOrchestrations =>
       workflowManager.convertWorkflow(requestConvertOrchestrator)
-
-    case requestQuerySchedulerWorkflowStatus: RequestQuerySchedulerWorkflowStatus =>
-      workflowManager
-        .getSchedulerWorkflowStatus(requestQuerySchedulerWorkflowStatus.getUsername, requestQuerySchedulerWorkflowStatus.getOrchestratorId)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

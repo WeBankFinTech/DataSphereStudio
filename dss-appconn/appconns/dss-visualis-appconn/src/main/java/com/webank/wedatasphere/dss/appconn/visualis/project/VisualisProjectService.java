@@ -18,10 +18,7 @@ package com.webank.wedatasphere.dss.appconn.visualis.project;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUrlOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import org.apache.linkis.httpclient.request.HttpAction;
 import org.apache.linkis.httpclient.response.HttpResult;
 
@@ -53,6 +50,14 @@ public class VisualisProjectService extends ProjectService {
     @Override
     protected ProjectDeletionOperation createProjectDeletionOperation() {
         return null;
+    }
+
+    @Override
+    protected ProjectGetOperation createProjectGetOperation() {
+        SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation = getSSORequestService().createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME);
+        VisualisProjectGetOperation visualisProjectQueryOperation = new VisualisProjectGetOperation(this, ssoRequestOperation);
+        visualisProjectQueryOperation.setStructureService(this);
+        return visualisProjectQueryOperation;
     }
 
     @Override

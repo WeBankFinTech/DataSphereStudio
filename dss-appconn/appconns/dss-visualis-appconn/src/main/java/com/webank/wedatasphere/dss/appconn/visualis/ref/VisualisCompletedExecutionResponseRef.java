@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.visualis.execution;
+package com.webank.wedatasphere.dss.appconn.visualis.ref;
 
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.CompletedExecutionResponseRef;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class VisualisCompletedExecutionResponseRef extends CompletedExecutionResponseRef {
 
-    public VisualisCompletedExecutionResponseRef(int status, String errorMessage){
+    public VisualisCompletedExecutionResponseRef(int status, String errorMessage) {
         super(status);
         this.errorMsg = errorMessage;
     }

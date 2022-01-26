@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
+import java.util.List;
 
 public interface ProjectRequestRef extends RequestRef {
 
@@ -52,4 +53,16 @@ public interface ProjectRequestRef extends RequestRef {
     default Workspace getWorkspace(){
         return null;
     }
+
+    public List<String> getAccessUsers();
+
+    public void setAccessUsers(List<String> accessUsers);
+
+    public List<String> getEditUsers();
+
+    public void setEditUsers(List<String> editUsers);
+
+    public List<String> getReleaseUsers();
+
+    public void setReleaseUsers(List<String> releaseUsers);
 }

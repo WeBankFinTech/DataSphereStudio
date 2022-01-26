@@ -16,14 +16,12 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref.impl;
 
-import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractRequestRef;
 
 import java.util.List;
-import java.util.Map;
 
 
 public  class CommonRequestRefImpl extends AbstractRequestRef implements CommonRequestRef {

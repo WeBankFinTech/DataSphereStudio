@@ -225,6 +225,7 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
 
             //保存编排模式
             orchestratorService.updateOrchestrator(orchestratorModifyRequest, username);
+            orchestratorVo.setOrchestratorId(orchestratorId);
         } catch (final Exception e) {
             DSSExceptionUtils.dealErrorException(60034, "failed to create orchestrator", e, DSSProjectErrorException.class);
         }
@@ -311,7 +312,11 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
             //删除编排模式
             orchestratorService.deleteOrchestrator(orchestratorDeleteRequest, username);
         } catch (final Exception e) {
-            DSSExceptionUtils.dealErrorException(60035, "failed to delete orchestrator", e, DSSProjectErrorException.class);
+            String errmsg = e.getMessage();
+            if(e instanceof ExternalOperationFailedException){
+                errmsg = ((ExternalOperationFailedException)e).getDesc();
+            }
+            DSSExceptionUtils.dealErrorException(60035, errmsg, e, DSSProjectErrorException.class);
         }
         return orchestratorVo;
     }

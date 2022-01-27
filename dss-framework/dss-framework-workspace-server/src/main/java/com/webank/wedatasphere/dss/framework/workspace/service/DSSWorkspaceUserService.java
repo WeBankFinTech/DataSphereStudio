@@ -24,7 +24,6 @@ import java.util.List;
 
 public interface DSSWorkspaceUserService {
 
-
     void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator);
 
     void deleteWorkspaceUser(String userName, int workspaceId);
@@ -38,4 +37,6 @@ public interface DSSWorkspaceUserService {
     List<String> getWorkspaceEditUsers(int workspaceId);
 
     List<String> getWorkspaceReleaseUsers(int workspaceId);
+
+    Long getCountByUsername(String username,int workspaceId);
 }

@@ -578,6 +578,7 @@ export default {
     },
     goHome() {
       this.isHomePage = true;
+      this.isConsolePage = false;
       if (this.isAdmin) {
         this.$router.push("/newhome");
       } else {

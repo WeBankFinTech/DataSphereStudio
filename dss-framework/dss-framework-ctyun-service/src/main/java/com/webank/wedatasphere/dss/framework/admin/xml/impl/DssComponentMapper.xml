@@ -57,7 +57,7 @@
         <set>
             <if test="url != null and url != ''">url = #{url},</if>
             <if test="projectUrl != null and projectUrl != ''">project_url = #{projectUrl},</if>
-            <if test="ifIframe != ifIframe">if_iframe = #{ifIframe},</if>
+            <if test="ifIframe != null and  ifIframe!=''">if_iframe = #{ifIframe},</if>
             <if test="homepageUrl != null and homepageUrl != ''">homepage_url = #{homepageUrl},</if>
             <if test="redirectUrl != null and redirectUrl != ''">redirect_url = #{redirectUrl},</if>
             name = #{name}

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
@@ -90,5 +91,11 @@ public interface DSSWorkspaceService {
 
     Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
 
+    List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
+
+    boolean checkAdminByWorkspace(String username, int workspaceId);
+
+    //是否为超级管理员
+    public boolean isAdminUser(Long workspaceId, String username);
 
 }

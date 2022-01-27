@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +54,6 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRefImpl;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -80,6 +75,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
+    @Autowired
+    private DSSProjectNoCreateSwitchService projectNameCheckSwitchService;
+
 
     public static final String MODE_SPLIT = ",";
 
@@ -95,12 +93,34 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     public DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace,boolean checkProjectName) throws Exception {
         //1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程
         //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后进行数据库进行回滚
+        boolean isWorkspaceUser = projectUserService.isWorkspaceUser(projectCreateRequest.getWorkspaceId(), username);
+        //非管理员
+        if (!isWorkspaceUser) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_USER_NOT_IN_WORKSPACE.getCode(), ProjectServerResponse.PROJECT_USER_NOT_IN_WORKSPACE.getMsg(), DSSProjectErrorException.class);
+        }
+        //增加名称长度限制
+        if(projectCreateRequest.getName().length()> MaxProjectNameSize ||projectCreateRequest.getDescription().length()> MaxPrjectDescSize){
+            DSSExceptionUtils.dealErrorException(60021,"project name or desc is too long for size is "+projectCreateRequest.getName().length()+",desc:"+projectCreateRequest.getDescription().length(),DSSProjectErrorException.class);
+        }
 
         //判断工程是否存在相同的名称
         DSSProjectDO dbProject = projectService.getProjectByName(projectCreateRequest.getName());
         if (dbProject != null) {
             DSSExceptionUtils.dealErrorException(60022, String.format("project name already has the same name %s ", projectCreateRequest.getName()), DSSProjectErrorException.class);
         }
+
+
+        List<String> appConnNameList = new ArrayList<>(1);
+        //判断已有组件是否已经存在相同的工程名称
+        if(checkProjectName) {
+            if (isExistSameProjectName(projectCreateRequest, username, workspace, appConnNameList)) {
+                throw new DSSProjectErrorException(71000, "" + appConnNameList.get(0) + "已存在相同项目名称，请重新命名");
+            }
+        }else {
+            //针对迁移的操作，wtss已经存在该同名工程，如果强行检查会导致迁移报错。
+            LOGGER.info("不检查工程名称是否在第三方节点已经存在");
+        }
+
         //todo 创建appconn的相关的工程 还没有调试通过
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, username, workspace);
         if (null == projectMap) {
@@ -110,9 +130,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //3.保存dss_project
         DSSProjectDO project = projectService.createProject(username, projectCreateRequest);
         //4.保存dss_project_user 工程与用户关系
-        projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest);
-        // 5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
-        if (projectMap.size() > 0) {
+        projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest, workspace);
+        //5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
+        if (null != projectMap && projectMap.size() > 0) {
             projectService.saveProjectRelation(project, projectMap);
         }
         DSSProjectVo dssProjectVo = new DSSProjectVo();
@@ -124,9 +144,18 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
 
     @Override
-    public void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws Exception {
+    public void modifyProject(ProjectModifyRequest projectModifyRequest, String username, Workspace workspace) throws Exception {
         DSSProjectDO dbProject = projectService.getProjectById(projectModifyRequest.getId());
-        if (dbProject == null) {//工程不存在
+        //如果不是工程的创建人，则校验是否管理员
+        if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
+            boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
+            //非管理员
+            if (!isAdmin) {
+                DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getMsg(), DSSProjectErrorException.class);
+            }
+        }
+        //工程不存在
+        if (dbProject == null) {
             LOGGER.error("{} project id is null, can not modify", projectModifyRequest.getName());
             DSSExceptionUtils.dealErrorException(60021,
                     String.format("%s project id is null, can not modify", projectModifyRequest.getName()), DSSProjectErrorException.class);
@@ -137,58 +166,108 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
 
         //1.统一修改各个接入的第三方的系统的工程状态信息
-        modifyThirdProject(projectModifyRequest, username, dbProject.getCreateBy());
-        //2.修改dss_project DSS基本工程信息
+        //2.修改dss_project_user 工程与用户关系
+        projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
+        //调用第三方的工程修改接口
+        modifyThirdProject(projectModifyRequest, username,dbProject);
+        //3.修改dss_project DSS基本工程信息
         projectService.modifyProject(username, projectModifyRequest);
-        try {
-            projectUserService.modifyProjectUser(dbProject, projectModifyRequest,username);
-        } catch (Exception e) {
-            LOGGER.error("modifyProjectUserError:", e);
+    }
+
+    //统一修改各个接入的第三方的系统的工程状态信息   修改dss_project调用
+    private void modifyThirdProject(ProjectModifyRequest projectModifyRequest, String username,DSSProjectDO dbProject){
+        for (AppConn appConn : AppConnManager.getAppConnManager().listAppConns()) {
+            ProjectRequestRef projectRequestRef = new ProjectRequestRefImpl();
+            projectRequestRef.setDescription(projectModifyRequest.getDescription());
+            projectRequestRef.setUpdateBy(username);
+            projectRequestRef.setCreateBy(dbProject.getCreateBy());
+            projectRequestRef.setName(projectModifyRequest.getName());
+            projectRequestRef.setAccessUsers(projectModifyRequest.getAccessUsers());
+            projectRequestRef.setEditUsers(projectModifyRequest.getEditUsers());
+            projectRequestRef.setReleaseUsers(projectModifyRequest.getReleaseUsers());
+            if (appConn instanceof OnlyStructureAppConn) {
+                StructureIntegrationStandard appStandard = ((OnlyStructureAppConn) appConn).getOrCreateStructureStandard();
+                for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
+                    try {
+                        ProjectService projectService = appStandard.getProjectService(appInstance);
+                        if (projectService == null) {
+                            continue;
+                        }
+                        ProjectUpdateOperation operation = projectService.getProjectUpdateOperation();
+                        if (operation == null) {
+                            continue;
+                        }
+                        if (!isNeadToCreateProject(appInstance.getId())) {
+                            continue;
+                        }
+                        Long thirdProjectId = projectService.getAppConnProjectId(appInstance.getId(), dbProject.getId());
+                        if(thirdProjectId == null){
+                            LOGGER.error("modifyThirdProject, appName: {}, projectId is null ",appConn.getAppDesc().getAppName());
+                        }
+                        projectRequestRef.setId(thirdProjectId);
+                        ProjectResponseRef responseRef = operation.updateProject(projectRequestRef);
+                        if(responseRef != null){
+                            LOGGER.info("appName:{},modifyThirdProject responseBody is ",responseRef.getResponseBody());
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("modify Third Project error ",e);
+/*                        DSSExceptionUtils.dealWarnException(60015,
+                                String.format("failed to update project %s", projectModifyRequest.getName()), e, LambdaWarnException.class);*/
+                    }
+                }
+            }
         }
     }
 
-    @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)
-        throws Exception {
-        LOGGER.warn("user {} begins to delete project {}.", username, projectDeleteRequest);
-
-        Long projectId = projectDeleteRequest.getId();
-        if (projectMapper.hasOrchestrator(projectId) != null) {
-            throw new DSSProjectErrorException(90041, "该工程项下存在工作流，请先删除对应工作流");
+    private boolean isExistSameProjectName(ProjectCreateRequest dssProjectCreateRequest,
+                                           String username,
+                                           Workspace workspace,
+                                           List<String> appConnNameList) throws ExternalOperationFailedException {
+        LOGGER.info("begin to check project name...");
+        ProjectRequestRefImpl requestRef;
+        try {
+            requestRef = RefFactory.INSTANCE.newRef(ProjectRequestRefImpl.class);
+        } catch (DSSErrorException e) {
+            LOGGER.error("get ProjectRequestRefImpl failed when check project name", e);
+            throw new ExternalOperationFailedException(71000, "check project name error", e);
         }
+        requestRef.setName(dssProjectCreateRequest.getName());
+        requestRef.setCreateBy(username);
+        requestRef.setDescription(dssProjectCreateRequest.getDescription());
+        requestRef.setWorkspaceName(dssProjectCreateRequest.getWorkspaceName());
+        requestRef.setWorkspace(workspace);
 
-        DSSProjectDO dSSProjectDO = projectMapper.selectById(projectId);
-        if (dSSProjectDO == null) {
-            throw new DSSErrorException(600001, "工程不存在");
-        }
-
-        if (projectDeleteRequest.isIfDelOtherSys()) {
-            ProjectInfoVo projectInfo = projectMapper.getProjectInfoById(projectId);
-            workspace.setWorkspaceName(projectInfo.getWorkspaceName());
-
-            ProjectRequestRefImpl projectRequestRef = new ProjectRequestRefImpl();
-            projectRequestRef.setName(dSSProjectDO.getName());
-            projectRequestRef.setWorkspace(workspace);
-            projectRequestRef.setType("Project");
-
-            AppConnManager.getAppConnManager().listAppConns().stream()
-                .filter(appConn -> appConn instanceof OnlyStructureAppConn).forEach(appConn -> {
-                    OnlyStructureAppConn structureAppConn = (OnlyStructureAppConn)appConn;
-                    appConn.getAppDesc().getAppInstances().forEach(DSSExceptionUtils.handling(appInstance -> {
-                        ProjectService appConnProjectService =
-                            structureAppConn.getOrCreateStructureStandard().getProjectService(appInstance);
-                        if (appConnProjectService != null) {
-                            ProjectDeletionOperation projectDeletionOperation =
-                                appConnProjectService.getProjectDeletionOperation();
-                            if (projectDeletionOperation != null) {
-                                projectDeletionOperation.deleteProject(projectRequestRef);
-                            }
+        for (AppConn appConn : AppConnManager.getAppConnManager().listAppConns()) {
+            if (appConn instanceof OnlyStructureAppConn) {
+                StructureIntegrationStandard appStandard = ((OnlyStructureAppConn) appConn).getOrCreateStructureStandard();
+                for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
+                    ProjectService projectService = appStandard.getProjectService(appInstance);
+                    if (projectService == null) {
+                        continue;
+                    }
+                    ProjectGetOperation projectGetOperation = projectService.getProjectGetOperation();
+                    if (projectGetOperation == null) {
+                        continue;
+                    }
+                    if (!isNeadToCreateProject(appInstance.getId())) {
+                        continue;
+                    }
+                    try {
+                        LOGGER.info("begin to check project name in {}...", appConn.getAppDesc().getAppName());
+                        //获取各组件工程信息
+                        DSSProject project = projectGetOperation.getProject(requestRef);
+                        if (project != null && project.getId() > 0) {
+                            appConnNameList.add(appConn.getAppDesc().getAppName());
+                            return true;
                         }
-                    }));
-                });
+                    } catch (ExternalOperationFailedException e) {
+                        LOGGER.error("Failed to check project {} name in {}", dssProjectCreateRequest.getName(), appConn.getAppDesc().getAppName(), e);
+                        throw new ExternalOperationFailedException(71000, "Failed to check project: " + dssProjectCreateRequest.getName() + " in " + appConn.getAppDesc().getAppName() + ", Instance id:"+appInstance.getId(), e);
+                    }
+                }
+            }
         }
-        projectService.deleteProject(projectDeleteRequest.getId());
-        LOGGER.warn("User {} deleted project {}.", username, dSSProjectDO.getName());
+        return false;
     }
 
     // 1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程 新增dss_project调用
@@ -264,52 +343,16 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return projectMap;
     }
 
-    //统一修改各个接入的第三方的系统的工程状态信息   修改dss_project调用
-    private void modifyThirdProject(ProjectModifyRequest projectModifyRequest, String username, String projectCreator) {
-        List<DSSProjectUser> dssProjectUsers =
-            projectUserService.listByPriv(projectModifyRequest.getId(), ProjectUserPrivEnum.PRIV_RELEASE);
-        List<String> oldReleaseUsers =
-            dssProjectUsers.stream().map(DSSProjectUser::getUsername).collect(Collectors.toList());
-        List<String> releaseUsers = projectModifyRequest.getReleaseUsers();
-        // 创建人默认为发布权限
-        releaseUsers.add(projectCreator);
-
-        ProjectRequestRefImpl projectRequestRef = new ProjectRequestRefImpl();
-        projectRequestRef.setName(projectModifyRequest.getName());
-        projectRequestRef.setWorkspaceName(projectModifyRequest.getWorkspaceName());
-        projectRequestRef.setDescription(projectModifyRequest.getDescription());
-        projectRequestRef.setUpdateBy(username);
-        // 有发布权限的用户
-        projectRequestRef.setParameter("releaseUsersIncreased",
-            CollectionUtils.removeAll(releaseUsers, oldReleaseUsers));
-        projectRequestRef.setParameter("releaseUsersDecreased",
-            CollectionUtils.removeAll(oldReleaseUsers, releaseUsers));
-
-        for (AppConn appConn : AppConnManager.getAppConnManager().listAppConns()) {
-            if (appConn instanceof OnlyStructureAppConn) {
-                OnlyStructureAppConn onlyStructureAppConn = (OnlyStructureAppConn)appConn;
-                StructureIntegrationStandard appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
-                // 如果该AppConn是有structureIntegrationStandard的话,那么所有的appinstance都要进行新建工程
-                for (AppInstance appInstance : appConn.getAppDesc().getAppInstances()) {
-                    ProjectService appStandardProjectService = appStandard.getProjectService(appInstance);
-                    if (appStandardProjectService == null) {
-                        continue;
-                    }
-
-                    ProjectUpdateOperation operation = appStandardProjectService.getProjectUpdateOperation();
-                    try {
-                        if (operation != null) {
-                            ProjectResponseRef responseRef = operation.updateProject(projectRequestRef);
-                        }
-                    } catch (ExternalOperationFailedException e) {
-                        DSSExceptionUtils.dealWarnException(60015,
-                            String.format("failed to update project %s", projectModifyRequest.getName()), e,
-                            LambdaWarnException.class);
-                    }
-                }
-            }
+    /**
+     * 是否需要创建工程
+     * appconn instance 是否配置在dss_project_no_create_switch这个表里面
+     * 如果配置上，则不需要检查工程名称或创建工程
+     */
+    private boolean isNeadToCreateProject(Long appconnInstanceId){
+        Long nocheckAppconnCount = projectNameCheckSwitchService.getCountByAppconnInstanceId(appconnInstanceId);
+        if (nocheckAppconnCount.longValue() != 0) {
+            return false;
         }
+        return true;
     }
-
-
 }

@@ -114,13 +114,18 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
         String lastMsgId = "0";
         try {
             msgConn = getEventCheckerConnection(props,log);
+            log.info("+++++++++++++++_===============================================1");
             pstmtForGetID = msgConn.prepareCall(sqlForReadMsgID);
+            log.info("+++++++++++++++_===============================================2");
             pstmtForGetID.setString(1, receiver);
             pstmtForGetID.setString(2, topic);
             pstmtForGetID.setString(3, msgName);
+            log.info("+++++++++++++++_===============================================3");
             rs = pstmtForGetID.executeQuery();
+            log.info("+++++++++++++++_===============================================4");
             lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
         } catch (SQLException e) {
+            log.info("+++++++++++++++_===================================================================================",e);
             throw new RuntimeException("get Offset failed " + e);
         }finally {
             closeQueryStmt(pstmtForGetID,log);

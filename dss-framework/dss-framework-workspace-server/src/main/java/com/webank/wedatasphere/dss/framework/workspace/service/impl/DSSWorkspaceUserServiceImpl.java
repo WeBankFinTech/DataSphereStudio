@@ -16,18 +16,21 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
-import org.apache.linkis.common.conf.CommonVars;
+import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,9 +40,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Autowired
     private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
 
-
-    final CommonVars<String> staff = CommonVars.apply("wds.dss.workspace.staffs", "tom,alex,bob");
-
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
@@ -59,23 +61,30 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Override
     public List<StaffInfoVO> listAllDSSUsers() {
-
-        String[] staffs = staff.getValue().split(",");
-        List<StaffInfoVO> staffInfoVOs = new ArrayList<>();
-        int count = 1;
-        for (String s : staffs){
-            StaffInfoVO staffInfoVO = new StaffInfoVO();
-            staffInfoVO.setUsername(s);
-            staffInfoVO.setDepartment("wds");
-            staffInfoVO.setOffice("dss");
-            staffInfoVO.setId(Integer.toString(count));
-            count += 1;
-            staffInfoVOs.add(staffInfoVO);
-        }
-        return staffInfoVOs;
+        //需要将esb带来的所有用户进行返回
+        List<StaffInfo> staffInfos = staffInfoGetter.getAllUsers();
+        return staffInfos.stream().map(this::staffToDSSUser).collect(Collectors.toList());
     }
 
-
+    private StaffInfoVO staffToDSSUser(StaffInfo staffInfo){
+        StaffInfoVO staffInfoVO = new StaffInfoVO();
+        String orgFullName = staffInfo.getOrgFullName();
+        if (StringUtils.isNotEmpty(orgFullName)){
+            try{
+                String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
+                String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
+                staffInfoVO.setDepartment(departmentName);
+                staffInfoVO.setOffice(officeName);
+            }catch(Exception e){
+                //LOGGER.warn("fail to get department and office {} ", e.getMessage());
+                staffInfoVO.setDepartment(WorkspaceServerConstant.DEFAULT_DEPARTMENT);
+                staffInfoVO.setOffice(WorkspaceServerConstant.DEFAULT_OFFICE);
+            }
+        }
+        staffInfoVO.setUsername(staffInfo.getEnglishName());
+        staffInfoVO.setId(staffInfo.getId());
+        return staffInfoVO;
+    }
 
     @Override
     public List<String> getAllWorkspaceUsers(int workspaceId) {
@@ -83,9 +92,9 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public    List<Integer>   getUserWorkspaceIds(String userName){
+    public List<Integer> getUserWorkspaceIds(String userName) {
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
-        return  tempWorkspaceIds;
+        return tempWorkspaceIds;
     }
 
     @Override
@@ -96,5 +105,10 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     public List<String> getWorkspaceReleaseUsers(int workspaceId) {
         return dssWorkspaceUserMapper.getWorkspaceReleaseUsers(workspaceId);
+    }
+
+    @Override
+    public Long getCountByUsername(String username,int workspaceId){
+        return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
     }
 }

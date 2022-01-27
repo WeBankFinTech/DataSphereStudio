@@ -45,8 +45,5 @@ public interface DSSFrameworkProjectService {
      */
     DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace,boolean checkProjectName) throws Exception;
 
-    void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws Exception;
-
-    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)
-        throws Exception;
+    void modifyProject(ProjectModifyRequest projectModifyRequest, String username, Workspace workspace) throws Exception;
 }

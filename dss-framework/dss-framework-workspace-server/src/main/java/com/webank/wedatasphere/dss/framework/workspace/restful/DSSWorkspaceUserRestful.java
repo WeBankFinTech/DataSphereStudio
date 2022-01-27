@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
-import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
@@ -31,6 +30,8 @@ import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 @RestController
 public class DSSWorkspaceUserRestful {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserRestful.class);
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
@@ -68,26 +70,19 @@ public class DSSWorkspaceUserRestful {
             //默认改成20
             pageSize = 20;
         }
-        pageSize = 500;
         if(StringUtils.isNotEmpty(roleName)){
             //如果roleName不是空的话，就按照roleName来吧
             List<Long> totals = new ArrayList<>();
             List<DSSWorkspaceUserVO> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsersByRole(Integer.parseInt(workspaceId),roleName, totals, pageNow, pageSize);
-            PageInfo<DSSWorkspaceUserVO> pageInfo = new PageInfo<>(workspaceUsers);
-            List<DSSWorkspaceUserVO> list = pageInfo.getList();
-            long total = pageInfo.getTotal();
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0));
+            return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
         }else{
             List<Long> totals = new ArrayList<>();
             List<DSSWorkspaceUser01> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
-            PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
-            List<DSSWorkspaceUser01> list = pageInfo.getList();
-            long total = pageInfo.getTotal();
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.ok().data("roles", dssRoles).data("workspaceUsers", list).data("total", totals.get(0));
+            return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
         }
     }
 
@@ -108,7 +103,13 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         String userName = updateWorkspaceUserRequest.getUserName();
         String userId = updateWorkspaceUserRequest.getUserId();
-
+        Long count = dssWorkspaceUserService.getCountByUsername(userName, workspaceId);
+        if (count != null && count.longValue() > 0) {
+            return Message.error("用户已经存在该工作空间，不需要重复添加！");
+        }
+        if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
+            return Message.error("无权限进行该操作");
+        }
         dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator,userId);
         return Message.ok();
     }
@@ -118,6 +119,9 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
+        if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
+            return Message.error("无权限进行该操作");
+        }
         String userName = updateWorkspaceUserRequest.getUserName();
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
@@ -128,6 +132,10 @@ public class DSSWorkspaceUserRestful {
         //todo 删除工作空间中的用户
         String userName = deleteWorkspaceUserRequest.getUsername();
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
+        String creator = SecurityFilter.getLoginUsername(request);
+        if(!dssWorkspaceService.checkAdmin(creator)||!dssWorkspaceService.checkAdminByWorkspace(creator,workspaceId)){
+            return Message.error("无权限进行该操作");
+        }
         dssWorkspaceUserService.deleteWorkspaceUser(userName,workspaceId);
         return Message.ok();
     }

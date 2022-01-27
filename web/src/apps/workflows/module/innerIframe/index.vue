@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import util from '@/common/util';
 import emptyGuide from "./emptyGuide.vue"
 export default {
   components: {
@@ -20,8 +21,7 @@ export default {
   mounted() {
     let baseInfo = JSON.parse(localStorage.getItem('baseInfo'))
     let applicationItem = baseInfo.applications.filter(item => item.name == "streamis")[0]
-    this.url = applicationItem.projectUrl;
-    console.log('this.url', this.url)
+    this.url = util.replaceHolder(applicationItem.projectUrl)
   },
   data() {
     return {

@@ -358,7 +358,7 @@ export default {
                 this.isCompleted = true
               }
             if( this.queryForTbls ) {
-              this.cardTabs = this.foamtDataToHighLigth(res.concat(data.result), this.queryForTbls)
+              this.cardTabs = res.concat(this.foamtDataToHighLigth(data.result, this.queryForTbls))
             } else {
               this.cardTabs = res.concat(data.result);
             }

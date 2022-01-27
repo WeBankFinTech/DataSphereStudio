@@ -99,7 +99,8 @@
                     "label": "用户名称"
                 },
                 "time": {
-                    "label": "时间"
+                    "label": "时间",
+                    "datetimerange": "请选择日期和时间"
                 }
             },
             "formItems": {

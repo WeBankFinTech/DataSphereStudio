@@ -1,11 +1,13 @@
 <template>
-  <div style="height: 100%" class="exchangisJob">
+  <div class="exchangisJob">
     <Row class-name="exchangisContent" :gutter="32">
       <Col class-name="leftSide" span="3">
         <Menu mode="vertical" theme="light" width="auto" :active-name="activeProjectId" @on-select="projectSelect">
+          <MenuGroup title="任务组" class="jobGroup">
             <MenuItem :name="project.id" :key="project.id" v-for="project in projects">
                 {{ project.projectName }}
             </MenuItem>
+          </MenuGroup>
         </Menu>
       </Col>
       <Col class-name="rightSide" span="19">
@@ -14,13 +16,8 @@
             <span>{{ projectTitle + "-任务列表" }}</span>
             <Button type="primary" @click="handleClick" class="button1">前往Exchangis</Button>
           </div>
-          <Table 
-            highlight-row 
-            ref="currentRowTable" 
-            :columns="columns" 
-            size="small"
-            :data="tableList"
-            @on-current-change="change"></Table>
+          <Table ref="currentRowTable" :columns="columns" size="small" :data="tableList">
+          </Table>
           <Page :total="page.total" :current="page.current" :page-size="page.pageSize" @on-change="pageChange" show-elevator show-total/>
         </Row>
         <Row class-name="footer">
@@ -83,29 +80,61 @@ export default {
       },
       columns: [
         {
+          slot: "selection",
+          key: "selection",
+          align: "center",
+          maxWidth: 100,
+          renderHeader: (h, params) => {
+            return h('span', {}, ' ');
+          },
+          render: (h, { row, column, index}) => {
+            return h('Checkbox', {
+              props: {
+                value: row.checkBox,
+                disabled: row.jobStatus ? true : false
+              },
+              on: {
+                'on-change': (e) => {
+                  this.tableList.forEach(item => {
+                    this.$set(item, 'checkBox', false)
+                    this.$set(item, "_highlight", false)
+                  });
+                  this.tableList[index].checkBox = e;
+                  this.tableList[index]._highlight = e
+                  if(!e){
+                    this.activeJobId = ''
+                  }else {
+                    this.activeJobId = row.id
+                  }
+                }
+              }
+            }, )
+          }
+        },
+        {
           title: "任务ID",
           key: "id",
-          align: 'center',
+          align: 'left',
         },
         {
           title: "任务名称",
           key: "jobName",
-          align: "center",
+          align: "left",
         },
         {
           title: "任务描述",
           key: "jobDesc",
-          align: "center",
+          align: "left",
         },
         {
           title: "定时状态",
           key: "jobStatus",
-          align: "center",
+          align: "left",
         },
         {
           title: "创建时间",
           key: "createTime",
-          align: "center",
+          align: "left",
         }
       ]
     };
@@ -141,7 +170,7 @@ export default {
     this.tabIndex = this.IdeInstance.$attrs["in-flows-index"]
   },
   methods: {
-    init(){
+    async init(){
       // 获取上次保存的项目ID、任务ID和当前页, 如果不存在则指定项目列表中的第一个值，对应任务列表里的第一个非定时状态任务以及页码
       this.activeProjectId = this.node.params && this.node.params.variable && this.node.params.variable.projectId && (this.node.params.variable.projectId !== '') ? this.node.params.variable.projectId : this.projects[0].id ;
       let activeProjectId = this.projects.find(item=>{
@@ -155,7 +184,7 @@ export default {
         projectId: this.activeProjectId,
         pageNum: this.page.current
       }
-      api.fetch('/dss/framework/exchangis/task/tree', params, 'get').then((res)=>{
+      await api.fetch('/dss/framework/exchangis/task/tree', params, 'get').then((res)=>{
         this.page.current = res.response.page
         this.page.total = res.response.totalItems
         this.tableList = res.response.dssExchangeTaskList
@@ -169,13 +198,14 @@ export default {
         this.tableList = this.tableList.map(item => {
           if(item.id === this.activeJobId){
             item._highlight = true
+            item.checkBox = true
             return item
           }
           return item
         });
       })
     },
-    // 切换页码
+    // 页码切换
     pageChange(current){
       this.activeJobId = ''
       let params = {
@@ -187,18 +217,6 @@ export default {
         this.page.total = res.response.totalItems
         this.tableList = res.response.dssExchangeTaskList
       })
-    },
-    // 表格选项切换
-    change(currentRow){
-      if(currentRow){
-        if(currentRow.jobStatus){
-          this.$Message.warning('当前选项为定时状态，无法被选中');
-          this.$refs.currentRowTable.clearCurrentRow();
-          this.activeJobId = ""
-        }else{
-          this.activeJobId = currentRow.id
-        }
-      }
     },
     // 项目切换
     projectSelect(name){
@@ -359,6 +377,13 @@ export default {
         height: 100%;
         .ivu-menu-vertical{
           height: 100%;
+          /deep/ .ivu-menu-item-group-title{
+            padding-left: 0px;
+            text-align: center;
+            height: 48px;
+            line-height: 48px;
+            font-size: 14px;
+          }
           .ivu-menu-item{
             text-align: center;
           }

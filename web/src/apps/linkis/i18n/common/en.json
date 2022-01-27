@@ -100,7 +100,8 @@
             "label": "userName"
         },
         "time": {
-            "label": "time"
+            "label": "time",
+            "datetimerange": "Please select date and time"
         }
       },
       "formItems": {

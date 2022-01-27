@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 public interface DSSProjectUserService {
 
@@ -63,7 +64,7 @@ public interface DSSProjectUserService {
      * @throws Exception
      *             the exception
      */
-    void saveProjectUser(Long projectID, String username, ProjectCreateRequest dssProjectCreateRequest)throws Exception;
+    void saveProjectUser(Long projectID, String username, ProjectCreateRequest dssProjectCreateRequest, Workspace workspace)throws Exception;
 
     /**
      * 修改工程与用户关系
@@ -77,7 +78,7 @@ public interface DSSProjectUserService {
      * @throws Exception
      *             the exception
      */
-    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest, String loginuser)throws Exception;
+    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest, String loginuser,Workspace workspace)throws Exception;
 
 
     List<DSSProjectUser> getListByParam(Long workspaceId, String username);
@@ -86,6 +87,8 @@ public interface DSSProjectUserService {
     boolean isAdminByUsername(Long workspaceId,String username);
 
     List<DSSProjectUser> getProjectUserPriv(Long projectId, String username);
+
+    boolean isWorkspaceUser(Long workspaceId,String username);
 
     /**
      * 获取某个项目下指定权限的用户名合.

@@ -1,5 +1,4 @@
 package com.webank.wedatasphere.dss.framework.admin.service.impl;
-
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssApplicationInfo;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssCreateApplicationData;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssOnestopMenuInfo;
@@ -7,6 +6,7 @@ import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssOnestopMenuJoi
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminComponentService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssComponentMapper;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 

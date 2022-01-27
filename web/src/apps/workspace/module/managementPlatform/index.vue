@@ -112,8 +112,7 @@ const menu = [
       },
       { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
       // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
-      { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
+      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" }
     ],
   },
   {
@@ -129,6 +128,11 @@ const menu = [
   {
     title: "知识库",
     icon: "question",
+    nodes: [],
+  },
+  {
+    title: "下载审计",
+    icon: "audit",
     nodes: [],
   }
 ];
@@ -191,7 +195,9 @@ export default {
     handleSidebarToggle(title) {
       this.currentHeader = title;
       if (title === this.defaultMenu.title) {
-        this.sidebarFold = !this.sidebarFold;
+        if(this.defaultMenu.title !== "下载审计"){
+          this.sidebarFold = !this.sidebarFold;
+        }
       } else {
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
@@ -199,6 +205,10 @@ export default {
           this.$router.push("guide");
         } else if (this.defaultMenu.title == "知识库") {
           this.$router.push("library");
+        }else if(this.defaultMenu.title == "下载审计"){
+          this.sidebarFold = true
+          let node = { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
+          this.handleTreeClick(node)
         }
       }
     },
@@ -320,8 +330,9 @@ export default {
             delete updateData[key]
           }
         }
+        updateData.id = componentItem.applicationId
         console.log(updateData)
-        UpdateDataFromId(componentItem.id, updateData)
+        UpdateDataFromId(componentItem.applicationId, updateData)
           .then((data) => {
             _this.$Message.success("更新成功");
           })
@@ -332,12 +343,17 @@ export default {
       //新增
       if (componentItem.isAdded) {
         const postData = formatComponentDataForPost(componentItem);
+        postData['accessButtonEn'] = ''
+        postData['accessButtonCn'] = ''
+        postData['labelsEn'] = ''
+        postData['labelsCn'] = ''
         CreateData(postData)
           .then((data) => {
             _this.$Message.success("新增成功");
           })
           .catch((err) => {
-            _this.$Message.fail("新增失败");
+            console.log(err, 'err')
+            _this.$Message.error("新增失败");
           });
       }
     },
@@ -362,7 +378,7 @@ export default {
             _menuOptions.push(menu);
           });
           that.menuOptions = _menuOptions;
-          console.log("that.menuOptions", that.menuOptions);
+          console.log('that.menuOptions', that.menuOptions)
           sessionStorage.setItem(
             "menuOptions",
             JSON.stringify(that.menuOptions)
@@ -415,7 +431,7 @@ export default {
     },
   },
   mounted() {
-    //this.getMenuForcomponentAccess();
+    this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }

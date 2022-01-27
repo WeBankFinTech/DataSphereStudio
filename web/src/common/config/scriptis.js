@@ -129,7 +129,8 @@ export default Object.freeze([{
   color: '#444444',
   isCanBeNew: true,
   label: 'JDBC',
-  isCanBeOpen: true
+  isCanBeOpen: true,
+  flowType: 'jdbc'
 },
 {
   rule: /\.python$/i,

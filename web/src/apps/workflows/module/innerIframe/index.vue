@@ -6,12 +6,13 @@
       </div>
     </template>
     <template v-else>
-      <iframe :src="`${url}?projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
+      <iframe :src="`${url}&projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
     </template>
   </div>
 </template>
 
 <script>
+import util from '@/common/util';
 import emptyGuide from "./emptyGuide.vue"
 export default {
   components: {
@@ -19,9 +20,8 @@ export default {
   },
   mounted() {
     let baseInfo = JSON.parse(localStorage.getItem('baseInfo'))
-    let applicationItem = baseInfo.applications.filter(item => item.name == 'realTimeJobCenter')[0]
-    this.url = applicationItem.projectUrl;
-    console.log('this.url', this.url)
+    let applicationItem = baseInfo.applications.filter(item => item.name == "streamis")[0]
+    this.url = util.replaceHolder(applicationItem.projectUrl)
   },
   data() {
     return {

@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="download-audit">
     <!-- 查询操作 -->
     <Form :model="searchBar" :rules="ruleInline" inline>
       <FormItem prop="userName" :label="$t('message.linkis.downloadAudit.userName.label')">
         <Input :maxlength="50" v-model="searchBar.userName" :placeholder="$t('message.linkis.searchUserName')"/>
       </FormItem>
       <FormItem prop="time" :label="$t('message.linkis.downloadAudit.time.label')">
-        <DatePicker type="datetimerange" :transfer="true" :editable="false" placement="bottom-start" v-model="searchBar.time" placeholder="Select date and time" style="width: 150px"></DatePicker>
+        <DatePicker type="datetimerange" :transfer="true" :editable="false" placement="bottom-start" v-model="searchBar.time" :placeholder="$t('message.linkis.downloadAudit.time.datetimerange')" style="width: 150px"></DatePicker>
       </FormItem>
       <FormItem>
         <Button type="default" @click="reset" style="margin-right: 10px;" >{{ $t('message.linkis.reset') }}</Button>
@@ -17,9 +17,6 @@
     </Form>
 
     <Table class="table-content" border :columns="columns" :data="tableData">
-        <template slot-scope="{ row }" slot="sql">
-            <strong>{{ JSON.parse(row.sql) }}</strong>
-        </template>
     </Table>
     <div class="page-bar">
       <Page
@@ -49,7 +46,6 @@ export default {
       tableData: [],
       page: {
         totalSize: 0,
-        // sizeOpts: [15, 30, 45],
         pageSize: 10,
         current: 1
       },
@@ -57,32 +53,52 @@ export default {
         {
           title: this.$t('message.linkis.tableColumns.date'),
           key: 'createTime',
-          minWidth: 100,
-          align: "center"
+          minWidth: 150,
+          align: "center",
+          sortable: true
         },
         {
           title: this.$t('message.linkis.tableColumns.user'),
           key: 'creator',
-          minWidth: 100,
+          minWidth: 150,
           align: "center"
         },
         {
           title: this.$t('message.linkis.tableColumns.scriptFilePath'),
           key: 'path',
-          minWidth: 100,
+          minWidth: 200,
           align: "center"
         },
         {
           title: this.$t('message.linkis.tableColumns.sqlContent'),
           key: 'sql',
-          slot: 'sql',
-          minWidth: 300,
-          align: "center"
+          minWidth: 200,
+          align: "center",
+          render: (h, params) => {
+            let texts = JSON.parse(params.row.sql)
+            if (texts != null) {
+              if (texts.length > 80) {
+                texts = texts.substring(0, 80) + '...' // 进行数字截取或slice截取超过长度时以...表示
+              } 
+            }
+            return h('Tooltip', {
+              props: {
+                placement: 'left',
+                transfer: true,
+              },
+            }, [texts,
+              h('span', {
+                slot: 'content',
+                style: {
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-all'
+                }
+              }, JSON.parse(params.row.sql))
+            ])
+          }
         }
       ],
     }
-  },
-  computed: {
   },
   created() {
     this.search()

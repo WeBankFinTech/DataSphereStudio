@@ -439,6 +439,13 @@ export default {
             crossStyle: {
               color: '#999'
             }
+          },
+          formatter: function (params) {
+            let str = ''
+            params.forEach((item, index) => {
+              str += index === 1 ? `${item.seriesName}: ${item.value}%<br/>` : `${item.seriesName}: ${item.value}<br/>`
+            })
+            return str
           }
         },
         /*toolbox: {

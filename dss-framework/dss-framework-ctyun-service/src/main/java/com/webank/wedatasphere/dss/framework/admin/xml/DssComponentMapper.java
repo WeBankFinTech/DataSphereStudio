@@ -27,7 +27,7 @@ public interface DssComponentMapper {
 //    @Insert("INSERT INTO dss_onestop_menu_application(id,application_id,onestop_menu_id,title_en,title_cn,desc_en,desc_cn,labels_en,labels_cn,is_active,access_button_en,access_button_cn) VALUES" +
 //            "('0',#{id},#{dssCreateApplicationData.onestopMenuId},#{dssCreateApplicationData.titleEn},#{dssCreateApplicationData.titleCn},#{dssCreateApplicationData.descEn},#{dssCreateApplicationData.descCn}," +
 //            "#{dssCreateApplicationData.labelsEn},#{dssCreateApplicationData.labelsCn},#{dssCreateApplicationData.isActive},#{dssCreateApplicationData.accessButtonEn},#{dssCreateApplicationData.accessButtonCn})")
-    void insertMenuApplication( DssCreateApplicationData dssCreateApplicationData, int id);
+    void insertMenuApplication(@Param("dssCreateApplicationData")  DssCreateApplicationData dssCreateApplicationData, @Param("id") int id);
 //
 //    @Update("UPDATE dss_application SET name=#{dssApplicationInfo.name},url=#{dssApplicationInfo.url},project_url=#{dssApplicationInfo.projectUrl},if_iframe=#{dssApplicationInfo.ifIframe},homepage_url=#{dssApplicationInfo.homepageUrl},redirect_url=#{dssApplicationInfo.redirectUrl} WHERE id=#{dssApplicationInfo.id}")
     void updateApplication( DssApplicationInfo dssApplicationInfo);

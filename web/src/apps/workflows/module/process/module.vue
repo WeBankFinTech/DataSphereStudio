@@ -1978,15 +1978,28 @@ export default {
     // 根据节点类型将后台节点基础信息加入
     bindNodeBasicInfo(node) {
       const shapes = JSON.parse(JSON.stringify(this.shapes));
-      shapes.map((item) => {
-        if (item.children.length > 0) {
-          item.children.map((subItem) => {
-            if (subItem.type === node.type) {
-              node = Object.assign(subItem, node);
+      // shapes.map((item) => {
+      //   if (item.children.length > 0) {
+      //     item.children.map((subItem) => {
+      //       if (subItem.type === node.type) {
+      //           node = Object.assign(subItem, node);
+      //       }
+      //     })
+      //   }
+      // })
+      for(let item of shapes){
+        if(item.children.length > 0){
+          for(let subItem of item.children){
+            if(subItem.type === node.type){
+              if(subItem.title.split("_")[0] == "exchangis" && node.title.split("_")[0] !== "exchangis"){
+                continue
+              }
+              node = Object.assign(subItem, node)
+              break
             }
-          })
+          }
         }
-      })
+      }
       return node;
     },
     // 点击节流

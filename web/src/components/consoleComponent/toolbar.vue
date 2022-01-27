@@ -334,12 +334,11 @@ export default {
         if (flag) {
           // 下载结果集审计
           let params = {
-            sql: JSON.stringify(this.script.executionCode),
+            sql: this.script.executionCode,
             path: temPath
           }
           api.fetch("/dss/framework/audit/script/download/save", params, "post").then((res)=>{
             console.log("下载审计")
-            console.log(res.message)
           })
           this.$Message.success(this.$t('message.common.toolbar.success.download'));
         }

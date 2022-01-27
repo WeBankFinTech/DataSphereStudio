@@ -46,7 +46,6 @@ export default {
       tableData: [],
       page: {
         totalSize: 0,
-        // sizeOpts: [15, 30, 45],
         pageSize: 10,
         current: 1
       },
@@ -54,19 +53,20 @@ export default {
         {
           title: this.$t('message.linkis.tableColumns.date'),
           key: 'createTime',
-          width: 200,
-          align: "center"
+          minWidth: 150,
+          align: "center",
+          sortable: true
         },
         {
           title: this.$t('message.linkis.tableColumns.user'),
           key: 'creator',
-          width: 200,
+          minWidth: 150,
           align: "center"
         },
         {
           title: this.$t('message.linkis.tableColumns.scriptFilePath'),
           key: 'path',
-          minWidth: 100,
+          minWidth: 200,
           align: "center"
         },
         {
@@ -75,7 +75,7 @@ export default {
           minWidth: 200,
           align: "center",
           render: (h, params) => {
-            let texts = 'JSON.parse(params.row.sql)'
+            let texts = JSON.parse(params.row.sql)
             if (texts != null) {
               if (texts.length > 80) {
                 texts = texts.substring(0, 80) + '...' // 进行数字截取或slice截取超过长度时以...表示

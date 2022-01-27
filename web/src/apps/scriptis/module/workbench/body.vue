@@ -62,7 +62,6 @@ export default {
   created() {
   },
   mounted() {
-    console.log("body", this)
   },
   methods: {
     removeWork() {

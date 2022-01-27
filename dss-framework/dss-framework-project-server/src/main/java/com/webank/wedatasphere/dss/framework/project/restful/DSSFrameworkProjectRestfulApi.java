@@ -94,11 +94,20 @@ public class DSSFrameworkProjectRestfulApi {
     public Message createProject(HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        String workspaceName =
-                dssWorkspaceService.getWorkspaceName(String.valueOf(projectCreateRequest.getWorkspaceId()));
-        projectCreateRequest.setWorkspaceName(workspaceName);
         try {
-            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
+            //將创建人默认为发布权限和編輯权限
+            if(!projectCreateRequest.getEditUsers().contains(username)){
+                projectCreateRequest.getEditUsers().add(username);
+            }
+            List<String> releaseUsers = projectCreateRequest.getReleaseUsers();
+            if(releaseUsers == null){
+                releaseUsers = new ArrayList<>();
+                projectCreateRequest.setReleaseUsers(releaseUsers);
+            }
+            if(!releaseUsers.contains(username)){
+                releaseUsers.add(username);
+            }
+            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace,true);
             if (dssProjectVo != null) {
                 return Message.ok("创建工程成功").data("project", dssProjectVo);
             } else {
@@ -120,11 +129,21 @@ public class DSSFrameworkProjectRestfulApi {
     @RequestMapping(path ="modifyProject", method = RequestMethod.POST)
     public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) {
         String username = SecurityFilter.getLoginUsername(request);
-        String workspaceName =
-                dssWorkspaceService.getWorkspaceName(String.valueOf(projectModifyRequest.getWorkspaceId()));
-        projectModifyRequest.setWorkspaceName(workspaceName);
+        Workspace workspace = SSOHelper.getWorkspace(request);
         try {
-            dssFrameworkProjectService.modifyProject(projectModifyRequest, username);
+            //將创建人默认为发布权限和編輯权限
+            if(!projectModifyRequest.getEditUsers().contains(username)){
+                projectModifyRequest.getEditUsers().add(username);
+            }
+            List<String> releaseUsers = projectModifyRequest.getReleaseUsers();
+            if(releaseUsers == null){
+                releaseUsers = new ArrayList<>();
+                projectModifyRequest.setReleaseUsers(releaseUsers);
+            }
+            if(!releaseUsers.contains(username)){
+                releaseUsers.add(username);
+            }
+            dssFrameworkProjectService.modifyProject(projectModifyRequest, username,workspace);
             return Message.ok("修改工程成功");
         } catch (Exception e) {
             LOGGER.error("Failed to modify project {} for user {}", projectModifyRequest.getName(), username, e);

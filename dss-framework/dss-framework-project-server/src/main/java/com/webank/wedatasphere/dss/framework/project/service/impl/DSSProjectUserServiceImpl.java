@@ -16,16 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
@@ -40,7 +30,16 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
@@ -93,7 +92,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
      * @param request
      */
     @Override
-    public void saveProjectUser(Long projectID,String username, ProjectCreateRequest request)throws Exception{
+    public void saveProjectUser(Long projectID,String username, ProjectCreateRequest request, Workspace workspace)throws Exception{
         //將创建人默认为发布权限
         List<String> releaseUsers = request.getReleaseUsers();
         if(!request.getEditUsers().contains(username)){
@@ -121,7 +120,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
      * @param modifyRequest
      */
     @Override
-    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest, String loginuser) throws Exception{
+    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest, String loginuser,Workspace workspace) throws Exception{
         projectUserMapper.deleteAllPriv(dbProject.getId());
         //將创建人默认为发布权限
         List<String> releaseUsers = modifyRequest.getReleaseUsers();
@@ -217,6 +216,12 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("username").eq("project_id", projectId).ge("priv", privEnum.getRank());
         return projectUserMapper.selectList(queryWrapper);
+    }
+
+
+    @Override
+    public  boolean isWorkspaceUser(Long workspaceId,String username){
+        return projectUserMapper.isWorkspaceUser(workspaceId,username).longValue() >0;
     }
 
 }

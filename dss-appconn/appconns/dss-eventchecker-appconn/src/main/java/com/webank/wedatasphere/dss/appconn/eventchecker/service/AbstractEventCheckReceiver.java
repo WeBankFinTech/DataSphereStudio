@@ -130,7 +130,11 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
 //            rs = pstmtForGetID.executeQuery();
             rs = ps.executeQuery();
             log.info("+++++++++++++++_===============================================4");
-            lastMsgId = rs.last() == true ? rs.getString("msg_id") : "0";
+//            lastMsgId = rs.last() == true ? rs.getString("msg_id") : "0";
+
+            lastMsgId = rs.next() == true ? rs.getString("msg_id") : "0";
+
+
             log.info("lastMsgId+++++:"+lastMsgId);
         } catch (SQLException e) {
             log.info("+++++++++++++++_===================================================================================", e);

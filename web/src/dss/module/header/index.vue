@@ -406,9 +406,9 @@ export default {
           );
         });
 
-        this.collections = this.collections.filter(
-          (i) => i.menuApplicationId !== app.menuApplicationId
-        );
+        if ( this.collections.find(item => item.menuApplicationId == app.menuApplicationId ) ) {
+          this.removeCollection(app)
+        }
       }
     },
     addCollection(app) {
@@ -601,6 +601,7 @@ export default {
     },
     goSpaceHome() {
       this.isHomePage = true;
+      this.isConsolePage = false;
       let workspaceId = this.$route.query.workspaceId;
       this.currentId = -1;
       if (!workspaceId) {

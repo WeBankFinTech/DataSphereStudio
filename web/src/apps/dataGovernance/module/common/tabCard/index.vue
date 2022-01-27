@@ -174,6 +174,8 @@ export default {
     display: flex;
     &-l {
       @include font-color(#3495f7, $dark-text-color);
+      height: 22px;
+      line-height: 22px;
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;

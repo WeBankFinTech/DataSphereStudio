@@ -112,6 +112,9 @@ public class DSSWorkspaceRoleRestful {
         String roleName = addWorkspaceRoleRequest.getRoleName();
         List<Integer> menuIds = addWorkspaceRoleRequest.getMenuIds();
         List<Integer> componentIds = addWorkspaceRoleRequest.getComponentIds();
+        if(!dssWorkspaceService.checkAdmin(username)||!dssWorkspaceService.checkAdminByWorkspace(username,workspaceId)){
+            return Message.error("无权限进行该操作");
+        }
         dssWorkspaceRoleService.addWorkspaceRole(roleName, workspaceId, menuIds, componentIds, username);
         return Message.ok("创建角色成功");
     }
@@ -151,41 +154,39 @@ public class DSSWorkspaceRoleRestful {
             return Message.error("can not get roles information");
         }
         //判断如果是没有权限的，那么就直接干掉
-//        if (roles.contains("apiUser")){
-//            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, "apiUser", "apiService");
-//            if(priv <= 0) {
-//                roles.remove("apiUser");
-//            }
-//        }
+        if (roles.contains("apiUser")){
+            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, "apiUser", "apiService");
+            if(priv <= 0) {
+                roles.remove("apiUser");
+            }
+        }
         Message retMessage = Message.ok();
         //工作空间中，加上用户在顶部的菜单
-        // todo: 对接工作空间权限管理的配置
         if (roles.contains("analyser")){
             retMessage.data("topName", "Scriptis");
             retMessage.data("topUrl", "/home");
         } else if (roles.contains("developer")){
-            retMessage.data("topName", "工作流开发");
-            retMessage.data("topUrl", "/project");
-        }else if(roles.contains("apiUser")){
-            retMessage.data("topName","数据服务");
-            retMessage.data("topUrl", "/apiservices");
+            retMessage.data("topName", "Scriptis");
+            retMessage.data("topUrl", "/home");
+        }else if(roles.contains("apiUser") && roles.size() == 1){
+            retMessage.data("topName","Scriptis");
+            retMessage.data("topUrl", "/home");
         }else{
             retMessage.data("topName", "Scriptis");
             retMessage.data("topUrl", "/home");
         }
         //如果其他的角色也是有这个api权限的，那么就加上这个apiUser
-//        boolean flag = false;
-//        for (String role : roles){
-//            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, role, "apiService");
-//            if (priv >= 1) {
-//                flag = true;
-//                break;
-//            }
-//        }
-//        if(flag && !roles.contains("apiUser")){
-//            roles.add("apiUser");
-//        }
-        //roles.add("apiUser");
+        boolean flag = false;
+        for (String role : roles){
+            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, role, "apiService");
+            if (priv >= 1) {
+                flag = true;
+                break;
+            }
+        }
+        if(flag && !roles.contains("apiUser")){
+            roles.add("apiUser");
+        }
         return retMessage.data("roles", roles).data("workspaceId", workspaceId);
     }
 

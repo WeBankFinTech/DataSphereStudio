@@ -100,4 +100,8 @@ public interface DSSWorkspaceUserMapper {
     List<String> getWorkspaceEditUsers(int workspaceId);
 
     List<String> getWorkspaceReleaseUsers(int workspaceId);
+
+    @Select("select count(0) from dss_workspace_user where workspace_id = #{workspaceId} and username = #{username}")
+    Long getCountByUsername(@Param("username") String username, @Param("workspaceId") int workspaceId);
+
 }

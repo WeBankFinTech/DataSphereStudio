@@ -29,4 +29,7 @@ public interface DSSWorkspaceConstant {
 
     CommonVars<String> DEFAULT_DEMO_WORKSPACE_NAME = CommonVars.apply("wds.dss.default.demo.workspace", "WDS_DSS_DEMO");
 
+    public static final String SUPER_ADMIN = CommonVars.apply("wds.dss.super.admin", "").getValue();
+    public static final String WORKSPACE_MANAGEMENT_NAME = CommonVars.apply("wds.dss.workspace.management.name", "工作空间管理").getValue();
+
 }

@@ -32,4 +32,8 @@
         WHERE workspace_id = #{workspaceId} AND role_id = 2
     </select>
 
+    <select id="getUserName" resultType="java.lang.String">
+        SELECT username FROM `dss_user` WHERE id = #{userID}
+    </select>
+
 </mapper>

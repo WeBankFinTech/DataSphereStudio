@@ -159,7 +159,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
         String[] consumedMsgInfo = null;
         try {
             msgConn = getEventCheckerConnection(props, log);
-            pstmt = msgConn.prepareCall(sqlForReadTMsg);
+            pstmt = msgConn.prepareStatement(sqlForReadTMsg);
             pstmt.setString(1, topic);
             pstmt.setString(2, msgName);
             pstmt.setString(3, params[0]);
@@ -168,15 +168,17 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
             log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]
                     + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
             rs = pstmt.executeQuery();
-
-            if (rs.last()) {
+            log.info("---------------------exec----ok---------");
+            if (rs.next()) {
                 consumedMsgInfo = new String[4];
                 String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
+                log.info("----------------------------------"+msgKey.toString());
                 for (int i = 0; i <= 3; i++) {
                     consumedMsgInfo[i] = rs.getString(msgKey[i]);
                 }
             }
         } catch (SQLException e) {
+            log.info("--------------------------------------", e);
             throw new RuntimeException("EventChecker failed to receive message" + e);
         } finally {
             closeQueryStmt(pstmt, log);

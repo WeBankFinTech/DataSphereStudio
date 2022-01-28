@@ -50,11 +50,11 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 //@MapperScan(annotationClass = Repository.class, basePackages = "com.webank.wedatasphere.dss.apiservice.dao" )
-@SpringBootTest(classes = {DataWorkCloudApplication.class})
+//@SpringBootTest(classes = {DataWorkCloudApplication.class})
 public class TestApiServiceDBOperation {
-    private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
+    /*private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
     @Autowired
     ApiService apiService;
     @Autowired
@@ -153,25 +153,5 @@ public class TestApiServiceDBOperation {
 
         );
 
-    }
-
-    @DisplayName("Token 解析验证")
-    @Test
-    public void testTokenParse() {
-        System.out.println("Token解析验证");
-        final String applyUser = "allenlliu";
-        ApiServiceToken apiServiceToken = new ApiServiceToken();
-        apiServiceToken.setPublisher("allenlliu");
-        apiServiceToken.setApiServiceId(150L);
-        apiServiceToken.setApplyUser("testUser1");
-        apiServiceToken.setApplyTime(new Date());
-        Long duration = 365L;
-        String token = JwtManager.createToken(applyUser, apiServiceToken, duration);
-
-        ApiServiceToken parseToken = JwtManager.parseToken(token);
-
-        Assertions.assertEquals(parseToken.getApiServiceId(), 150L);
-        Assertions.assertEquals(parseToken.getApplyUser(), "testUser1");
-
-    }
+    }*/
 }

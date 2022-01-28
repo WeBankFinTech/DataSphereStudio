@@ -53,10 +53,6 @@ public class DSSFrameworkProjectRestfulApi {
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
     private DSSProjectService projectService;
-    @Autowired
-    private DSSWorkspaceService dssWorkspaceService;
-    @Autowired
-    private DSSProjectUserService projectUserService;
 
     /**
      * 获取所有工程或者单个工程
@@ -167,9 +163,7 @@ public class DSSFrameworkProjectRestfulApi {
         try{
             // 检查是否具有删除项目权限
             projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
-
-
-            dssFrameworkProjectService.deleteProject(username, projectDeleteRequest, workspace);
+            projectService.deleteProject(username, projectDeleteRequest, workspace);
             return  Message.ok("删除工程成功");
         }catch(final Throwable t){
             LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);

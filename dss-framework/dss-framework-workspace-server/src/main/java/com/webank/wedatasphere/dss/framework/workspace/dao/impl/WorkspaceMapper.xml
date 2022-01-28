@@ -95,7 +95,6 @@
     </select>
     <select id="getHomepageDemoMenusEn" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`description`,`icon`,`order`
-
         FROM dss_homepage_demo_menu
         <where>
             `is_active` = 1

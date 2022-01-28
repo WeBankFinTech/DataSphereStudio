@@ -115,9 +115,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
         String lastMsgId = "0";
         try {
             msgConn = getEventCheckerConnection(props, log);
-            log.info("+++++++++++++++_===============================================1");
 //            pstmtForGetID = msgConn.prepareCall(sqlForReadMsgID);
-            log.info("+++++++++++++++_===============================================2");
 //            pstmtForGetID.setString(1, receiver);
 //            pstmtForGetID.setString(2, topic);
 //            pstmtForGetID.setString(3, msgName);
@@ -125,19 +123,12 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
             ps.setString(1, receiver);
             ps.setString(2, topic);
             ps.setString(3, msgName);
-            log.info("receiver是：---" + receiver + "topic是" + topic + "+++++++" + msgName);
-            log.info("+++++++++++++++_===============================================3");
 //            rs = pstmtForGetID.executeQuery();
             rs = ps.executeQuery();
-            log.info("+++++++++++++++_===============================================4");
 //            lastMsgId = rs.last() == true ? rs.getString("msg_id") : "0";
-
             lastMsgId = rs.next() == true ? rs.getString("msg_id") : "0";
-
-
-            log.info("lastMsgId+++++:"+lastMsgId);
+            log.info("lastMsgId:"+lastMsgId);
         } catch (SQLException e) {
-            log.info("+++++++++++++++_===================================================================================", e);
             throw new RuntimeException("get Offset failed " + e);
         } finally {
             closeQueryStmt(pstmtForGetID, log);
@@ -168,17 +159,14 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck {
             log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]
                     + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
             rs = pstmt.executeQuery();
-            log.info("---------------------exec----ok---------");
             if (rs.next()) {
                 consumedMsgInfo = new String[4];
                 String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
-                log.info("----------------------------------"+msgKey.toString());
                 for (int i = 0; i <= 3; i++) {
                     consumedMsgInfo[i] = rs.getString(msgKey[i]);
                 }
             }
         } catch (SQLException e) {
-            log.info("--------------------------------------", e);
             throw new RuntimeException("EventChecker failed to receive message" + e);
         } finally {
             closeQueryStmt(pstmt, log);

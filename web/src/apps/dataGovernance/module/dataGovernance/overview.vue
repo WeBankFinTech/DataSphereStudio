@@ -75,7 +75,7 @@ export default {
                   "icon-class": "biao"
                 },
                 style: {
-                  fontSize: "15px"
+                  fontSize: "15px",
                 }
               }),
               h(
@@ -84,7 +84,7 @@ export default {
                   style: {
                     marginLeft: "4.8px",
                     fontSize: "14px",
-                    color: "#2E92F7",
+                    color: params.row.guid ? "#2E92F7" : "rgba(0,0,0,0.65)",
                     cursor: params.row.guid ? "pointer" : "not-allowed"
                   },
                   on: {

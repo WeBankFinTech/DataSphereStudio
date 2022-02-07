@@ -4,6 +4,7 @@
     <div class="assets-index-t">
       <!-- bottom -->
       <div class="assets-index-t-b1">
+
         <Row>
           <Col :span="24" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
@@ -19,7 +20,7 @@
           </Col>
         </Row>
         <Row :style="{ 'margin-top': '16px' }">
-          <Col :span="8" :style="{ display: 'flex' }">
+          <Col :span="10" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label">
               <span>主题域/分层</span>
             </div>
@@ -49,7 +50,7 @@
               </Select>
             </div>
           </Col>
-          <Col :span="8" :style="{ display: 'flex' }">
+          <Col :span="10" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label"><span>负责人</span></div>
             <div class="assets-index-t-b1-content">
               <Select
@@ -71,7 +72,7 @@
               </Select>
             </div>
           </Col>
-          <Col :span="8">
+          <Col :span="4">
             <div :style="{ display: 'flex', 'margin-left': '32px' }">
               <Button @click="onReset">重置</Button>
               <Button
@@ -357,11 +358,11 @@ export default {
               } else {
                 this.isCompleted = true
               }
-            if( this.queryForTbls ) {
-              this.cardTabs = res.concat(this.foamtDataToHighLigth(data.result, this.queryForTbls))
-            } else {
-              this.cardTabs = res.concat(data.result);
-            }
+              if( this.queryForTbls ) {
+                this.cardTabs = res.concat(this.foamtDataToHighLigth(data.result, this.queryForTbls))
+              } else {
+                this.cardTabs = res.concat(data.result);
+              }
             } else {
               that.$Message.success("所有数据已加载完成");
               that.isLoading = true;
@@ -507,6 +508,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   .assets-index-t-t1 {
     padding: 0px $padding-25;
     border-bottom: $border-width-base $border-style-base $border-color-base;

@@ -109,12 +109,12 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
     }
 
     @Override
-    public int getTableInfo(String dbName, String tableName, Boolean isPartTable) throws SQLException {
+    public long getTableInfo(String dbName, String tableName, Boolean isPartTable) throws SQLException {
         DataSource dataSource = DataSourceUtil.getDataSource();
         Connection con =dataSource.getConnection();
         PreparedStatement ps=null;
         ResultSet rs=null;
-        int res = 0;
+        long res = 0;
         try {
             String sql=null;
             if(isPartTable==false){
@@ -127,7 +127,7 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
-               res=rs.getInt(1);
+               res=rs.getLong(1);
             }
 
         } catch (DAOException | SQLException e){

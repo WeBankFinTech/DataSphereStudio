@@ -53,7 +53,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
         dssRole.setCreateTime(new Date());
         dssRole.setDescription("workspace{ " + workspaceId + " }添加的role");
         dssWorkspaceRoleMapper.addNewRole(dssRole);
-        List<Integer> allMenuIds = workspaceDBHelper.getAllMenuIds();
+        List<Integer> allMenuIds = workspaceDBHelper.getAllOnestopMenuIds();
         if (menuIds.size() > 0){
             dssWorkspaceRoleMapper.updateRoleMenu(dssRole.getId(), workspaceId, menuIds, username, 1);
         }

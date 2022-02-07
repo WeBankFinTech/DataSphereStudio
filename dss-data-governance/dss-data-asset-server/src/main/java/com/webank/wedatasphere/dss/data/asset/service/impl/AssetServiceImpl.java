@@ -170,7 +170,7 @@ public class AssetServiceImpl implements AssetService {
     private HiveTblDetailInfo.HiveTblBasicInfo getBasicInfo(String guid, AtlasEntity atlasEntity) throws AtlasServiceException {
         Map<String, Object> hiveTblAttributesMap = atlasService.getHiveTblAttributesByGuid(guid);
         Boolean isPartTable = (Boolean) hiveTblAttributesMap.get("isPartition");
-        int storage = 0;
+        long storage = 0;
         String db_name = String.valueOf(atlasEntity.getAttributes().get("qualifiedName")).split("@")[0];
         String tableName = db_name.split("\\.")[1];
         String dbName = db_name.split("\\.")[0];
@@ -190,8 +190,8 @@ public class AssetServiceImpl implements AssetService {
         basic.setLabels(labels);
         basic.setIsParTbl(isPartTable);
         basic.setGuid(guid);
-        basic.setTableType(String.valueOf(hiveTblAttributesMap.get("tableType").toString()));
-        basic.setLocation(String.valueOf(hiveTblAttributesMap.get("location").toString()));
+        basic.setTableType(String.valueOf(hiveTblAttributesMap.get("tableType")));
+        basic.setLocation(String.valueOf(hiveTblAttributesMap.get("location")));
 
         return basic;
     }

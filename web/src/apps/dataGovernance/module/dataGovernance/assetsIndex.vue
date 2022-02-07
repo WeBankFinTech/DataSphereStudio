@@ -1,7 +1,7 @@
 <template>
   <div class="assets-index-wrap">
     <!-- top 面包屑  -->
-    <div class="assets-index-t">
+    <div class="assets-index-t" v-if="hasTop">
       <!-- top -->
       <div class="assets-index-t-t1">
         <slot name="top">
@@ -53,7 +53,13 @@ export default {
       topTapList: [],
     }
   },
-  created() {},
+  created() {
+  },
+  computed: {
+    hasTop() {
+      return !this.$route.query.back
+    }
+  },
   mounted() {
     EventBus.$on("on-choose-card", (model) => {
       let that = this

@@ -243,7 +243,7 @@ export default {
       this.$router.push({
         name: "dataGovernance/assets/info",
         params: { guid },
-        query: { workspaceId }
+        query: { workspaceId, back: 1 }
       });
     }
   }

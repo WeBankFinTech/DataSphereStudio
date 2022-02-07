@@ -14,7 +14,7 @@
       }"
     >
       <div class="ds-main-container">
-        <div class="ds-breadcumb" v-if="title !== '数据资产目录'">
+        <div class="ds-breadcumb" v-if="isTitle">
           <span>{{ title }}</span>
         </div>
         <div class="ds-router-view">
@@ -75,6 +75,9 @@ export default {
   computed: {
     searchScroll() {
       return this.$route.name === "dataGovernance/assets/search";
+    },
+    isTitle() {
+      return this.$route.name !== 'dataGovernance/assets/search' && this.title !== '数据资产目录' && this.$route.name !== 'dataGovernance/assets/info'
     }
   },
   mounted() {

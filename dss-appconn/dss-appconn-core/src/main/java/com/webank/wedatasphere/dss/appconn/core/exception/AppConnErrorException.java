@@ -16,17 +16,16 @@
 
 package com.webank.wedatasphere.dss.appconn.core.exception;
 
-
 import org.apache.linkis.common.exception.ErrorException;
 
 public class AppConnErrorException extends ErrorException {
 
-    public AppConnErrorException(int errorCode, String errorDesc){
+    public AppConnErrorException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
-    public AppConnErrorException(int errorCode, String errorDesc, Throwable cause){
+
+    public AppConnErrorException(int errorCode, String errorDesc, Throwable cause) {
         super(errorCode, errorDesc);
         initCause(cause);
     }
-
 }

@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.webank.wedatasphere.dss.appconn.eventchecker.connector.EventDruidFactory;
 import com.webank.wedatasphere.dss.appconn.eventchecker.adapter.EventCheckAdapter;
+import com.webank.wedatasphere.dss.appconn.eventchecker.connector.EventDruidFactory;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 
 import org.apache.log4j.Logger;
+
+import javax.sql.DataSource;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -33,7 +34,8 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.sql.DataSource;
+
+import com.alibaba.druid.pool.DruidDataSource;
 
 public abstract class AbstractEventCheck implements EventCheckAdapter {
     static DataSource msgDS;
@@ -49,7 +51,7 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
     String msg;
     String afterSend;
 
-    DataSource getMsgDS(Properties props, Logger log){
+    DataSource getMsgDS(Properties props, Logger log) {
         if (msgDS == null) {
             msgDS = EventDruidFactory.getMsgInstance(props, log);
             if (msgDS == null) {
@@ -59,7 +61,7 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         return msgDS;
     }
 
-    void initECParams(Properties props){
+    void initECParams(Properties props) {
         topic = props.getProperty(EventChecker.TOPIC);
         msgName = props.getProperty(EventChecker.MSGNAME);
         receiver = props.getProperty(EventChecker.RECEIVER);
@@ -72,10 +74,10 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         afterSend = props.getProperty(EventChecker.AFTERSEND);
     }
 
-    Connection getEventCheckerConnection(Properties props, Logger log){
+    Connection getEventCheckerConnection(Properties props, Logger log) {
         Connection connection = null;
         try {
-            connection =  getMsgDS(props,log).getConnection();
+            connection = getMsgDS(props, log).getConnection();
         } catch (SQLException e) {
             throw new RuntimeException("Error getting DB Connection instance {} " + e);
         }
@@ -110,7 +112,6 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
                 log.error("Error closing result set", e);
             }
         }
-
     }
 
     void closeQueryStmt(PreparedStatement stmt, Logger log) {
@@ -121,30 +122,31 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
                 log.error("Error closing result stmt", e);
             }
         }
-
     }
-
 
     public static void closeDruidDataSource() {
         DruidDataSource msgDSObject = (DruidDataSource) msgDS;
         if (msgDSObject != null) {
             msgDSObject.close();
         }
-
     }
 
     String getLinuxLocalIp(Logger log) {
         String ip = "127.0.0.1";
         try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+                    en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
                 String name = intf.getName();
                 if (!name.contains("docker") && !name.contains("lo")) {
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
+                            enumIpAddr.hasMoreElements(); ) {
                         InetAddress inetAddress = enumIpAddr.nextElement();
                         if (!inetAddress.isLoopbackAddress()) {
                             String ipaddress = inetAddress.getHostAddress().toString();
-                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
+                            if (!ipaddress.contains("::")
+                                    && !ipaddress.contains("0:0:")
+                                    && !ipaddress.contains("fe80")) {
                                 ip = ipaddress;
                             }
                         }
@@ -153,7 +155,6 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
             }
         } catch (SocketException ex) {
             log.warn("get ip failed", ex);
-
         }
         log.info("Send IP:" + ip);
         return ip;

@@ -18,14 +18,13 @@ package com.webank.wedatasphere.dss.framework.appconn.entity;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.common.entity.Resource;
+
 import java.io.Serializable;
 import java.util.List;
 
-
-
 public class AppConnBean implements AppConnInfo, Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String appConnName;
     private String isUserNeedInit;
@@ -42,7 +41,6 @@ public class AppConnBean implements AppConnInfo, Serializable {
     private String appConnClassPath;
 
     private List<AppInstanceBean> appInstanceBeans;
-
 
     public Long getId() {
         return id;
@@ -145,11 +143,18 @@ public class AppConnBean implements AppConnInfo, Serializable {
 
     @Override
     public String toString() {
-        return "AppConnBean{" +
-                "id=" + id +
-                ", appConnName='" + appConnName + '\'' +
-                ", className='" + className + '\'' +
-                ", appConnClassPath='" + appConnClassPath + '\'' +
-                '}';
+        return "AppConnBean{"
+                + "id="
+                + id
+                + ", appConnName='"
+                + appConnName
+                + '\''
+                + ", className='"
+                + className
+                + '\''
+                + ", appConnClassPath='"
+                + appConnClassPath
+                + '\''
+                + '}';
     }
 }

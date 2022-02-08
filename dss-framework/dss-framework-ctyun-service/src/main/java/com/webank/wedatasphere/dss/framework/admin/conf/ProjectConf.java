@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -20,14 +20,14 @@ package com.webank.wedatasphere.dss.framework.admin.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-/**
- * created by cooperyang on 2021/2/26
- * Description:
- */
+/** created by cooperyang on 2021/2/26 Description: */
 public interface ProjectConf {
 
-    CommonVars<String> SUPPORT_ABILITY = CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");
-    CommonVars<String> SERVICE_NAME = CommonVars.apply("wds.dss.framework.project.service.name", "dss-framework-project-server");
+    CommonVars<String> SUPPORT_ABILITY =
+            CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");
+    CommonVars<String> SERVICE_NAME =
+            CommonVars.apply(
+                    "wds.dss.framework.project.service.name", "dss-framework-project-server");
 
     CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "");
     CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "");
@@ -38,6 +38,4 @@ public interface ProjectConf {
     CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "");
     CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "");
     CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "");
-
-
 }

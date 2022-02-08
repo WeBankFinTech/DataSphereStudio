@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.sso;
 
-
 public interface UserInfo {
 
     String getUser();
-
 }

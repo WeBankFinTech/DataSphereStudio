@@ -17,5 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.scheduler;
 
 public enum DssJobStatus {
-    Inited,Running,Succeed,Failed
+    Inited,
+    Running,
+    Succeed,
+    Failed
 }

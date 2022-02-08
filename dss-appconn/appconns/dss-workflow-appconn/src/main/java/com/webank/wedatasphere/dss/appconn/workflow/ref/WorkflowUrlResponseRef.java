@@ -16,10 +16,10 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.ref;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.UrlResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UrlResponseRef;
 
-public class WorkflowUrlResponseRef  extends CommonResponseRef implements UrlResponseRef {
+public class WorkflowUrlResponseRef extends CommonResponseRef implements UrlResponseRef {
 
     private String url;
 
@@ -31,5 +31,4 @@ public class WorkflowUrlResponseRef  extends CommonResponseRef implements UrlRes
     public void setUrl(String url) {
         this.url = url;
     }
-
 }

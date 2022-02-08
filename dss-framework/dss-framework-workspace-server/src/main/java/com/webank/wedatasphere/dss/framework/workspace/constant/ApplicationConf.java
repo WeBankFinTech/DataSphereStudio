@@ -16,13 +16,14 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.constant;
 
-
 import org.apache.linkis.common.conf.CommonVars;
-
 
 public class ApplicationConf {
 
-    public static final CommonVars<String> FAQ = CommonVars.apply("wds.linkis.application.dws.params","http://127.0.0.1:8088/wiki/scriptis/manual/feature_overview_cn.html");
+    public static final CommonVars<String> FAQ =
+            CommonVars.apply(
+                    "wds.linkis.application.dws.params",
+                    "http://127.0.0.1:8088/wiki/scriptis/manual/feature_overview_cn.html");
     public static final CommonVars<String> SCHEDULIS_URL =
             CommonVars.apply("wds.linkis.schedulis.url", "http://127.0.0.1:8088");
 
@@ -35,8 +36,8 @@ public class ApplicationConf {
     public static final CommonVars<String> DSS_ENV_PROD_LABEL =
             CommonVars.apply("wds.dss.env.prod.label", "PROD");
 
-    public static final String SCHEDULER_APP_CONN_NAME = CommonVars.apply("wds.dss.appconn.scheduler.name", "schedulis").getValue();
+    public static final String SCHEDULER_APP_CONN_NAME =
+            CommonVars.apply("wds.dss.appconn.scheduler.name", "schedulis").getValue();
 
     public static final String ESB_APPID = CommonVars.apply("wds.dss.esb.appid", "").getValue();
-
 }

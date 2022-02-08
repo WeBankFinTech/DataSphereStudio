@@ -1,10 +1,11 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.Objects;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DolphinAppConnUtils {
 
@@ -12,11 +13,12 @@ public class DolphinAppConnUtils {
      * Gets value from entity.
      *
      * @param entityString the entity string
-     * @param searchKey    the search key
+     * @param searchKey the search key
      * @return the value from entity 返回null，则不存在该key
      * @throws IOException the io exception
      */
-    public static String getValueFromEntity(String entityString, String searchKey) throws IOException {
+    public static String getValueFromEntity(String entityString, String searchKey)
+            throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(entityString);
         JsonNode valueNode = jsonNode.get(searchKey);
@@ -39,11 +41,12 @@ public class DolphinAppConnUtils {
      * Gets value from json string.
      *
      * @param jsonString the json string
-     * @param searchKey  the search key
+     * @param searchKey the search key
      * @return the value from json string
      * @throws IOException the io exception
      */
-    public static String getValueFromJsonString(String jsonString, String searchKey) throws IOException {
+    public static String getValueFromJsonString(String jsonString, String searchKey)
+            throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(jsonString);
         JsonNode valueNode = jsonNode.get(searchKey);

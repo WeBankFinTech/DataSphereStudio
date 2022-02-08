@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import java.util.function.Consumer;
 
-
 public interface AsyncResponseRef extends ResponseRef {
 
     long getStartTime();
@@ -30,5 +29,4 @@ public interface AsyncResponseRef extends ResponseRef {
     void waitForCompleted() throws InterruptedException;
 
     void notifyMe(Consumer<ResponseRef> notifyListener);
-
 }

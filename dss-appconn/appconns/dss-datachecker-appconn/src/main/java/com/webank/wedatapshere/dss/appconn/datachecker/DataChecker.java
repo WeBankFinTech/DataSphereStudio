@@ -16,23 +16,23 @@
 
 package com.webank.wedatapshere.dss.appconn.datachecker;
 
-
 import com.webank.wedatapshere.dss.appconn.datachecker.connector.DataCheckerDao;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
+
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
 
 public class DataChecker {
-    public final static String SOURCE_TYPE = "source.type";
-    public final static String DATA_OBJECT = "check.object";
-    public final static String WAIT_TIME = "max.check.hours";
-    public final static String QUERY_FREQUENCY = "query.frequency";
-    public final static String TIME_SCAPE = "time.scape";
-    public final static String MASK_URL = "bdp.mask.url";
-    public final static String MASK_APP_ID = "bdp.mask.app.id";
-    public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
+    public static final String SOURCE_TYPE = "source.type";
+    public static final String DATA_OBJECT = "check.object";
+    public static final String WAIT_TIME = "max.check.hours";
+    public static final String QUERY_FREQUENCY = "query.frequency";
+    public static final String TIME_SCAPE = "time.scape";
+    public static final String MASK_URL = "bdp.mask.url";
+    public static final String MASK_APP_ID = "bdp.mask.app.id";
+    public static final String MASK_APP_TOKEN = "bdp.mask.app.token";
 
     private Properties p;
     private static final Logger logger = Logger.getRootLogger();
@@ -45,49 +45,46 @@ public class DataChecker {
         this.p = p;
         dataCheckerAction = action;
         maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
-        //test over time
-//        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 * 1000;
+        // test over time
+        //        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 *
+        // 1000;
         queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
-
     }
 
     public void run() {
         dataCheckerAction.setState(RefExecutionState.Running);
         try {
-            if(p == null) {
+            if (p == null) {
                 throw new RuntimeException("Properties is null. Can't continue");
             }
             if (!p.containsKey(SOURCE_TYPE)) {
-                logger.info("Properties "  + SOURCE_TYPE + " value is Null !");
+                logger.info("Properties " + SOURCE_TYPE + " value is Null !");
             }
             if (!p.containsKey(DATA_OBJECT)) {
                 logger.info("Properties " + DATA_OBJECT + " value is Null !");
             }
             begineCheck(dataCheckerAction);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             dataCheckerAction.setState(RefExecutionState.Failed);
-            throw new  RuntimeException("get DataChecker result failed", ex);
+            throw new RuntimeException("get DataChecker result failed", ex);
         }
-
     }
 
-    public void begineCheck(RefExecutionAction action){
-        boolean success=false;
+    public void begineCheck(RefExecutionAction action) {
+        boolean success = false;
         try {
-            success= wbDao.validateTableStatusFunction(p, logger,action);
-        }catch (Exception ex){
+            success = wbDao.validateTableStatusFunction(p, logger, action);
+        } catch (Exception ex) {
             dataCheckerAction.setState(RefExecutionState.Failed);
-            logger.error("datacheck error",ex);
-            throw new  RuntimeException("get DataChecker result failed", ex);
+            logger.error("datacheck error", ex);
+            throw new RuntimeException("get DataChecker result failed", ex);
         }
-        if(success) {
+        if (success) {
             dataCheckerAction.setState(RefExecutionState.Success);
-        }else {
+        } else {
             dataCheckerAction.setState(RefExecutionState.Running);
         }
     }
 
-    public void cancel() {
-    }
-
+    public void cancel() {}
 }

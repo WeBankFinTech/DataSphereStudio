@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.core.entity;
 
-
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
 
@@ -25,5 +24,4 @@ public interface WorkflowNode extends Node {
     DSSNode getDSSNode();
 
     void setDSSNode(DSSNode dwsNode);
-
 }

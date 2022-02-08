@@ -17,16 +17,16 @@
 package com.webank.wedatasphere.dss.appconn.orchestrator.service;
 
 import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFrameworkQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
 
-public class OrchestratorQueryService  extends AbstractRefQueryService {
+public class OrchestratorQueryService extends AbstractRefQueryService {
 
     @Override
     public RefQueryOperation createRefQueryOperation() {
-        OrchestratorFrameworkQueryOperation  orchestratorFrameworkQueryOperation = new OrchestratorFrameworkQueryOperation();
+        OrchestratorFrameworkQueryOperation orchestratorFrameworkQueryOperation =
+                new OrchestratorFrameworkQueryOperation();
         orchestratorFrameworkQueryOperation.setDevelopmentService(this);
-        return orchestratorFrameworkQueryOperation ;
+        return orchestratorFrameworkQueryOperation;
     }
-
 }

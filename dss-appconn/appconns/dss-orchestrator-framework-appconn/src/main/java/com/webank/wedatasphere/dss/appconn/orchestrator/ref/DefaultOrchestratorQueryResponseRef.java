@@ -22,7 +22,8 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRe
 
 import java.util.List;
 
-public class DefaultOrchestratorQueryResponseRef extends CommonResponseRef implements OrchestratorQueryResponseRef {
+public class DefaultOrchestratorQueryResponseRef extends CommonResponseRef
+        implements OrchestratorQueryResponseRef {
     private List<OrchestratorVo> orchestratorVos;
 
     @Override
@@ -32,7 +33,6 @@ public class DefaultOrchestratorQueryResponseRef extends CommonResponseRef imple
 
     @Override
     public void setOrchestratorVoList(List<OrchestratorVo> orchestratorVoList) {
-        this.orchestratorVos =  orchestratorVoList;
+        this.orchestratorVos = orchestratorVoList;
     }
-
 }

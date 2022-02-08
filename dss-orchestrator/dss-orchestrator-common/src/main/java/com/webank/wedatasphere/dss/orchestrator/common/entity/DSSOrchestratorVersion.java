@@ -18,14 +18,13 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 
 public class DSSOrchestratorVersion {
-    private final static Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorVersion.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorVersion.class);
 
     private Long id;
     private Long orchestratorId;
@@ -34,11 +33,10 @@ public class DSSOrchestratorVersion {
     private String source;
     private String version;
     private String comment;
-    private Date   updateTime;
+    private Date updateTime;
     private String updater;
     private String content;
     private String contextId;
-
 
     public Long getId() {
         return id;
@@ -128,18 +126,20 @@ public class DSSOrchestratorVersion {
         this.contextId = contextId;
     }
 
-    /**
-     * 提取出contextId
-     */
+    /** 提取出contextId */
     public void setFormatContextId(String contextId) {
         try {
-            if (contextId == null || "".equals(contextId.trim()) || !contextId.contains("value") || !contextId.contains("contextId")) {
+            if (contextId == null
+                    || "".equals(contextId.trim())
+                    || !contextId.contains("value")
+                    || !contextId.contains("contextId")) {
                 this.contextId = contextId;
             } else {
                 JsonParser parser = new JsonParser();
                 JsonObject jsonObject = parser.parse(contextId).getAsJsonObject();
                 String tempValue = jsonObject.get("value").getAsString();
-                String tempContextId = parser.parse(tempValue).getAsJsonObject().get("contextId").getAsString();
+                String tempContextId =
+                        parser.parse(tempValue).getAsJsonObject().get("contextId").getAsString();
                 this.contextId = tempContextId;
             }
         } catch (Exception e) {
@@ -150,18 +150,35 @@ public class DSSOrchestratorVersion {
 
     @Override
     public String toString() {
-        return "DSSOrchestratorVersion{" +
-                "id=" + id +
-                ", orchestratorId=" + orchestratorId +
-                ", appId=" + appId +
-                ", projectId=" + projectId +
-                ", source='" + source + '\'' +
-                ", version='" + version + '\'' +
-                ", comment='" + comment + '\'' +
-                ", updateTime=" + updateTime +
-                ", updater='" + updater + '\'' +
-                ", content='" + content + '\'' +
-                ", contextId='" + contextId + '\'' +
-                '}';
+        return "DSSOrchestratorVersion{"
+                + "id="
+                + id
+                + ", orchestratorId="
+                + orchestratorId
+                + ", appId="
+                + appId
+                + ", projectId="
+                + projectId
+                + ", source='"
+                + source
+                + '\''
+                + ", version='"
+                + version
+                + '\''
+                + ", comment='"
+                + comment
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + ", updater='"
+                + updater
+                + '\''
+                + ", content='"
+                + content
+                + '\''
+                + ", contextId='"
+                + contextId
+                + '\''
+                + '}';
     }
 }

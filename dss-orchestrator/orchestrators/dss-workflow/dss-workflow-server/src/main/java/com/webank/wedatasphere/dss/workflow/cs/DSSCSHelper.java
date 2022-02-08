@@ -16,26 +16,27 @@
 
 package com.webank.wedatasphere.dss.workflow.cs;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.linkis.cs.client.service.CSTableService;
 import org.apache.linkis.cs.common.entity.metadata.CSTable;
 import org.apache.linkis.cs.common.entity.source.ContextKeyValue;
 import org.apache.linkis.cs.common.exception.CSErrorException;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-
 public class DSSCSHelper {
 
-    private final static Logger logger = LoggerFactory.getLogger(DSSCSHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(DSSCSHelper.class);
 
-    private final static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
-    public static List<ContextKeyValue> getTableContextKeyValueList(String contextIDStr, String nodeName) {
+    public static List<ContextKeyValue> getTableContextKeyValueList(
+            String contextIDStr, String nodeName) {
         try {
             return CSTableService.getInstance().searchUpstreamTableKeyValue(contextIDStr, nodeName);
         } catch (CSErrorException e) {
@@ -46,9 +47,7 @@ public class DSSCSHelper {
         return null;
     }
 
-
     public static CSTable getCSTable(String contextIDStr, String contextKeyStr) {
-
 
         try {
             return CSTableService.getInstance().getCSTable(contextIDStr, contextKeyStr);
@@ -62,7 +61,8 @@ public class DSSCSHelper {
     public static String getContextIDStrByJson(String flowJson) {
 
         JsonObject jsonObject = gson.fromJson(flowJson, JsonObject.class);
-        if (!jsonObject.has(CSCommonUtils.CONTEXT_ID_STR) || null == jsonObject.get(CSCommonUtils.CONTEXT_ID_STR)){
+        if (!jsonObject.has(CSCommonUtils.CONTEXT_ID_STR)
+                || null == jsonObject.get(CSCommonUtils.CONTEXT_ID_STR)) {
             return null;
         }
         return jsonObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString();

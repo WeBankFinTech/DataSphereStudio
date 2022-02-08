@@ -16,14 +16,12 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 public class ResponseConvertOrchestrator {
 
     private String id;
     private ResponseOperateOrchestrator response;
 
-    public ResponseConvertOrchestrator() {
-    }
+    public ResponseConvertOrchestrator() {}
 
     public ResponseConvertOrchestrator(String id, ResponseOperateOrchestrator response) {
         this.id = id;

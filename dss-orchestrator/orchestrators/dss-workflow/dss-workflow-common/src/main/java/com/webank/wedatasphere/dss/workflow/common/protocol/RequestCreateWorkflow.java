@@ -20,26 +20,26 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
 
-
 public class RequestCreateWorkflow {
 
     private String userName;
     private String workflowName;
     private String contextIDStr;
-    private  String description;
-    private  Long parentFlowID;
-    private  String  uses;
-    private List<String > linkedAppConnNames;
+    private String description;
+    private Long parentFlowID;
+    private String uses;
+    private List<String> linkedAppConnNames;
     private List<DSSLabel> dssLabels;
 
-    public RequestCreateWorkflow(String userName,
-                                 String workflowName,
-                                 String contextIDStr,
-                                 String description,
-                                 Long parentFlowID,
-                                 String uses,
-                                 List<String> linkedAppConnNames,
-                                 List<DSSLabel> dssLabels) {
+    public RequestCreateWorkflow(
+            String userName,
+            String workflowName,
+            String contextIDStr,
+            String description,
+            Long parentFlowID,
+            String uses,
+            List<String> linkedAppConnNames,
+            List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.workflowName = workflowName;
         this.contextIDStr = contextIDStr;
@@ -47,7 +47,7 @@ public class RequestCreateWorkflow {
         this.parentFlowID = parentFlowID;
         this.uses = uses;
         this.linkedAppConnNames = linkedAppConnNames;
-        this.dssLabels =dssLabels;
+        this.dssLabels = dssLabels;
     }
 
     public String getUserName() {
@@ -105,6 +105,7 @@ public class RequestCreateWorkflow {
     public void setLinkedAppConnNames(List<String> linkedAppConnNames) {
         this.linkedAppConnNames = linkedAppConnNames;
     }
+
     public List<DSSLabel> getDssLabels() {
         return dssLabels;
     }

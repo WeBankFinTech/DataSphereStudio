@@ -18,16 +18,13 @@ package com.webank.wedatasphere.dss.standard.app.development.ref;
 
 import java.util.Map;
 
+public interface NodeRequestRef extends CommonRequestRef, CreateRequestRef, UpdateRequestRef {
 
-public interface NodeRequestRef extends CommonRequestRef, CreateRequestRef,UpdateRequestRef {
+    void setNodeType(String nodeType);
 
-     void setNodeType(String nodeType);
+    String getNodeType();
 
-     String getNodeType();
+    void setJobContent(Map<String, Object> jobContent);
 
-     void setJobContent(Map<String, Object> jobContent);
-
-     Map<String, Object> getJobContent();
-
-
+    Map<String, Object> getJobContent();
 }

@@ -16,13 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-public class DSSWorkspaceUserVO extends AbstractDSSVO{
+public class DSSWorkspaceUserVO extends AbstractDSSVO {
     private int id;
     private String name;
     private List<Integer> roles;
@@ -31,10 +28,7 @@ public class DSSWorkspaceUserVO extends AbstractDSSVO{
     private String creator;
     private Date joinTime;
 
-    public DSSWorkspaceUserVO() {
-    }
-
-
+    public DSSWorkspaceUserVO() {}
 
     public int getId() {
         return id;
@@ -91,7 +85,4 @@ public class DSSWorkspaceUserVO extends AbstractDSSVO{
     public void setJoinTime(Date joinTime) {
         this.joinTime = joinTime;
     }
-
-
-
 }

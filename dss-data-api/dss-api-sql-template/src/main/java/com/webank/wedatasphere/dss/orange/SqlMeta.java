@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.orange;
 
 import java.util.List;
 
-
 public class SqlMeta {
 
     String sql;

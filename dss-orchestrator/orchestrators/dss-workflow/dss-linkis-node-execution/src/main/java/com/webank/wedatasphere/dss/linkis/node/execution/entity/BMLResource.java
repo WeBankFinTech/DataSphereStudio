@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.entity;
 
-
 public class BMLResource {
 
     private String resourceId;

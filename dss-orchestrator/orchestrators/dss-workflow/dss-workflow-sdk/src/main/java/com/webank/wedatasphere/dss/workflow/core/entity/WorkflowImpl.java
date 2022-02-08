@@ -129,7 +129,6 @@ public class WorkflowImpl implements Workflow {
     @Override
     public void setFlowType(String flowType) {
         this.type = flowType;
-
     }
 
     @Override
@@ -158,9 +157,9 @@ public class WorkflowImpl implements Workflow {
 
     @Override
     public void setChildren(List<? extends Flow> children) {
-        if(null!=children) {
-            this.children = children.stream().map(f -> (WorkflowImpl) f).collect(Collectors.toList());
+        if (null != children) {
+            this.children =
+                    children.stream().map(f -> (WorkflowImpl) f).collect(Collectors.toList());
         }
     }
-
 }

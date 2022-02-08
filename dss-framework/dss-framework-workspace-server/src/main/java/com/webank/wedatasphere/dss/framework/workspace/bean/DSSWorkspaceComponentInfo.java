@@ -16,10 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-
-import java.util.List;
-
-
 public class DSSWorkspaceComponentInfo {
     private String title;
 
@@ -28,7 +24,7 @@ public class DSSWorkspaceComponentInfo {
     private String desc;
 
     private String buttonText;
-/*
+    /*
     private List<ComponentStatistic> statistics;*/
 
     private String componentUrl;
@@ -36,7 +32,6 @@ public class DSSWorkspaceComponentInfo {
     private String userManualUrl;
 
     private String indicatorUrl;
-
 
     public String getTitle() {
         return title;
@@ -70,15 +65,15 @@ public class DSSWorkspaceComponentInfo {
         this.buttonText = buttonText;
     }
 
-/*
-    public List<ComponentStatistic> getStatistics() {
-        return statistics;
-    }
+    /*
+        public List<ComponentStatistic> getStatistics() {
+            return statistics;
+        }
 
-    public void setStatistics(List<ComponentStatistic> statistics) {
-        this.statistics = statistics;
-    }
-*/
+        public void setStatistics(List<ComponentStatistic> statistics) {
+            this.statistics = statistics;
+        }
+    */
 
     public String getComponentUrl() {
         return componentUrl;

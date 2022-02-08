@@ -20,11 +20,9 @@ import java.util.List;
 
 public class NodeGroupVO implements Comparable<NodeGroupVO> {
     private Long id;
-    /**
-     * title是前台字段..后台自动根据请求头返回中英文字段
-     * chilren是为了适配前台插件的字段
-     */
+    /** title是前台字段..后台自动根据请求头返回中英文字段 chilren是为了适配前台插件的字段 */
     private String title;
+
     private String description;
     private Integer order;
 

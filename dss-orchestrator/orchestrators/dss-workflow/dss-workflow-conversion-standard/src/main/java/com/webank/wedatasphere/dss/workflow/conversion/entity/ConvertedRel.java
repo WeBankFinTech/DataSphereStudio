@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.workflow.conversion.entity;
 
-
-public interface ConvertedRel extends PreConversionRel {
-
-}
+public interface ConvertedRel extends PreConversionRel {}

@@ -49,5 +49,4 @@ public class WorkflowDevelopmentIntegrationStandard extends AbstractDevelopmentI
     protected RefQueryService createRefQueryService() {
         return new WorkflowQueryService();
     }
-
 }

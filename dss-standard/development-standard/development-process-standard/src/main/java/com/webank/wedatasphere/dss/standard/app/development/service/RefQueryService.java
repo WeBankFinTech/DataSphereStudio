@@ -21,5 +21,4 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOp
 public interface RefQueryService extends DevelopmentService {
 
     RefQueryOperation getRefQueryOperation();
-
 }

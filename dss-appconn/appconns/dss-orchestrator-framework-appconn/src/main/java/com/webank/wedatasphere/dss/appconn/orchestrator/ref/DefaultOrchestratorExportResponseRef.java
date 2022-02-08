@@ -19,14 +19,15 @@ package com.webank.wedatasphere.dss.appconn.orchestrator.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 
-
-public class DefaultOrchestratorExportResponseRef extends CommonResponseRef implements OrchestratorExportResponseRef {
+public class DefaultOrchestratorExportResponseRef extends CommonResponseRef
+        implements OrchestratorExportResponseRef {
 
     private String resourceId;
 
     private String bmlVersion;
 
     private Long orchestratorVersionId;
+
     @Override
     public String getResourceId() {
         return resourceId;
@@ -44,7 +45,7 @@ public class DefaultOrchestratorExportResponseRef extends CommonResponseRef impl
 
     @Override
     public void setBmlVersion(String bmlVersion) {
-       this.bmlVersion = bmlVersion;
+        this.bmlVersion = bmlVersion;
     }
 
     @Override
@@ -54,6 +55,6 @@ public class DefaultOrchestratorExportResponseRef extends CommonResponseRef impl
 
     @Override
     public void setOrchestratorVersionId(Long orchestratorVersionId) {
-         this.orchestratorVersionId = orchestratorVersionId;
+        this.orchestratorVersionId = orchestratorVersionId;
     }
 }

@@ -16,10 +16,10 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext;
-import java.util.Map;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 
+import java.util.Map;
 
 public interface AsyncExecutionRequestRef extends ExecutionRequestRef {
 
@@ -36,5 +36,4 @@ public interface AsyncExecutionRequestRef extends ExecutionRequestRef {
     void setName(String name);
 
     void setType(String type);
-
 }

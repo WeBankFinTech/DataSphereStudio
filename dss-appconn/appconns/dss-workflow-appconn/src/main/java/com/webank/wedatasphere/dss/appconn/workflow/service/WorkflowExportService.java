@@ -28,5 +28,4 @@ public class WorkflowExportService extends AbstractRefExportService {
     protected RefExportOperation<WorkflowExportRequestRef> createRefExportOperation() {
         return new WorkflowRefExportOperation();
     }
-
 }

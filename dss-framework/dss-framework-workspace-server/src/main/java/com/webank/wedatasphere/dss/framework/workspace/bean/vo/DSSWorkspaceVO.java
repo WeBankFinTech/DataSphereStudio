@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
-public class DSSWorkspaceVO extends AbstractDSSVO{
-
+public class DSSWorkspaceVO extends AbstractDSSVO {
 
     private int id;
     private String name;
@@ -27,16 +25,12 @@ public class DSSWorkspaceVO extends AbstractDSSVO{
     private String description;
     private String product;
 
+    public DSSWorkspaceVO() {}
 
-    public DSSWorkspaceVO() {
-    }
-
-    public DSSWorkspaceVO(int id, String name){
+    public DSSWorkspaceVO(int id, String name) {
         this.id = id;
         this.name = name;
     }
-
-
 
     public int getId() {
         return id;
@@ -61,7 +55,6 @@ public class DSSWorkspaceVO extends AbstractDSSVO{
     public void setTags(String tags) {
         this.tags = tags;
     }
-
 
     public String getDepartment() {
         return department;

@@ -19,14 +19,13 @@ package com.webank.wedatasphere.dss.appconn.workflow.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
+public class WorkflowCopyRequestRef extends CommonRequestRefImpl
+        implements OrchestratorCopyRequestRef {
 
-public class WorkflowCopyRequestRef extends CommonRequestRefImpl implements OrchestratorCopyRequestRef {
-
-    private  Long  appId;
-    private  Long  orcVersionId;
+    private Long appId;
+    private Long orcVersionId;
     private String version;
     private String description;
-
 
     public String getVersion() {
         return version;
@@ -44,10 +43,9 @@ public class WorkflowCopyRequestRef extends CommonRequestRefImpl implements Orch
         this.description = description;
     }
 
-    public Long getAppId(){
+    public Long getAppId() {
         return this.appId;
     }
-
 
     @Override
     public boolean equals(Object ref) {
@@ -66,11 +64,10 @@ public class WorkflowCopyRequestRef extends CommonRequestRefImpl implements Orch
 
     @Override
     public void setCopyOrcVersionId(long orcVersionId) {
-     this.orcVersionId = orcVersionId;
+        this.orcVersionId = orcVersionId;
     }
 
-
-    public Long getOrcVersionId(){
+    public Long getOrcVersionId() {
         return orcVersionId;
     }
 }

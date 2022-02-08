@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-
-public interface ExportRequestRef extends WorkspaceRequestRef {
-}
+public interface ExportRequestRef extends WorkspaceRequestRef {}

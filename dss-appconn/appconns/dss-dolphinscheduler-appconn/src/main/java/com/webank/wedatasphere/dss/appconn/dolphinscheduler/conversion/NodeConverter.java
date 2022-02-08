@@ -1,16 +1,17 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Node converter.
@@ -22,14 +23,12 @@ public class NodeConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeConverter.class);
 
-    public NodeConverter() {
-    }
+    public NodeConverter() {}
 
     /**
      * 将DSS中节点转为Dolphin Scheduler中节点task.
      *
-     * @param schedulerNode
-     *            the scheduler node
+     * @param schedulerNode the scheduler node
      * @return the dolphin scheduler task
      */
     public DolphinSchedulerTask conversion(DSSNode dssNode) {
@@ -53,13 +52,21 @@ public class NodeConverter {
             if (nodeParams != null && !nodeParams.isEmpty()) {
                 Object configuration = nodeParams.get("configuration");
                 String confprefix = "node.conf.";
-                ((Map<String, Map<String, Object>>)configuration)
-                    .forEach((k, v) -> v.forEach((k2, v2) -> map.put(confprefix + k + "." + k2, v2.toString())));
+                ((Map<String, Map<String, Object>>) configuration)
+                        .forEach(
+                                (k, v) ->
+                                        v.forEach(
+                                                (k2, v2) ->
+                                                        map.put(
+                                                                confprefix + k + "." + k2,
+                                                                v2.toString())));
             }
 
             // TODO 改为参数配置路径
             String dolphinScript =
-                "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar '" + new Gson().toJson(map) + "'";
+                    "java -jar /usr/local/dolphin/linkis-dolphinscheduler-client.jar '"
+                            + new Gson().toJson(map)
+                            + "'";
             taskParams.setRawScript(dolphinScript);
         } catch (Exception e) {
             logger.error("任务转换失败", e);
@@ -68,5 +75,4 @@ public class NodeConverter {
         task.setParams(taskParams);
         return task;
     }
-
 }

@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
+import org.apache.linkis.common.exception.ErrorException;
+
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
@@ -30,24 +32,37 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
-import org.apache.linkis.common.exception.ErrorException;
 
 import java.util.List;
 
-
 public interface DSSWorkspaceService {
 
+    int createWorkspace(
+            String workspaceName,
+            String tags,
+            String userName,
+            String description,
+            String department,
+            String productName,
+            String workspaceType)
+            throws ErrorException;
 
-    int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName,String workspaceType) throws ErrorException;
-
-    void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creater,String userId);
+    void addWorkspaceUser(
+            List<Integer> roleIds, int workspaceId, String userName, String creater, String userId);
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
-    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception;
+    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName, String moduleName)
+            throws Exception;
 
-    List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
-                                               String roleName, int pageNow, int pageSize, List<Long> total);
+    List<DSSWorkspaceUser01> getWorkspaceUsers(
+            String workspaceId,
+            String department,
+            String username,
+            String roleName,
+            int pageNow,
+            int pageSize,
+            List<Long> total);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);
 
@@ -63,12 +78,13 @@ public interface DSSWorkspaceService {
 
     List<DepartmentVO> getDepartments();
 
-    List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(int workspaceId, String roleName, List<Long> totals,
-                                                     int pageNow, int pageSize);
+    List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(
+            int workspaceId, String roleName, List<Long> totals, int pageNow, int pageSize);
 
     List<DSSWorkspace> getWorkspaces();
 
-    Long addWorkspace(String userName, String name, String department, String label, String description);
+    Long addWorkspace(
+            String userName, String name, String department, String label, String description);
 
     boolean existWorkspaceName(String name);
 
@@ -78,17 +94,18 @@ public interface DSSWorkspaceService {
 
     List<HomepageVideoVo> getHomepageVideos(boolean isChinese);
 
-    List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
+    List<OnestopMenuVo> getWorkspaceManagements(
+            Long workspaceId, String username, boolean isChinese);
 
-    List<OnestopMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese);
+    List<OnestopMenuVo> getWorkspaceApplications(
+            Long workspaceId, String username, boolean isChinese);
 
     DSSWorkspace getWorkspacesById(Long id);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese,String type);
+    List<WorkspaceFavoriteVo> getWorkspaceFavorites(
+            Long workspaceId, String username, boolean isChinese, String type);
 
-    Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);
+    Long addFavorite(String username, Long workspaceId, Long menuApplicationId, String type);
 
-    Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
-
-
+    Long deleteFavorite(String username, Long applicationId, Long workspaceId, String type);
 }

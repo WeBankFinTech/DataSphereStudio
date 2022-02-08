@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.entity;
 
-
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 
 public class InputRelation {

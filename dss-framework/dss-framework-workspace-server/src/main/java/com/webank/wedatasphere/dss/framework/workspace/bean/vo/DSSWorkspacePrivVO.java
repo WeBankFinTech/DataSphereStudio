@@ -19,9 +19,8 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 import java.io.Serializable;
 import java.util.List;
 
-
 public class DSSWorkspacePrivVO implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
     private int workspaceId;
     private List<DSSWorkspaceMenuPrivVO> menuPrivVOS;
     private List<DSSWorkspaceComponentPrivVO> componentPrivVOS;
@@ -35,17 +34,17 @@ public class DSSWorkspacePrivVO implements Serializable {
         this.roleVOS = roleVOS;
     }
 
+    public DSSWorkspacePrivVO() {}
 
-
-
-    public DSSWorkspacePrivVO() {
-    }
-
-    public DSSWorkspacePrivVO(int workspaceId, List<DSSWorkspaceMenuPrivVO> menuPrivVOS, List<DSSWorkspaceComponentPrivVO> componentPrivVOS,List<DSSWorkspaceRoleVO> roleVOS) {
+    public DSSWorkspacePrivVO(
+            int workspaceId,
+            List<DSSWorkspaceMenuPrivVO> menuPrivVOS,
+            List<DSSWorkspaceComponentPrivVO> componentPrivVOS,
+            List<DSSWorkspaceRoleVO> roleVOS) {
         this.workspaceId = workspaceId;
         this.menuPrivVOS = menuPrivVOS;
         this.componentPrivVOS = componentPrivVOS;
-        this.roleVOS=roleVOS;
+        this.roleVOS = roleVOS;
     }
 
     public int getWorkspaceId() {
@@ -74,15 +73,15 @@ public class DSSWorkspacePrivVO implements Serializable {
 
     @Override
     public String toString() {
-        return "DSSWorkspacePrivVO{" +
-                "workspaceId=" + workspaceId +
-                ", menuPrivVOS=" + menuPrivVOS +
-                ", componentPrivVOS=" + componentPrivVOS +
-                ", roleVOS=" + roleVOS +
-                '}';
+        return "DSSWorkspacePrivVO{"
+                + "workspaceId="
+                + workspaceId
+                + ", menuPrivVOS="
+                + menuPrivVOS
+                + ", componentPrivVOS="
+                + componentPrivVOS
+                + ", roleVOS="
+                + roleVOS
+                + '}';
     }
-
-
-
-
 }

@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.converter.standard.service;
 
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 
-
 public interface DSSToRelConversionService extends ConversionService {
 
     DSSToRelConversionOperation getDSSToRelConversionOperation();
@@ -26,5 +25,4 @@ public interface DSSToRelConversionService extends ConversionService {
     default boolean isConvertAllOrcs() {
         return true;
     }
-
 }

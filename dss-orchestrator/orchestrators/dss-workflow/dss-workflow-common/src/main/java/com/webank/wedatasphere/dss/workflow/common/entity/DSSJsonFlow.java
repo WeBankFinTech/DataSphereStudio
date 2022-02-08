@@ -34,7 +34,7 @@ public class DSSJsonFlow extends DSSFlow {
 
     @Override
     public void setChildren(List<? extends Flow> children) {
-        this.children = children.stream().map(f ->(DSSJsonFlow)f).collect(Collectors.toList());
+        this.children = children.stream().map(f -> (DSSJsonFlow) f).collect(Collectors.toList());
     }
 
     @Override

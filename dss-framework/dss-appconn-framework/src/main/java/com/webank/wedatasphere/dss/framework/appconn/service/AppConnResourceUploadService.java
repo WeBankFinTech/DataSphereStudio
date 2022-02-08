@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.framework.appconn.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public interface AppConnResourceUploadService {
 
     void upload(String appConnName) throws DSSErrorException;
-
 }

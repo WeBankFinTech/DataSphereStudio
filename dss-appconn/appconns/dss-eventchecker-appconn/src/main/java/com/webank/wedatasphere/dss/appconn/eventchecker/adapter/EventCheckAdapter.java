@@ -25,5 +25,4 @@ public interface EventCheckAdapter {
     boolean sendMsg(int jobId, Properties props, Logger log);
 
     boolean reciveMsg(int jobId, Properties props, Logger log);
-
 }

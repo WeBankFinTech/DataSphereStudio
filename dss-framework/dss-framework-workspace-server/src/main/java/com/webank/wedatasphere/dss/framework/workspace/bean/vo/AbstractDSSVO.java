@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
-public abstract class AbstractDSSVO {
-}
+public abstract class AbstractDSSVO {}

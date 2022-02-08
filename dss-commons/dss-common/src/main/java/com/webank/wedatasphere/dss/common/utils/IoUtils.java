@@ -19,9 +19,8 @@ package com.webank.wedatasphere.dss.common.utils;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.entity.IOType;
+
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -29,13 +28,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class IoUtils {
 
     private static Logger logger = LoggerFactory.getLogger(IoUtils.class);
     private static final String DATE_FORMAT = "yyyyMMddHHmmssSSS";
     private static final String DEFAULT_IO_FILE_NAME = "IO.properties";
 
-    public static String generateIOPath(String userName,String projectName,String subDir) {
+    public static String generateIOPath(String userName, String projectName, String subDir) {
         String baseUrl = DSSCommonConf.DSS_EXPORT_URL.getValue();
         String dataStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
         return addFileSeparator(baseUrl, dataStr, userName, projectName, subDir);
@@ -58,67 +61,66 @@ public class IoUtils {
         return FileUtils.openOutputStream(file, true);
     }
 
-    public static InputStream generateInputInputStream(String path)throws IOException{
+    public static InputStream generateInputInputStream(String path) throws IOException {
         return new FileInputStream(path);
     }
 
     public static void generateIOType(IOType ioType, String basePath) throws IOException {
-        generateIOProperties("type",ioType.name(),basePath);
+        generateIOProperties("type", ioType.name(), basePath);
     }
 
-    public static void generateIOProperties(String key,String value,String basePath) throws IOException {
+    public static void generateIOProperties(String key, String value, String basePath)
+            throws IOException {
         Properties properties = new Properties();
-        properties.setProperty(key,value);
+        properties.setProperty(key, value);
 
         File file = new File(basePath + File.separator + DEFAULT_IO_FILE_NAME);
         if (!file.getParentFile().exists()) {
             FileUtils.forceMkdir(file.getParentFile());
         }
-        if(!file.exists()){
+        if (!file.exists()) {
             file.createNewFile();
         }
-        try(FileOutputStream fileOutputStream = FileUtils.openOutputStream(file, true)) {
-            properties.store(fileOutputStream,"");
+        try (FileOutputStream fileOutputStream = FileUtils.openOutputStream(file, true)) {
+            properties.store(fileOutputStream, "");
         }
-
     }
 
-    public static String readIOProperties(String key,String basepath) throws IOException {
-        try(FileInputStream inputStream = new FileInputStream(basepath + File.separator + DEFAULT_IO_FILE_NAME)){
+    public static String readIOProperties(String key, String basepath) throws IOException {
+        try (FileInputStream inputStream =
+                new FileInputStream(basepath + File.separator + DEFAULT_IO_FILE_NAME)) {
             Properties properties = new Properties();
             properties.load(inputStream);
             return properties.get(key).toString();
         }
-
     }
 
-    public static IOType readIOType(String basepath)throws IOException{
-        return IOType.valueOf(readIOProperties("type",basepath));
+    public static IOType readIOType(String basepath) throws IOException {
+        return IOType.valueOf(readIOProperties("type", basepath));
     }
 
     public static void generateIOEnv(String basePath) throws IOException {
-        generateIOProperties("env",getDSSServerEnv().name(),basePath);
+        generateIOProperties("env", getDSSServerEnv().name(), basePath);
     }
 
     public static IOEnv readIOEnv(String basePath) throws IOException {
-        return IOEnv.valueOf(readIOProperties("env",basePath));
+        return IOEnv.valueOf(readIOProperties("env", basePath));
     }
 
-    public static IOEnv getDSSServerEnv(){
-        //dssserverEnv 是当前dss服务启动的env环境
+    public static IOEnv getDSSServerEnv() {
+        // dssserverEnv 是当前dss服务启动的env环境
         return IOEnv.valueOf(DSSCommonConf.DSS_IO_ENV.getValue());
     }
 
-    public static String addVersion(String version){
+    public static String addVersion(String version) {
         String num = String.valueOf(Integer.valueOf(version.substring(1)) + 1);
         int length = num.length();
-        return version.substring(0,version.length() - length) + num;
+        return version.substring(0, version.length() - length) + num;
     }
 
-    public static String subVersion(String version){
+    public static String subVersion(String version) {
         String num = String.valueOf(Integer.valueOf(version.substring(1)) - 1);
         int length = num.length();
-        return version.substring(0,version.length() - length) + num;
+        return version.substring(0, version.length() - length) + num;
     }
-
 }

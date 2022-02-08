@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_sidebar")
 public class Sidebar implements Serializable {
 
@@ -32,42 +31,40 @@ public class Sidebar implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    //名称
+    // 名称
     private String name;
 
-    //名称(英文)
+    // 名称(英文)
     private String nameEn;
 
-    //标题
+    // 标题
     private String title;
 
-    //标题(英文)
+    // 标题(英文)
     private String titleEn;
 
-    //类型: 0-知识库，1-菜单，2-常见问题
+    // 类型: 0-知识库，1-菜单，2-常见问题
     private Integer type;
 
-    //序号
+    // 序号
     private Integer orderNum;
 
-    //备注
+    // 备注
     private String remark;
 
-    //创建人
+    // 创建人
     private String createUser;
 
-    //创建时间
+    // 创建时间
     private Date createTime;
 
-    //更新人
+    // 更新人
     private String updateUser;
 
-    //更新时间
+    // 更新时间
     private Date updateTime;
 
-
-    public Sidebar() {
-    }
+    public Sidebar() {}
 
     public Integer getId() {
         return id;
@@ -167,19 +164,38 @@ public class Sidebar implements Serializable {
 
     @Override
     public String toString() {
-        return "Sidebar{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", nameEn='" + nameEn + '\'' +
-                ", title='" + title + '\'' +
-                ", titleEn='" + titleEn + '\'' +
-                ", type=" + type +
-                ", orderNum=" + orderNum +
-                ", remark='" + remark + '\'' +
-                ", createUser='" + createUser + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Sidebar{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", nameEn='"
+                + nameEn
+                + '\''
+                + ", title='"
+                + title
+                + '\''
+                + ", titleEn='"
+                + titleEn
+                + '\''
+                + ", type="
+                + type
+                + ", orderNum="
+                + orderNum
+                + ", remark='"
+                + remark
+                + '\''
+                + ", createUser='"
+                + createUser
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateUser='"
+                + updateUser
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + '}';
     }
 }

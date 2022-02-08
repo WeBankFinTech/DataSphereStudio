@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.scheduler;
 
-
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 
 import java.util.Date;
@@ -30,7 +29,8 @@ public class DssJobInfo {
     private String msg;
 
     public Boolean timeout() {
-        return System.currentTimeMillis() - updateTime.getTime() > (int) DSSWorkFlowConstant.CACHE_TIMEOUT.getValue();
+        return System.currentTimeMillis() - updateTime.getTime()
+                > (int) DSSWorkFlowConstant.CACHE_TIMEOUT.getValue();
     }
 
     public Boolean isExecute() {

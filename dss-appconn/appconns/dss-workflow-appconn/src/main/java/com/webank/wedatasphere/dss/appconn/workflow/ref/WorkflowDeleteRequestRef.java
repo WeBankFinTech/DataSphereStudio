@@ -19,10 +19,10 @@ package com.webank.wedatasphere.dss.appconn.workflow.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorDeleteRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
+public class WorkflowDeleteRequestRef extends CommonRequestRefImpl
+        implements OrchestratorDeleteRequestRef {
 
-public class WorkflowDeleteRequestRef extends CommonRequestRefImpl implements OrchestratorDeleteRequestRef {
-
-    private  Long  appId;
+    private Long appId;
 
     @Override
     public void setAppId(Long appId) {
@@ -30,8 +30,7 @@ public class WorkflowDeleteRequestRef extends CommonRequestRefImpl implements Or
     }
 
     @Override
-    public Long getAppId(){
+    public Long getAppId() {
         return this.appId;
     }
-
 }

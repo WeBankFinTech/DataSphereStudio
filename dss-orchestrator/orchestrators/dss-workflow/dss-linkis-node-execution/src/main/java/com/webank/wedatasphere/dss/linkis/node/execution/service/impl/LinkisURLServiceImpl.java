@@ -19,15 +19,15 @@ package com.webank.wedatasphere.dss.linkis.node.execution.service.impl;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
-import java.util.Map;
 
+import java.util.Map;
 
 public class LinkisURLServiceImpl implements LinkisURLService {
 
     @Override
     public String getLinkisURL(Job job) {
         Map<String, String> props = job.getJobProps();
-        if(LinkisJobExecutionConfiguration.isLinkis1_X(props)){
+        if (LinkisJobExecutionConfiguration.isLinkis1_X(props)) {
             return LinkisJobExecutionConfiguration.LINKIS_URL_1_X.getValue(props);
         } else {
             return LinkisJobExecutionConfiguration.LINKIS_URL.getValue(props);

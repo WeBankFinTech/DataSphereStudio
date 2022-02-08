@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.filter;
 
-
 public enum ProjectRequestType {
-    Edit, Access, Delete, Execute
+    Edit,
+    Access,
+    Delete,
+    Execute
 }

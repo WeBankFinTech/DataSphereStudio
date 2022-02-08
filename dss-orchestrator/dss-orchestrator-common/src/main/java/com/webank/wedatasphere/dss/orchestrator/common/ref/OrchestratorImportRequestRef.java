@@ -17,9 +17,8 @@
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
-import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 
 public interface OrchestratorImportRequestRef extends ImportRequestRef, CommonRequestRef {
 
@@ -38,5 +37,4 @@ public interface OrchestratorImportRequestRef extends ImportRequestRef, CommonRe
     void setOrcVersion(String orcVersion);
 
     String getOrcVersion();
-
 }

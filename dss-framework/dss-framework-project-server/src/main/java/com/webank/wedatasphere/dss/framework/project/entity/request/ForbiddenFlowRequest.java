@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 @XmlRootElement
 public class ForbiddenFlowRequest {
 
@@ -69,11 +68,17 @@ public class ForbiddenFlowRequest {
 
     @Override
     public String toString() {
-        return "ForbiddenFlowRequest{" +
-                "orchestratorId=" + orchestratorId +
-                ", projectId=" + projectId +
-                ", activeFlag='" + activeFlag + '\'' +
-                ", orchestratorName='" + orchestratorName + '\'' +
-                '}';
+        return "ForbiddenFlowRequest{"
+                + "orchestratorId="
+                + orchestratorId
+                + ", projectId="
+                + projectId
+                + ", activeFlag='"
+                + activeFlag
+                + '\''
+                + ", orchestratorName='"
+                + orchestratorName
+                + '\''
+                + '}';
     }
 }

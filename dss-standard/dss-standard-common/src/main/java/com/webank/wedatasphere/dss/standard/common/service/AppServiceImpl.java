@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 public class AppServiceImpl implements AppService {
 
     private Set<Class<? extends Operation>> necessaryOperations = new HashSet<>();
@@ -37,16 +36,21 @@ public class AppServiceImpl implements AppService {
     @Override
     public Operation createOperation(Class<? extends Operation> clazz) {
         String clazzSimpleName = clazz.getSimpleName();
-        List<Method> methodList = Arrays.stream(this.getClass().getDeclaredMethods())
-            .filter(method -> method.getReturnType() == clazz
-            && method.getParameterCount() == 0).collect(Collectors.toList());
-        if(methodList.size() == 1) {
+        List<Method> methodList =
+                Arrays.stream(this.getClass().getDeclaredMethods())
+                        .filter(
+                                method ->
+                                        method.getReturnType() == clazz
+                                                && method.getParameterCount() == 0)
+                        .collect(Collectors.toList());
+        if (methodList.size() == 1) {
             try {
                 return (Operation) methodList.get(0).invoke(this);
             } catch (ReflectiveOperationException e) {
-                throw new AppStandardWarnException(80020, "Not exists operation: " + clazzSimpleName, e);
+                throw new AppStandardWarnException(
+                        80020, "Not exists operation: " + clazzSimpleName, e);
             }
-        } else if(methodList.isEmpty()) {
+        } else if (methodList.isEmpty()) {
             return notFoundOperation(clazz);
         } else {
             return multiFoundOperation(clazz);
@@ -58,12 +62,13 @@ public class AppServiceImpl implements AppService {
     }
 
     protected Operation multiFoundOperation(Class<? extends Operation> clazz) {
-        throw new AppStandardWarnException(80020, "Multi exists operations: " + clazz.getSimpleName());
+        throw new AppStandardWarnException(
+                80020, "Multi exists operations: " + clazz.getSimpleName());
     }
 
     @Override
     public boolean isOperationExists(Class<? extends Operation> clazz) {
-        try{
+        try {
             return createOperation(clazz) != null;
         } catch (AppStandardWarnException e) {
             return false;
@@ -73,7 +78,7 @@ public class AppServiceImpl implements AppService {
     @Override
     public boolean isOperationNecessary(Class<? extends Operation> clazz) {
         boolean isNecessary = necessaryOperations.contains(clazz);
-        if(isNecessary) {
+        if (isNecessary) {
             return true;
         } else {
             return isOperationExists(clazz);

@@ -17,14 +17,16 @@
 package com.webank.wedatasphere.dss.standard.app.sso.builder.impl;
 
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation;
+
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DssMsgBuilderOperationImpl implements DssMsgBuilderOperation {
 
@@ -52,7 +54,7 @@ public class DssMsgBuilderOperationImpl implements DssMsgBuilderOperation {
 
     private String getOrNull(String key) {
         String[] values = parameterMap.get(key);
-        if(values == null || values.length == 0) {
+        if (values == null || values.length == 0) {
             return null;
         } else {
             return values[0];
@@ -68,15 +70,17 @@ public class DssMsgBuilderOperationImpl implements DssMsgBuilderOperation {
         dssMsg.setAppName(getOrNull("appName"));
         Map<String, String> cookies = new HashMap<>();
         String cookiesStr = getOrNull("cookies");
-        if(StringUtils.isNotBlank(cookiesStr)) {
-            Arrays.stream(cookiesStr.split(";")).forEach(cookie -> {
-                int index = cookie.indexOf('=');
-                String key = cookie.substring(0, index).trim();
-                String value = cookie.substring(index + 1).trim();
-                cookies.put(key, value);
-            });
+        if (StringUtils.isNotBlank(cookiesStr)) {
+            Arrays.stream(cookiesStr.split(";"))
+                    .forEach(
+                            cookie -> {
+                                int index = cookie.indexOf('=');
+                                String key = cookie.substring(0, index).trim();
+                                String value = cookie.substring(index + 1).trim();
+                                cookies.put(key, value);
+                            });
         }
-        LOGGER.info("Set cookies from dssMsg: "+cookies.toString());
+        LOGGER.info("Set cookies from dssMsg: " + cookies.toString());
         dssMsg.setCookies(cookies);
         return dssMsg;
     }

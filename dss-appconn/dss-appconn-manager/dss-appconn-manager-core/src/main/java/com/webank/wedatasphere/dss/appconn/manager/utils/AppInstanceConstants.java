@@ -23,5 +23,4 @@ public class AppInstanceConstants {
 
     static final String INDEX_FILE_PREFIX = "index_";
     static final String INDEX_FILE_SUFFIX = ".index";
-
 }

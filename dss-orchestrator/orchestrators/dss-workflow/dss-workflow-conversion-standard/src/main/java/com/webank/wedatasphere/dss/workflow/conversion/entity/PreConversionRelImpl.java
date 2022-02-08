@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.workflow.conversion.entity;
 
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
-import java.util.List;
 
+import java.util.List;
 
 public class PreConversionRelImpl implements PreConversionRel {
 
@@ -31,7 +31,7 @@ public class PreConversionRelImpl implements PreConversionRel {
     }
 
     public void setDSSToRelConversionRequestRef(
-        DSSToRelConversionRequestRef dssToRelConversionRequestRef) {
+            DSSToRelConversionRequestRef dssToRelConversionRequestRef) {
         this.dssToRelConversionRequestRef = dssToRelConversionRequestRef;
     }
 

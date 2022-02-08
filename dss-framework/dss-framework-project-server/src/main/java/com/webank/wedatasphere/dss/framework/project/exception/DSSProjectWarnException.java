@@ -18,12 +18,8 @@ package com.webank.wedatasphere.dss.framework.project.exception;
 
 import org.apache.linkis.common.exception.WarnException;
 
-
 public class DSSProjectWarnException extends WarnException {
-    public DSSProjectWarnException(int errorCode, String errorDesc){
+    public DSSProjectWarnException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
-
-
-
 }

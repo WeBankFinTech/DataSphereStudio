@@ -16,21 +16,19 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
 public class DSSWorkspaceHomePageVO {
     private int workspaceId;
     private String roleName;
     private String homePageUrl;
 
-    public DSSWorkspaceHomePageVO() {
-    }
+    public DSSWorkspaceHomePageVO() {}
 
-    public DSSWorkspaceHomePageVO(int workspaceId, String roleName, String username, String homePageUrl) {
+    public DSSWorkspaceHomePageVO(
+            int workspaceId, String roleName, String username, String homePageUrl) {
         this.workspaceId = workspaceId;
         this.roleName = roleName;
         this.homePageUrl = homePageUrl;
     }
-
 
     public int getWorkspaceId() {
         return workspaceId;
@@ -48,8 +46,6 @@ public class DSSWorkspaceHomePageVO {
         this.roleName = roleName;
     }
 
-
-
     public String getHomePageUrl() {
         return homePageUrl;
     }
@@ -57,7 +53,4 @@ public class DSSWorkspaceHomePageVO {
     public void setHomePageUrl(String homePageUrl) {
         this.homePageUrl = homePageUrl;
     }
-
-
-
 }

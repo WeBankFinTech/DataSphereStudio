@@ -21,21 +21,21 @@ import java.util.List;
 public class NodeInfoVO {
 
     private Integer id;
-    //icon
+    // icon
     private String image;
-    //nodeType
+    // nodeType
     private String type;
     private Integer applicationId;
-    private Boolean submitToScheduler; //是否可以提交执行
+    private Boolean submitToScheduler; // 是否可以提交执行
     private Boolean enableCopy;
     private Boolean shouldCreationBeforeNode;
     private Boolean supportJump;
     private String jumpUrl;
-    //name
+    // name
     private String title;
-    //前台插件参数 默认false
+    // 前台插件参数 默认false
     private boolean editParam;
-    //前台插件参数 默认false
+    // 前台插件参数 默认false
     private boolean editBaseInfo;
 
     private List<NodeUiVO> nodeUiVOS;

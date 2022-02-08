@@ -23,5 +23,4 @@ public class VisualisOpenResponseRef extends CommonResponseRef {
     public VisualisOpenResponseRef(String responseBody, int status) {
         super(responseBody, status);
     }
-
 }

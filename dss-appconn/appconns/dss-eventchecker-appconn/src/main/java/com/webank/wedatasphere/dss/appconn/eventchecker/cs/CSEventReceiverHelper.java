@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.cs;
 
-import com.google.gson.Gson;
 import org.apache.linkis.cs.client.service.CSVariableService;
 import org.apache.linkis.cs.client.utils.ContextServiceUtils;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
@@ -26,10 +25,13 @@ import org.apache.linkis.cs.common.entity.object.LinkisVariable;
 import org.apache.linkis.cs.common.entity.source.CommonContextKey;
 import org.apache.linkis.cs.common.entity.source.ContextKey;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+
+
+import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CSEventReceiverHelper {
 
@@ -51,7 +53,11 @@ public class CSEventReceiverHelper {
             LinkisVariable varValue = new LinkisVariable();
             varValue.setKey(key);
             varValue.setValue(value);
-            CSVariableService.getInstance().putVariable(contextIDStr, SerializeHelper.serializeContextKey(contextKey), varValue);
+            CSVariableService.getInstance()
+                    .putVariable(
+                            contextIDStr,
+                            SerializeHelper.serializeContextKey(contextKey),
+                            varValue);
         } catch (Exception e) {
             LOGGER.error("Failed to put variable to cs", e);
         }

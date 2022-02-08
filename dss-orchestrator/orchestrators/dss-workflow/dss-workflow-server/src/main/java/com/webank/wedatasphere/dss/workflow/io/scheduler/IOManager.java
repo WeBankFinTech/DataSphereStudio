@@ -30,7 +30,8 @@ public class IOManager extends DssJobManager {
         addDssJobHook(new IOJobHook());
     }
 
-    public void submitIoJob(String userName, String comment,  Long... flowIDs) throws DSSErrorException {
+    public void submitIoJob(String userName, String comment, Long... flowIDs)
+            throws DSSErrorException {
         PublishJob exportJob = new PublishJob();
         exportJob.setDssJobListener(this);
         exportJob.setUser(userName);
@@ -38,5 +39,4 @@ public class IOManager extends DssJobManager {
         exportJob.setComment(comment);
         submit(exportJob);
     }
-
 }

@@ -16,11 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import org.apache.ibatis.annotations.Mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 
 @Mapper
-public interface DSSUserMapper extends BaseMapper<DSSUser> {
-}
+public interface DSSUserMapper extends BaseMapper<DSSUser> {}

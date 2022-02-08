@@ -6,7 +6,7 @@ public class UpdateFlowBaseInfoRequest {
 
     private Long id;
     private String name;
-    private String description ;
+    private String description;
     private String uses;
     private LabelRouteVO labels;
 

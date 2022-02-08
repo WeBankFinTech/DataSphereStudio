@@ -1,61 +1,53 @@
 package com.webank.wedatasphere.dss.framework.admin.restful;
 
-
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
-import com.webank.wedatasphere.dss.framework.admin.common.domain.PasswordResult;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.TableDataInfo;
-import com.webank.wedatasphere.dss.framework.admin.common.utils.PasswordUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
-import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
-//import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
-import org.apache.linkis.server.security.SecurityFilter;
-import org.apache.commons.codec.digest.DigestUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
- * <p>
  * 用户信息表 前端控制器
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01
  */
-//@RestController
-//@RequestMapping("/dss/framework/admin/user")
+// @RestController
+// @RequestMapping("/dss/framework/admin/user")
 
-@RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
+@RequestMapping(
+        path = "/dss/framework/admin/user",
+        produces = {"application/json"})
 @RestController
 public class DssFrameworkAdminUserController extends BaseController {
-    @Resource
-    private DssAdminUserService dssAdminUserService;
-//    @Autowired
-//    private LdapService ldapService;
-    @Autowired
+    @Resource private DssAdminUserService dssAdminUserService;
+    //    @Autowired
+    //    private LdapService ldapService;
+    @Autowired DssUserMapper dssUserMapper;
 
-    DssUserMapper dssUserMapper;
-
-//    @GET
-//    @Path("/list")
-    @RequestMapping(path ="list", method = RequestMethod.GET)
-//    public TableDataInfo list(DssAdminUser user) {
-    public TableDataInfo list(@QueryParam("userName") String userName, @QueryParam("deptId") Long deptId, @QueryParam("phonenumber") String phonenumber, @QueryParam("beginTime") String beginTime, @QueryParam("endTime") String endTime) {
+    //    @GET
+    //    @Path("/list")
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+    //    public TableDataInfo list(DssAdminUser user) {
+    public TableDataInfo list(
+            @QueryParam("userName") String userName,
+            @QueryParam("deptId") Long deptId,
+            @QueryParam("phonenumber") String phonenumber,
+            @QueryParam("beginTime") String beginTime,
+            @QueryParam("endTime") String endTime) {
         DssAdminUser user = new DssAdminUser();
         user.setUserName(userName);
         user.setDeptId(deptId);
@@ -70,9 +62,9 @@ public class DssFrameworkAdminUserController extends BaseController {
     }
 
     //    @PostMapping("/add")
-//    @POST
-//    @Path("/add")
-/*    @RequestMapping(path ="add", method = RequestMethod.POST)
+    //    @POST
+    //    @Path("/add")
+    /*    @RequestMapping(path ="add", method = RequestMethod.POST)
 
     public Message add(@Validated @RequestBody DssAdminUser user, @Context HttpServletRequest req
     ) {
@@ -109,17 +101,16 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     }*/
 
-
     //    @GET
-//    @Path("/{id}")
-    @RequestMapping(path ="{id}", method = RequestMethod.GET)
+    //    @Path("/{id}")
+    @RequestMapping(path = "{id}", method = RequestMethod.GET)
     public Message getInfo(@PathVariable("id") Long userId) {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
     }
 
-//    @POST
-//    @Path("/edit")
-    @RequestMapping(path ="edit", method = RequestMethod.POST)
+    //    @POST
+    //    @Path("/edit")
+    @RequestMapping(path = "edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminUser user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
@@ -128,13 +119,13 @@ public class DssFrameworkAdminUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
             return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        //        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         return Message.ok().data("修改用户成功", dssAdminUserService.updateUser(user));
     }
 
-//    @POST
-//    @Path("/resetPsw")
-/*    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
+    //    @POST
+    //    @Path("/resetPsw")
+    /*    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
     public Message resetPwd(@RequestBody DssAdminUser user) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
@@ -151,4 +142,3 @@ public class DssFrameworkAdminUserController extends BaseController {
         }
     }*/
 }
-

@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.appconn.service.impl;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
@@ -23,27 +25,27 @@ import com.webank.wedatasphere.dss.framework.appconn.dao.AppConnMapper;
 import com.webank.wedatasphere.dss.framework.appconn.dao.AppInstanceMapper;
 import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean;
 import com.webank.wedatasphere.dss.framework.appconn.utils.AppConnServiceUtils;
-import java.util.List;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class AppConnInfoServiceImpl implements AppConnInfoService {
-    @Autowired
-    private AppConnMapper appConnMapper;
-    @Autowired
-    private AppInstanceMapper appInstanceMapper;
+    @Autowired private AppConnMapper appConnMapper;
+    @Autowired private AppInstanceMapper appInstanceMapper;
 
     @Override
     public List<? extends AppConnInfo> getAppConnInfos() {
         List<AppConnBean> appConnBeans = appConnMapper.getAllAppConnBeans();
-        appConnBeans.forEach(appConnBean -> {
-            String resource = appConnBean.getResource();
-            if(StringUtils.isNotBlank(resource)) {
-                appConnBean.setAppConnResource(AppConnServiceUtils.stringToResource(resource).getResource());
-            }
-        });
+        appConnBeans.forEach(
+                appConnBean -> {
+                    String resource = appConnBean.getResource();
+                    if (StringUtils.isNotBlank(resource)) {
+                        appConnBean.setAppConnResource(
+                                AppConnServiceUtils.stringToResource(resource).getResource());
+                    }
+                });
         return appConnBeans;
     }
 

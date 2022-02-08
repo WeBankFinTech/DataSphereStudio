@@ -23,6 +23,8 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOp
 import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +35,19 @@ public class WorkflowRefQueryOperation implements RefQueryOperation<OpenRequestR
     private DevelopmentService developmentService;
 
     @Override
-    public WorkflowUrlResponseRef query(OpenRequestRef ref) throws ExternalOperationFailedException {
-        EnvDSSLabel label = (EnvDSSLabel) ref.getDSSLabels().stream().filter(EnvDSSLabel.class::isInstance)
-                .findFirst().orElseThrow(() -> new DSSRuntimeException(50321, "Not exists EnvDSSLabel."));
+    public WorkflowUrlResponseRef query(OpenRequestRef ref)
+            throws ExternalOperationFailedException {
+        EnvDSSLabel label =
+                (EnvDSSLabel)
+                        ref.getDSSLabels().stream()
+                                .filter(EnvDSSLabel.class::isInstance)
+                                .findFirst()
+                                .orElseThrow(
+                                        () ->
+                                                new DSSRuntimeException(
+                                                        50321, "Not exists EnvDSSLabel."));
         String urlStr = "router/workflow/editable?labels=" + label.getEnv();
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("url for  {} is {}", ref.getName(), urlStr);
         }
         WorkflowUrlResponseRef workflowUrlResponseRef = new WorkflowUrlResponseRef();
@@ -47,6 +57,6 @@ public class WorkflowRefQueryOperation implements RefQueryOperation<OpenRequestR
 
     @Override
     public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService =service;
+        this.developmentService = service;
     }
 }

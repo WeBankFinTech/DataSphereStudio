@@ -1,15 +1,10 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
-
 public class PositionBo {
-    /**
-     * 行号
-     */
+    /** 行号 */
     private int row;
 
-    /**
-     * 列号
-     */
+    /** 列号 */
     private int column;
 
     public PositionBo(Integer row, Integer column) {
@@ -17,15 +12,11 @@ public class PositionBo {
         this.column = column;
     }
 
-    public PositionBo() {
-    }
+    public PositionBo() {}
 
     @Override
     public String toString() {
-        return "PositionBo{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
+        return "PositionBo{" + "row=" + row + ", column=" + column + '}';
     }
 
     public int getRow() {

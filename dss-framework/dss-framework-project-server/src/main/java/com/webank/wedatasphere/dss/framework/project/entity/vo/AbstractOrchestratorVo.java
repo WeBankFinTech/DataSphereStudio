@@ -16,12 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
-
 public abstract class AbstractOrchestratorVo {
 
-    final static String WORK_FLOW = "workflow";
+    static final String WORK_FLOW = "workflow";
 
-    final static String ORDINARY = "ordinary";
+    static final String ORDINARY = "ordinary";
 
     private Long orchestratorId;
 
@@ -44,5 +43,4 @@ public abstract class AbstractOrchestratorVo {
     }
 
     abstract String getType();
-
 }

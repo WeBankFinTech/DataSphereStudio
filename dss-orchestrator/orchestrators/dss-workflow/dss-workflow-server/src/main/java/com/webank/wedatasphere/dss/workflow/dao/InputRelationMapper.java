@@ -16,23 +16,24 @@
 
 package com.webank.wedatasphere.dss.workflow.dao;
 
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
-
-
-import com.webank.wedatasphere.dss.common.entity.InputRelation;
 import org.apache.ibatis.annotations.Param;
+
+import com.webank.wedatasphere.dss.common.entity.IOEnv;
+import com.webank.wedatasphere.dss.common.entity.InputRelation;
 
 public interface InputRelationMapper {
 
-    InputRelation selectInputRelation(@Param("type") String type,
-                                      @Param("sourceEnv") IOEnv sourceEnv,
-                                      @Param("sourceID") Long sourceID,
-                                      @Param("targetEnv") IOEnv targetEnv);
+    InputRelation selectInputRelation(
+            @Param("type") String type,
+            @Param("sourceEnv") IOEnv sourceEnv,
+            @Param("sourceID") Long sourceID,
+            @Param("targetEnv") IOEnv targetEnv);
 
     void insertInputRelation(@Param("inputRelation") InputRelation inputRelation);
 
-    void removeInputRelation(@Param("type") String type,
-                             @Param("sourceEnv") IOEnv sourceEnv,
-                             @Param("targetID") Long targetID,
-                             @Param("targetEnv") IOEnv targetEnv);
+    void removeInputRelation(
+            @Param("type") String type,
+            @Param("sourceEnv") IOEnv sourceEnv,
+            @Param("targetID") Long targetID,
+            @Param("targetEnv") IOEnv targetEnv);
 }

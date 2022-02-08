@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.scheduler;
 import org.apache.linkis.common.listener.Event;
 import org.apache.linkis.common.listener.EventListener;
 
-
 public interface AsyncRefExecutionSchedulerListener extends EventListener {
 
     void onEvent(AsyncResponseRefEvent event);
@@ -28,7 +27,7 @@ public interface AsyncRefExecutionSchedulerListener extends EventListener {
 
     @Override
     default void onEventError(Event event, Throwable t) {
-        if(event instanceof AsyncResponseRefEvent) {
+        if (event instanceof AsyncResponseRefEvent) {
             onEventError((AsyncResponseRefEvent) event, t);
         }
     }

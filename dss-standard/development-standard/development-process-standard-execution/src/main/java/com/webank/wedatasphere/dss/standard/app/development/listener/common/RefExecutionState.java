@@ -16,11 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
-
 public enum RefExecutionState {
-    /**
-     * NodeExecution的状态枚举
-     */
+    /** NodeExecution的状态枚举 */
     Accepted(0, "Accepted"),
     Running(1, "Running"),
     Success(2, "Success"),
@@ -31,7 +28,7 @@ public enum RefExecutionState {
     private int code;
     private String status;
 
-    private RefExecutionState(int code, String status){
+    private RefExecutionState(int code, String status) {
         this.code = code;
         this.status = status;
     }
@@ -44,24 +41,21 @@ public enum RefExecutionState {
         return status;
     }
 
-    public static boolean isCompleted(RefExecutionState state){
+    public static boolean isCompleted(RefExecutionState state) {
         return Success.equals(state) || Failed.equals(state) || Killed.equals(state);
     }
 
-    public static boolean isCompleted(String state){
-        return Success.status.equals(state) ||
-                Failed.status.equals(state) ||
-                Killed.status.equals(state);
+    public static boolean isCompleted(String state) {
+        return Success.status.equals(state)
+                || Failed.status.equals(state)
+                || Killed.status.equals(state);
     }
 
-    public boolean isCompleted(){
+    public boolean isCompleted() {
         return isCompleted(this);
     }
 
-    public boolean isSuccess(){
+    public boolean isSuccess() {
         return Success.equals(this);
     }
-
-
-
 }

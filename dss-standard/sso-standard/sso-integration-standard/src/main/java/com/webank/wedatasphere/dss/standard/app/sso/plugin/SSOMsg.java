@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.plugin;
 
-
 public interface SSOMsg {
 
     String getRedirectUrl();
@@ -24,5 +23,4 @@ public interface SSOMsg {
     String getWorkspaceName();
 
     String getUser();
-
 }

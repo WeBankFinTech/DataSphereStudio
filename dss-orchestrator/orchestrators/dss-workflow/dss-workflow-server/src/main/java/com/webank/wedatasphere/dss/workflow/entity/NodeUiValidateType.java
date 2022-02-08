@@ -17,36 +17,20 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 public enum NodeUiValidateType {
-    /**
-     * 不校验，None不能和下面的校验类型搭配
-     */
+    /** 不校验，None不能和下面的校验类型搭配 */
     None,
-    /**
-     * 整数类型
-     */
+    /** 整数类型 */
     NumInterval,
-    /**
-     * 在这几个中
-     */
+    /** 在这几个中 */
     OFT,
-    /**
-     * 浮点数
-     */
+    /** 浮点数 */
     FloatInterval,
-    /**
-     * 包含
-     */
+    /** 包含 */
     Contains,
-    /**
-     * 正则
-     */
+    /** 正则 */
     Regex,
-    /**
-     * 自定义函数..validate_range是函数名,由前台提供
-     */
+    /** 自定义函数..validate_range是函数名,由前台提供 */
     Function,
-    /**
-     * 不为空
-     */
+    /** 不为空 */
     Required
 }

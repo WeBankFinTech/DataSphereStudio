@@ -16,23 +16,23 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email.sender;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.Attachment;
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException;
-
-import java.util.Properties;
-import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-public class SpringJavaEmailSender extends AbstractEmailSender {
+import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 
+import java.util.Properties;
+
+public class SpringJavaEmailSender extends AbstractEmailSender {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringJavaEmailSender.class);
 
@@ -41,11 +41,27 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     public SpringJavaEmailSender() {
         try {
             Properties prop = new Properties();
-            prop.put("mail.smtp.auth", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_AUTH().getValue()));
-            prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
-            prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
-            prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
-            prop.put("mail.smtp.timeout", Integer.parseInt(SendEmailAppConnConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
+            prop.put(
+                    "mail.smtp.auth",
+                    Boolean.parseBoolean(
+                            SendEmailAppConnConfiguration.EMAIL_SMTP_AUTH().getValue()));
+            prop.put(
+                    "mail.smtp.starttls.enable",
+                    Boolean.parseBoolean(
+                            SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
+            prop.put(
+                    "mail.smtp.starttls.required",
+                    Boolean.parseBoolean(
+                            SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED()
+                                    .getValue()));
+            prop.put(
+                    "mail.smtp.ssl.enable",
+                    Boolean.parseBoolean(
+                            SendEmailAppConnConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
+            prop.put(
+                    "mail.smtp.timeout",
+                    Integer.parseInt(
+                            SendEmailAppConnConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
             javaMailSender.setJavaMailProperties(prop);
         } catch (Exception e) {
             logger.error("Failed to read mail properties, roll back to default values.", e);
@@ -71,7 +87,8 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
             if (StringUtils.isBlank(email.getFrom())) {
-                messageHelper.setFrom(SendEmailAppConnConfiguration.DEFAULT_EMAIL_FROM().getValue());
+                messageHelper.setFrom(
+                        SendEmailAppConnConfiguration.DEFAULT_EMAIL_FROM().getValue());
             } else {
                 messageHelper.setFrom(email.getFrom());
             }
@@ -84,7 +101,10 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
                 messageHelper.setBcc(email.getBcc());
             }
             for (Attachment attachment : email.getAttachments()) {
-                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(attachment.getBase64Str(), attachment.getMediaType()));
+                messageHelper.addAttachment(
+                        attachment.getName(),
+                        new ByteArrayDataSource(
+                                attachment.getBase64Str(), attachment.getMediaType()));
             }
             messageHelper.setText(email.getContent(), true);
         } catch (Exception e) {

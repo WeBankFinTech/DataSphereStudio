@@ -26,13 +26,8 @@ public class IOJobHook implements DssJobHook {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void preExecute(DssJob job) {
-
-
-    }
+    public void preExecute(DssJob job) {}
 
     @Override
-    public void postExecute(DssJob job) {
-
-    }
+    public void postExecute(DssJob job) {}
 }

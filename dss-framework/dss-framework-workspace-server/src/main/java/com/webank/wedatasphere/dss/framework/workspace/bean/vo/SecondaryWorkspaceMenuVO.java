@@ -16,14 +16,12 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
 public class SecondaryWorkspaceMenuVO {
     private int id;
     private String name;
     private String url;
 
-    public SecondaryWorkspaceMenuVO() {
-    }
+    public SecondaryWorkspaceMenuVO() {}
 
     public SecondaryWorkspaceMenuVO(int id, String name, String url) {
         this.id = id;

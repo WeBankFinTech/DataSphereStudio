@@ -29,15 +29,16 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultOrchestratorFrameworkAppConn extends AbstractAppConn implements OrchestratorFrameworkAppConn, OnlyDevelopmentAppConn {
+public class DefaultOrchestratorFrameworkAppConn extends AbstractAppConn
+        implements OrchestratorFrameworkAppConn, OnlyDevelopmentAppConn {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrchestratorFrameworkAppConn.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DefaultOrchestratorFrameworkAppConn.class);
 
     private OrchestratorFrameworkStandard orchestratorFrameworkStandard;
     private AppDesc appDesc;
 
     private final List<AppStandard> standards = new ArrayList<>();
-
 
     @Override
     public void setAppDesc(AppDesc appDesc) {

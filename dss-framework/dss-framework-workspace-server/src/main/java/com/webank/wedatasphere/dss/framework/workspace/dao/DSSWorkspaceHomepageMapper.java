@@ -16,16 +16,14 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepage;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepage;
 
+import java.util.List;
 
 public interface DSSWorkspaceHomepageMapper extends BaseMapper<DSSWorkspaceHomepage> {
 
     public void insertBatch(@Param("list") List<DSSWorkspaceHomepage> homepageList);
-
 }

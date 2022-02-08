@@ -21,21 +21,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-
-
 public class LambdaHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LambdaHelper.class);
 
-    public static <T> Consumer<T> consumerWrapper(Consumer<T> consumer){
+    public static <T> Consumer<T> consumerWrapper(Consumer<T> consumer) {
         return t -> {
-            try{
+            try {
                 consumer.accept(t);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOGGER.error("Failed to do with {} ", t, e);
             }
         };
     }
-
-
 }

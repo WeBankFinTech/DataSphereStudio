@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.parser;
 
-import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanWorkflow;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
@@ -25,11 +24,16 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
+
+import org.apache.commons.beanutils.BeanUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.beanutils.BeanUtils;
+
+
+import com.google.gson.JsonObject;
 
 public class AzkabanWorkflowParser implements WorkflowParser {
 
@@ -47,10 +51,10 @@ public class AzkabanWorkflowParser implements WorkflowParser {
     private AzkabanWorkflow addEndNodeForFlowName(AzkabanWorkflow flow) {
         DSSNodeDefault endNode = new DSSNodeDefault();
         List<WorkflowNode> endNodeList = getFlowEndJobList(flow);
-        if(flow.getRootFlow()){
+        if (flow.getRootFlow()) {
             endNode.setId(flow.getName());
             endNode.setName(flow.getName());
-        }else{
+        } else {
             endNode.setId(flow.getName() + "_");
             endNode.setName(flow.getName() + "_");
         }
@@ -58,8 +62,8 @@ public class AzkabanWorkflowParser implements WorkflowParser {
         Map<String, Object> jobContentMap = new HashMap<>();
         endNode.setJobContent(jobContentMap);
         if (!endNodeList.isEmpty()) {
-            if(endNodeList.size() == 1 ) {
-                if(endNodeList.get(0).getName().equals(flow.getName())){
+            if (endNodeList.size() == 1) {
+                if (endNodeList.get(0).getName().equals(flow.getName())) {
                     return flow;
                 }
             }

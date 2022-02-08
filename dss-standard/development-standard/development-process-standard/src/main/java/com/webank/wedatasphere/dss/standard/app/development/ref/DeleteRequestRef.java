@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-
-public interface DeleteRequestRef extends WorkspaceRequestRef {
-}
+public interface DeleteRequestRef extends WorkspaceRequestRef {}

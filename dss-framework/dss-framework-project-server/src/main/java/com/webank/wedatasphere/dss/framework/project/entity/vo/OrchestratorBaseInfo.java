@@ -20,79 +20,51 @@ import java.util.Date;
 import java.util.List;
 
 public class OrchestratorBaseInfo {
-    /**
-     * 主键ID
-     */
+    /** 主键ID */
     private Long id;
 
-    /**
-     * 空间id
-     */
+    /** 空间id */
     private Long workspaceId;
 
-    /**
-     * 工程id
-     */
+    /** 工程id */
     private Long projectId;
 
-    /**
-     * 编排模式id（工作流,调用orchestrator服务返回的orchestratorId）
-     */
+    /** 编排模式id（工作流,调用orchestrator服务返回的orchestratorId） */
     private Long orchestratorId;
 
-    /**
-     * 编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId）
-     */
+    /** 编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId） */
     private Long orchestratorVersionId;
 
-    /**
-     * 编排名称
-     */
+    /** 编排名称 */
     private String orchestratorName;
 
-    /**
-     * 编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_orchestratorment_mode)
-     */
+    /** 编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_orchestratorment_mode) */
     private String orchestratorMode;
 
-    /**
-     * 编排方式
-     */
-    //private String  orchestratorWay;
+    /** 编排方式 */
+    // private String  orchestratorWay;
 
-    /**
-     * 用途
-     */
+    /** 用途 */
     private String uses;
 
-    /**
-     * 描述
-     */
+    /** 描述 */
     private String description;
 
-    /**
-     * 创建人
-     */
+    /** 创建人 */
     private String createUser;
 
-    /**
-     * 创建时间
-     */
+    /** 创建时间 */
     private Date createTime;
 
-    /**
-     * 更新人
-     */
+    /** 更新人 */
     private String updateUser;
 
-    /**
-     * 更新时间
-     */
+    /** 更新时间 */
     private Date updateTime;
 
     private List<String> orchestratorWays;
 
-    private boolean flowEditLockExist=false;
+    private boolean flowEditLockExist = false;
 
     public Boolean getEditable() {
         return editable;
@@ -110,18 +82,11 @@ public class OrchestratorBaseInfo {
         this.releasable = releasable;
     }
 
-    /**
-     * 工程权限等级：0-查看，1-编辑，2-发布
-     */
-
+    /** 工程权限等级：0-查看，1-编辑，2-发布 */
     private Boolean editable;
 
-    /**
-     * 工作流是否可发布
-     */
+    /** 工作流是否可发布 */
     private Boolean releasable;
-
-
 
     public Long getId() {
         return id;

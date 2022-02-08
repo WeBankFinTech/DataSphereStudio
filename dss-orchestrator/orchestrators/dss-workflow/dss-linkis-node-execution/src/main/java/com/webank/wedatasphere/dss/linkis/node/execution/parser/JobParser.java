@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.linkis.node.execution.parser;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 
-
 public interface JobParser {
 
     void parseJob(Job job) throws Exception;
-
 }

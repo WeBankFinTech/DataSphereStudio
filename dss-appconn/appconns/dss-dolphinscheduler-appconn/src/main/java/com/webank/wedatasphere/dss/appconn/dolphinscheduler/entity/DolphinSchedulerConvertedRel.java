@@ -20,7 +20,6 @@ public class DolphinSchedulerConvertedRel extends PreConversionRelImpl implement
 
     @Override
     public ProjectToRelConversionRequestRef getDSSToRelConversionRequestRef() {
-        return (ProjectToRelConversionRequestRef)super.getDSSToRelConversionRequestRef();
+        return (ProjectToRelConversionRequestRef) super.getDSSToRelConversionRequestRef();
     }
-
 }

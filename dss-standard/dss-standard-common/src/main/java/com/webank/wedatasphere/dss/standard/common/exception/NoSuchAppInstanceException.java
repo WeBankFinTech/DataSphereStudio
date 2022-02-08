@@ -18,15 +18,14 @@ package com.webank.wedatasphere.dss.standard.common.exception;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public class NoSuchAppInstanceException extends DSSErrorException {
 
     public NoSuchAppInstanceException(int errCode, String desc) {
         super(errCode, desc);
     }
 
-    public NoSuchAppInstanceException(int errCode, String desc, String ip, int port, String serviceKind) {
+    public NoSuchAppInstanceException(
+            int errCode, String desc, String ip, int port, String serviceKind) {
         super(errCode, desc, ip, port, serviceKind);
     }
-
 }

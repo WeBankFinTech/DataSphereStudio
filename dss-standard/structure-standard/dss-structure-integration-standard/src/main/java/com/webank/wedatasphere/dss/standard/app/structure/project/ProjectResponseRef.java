@@ -19,14 +19,11 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-import java.util.List;
 import java.util.Map;
-
 
 public interface ProjectResponseRef extends ResponseRef {
 
     Long getProjectRefId();
 
     Map<AppInstance, Long> getProjectRefIds();
-
 }

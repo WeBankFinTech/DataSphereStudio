@@ -22,8 +22,10 @@ import java.util.concurrent.ExecutorService;
 
 public class DssJobThreadPool {
 
-    private static ExecutorService executorService = Utils.newFixedThreadPool(1000, "project-publish", false);
-    private static ExecutorService executorServiceDeamon = Utils.newFixedThreadPool(1000, "project-publish-deamon", true);
+    private static ExecutorService executorService =
+            Utils.newFixedThreadPool(1000, "project-publish", false);
+    private static ExecutorService executorServiceDeamon =
+            Utils.newFixedThreadPool(1000, "project-publish-deamon", true);
 
     public static ExecutorService get() {
         return executorService;

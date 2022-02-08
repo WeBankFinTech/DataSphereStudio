@@ -36,11 +36,10 @@ public class DSSProject implements Project {
     private Integer workspaceId;
     private String workspaceName;
 
-    //stitched
+    // stitched
     private List<String> viewUsers;
     private List<String> editUsers;
     private List<String> executeUsers;
-
 
     @Override
     public Long getId() {
@@ -172,22 +171,44 @@ public class DSSProject implements Project {
 
     @Override
     public String toString() {
-        return "DSSProject{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createBy='" + createBy + '\'' +
-                ", username='" + username + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", product='" + product + '\'' +
-                ", applicationArea=" + applicationArea +
-                ", business='" + business + '\'' +
-                ", workspaceId=" + workspaceId +
-                ", workspaceName='" + workspaceName + '\'' +
-                ", viewUsers=" + viewUsers +
-                ", editUsers=" + editUsers +
-                ", executeUsers=" + executeUsers +
-                '}';
+        return "DSSProject{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + ", createBy='"
+                + createBy
+                + '\''
+                + ", username='"
+                + username
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateTime="
+                + updateTime
+                + ", product='"
+                + product
+                + '\''
+                + ", applicationArea="
+                + applicationArea
+                + ", business='"
+                + business
+                + '\''
+                + ", workspaceId="
+                + workspaceId
+                + ", workspaceName='"
+                + workspaceName
+                + '\''
+                + ", viewUsers="
+                + viewUsers
+                + ", editUsers="
+                + editUsers
+                + ", executeUsers="
+                + executeUsers
+                + '}';
     }
 }

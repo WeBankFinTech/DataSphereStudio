@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 
-
 public class ResponseOperateOrchestrator {
 
     private JobStatus jobStatus;

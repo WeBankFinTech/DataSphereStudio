@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.async;
 
-
-public interface RefExecutionListener {
-}
+public interface RefExecutionListener {}

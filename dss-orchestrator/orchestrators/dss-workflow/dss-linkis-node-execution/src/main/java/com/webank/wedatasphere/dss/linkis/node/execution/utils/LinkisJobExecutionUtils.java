@@ -16,46 +16,42 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
-
 public class LinkisJobExecutionUtils {
 
+    public static final Gson gson =
+            new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
 
+    public static final Gson gson1 =
+            new GsonBuilder()
+                    .disableHtmlEscaping()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                    .create();
 
-    public final static  Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
-
-    public final static Gson gson1 = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
-
-
-
-    public static BMLResource getBMLResourceByJson(String json){
+    public static BMLResource getBMLResourceByJson(String json) {
         return gson.fromJson(json, BMLResource.class);
     }
 
-    public static ArrayList<BMLResource> getResourceListByJson(String json){
-        if(StringUtils.isEmpty(json)){
+    public static ArrayList<BMLResource> getResourceListByJson(String json) {
+        if (StringUtils.isEmpty(json)) {
             return null;
         }
-        return gson.fromJson(json,new TypeToken<List<BMLResource>>() {}.getType());
+        return gson.fromJson(json, new TypeToken<List<BMLResource>>() {}.getType());
     }
 
+    public static Boolean isCommonAppConnJob(String engineType) {
 
-    public static Boolean isCommonAppConnJob(String engineType){
-
-        return  LinkisJobExecutionConfiguration.APPCONN.equalsIgnoreCase(engineType);
-
+        return LinkisJobExecutionConfiguration.APPCONN.equalsIgnoreCase(engineType);
     }
 
-    public static final Integer IDX_FOR_LOG_TYPE_ALL = 3;// 0: Error 1: WARN 2:INFO 3: ALL
-
-
-
+    public static final Integer IDX_FOR_LOG_TYPE_ALL = 3; // 0: Error 1: WARN 2:INFO 3: ALL
 }

@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.workflow.entity;
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
-
 public class DSSFlowImportParam {
 
     String workspaceName;
@@ -27,7 +26,7 @@ public class DSSFlowImportParam {
     String projectName;
     String version;
     String orcVersion;
-    //TODO 目前只支持一个rootflow导入，只带了一个ContextID
+    // TODO 目前只支持一个rootflow导入，只带了一个ContextID
     String contextId;
     IOEnv sourceEnv;
     Workspace workspace;

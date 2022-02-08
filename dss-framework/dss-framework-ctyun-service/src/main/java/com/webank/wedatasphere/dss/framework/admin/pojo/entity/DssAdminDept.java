@@ -1,31 +1,23 @@
 package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.webank.wedatasphere.dss.framework.admin.common.domain.BaseEntity;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.webank.wedatasphere.dss.framework.admin.common.domain.BaseEntity;
-//import io.swagger.annotations.ApiModel;
-//import io.swagger.annotations.ApiModelProperty;
-//import lombok.Data;
-//import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 /**
- * <p>
  * 部门表
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01
  */
-//@Data
-//@EqualsAndHashCode(callSuper = false)
-//@ApiModel(value="DssAdminDept对象", description="部门表")
+// @Data
+// @EqualsAndHashCode(callSuper = false)
+// @ApiModel(value="DssAdminDept对象", description="部门表")
 public class DssAdminDept extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -65,128 +57,103 @@ public class DssAdminDept extends BaseEntity implements Serializable {
     /** 子部门 */
     private List<DssAdminDept> children = new ArrayList<DssAdminDept>();
 
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Long deptId)
-    {
-        this.id = deptId;
-    }
-    public void setDeptId(Long deptId)
-    {
+    public void setId(Long deptId) {
         this.id = deptId;
     }
 
-    public Long getParentId()
-    {
+    public void setDeptId(Long deptId) {
+        this.id = deptId;
+    }
+
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId)
-    {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
-    public String getAncestors()
-    {
+    public String getAncestors() {
         return ancestors;
     }
 
-    public void setAncestors(String ancestors)
-    {
+    public void setAncestors(String ancestors) {
         this.ancestors = ancestors;
     }
 
-
-    public String getDeptName()
-    {
+    public String getDeptName() {
         return deptName;
     }
 
-    public void setDeptName(String deptName)
-    {
+    public void setDeptName(String deptName) {
         this.deptName = deptName;
     }
 
-    public String getOrderNum()
-    {
+    public String getOrderNum() {
         return orderNum;
     }
 
-    public void setOrderNum(String orderNum)
-    {
+    public void setOrderNum(String orderNum) {
         this.orderNum = orderNum;
     }
 
-    public String getLeader()
-    {
+    public String getLeader() {
         return leader;
     }
 
-    public void setLeader(String leader)
-    {
+    public void setLeader(String leader) {
         this.leader = leader;
     }
 
-    public String getPhone()
-    {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone)
-    {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public String getEmail()
-    {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email)
-    {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status)
-    {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getDelFlag()
-    {
+    public String getDelFlag() {
         return delFlag;
     }
 
-    public void setDelFlag(String delFlag)
-    {
+    public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
     }
 
-    public String getParentName()
-    {
+    public String getParentName() {
         return parentName;
     }
 
-    public void setParentName(String parentName)
-    {
+    public void setParentName(String parentName) {
         this.parentName = parentName;
     }
 
-    public List<DssAdminDept> getChildren()
-    {
+    public List<DssAdminDept> getChildren() {
         return children;
     }
 
-    public void setChildren(List<DssAdminDept> children)
-    {
+    public void setChildren(List<DssAdminDept> children) {
         this.children = children;
     }
 
@@ -209,5 +176,4 @@ public class DssAdminDept extends BaseEntity implements Serializable {
                 .append("updateTime", getUpdateTime())
                 .toString();
     }
-
 }

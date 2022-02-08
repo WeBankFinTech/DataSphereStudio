@@ -4,15 +4,19 @@ import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DolphinSchedulerProjectResponseRef extends AbstractResponseRef implements ProjectResponseRef {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectResponseRef.class);
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DolphinSchedulerProjectResponseRef extends AbstractResponseRef
+        implements ProjectResponseRef {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DolphinSchedulerProjectResponseRef.class);
 
     private String errorMsg;
 
@@ -63,5 +67,4 @@ public class DolphinSchedulerProjectResponseRef extends AbstractResponseRef impl
     public void setProjectRefId(Long projectRefId) {
         this.projectRefId = projectRefId;
     }
-
 }

@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.standard.common.core;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,40 +27,50 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-
-public abstract class AbstractAppIntegrationStandard<Service extends AppIntegrationService, SSORequestService extends AppService>
-    implements AppIntegrationStandard<SSORequestService> {
+public abstract class AbstractAppIntegrationStandard<
+                Service extends AppIntegrationService, SSORequestService extends AppService>
+        implements AppIntegrationStandard<SSORequestService> {
 
     private final Map<AppInstance, List<Service>> appServices = new HashMap<>();
     private SSORequestService ssoRequestService;
 
-    protected <T extends Service> T getOrCreate(AppInstance appInstance, Supplier<T> create, Class<T> clazz) {
-        Supplier<T> createAndPut = () -> {
-            T t = create.get();
-            if(t == null) {
-                return null;
-            }
-            t.setSSORequestService(ssoRequestService);
-            t.setAppInstance(appInstance);
-            initService(t);
-            appServices.get(appInstance).add(t);
-            return t;
-        };
-        if(!appServices.containsKey(appInstance)) {
+    protected <T extends Service> T getOrCreate(
+            AppInstance appInstance, Supplier<T> create, Class<T> clazz) {
+        Supplier<T> createAndPut =
+                () -> {
+                    T t = create.get();
+                    if (t == null) {
+                        return null;
+                    }
+                    t.setSSORequestService(ssoRequestService);
+                    t.setAppInstance(appInstance);
+                    initService(t);
+                    appServices.get(appInstance).add(t);
+                    return t;
+                };
+        if (!appServices.containsKey(appInstance)) {
             synchronized (appServices) {
-                if(!appServices.containsKey(appInstance)) {
+                if (!appServices.containsKey(appInstance)) {
                     appServices.put(appInstance, new ArrayList<>());
                     return createAndPut.get();
                 }
             }
         }
         final List<Service> services = appServices.get(appInstance);
-        Supplier<Optional<T>> filterService = () -> services.stream().filter(clazz::isInstance).findFirst().map(service -> (T) service);
-        return filterService.get().orElseGet(() -> {
-            synchronized (services) {
-                return filterService.get().orElseGet(createAndPut);
-            }
-        });
+        Supplier<Optional<T>> filterService =
+                () ->
+                        services.stream()
+                                .filter(clazz::isInstance)
+                                .findFirst()
+                                .map(service -> (T) service);
+        return filterService
+                .get()
+                .orElseGet(
+                        () -> {
+                            synchronized (services) {
+                                return filterService.get().orElseGet(createAndPut);
+                            }
+                        });
     }
 
     protected <T extends Service> void initService(T service) {}

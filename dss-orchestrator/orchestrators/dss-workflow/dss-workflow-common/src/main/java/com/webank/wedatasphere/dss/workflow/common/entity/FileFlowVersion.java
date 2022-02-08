@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.common.entity;
 
 /*
-    FileFlowVersion 接口
- */
+   FileFlowVersion 接口
+*/
 public interface FileFlowVersion extends FlowVersion {
     Object getFlowFile();
 

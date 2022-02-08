@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.common.protocol.project;
 
-
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
@@ -31,7 +30,11 @@ public class ProjectRelationResponse {
 
     private Long appInstanceProjectId;
 
-    public ProjectRelationResponse(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels, Long appInstanceProjectId) {
+    public ProjectRelationResponse(
+            Long dssProjectId,
+            String appConnName,
+            List<DSSLabel> dssLabels,
+            Long appInstanceProjectId) {
         this.dssProjectId = dssProjectId;
         this.appConnName = appConnName;
         this.dssLabels = dssLabels;

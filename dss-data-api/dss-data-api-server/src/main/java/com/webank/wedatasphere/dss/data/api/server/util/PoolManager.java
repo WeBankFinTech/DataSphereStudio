@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.data.api.server.util;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
-import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -12,6 +9,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class PoolManager {
 
@@ -19,7 +20,7 @@ public class PoolManager {
 
     private static Lock deleteLock = new ReentrantLock();
 
-    //所有数据源的连接池存在map里
+    // 所有数据源的连接池存在map里
     static Map<Integer, DruidDataSource> map = new HashMap<>();
 
     public static DruidDataSource getJdbcConnectionPool(DataSource ds) {
@@ -36,7 +37,7 @@ public class PoolManager {
                     druidDataSource.setUsername(ds.getUsername());
                     druidDataSource.setPassword(ds.getPwd());
                     druidDataSource.setDriverClassName(ds.getClassName());
-                    druidDataSource.setConnectionErrorRetryAttempts(3);       //失败后重连次数
+                    druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
                     druidDataSource.setBreakAfterAcquireFailure(true);
 
                     map.put(ds.getDatasourceId(), druidDataSource);
@@ -51,7 +52,7 @@ public class PoolManager {
         }
     }
 
-    //删除数据库连接池
+    // 删除数据库连接池
     public static void removeJdbcConnectionPool(Integer id) {
         deleteLock.lock();
         try {
@@ -65,7 +66,6 @@ public class PoolManager {
         } finally {
             deleteLock.unlock();
         }
-
     }
 
     public static DruidPooledConnection getPooledConnection(DataSource ds) throws SQLException {

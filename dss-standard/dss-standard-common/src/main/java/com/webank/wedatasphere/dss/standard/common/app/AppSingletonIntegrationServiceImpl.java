@@ -18,34 +18,43 @@ package com.webank.wedatasphere.dss.standard.common.app;
 
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-
-public class AppSingletonIntegrationServiceImpl<O extends Operation, T extends AppService> extends AppIntegrationServiceImpl<T> {
+public class AppSingletonIntegrationServiceImpl<O extends Operation, T extends AppService>
+        extends AppIntegrationServiceImpl<T> {
 
     private final List<O> appOperations = new ArrayList<>();
 
     protected <TO extends O> TO getOrCreate(Supplier<TO> create, Class<TO> clazz) {
-        Supplier<TO> createAndPut = () -> {
-            TO t = create.get();
-            if(t == null) {
-                return null;
-            }
-            initOperation(t);
-            appOperations.add(t);
-            return t;
-        };
-        Supplier<Optional<TO>> filterOperation = () -> appOperations.stream().filter(clazz::isInstance).findFirst().map(operation -> (TO) operation);
-        return filterOperation.get().orElseGet(() -> {
-            synchronized (appOperations) {
-                return filterOperation.get().orElseGet(createAndPut);
-            }
-        });
+        Supplier<TO> createAndPut =
+                () -> {
+                    TO t = create.get();
+                    if (t == null) {
+                        return null;
+                    }
+                    initOperation(t);
+                    appOperations.add(t);
+                    return t;
+                };
+        Supplier<Optional<TO>> filterOperation =
+                () ->
+                        appOperations.stream()
+                                .filter(clazz::isInstance)
+                                .findFirst()
+                                .map(operation -> (TO) operation);
+        return filterOperation
+                .get()
+                .orElseGet(
+                        () -> {
+                            synchronized (appOperations) {
+                                return filterOperation.get().orElseGet(createAndPut);
+                            }
+                        });
     }
 
     protected void initOperation(O operation) {}
-
 }

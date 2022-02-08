@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class DSSWorkspaceMenuVO {
     private int id;
@@ -26,9 +24,7 @@ public class DSSWorkspaceMenuVO {
     private String icon;
     private List<SecondaryWorkspaceMenuVO> subMenus;
 
-    public DSSWorkspaceMenuVO(){
-
-    }
+    public DSSWorkspaceMenuVO() {}
 
     public DSSWorkspaceMenuVO(int id, String name, List<SecondaryWorkspaceMenuVO> subMenus) {
         this.id = id;
@@ -60,7 +56,6 @@ public class DSSWorkspaceMenuVO {
         this.subMenus = subMenus;
     }
 
-
     public String getIcon() {
         return icon;
     }
@@ -68,8 +63,4 @@ public class DSSWorkspaceMenuVO {
     public void setIcon(String icon) {
         this.icon = icon;
     }
-
-
-
-
 }

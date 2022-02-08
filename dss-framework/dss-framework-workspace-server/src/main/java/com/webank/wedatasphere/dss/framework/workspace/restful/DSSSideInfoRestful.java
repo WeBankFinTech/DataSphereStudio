@@ -16,9 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,26 +30,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-
-@RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
+@RequestMapping(
+        path = "/dss/framework/workspace",
+        produces = {"application/json"})
 @RestController
 public class DSSSideInfoRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSSideInfoRestful.class);
 
-    @Autowired
-    private DSSSideInfoService dssSideInfoService;
+    @Autowired private DSSSideInfoService dssSideInfoService;
 
-    @RequestMapping(path ="getSideInfos", method = RequestMethod.GET)
-    public Message getSideInfos(HttpServletRequest request, @RequestParam(required = false, name = "workspaceID") Integer workspaceId){
+    @RequestMapping(path = "getSideInfos", method = RequestMethod.GET)
+    public Message getSideInfos(
+            HttpServletRequest request,
+            @RequestParam(required = false, name = "workspaceID") Integer workspaceId) {
         String username = SecurityFilter.getLoginUsername(request);
-        try{
+        try {
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));
-            return Message.ok("获取侧边栏成功").data("presentations", dssSideInfoService.getSidebarVOList(username, workspaceId,isEnglish));
-        }catch(Exception e){
-            LOGGER.info("Fail to get sideinfos for user {} in workspace {}",username, workspaceId, e);
+            return Message.ok("获取侧边栏成功")
+                    .data(
+                            "presentations",
+                            dssSideInfoService.getSidebarVOList(username, workspaceId, isEnglish));
+        } catch (Exception e) {
+            LOGGER.info(
+                    "Fail to get sideinfos for user {} in workspace {}", username, workspaceId, e);
             return Message.error("获取侧边栏失败");
         }
     }
-
 }

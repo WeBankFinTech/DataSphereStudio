@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 
-public abstract class AbstractRefExecutionService extends AbstractDevelopmentService implements RefExecutionService {
+public abstract class AbstractRefExecutionService extends AbstractDevelopmentService
+        implements RefExecutionService {
 
-   public abstract RefExecutionOperation createRefExecutionOperation();
+    public abstract RefExecutionOperation createRefExecutionOperation();
 
-   @Override
-   public RefExecutionOperation getRefExecutionOperation() {
-          return getOrCreate(this::createRefExecutionOperation, RefExecutionOperation.class);
-   }
-
+    @Override
+    public RefExecutionOperation getRefExecutionOperation() {
+        return getOrCreate(this::createRefExecutionOperation, RefExecutionOperation.class);
+    }
 }

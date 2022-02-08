@@ -16,18 +16,17 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
 
 public interface OrchestratorDeleteRequestRef extends DeleteRequestRef, CommonRequestRef {
 
     /**
      * 检索数据库中关联的第三方应用的id
+     *
      * @param appId
      */
     void setAppId(Long appId);
 
     Long getAppId();
-
 }

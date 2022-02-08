@@ -22,9 +22,7 @@ public interface DSSUserService {
 
     public void saveWorkspaceUser(String userName);
 
-
     public Long getUserID(String userName);
-
 
     public DSSUser getByUsername(String userName);
 

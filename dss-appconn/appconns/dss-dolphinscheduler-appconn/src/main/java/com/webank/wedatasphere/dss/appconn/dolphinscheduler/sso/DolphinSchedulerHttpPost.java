@@ -1,8 +1,8 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
 
-import java.net.URI;
-
 import org.apache.http.client.methods.HttpPost;
+
+import java.net.URI;
 
 /**
  * The type Dolphin scheduler http post.
@@ -28,5 +28,4 @@ public class DolphinSchedulerHttpPost extends HttpPost implements UserInfo {
     public String getUser() {
         return user;
     }
-
 }

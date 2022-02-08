@@ -17,5 +17,13 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 public enum NodeUiType {
-    Input, Text, Upload, Tag, Select, MultiSelect, Disable, Binding, MultiBinding
+    Input,
+    Text,
+    Upload,
+    Tag,
+    Select,
+    MultiSelect,
+    Disable,
+    Binding,
+    MultiBinding
 }

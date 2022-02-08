@@ -82,5 +82,4 @@ public class LinkisJob {
     public void setCommand(String command) {
         this.command = command;
     }
-
 }

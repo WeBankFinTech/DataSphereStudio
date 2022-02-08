@@ -47,5 +47,4 @@ public class VisualisDevelopmentIntegrationStandard extends AbstractDevelopmentI
     protected RefQueryService createRefQueryService() {
         return new VisualisQueryService();
     }
-
 }

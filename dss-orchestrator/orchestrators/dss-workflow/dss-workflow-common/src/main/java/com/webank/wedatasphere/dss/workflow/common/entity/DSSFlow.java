@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class DSSFlow implements Flow {
     private Long id;
     private String name;
-    private Boolean state; //0,1代表发布过和未发布过
+    private Boolean state; // 0,1代表发布过和未发布过
     private String source;
     private String description;
     private Date createTime;
@@ -32,14 +32,12 @@ public class DSSFlow implements Flow {
     private Boolean isRootFlow;
     private Integer rank;
     private Long projectID;
-    private String  linkedAppConnNames;
-    private String  dssLabels;
+    private String linkedAppConnNames;
+    private String dssLabels;
 
-    /**
-     * 0disable 1 enable  0表示工作流从来没存过，发布的时候忽略
-     */
-
+    /** 0disable 1 enable 0表示工作流从来没存过，发布的时候忽略 */
     private Boolean hasSaved;
+
     private String uses;
     private List<DSSFlow> children;
     private String flowType;
@@ -101,7 +99,6 @@ public class DSSFlow implements Flow {
         this.name = name;
     }
 
-
     @Override
     public String getDescription() {
         return description;
@@ -118,7 +115,7 @@ public class DSSFlow implements Flow {
     }
 
     public void addChildren(DSSFlow children) {
-        if (this.children == null){
+        if (this.children == null) {
             this.children = new ArrayList<>();
         }
         this.children.add(children);

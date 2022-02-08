@@ -23,5 +23,4 @@ public interface SSOIntegrationStandardFactory extends Serializable {
     void init();
 
     SSOIntegrationStandard getSSOIntegrationStandard();
-
 }

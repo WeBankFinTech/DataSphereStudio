@@ -15,12 +15,12 @@
  */
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref.impl;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorOpenRequestRef;
 
 import java.util.List;
 import java.util.Map;
-
 
 public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRef {
 
@@ -29,6 +29,7 @@ public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRe
     private Long appId;
     private String secondaryType;
     private List<DSSLabel> dssLabels;
+
     @Override
     public void setOrchestratorId(Long orchestratorId) {
         this.orchestratorId = orchestratorId;
@@ -41,7 +42,7 @@ public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRe
 
     @Override
     public void setUserName(String userName) {
-     this.userName = userName;
+        this.userName = userName;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRe
 
     @Override
     public void setSecondaryType(String secondaryType) {
-      this.secondaryType = secondaryType;
+        this.secondaryType = secondaryType;
     }
 
     @Override
@@ -85,9 +86,7 @@ public class OrchestratorOpenRequestRefImpl implements OrchestratorOpenRequestRe
     }
 
     @Override
-    public void setParameter(String key, Object value) {
-
-    }
+    public void setParameter(String key, Object value) {}
 
     @Override
     public Map<String, Object> getParameters() {

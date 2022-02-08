@@ -16,15 +16,14 @@
 
 package com.webank.wedatasphere.dss.workflow.entity.vo;
 
-
 import com.webank.wedatasphere.dss.workflow.entity.NodeUiValidateTrigger;
 import com.webank.wedatasphere.dss.workflow.entity.NodeUiValidateType;
 
 public class NodeUiValidateVO implements Comparable<NodeUiValidateVO> {
 
-    private NodeUiValidateType validateType; //前台的自定义校验函数名,对应validateType
+    private NodeUiValidateType validateType; // 前台的自定义校验函数名,对应validateType
     private String validateRange;
-    private NodeUiValidateTrigger trigger;  //blur change
+    private NodeUiValidateTrigger trigger; // blur change
     private String message;
 
     public NodeUiValidateType getValidateType() {
@@ -59,10 +58,9 @@ public class NodeUiValidateVO implements Comparable<NodeUiValidateVO> {
         this.validateRange = validateRange;
     }
 
-
     @Override
     public int compareTo(NodeUiValidateVO o) {
-        //Required校验类型要在数组最前，否则前台无法渲染
+        // Required校验类型要在数组最前，否则前台无法渲染
         return o.validateType.ordinal() - this.validateType.ordinal();
     }
 }

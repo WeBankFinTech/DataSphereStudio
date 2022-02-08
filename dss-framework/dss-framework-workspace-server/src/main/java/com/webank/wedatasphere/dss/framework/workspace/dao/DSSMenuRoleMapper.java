@@ -16,16 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenuRole;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenuRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole;
 
+import java.util.List;
 
 public interface DSSMenuRoleMapper extends BaseMapper<DSSMenuRole> {
 
     public void insertBatch(@Param("list") List<DSSWorkspaceMenuRole> menuRoles);
-
 }

@@ -16,11 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 import org.apache.ibatis.annotations.Mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 
 @Mapper
-public interface SidebarContentMapper extends BaseMapper<SidebarContent> {
-}
+public interface SidebarContentMapper extends BaseMapper<SidebarContent> {}

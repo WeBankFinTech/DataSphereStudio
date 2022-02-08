@@ -27,17 +27,20 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequest
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SchedulisProjectCreationOperation implements ProjectCreationOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectCreationOperation.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(SchedulisProjectCreationOperation.class);
 
     private ProjectService schedulisProjectService;
 
@@ -45,24 +48,25 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
 
     private String managerUrl;
 
-    private static  Long DEFAULT_PROJECT_ID = 0L;
+    private static Long DEFAULT_PROJECT_ID = 0L;
 
-
-    public SchedulisProjectCreationOperation() {
-    }
+    public SchedulisProjectCreationOperation() {}
 
     @Override
     public void init() {
-        this.projectUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ?
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
-        managerUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
+        this.projectUrl =
+                this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/")
+                        ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager"
+                        : this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
+        managerUrl =
+                this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/")
+                        ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager"
+                        : this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
     }
 
-
     @Override
-    public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef createProject(ProjectRequestRef requestRef)
+            throws ExternalOperationFailedException {
         LOGGER.info("begin to create project in schedulis project is {}", requestRef.getName());
         SchedulisProjectResponseRef responseRef = new SchedulisProjectResponseRef();
         Map<String, String> params = new HashMap<>();
@@ -71,7 +75,12 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
         params.put("description", requestRef.getDescription());
         try {
 
-            String entStr = SSORequestWTSS.requestWTSSWithSSOPost(projectUrl,params,this.schedulisProjectService,requestRef.getWorkspace());
+            String entStr =
+                    SSORequestWTSS.requestWTSSWithSSOPost(
+                            projectUrl,
+                            params,
+                            this.schedulisProjectService,
+                            requestRef.getWorkspace());
             LOGGER.error("新建工程 {}, azkaban 返回的信息是 {}", requestRef.getName(), entStr);
             String message = AzkabanUtils.handleAzkabanEntity(entStr);
             if (!"success".equals(message)) {
@@ -79,13 +88,13 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
             }
 
         } catch (final Exception t) {
-            LOGGER.error("Failed to create project!",t);
+            LOGGER.error("Failed to create project!", t);
         }
         try {
-            DEFAULT_PROJECT_ID = getSchedulisProjectId(requestRef.getName(),requestRef);
+            DEFAULT_PROJECT_ID = getSchedulisProjectId(requestRef.getName(), requestRef);
         } catch (Exception e) {
-            SchedulisExceptionUtils.dealErrorException(60051, "failed to get project id", e,
-                    ExternalOperationFailedException.class);
+            SchedulisExceptionUtils.dealErrorException(
+                    60051, "failed to get project id", e, ExternalOperationFailedException.class);
         }
 
         responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
@@ -99,10 +108,9 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
         this.schedulisProjectService = (SchedulisProjectService) service;
     }
 
-    /**
-     * Get project ID.
-     */
-    public Long getSchedulisProjectId(String projectName, ProjectRequestRef requestRef) throws Exception {
+    /** Get project ID. */
+    public Long getSchedulisProjectId(String projectName, ProjectRequestRef requestRef)
+            throws Exception {
 
         Map<String, Object> params = new HashMap<>();
         params.put("ajax", "getProjectId");
@@ -110,17 +118,23 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
 
         long projectId = 0L;
         try {
-            String content = SSORequestWTSS.requestWTSSWithSSOGet(this.managerUrl, params, this.schedulisProjectService.getSSORequestService(), requestRef.getWorkspace());
+            String content =
+                    SSORequestWTSS.requestWTSSWithSSOGet(
+                            this.managerUrl,
+                            params,
+                            this.schedulisProjectService.getSSORequestService(),
+                            requestRef.getWorkspace());
             LOGGER.info("Get  schedulis  project  id return str is " + content);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readValue(content, JsonNode.class);
             projectId = jsonNode.get("projectId").getLongValue();
         } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(60051, "failed to create project in schedulis", t,
+            SchedulisExceptionUtils.dealErrorException(
+                    60051,
+                    "failed to create project in schedulis",
+                    t,
                     ExternalOperationFailedException.class);
         }
         return projectId;
     }
-
-
 }

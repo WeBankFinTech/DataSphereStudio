@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.linkis.node.execution.execution;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
-import java.io.Closeable;
 
+import java.io.Closeable;
 
 public interface LinkisNodeExecution extends Closeable {
 
@@ -39,6 +39,4 @@ public interface LinkisNodeExecution extends Closeable {
     int getResultSize(Job job);
 
     String getResult(Job job, int index, int maxSize);
-
-
 }

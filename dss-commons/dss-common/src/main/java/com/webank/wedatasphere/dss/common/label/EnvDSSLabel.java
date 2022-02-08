@@ -19,12 +19,11 @@ package com.webank.wedatasphere.dss.common.label;
 import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
 import org.apache.linkis.manager.label.entity.Feature;
 import org.apache.linkis.manager.label.entity.annon.ValueSerialNum;
+
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Used to mark the env of this micro-services.
- */
+/** Used to mark the env of this micro-services. */
 public class EnvDSSLabel extends DSSLabel {
 
     public static final String DSS_ENV_LABEL_KEY = "DSSEnv";
@@ -61,8 +60,9 @@ public class EnvDSSLabel extends DSSLabel {
     public static void main(String[] args) {
         Map<String, Object> map = new HashMap<>();
         map.put(DSS_ENV_LABEL_KEY, "dev");
-        EnvDSSLabel label = (EnvDSSLabel) LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(map).get(0);
+        EnvDSSLabel label =
+                (EnvDSSLabel)
+                        LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(map).get(0);
         System.out.println("label: " + label.getEnv());
     }
-
 }

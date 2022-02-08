@@ -26,7 +26,8 @@ public abstract class AbstractOnlySSOAppConn extends AbstractAppConn implements 
     private static final SSOIntegrationStandard SSO_INTEGRATION_STANDARD;
 
     static {
-        SSOIntegrationStandardFactory ssoIntegrationStandardFactory = ClassUtils.getInstanceOrWarn(SSOIntegrationStandardFactory.class);
+        SSOIntegrationStandardFactory ssoIntegrationStandardFactory =
+                ClassUtils.getInstanceOrWarn(SSOIntegrationStandardFactory.class);
         ssoIntegrationStandardFactory.init();
         SSO_INTEGRATION_STANDARD = ssoIntegrationStandardFactory.getSSOIntegrationStandard();
     }

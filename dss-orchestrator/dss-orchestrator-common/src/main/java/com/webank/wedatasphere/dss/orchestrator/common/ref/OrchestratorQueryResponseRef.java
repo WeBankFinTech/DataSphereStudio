@@ -21,8 +21,8 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
 import java.util.List;
 
-
-public interface OrchestratorQueryResponseRef  extends ResponseRef {
+public interface OrchestratorQueryResponseRef extends ResponseRef {
     List<OrchestratorVo> getOrchestratorVos();
+
     void setOrchestratorVoList(List<OrchestratorVo> orchestratorVoList);
 }

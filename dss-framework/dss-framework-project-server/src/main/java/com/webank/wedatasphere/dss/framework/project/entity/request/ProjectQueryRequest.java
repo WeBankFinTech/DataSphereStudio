@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
+import java.io.Serializable;
 
 @XmlRootElement
 public class ProjectQueryRequest implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     private Long id;
 

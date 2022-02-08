@@ -59,7 +59,7 @@ public class MetaReader<T> {
 
     public List<T> read(InputStream inputStream) throws IOException {
         try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader);) {
+                BufferedReader reader = new BufferedReader(streamReader); ) {
             readTable(reader);
         }
         readT();
@@ -68,10 +68,11 @@ public class MetaReader<T> {
 
     public String read(InputStream inputStream, String key) throws IOException {
         try (InputStreamReader streamReader = new InputStreamReader(inputStream);
-             BufferedReader reader = new BufferedReader(streamReader);) {
+                BufferedReader reader = new BufferedReader(streamReader); ) {
             readTable(reader);
         }
-        String comment = comments.stream().filter(c -> c.contains(key + ":")).findFirst().orElse("");
+        String comment =
+                comments.stream().filter(c -> c.contains(key + ":")).findFirst().orElse("");
         String[] split = comment.split(":");
         if (split.length > 1) return split[1];
         return "";
@@ -81,7 +82,9 @@ public class MetaReader<T> {
         body.stream().map(DSSExceptionUtils.map(this::lineToT)).forEach(datas::add);
     }
 
-    private T lineToT(List<String> list) throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParseException {
+    private T lineToT(List<String> list)
+            throws IllegalAccessException, InstantiationException, NoSuchFieldException,
+                    ParseException {
         T t = tClass.newInstance();
         for (int i = 0; i < list.size(); i++) {
             String valueStr = list.get(i);
@@ -95,7 +98,9 @@ public class MetaReader<T> {
                     value = valueStr;
                     break;
                 case "Date":
-                    value = new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy", Locale.ENGLISH).parse(valueStr);
+                    value =
+                            new SimpleDateFormat("EEE MMM dd HH:mm:ss ZZZ yyyy", Locale.ENGLISH)
+                                    .parse(valueStr);
                     break;
                 case "Long":
                     value = Long.valueOf(valueStr);
@@ -133,13 +138,13 @@ public class MetaReader<T> {
                 continue;
             }
             if (firstLine) {
-                //handle head
+                // handle head
                 fields = Arrays.stream(line.split(seperator)).collect(Collectors.toList());
                 firstLine = false;
                 continue;
             }
             body.add(Arrays.stream(line.split(seperator)).collect(Collectors.toList()));
-            //handle body
+            // handle body
         }
     }
 

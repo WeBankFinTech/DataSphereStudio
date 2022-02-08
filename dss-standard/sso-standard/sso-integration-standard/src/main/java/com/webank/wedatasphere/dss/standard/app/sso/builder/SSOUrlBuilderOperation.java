@@ -16,10 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.builder;
 
-
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
-
 
 public interface SSOUrlBuilderOperation extends Operation {
 

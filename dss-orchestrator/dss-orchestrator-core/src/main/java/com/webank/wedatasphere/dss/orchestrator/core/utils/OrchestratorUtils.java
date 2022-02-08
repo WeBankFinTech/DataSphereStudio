@@ -16,23 +16,21 @@
 
 package com.webank.wedatasphere.dss.orchestrator.core.utils;
 
-
 public class OrchestratorUtils {
 
-        public static String generateNewVersion() {
-            return "v000001";
-        }
+    public static String generateNewVersion() {
+        return "v000001";
+    }
 
-        /**
-         * 注意： flow版本更新需要同步更新ContextID
-         * @param oldVersion
-         * @return
-         */
-        public static String increaseVersion(String oldVersion) {
-            int num = Integer.parseInt(oldVersion.substring(1)) + 1;
-            String tmp = "00000" + num;
-            return "v" + tmp.substring(tmp.length() - 6);
-        }
-
-
+    /**
+     * 注意： flow版本更新需要同步更新ContextID
+     *
+     * @param oldVersion
+     * @return
+     */
+    public static String increaseVersion(String oldVersion) {
+        int num = Integer.parseInt(oldVersion.substring(1)) + 1;
+        String tmp = "00000" + num;
+        return "v" + tmp.substring(tmp.length() - 6);
+    }
 }

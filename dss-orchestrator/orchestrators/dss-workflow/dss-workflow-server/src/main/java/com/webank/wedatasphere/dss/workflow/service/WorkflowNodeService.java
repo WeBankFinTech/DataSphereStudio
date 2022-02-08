@@ -15,6 +15,7 @@
  */
 
 package com.webank.wedatasphere.dss.workflow.service;
+
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
@@ -30,25 +31,29 @@ public interface WorkflowNodeService {
 
     /**
      * 根据参数创建外部节点
+     *
      * @param node 节点信息
      * @return 返回jobContent的Map，工作流会将该Map存储起来，作为该节点的关键关联信息，用于后续的CRUD和执行。
      */
-    Map<String, Object> createNode(String userName, AbstractAppConnNode node
-                                   ) throws ExternalOperationFailedException;
+    Map<String, Object> createNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException;
 
-    void deleteNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException;
+    void deleteNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException;
 
-    Map<String, Object> updateNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException;
+    Map<String, Object> updateNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException;
 
-    default Map<String, Object> refresh(String userName,AbstractAppConnNode node) {
+    default Map<String, Object> refresh(String userName, AbstractAppConnNode node) {
         return null;
     }
 
-    default void copyNode(String userName, AbstractAppConnNode newNode, AbstractAppConnNode oldNode)  { }
+    default void copyNode(
+            String userName, AbstractAppConnNode newNode, AbstractAppConnNode oldNode) {}
 
-    default void setNodeReadOnly(String userName, AbstractAppConnNode node)  {}
+    default void setNodeReadOnly(String userName, AbstractAppConnNode node) {}
 
-    default List<AbstractAppConnNode> listNodes(String userName, AbstractAppConnNode node)  {
+    default List<AbstractAppConnNode> listNodes(String userName, AbstractAppConnNode node) {
         return new ArrayList<>();
     }
 
@@ -56,10 +61,16 @@ public interface WorkflowNodeService {
         return null;
     }
 
-    default Map<String, Object> importNode(String userName, AbstractAppConnNode node, Map<String, Object> resourceMap, Workspace workspace, String orcVersion) throws Exception {
+    default Map<String, Object> importNode(
+            String userName,
+            AbstractAppConnNode node,
+            Map<String, Object> resourceMap,
+            Workspace workspace,
+            String orcVersion)
+            throws Exception {
         return null;
     }
 
-    String getNodeJumpUrl(Map<String, Object> params, AbstractAppConnNode node) throws ExternalOperationFailedException;
-
+    String getNodeJumpUrl(Map<String, Object> params, AbstractAppConnNode node)
+            throws ExternalOperationFailedException;
 }

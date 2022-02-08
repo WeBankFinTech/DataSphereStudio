@@ -23,5 +23,4 @@ public interface Ref {
 
     @Override
     String toString();
-
 }

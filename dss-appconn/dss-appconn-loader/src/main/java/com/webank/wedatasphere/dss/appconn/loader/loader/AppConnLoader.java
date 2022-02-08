@@ -16,14 +16,10 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.loader;
 
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 
-/**
- * Load interface specification of appconn
- * */
+/** Load interface specification of appconn */
 public interface AppConnLoader {
 
     AppConn getAppConn(String appConnName, String spi, String homePath) throws Exception;
-
 }

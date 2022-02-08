@@ -16,6 +16,13 @@
 
 package com.webank.wedatasphere.dss.appconn.manager.service;
 
+import org.apache.linkis.common.conf.Configuration;
+import org.apache.linkis.httpclient.config.ClientConfig;
+import org.apache.linkis.httpclient.dws.DWSHttpClient;
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+
 import com.webank.wedatasphere.dss.appconn.manager.action.GetAppConnInfoAction;
 import com.webank.wedatasphere.dss.appconn.manager.action.GetAppConnInfosAction;
 import com.webank.wedatasphere.dss.appconn.manager.action.GetAppInstancesAction;
@@ -25,28 +32,35 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfoResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfosResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppInstancesResult;
-import org.apache.linkis.common.conf.Configuration;
-import org.apache.linkis.httpclient.config.ClientConfig;
-import org.apache.linkis.httpclient.dws.DWSHttpClient;
-import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
-import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
-import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+
 import java.util.List;
 
 import static com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerClientConfiguration.LINKIS_ADMIN_USER;
 
 public class AppConnInfoServiceImpl implements AppConnInfoService {
 
-    private ClientConfig clientConfig = DWSClientConfigBuilder.newBuilder().setDWSVersion("v1").addServerUrl(Configuration.getGateWayURL())
-        .connectionTimeout(300000).discoveryEnabled(false).setAuthenticationStrategy(new TokenAuthenticationStrategy()).setAuthTokenKey(LINKIS_ADMIN_USER.getValue())
-        .setAuthTokenValue(AppConnManagerClientConfiguration.DSS_APPCONN_CLIENT_TOKEN.getValue()).maxConnectionSize(50).readTimeout(300000).build();
-    private DWSHttpClient client = new DWSHttpClient((DWSClientConfig) clientConfig, "AppConn-Client-");
+    private ClientConfig clientConfig =
+            DWSClientConfigBuilder.newBuilder()
+                    .setDWSVersion("v1")
+                    .addServerUrl(Configuration.getGateWayURL())
+                    .connectionTimeout(300000)
+                    .discoveryEnabled(false)
+                    .setAuthenticationStrategy(new TokenAuthenticationStrategy())
+                    .setAuthTokenKey(LINKIS_ADMIN_USER.getValue())
+                    .setAuthTokenValue(
+                            AppConnManagerClientConfiguration.DSS_APPCONN_CLIENT_TOKEN.getValue())
+                    .maxConnectionSize(50)
+                    .readTimeout(300000)
+                    .build();
+    private DWSHttpClient client =
+            new DWSHttpClient((DWSClientConfig) clientConfig, "AppConn-Client-");
 
     @Override
     public List<? extends AppConnInfo> getAppConnInfos() {
-        GetAppConnInfosAction getAppConnInfosAction =new GetAppConnInfosAction();
+        GetAppConnInfosAction getAppConnInfosAction = new GetAppConnInfosAction();
         getAppConnInfosAction.setUser(LINKIS_ADMIN_USER.getValue());
-        GetAppConnInfosResult result = (GetAppConnInfosResult) client.execute(getAppConnInfosAction);
+        GetAppConnInfosResult result =
+                (GetAppConnInfosResult) client.execute(getAppConnInfosAction);
         return result.getAppConnInfos();
     }
 

@@ -17,9 +17,9 @@
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
 import org.apache.linkis.manager.label.entity.Label;
+
 import java.util.List;
 import java.util.Map;
-
 
 public interface LinkisJob {
 
@@ -36,5 +36,4 @@ public interface LinkisJob {
     Map<String, Object> getParams();
 
     List<Label<?>> getLabels();
-
 }

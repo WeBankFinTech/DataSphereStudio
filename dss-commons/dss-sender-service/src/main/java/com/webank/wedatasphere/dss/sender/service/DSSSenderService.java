@@ -17,7 +17,9 @@
 package com.webank.wedatasphere.dss.sender.service;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+
 import org.apache.linkis.rpc.Sender;
+
 import java.util.List;
 
 public interface DSSSenderService {
@@ -35,6 +37,4 @@ public interface DSSSenderService {
     Sender getSchedulerWorkflowSender();
 
     Sender getProjectServerSender();
-
 }
-

@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.app.development.listener.common.Asyn
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.LongTermRefExecutionAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AsyncResponseRef;
 
-
 public interface LongTermRefExecutionScheduler {
 
     void addAsyncResponse(AsyncExecutionResponseRef response);
@@ -32,5 +31,4 @@ public interface LongTermRefExecutionScheduler {
     void start();
 
     void stop();
-
 }

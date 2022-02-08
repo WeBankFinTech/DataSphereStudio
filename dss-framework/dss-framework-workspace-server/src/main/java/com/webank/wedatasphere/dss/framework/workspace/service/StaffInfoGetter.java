@@ -20,11 +20,9 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 
 import java.util.List;
 
-
 public interface StaffInfoGetter {
 
     List<StaffInfo> getAllUsers();
 
     String getFullOrgNameByUsername(String username);
-
 }

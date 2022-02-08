@@ -1,14 +1,14 @@
 package com.webank.wedatasphere.dss.framework.admin.service;
 
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
-import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
+
+import com.baomidou.mybatisplus.extension.service.IService;
+
 /**
- * <p>
  * 用户信息表 服务类
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01

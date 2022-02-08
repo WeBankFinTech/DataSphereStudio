@@ -64,5 +64,3 @@ public class AppMapEdge {
         this.edgeType = edgeType;
     }
 }
-
-

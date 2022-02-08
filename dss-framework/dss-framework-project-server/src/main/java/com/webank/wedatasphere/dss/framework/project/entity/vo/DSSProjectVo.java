@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
-import java.util.List;
-
-
 public class DSSProjectVo {
 
     private Long id;
@@ -50,5 +47,4 @@ public class DSSProjectVo {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }

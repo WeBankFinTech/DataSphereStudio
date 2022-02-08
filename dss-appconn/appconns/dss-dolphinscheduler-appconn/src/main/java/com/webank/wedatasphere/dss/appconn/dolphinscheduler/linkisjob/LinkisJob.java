@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -20,9 +20,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob;
 
 import java.util.Map;
 
-/**
- * Created by v_wbjftang on 2019/11/1.
- */
+/** Created by v_wbjftang on 2019/11/1. */
 public class LinkisJob {
     private String name;
     private String type;
@@ -87,5 +85,4 @@ public class LinkisJob {
     public void setCommand(String command) {
         this.command = command;
     }
-
 }

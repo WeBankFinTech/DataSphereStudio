@@ -29,5 +29,4 @@ public interface AppInstanceInfo {
     String getLabels();
 
     String getEnhanceJson();
-
 }

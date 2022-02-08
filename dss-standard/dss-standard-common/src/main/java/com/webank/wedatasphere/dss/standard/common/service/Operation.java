@@ -16,13 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.common.service;
 
-
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-/**
- * Operation是顶层的操作类,对于操作来说，传入一个RequestRef,返回一个ResponseRef
- */
-public interface Operation<K extends RequestRef, V extends ResponseRef> {
-
-}
+/** Operation是顶层的操作类,对于操作来说，传入一个RequestRef,返回一个ResponseRef */
+public interface Operation<K extends RequestRef, V extends ResponseRef> {}

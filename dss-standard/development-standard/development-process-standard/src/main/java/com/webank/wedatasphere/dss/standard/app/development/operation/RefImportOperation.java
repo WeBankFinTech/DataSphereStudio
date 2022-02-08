@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefImportOperation<K extends RequestRef> extends DevelopmentOperation<K, ResponseRef> {
+public interface RefImportOperation<K extends RequestRef>
+        extends DevelopmentOperation<K, ResponseRef> {
 
     ResponseRef importRef(K requestRef) throws ExternalOperationFailedException;
-
 }

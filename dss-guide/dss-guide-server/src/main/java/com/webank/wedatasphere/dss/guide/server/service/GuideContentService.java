@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author suyc
- * @Classname GuideContentService
- * @Description TODO
- * @Date 2021/12/21 20:11
- * @Created by suyc
+ * @author suyc @Classname GuideContentService @Description TODO @Date 2021/12/21 20:11 @Created by
+ *     suyc
  */
 public interface GuideContentService {
     public boolean saveGuideContent(GuideContent guideGroup);

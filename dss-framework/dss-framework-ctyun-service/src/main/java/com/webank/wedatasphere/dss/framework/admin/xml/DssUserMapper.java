@@ -1,16 +1,17 @@
 package com.webank.wedatasphere.dss.framework.admin.xml;
 
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 /**
- * <p>
  * 用户信息表 Mapper 接口
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01
@@ -40,7 +41,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param id 用户ID
      * @return 用户对象信息
      */
-    public DssAdminUser selectUserById(Long  id);
+    public DssAdminUser selectUserById(Long id);
 
     /**
      * 新增用户信息
@@ -58,7 +59,6 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      */
     public int updateUser(DssAdminUser user);
 
-
     /**
      * 重置用户密码
      *
@@ -75,7 +75,6 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @return 结果
      */
     public int deleteUserById(Long id);
-
 
     /**
      * 校验用户名称是否唯一
@@ -100,8 +99,4 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @return 结果
      */
     public DssAdminUser checkEmailUnique(String email);
-
-
-
-
 }

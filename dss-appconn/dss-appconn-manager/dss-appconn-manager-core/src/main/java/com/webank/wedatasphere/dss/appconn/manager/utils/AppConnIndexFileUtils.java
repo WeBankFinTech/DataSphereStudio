@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.manager.utils;
 
 import com.webank.wedatasphere.dss.appconn.manager.exception.AppConnIndexFileWarnException;
 import com.webank.wedatasphere.dss.common.entity.Resource;
+
 import java.io.File;
 import java.util.Arrays;
 
@@ -31,11 +32,14 @@ public class AppConnIndexFileUtils {
 
     public static File getIndexFile(File parent) {
         File[] indexFiles = parent.listFiles((p, fileName) -> isIndexFile(fileName));
-        if(indexFiles == null) {
+        if (indexFiles == null) {
             return null;
-        }else if(indexFiles.length > 1) {
-            throw new AppConnIndexFileWarnException(20533, "More than one index files exists, indexFile list: " + Arrays.asList(indexFiles));
-        } else if(indexFiles.length == 0) {
+        } else if (indexFiles.length > 1) {
+            throw new AppConnIndexFileWarnException(
+                    20533,
+                    "More than one index files exists, indexFile list: "
+                            + Arrays.asList(indexFiles));
+        } else if (indexFiles.length == 0) {
             return null;
         } else {
             return indexFiles[0];
@@ -44,15 +48,18 @@ public class AppConnIndexFileUtils {
 
     public static boolean isLatestIndex(File parent, Resource resource) {
         File indexFile = getIndexFile(parent);
-        if(indexFile == null) {
+        if (indexFile == null) {
             return false;
         }
-        String version = indexFile.getName().replaceAll(INDEX_FILE_PREFIX, "").replaceAll(INDEX_FILE_SUFFIX, "");
+        String version =
+                indexFile
+                        .getName()
+                        .replaceAll(INDEX_FILE_PREFIX, "")
+                        .replaceAll(INDEX_FILE_SUFFIX, "");
         return resource.getVersion().equals(version);
     }
 
     public static String getIndexFileName(Resource resource) {
         return INDEX_FILE_PREFIX + resource.getVersion() + INDEX_FILE_SUFFIX;
     }
-
 }

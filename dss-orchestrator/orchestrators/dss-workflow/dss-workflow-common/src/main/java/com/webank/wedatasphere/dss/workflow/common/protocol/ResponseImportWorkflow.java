@@ -20,9 +20,7 @@ import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 
 import java.util.List;
 
-
 public class ResponseImportWorkflow {
-
 
     private JobStatus status;
 

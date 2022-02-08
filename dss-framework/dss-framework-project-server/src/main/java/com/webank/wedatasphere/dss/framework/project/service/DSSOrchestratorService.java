@@ -17,8 +17,6 @@
 package com.webank.wedatasphere.dss.framework.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import java.util.*;
-
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.project.entity.*;
 import com.webank.wedatasphere.dss.framework.project.entity.request.*;
@@ -27,27 +25,30 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 
+import java.util.*;
 
 public interface DSSOrchestratorService extends IService<DSSOrchestrator> {
 
+    void saveOrchestrator(
+            OrchestratorCreateRequest orchestratorCreateRequest,
+            OrchestratorCreateResponseRef responseRef,
+            String username)
+            throws DSSFrameworkErrorException, DSSProjectErrorException;
 
-    void saveOrchestrator(OrchestratorCreateRequest orchestratorCreateRequest, OrchestratorCreateResponseRef responseRef, String username) throws DSSFrameworkErrorException, DSSProjectErrorException;
+    void updateOrchestrator(OrchestratorModifyRequest orchestratorModifyRequest, String username)
+            throws DSSFrameworkErrorException, DSSProjectErrorException;
 
+    List<OrchestratorBaseInfo> getListByPage(
+            OrchestratorRequest orchestratorRequest, String username);
 
-    void updateOrchestrator(OrchestratorModifyRequest orchestratorModifyRequest, String username) throws DSSFrameworkErrorException, DSSProjectErrorException;
+    boolean deleteOrchestrator(OrchestratorDeleteRequest orchestratorDeleteRequest, String username)
+            throws DSSProjectErrorException;
 
+    void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName)
+            throws DSSFrameworkErrorException;
 
-    List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
-
-
-    boolean deleteOrchestrator(OrchestratorDeleteRequest orchestratorDeleteRequest, String username) throws DSSProjectErrorException;
-
-
-    void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
-
-
-    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest)throws DSSFrameworkErrorException;
-
+    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest)
+            throws DSSFrameworkErrorException;
 
     DSSOrchestrator getOrchestratorById(Long id);
 

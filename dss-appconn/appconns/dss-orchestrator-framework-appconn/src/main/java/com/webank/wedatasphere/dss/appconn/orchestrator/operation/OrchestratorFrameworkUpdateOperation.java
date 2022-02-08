@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
+import org.apache.linkis.rpc.Sender;
+
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestUpdateOrchestrator;
@@ -26,29 +28,39 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateO
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkUpdateOperation implements
-        RefUpdateOperation<OrchestratorUpdateRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkUpdateOperation.class);
+public class OrchestratorFrameworkUpdateOperation
+        implements RefUpdateOperation<OrchestratorUpdateRef> {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(OrchestratorFrameworkUpdateOperation.class);
 
     @Override
-    public CommonResponseRef updateRef(OrchestratorUpdateRef requestRef) throws ExternalOperationFailedException {
-        if (null == requestRef){
+    public CommonResponseRef updateRef(OrchestratorUpdateRef requestRef)
+            throws ExternalOperationFailedException {
+        if (null == requestRef) {
             LOGGER.error("request ref is null, can not deal with null ref");
             return null;
         }
         LOGGER.info("Begin to ask to update orchestrator, requestRef is {}", requestRef);
-        RequestUpdateOrchestrator updateRequest = new RequestUpdateOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspaceName(), requestRef.getOrchestratorInfo(), requestRef.getDSSLabels());
+        RequestUpdateOrchestrator updateRequest =
+                new RequestUpdateOrchestrator(
+                        requestRef.getUserName(),
+                        requestRef.getWorkspaceName(),
+                        requestRef.getOrchestratorInfo(),
+                        requestRef.getDSSLabels());
         ResponseOperateOrchestrator updateResponse = null;
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
-        try{
+        Sender sender =
+                DSSSenderServiceFactory.getOrCreateServiceInstance()
+                        .getOrcSender(requestRef.getDSSLabels());
+        try {
             updateResponse = (ResponseOperateOrchestrator) sender.ask(updateRequest);
-        }catch(final Exception e){
-            DSSExceptionUtils.dealErrorException(60015, "update orchestrator ref failed", e,
+        } catch (final Exception e) {
+            DSSExceptionUtils.dealErrorException(
+                    60015,
+                    "update orchestrator ref failed",
+                    e,
                     ExternalOperationFailedException.class);
         }
         LOGGER.info("End to ask to update orchestrator, responseRef is {}", updateResponse);
@@ -62,6 +74,5 @@ public class OrchestratorFrameworkUpdateOperation implements
     }
 
     @Override
-    public void setDevelopmentService(DevelopmentService service) {
-    }
+    public void setDevelopmentService(DevelopmentService service) {}
 }

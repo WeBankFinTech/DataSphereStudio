@@ -1,11 +1,11 @@
 package com.webank.wedatasphere.dss.orange.node;
 
 import com.webank.wedatasphere.dss.orange.context.Context;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Set;
-
 
 public class TrimSqlNode implements SqlNode {
 
@@ -15,7 +15,12 @@ public class TrimSqlNode implements SqlNode {
     List<String> prefixesToOverride;
     List<String> suffixesToOverride;
 
-    public TrimSqlNode(SqlNode contents, String prefix, String suffix, List<String> prefixesToOverride, List<String> suffixesToOverride) {
+    public TrimSqlNode(
+            SqlNode contents,
+            String prefix,
+            String suffix,
+            List<String> prefixesToOverride,
+            List<String> suffixesToOverride) {
         this.contents = contents;
         this.prefix = prefix;
         this.suffix = suffix;
@@ -25,9 +30,9 @@ public class TrimSqlNode implements SqlNode {
 
     @Override
     public void apply(Context context) {
-        context.appendSql(" ");//标签类SqlNode先拼接空格，和前面的内容隔开
+        context.appendSql(" "); // 标签类SqlNode先拼接空格，和前面的内容隔开
         Context proxy = new Context(context.getData());
-//        FilterContext filterContext = new FilterContext(context);
+        //        FilterContext filterContext = new FilterContext(context);
         contents.apply(proxy);
         String sql = proxy.getSql().trim();
 
@@ -55,7 +60,6 @@ public class TrimSqlNode implements SqlNode {
         if (StringUtils.isNotBlank(sql) && StringUtils.isNotBlank(suffix)) {
             context.appendSql(suffix);
         }
-
     }
 
     @Override

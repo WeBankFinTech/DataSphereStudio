@@ -25,7 +25,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 
-
 @Mapper
 public interface DSSOrchestratorMapper extends BaseMapper<DSSOrchestrator> {
 
@@ -38,5 +37,3 @@ public interface DSSOrchestratorMapper extends BaseMapper<DSSOrchestrator> {
     @Delete("DELETE FROM dss_orchestrator_release_info WHERE id = #{id}")
     int removeOrchestratorReleaseInfoById(Long id);
 }
-
-

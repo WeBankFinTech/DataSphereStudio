@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -21,10 +21,7 @@ package com.webank.wedatasphere.dss.workflow.common.entity;
 import java.util.Date;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/3/22
- * Description:
- */
+/** created by cooperyang on 2020/3/22 Description: */
 public class DSSReleasedFlowVO {
     private Integer id;
     private String workflowName;
@@ -42,7 +39,7 @@ public class DSSReleasedFlowVO {
     private Long projectId;
     private FlowPriv flowPriv;
 
-    public static class FlowPriv{
+    public static class FlowPriv {
         private Integer privModel;
         private List<String> usernames;
 
@@ -63,7 +60,7 @@ public class DSSReleasedFlowVO {
         }
     }
 
-    public static class ScheduleInfo{
+    public static class ScheduleInfo {
         private String scheduleTime;
         private String alarmUserEmails;
         private String alarmLevel;
@@ -92,7 +89,6 @@ public class DSSReleasedFlowVO {
             this.alarmLevel = alarmLevel;
         }
     }
-
 
     public Integer getId() {
         return id;

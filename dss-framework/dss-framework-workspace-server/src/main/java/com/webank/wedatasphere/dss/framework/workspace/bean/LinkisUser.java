@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -27,6 +26,7 @@ import java.util.Date;
 public class LinkisUser {
     @TableId(type = IdType.AUTO)
     private Long id;
+
     private String username;
     private String name;
     private Boolean isFirstLogin;
@@ -80,5 +80,4 @@ public class LinkisUser {
     public void setFirstLogin(Boolean firstLogin) {
         isFirstLogin = firstLogin;
     }
-
 }

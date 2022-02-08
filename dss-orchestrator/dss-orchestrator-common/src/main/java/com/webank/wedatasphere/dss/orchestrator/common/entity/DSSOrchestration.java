@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
-
 public interface DSSOrchestration {
 
     Long getId();
@@ -24,5 +23,4 @@ public interface DSSOrchestration {
     String getName();
 
     String getDescription();
-
 }

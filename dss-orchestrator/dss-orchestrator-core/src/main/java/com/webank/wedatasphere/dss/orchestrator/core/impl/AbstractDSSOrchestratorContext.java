@@ -19,15 +19,14 @@ package com.webank.wedatasphere.dss.orchestrator.core.impl;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
+
 import java.util.HashMap;
 import java.util.Map;
-
 
 public abstract class AbstractDSSOrchestratorContext implements DSSOrchestratorContext {
 
     private boolean isClosed = false;
     private Map<String, Object> configMap = new HashMap<>();
-
 
     @Override
     public Map<String, Object> getConfigMap() {

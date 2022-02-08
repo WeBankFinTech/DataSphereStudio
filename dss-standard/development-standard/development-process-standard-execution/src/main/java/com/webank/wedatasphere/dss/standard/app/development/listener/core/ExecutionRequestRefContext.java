@@ -22,17 +22,15 @@ import org.apache.linkis.common.io.Record;
 import org.apache.linkis.common.io.resultset.ResultSet;
 import org.apache.linkis.common.io.resultset.ResultSetReader;
 import org.apache.linkis.common.io.resultset.ResultSetWriter;
+
 import java.util.HashMap;
 import java.util.Map;
 
-
 public interface ExecutionRequestRefContext {
-
 
     static final String TOKEN_USER_STR = "Token-User";
 
     static final String TOKEN_CODE_STR = "Token-Code";
-
 
     public Map<String, Object> getRuntimeMap();
 
@@ -42,11 +40,12 @@ public interface ExecutionRequestRefContext {
 
     LinkisJob fetchLinkisJob(long jobId);
 
-    //获取任务的所有的结果集路径
+    // 获取任务的所有的结果集路径
     FsPath[] fetchLinkisJobResultSetPaths(long jobId);
 
     /**
      * 获取本节点的操作用户
+     *
      * @return
      */
     public String getUser();
@@ -57,40 +56,38 @@ public interface ExecutionRequestRefContext {
 
     <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTableResultSetWriter();
 
-    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTableResultSetWriter(String resultSetAlias);
+    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTableResultSetWriter(
+            String resultSetAlias);
 
     <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTextResultSetWriter();
 
-    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTextResultSetWriter(String resultSetAlias);
+    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createTextResultSetWriter(
+            String resultSetAlias);
 
     <M extends MetaData, R extends Record> ResultSetWriter<M, R> createHTMLResultSetWriter();
 
-    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createHTMLResultSetWriter(String resultSetAlias);
+    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createHTMLResultSetWriter(
+            String resultSetAlias);
 
     <M extends MetaData, R extends Record> ResultSetWriter<M, R> createPictureResultSetWriter();
 
-    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createPictureResultSetWriter(String resultSetAlias);
+    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createPictureResultSetWriter(
+            String resultSetAlias);
 
-    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createResultSetWriter(ResultSet<? extends MetaData, ? extends Record> resultSet,
-        String resultSetAlias);
-
+    <M extends MetaData, R extends Record> ResultSetWriter<M, R> createResultSetWriter(
+            ResultSet<? extends MetaData, ? extends Record> resultSet, String resultSetAlias);
 
     <M extends MetaData, R extends Record> ResultSetReader<M, R> getResultSetReader(FsPath fsPath);
 
     void sendResultSet(ResultSetWriter<? extends MetaData, ? extends Record> resultSetWriter);
 
-    /**
-     *
-     * @return
-     */
+    /** @return */
     String getGatewayUrl();
 
-
-    default Map<String,String> getTokenHeader(String user){
+    default Map<String, String> getTokenHeader(String user) {
         Map<String, String> tokenHeader = new HashMap<>();
         tokenHeader.put(TOKEN_CODE_STR, "dss-AUTH");
         tokenHeader.put(TOKEN_USER_STR, user);
         return tokenHeader;
     }
-
 }

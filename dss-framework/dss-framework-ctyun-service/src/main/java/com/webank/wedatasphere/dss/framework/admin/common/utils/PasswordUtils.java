@@ -3,52 +3,41 @@ package com.webank.wedatasphere.dss.framework.admin.common.utils;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.PasswordResult;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.PositionBo;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PasswordUtils {
-    /**
-     * 密码强度正则匹配
-     */
-    private static final String PWD_STRENGTH_REGEX
-            = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*#_~?&^])[A-Za-z0-9@$!%*#_~?&^]{8,26}$";
+    /** 密码强度正则匹配 */
+    private static final String PWD_STRENGTH_REGEX =
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*#_~?&^])[A-Za-z0-9@$!%*#_~?&^]{8,26}$";
 
-    /**
-     * 密码以字母开头
-     */
+    /** 密码以字母开头 */
     private static final String PWD_STARTER_REGEX = "^[a-zA-z].*";
-    /**
-     * 字符表行数
-     */
+    /** 字符表行数 */
     private static final int CHAR_TABLE_ROW_NUM = 4;
-    /**
-     * 字符表列数
-     */
+    /** 字符表列数 */
     private static final int CHAR_TABLE_COLUMN_NUM = 13;
-    /**
-     * 常规字符表
-     */
-    private static final char[][] charTable = {{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\0'},
-            {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'},
-            {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\0', '\0'},
-            {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '\0', '\0', '\0'}};
-    /**
-     * shift下的字符表
-     */
+    /** 常规字符表 */
+    private static final char[][] charTable = {
+        {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\0'},
+        {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'},
+        {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\0', '\0'},
+        {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '\0', '\0', '\0'}
+    };
+    /** shift下的字符表 */
     private static final char[][] charTableWithShift = {
-            {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\0'},
-            {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', '|'},
-            {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', '\0', '\0'},
-            {'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?', '\0', '\0', '\0'}};
-    /**
-     * 加密编码
-     */
+        {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\0'},
+        {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', '|'},
+        {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', '\0', '\0'},
+        {'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?', '\0', '\0', '\0'}
+    };
+    /** 加密编码 */
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-    private PasswordUtils() {
-    }
+    private PasswordUtils() {}
 
     /**
      * 密码规则
@@ -74,13 +63,10 @@ public class PasswordUtils {
             return PasswordResult.PASSWORD_KEYBOARD_CONTINUOUS_ERROR;
         }
 
-
         return PasswordResult.PASSWORD_RULE_PASS;
     }
 
-    /**
-     * 键盘序检测
-     */
+    /** 键盘序检测 */
     private static boolean isKeyBoardContinuous(String password) {
         List<PositionBo> positions = new ArrayList<>();
 
@@ -96,9 +82,11 @@ public class PasswordUtils {
             PositionBo end = positions.get(i + 1);
             // 正向连续（asd）或者反向连续（dsa）
             if (front.getRow() == middle.getRow() && middle.getRow() == end.getRow()) {
-                if (front.getColumn() + 1 == middle.getColumn() && middle.getColumn() + 1 == end.getColumn()) {
+                if (front.getColumn() + 1 == middle.getColumn()
+                        && middle.getColumn() + 1 == end.getColumn()) {
                     return true;
-                } else if (front.getColumn() - 1 == middle.getColumn() && middle.getColumn() - 1 == end.getColumn()) {
+                } else if (front.getColumn() - 1 == middle.getColumn()
+                        && middle.getColumn() - 1 == end.getColumn()) {
                     return true;
                 }
             }
@@ -106,7 +94,8 @@ public class PasswordUtils {
             if (front.getColumn() == middle.getColumn() && middle.getColumn() == end.getColumn()) {
                 if (front.getRow() + 1 == middle.getRow() && middle.getRow() + 1 == end.getRow()) {
                     return true;
-                } else if (front.getRow() - 1 == middle.getRow() && middle.getRow() - 1 == end.getRow()) {
+                } else if (front.getRow() - 1 == middle.getRow()
+                        && middle.getRow() - 1 == end.getRow()) {
                     return true;
                 }
             }
@@ -124,6 +113,4 @@ public class PasswordUtils {
         }
         return null;
     }
-
-
 }

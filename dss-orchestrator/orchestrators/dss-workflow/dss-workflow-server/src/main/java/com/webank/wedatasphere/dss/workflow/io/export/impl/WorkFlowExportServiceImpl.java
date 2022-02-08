@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.export.impl;
 
+import org.apache.commons.lang.StringUtils;
 
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
@@ -35,56 +36,56 @@ import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private BMLService bmlService;
+    @Autowired private BMLService bmlService;
 
-    @Autowired
-    private WorkFlowParser workFlowParser;
+    @Autowired private WorkFlowParser workFlowParser;
 
-    @Autowired
-    private NodeExportService nodeExportService;
+    @Autowired private NodeExportService nodeExportService;
 
-    @Autowired
-    private MetaExportService metaExportService;
+    @Autowired private MetaExportService metaExportService;
 
-    @Autowired
-    private FlowMapper flowMapper;
+    @Autowired private FlowMapper flowMapper;
 
-    @Autowired
-    private DSSFlowService flowService;
-
+    @Autowired private DSSFlowService flowService;
 
     @Override
-    public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
-        //获取rootFlow,和所有子Flow
+    public String exportFlowInfo(
+            Long dssProjectId,
+            String projectName,
+            long rootFlowId,
+            String userName,
+            Workspace workspace,
+            List<DSSLabel> dssLabels)
+            throws Exception {
+        // 获取rootFlow,和所有子Flow
         DSSFlow rootFlow = flowMapper.selectFlowByID(rootFlowId);
         List<DSSFlow> dssFlowList = new ArrayList<>();
-        //生成rootflow及所有子flow
+        // 生成rootflow及所有子flow
         dssFlowList.add(rootFlow);
         getAllDssFlowsByRootflowId(rootFlow, dssFlowList);
-        //生成rootflow及所有子flow的Relations
+        // 生成rootflow及所有子flow的Relations
         List<Long> flowIds = dssFlowList.stream().map(DSSFlow::getId).collect(Collectors.toList());
-        List<DSSFlowRelation> flowRelations = flowIds.isEmpty() ? new ArrayList<>() : flowMapper.listFlowRelation(flowIds);
+        List<DSSFlowRelation> flowRelations =
+                flowIds.isEmpty() ? new ArrayList<>() : flowMapper.listFlowRelation(flowIds);
         String flowExportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
-        //标记当前导出为project导出
+        // 标记当前导出为project导出
         IoUtils.generateIOType(IOType.FLOW, flowExportSaveBasePath);
-        //标记当前导出环境
+        // 标记当前导出环境
         IoUtils.generateIOEnv(flowExportSaveBasePath);
         metaExportService.exportFlowBaseInfo(dssFlowList, flowRelations, flowExportSaveBasePath);
         logger.info(userName + "-开始导出Flow：" + rootFlow.getName());
@@ -92,17 +93,45 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
         for (DSSFlow dssFlow : dssFlowList) {
             if (dssFlow.getRootFlow()) {
-                String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";
-                //导出工作流json文件
-                String flowJson = downloadFlowJsonFromBml(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
+                String savePath =
+                        flowExportSaveBasePath
+                                + File.separator
+                                + dssFlow.getName()
+                                + File.separator
+                                + dssFlow.getName()
+                                + ".json";
+                // 导出工作流json文件
+                String flowJson =
+                        downloadFlowJsonFromBml(
+                                userName,
+                                dssFlow.getResourceId(),
+                                dssFlow.getBmlVersion(),
+                                savePath);
                 if (!dssFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", dssFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, dssProjectId, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, dssFlow, dssProjectId, flowExportSaveBasePath, workspace,dssLabels);
+                    exportFlowResources(
+                            userName,
+                            dssProjectId,
+                            flowExportSaveBasePath,
+                            flowJson,
+                            dssFlow.getName(),
+                            workspace,
+                            dssLabels);
+                    exportAllSubFlows(
+                            userName,
+                            dssFlow,
+                            dssProjectId,
+                            flowExportSaveBasePath,
+                            workspace,
+                            dssLabels);
                     dssFlows.add(dssFlow);
                 } else {
-                    String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, dssFlow.getName(), dssFlow.getBmlVersion());
+                    String warnMsg =
+                            String.format(
+                                    DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE,
+                                    dssFlow.getName(),
+                                    dssFlow.getBmlVersion());
                     logger.info(warnMsg);
                     throw new DSSErrorException(90033, warnMsg);
                 }
@@ -111,25 +140,59 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         if (dssFlows.isEmpty()) {
             throw new DSSErrorException(90037, "该工程没有可以导出的工作流,请检查工作流是否都为空");
         }
-        //打包导出工程
+        // 打包导出工程
         return ZipHelper.zipExportProject(flowExportSaveBasePath);
     }
 
-
-    private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectExportBasePath, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+    private void exportAllSubFlows(
+            String userName,
+            DSSFlow dssFlowParent,
+            Long projectId,
+            String projectExportBasePath,
+            Workspace workspace,
+            List<DSSLabel> dssLabels)
+            throws Exception {
         List<? extends DSSFlow> subFlows = dssFlowParent.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
-                String savePath = projectExportBasePath + File.separator + subFlow.getName() + File.separator + subFlow.getName() + ".json";
-                //导出子flow的json文件
-                String flowJson = downloadFlowJsonFromBml(userName, subFlow.getResourceId(), subFlow.getBmlVersion(), savePath);
+                String savePath =
+                        projectExportBasePath
+                                + File.separator
+                                + subFlow.getName()
+                                + File.separator
+                                + subFlow.getName()
+                                + ".json";
+                // 导出子flow的json文件
+                String flowJson =
+                        downloadFlowJsonFromBml(
+                                userName,
+                                subFlow.getResourceId(),
+                                subFlow.getBmlVersion(),
+                                savePath);
                 if (!subFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", subFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, projectId, projectExportBasePath, flowJson, subFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, subFlow, projectId, projectExportBasePath, workspace,dssLabels);
+                    exportFlowResources(
+                            userName,
+                            projectId,
+                            projectExportBasePath,
+                            flowJson,
+                            subFlow.getName(),
+                            workspace,
+                            dssLabels);
+                    exportAllSubFlows(
+                            userName,
+                            subFlow,
+                            projectId,
+                            projectExportBasePath,
+                            workspace,
+                            dssLabels);
                 } else {
-                    String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, subFlow.getName(), subFlow.getBmlVersion());
+                    String warnMsg =
+                            String.format(
+                                    DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE,
+                                    subFlow.getName(),
+                                    subFlow.getBmlVersion());
                     logger.info(warnMsg);
                     throw new DSSErrorException(90014, warnMsg);
                 }
@@ -137,31 +200,47 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         }
     }
 
-
     private String genWorkFlowExportDir(String projectExportPath, String flowName) {
         return projectExportPath + File.separator + flowName;
     }
 
     @Override
-    public void exportFlowResources(String userName, Long projectId, String projectSavePath, String flowJson, String flowName, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+    public void exportFlowResources(
+            String userName,
+            Long projectId,
+            String projectSavePath,
+            String flowJson,
+            String flowName,
+            Workspace workspace,
+            List<DSSLabel> dssLabels)
+            throws Exception {
         String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
         String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
         String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";
         if (StringUtils.isNotEmpty(workFlowExportPath)) {
-            //导出工作流资源文件
+            // 导出工作流资源文件
             List<Resource> resources = workFlowParser.getWorkFlowResources(flowJson);
             if (resources != null) {
-                resources.forEach(resource -> {
-                    downloadFlowResourceFromBml(userName, resource, workFlowResourceSavePath);
-                });
+                resources.forEach(
+                        resource -> {
+                            downloadFlowResourceFromBml(
+                                    userName, resource, workFlowResourceSavePath);
+                        });
             }
 
-            //导出工作流节点资源文件,工作流节点appconn文件
+            // 导出工作流节点资源文件,工作流节点appconn文件
             List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
             if (nodes != null) {
                 for (DSSNode node : nodes) {
-                    nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                    nodeExportService.downloadAppConnResourceToLocal(userName, projectId, node, appConnResourceSavePath, workspace,dssLabels);
+                    nodeExportService.downloadNodeResourceToLocal(
+                            userName, node, workFlowResourceSavePath);
+                    nodeExportService.downloadAppConnResourceToLocal(
+                            userName,
+                            projectId,
+                            node,
+                            appConnResourceSavePath,
+                            workspace,
+                            dssLabels);
                 }
             }
 
@@ -171,13 +250,16 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     }
 
     @Override
-    public String downloadFlowJsonFromBml(String userName, String resourceId, String version, String savePath) {
+    public String downloadFlowJsonFromBml(
+            String userName, String resourceId, String version, String savePath) {
         return bmlService.downloadAndGetFlowJson(userName, resourceId, version, savePath);
     }
 
-    private String downloadFlowResourceFromBml(String userName, Resource resource, String savePath) {
+    private String downloadFlowResourceFromBml(
+            String userName, Resource resource, String savePath) {
         String flowResourcePath = savePath + File.separator + resource.getResourceId() + ".re";
-        return bmlService.downloadToLocalPath(userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);
+        return bmlService.downloadToLocalPath(
+                userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);
     }
 
     private void getAllDssFlowsByRootflowId(DSSFlow parentFlow, List<DSSFlow> flowList) {

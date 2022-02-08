@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
-
 public class WorkspaceDepartmentVo {
 
     private Long id;

@@ -18,8 +18,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.ref;
 
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 
-
-public class WorkflowExportResponseRef  extends CommonResponseRef  {
+public class WorkflowExportResponseRef extends CommonResponseRef {
 
     private String resourceId;
 
@@ -50,5 +49,4 @@ public class WorkflowExportResponseRef  extends CommonResponseRef  {
     public void setFlowID(Long flowID) {
         this.flowID = flowID;
     }
-
 }

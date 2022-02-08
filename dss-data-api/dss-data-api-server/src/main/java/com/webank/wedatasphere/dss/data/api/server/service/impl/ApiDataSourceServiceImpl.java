@@ -1,26 +1,29 @@
 package com.webank.wedatasphere.dss.data.api.server.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.data.api.server.dao.DataSourceMapper;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
-import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
+import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
-public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, DataSource> implements ApiDataSourceService {
-    @Resource
-    private DataSourceMapper dataSourceMapper;
+public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, DataSource>
+        implements ApiDataSourceService {
+    @Resource private DataSourceMapper dataSourceMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiDataSourceServiceImpl.class);
 
     @Override
@@ -59,10 +62,8 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
                     }
                 }
             }
-
         }
         return availableConns;
-
     }
 
     @Override
@@ -92,5 +93,4 @@ public class ApiDataSourceServiceImpl extends ServiceImpl<DataSourceMapper, Data
         }
         return false;
     }
-
 }

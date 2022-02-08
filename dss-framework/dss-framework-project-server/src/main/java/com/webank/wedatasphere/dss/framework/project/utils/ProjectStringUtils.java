@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.utils;
 
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,39 +29,47 @@ import java.util.stream.Collectors;
 
 public class ProjectStringUtils {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStringUtils.class);
 
-    private static final String REDIRECT_FORMAT = "%s?redirect=%s&dssurl=${dssurl}&cookies=${cookies}";
+    private static final String REDIRECT_FORMAT =
+            "%s?redirect=%s&dssurl=${dssurl}&cookies=${cookies}";
 
     public static final String MODE_SPLIT = ",";
     public static final String KEY_SPLIT = "-";
 
-    public static List<String> convertList(String str){
-        if(org.apache.commons.lang.StringUtils.isEmpty(str)){
+    public static List<String> convertList(String str) {
+        if (org.apache.commons.lang.StringUtils.isEmpty(str)) {
             return new ArrayList<>();
         }
-        return Arrays.stream(str.split(MODE_SPLIT)).map(String::trim).filter((s)-> StringUtils.isNotBlank(s)).distinct().collect(Collectors.toList());
+        return Arrays.stream(str.split(MODE_SPLIT))
+                .map(String::trim)
+                .filter((s) -> StringUtils.isNotBlank(s))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
-    //拼接 前后使用英文逗号结尾
-    public static String getModeStr(List<String> strList){
-        if(CollectionUtils.isEmpty(strList)){
+    // 拼接 前后使用英文逗号结尾
+    public static String getModeStr(List<String> strList) {
+        if (CollectionUtils.isEmpty(strList)) {
             return null;
         }
-        return strList.stream().map(String::trim).filter((s)-> StringUtils.isNotBlank(s)).distinct().collect(Collectors.joining(MODE_SPLIT,MODE_SPLIT,MODE_SPLIT));
+        return strList.stream()
+                .map(String::trim)
+                .filter((s) -> StringUtils.isNotBlank(s))
+                .distinct()
+                .collect(Collectors.joining(MODE_SPLIT, MODE_SPLIT, MODE_SPLIT));
     }
 
-    private static String URLEndoder(String str){
+    private static String URLEndoder(String str) {
         try {
-            return URLEncoder.encode(str,"utf-8");
+            return URLEncoder.encode(str, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("endoe failed:",e);
+            LOGGER.warn("endoe failed:", e);
             return str;
         }
     }
 
-    public static String redirectUrlFormat(String redirectUrl,String url){
-        return String.format(REDIRECT_FORMAT,redirectUrl,URLEndoder(url));
+    public static String redirectUrlFormat(String redirectUrl, String url) {
+        return String.format(REDIRECT_FORMAT, redirectUrl, URLEndoder(url));
     }
 }

@@ -16,11 +16,8 @@
 
 package com.webank.wedatasphere.dss.workflow.core.order;
 
-/**
- * order接口用于标识parser和tunning，hook的调用顺序
- */
+/** order接口用于标识parser和tunning，hook的调用顺序 */
 public interface Order {
 
     int getOrder();
-
 }

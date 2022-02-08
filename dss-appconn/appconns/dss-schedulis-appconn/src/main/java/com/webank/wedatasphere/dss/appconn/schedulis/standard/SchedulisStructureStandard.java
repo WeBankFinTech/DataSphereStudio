@@ -20,21 +20,17 @@ import com.webank.wedatasphere.dss.appconn.schedulis.service.SchedulisProjectSer
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 
+/** Schedulis's engineering integration specification is a singleton. */
+public class SchedulisStructureStandard extends AbstractStructureIntegrationStandard {
 
-/**
- * Schedulis's engineering integration specification is a singleton.
- */
-public class SchedulisStructureStandard  extends AbstractStructureIntegrationStandard {
+    private static volatile SchedulisStructureStandard instance;
 
-    private volatile static SchedulisStructureStandard instance;
+    private SchedulisStructureStandard() {}
 
-    private SchedulisStructureStandard(){
-    }
-
-    public static SchedulisStructureStandard getInstance(){
-        if(instance == null){
-            synchronized (SchedulisStructureStandard.class){
-                if (instance == null){
+    public static SchedulisStructureStandard getInstance() {
+        if (instance == null) {
+            synchronized (SchedulisStructureStandard.class) {
+                if (instance == null) {
                     instance = new SchedulisStructureStandard();
                 }
             }

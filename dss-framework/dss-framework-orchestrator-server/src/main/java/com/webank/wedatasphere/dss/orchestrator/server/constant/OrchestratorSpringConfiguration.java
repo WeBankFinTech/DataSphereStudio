@@ -30,5 +30,4 @@ public class OrchestratorSpringConfiguration {
     public OrchestratorPluginService createOrchestratorPluginService() {
         return new OrchestratorPluginServiceImpl();
     }
-
 }

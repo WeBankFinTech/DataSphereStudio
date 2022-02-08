@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeImpl;
 
-
 public class WorkflowNodeParserImpl implements WorkflowNodeParser {
     @Override
     public WorkflowNode parseNode(DSSNode dwsNode) {

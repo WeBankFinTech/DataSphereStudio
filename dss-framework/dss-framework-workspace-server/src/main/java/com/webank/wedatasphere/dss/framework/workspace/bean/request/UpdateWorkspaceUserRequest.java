@@ -6,7 +6,7 @@ import java.util.List;
 public class UpdateWorkspaceUserRequest implements Serializable {
 
     private int workspaceId;
-    private String userName ;
+    private String userName;
     private List<Integer> roles;
     private String userId;
 
@@ -18,7 +18,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
         this.userName = userName;
     }
 
-
     public String getUserId() {
         return userId;
     }
@@ -27,7 +26,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
         this.userId = userId;
     }
 
-
     public int getWorkspaceId() {
         return workspaceId;
     }
@@ -35,8 +33,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
     public void setWorkspaceId(int workspaceId) {
         this.workspaceId = workspaceId;
     }
-
-
 
     public List<Integer> getRoles() {
         return roles;

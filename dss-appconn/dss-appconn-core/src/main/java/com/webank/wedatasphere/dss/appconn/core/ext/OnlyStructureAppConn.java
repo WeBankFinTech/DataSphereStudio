@@ -22,5 +22,4 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationSt
 public interface OnlyStructureAppConn extends AppConn {
 
     StructureIntegrationStandard getOrCreateStructureStandard();
-
 }

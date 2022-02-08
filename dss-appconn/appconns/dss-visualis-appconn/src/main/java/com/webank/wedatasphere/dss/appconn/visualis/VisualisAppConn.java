@@ -16,15 +16,17 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis;
 
+import org.apache.linkis.common.conf.CommonVars;
+
 import com.webank.wedatasphere.dss.appconn.core.ext.ThirdlyAppConn;
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractOnlySSOAppConn;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
-import org.apache.linkis.common.conf.CommonVars;
 
 public class VisualisAppConn extends AbstractOnlySSOAppConn implements ThirdlyAppConn {
 
-    public static final String VISUALIS_APPCONN_NAME = CommonVars.apply("wds.dss.appconn.visualis.name", "Visualis").getValue();
+    public static final String VISUALIS_APPCONN_NAME =
+            CommonVars.apply("wds.dss.appconn.visualis.name", "Visualis").getValue();
 
     private VisualisDevelopmentIntegrationStandard developmentIntegrationStandard;
     private VisualisStructureIntegrationStandard structureIntegrationStandard;
@@ -44,5 +46,4 @@ public class VisualisAppConn extends AbstractOnlySSOAppConn implements ThirdlyAp
     public DevelopmentIntegrationStandard getOrCreateDevelopmentStandard() {
         return developmentIntegrationStandard;
     }
-
 }

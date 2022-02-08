@@ -19,9 +19,8 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-
 public interface ProjectCreationOperation extends StructureOperation {
 
-    ProjectResponseRef createProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException;
-
+    ProjectResponseRef createProject(ProjectRequestRef projectRef)
+            throws ExternalOperationFailedException;
 }

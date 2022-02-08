@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
 import java.util.List;
 
-
 public class OnestopMenuVo {
     private Long id;
     private String title;

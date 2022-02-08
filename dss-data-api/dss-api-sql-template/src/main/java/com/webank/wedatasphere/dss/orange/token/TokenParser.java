@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.orange.token;
 
-import org.dom4j.DocumentException;
 
+import org.dom4j.DocumentException;
 
 public class TokenParser {
 
@@ -16,15 +16,17 @@ public class TokenParser {
     }
 
     public static void main(String[] args) throws DocumentException {
-//        String parse = parse("   and name = #{minId\\}} and id < #{yy \n} and name = #{ eee  }");
-//        System.out.println(parse);
+        //        String parse = parse("   and name = #{minId\\}} and id < #{yy \n} and name = #{
+        // eee  }");
+        //        System.out.println(parse);
 
-//        parseVariableNames("select * from Blog where 1=1<if test=\"minId != null and minId != '' \">  and id > #{minId} </if><if test=\"maxId != null and maxId != '' \"> and id &lt; #{maxId} </if> \t<if test=\"minId != null and minId != '' \"> and id > #{minId} </if> and udr = #{  ffr}");
+        //        parseVariableNames("select * from Blog where 1=1<if test=\"minId != null and minId
+        // != '' \">  and id > #{minId} </if><if test=\"maxId != null and maxId != '' \"> and id
+        // &lt; #{maxId} </if> \t<if test=\"minId != null and minId != '' \"> and id > #{minId}
+        // </if> and udr = #{  ffr}");
     }
 
-    /**
-     * 将sql文本片段中的参数替换成？ 并且将？对应的参数值按顺序保存起来
-     */
+    /** 将sql文本片段中的参数替换成？ 并且将？对应的参数值按顺序保存起来 */
     public String parse(String text) {
         if (text == null || text.isEmpty()) {
             return "";
@@ -38,12 +40,12 @@ public class TokenParser {
         final StringBuilder builder = new StringBuilder();
         StringBuilder expression = null;
         do {
-            //搜索到假的#{ ，  \#{ 转化成 #{
+            // 搜索到假的#{ ，  \#{ 转化成 #{
             if (start > 0 && src[start - 1] == '\\') {
                 builder.append(src, offset, start - offset - 1).append(openToken);
                 offset = start + openToken.length();
             }
-            //搜索到真实的 #{
+            // 搜索到真实的 #{
             else {
 
                 if (expression == null) {
@@ -54,29 +56,29 @@ public class TokenParser {
                 builder.append(src, offset, start - offset);
                 offset = start + openToken.length();
 
-                //开始搜索 }
+                // 开始搜索 }
                 int end = text.indexOf(closeToken, offset);
                 while (end > -1) {
-                    //搜索到假的 } ，   \} 转化成 }
+                    // 搜索到假的 } ，   \} 转化成 }
                     if (end > offset && src[end - 1] == '\\') {
                         expression.append(src, offset, end - offset - 1).append(closeToken);
                         offset = end + closeToken.length();
-                        //继续向右搜索 }
+                        // 继续向右搜索 }
                         end = text.indexOf(closeToken, offset);
                     }
-                    //搜索到真实的 }
+                    // 搜索到真实的 }
                     else {
                         expression.append(src, offset, end - offset);
                         break;
                     }
                 }
-                //没有搜索到真实的右括号 }
+                // 没有搜索到真实的右括号 }
                 if (end == -1) {
 
                     builder.append(src, start, src.length - start);
                     offset = src.length;
                 }
-                //搜索到真实的右括号}
+                // 搜索到真实的右括号}
                 else {
                     builder.append(tokenHandler.handleToken(expression.toString().trim()));
                     offset = end + closeToken.length();
@@ -89,6 +91,4 @@ public class TokenParser {
         }
         return builder.toString();
     }
-
-
 }

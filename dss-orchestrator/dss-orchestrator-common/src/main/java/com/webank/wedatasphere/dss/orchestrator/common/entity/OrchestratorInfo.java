@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
-
 public class OrchestratorInfo {
 
     private Long orchestratorId;
@@ -43,5 +42,4 @@ public class OrchestratorInfo {
     public void setOrchestratorVersionId(Long orchestratorVersionId) {
         this.orchestratorVersionId = orchestratorVersionId;
     }
-
 }

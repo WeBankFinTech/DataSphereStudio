@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-
-public class DefaultOrchestratorImportRequestRef extends CommonRequestRefImpl implements OrchestratorImportRequestRef {
+public class DefaultOrchestratorImportRequestRef extends CommonRequestRefImpl
+        implements OrchestratorImportRequestRef {
     private String resourceId;
     private String bmlVersion;
     private IOEnv sourceEnv;
@@ -46,6 +46,7 @@ public class DefaultOrchestratorImportRequestRef extends CommonRequestRefImpl im
     public String getBmlVersion() {
         return bmlVersion;
     }
+
     @Override
     public void setSourceEnv(IOEnv sourceEnv) {
         this.sourceEnv = sourceEnv;
@@ -65,6 +66,4 @@ public class DefaultOrchestratorImportRequestRef extends CommonRequestRefImpl im
     public String getOrcVersion() {
         return orcVersion;
     }
-
-
 }

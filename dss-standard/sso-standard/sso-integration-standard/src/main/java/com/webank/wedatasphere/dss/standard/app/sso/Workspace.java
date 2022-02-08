@@ -21,7 +21,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperati
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOIntegrationConf;
 
-
 public class Workspace implements DSSWorkspace {
 
     protected String workspaceName;
@@ -35,11 +34,9 @@ public class Workspace implements DSSWorkspace {
         return this.workspaceName;
     }
 
-
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
     }
-
 
     public SSOUrlBuilderOperation getSSOUrlBuilderOperation() {
         if (this.ssoUrlBuilderOperation == null) {
@@ -47,7 +44,6 @@ public class Workspace implements DSSWorkspace {
         }
         return this.ssoUrlBuilderOperation;
     }
-
 
     public void setSSOUrlBuilderOperation(SSOUrlBuilderOperation ssoUrlBuilderOperation) {
         this.ssoUrlBuilderOperation = ssoUrlBuilderOperation;

@@ -24,47 +24,47 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.impl.DefaultOrchestrator;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 
 @Component
 public class DefaultOrchestratorLoader implements OrchestratorLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrchestratorLoader.class);
-    @Autowired
-    private DSSOrchestratorContext dssOrchestratorContext;
+    @Autowired private DSSOrchestratorContext dssOrchestratorContext;
 
-    @Autowired
-    private LinkedAppConnResolver linkedAppConnResolver;
-
+    @Autowired private LinkedAppConnResolver linkedAppConnResolver;
 
     @Override
-    public DSSOrchestrator loadOrchestrator(String userName,
-                                            String workspaceName,
-                                            String typeName,
-                                            String appConnName,
-                                            List<DSSLabel> dssLabels) throws AppConnErrorException {
+    public DSSOrchestrator loadOrchestrator(
+            String userName,
+            String workspaceName,
+            String typeName,
+            String appConnName,
+            List<DSSLabel> dssLabels)
+            throws AppConnErrorException {
 
-        //todo load DSSOrchestatror by type name
-        DSSOrchestrator dssOrchestrator = new DefaultOrchestrator() {
-            @Override
-            protected DSSOrchestratorContext createOrchestratorContext() {
-                return dssOrchestratorContext;
-            }
-        };
+        // todo load DSSOrchestatror by type name
+        DSSOrchestrator dssOrchestrator =
+                new DefaultOrchestrator() {
+                    @Override
+                    protected DSSOrchestratorContext createOrchestratorContext() {
+                        return dssOrchestratorContext;
+                    }
+                };
 
-        //向工作流添加实现了第三级规范的AppConn
-        List<AppConn> appConnList = linkedAppConnResolver.resolveAppConnByUser(userName, workspaceName, typeName);
+        // 向工作流添加实现了第三级规范的AppConn
+        List<AppConn> appConnList =
+                linkedAppConnResolver.resolveAppConnByUser(userName, workspaceName, typeName);
         for (AppConn appConn : appConnList) {
-            if(appConn instanceof OnlyDevelopmentAppConn){
+            if (appConn instanceof OnlyDevelopmentAppConn) {
                 dssOrchestrator.addLinkedAppConn(appConn);
             }
-
         }
-        LOGGER.info("Load dss orchestrator:"+appConnName+",typeName:"+typeName);
+        LOGGER.info("Load dss orchestrator:" + appConnName + ",typeName:" + typeName);
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(appConnName);
         dssLabels.forEach(dssOrchestrator::addLinkedDssLabels);
         dssOrchestrator.setAppConn(appConn);

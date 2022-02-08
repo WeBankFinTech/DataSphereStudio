@@ -18,15 +18,14 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-public abstract class AbstractRefExportService extends AbstractDevelopmentService implements RefExportService {
+public abstract class AbstractRefExportService extends AbstractDevelopmentService
+        implements RefExportService {
 
-  protected abstract <K extends RequestRef> RefExportOperation<K> createRefExportOperation();
+    protected abstract <K extends RequestRef> RefExportOperation<K> createRefExportOperation();
 
-  @Override
-  public <K extends RequestRef> RefExportOperation<K> getRefExportOperation() {
-    return getOrCreate(this::createRefExportOperation, RefExportOperation.class);
-  }
-
+    @Override
+    public <K extends RequestRef> RefExportOperation<K> getRefExportOperation() {
+        return getOrCreate(this::createRefExportOperation, RefExportOperation.class);
+    }
 }

@@ -19,11 +19,10 @@ package com.webank.wedatasphere.dss.orchestrator.server.service;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 
-
 public interface OrchestratorPluginService {
 
-    ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration);
+    ResponseConvertOrchestrator convertOrchestration(
+            RequestFrameworkConvertOrchestration requestConversionOrchestration);
 
     ResponseConvertOrchestrator getConvertOrchestrationStatus(String id);
-
 }

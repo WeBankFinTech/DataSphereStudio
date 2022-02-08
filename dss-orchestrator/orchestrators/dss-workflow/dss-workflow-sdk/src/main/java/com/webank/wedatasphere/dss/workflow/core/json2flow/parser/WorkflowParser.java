@@ -25,5 +25,4 @@ public interface WorkflowParser extends Order {
     default void init() {}
 
     Workflow parse(JsonObject flowJson, Workflow workflow);
-
 }

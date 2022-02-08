@@ -21,14 +21,15 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import java.io.IOException;
 import java.util.List;
-
 
 public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
     /**
      * 导入Orchestrator
+     *
      * @param userName 用户名
      * @param workspaceName 工作空间名
      * @param projectName 工程名
@@ -42,13 +43,14 @@ public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
      * @throws IOException
      * @throws ExternalOperationFailedException
      */
-    Long importOrchestrator(String userName,
-        String workspaceName,
-        String projectName,
-        Long projectId,
-        String resourceId,
-        String version,
-        List<DSSLabel> dssLabels,
-        Workspace workspace) throws Exception;
-
+    Long importOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long projectId,
+            String resourceId,
+            String version,
+            List<DSSLabel> dssLabels,
+            Workspace workspace)
+            throws Exception;
 }

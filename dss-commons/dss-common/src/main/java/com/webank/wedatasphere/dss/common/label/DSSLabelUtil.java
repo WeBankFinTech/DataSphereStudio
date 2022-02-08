@@ -20,13 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 生成DSSLabel工具类
- */
+/** 生成DSSLabel工具类 */
 public class DSSLabelUtil {
-    /**
-     * 临时构建标准labe map
-     */
+    /** 临时构建标准labe map */
     private static Map<String, Object> consltructLabelMap(String label) {
         HashMap<String, Object> labelMap = new HashMap<>();
         labelMap.put(LabelKeyConvertor.ROUTE_LABEL_KEY, label);
@@ -35,10 +31,11 @@ public class DSSLabelUtil {
 
     /**
      * 生成DSSLabel list
+     *
      * @param label
      * @return
      */
-    public static List<DSSLabel> createLabelList(String label){
+    public static List<DSSLabel> createLabelList(String label) {
         Map<String, Object> labelParam = consltructLabelMap(label);
         LabelInstanceFactory labelInstanceFactory = new LabelInstanceFactory(labelParam);
         List<DSSLabel> dssLabelList = labelInstanceFactory.getLabelList();
@@ -47,10 +44,11 @@ public class DSSLabelUtil {
 
     /**
      * 生成单一 DSSLabel
+     *
      * @param label
      * @return
      */
-    public static EnvDSSLabel createLabel(String label){
+    public static EnvDSSLabel createLabel(String label) {
         Map<String, Object> labelParam = consltructLabelMap(label);
         LabelInstanceFactory labelInstanceFactory = new LabelInstanceFactory(labelParam);
         EnvDSSLabel envDSSLabel = labelInstanceFactory.getEnvDssLabel();
@@ -61,5 +59,4 @@ public class DSSLabelUtil {
         List<DSSLabel> labelList = DSSLabelUtil.createLabelList("dev");
         System.out.println(labelList.size());
     }
-
 }

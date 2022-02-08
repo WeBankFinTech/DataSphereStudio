@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.workflow.io.export.MetaWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.io.*;
 import java.util.List;
 
@@ -32,16 +33,14 @@ public class MetaExportServiceImpl implements MetaExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     private final String fileName = "meta.txt";
 
-
     @Override
-    public void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
+    public void exportFlowBaseInfo(
+            List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath)
+            throws IOException {
 
-        try (
-                OutputStream outputStream = generateOutputStream(savePath)
-        ) {
+        try (OutputStream outputStream = generateOutputStream(savePath)) {
             exportFlowBaseInfo(allDSSFlows, outputStream);
             exportFlowRelation(allFlowRelations, outputStream);
         }
@@ -51,28 +50,29 @@ public class MetaExportServiceImpl implements MetaExportService {
         return IoUtils.generateExportOutputStream(basePath + File.separator + fileName);
     }
 
-    private void exportFlowBaseInfo(List<DSSFlow> DSSFlows, OutputStream outputStream) throws IOException {
+    private void exportFlowBaseInfo(List<DSSFlow> DSSFlows, OutputStream outputStream)
+            throws IOException {
 
         MetaWriter.of("dss_flow", DSSFlow.class).data(DSSFlows).write(outputStream);
-
     }
 
     private InputStream exportFlowBaseInfo(List<DSSFlow> DSSFlows) throws IOException {
 
         return MetaWriter.of("dss_flow", DSSFlow.class).data(DSSFlows).write();
-
     }
 
-    private void exportFlowRelation(List<DSSFlowRelation> flowRelations, OutputStream outputStream) throws IOException {
+    private void exportFlowRelation(List<DSSFlowRelation> flowRelations, OutputStream outputStream)
+            throws IOException {
 
-        MetaWriter.of("dss_flow_relation", DSSFlowRelation.class).data(flowRelations).write(outputStream);
-
+        MetaWriter.of("dss_flow_relation", DSSFlowRelation.class)
+                .data(flowRelations)
+                .write(outputStream);
     }
 
     private InputStream exportFlowRelation(List<DSSFlowRelation> flowRelations) throws IOException {
 
-        return MetaWriter.of("dss_flow_relation", DSSFlowRelation.class).data(flowRelations).write();
-
+        return MetaWriter.of("dss_flow_relation", DSSFlowRelation.class)
+                .data(flowRelations)
+                .write();
     }
-
 }

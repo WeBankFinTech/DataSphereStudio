@@ -18,8 +18,6 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-
 
 @XmlRootElement
 public class OrchestratorRequest {
@@ -32,12 +30,9 @@ public class OrchestratorRequest {
     @NotNull(message = "工程id不能为空")
     private Long projectId;
 
-    /**
-     * 编排类型，如工作流，组合编排等
-     */
-   // @NotNull(message = "编排类型不能为空")
+    /** 编排类型，如工作流，组合编排等 */
+    // @NotNull(message = "编排类型不能为空")
     private String orchestratorMode;
-
 
     public Long getId() {
         return id;
@@ -73,11 +68,16 @@ public class OrchestratorRequest {
 
     @Override
     public String toString() {
-        return "OrchestratorRequest{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", projectId=" + projectId +
-                ", orchestratorMode='" + orchestratorMode + '\'' +
-                '}';
+        return "OrchestratorRequest{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", projectId="
+                + projectId
+                + ", orchestratorMode='"
+                + orchestratorMode
+                + '\''
+                + '}';
     }
 }

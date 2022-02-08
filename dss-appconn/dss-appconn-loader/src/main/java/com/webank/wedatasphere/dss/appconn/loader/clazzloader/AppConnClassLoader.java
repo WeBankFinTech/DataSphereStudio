@@ -19,9 +19,7 @@ package com.webank.wedatasphere.dss.appconn.loader.clazzloader;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-/**
- * use UrlClassLoader load Jar package to jvm.
- * */
+/** use UrlClassLoader load Jar package to jvm. */
 public class AppConnClassLoader extends URLClassLoader {
 
     public AppConnClassLoader(URL[] urls, ClassLoader parent) {

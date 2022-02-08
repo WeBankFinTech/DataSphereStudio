@@ -16,37 +16,27 @@
 
 package com.webank.wedatasphere.dss.framework.appconn.dao;
 
-
-import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean;
 
+import java.util.List;
 
 @Mapper
 public interface AppConnMapper {
 
-    /**
-     * get all appconnbeans
-     * */
+    /** get all appconnbeans */
     List<AppConnBean> getAllAppConnBeans();
 
-    /**
-     * get all appconns' name
-     * */
+    /** get all appconns' name */
     List<String> getAllAppConnsName();
 
-    /**
-     * get appconnbeans by name
-     * */
+    /** get appconnbeans by name */
     AppConnBean getAppConnBeanByName(@Param("appConnName") String appConnName);
 
-    /**
-     * get appconn by id
-     * */
+    /** get appconn by id */
     AppConnBean getAppConnBeanById(@Param("appConnId") Long appConnId);
 
     void updateResourceByName(AppConnBean appConnBean);
-
 }

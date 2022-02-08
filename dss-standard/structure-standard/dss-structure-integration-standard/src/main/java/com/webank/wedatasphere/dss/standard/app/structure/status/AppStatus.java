@@ -20,11 +20,9 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 import java.util.List;
 
-
 public interface AppStatus {
 
     boolean isHealthy();
 
     List<AppInstance> getUnreachableAppInstance();
-
 }

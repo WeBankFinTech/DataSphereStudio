@@ -21,8 +21,8 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonReque
 
 import java.util.List;
 
-
-public class DefaultOrchestratorQueryRequestRef extends CommonRequestRefImpl implements OrchestratorQueryRequestRef {
+public class DefaultOrchestratorQueryRequestRef extends CommonRequestRefImpl
+        implements OrchestratorQueryRequestRef {
 
     private List<Long> orcIdList;
 
@@ -35,5 +35,4 @@ public class DefaultOrchestratorQueryRequestRef extends CommonRequestRefImpl imp
     public void setOrchestratorIdList(List<Long> orchestratorIdList) {
         this.orcIdList = orchestratorIdList;
     }
-
 }

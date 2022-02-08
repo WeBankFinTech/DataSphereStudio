@@ -20,9 +20,7 @@ import java.util.List;
 
 public class SidebarVO {
 
-
     private String name;
-
 
     private String title;
 

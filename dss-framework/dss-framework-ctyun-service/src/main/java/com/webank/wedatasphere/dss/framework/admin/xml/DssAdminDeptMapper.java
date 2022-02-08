@@ -1,16 +1,17 @@
 package com.webank.wedatasphere.dss.framework.admin.xml;
 
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 /**
- * <p>
  * 部门表 Mapper 接口
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01
@@ -32,7 +33,8 @@ public interface DssAdminDeptMapper extends BaseMapper<DssAdminDept> {
      * @param deptCheckStrictly 部门树选择项是否关联显示
      * @return 选中部门列表
      */
-    public List<Integer> selectDeptListByRoleId(@Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
+    public List<Integer> selectDeptListByRoleId(
+            @Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
 
     /**
      * 根据部门ID查询信息
@@ -81,7 +83,8 @@ public interface DssAdminDeptMapper extends BaseMapper<DssAdminDept> {
      * @param parentId 父部门ID
      * @return 结果
      */
-    public DssAdminDept checkDeptNameUnique(@Param("deptName") String deptName, @Param("parentId") Long parentId);
+    public DssAdminDept checkDeptNameUnique(
+            @Param("deptName") String deptName, @Param("parentId") Long parentId);
 
     /**
      * 新增部门信息

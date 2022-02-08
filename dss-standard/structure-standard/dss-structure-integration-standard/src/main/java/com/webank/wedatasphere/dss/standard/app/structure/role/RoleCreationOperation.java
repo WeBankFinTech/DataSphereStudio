@@ -18,11 +18,7 @@ package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 
-import java.util.Map;
-
-
 public interface RoleCreationOperation extends StructureOperation {
 
     RoleResponseRef createRole(String workspaceName, Role role);
-
 }

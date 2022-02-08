@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -25,39 +25,46 @@ import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiExecuteInf
 import com.webank.wedatasphere.dss.data.api.server.entity.response.ApiGroupInfo;
 import com.webank.wedatasphere.dss.data.api.server.exception.DataApiException;
 import com.webank.wedatasphere.dss.data.api.server.service.ApiConfigService;
+
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jettison.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.ws.rs.core.Context;
+
 import java.util.List;
 import java.util.Map;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.codehaus.jettison.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping(path = "/dss/data/api", produces = {"application/json"})
+@RequestMapping(
+        path = "/dss/data/api",
+        produces = {"application/json"})
 @Slf4j
 public class DSSDbApiConfigRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSDbApiConfigRestful.class);
-    @Autowired
-    ApiConfigService apiConfigService;
+    @Autowired ApiConfigService apiConfigService;
 
     /**
      * 保存api配置信息
+     *
      * @param request
      * @param apiConfig
      * @return
      */
     @RequestMapping(path = "save", method = RequestMethod.POST)
-    public Message saveApi(@Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request) throws JSONException, DataApiException {
+    public Message saveApi(
+            @Valid @RequestBody ApiConfig apiConfig, @Context HttpServletRequest request)
+            throws JSONException, DataApiException {
         String username = SecurityFilter.getLoginUsername(request);
         apiConfig.setCreateBy(username);
         apiConfig.setUpdateBy(username);
@@ -68,12 +75,13 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 创建API 组
+     *
      * @param apiGroup
      * @return
      */
-
     @RequestMapping(path = "/group/create", method = RequestMethod.POST)
-    public Message saveGroup(@Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
+    public Message saveGroup(
+            @Valid @RequestBody ApiGroup apiGroup, @Context HttpServletRequest request) {
         String username = SecurityFilter.getLoginUsername(request);
         apiGroup.setCreateBy(username);
         apiConfigService.addGroup(apiGroup);
@@ -83,10 +91,10 @@ public class DSSDbApiConfigRestful {
 
     /**
      * API list
+     *
      * @param workspaceId
      * @return
      */
-
     @RequestMapping(path = "list", method = RequestMethod.GET)
     public Message getApiList(@RequestParam("workspaceId") String workspaceId) {
         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
@@ -96,10 +104,10 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 查询api详情
+     *
      * @param apiId
      * @return
      */
-
     @RequestMapping(path = "detail", method = RequestMethod.GET)
     public Message getApiDetail(@RequestParam("apiId") int apiId) {
         ApiConfig apiConfig = apiConfigService.getById(apiId);
@@ -109,37 +117,41 @@ public class DSSDbApiConfigRestful {
 
     /**
      * 测试 API
+     *
      * @param request
      * @param path
      * @param map
      * @return
      */
-
-    @RequestMapping(value ="/test/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
-    public Message testApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
+    @RequestMapping(value = "/test/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
+    public Message testApi(
+            @Context HttpServletRequest request,
+            @PathVariable("path") VariableString path,
+            @RequestBody Map<String, Object> map) {
 
         try {
-            ApiExecuteInfo resJo = apiConfigService.apiTest(path.getPath(), request, map,true);
+            ApiExecuteInfo resJo = apiConfigService.apiTest(path.getPath(), request, map, true);
             Message message = Message.ok().data("response", resJo);
             return message;
         } catch (Exception exception) {
             log.error("ERROR", "Error found: ", exception);
             return Message.error(exception.getMessage());
         }
-
     }
-
 
     /**
      * 第三方调用 api
+     *
      * @param request
      * @param path
      * @param map
      * @return
      */
-
-    @RequestMapping(value ="/execute/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
-    public Message executeApi(@Context HttpServletRequest request, @PathVariable("path") VariableString path, @RequestBody Map<String, Object> map) {
+    @RequestMapping(value = "/execute/{path:[a-zA-Z0-9_-]+}", method = RequestMethod.POST)
+    public Message executeApi(
+            @Context HttpServletRequest request,
+            @PathVariable("path") VariableString path,
+            @RequestBody Map<String, Object> map) {
         try {
             ApiExecuteInfo resJo = apiConfigService.apiExecute(path.getPath(), request, map);
             Message message = Message.ok().data("response", resJo);
@@ -148,7 +160,5 @@ public class DSSDbApiConfigRestful {
             log.error("ERROR", "Error found: ", exception);
             return Message.error(exception.getMessage());
         }
-
     }
-
 }

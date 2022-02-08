@@ -25,7 +25,8 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
 import java.io.IOException;
 
 public abstract class AbstractDevelopmentIntegrationStandard
-    extends AbstractAppIntegrationStandard<DevelopmentService, SSORequestService> implements DevelopmentIntegrationStandard {
+        extends AbstractAppIntegrationStandard<DevelopmentService, SSORequestService>
+        implements DevelopmentIntegrationStandard {
 
     @Override
     protected <T extends DevelopmentService> void initService(T service) {
@@ -67,14 +68,9 @@ public abstract class AbstractDevelopmentIntegrationStandard
 
     protected abstract RefQueryService createRefQueryService();
 
+    @Override
+    public void init() throws AppStandardErrorException {}
 
     @Override
-    public void init() throws AppStandardErrorException {
-
-    }
-
-    @Override
-    public void close() throws IOException {
-
-    }
+    public void close() throws IOException {}
 }

@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import java.util.List;
 
-
 public class RequestQueryOrchestrator {
     private List<Long> orchestratorIds;
 
@@ -33,6 +32,4 @@ public class RequestQueryOrchestrator {
     public void setOrchestratorIds(List<Long> orchestratorIds) {
         this.orchestratorIds = orchestratorIds;
     }
-
-
 }

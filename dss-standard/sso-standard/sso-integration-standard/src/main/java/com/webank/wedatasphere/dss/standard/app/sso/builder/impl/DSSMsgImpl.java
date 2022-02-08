@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.standard.app.sso.builder.impl;
 
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg;
-import java.util.Map;
 
+import java.util.Map;
 
 public class DSSMsgImpl implements DSSMsg {
 

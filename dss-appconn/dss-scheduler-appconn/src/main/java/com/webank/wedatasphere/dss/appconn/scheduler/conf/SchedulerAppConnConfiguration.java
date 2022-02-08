@@ -20,6 +20,6 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class SchedulerAppConnConfiguration {
 
-    public static final String SCHEDULER_APP_CONN_NAME = CommonVars.apply("wds.dss.appconn.scheduler.name", "schedulis").getValue();
-
+    public static final String SCHEDULER_APP_CONN_NAME =
+            CommonVars.apply("wds.dss.appconn.scheduler.name", "schedulis").getValue();
 }

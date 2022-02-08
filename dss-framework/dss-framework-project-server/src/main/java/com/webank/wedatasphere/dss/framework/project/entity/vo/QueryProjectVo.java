@@ -18,12 +18,10 @@ package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-
 
 public class QueryProjectVo implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Integer applicationArea;
     private String business;
@@ -41,7 +39,6 @@ public class QueryProjectVo implements Serializable {
     private String pusername;
 
     private Integer visible;
-
 
     public Long getId() {
         return id;

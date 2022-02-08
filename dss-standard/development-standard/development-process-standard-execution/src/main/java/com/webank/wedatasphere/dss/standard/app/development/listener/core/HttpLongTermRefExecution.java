@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-
-public abstract class HttpLongTermRefExecution extends LongTermRefExecutionOperation {
-
-}
+public abstract class HttpLongTermRefExecution extends LongTermRefExecutionOperation {}

@@ -17,23 +17,33 @@
 package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import org.apache.linkis.common.conf.CommonVars;
 
+import org.apache.linkis.common.conf.CommonVars;
 
 public class AppConnRefFactoryUtils {
 
-    public static final String APP_CONN_PACKAGE_HEADER = CommonVars.apply("wds.dss.appconn.package.header", "com.webank.wedatasphere.dss.appconn.").getValue();
+    public static final String APP_CONN_PACKAGE_HEADER =
+            CommonVars.apply(
+                            "wds.dss.appconn.package.header",
+                            "com.webank.wedatasphere.dss.appconn.")
+                    .getValue();
 
-    public static <R extends Ref> R newAppConnRef(Class<R> clazz, String appConnName) throws DSSErrorException {
-        return RefFactory.INSTANCE.newRef(clazz, Thread.currentThread().getContextClassLoader(), APP_CONN_PACKAGE_HEADER + appConnName);
+    public static <R extends Ref> R newAppConnRef(Class<R> clazz, String appConnName)
+            throws DSSErrorException {
+        return RefFactory.INSTANCE.newRef(
+                clazz,
+                Thread.currentThread().getContextClassLoader(),
+                APP_CONN_PACKAGE_HEADER + appConnName);
     }
 
-    public static <R extends Ref> R newAppConnRef(Class<R> clazz, ClassLoader classLoader, String appConnName) throws DSSErrorException {
-        return RefFactory.INSTANCE.newRef(clazz, classLoader, APP_CONN_PACKAGE_HEADER + appConnName);
+    public static <R extends Ref> R newAppConnRef(
+            Class<R> clazz, ClassLoader classLoader, String appConnName) throws DSSErrorException {
+        return RefFactory.INSTANCE.newRef(
+                clazz, classLoader, APP_CONN_PACKAGE_HEADER + appConnName);
     }
 
-    public static <R extends Ref> R newAppConnRefByPackageName(Class<R> clazz, ClassLoader classLoader, String packageName) throws DSSErrorException {
+    public static <R extends Ref> R newAppConnRefByPackageName(
+            Class<R> clazz, ClassLoader classLoader, String packageName) throws DSSErrorException {
         return RefFactory.INSTANCE.newRef(clazz, classLoader, packageName);
     }
-
 }

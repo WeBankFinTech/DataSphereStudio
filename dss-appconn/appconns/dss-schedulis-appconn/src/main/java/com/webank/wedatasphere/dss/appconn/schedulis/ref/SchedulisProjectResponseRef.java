@@ -20,14 +20,15 @@ import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchedulisProjectResponseRef extends AbstractResponseRef implements ProjectResponseRef {
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SchedulisProjectResponseRef extends AbstractResponseRef implements ProjectResponseRef {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectResponseRef.class);
 
@@ -35,10 +36,9 @@ public class SchedulisProjectResponseRef extends AbstractResponseRef implements 
 
     private Long projectRefId;
 
-    public SchedulisProjectResponseRef(){
+    public SchedulisProjectResponseRef() {
         super("", 0);
     }
-
 
     public SchedulisProjectResponseRef(String responseBody, int status, String errorMsg) {
         super(responseBody, status);
@@ -48,9 +48,9 @@ public class SchedulisProjectResponseRef extends AbstractResponseRef implements 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> toMap() {
-        try{
-           return SchedulisConf.gson().fromJson(this.getResponseBody(), Map.class);
-        }catch(Exception e){
+        try {
+            return SchedulisConf.gson().fromJson(this.getResponseBody(), Map.class);
+        } catch (Exception e) {
             LOGGER.error("failed to covert {} to a map", this.getResponseBody(), e);
             return new HashMap<String, Object>();
         }
@@ -61,10 +61,9 @@ public class SchedulisProjectResponseRef extends AbstractResponseRef implements 
         return this.errorMsg;
     }
 
-    public void setErrorMsg(String errorMsg){
+    public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
     }
-
 
     @Override
     public Long getProjectRefId() {
@@ -76,8 +75,7 @@ public class SchedulisProjectResponseRef extends AbstractResponseRef implements 
         return null;
     }
 
-    public void setProjectRefId(Long projectRefId){
+    public void setProjectRefId(Long projectRefId) {
         this.projectRefId = projectRefId;
     }
-
 }

@@ -46,5 +46,4 @@ public class VisualisCRUDService extends AbstractRefCRUDService {
     protected RefDeletionOperation createRefDeletionOperation() {
         return new VisualisRefDeletionOperation(this);
     }
-
 }

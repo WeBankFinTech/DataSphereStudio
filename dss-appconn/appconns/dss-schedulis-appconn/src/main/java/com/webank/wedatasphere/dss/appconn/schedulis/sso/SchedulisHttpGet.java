@@ -22,10 +22,11 @@ public class SchedulisHttpGet extends HttpGet implements UserInfo {
 
     private String user;
 
-    public SchedulisHttpGet(String url, String user){
+    public SchedulisHttpGet(String url, String user) {
         super(url);
         this.user = user;
     }
+
     @Override
     public String getUser() {
         return user;

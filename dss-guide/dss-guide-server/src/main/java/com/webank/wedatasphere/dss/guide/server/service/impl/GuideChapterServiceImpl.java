@@ -1,36 +1,36 @@
 package com.webank.wedatasphere.dss.guide.server.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.guide.server.dao.GuideChapterMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideChapter;
 import com.webank.wedatasphere.dss.guide.server.service.GuideChapterService;
-import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import lombok.AllArgsConstructor;
+
 /**
- * @author suyc
- * @Classname GuideChapterServiceImpl
- * @Description TODO
- * @Date 2022/1/14 15:42
- * @Created by suyc
+ * @author suyc @Classname GuideChapterServiceImpl @Description TODO @Date 2022/1/14 15:42 @Created
+ *     by suyc
  */
 @Service
 @AllArgsConstructor
-public class GuideChapterServiceImpl extends ServiceImpl<GuideChapterMapper, GuideChapter> implements GuideChapterService {
+public class GuideChapterServiceImpl extends ServiceImpl<GuideChapterMapper, GuideChapter>
+        implements GuideChapterService {
     private GuideChapterMapper guideChapterMapper;
 
     @Override
     public boolean saveGuideChapter(GuideChapter guideChapter) {
         Long id = guideChapter.getId();
 
-        if(id != null){
+        if (id != null) {
             return this.updateById(guideChapter);
-        }
-        else {
+        } else {
             return this.save(guideChapter);
         }
     }
@@ -46,10 +46,11 @@ public class GuideChapterServiceImpl extends ServiceImpl<GuideChapterMapper, Gui
     }
 
     @Override
-    public List<GuideChapter> searchGuideChapterList(String keyword, List<Long> totals, Integer pageNow, Integer pageSize) {
+    public List<GuideChapter> searchGuideChapterList(
+            String keyword, List<Long> totals, Integer pageNow, Integer pageSize) {
         PageHelper.startPage(pageNow, pageSize, true);
         // MYSQL LIKE % _:  LIKE '%\_%', LIKE '%\%%'
-        if(keyword !=null) {
+        if (keyword != null) {
             if ("_".equalsIgnoreCase(keyword.trim())) {
                 keyword = "\\_";
             }
@@ -57,7 +58,8 @@ public class GuideChapterServiceImpl extends ServiceImpl<GuideChapterMapper, Gui
                 keyword = "\\%";
             }
         }
-        List<GuideChapter> guideChapterList = guideChapterMapper.searchGuideChapterListByKeyword(keyword);
+        List<GuideChapter> guideChapterList =
+                guideChapterMapper.searchGuideChapterListByKeyword(keyword);
         PageInfo<GuideChapter> pageInfo = new PageInfo<>(guideChapterList);
         totals.add(pageInfo.getTotal());
 

@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.core.entity;
 
-
 public class WorkflowWithContextImpl extends WorkflowImpl {
 
     private String contextID;
@@ -28,5 +27,4 @@ public class WorkflowWithContextImpl extends WorkflowImpl {
     public void setContextID(String contextID) {
         this.contextID = contextID;
     }
-
 }

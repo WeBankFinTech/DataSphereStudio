@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
 import java.util.List;
 
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/18-01-18-18:06
- */
+/** @Auther: Han Tang @Date: 2022/1/18-01-18-18:06 */
 public class DssExchangeTaskRes {
 
     private int page;
@@ -13,6 +10,7 @@ public class DssExchangeTaskRes {
     private int totalPages;
     private int pageSize;
     private List<DssExchangeTask> dssExchangeTaskList;
+
     public int getPageSize() {
         return pageSize;
     }
@@ -52,6 +50,4 @@ public class DssExchangeTaskRes {
     public void setDssExchangeTaskList(List<DssExchangeTask> dssExchangeTaskList) {
         this.dssExchangeTaskList = dssExchangeTaskList;
     }
-
-
 }

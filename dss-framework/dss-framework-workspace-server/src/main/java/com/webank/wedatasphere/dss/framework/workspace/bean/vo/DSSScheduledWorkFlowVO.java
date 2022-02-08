@@ -18,8 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.util.Date;
 
-
-public class DSSScheduledWorkFlowVO extends AbstractDSSVO{
+public class DSSScheduledWorkFlowVO extends AbstractDSSVO {
     private String workflowName;
     private String project;
     private Date scheduledTime;
@@ -30,11 +29,18 @@ public class DSSScheduledWorkFlowVO extends AbstractDSSVO{
     private Date lastOperateTime;
     private String workflowJson;
     private int workflowId;
-    public DSSScheduledWorkFlowVO() {
-    }
 
-    public DSSScheduledWorkFlowVO(String workflowName, String project, Date scheduledTime, String newestVersion,
-                                  String lastScheduledStatus, String committer, String lastOperator, Date lastOperateTime) {
+    public DSSScheduledWorkFlowVO() {}
+
+    public DSSScheduledWorkFlowVO(
+            String workflowName,
+            String project,
+            Date scheduledTime,
+            String newestVersion,
+            String lastScheduledStatus,
+            String committer,
+            String lastOperator,
+            Date lastOperateTime) {
         this.workflowName = workflowName;
         this.project = project;
         this.scheduledTime = scheduledTime;
@@ -124,8 +130,4 @@ public class DSSScheduledWorkFlowVO extends AbstractDSSVO{
     public void setWorkflowId(int workflowId) {
         this.workflowId = workflowId;
     }
-
-
-
-
 }

@@ -1,8 +1,5 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectDeletionOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectUpdateOperation;
@@ -13,6 +10,9 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateO
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUrlOperation;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * The type Dolphin scheduler project service.
  *
@@ -21,10 +21,12 @@ import com.webank.wedatasphere.dss.standard.common.service.Operation;
  */
 public class DolphinSchedulerProjectService extends ProjectService {
 
-    private Map<Class<? extends Operation>, Operation<?, ?>> operationMap = new ConcurrentHashMap<>();
+    private Map<Class<? extends Operation>, Operation<?, ?>> operationMap =
+            new ConcurrentHashMap<>();
 
     private void init() {
-        // operationMap.put(RefQueryOperation.class, new DolphinSchedulerProcessDefinitionQueryOperation(this.appDesc));
+        // operationMap.put(RefQueryOperation.class, new
+        // DolphinSchedulerProcessDefinitionQueryOperation(this.appDesc));
     }
 
     public DolphinSchedulerProjectService() {}
@@ -48,5 +50,4 @@ public class DolphinSchedulerProjectService extends ProjectService {
     protected ProjectUrlOperation createProjectUrlOperation() {
         return null;
     }
-
 }

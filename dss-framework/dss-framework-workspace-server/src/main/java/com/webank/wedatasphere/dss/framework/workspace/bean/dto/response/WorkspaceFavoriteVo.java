@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
 import com.google.common.base.Objects;
 
-
 public class WorkspaceFavoriteVo {
     private Long id;
 
@@ -39,6 +38,7 @@ public class WorkspaceFavoriteVo {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }

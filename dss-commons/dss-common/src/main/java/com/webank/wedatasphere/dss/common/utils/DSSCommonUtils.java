@@ -16,9 +16,11 @@
 
 package com.webank.wedatasphere.dss.common.utils;
 
+import org.apache.linkis.common.conf.CommonVars;
+
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.linkis.common.conf.CommonVars;
 
 public class DSSCommonUtils {
 
@@ -27,7 +29,6 @@ public class DSSCommonUtils {
     public static final String FLOW_EDGES_NAME = "edges";
 
     public static final String FLOW_PARENT_NAME = "parent";
-
 
     public static final String NODE_RESOURCE_NAME = "resources";
 
@@ -45,12 +46,15 @@ public class DSSCommonUtils {
 
     public static final String FLOW_CONTEXT_ID_PREFIX = "dss.context.id.";
 
-    public static final Gson COMMON_GSON = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+    public static final Gson COMMON_GSON =
+            new GsonBuilder()
+                    .disableHtmlEscaping()
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                    .create();
 
     public static final String ENV_LABEL_VALUE_DEV = "dev";
 
     public static final String DSS_LABELS_KEY = "labels";
 
     public static final CommonVars<String> DSS_HOME = CommonVars.apply("DSS_HOME", "");
-    
 }

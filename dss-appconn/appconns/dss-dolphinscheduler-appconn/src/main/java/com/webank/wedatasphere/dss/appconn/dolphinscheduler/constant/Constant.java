@@ -7,15 +7,14 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant;
  * @date 2021/10/22
  */
 public class Constant {
-    public final static String JOB_TYPE = "type";
-    public final static String LINKIS_TYPE = "linkistype";
-    public final static String JOB_COMMAND = "command";
-    public final static String PROXY_USER = "proxy.user";
+    public static final String JOB_TYPE = "type";
+    public static final String LINKIS_TYPE = "linkistype";
+    public static final String JOB_COMMAND = "command";
+    public static final String PROXY_USER = "proxy.user";
 
-    /**
-     * dolphin scheduler result code.
-     */
-    public final static int DS_RESULT_CODE_SUCCESS = 0;
-    public final static int DS_RESULT_CODE_PROJECT_ALREADY_EXISTS = 10019;
-    public final static String DS_ADMIN_USERNAME = "admin";
+    /** dolphin scheduler result code. */
+    public static final int DS_RESULT_CODE_SUCCESS = 0;
+
+    public static final int DS_RESULT_CODE_PROJECT_ALREADY_EXISTS = 10019;
+    public static final String DS_ADMIN_USERNAME = "admin";
 }

@@ -22,32 +22,42 @@ public interface ContextService {
 
     /**
      * 创建ContextID，返回ContextID序列化后的字符串
+     *
      * @param flow
      * @param user
      * @param version
      * @return
      */
-    String createContextID(String workspace, String projectName, String flow, String version, String user);
+    String createContextID(
+            String workspace, String projectName, String flow, String version, String user);
 
     /**
-     * 检查和创建ContextID，返回创建ID后的jsonFlow
-     * 检查ContextID信息：如果jsonFlow不包含ContextID信息，则创建新的；
+     * 检查和创建ContextID，返回创建ID后的jsonFlow 检查ContextID信息：如果jsonFlow不包含ContextID信息，则创建新的；
      * 如果已经有ContextID，判断传入flowVersion是否相同，不同则创建新的ContextID，并返回新创建的ContextID序列化内容；相同则不创建新ID;
      * 新创建的ContextID会更新到flowJson里
+     *
      * @param jsonFlow
      * @param flowVersion
      * @param workspace
      * @param project
      * @param flow
      * @param user
-     * @param fullCheck - true 检查所有参数； false 只检查jsonFlow中ContextID是否存在，存在则不再比较ContextID中version参数等是否相同，且不创建
+     * @param fullCheck - true 检查所有参数； false
+     *     只检查jsonFlow中ContextID是否存在，存在则不再比较ContextID中version参数等是否相同，且不创建
      * @return
      */
-    String checkAndCreateContextID(String jsonFlow, String flowVersion, String workspace, String project, String flow, String user, boolean fullCheck);
+    String checkAndCreateContextID(
+            String jsonFlow,
+            String flowVersion,
+            String workspace,
+            String project,
+            String flow,
+            String user,
+            boolean fullCheck);
 
     /**
-     * 解析jsonFlow、DWSProject内容，存储到CS里
-     * 解析DWSProject、jsonFlow里面的资源、变量、节点依赖等信息，存储到CS服务
+     * 解析jsonFlow、DWSProject内容，存储到CS里 解析DWSProject、jsonFlow里面的资源、变量、节点依赖等信息，存储到CS服务
+     *
      * @param jsonFlow
      * @param parentFlowID
      */
@@ -55,6 +65,7 @@ public interface ContextService {
 
     /**
      * 检查更新ContextID信息，解析传入的jsonFlow、DWSProject内容，存储到CS里
+     *
      * @param jsonFlow 必需
      * @param parentFlowId 必需
      * @param workspace
@@ -62,13 +73,22 @@ public interface ContextService {
      * @param user
      * @throws DSSErrorException
      */
-    String checkAndInitContext(String jsonFlow, String parentFlowId, String workspace, String  projectName, String flowName, String flowVersion, String user) throws DSSErrorException;
+    String checkAndInitContext(
+            String jsonFlow,
+            String parentFlowId,
+            String workspace,
+            String projectName,
+            String flowName,
+            String flowVersion,
+            String user)
+            throws DSSErrorException;
 
     /**
      * 解析SchedulerFlow信息，并更新ContextID和存储Context信息，调用checkAndInitContext信息
+     *
      * @param schedulerFlow
      * @return
      * @throws DSSErrorException
      */
-//    String checkAndInitContext(SchedulerFlow schedulerFlow) throws DSSErrorException;
+    //    String checkAndInitContext(SchedulerFlow schedulerFlow) throws DSSErrorException;
 }

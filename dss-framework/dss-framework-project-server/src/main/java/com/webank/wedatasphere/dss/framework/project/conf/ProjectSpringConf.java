@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class ProjectSpringConf {
 
@@ -39,5 +38,4 @@ public class ProjectSpringConf {
     public DSSFrameworkOrchestratorService createDSSFrameworkOrchestratorService() {
         return new DSSFrameworkOrchestratorServiceImpl();
     }
-
 }

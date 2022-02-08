@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.workflow.core.entity;
 
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 
-
 public class WorkflowNodeEdgeImpl implements WorkflowNodeEdge {
     private DSSEdge dssEdge;
 
@@ -31,5 +30,4 @@ public class WorkflowNodeEdgeImpl implements WorkflowNodeEdge {
     public void setDSSEdge(DSSEdge dssEdge) {
         this.dssEdge = dssEdge;
     }
-
 }

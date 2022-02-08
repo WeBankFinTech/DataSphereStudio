@@ -18,10 +18,7 @@ package com.webank.wedatasphere.dss.appconn.manager.service;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 
-import java.io.Serializable;
-
-public interface AppConnResourceService{
+public interface AppConnResourceService {
 
     String getAppConnHome(AppConnInfo appConnInfo);
-
 }

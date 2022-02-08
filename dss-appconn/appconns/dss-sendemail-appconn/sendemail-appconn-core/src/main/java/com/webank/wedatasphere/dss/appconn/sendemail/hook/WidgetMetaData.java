@@ -17,10 +17,9 @@
 package com.webank.wedatasphere.dss.appconn.sendemail.hook;
 
 import java.util.List;
-import java.util.Map;
 
-public class WidgetMetaData extends HttpResponseModel{
-    public static class Meta{
+public class WidgetMetaData extends HttpResponseModel {
+    public static class Meta {
         private String name;
         private String updated;
         private String columns;
@@ -50,8 +49,7 @@ public class WidgetMetaData extends HttpResponseModel{
         }
     }
 
-
-    public static class Data{
+    public static class Data {
         private String projectName;
         private List<Meta> widgetsMetaData;
 
@@ -82,4 +80,3 @@ public class WidgetMetaData extends HttpResponseModel{
         this.data = data;
     }
 }
-

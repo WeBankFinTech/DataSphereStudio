@@ -21,16 +21,13 @@ import com.webank.wedatasphere.dss.framework.workspace.service.impl.DefaultStaff
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
 
 @Configuration
 public class WorkspaceSpringConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public StaffInfoGetter getStaffInfoGetter(){
+    public StaffInfoGetter getStaffInfoGetter() {
         return new DefaultStaffInfoGetter();
     }
-
 }

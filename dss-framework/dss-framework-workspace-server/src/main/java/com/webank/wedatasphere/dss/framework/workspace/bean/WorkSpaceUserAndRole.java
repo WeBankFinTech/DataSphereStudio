@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import java.util.Date;
 
-
 public class WorkSpaceUserAndRole {
 
     private int id;
@@ -75,6 +74,4 @@ public class WorkSpaceUserAndRole {
     public void setDate(Date date) {
         this.date = date;
     }
-
-
 }

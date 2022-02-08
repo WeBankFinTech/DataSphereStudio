@@ -16,25 +16,25 @@
 
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
-
 public class RequestCopyWorkflow {
-   private String  userName;
-   private String  workspaceName;
-   private Long  rootFlowId;
-   private String  contextIdStr;
-   private String projectName;
-   private Long  orcVersionId;
-   private String  version;
-   private String  description;
+    private String userName;
+    private String workspaceName;
+    private Long rootFlowId;
+    private String contextIdStr;
+    private String projectName;
+    private Long orcVersionId;
+    private String version;
+    private String description;
 
-    public RequestCopyWorkflow(String userName,
-                               String workspaceName,
-                               Long rootFlowId,
-                               String contextIdStr,
-                               String projectName,
-                               Long orcVersionId,
-                               String version,
-                               String description) {
+    public RequestCopyWorkflow(
+            String userName,
+            String workspaceName,
+            Long rootFlowId,
+            String contextIdStr,
+            String projectName,
+            Long orcVersionId,
+            String version,
+            String description) {
 
         this.userName = userName;
         this.workspaceName = workspaceName;
@@ -66,7 +66,7 @@ public class RequestCopyWorkflow {
         return rootFlowId;
     }
 
-    public void setRootFlowId(Long  rootFlowId) {
+    public void setRootFlowId(Long rootFlowId) {
         this.rootFlowId = rootFlowId;
     }
 

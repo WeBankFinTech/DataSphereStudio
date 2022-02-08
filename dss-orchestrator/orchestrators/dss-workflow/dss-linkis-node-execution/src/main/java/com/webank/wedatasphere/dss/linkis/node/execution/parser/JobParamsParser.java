@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.linkis.node.execution.parser;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
-import java.util.Map;
 
+import java.util.Map;
 
 public class JobParamsParser implements JobParser {
 
@@ -29,7 +29,7 @@ public class JobParamsParser implements JobParser {
         if (job instanceof LinkisJob) {
             LinkisJob linkisJob = (LinkisJob) job;
             linkisJob.getLogObj().info("Start to  put variable and configuration");
-            //put variable
+            // put variable
             Map<String, Object> flowVariables = linkisJob.getVariables();
             putParamsMap(job.getParams(), "variable", flowVariables);
             // put configuration

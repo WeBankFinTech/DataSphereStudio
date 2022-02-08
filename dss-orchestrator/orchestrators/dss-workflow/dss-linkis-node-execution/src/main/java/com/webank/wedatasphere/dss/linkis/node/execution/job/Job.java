@@ -16,49 +16,51 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
+
+import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 
 import java.util.Map;
 
 public interface Job {
 
-     String getCode();
+    String getCode();
 
-     void setCode(String code);
+    void setCode(String code);
 
-     String getEngineType();
+    String getEngineType();
 
     void setEngineType(String engineType);
 
-     String getRunType();
+    String getRunType();
 
     void setRunType(String runType);
 
     String getUser();
 
-     String getJobName();
+    String getJobName();
 
-     Map<String, Object> getParams();
+    Map<String, Object> getParams();
 
     void setParams(Map<String, Object> params);
 
-    Map<String,Object> getRuntimeParams();
+    Map<String, Object> getRuntimeParams();
+
     void setRuntimeParams(Map<String, Object> runtimeParams);
 
     JobExecuteResult getJobExecuteResult();
 
     void setJobExecuteResult(JobExecuteResult jobExecuteResult);
 
-    Map<String, String>  getJobProps();
+    Map<String, String> getJobProps();
 
     void setJobProps(Map<String, String> jobProps);
 
     LinkisJobExecutionLog getLogObj();
+
     void setLogObj(LinkisJobExecutionLog logObj);
 
     int getLogFromLine();
 
     void setLogFromLine(int index);
-
 }

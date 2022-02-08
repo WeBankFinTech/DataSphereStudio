@@ -18,22 +18,21 @@ package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 public abstract class CommonLinkisJob extends LinkisJob {
 
-    public  abstract List<BMLResource> getJobResourceList();
+    public abstract List<BMLResource> getJobResourceList();
 
-    public  abstract void setJobResourceList(List<BMLResource> jobResourceList);
+    public abstract void setJobResourceList(List<BMLResource> jobResourceList);
 
-    public  abstract List<BMLResource> getProjectResourceList();
+    public abstract List<BMLResource> getProjectResourceList();
 
-    public  abstract void setProjectResourceList(List<BMLResource> projectResourceList);
+    public abstract void setProjectResourceList(List<BMLResource> projectResourceList);
 
-    public abstract Map<String,  List<BMLResource>> getFlowNameAndResources();
+    public abstract Map<String, List<BMLResource>> getFlowNameAndResources();
 
-    public abstract void setFlowNameAndResources(Map<String, List<BMLResource>> fLowNameAndResources);
+    public abstract void setFlowNameAndResources(
+            Map<String, List<BMLResource>> fLowNameAndResources);
 }

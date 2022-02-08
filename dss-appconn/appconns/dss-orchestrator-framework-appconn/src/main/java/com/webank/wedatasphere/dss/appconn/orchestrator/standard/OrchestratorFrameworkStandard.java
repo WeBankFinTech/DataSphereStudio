@@ -25,12 +25,12 @@ import com.webank.wedatasphere.dss.standard.app.development.standard.AbstractDev
 
 public class OrchestratorFrameworkStandard extends AbstractDevelopmentIntegrationStandard {
 
-    private volatile static OrchestratorFrameworkStandard instance;
+    private static volatile OrchestratorFrameworkStandard instance;
 
-    public static OrchestratorFrameworkStandard getInstance(){
-        if (instance == null){
-            synchronized (OrchestratorFrameworkStandard.class){
-                if (instance == null){
+    public static OrchestratorFrameworkStandard getInstance() {
+        if (instance == null) {
+            synchronized (OrchestratorFrameworkStandard.class) {
+                if (instance == null) {
                     instance = new OrchestratorFrameworkStandard();
                 }
             }
@@ -40,7 +40,7 @@ public class OrchestratorFrameworkStandard extends AbstractDevelopmentIntegratio
 
     @Override
     protected RefCRUDService createRefCRUDService() {
-        return  new OrchestratorCRUDService();
+        return new OrchestratorCRUDService();
     }
 
     @Override
@@ -50,12 +50,12 @@ public class OrchestratorFrameworkStandard extends AbstractDevelopmentIntegratio
 
     @Override
     protected RefExportService createRefExportService() {
-        return  new OrchestratorExportProcessService();
+        return new OrchestratorExportProcessService();
     }
 
     @Override
     protected RefImportService createRefImportService() {
-        return  new OrchestratorImportProcessService();
+        return new OrchestratorImportProcessService();
     }
 
     @Override
@@ -63,11 +63,8 @@ public class OrchestratorFrameworkStandard extends AbstractDevelopmentIntegratio
         return new OrchestratorQueryService();
     }
 
-
     @Override
     public String getStandardName() {
         return "OrchestratorFrameworkStandard";
     }
-
-
 }

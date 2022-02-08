@@ -23,8 +23,8 @@ public class VisualisExecutionService extends AbstractRefExecutionService {
 
     @Override
     public RefExecutionOperation createRefExecutionOperation() {
-        VisualisRefExecutionOperation visualisRefExecutionOperation = new VisualisRefExecutionOperation(this);
+        VisualisRefExecutionOperation visualisRefExecutionOperation =
+                new VisualisRefExecutionOperation(this);
         return visualisRefExecutionOperation;
     }
-
 }

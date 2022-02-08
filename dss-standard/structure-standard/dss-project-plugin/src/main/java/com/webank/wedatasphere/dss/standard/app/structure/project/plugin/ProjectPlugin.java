@@ -20,30 +20,35 @@ import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandardFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 public interface ProjectPlugin {
 
-    //TODO 如果一个用户从dss空间进入到qualitis建立工程，添加一个是否是创建工程的请求，添加一个开关参数，是否允许用户建工程
+    // TODO 如果一个用户从dss空间进入到qualitis建立工程，添加一个是否是创建工程的请求，添加一个开关参数，是否允许用户建工程
     List<String> getProjects(HttpServletRequest request);
 
-    default <T> List<T> filterProjects(List<T> projects, HttpServletRequest request,
-                                        Function<T, String> getProjectId) {
-        SSOIntegrationStandard ssoIntegrationStandard = new OriginSSOIntegrationStandardFactory().getSSOIntegrationStandard();
-        if(!ssoIntegrationStandard.getSSOPluginService().createSSOMsgParseOperation().isDssRequest(request)) {
+    default <T> List<T> filterProjects(
+            List<T> projects, HttpServletRequest request, Function<T, String> getProjectId) {
+        SSOIntegrationStandard ssoIntegrationStandard =
+                new OriginSSOIntegrationStandardFactory().getSSOIntegrationStandard();
+        if (!ssoIntegrationStandard
+                .getSSOPluginService()
+                .createSSOMsgParseOperation()
+                .isDssRequest(request)) {
             return projects;
         }
         List<String> projectList = getProjects(request);
-        if(projectList == null) {
+        if (projectList == null) {
             return new ArrayList<>();
         }
-        List<T> filteredList =  projects.stream().filter(t -> projectList.contains(getProjectId.apply(t)))
-            .collect(Collectors.toList());
+        List<T> filteredList =
+                projects.stream()
+                        .filter(t -> projectList.contains(getProjectId.apply(t)))
+                        .collect(Collectors.toList());
         return filteredList;
     }
-
 }

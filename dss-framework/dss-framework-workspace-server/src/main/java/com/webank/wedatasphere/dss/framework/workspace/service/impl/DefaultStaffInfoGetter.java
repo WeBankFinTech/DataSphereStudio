@@ -19,18 +19,14 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-
 
 public class DefaultStaffInfoGetter implements StaffInfoGetter {
 
     @Override
     public List<StaffInfo> getAllUsers() {
-        return Lists.newArrayList(new StaffInfo("1","hadoop", "WeDataSphere"));
+        return Lists.newArrayList(new StaffInfo("1", "hadoop", "WeDataSphere"));
     }
 
     @Override

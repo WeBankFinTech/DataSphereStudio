@@ -23,7 +23,6 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefQueryServ
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.service.WorkflowToRelConversionService;
 
-
 public class WorkflowConversionIntegrationStandard extends AbstractConversionIntegrationStandard {
 
     @Override

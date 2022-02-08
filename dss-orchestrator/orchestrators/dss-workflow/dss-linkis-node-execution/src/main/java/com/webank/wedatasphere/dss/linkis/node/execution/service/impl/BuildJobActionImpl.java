@@ -16,12 +16,6 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.service.impl;
 
-import com.google.gson.Gson;
-import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
-import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
@@ -29,28 +23,28 @@ import org.apache.linkis.protocol.utils.TaskUtils;
 import org.apache.linkis.ujes.client.request.JobExecuteAction;
 import org.apache.linkis.ujes.client.request.JobSubmitAction;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
+
+import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
+import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.LINKIS_JOB_CREATOR;
-
 
 public class BuildJobActionImpl implements BuildJobAction {
 
     private Logger logger = LoggerFactory.getLogger(BuildJobActionImpl.class);
     private static BuildJobAction buildJobAction = new BuildJobActionImpl();
 
-    private BuildJobActionImpl() {
-
-    }
+    private BuildJobActionImpl() {}
 
     public static BuildJobAction getbuildJobAction() {
         return buildJobAction;
@@ -59,7 +53,9 @@ public class BuildJobActionImpl implements BuildJobAction {
     private Map<String, Object> prepareYarnLabel(Job job) {
         Map<String, Object> labels = new HashMap<>();
 
-        Object labelStr = job.getRuntimeParams().getOrDefault(LinkisJobExecutionConfiguration.DSS_LABELS_KEY, null);
+        Object labelStr =
+                job.getRuntimeParams()
+                        .getOrDefault(LinkisJobExecutionConfiguration.DSS_LABELS_KEY, null);
 
         if (StringUtils.isNotBlank((String) labelStr)) {
             labels.put(LinkisJobExecutionConfiguration.DSS_LABELS_KEY, labelStr);
@@ -81,7 +77,6 @@ public class BuildJobActionImpl implements BuildJobAction {
         return code;
     }
 
-
     @Override
     public JobExecuteAction getJobAction(Job job) throws LinkisJobExecutionErrorException {
 
@@ -93,13 +88,15 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         String code = parseExecutionCode(job);
 
-        JobExecuteAction.Builder builder = JobExecuteAction.builder().setCreator(LINKIS_JOB_CREATOR.getValue(job.getJobProps()))
-                .addExecuteCode(code)
-                .setEngineTypeStr(parseAppConnEngineType(job.getEngineType(), job))
-                .setRunTypeStr(parseRunType(job.getEngineType(), job.getRunType(), job))
-                .setUser(job.getUser())
-                .setParams(job.getParams())
-                .setRuntimeParams(job.getRuntimeParams());
+        JobExecuteAction.Builder builder =
+                JobExecuteAction.builder()
+                        .setCreator(LINKIS_JOB_CREATOR.getValue(job.getJobProps()))
+                        .addExecuteCode(code)
+                        .setEngineTypeStr(parseAppConnEngineType(job.getEngineType(), job))
+                        .setRunTypeStr(parseRunType(job.getEngineType(), job.getRunType(), job))
+                        .setUser(job.getUser())
+                        .setParams(job.getParams())
+                        .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
             Map<String, Object> source = new HashMap<>();
             source.putAll(((LinkisJob) job).getSource());
@@ -118,24 +115,31 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         String code = parseExecutionCode(job);
 
-        EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
+        EngineTypeLabel engineTypeLabel =
+                EngineTypeLabelCreator.createEngineTypeLabel(
+                        parseAppConnEngineType(job.getEngineType(), job));
 
         labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
-        labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR.getValue());
-        labels.put(LabelKeyConstant.CODE_TYPE_KEY, parseRunType(job.getEngineType(), job.getRunType(), job));
+        labels.put(
+                LabelKeyConstant.USER_CREATOR_TYPE_KEY,
+                job.getUser() + "-" + LINKIS_JOB_CREATOR.getValue());
+        labels.put(
+                LabelKeyConstant.CODE_TYPE_KEY,
+                parseRunType(job.getEngineType(), job.getRunType(), job));
 
-
-        //是否复用引擎，不复用就为空
-        if(!isReuseEngine(job.getParams())){
+        // 是否复用引擎，不复用就为空
+        if (!isReuseEngine(job.getParams())) {
             labels.put("executeOnce", "");
         }
-        JobSubmitAction.Builder builder = JobSubmitAction.builder().setUser(LINKIS_JOB_CREATOR.getValue(job.getJobProps()))
-                .addExecuteCode(code)
-                .setUser(job.getUser())
-                .addExecuteUser(job.getUser())
-                .setParams(job.getParams())
-                .setLabels(labels)
-                .setRuntimeParams(job.getRuntimeParams());
+        JobSubmitAction.Builder builder =
+                JobSubmitAction.builder()
+                        .setUser(LINKIS_JOB_CREATOR.getValue(job.getJobProps()))
+                        .addExecuteCode(code)
+                        .setUser(job.getUser())
+                        .addExecuteUser(job.getUser())
+                        .setParams(job.getParams())
+                        .setLabels(labels)
+                        .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
             Map<String, Object> source = new HashMap<>();
             source.putAll(((LinkisJob) job).getSource());
@@ -146,17 +150,21 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     /**
      * 是否复用引擎，复用返回：true，不复用：false
+     *
      * @param params
      * @return
      */
     public boolean isReuseEngine(Map<String, Object> params) {
         if (params.get("configuration") != null) {
-            Map<String, Object> configurationMap = (Map<String, Object>) params.get("configuration");
+            Map<String, Object> configurationMap =
+                    (Map<String, Object>) params.get("configuration");
             if (configurationMap.get("startup") != null) {
-                Map<String, Object> startupMap = (Map<String, Object>) configurationMap.get("startup");
+                Map<String, Object> startupMap =
+                        (Map<String, Object>) configurationMap.get("startup");
                 if (startupMap.get("ReuseEngine") != null) {
                     String reuseEngine = (String) startupMap.get("ReuseEngine");
-                    if (StringUtils.isNotBlank(reuseEngine) && "false".equalsIgnoreCase(reuseEngine.trim())) {
+                    if (StringUtils.isNotBlank(reuseEngine)
+                            && "false".equalsIgnoreCase(reuseEngine.trim())) {
                         return false;
                     }
                 }
@@ -165,10 +173,11 @@ public class BuildJobActionImpl implements BuildJobAction {
         return true;
     }
 
-    //TODO
+    // TODO
     private String parseAppConnEngineType(String engineType, Job job) {
         Map<String, String> props = job.getJobProps();
-        if (LinkisJobExecutionConfiguration.isLinkis1_X(props) && engineType.equalsIgnoreCase("appjoint")) {
+        if (LinkisJobExecutionConfiguration.isLinkis1_X(props)
+                && engineType.equalsIgnoreCase("appjoint")) {
             return LinkisJobExecutionConfiguration.APPCONN;
         }
         return engineType;
@@ -176,7 +185,8 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private String parseRunType(String engineType, String runType, Job job) {
         Map<String, String> props = job.getJobProps();
-        if (LinkisJobExecutionConfiguration.isLinkis1_X(props) && engineType.equalsIgnoreCase("appjoint")) {
+        if (LinkisJobExecutionConfiguration.isLinkis1_X(props)
+                && engineType.equalsIgnoreCase("appjoint")) {
             return LinkisJobExecutionConfiguration.APPCONN;
         } else if (engineType.toLowerCase().contains("shell")) {
             return "shell";

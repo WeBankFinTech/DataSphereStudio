@@ -16,8 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.utils;
 
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import org.apache.commons.collections.CollectionUtils;
+
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,21 +26,21 @@ import java.util.stream.Collectors;
 
 public class ProjectUserUtils {
 
-
-    public static List<DSSProjectUser> createPUser(Long wid, Long pid, List<String> users, int priv){
+    public static List<DSSProjectUser> createPUser(
+            Long wid, Long pid, List<String> users, int priv) {
         List<DSSProjectUser> retList = new ArrayList<>();
-        if(CollectionUtils.isEmpty(users)){
+        if (CollectionUtils.isEmpty(users)) {
             return retList;
         }
-        users.forEach(tname->{
-            DSSProjectUser DSSProjectUser = new DSSProjectUser(wid, pid, tname,priv);
-            retList.add(DSSProjectUser);
-        });
+        users.forEach(
+                tname -> {
+                    DSSProjectUser DSSProjectUser = new DSSProjectUser(wid, pid, tname, priv);
+                    retList.add(DSSProjectUser);
+                });
         return retList;
     }
 
-
-    public static List<String> getEditUserList(List<String> releaseUsers, List<String> editUsers){
+    public static List<String> getEditUserList(List<String> releaseUsers, List<String> editUsers) {
         List<String> sumEditUsers = new ArrayList<>();
         if (!CollectionUtils.isEmpty(releaseUsers)) {
             sumEditUsers.addAll(releaseUsers);

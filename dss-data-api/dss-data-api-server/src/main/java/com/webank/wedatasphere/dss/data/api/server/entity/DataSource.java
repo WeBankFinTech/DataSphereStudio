@@ -1,18 +1,19 @@
 package com.webank.wedatasphere.dss.data.api.server.entity;
 
+import java.util.Date;
+
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @program: dbApi
  * @description:
  * @create: 2021-01-20 09:52
- **/
+ */
 @Data
 @TableName(value = "datasource")
 public class DataSource {
@@ -20,43 +21,30 @@ public class DataSource {
     @TableId(value = "id", type = IdType.AUTO)
     Integer datasourceId;
 
-    @TableField
-    Integer workspaceId;
+    @TableField Integer workspaceId;
 
-    @TableField
-    String name;
+    @TableField String name;
 
-    @TableField
-    String note;
+    @TableField String note;
 
-    @TableField
-    String url;
+    @TableField String url;
 
-    @TableField
-    String username;
+    @TableField String username;
 
-    @TableField
-    String pwd;
+    @TableField String pwd;
 
-    @TableField
-    String type;
+    @TableField String type;
 
+    @TableField String createBy;
 
-    @TableField
-    String createBy;
+    @TableField String updateBy;
 
-    @TableField
-    String updateBy;
-
-
-    @TableField
-    Integer isDelete;
+    @TableField Integer isDelete;
 
     @TableField(exist = false)
     String className;
 
-    @TableField
-    Date createTime;
+    @TableField Date createTime;
 
     public Integer getDatasourceId() {
         return datasourceId;

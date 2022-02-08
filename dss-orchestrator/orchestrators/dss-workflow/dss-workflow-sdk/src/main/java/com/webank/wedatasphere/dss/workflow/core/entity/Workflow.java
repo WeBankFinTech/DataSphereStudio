@@ -18,9 +18,9 @@ package com.webank.wedatasphere.dss.workflow.core.entity;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.workflow.common.entity.Flow;
+
 import java.util.List;
 import java.util.Map;
-
 
 public interface Workflow extends Flow {
 
@@ -33,5 +33,4 @@ public interface Workflow extends Flow {
     List<Resource> getFlowResources();
 
     List<Map<String, Object>> getFlowProperties();
-
 }

@@ -16,5 +16,4 @@
 
 package com.webank.wedatasphere.dss.workflow.scheduler;
 
-public interface JobParams {
-}
+public interface JobParams {}

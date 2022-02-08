@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.appconn.core.ext;
 
-
-public interface SecondlyAppConn extends OnlySSOAppConn, OnlyStructureAppConn {
-
-}
+public interface SecondlyAppConn extends OnlySSOAppConn, OnlyStructureAppConn {}

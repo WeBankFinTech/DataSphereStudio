@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.loader;
 
+import org.apache.linkis.common.exception.ErrorException;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.clazzloader.AppConnClassLoader;
@@ -23,14 +26,13 @@ import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnExcepti
 import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
-import org.apache.linkis.common.exception.ErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CommonAppConnLoader implements AppConnLoader {
 
@@ -42,19 +44,26 @@ public class CommonAppConnLoader implements AppConnLoader {
     public AppConn getAppConn(String appConnName, String spi, String homePath) throws Exception {
         ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
         String libPathUrl;
-        if (StringUtils.isNotEmpty(homePath)){
+        if (StringUtils.isNotEmpty(homePath)) {
             libPathUrl = new File(homePath, LIB_NAME).getPath();
         } else {
-            libPathUrl = Paths.get(AppConnUtils.getAppConnHomePath(), appConnName, LIB_NAME).toFile().getPath();
+            libPathUrl =
+                    Paths.get(AppConnUtils.getAppConnHomePath(), appConnName, LIB_NAME)
+                            .toFile()
+                            .getPath();
         }
         LOGGER.info("The libPath url of AppConn {} is {}.", appConnName, libPathUrl);
         List<URL> jars = AppConnUtils.getJarsUrlsOfPath(libPathUrl);
-        ClassLoader classLoader = AppStandardClassUtils.getClassLoader(appConnName, () -> new AppConnClassLoader(jars.toArray(new URL[1]), currentClassLoader));
+        ClassLoader classLoader =
+                AppStandardClassUtils.getClassLoader(
+                        appConnName,
+                        () -> new AppConnClassLoader(jars.toArray(new URL[1]), currentClassLoader));
         Thread.currentThread().setContextClassLoader(classLoader);
         String fullClassName;
         if (StringUtils.isEmpty(spi)) {
             try {
-                fullClassName = AppConnUtils.getAppConnClassName(appConnName, libPathUrl, classLoader);
+                fullClassName =
+                        AppConnUtils.getAppConnClassName(appConnName, libPathUrl, classLoader);
             } catch (NoSuchAppConnException e) {
                 Thread.currentThread().setContextClassLoader(currentClassLoader);
                 throw e;
@@ -67,7 +76,8 @@ public class CommonAppConnLoader implements AppConnLoader {
             clazz = classLoader.loadClass(fullClassName);
         } catch (ClassNotFoundException e) {
             Thread.currentThread().setContextClassLoader(currentClassLoader);
-            DSSExceptionUtils.dealErrorException(70062, fullClassName + " class not found ", e, ErrorException.class);
+            DSSExceptionUtils.dealErrorException(
+                    70062, fullClassName + " class not found ", e, ErrorException.class);
         }
         if (clazz == null) {
             Thread.currentThread().setContextClassLoader(currentClassLoader);
@@ -75,7 +85,10 @@ public class CommonAppConnLoader implements AppConnLoader {
         } else {
             AppConn retAppConn = (AppConn) clazz.newInstance();
             Thread.currentThread().setContextClassLoader(currentClassLoader);
-            LOGGER.info("AppConn is {}, retAppConn is {}.", appConnName, retAppConn.getClass().getName());
+            LOGGER.info(
+                    "AppConn is {}, retAppConn is {}.",
+                    appConnName,
+                    retAppConn.getClass().getName());
             return retAppConn;
         }
     }

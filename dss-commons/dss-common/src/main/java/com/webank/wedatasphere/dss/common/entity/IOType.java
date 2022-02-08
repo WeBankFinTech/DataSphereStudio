@@ -17,10 +17,8 @@
 package com.webank.wedatasphere.dss.common.entity;
 
 public enum IOType {
-    /**
-     *  区分工程导出和工作流导出
-     *  basepath/IO.properties
-     *  type=PROJECT   或者  type=FLOE
-     */
-    PROJECT,FLOW,ORCHESTRATOR
+    /** 区分工程导出和工作流导出 basepath/IO.properties type=PROJECT 或者 type=FLOE */
+    PROJECT,
+    FLOW,
+    ORCHESTRATOR
 }

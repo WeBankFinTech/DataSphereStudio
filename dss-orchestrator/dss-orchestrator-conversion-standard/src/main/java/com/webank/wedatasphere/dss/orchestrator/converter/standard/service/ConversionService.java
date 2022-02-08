@@ -20,14 +20,14 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ConversionIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
-import java.util.List;
 
+import java.util.List;
 
 public interface ConversionService extends AppIntegrationService<SSORequestService> {
 
     /**
      * Labels by default.
+     *
      * @return All default labels
      */
     List<DSSLabel> getLabels();
@@ -35,5 +35,4 @@ public interface ConversionService extends AppIntegrationService<SSORequestServi
     void setAppStandard(ConversionIntegrationStandard appStandard);
 
     ConversionIntegrationStandard getAppStandard();
-
 }

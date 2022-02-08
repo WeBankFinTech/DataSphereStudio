@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.standard.common.desc;
 
-import com.google.common.base.Objects;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
 import java.util.Map;
 
+
+import com.google.common.base.Objects;
 
 public class AppInstanceImpl implements AppInstance {
 

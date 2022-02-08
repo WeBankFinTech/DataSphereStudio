@@ -16,10 +16,14 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.utils;
 
+import org.apache.linkis.common.conf.CommonVars;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnException;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import org.apache.linkis.common.conf.CommonVars;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -30,7 +34,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.commons.lang.StringUtils;
 
 public class AppConnUtils {
 
@@ -38,30 +41,35 @@ public class AppConnUtils {
 
     public static final String APPCONN_DIR_NAME = "dss-appconns";
 
-    public static final CommonVars<String> APPCONN_HOME_PATH = CommonVars.apply("wds.dss.appconn.home.path",
-        new File(DSSCommonUtils.DSS_HOME.getValue(), APPCONN_DIR_NAME).getPath());
+    public static final CommonVars<String> APPCONN_HOME_PATH =
+            CommonVars.apply(
+                    "wds.dss.appconn.home.path",
+                    new File(DSSCommonUtils.DSS_HOME.getValue(), APPCONN_DIR_NAME).getPath());
 
     public static String getAppConnHomePath() {
-       return APPCONN_HOME_PATH.acquireNew();
+        return APPCONN_HOME_PATH.acquireNew();
     }
 
-    /**
-     * Obtain the fully qualified name of the appconn to be instantiated.
-     * */
-    public static String getAppConnClassName(String appConnName, String libPath,
-                                             ClassLoader classLoader) throws NoSuchAppConnException, IOException {
-        //1.Get all the jar packages under the directory
+    /** Obtain the fully qualified name of the appconn to be instantiated. */
+    public static String getAppConnClassName(
+            String appConnName, String libPath, ClassLoader classLoader)
+            throws NoSuchAppConnException, IOException {
+        // 1.Get all the jar packages under the directory
         List<String> jars = getJarsOfPath(libPath);
-        //2.Get the subclass of appconn from all jars
+        // 2.Get the subclass of appconn from all jars
         for (String jar : jars) {
             for (String clazzName : getClassNameFrom(jar)) {
-                //3.Then find the subclass of appconn in the corresponding jar package
+                // 3.Then find the subclass of appconn in the corresponding jar package
                 if (isChildClass(clazzName, AppConn.class, classLoader)) {
                     return clazzName;
                 }
             }
         }
-        throw new NoSuchAppConnException("Cannot find a appConn instance for AppConn " + appConnName + " in lib path " + libPath);
+        throw new NoSuchAppConnException(
+                "Cannot find a appConn instance for AppConn "
+                        + appConnName
+                        + " in lib path "
+                        + libPath);
     }
 
     public static List<String> getJarsOfPath(String path) {
@@ -70,14 +78,15 @@ public class AppConnUtils {
         if (file.listFiles() != null) {
             for (File f : file.listFiles()) {
                 // only search from dss-xxxxx.jar.
-                if (!f.isDirectory() && f.getName().endsWith(JAR_SUF_NAME) && f.getName().startsWith("dss-")) {
+                if (!f.isDirectory()
+                        && f.getName().endsWith(JAR_SUF_NAME)
+                        && f.getName().startsWith("dss-")) {
                     jars.add(f.getPath());
                 }
             }
         }
         return jars;
     }
-
 
     public static List<URL> getJarsUrlsOfPath(String path) throws MalformedURLException {
         File file = new File(path);
@@ -92,10 +101,9 @@ public class AppConnUtils {
         return jars;
     }
 
-
     /**
-     * Then look for the subclass of appconn in the corresponding jar package,
-     * and read all the class file names from the jar package.
+     * Then look for the subclass of appconn in the corresponding jar package, and read all the
+     * class file names from the jar package.
      */
     private static List<String> getClassNameFrom(String jarName) throws IOException {
         List<String> fileList = new ArrayList<>();
@@ -113,15 +121,15 @@ public class AppConnUtils {
         return fileList;
     }
 
-
-    private static boolean isChildClass(String className, Class parentClazz, ClassLoader classLoader) {
+    private static boolean isChildClass(
+            String className, Class parentClazz, ClassLoader classLoader) {
         if (StringUtils.isEmpty(className)) {
             return false;
         }
         Class clazz = null;
         try {
             clazz = classLoader.loadClass(className);
-            //忽略抽象类和接口
+            // 忽略抽象类和接口
             if (Modifier.isAbstract(clazz.getModifiers())) {
                 return false;
             }
@@ -133,5 +141,4 @@ public class AppConnUtils {
         }
         return parentClazz.isAssignableFrom(clazz);
     }
-
 }

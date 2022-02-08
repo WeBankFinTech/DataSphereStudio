@@ -18,20 +18,21 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.service;
 
 import org.apache.linkis.governance.common.entity.task.*;
 
-
 public interface WorkflowQueryService {
 
     ResponsePersist add(RequestInsertTask requestInsertTask);
 
     ResponsePersist change(RequestUpdateTask requestUpdateTask);
 
-//    ResponsePersist query(RequestQueryTask requestQueryTask);
-//
-//    WorkflowQueryTaskVO getTaskByID(Long taskID, String userName);
-//
-//    List<WorkflowQueryTask> search(Long taskID, String username, String status, Date sDate, Date eDate, String executeApplicationName);
-//
-//    RequestPersistTask searchOne(String instance, String execId, Date sDate, Date eDate, String executeApplicationName);
-//
-//    List<WorkflowQueryTaskVO> getQueryVOList(List<WorkflowQueryTask> list);
+    //    ResponsePersist query(RequestQueryTask requestQueryTask);
+    //
+    //    WorkflowQueryTaskVO getTaskByID(Long taskID, String userName);
+    //
+    //    List<WorkflowQueryTask> search(Long taskID, String username, String status, Date sDate,
+    // Date eDate, String executeApplicationName);
+    //
+    //    RequestPersistTask searchOne(String instance, String execId, Date sDate, Date eDate,
+    // String executeApplicationName);
+    //
+    //    List<WorkflowQueryTaskVO> getQueryVOList(List<WorkflowQueryTask> list);
 }

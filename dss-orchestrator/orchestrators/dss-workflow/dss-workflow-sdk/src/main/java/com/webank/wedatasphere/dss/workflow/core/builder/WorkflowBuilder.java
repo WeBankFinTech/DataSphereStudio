@@ -19,11 +19,10 @@ package com.webank.wedatasphere.dss.workflow.core.builder;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
+
 import java.util.Map;
 
-/**
- * More conveniently to build a workflow.
- */
+/** More conveniently to build a workflow. */
 public interface WorkflowBuilder<T extends WorkflowBuilder> {
 
     T create(String name, String description);
@@ -41,5 +40,4 @@ public interface WorkflowBuilder<T extends WorkflowBuilder> {
     T addFlowProperties(Map<String, Object> properties);
 
     Workflow build();
-    
 }

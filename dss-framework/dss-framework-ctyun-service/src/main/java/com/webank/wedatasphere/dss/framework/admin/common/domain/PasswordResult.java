@@ -1,8 +1,6 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
-
-public enum PasswordResult  {
-
+public enum PasswordResult {
     PASSWORD_RULE_PASS("11000", "密码校验通过"),
 
     PASSWORD_STRENGTH_ERROR("11002", "密码应包括数字、小写字母、大写字母和特殊符号四种类型字符（长度为8-26位）"),
@@ -26,8 +24,6 @@ public enum PasswordResult  {
     public String getMessage() {
         return message;
     }
-
-
 
     PasswordResult(String code, String message) {
         this.code = code;

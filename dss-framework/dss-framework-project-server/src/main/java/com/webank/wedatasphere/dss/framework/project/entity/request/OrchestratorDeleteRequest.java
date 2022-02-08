@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
+import java.util.List;
 
 @XmlRootElement
 public class OrchestratorDeleteRequest {
@@ -45,9 +45,7 @@ public class OrchestratorDeleteRequest {
 
     private List<String> dssLabels;
 
-    /**
-     * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
-     */
+    /** dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息 */
     private LabelRouteVo labels;
 
     public Long getId() {

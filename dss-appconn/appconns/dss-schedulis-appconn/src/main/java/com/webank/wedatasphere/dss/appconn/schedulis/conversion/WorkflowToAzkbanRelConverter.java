@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.conversion;
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.schedulis.constant.AzkabanConstant;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanConvertedRel;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanWorkflow;
@@ -27,14 +26,18 @@ import com.webank.wedatasphere.dss.workflow.common.entity.Flow;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConverter;
-import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+
+
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,36 +48,57 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
         AzkabanConvertedRel azkabanConvertedRel = (AzkabanConvertedRel) rel;
-        azkabanConvertedRel.getWorkflows().forEach(DSSExceptionUtils.handling(workflow -> {
-            //1. Set sub flow and node storage paths
-            String flowStorePath = ((AzkabanWorkflow) workflow).getStorePath();
-            if (workflow.getChildren() != null) {
-                workflow.getChildren().forEach(flow -> setFlowStorePath(flowStorePath, flow));
-            }
-            // 2. Processing resources, generating files, and so on.
-            writeWorkflowFiles(workflow, azkabanConvertedRel.getStorePath());
-        }));
+        azkabanConvertedRel
+                .getWorkflows()
+                .forEach(
+                        DSSExceptionUtils.handling(
+                                workflow -> {
+                                    // 1. Set sub flow and node storage paths
+                                    String flowStorePath =
+                                            ((AzkabanWorkflow) workflow).getStorePath();
+                                    if (workflow.getChildren() != null) {
+                                        workflow.getChildren()
+                                                .forEach(
+                                                        flow ->
+                                                                setFlowStorePath(
+                                                                        flowStorePath, flow));
+                                    }
+                                    // 2. Processing resources, generating files, and so on.
+                                    writeWorkflowFiles(
+                                            workflow, azkabanConvertedRel.getStorePath());
+                                }));
         return azkabanConvertedRel;
     }
 
-    private void writeWorkflowFiles(Flow workflow, String projectStorePath) throws DSSErrorException {
+    private void writeWorkflowFiles(Flow workflow, String projectStorePath)
+            throws DSSErrorException {
         AzkabanWorkflow flow = (AzkabanWorkflow) workflow;
         writeFlowResourcesToLocal(flow, projectStorePath);
         writeFlowPropertiesToLocal(flow);
         if (workflow.getChildren() != null) {
-            workflow.getChildren().forEach(DSSExceptionUtils.handling(f -> writeWorkflowFiles(f, projectStorePath)));
+            workflow.getChildren()
+                    .forEach(
+                            DSSExceptionUtils.handling(
+                                    f -> writeWorkflowFiles(f, projectStorePath)));
         }
     }
 
     private void setFlowStorePath(String flowStorePath, Flow workflow) {
         AzkabanWorkflow azkabanWorkflow = (AzkabanWorkflow) workflow;
-        azkabanWorkflow.setStorePath(flowStorePath + File.separator + "subFlows" + File.separator + azkabanWorkflow.getName());
+        azkabanWorkflow.setStorePath(
+                flowStorePath
+                        + File.separator
+                        + "subFlows"
+                        + File.separator
+                        + azkabanWorkflow.getName());
         if (workflow.getChildren() != null) {
-            workflow.getChildren().forEach(flow -> setFlowStorePath(azkabanWorkflow.getStorePath(), flow));
+            workflow.getChildren()
+                    .forEach(flow -> setFlowStorePath(azkabanWorkflow.getStorePath(), flow));
         }
     }
 
-    private void writeFlowResourcesToLocal(AzkabanWorkflow flow, String projectStorePath) throws DSSErrorException {
+    private void writeFlowResourcesToLocal(AzkabanWorkflow flow, String projectStorePath)
+            throws DSSErrorException {
         List<Resource> flowResources = flow.getFlowResources();
         FileOutputStream os = null;
         try {
@@ -84,8 +108,10 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
             if (flowResources == null || flowResources.isEmpty()) {
                 return;
             }
-            String flowResourceStringPrefix = getFlowResourceStringPrefix(projectStorePath, storePath);
-            String flowResourceString = flowResourceStringPrefix + new Gson().toJson(flowResources) + "\n";
+            String flowResourceStringPrefix =
+                    getFlowResourceStringPrefix(projectStorePath, storePath);
+            String flowResourceString =
+                    flowResourceStringPrefix + new Gson().toJson(flowResources) + "\n";
             File projectResourcesFile = new File(projectStorePath, "project.properties");
             os = FileUtils.openOutputStream(projectResourcesFile, true);
             os.write(flowResourceString.getBytes());
@@ -99,7 +125,9 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
 
     private String getFlowResourceStringPrefix(String projectStorePath, String storePath) {
         String substring = storePath.substring(projectStorePath.length() + 1);
-        String prefix = substring.replaceAll("\\" + File.separator + "subFlows" + "\\" + File.separator, ".");
+        String prefix =
+                substring.replaceAll(
+                        "\\" + File.separator + "subFlows" + "\\" + File.separator, ".");
         return "flow." + prefix + "_.resources=";
     }
 
@@ -111,13 +139,22 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
         FileOutputStream os = null;
         try {
             String storePath = flow.getStorePath();
-            File flowPrpsFile = new File(storePath, flow.getName() + AzkabanConstant.AZKABAN_PROPERTIES_SUFFIX);
+            File flowPrpsFile =
+                    new File(storePath, flow.getName() + AzkabanConstant.AZKABAN_PROPERTIES_SUFFIX);
             flowPrpsFile.createNewFile();
             os = FileUtils.openOutputStream(flowPrpsFile, true);
             StringBuilder stringBuilder = new StringBuilder();
-            flowProperties.forEach(p -> p.forEach((k, v) -> {
-                stringBuilder.append(AzkabanConstant.LINKIS_FLOW_VARIABLE_KEY + k + "=" + v + "\n");
-            }));
+            flowProperties.forEach(
+                    p ->
+                            p.forEach(
+                                    (k, v) -> {
+                                        stringBuilder.append(
+                                                AzkabanConstant.LINKIS_FLOW_VARIABLE_KEY
+                                                        + k
+                                                        + "="
+                                                        + v
+                                                        + "\n");
+                                    }));
             // update by peaceWong add contextID to Flow properties
             String contextID = flow.getContextID();
             if (StringUtils.isNotBlank(contextID)) {

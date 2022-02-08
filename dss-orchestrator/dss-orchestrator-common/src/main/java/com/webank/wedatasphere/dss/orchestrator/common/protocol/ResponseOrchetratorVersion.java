@@ -16,11 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 
 import java.util.List;
-
 
 public class ResponseOrchetratorVersion {
 
@@ -28,7 +26,10 @@ public class ResponseOrchetratorVersion {
     private Long orchestratorId;
     private List<DSSOrchestratorVersion> orchestratorVersions;
 
-    public ResponseOrchetratorVersion(Long projectId, Long orchestratorId, List<DSSOrchestratorVersion> orchestratorVersions) {
+    public ResponseOrchetratorVersion(
+            Long projectId,
+            Long orchestratorId,
+            List<DSSOrchestratorVersion> orchestratorVersions) {
         this.projectId = projectId;
         this.orchestratorId = orchestratorId;
         this.orchestratorVersions = orchestratorVersions;

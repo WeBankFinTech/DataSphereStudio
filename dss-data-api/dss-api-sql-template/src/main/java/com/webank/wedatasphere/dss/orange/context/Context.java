@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.orange.util.OgnlUtil;
 
 import java.util.*;
 
-
 public class Context {
 
     StringBuilder sqlBuilder = new StringBuilder();
@@ -19,8 +18,7 @@ public class Context {
     }
 
     public void appendSql(String text) {
-        if (text != null)
-            sqlBuilder.append(text);
+        if (text != null) sqlBuilder.append(text);
     }
 
     public void addParameter(Object o) {
@@ -60,5 +58,4 @@ public class Context {
     public Map<String, Object> getData() {
         return data;
     }
-
 }

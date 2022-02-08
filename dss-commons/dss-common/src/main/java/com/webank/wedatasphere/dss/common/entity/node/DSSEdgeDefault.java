@@ -64,11 +64,19 @@ public class DSSEdgeDefault implements DSSEdge {
 
     @Override
     public String toString() {
-        return "DWSEdge{" +
-                "source='" + source + '\'' +
-                ", target='" + target + '\'' +
-                ", sourceLocation='" + sourceLocation + '\'' +
-                ", targetLocation='" + targetLocation + '\'' +
-                '}';
+        return "DWSEdge{"
+                + "source='"
+                + source
+                + '\''
+                + ", target='"
+                + target
+                + '\''
+                + ", sourceLocation='"
+                + sourceLocation
+                + '\''
+                + ", targetLocation='"
+                + targetLocation
+                + '\''
+                + '}';
     }
 }

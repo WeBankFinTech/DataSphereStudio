@@ -19,11 +19,10 @@ package com.webank.wedatasphere.dss.appconn.orchestrator.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 
-public class DefaultOrchestratorCreateResponseRef extends CommonResponseRef implements OrchestratorCreateResponseRef {
-
+public class DefaultOrchestratorCreateResponseRef extends CommonResponseRef
+        implements OrchestratorCreateResponseRef {
 
     private Long versionId;
-
 
     @Override
     public Long getOrchestratorVersionId() {
@@ -32,9 +31,6 @@ public class DefaultOrchestratorCreateResponseRef extends CommonResponseRef impl
 
     @Override
     public void setOrchestratorVersionId(Long versionId) {
-       this.versionId = versionId;
+        this.versionId = versionId;
     }
-
-
-
 }

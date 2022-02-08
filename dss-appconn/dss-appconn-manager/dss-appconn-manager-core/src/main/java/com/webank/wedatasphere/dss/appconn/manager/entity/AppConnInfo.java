@@ -25,5 +25,4 @@ public interface AppConnInfo {
     String getClassName();
 
     Resource getAppConnResource();
-
 }

@@ -20,9 +20,9 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.Date;
 import java.util.List;
-
 
 public class ConversionJobEntity {
 

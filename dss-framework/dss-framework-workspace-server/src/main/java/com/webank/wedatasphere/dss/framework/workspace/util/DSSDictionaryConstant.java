@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
-
 public class DSSDictionaryConstant {
     public static final String W_WORKSPACE_DEPARTMENT = "w_workspace_department";
 }

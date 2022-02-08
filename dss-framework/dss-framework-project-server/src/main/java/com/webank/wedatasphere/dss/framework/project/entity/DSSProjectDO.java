@@ -24,21 +24,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
-
 @TableName(value = "dss_project")
 public class DSSProjectDO implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private String name;
 
-    /**
-     * Source of the dss_project
-     */
+    /** Source of the dss_project */
     private String source;
 
     private String description;
@@ -57,23 +53,17 @@ public class DSSProjectDO implements Serializable {
 
     private String updateBy;
 
-    /**
-     * Organization ID
-     */
+    /** Organization ID */
     private Long orgId;
 
     private Boolean visibility;
 
-    /**
-     * Reserved word
-     */
+    /** Reserved word */
     private Boolean isTransfer;
 
     private Long initialOrgId;
 
-    /**
-     * If it is archived
-     */
+    /** If it is archived */
     @TableField("isArchive")
     private Boolean isArchive;
 
@@ -92,14 +82,10 @@ public class DSSProjectDO implements Serializable {
     private String createByStr;
 
     private String updateByStr;
-    /**
-     * 开发流程，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_develop_process)，首尾以英文逗号结束
-     */
+    /** 开发流程，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_develop_process)，首尾以英文逗号结束 */
     private String devProcess;
 
-    /**
-     * 编码模式，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode或下面一级)，首尾以英文逗号结束
-     */
+    /** 编码模式，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode或下面一级)，首尾以英文逗号结束 */
     private String orchestratorMode;
 
     public Long getId() {
@@ -312,33 +298,72 @@ public class DSSProjectDO implements Serializable {
 
     @Override
     public String toString() {
-        return "DSSProject{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", source='" + source + '\'' +
-                ", description='" + description + '\'' +
-                ", userId=" + userId +
-                ", username='" + username + '\'' +
-                ", workspaceId=" + workspaceId +
-                ", createTime=" + createTime +
-                ", createBy='" + createBy + '\'' +
-                ", updateTime=" + updateTime +
-                ", updateBy='" + updateBy + '\'' +
-                ", orgId=" + orgId +
-                ", visibility=" + visibility +
-                ", isTransfer=" + isTransfer +
-                ", initialOrgId=" + initialOrgId +
-                ", isArchive=" + isArchive +
-                ", pic='" + pic + '\'' +
-                ", starNum=" + starNum +
-                ", product='" + product + '\'' +
-                ", applicationArea=" + applicationArea +
-                ", business='" + business + '\'' +
-                ", isPersonal=" + isPersonal +
-                ", createByStr='" + createByStr + '\'' +
-                ", updateByStr='" + updateByStr + '\'' +
-                ", devProcess='" + devProcess + '\'' +
-                ", orchestratorMode='" + orchestratorMode + '\'' +
-                '}';
+        return "DSSProject{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", source='"
+                + source
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + ", userId="
+                + userId
+                + ", username='"
+                + username
+                + '\''
+                + ", workspaceId="
+                + workspaceId
+                + ", createTime="
+                + createTime
+                + ", createBy='"
+                + createBy
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + ", updateBy='"
+                + updateBy
+                + '\''
+                + ", orgId="
+                + orgId
+                + ", visibility="
+                + visibility
+                + ", isTransfer="
+                + isTransfer
+                + ", initialOrgId="
+                + initialOrgId
+                + ", isArchive="
+                + isArchive
+                + ", pic='"
+                + pic
+                + '\''
+                + ", starNum="
+                + starNum
+                + ", product='"
+                + product
+                + '\''
+                + ", applicationArea="
+                + applicationArea
+                + ", business='"
+                + business
+                + '\''
+                + ", isPersonal="
+                + isPersonal
+                + ", createByStr='"
+                + createByStr
+                + '\''
+                + ", updateByStr='"
+                + updateByStr
+                + '\''
+                + ", devProcess='"
+                + devProcess
+                + '\''
+                + ", orchestratorMode='"
+                + orchestratorMode
+                + '\''
+                + '}';
     }
 }

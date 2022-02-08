@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
-import java.util.Map;
+import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 
+import java.util.Map;
 
 public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
 
@@ -39,8 +39,6 @@ public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
 
     private String runType;
 
-
-
     private Map<String, Object> params;
 
     private Map<String, Object> runtimeParams;
@@ -51,11 +49,6 @@ public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
 
     private int logFromLine;
 
-
-
-
-
-
     @Override
     public Map<String, String> getSource() {
         return this.source;
@@ -65,7 +58,6 @@ public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
     public JobTypeEnum getJobType() {
         return this.jobType;
     }
-
 
     @Override
     public Map<String, Object> getVariables() {
@@ -96,8 +88,6 @@ public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
     public String getRunType() {
         return this.runType;
     }
-
-
 
     @Override
     public Map<String, Object> getParams() {
@@ -143,7 +133,6 @@ public abstract class AbstractAppConnLinkisJob extends AppConnLinkisJob {
     public void setLogFromLine(int index) {
         this.logFromLine = index;
     }
-
 
     @Override
     public void setSource(Map<String, String> source) {

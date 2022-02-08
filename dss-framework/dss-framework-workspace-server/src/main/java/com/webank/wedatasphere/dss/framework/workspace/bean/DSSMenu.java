@@ -24,12 +24,13 @@ import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
-
 @TableName(value = "dss_menu")
 public class DSSMenu implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
     private String name;
     private int level;
     private int upperMenuId;
@@ -38,8 +39,10 @@ public class DSSMenu implements Serializable {
     private String description;
     private boolean isActive;
     private boolean isComponent;
+
     @TableField(exist = false)
     private String url;
+
     private String icon;
     private int applicationId;
     private int menuApplicationId;
@@ -158,22 +161,34 @@ public class DSSMenu implements Serializable {
             return false;
         }
         DSSMenu dssMenu = (DSSMenu) o;
-        return id == dssMenu.id &&
-                level == dssMenu.level &&
-                upperMenuId == dssMenu.upperMenuId &&
-                isActive == dssMenu.isActive &&
-                isComponent == dssMenu.isComponent &&
-                applicationId == dssMenu.applicationId &&
-                menuApplicationId == dssMenu.menuApplicationId &&
-                Objects.equal(name, dssMenu.name) &&
-                Objects.equal(frontName, dssMenu.frontName) &&
-                Objects.equal(description, dssMenu.description) &&
-                Objects.equal(url, dssMenu.url) &&
-                Objects.equal(icon, dssMenu.icon);
+        return id == dssMenu.id
+                && level == dssMenu.level
+                && upperMenuId == dssMenu.upperMenuId
+                && isActive == dssMenu.isActive
+                && isComponent == dssMenu.isComponent
+                && applicationId == dssMenu.applicationId
+                && menuApplicationId == dssMenu.menuApplicationId
+                && Objects.equal(name, dssMenu.name)
+                && Objects.equal(frontName, dssMenu.frontName)
+                && Objects.equal(description, dssMenu.description)
+                && Objects.equal(url, dssMenu.url)
+                && Objects.equal(icon, dssMenu.icon);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, name, level, upperMenuId, frontName, description, isActive, isComponent, url, icon, applicationId, menuApplicationId);
+        return Objects.hashCode(
+                id,
+                name,
+                level,
+                upperMenuId,
+                frontName,
+                description,
+                isActive,
+                isComponent,
+                url,
+                icon,
+                applicationId,
+                menuApplicationId);
     }
 }

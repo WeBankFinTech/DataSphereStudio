@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.plugin;
 
+import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.impl.SSOMsgImpl;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg;
-import javax.servlet.http.HttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 
 public abstract class AbstractSSOMsgParseOperation implements SSOMsgParseOperation {
 
@@ -32,13 +32,18 @@ public abstract class AbstractSSOMsgParseOperation implements SSOMsgParseOperati
 
     @Override
     public boolean isDssRequest(HttpServletRequest request) {
-        return ssoBuilderService.createDssMsgBuilderOperation().setParameterMap(request.getParameterMap()).isDSSMsgRequest();
+        return ssoBuilderService
+                .createDssMsgBuilderOperation()
+                .setParameterMap(request.getParameterMap())
+                .isDSSMsgRequest();
     }
 
     @Override
     public DSSMsg getDSSMsg(HttpServletRequest request) {
-        return ssoBuilderService.createDssMsgBuilderOperation()
-            .setParameterMap(request.getParameterMap()).getBuiltMsg();
+        return ssoBuilderService
+                .createDssMsgBuilderOperation()
+                .setParameterMap(request.getParameterMap())
+                .getBuiltMsg();
     }
 
     @Override

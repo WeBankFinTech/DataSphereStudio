@@ -21,20 +21,20 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.role.RoleService;
 import com.webank.wedatasphere.dss.standard.app.structure.status.AppStatusService;
 import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-
 
 public interface StructureIntegrationStandard extends AppIntegrationStandard<SSORequestService> {
 
     /**
      * 统一角色规范，用于打通DSS与各集成接入系统的角色体系
+     *
      * @return
      */
     RoleService getRoleService(AppInstance appInstance);
 
     /**
      * 统一工程规范，用于打通DSS与各集成接入系统的工程体系
+     *
      * @return
      */
     ProjectService getProjectService(AppInstance appInstance);
@@ -55,5 +55,4 @@ public interface StructureIntegrationStandard extends AppIntegrationStandard<SSO
     default boolean isNecessary() {
         return false;
     }
-
 }

@@ -28,6 +28,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +36,16 @@ import java.io.UnsupportedEncodingException;
 
 public class HttpUtils {
     private static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
-    public static String sendPostReq(String url, String params,
-                                     String user) throws Exception {
+
+    public static String sendPostReq(String url, String params, String user) throws Exception {
         String resultString = "{}";
-        logger.info("sendPostReq url is: "+url);
+        logger.info("sendPostReq url is: " + url);
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
-        httpPost.addHeader("Token-User",user);
+        httpPost.addHeader("Token-User", user);
         httpPost.addHeader("Token-Code", "WS-AUTH");
         CookieStore cookieStore = new BasicCookieStore();
-        logger.info("Http request params is :"+params);
+        logger.info("Http request params is :" + params);
         StringEntity entity = entity = new StringEntity(params);
         entity.setContentEncoding("UTF-8");
         entity.setContentType("application/json");
@@ -67,13 +68,13 @@ public class HttpUtils {
         return resultString;
     }
 
-    public static String sendHttpDelete(String url,String user) throws Exception {
+    public static String sendHttpDelete(String url, String user) throws Exception {
         String resultString = "{}";
         HttpDelete httpdelete = new HttpDelete(url);
-        logger.info("sendDeleteReq url is: "+url);
+        logger.info("sendDeleteReq url is: " + url);
         httpdelete.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
-        httpdelete.addHeader("Token-User",user);
-        httpdelete.addHeader("Token-Code","WS-AUTH");
+        httpdelete.addHeader("Token-User", user);
+        httpdelete.addHeader("Token-Code", "WS-AUTH");
         CookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
@@ -86,23 +87,22 @@ public class HttpUtils {
         } catch (Exception e) {
             logger.error("Send Http Delete Request Failed", e);
             throw e;
-        }finally{
+        } finally {
             IOUtils.closeQuietly(response);
             IOUtils.closeQuietly(httpClient);
         }
         return resultString;
     }
 
-    public static String sendHttpPut(String url, String params,
-                                     String user) throws Exception {
+    public static String sendHttpPut(String url, String params, String user) throws Exception {
         String resultString = "{}";
-        logger.info("sendPostReq url is: "+url);
+        logger.info("sendPostReq url is: " + url);
         HttpPut httpPut = new HttpPut(url);
         httpPut.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
-        httpPut.addHeader("Token-User",user);
-        httpPut.addHeader("Token-Code","WS-AUTH");
+        httpPut.addHeader("Token-User", user);
+        httpPut.addHeader("Token-Code", "WS-AUTH");
         CookieStore cookieStore = new BasicCookieStore();
-        logger.info("Http put params is :"+params);
+        logger.info("Http put params is :" + params);
         StringEntity entity = null;
         try {
             entity = new StringEntity(params);
@@ -129,5 +129,4 @@ public class HttpUtils {
         }
         return resultString;
     }
-
 }

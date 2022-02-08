@@ -19,14 +19,13 @@ package com.webank.wedatasphere.dss.workflow.entity;
 import java.io.Serializable;
 import java.util.List;
 
-
 public class NodeInfo implements Serializable {
     private Integer id;
     private String icon;
     private String nodeType;
     private Integer appConnId;
     private String appConnName;
-    private Boolean submitToScheduler; //是否可以提交执行
+    private Boolean submitToScheduler; // 是否可以提交执行
     private Boolean enableCopy;
     private Boolean shouldCreationBeforeNode;
     private Boolean supportJump;

@@ -19,10 +19,7 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractRequestRef;
 
-
 public class ProjectRequestRefImpl extends AbstractRequestRef implements ProjectRequestRef {
-
-
 
     private String workspaceName;
 
@@ -96,7 +93,6 @@ public class ProjectRequestRefImpl extends AbstractRequestRef implements Project
     public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
     }
-
 
     @Override
     public Workspace getWorkspace() {

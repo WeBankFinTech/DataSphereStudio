@@ -16,28 +16,25 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-
 import java.util.Map;
 
-
-public abstract class LinkisJob implements Job{
-
+public abstract class LinkisJob implements Job {
 
     public abstract Map<String, String> getSource();
 
     public abstract void setSource(Map<String, String> source);
 
-    public abstract JobTypeEnum  getJobType();
+    public abstract JobTypeEnum getJobType();
+
     public abstract void setJobType(JobTypeEnum jobType);
 
     public abstract String getSubmitUser();
 
-    public abstract  Map<String, Object>  getVariables();
+    public abstract Map<String, Object> getVariables();
+
     public abstract void setVariables(Map<String, Object> variables);
 
+    public abstract Map<String, Object> getConfiguration();
 
-    public abstract  Map<String, Object>  getConfiguration();
     public abstract void setConfiguration(Map<String, Object> configuration);
-
-
 }

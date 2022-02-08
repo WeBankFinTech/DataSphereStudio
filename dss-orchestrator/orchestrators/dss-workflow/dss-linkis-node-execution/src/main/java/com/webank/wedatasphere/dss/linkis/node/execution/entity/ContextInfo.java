@@ -16,15 +16,11 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.entity;
 
-
 public class ContextInfo {
-
-
 
     private Object value;
 
     private int readNum;
-
 
     public ContextInfo(Object value, int readNum) {
         this.value = value;

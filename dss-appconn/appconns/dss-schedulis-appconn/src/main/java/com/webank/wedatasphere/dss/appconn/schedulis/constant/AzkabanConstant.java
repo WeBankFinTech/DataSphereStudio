@@ -17,16 +17,15 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.constant;
 
 public class AzkabanConstant {
-    public final static String LINKIS_FLOW_VARIABLE_KEY = "flow.variable.";
-    public final static String AZKABAN_JOB_SUFFIX = ".job";
-    public final static String AZKABAN_PROPERTIES_SUFFIX = ".properties";
-    public final static String  LINKIS_JOB_RESOURCES_KEY = "resources=";
-    public final static String  ZAKABAN_DEPENDENCIES_KEY = "dependencies";
-    public final static String JOB_TYPE = "type";
-    public final static String JOB_LABELS = "labels";
-    public final static String LINKIS_TYPE = "linkistype";
-    public final static String JOB_COMMAND = "command";
-    public final static  String FLOW_CONTEXT_ID = "wds.linkis.flow.contextID=";
-    public final static String LINKIS_VERSION = "linkis.version";
-
+    public static final String LINKIS_FLOW_VARIABLE_KEY = "flow.variable.";
+    public static final String AZKABAN_JOB_SUFFIX = ".job";
+    public static final String AZKABAN_PROPERTIES_SUFFIX = ".properties";
+    public static final String LINKIS_JOB_RESOURCES_KEY = "resources=";
+    public static final String ZAKABAN_DEPENDENCIES_KEY = "dependencies";
+    public static final String JOB_TYPE = "type";
+    public static final String JOB_LABELS = "labels";
+    public static final String LINKIS_TYPE = "linkistype";
+    public static final String JOB_COMMAND = "command";
+    public static final String FLOW_CONTEXT_ID = "wds.linkis.flow.contextID=";
+    public static final String LINKIS_VERSION = "linkis.version";
 }

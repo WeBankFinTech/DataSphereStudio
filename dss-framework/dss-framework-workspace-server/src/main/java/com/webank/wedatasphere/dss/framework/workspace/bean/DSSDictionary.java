@@ -23,107 +23,67 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_dictionary")
 public class DSSDictionary implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID，默认为0，所有空间都有
-     */
-      @TableId(value = "id", type = IdType.AUTO)
+    /** 主键ID，默认为0，所有空间都有 */
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * 空间ID，默认为0，所有空间都有
-     */
+    /** 空间ID，默认为0，所有空间都有 */
     private Integer workspaceId;
 
-    /**
-     * 父key
-     */
+    /** 父key */
     private String parentKey;
 
-    /**
-     * 名称
-     */
+    /** 名称 */
     private String dicName;
-    /**
-     * 名称(英文)
-     */
+    /** 名称(英文) */
     private String dicNameEn;
 
-    /**
-     * key 相当于编码，空间是w_开头，工程是p_
-     */
+    /** key 相当于编码，空间是w_开头，工程是p_ */
     private String dicKey;
 
-    /**
-     * key对应的值
-     */
+    /** key对应的值 */
     private String dicValue;
 
-    /**
-     * key对应的值(英文)
-     */
+    /** key对应的值(英文) */
     private String dicValueEn;
 
-    /**
-     * 标题
-     */
+    /** 标题 */
     private String title;
 
-    /**
-     * 标题(英文)
-     */
+    /** 标题(英文) */
     private String titleEn;
 
-    /**
-     * url
-     */
+    /** url */
     private String url;
 
-    /**
-     * url类型: 0-内部系统，1-外部系统；默认是内部
-     */
+    /** url类型: 0-内部系统，1-外部系统；默认是内部 */
     private Integer urlType;
 
-    /**
-     * 图标
-     */
+    /** 图标 */
     private String icon;
 
-    /**
-     * 序号
-     */
+    /** 序号 */
     private Integer orderNum;
 
-    /**
-     * 备注
-     */
+    /** 备注 */
     private String remark;
 
-    /**
-     * 创建人
-     */
+    /** 创建人 */
     private String createUser;
 
-    /**
-     * 创建时间
-     */
+    /** 创建时间 */
     private Date createTime;
 
-    /**
-     * 更新人
-     */
+    /** 更新人 */
     private String updateUser;
 
-    /**
-     * 更新时间
-     */
+    /** 更新时间 */
     private Date updateTime;
-
 
     public Integer getId() {
         return id;
@@ -279,26 +239,58 @@ public class DSSDictionary implements Serializable {
 
     @Override
     public String toString() {
-        return "DSSDictionary{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", parentKey='" + parentKey + '\'' +
-                ", dicName='" + dicName + '\'' +
-                ", dicNameEn='" + dicNameEn + '\'' +
-                ", dicKey='" + dicKey + '\'' +
-                ", dicValue='" + dicValue + '\'' +
-                ", dicValueEn='" + dicValueEn + '\'' +
-                ", title='" + title + '\'' +
-                ", titleEn='" + titleEn + '\'' +
-                ", url='" + url + '\'' +
-                ", urlType=" + urlType +
-                ", icon='" + icon + '\'' +
-                ", orderNum=" + orderNum +
-                ", remark='" + remark + '\'' +
-                ", createUser='" + createUser + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
-                '}';
+        return "DSSDictionary{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", parentKey='"
+                + parentKey
+                + '\''
+                + ", dicName='"
+                + dicName
+                + '\''
+                + ", dicNameEn='"
+                + dicNameEn
+                + '\''
+                + ", dicKey='"
+                + dicKey
+                + '\''
+                + ", dicValue='"
+                + dicValue
+                + '\''
+                + ", dicValueEn='"
+                + dicValueEn
+                + '\''
+                + ", title='"
+                + title
+                + '\''
+                + ", titleEn='"
+                + titleEn
+                + '\''
+                + ", url='"
+                + url
+                + '\''
+                + ", urlType="
+                + urlType
+                + ", icon='"
+                + icon
+                + '\''
+                + ", orderNum="
+                + orderNum
+                + ", remark='"
+                + remark
+                + '\''
+                + ", createUser='"
+                + createUser
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateUser='"
+                + updateUser
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + '}';
     }
 }

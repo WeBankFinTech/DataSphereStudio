@@ -1,15 +1,17 @@
 package com.webank.wedatasphere.dss.data.api.server.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CommUtil {
     /**
      * 将object转换成数组
+     *
      * @param object
      * @return
      */
@@ -32,11 +34,11 @@ public class CommUtil {
 
     /**
      * 拼接where句柄
+     *
      * @param requestFields
      * @return
      * @throws JSONException
      */
-
     public static String getWhereCause(String requestFields) throws JSONException {
         JSONArray jsonArray = new JSONArray(requestFields);
         StringBuilder whereCauseBuild = new StringBuilder();
@@ -44,28 +46,28 @@ public class CommUtil {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String columnName = jsonObject.getString("name").trim();
-            if("pageNum".equalsIgnoreCase(columnName)) continue;
+            if ("pageNum".equalsIgnoreCase(columnName)) continue;
             if (index == 0) {
                 whereCauseBuild.append(" where ");
             }
             index++;
-            String columnNameFormat = String.format("%s%s%s","`",columnName,"`");
-            String compareType = jsonObject.getString("compare").replaceAll("<","&lt;");
-            String whereCause = String.format("%s %s #{%s}", columnNameFormat, compareType, columnName);
+            String columnNameFormat = String.format("%s%s%s", "`", columnName, "`");
+            String compareType = jsonObject.getString("compare").replaceAll("<", "&lt;");
+            String whereCause =
+                    String.format("%s %s #{%s}", columnNameFormat, compareType, columnName);
             whereCauseBuild.append(whereCause).append(" and ");
-
         }
         String whereStr = whereCauseBuild.toString();
         int whereStrSize = whereStr.length();
-        if(whereStr.endsWith(" and ")){
-            whereStr = whereStr.substring(0,whereStrSize-5);
-
+        if (whereStr.endsWith(" and ")) {
+            whereStr = whereStr.substring(0, whereStrSize - 5);
         }
         return whereStr;
     }
 
     /**
      * 拼接 order by 句柄
+     *
      * @param orderFields
      * @return
      * @throws JSONException
@@ -79,7 +81,7 @@ public class CommUtil {
             }
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String columnName = jsonObject.getString("name").trim();
-            columnName = String.format("%s%s%s","`",columnName,"`");
+            columnName = String.format("%s%s%s", "`", columnName, "`");
             String orderType = jsonObject.getString("type");
             String orderCause = String.format("%s %s", columnName, orderType);
             System.out.println(orderCause);
@@ -91,5 +93,4 @@ public class CommUtil {
         }
         return orderCauseBuild.toString();
     }
-
 }

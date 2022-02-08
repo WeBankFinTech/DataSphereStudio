@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import java.util.Date;
 
-
 public class DSSWorkspace {
     private int id;
     private String name;
@@ -128,6 +127,4 @@ public class DSSWorkspace {
     public void setLastUpdateUser(String lastUpdateUser) {
         this.lastUpdateUser = lastUpdateUser;
     }
-
-
 }

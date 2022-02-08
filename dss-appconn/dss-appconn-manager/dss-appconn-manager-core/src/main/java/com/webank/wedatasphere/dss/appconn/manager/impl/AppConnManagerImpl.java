@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 
-
 public class AppConnManagerImpl extends AbstractAppConnManager {
 
     @Override
@@ -42,5 +41,4 @@ public class AppConnManagerImpl extends AbstractAppConnManager {
             throw new DSSRuntimeException(25000, "Cannot find a useful AppConnResourceService.", e);
         }
     }
-
 }

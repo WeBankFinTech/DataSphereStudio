@@ -18,17 +18,14 @@ package com.webank.wedatasphere.dss.appconn.workflow.service;
 
 import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefImportOperation;
 import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowImportRequestRef;
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowImportResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefImportService;
 
 public class WorkflowImportService extends AbstractRefImportService {
-
 
     @Override
     @SuppressWarnings("unchecked")
     protected RefImportOperation<WorkflowImportRequestRef> createRefImportOperation() {
         return new WorkflowRefImportOperation();
     }
-
 }

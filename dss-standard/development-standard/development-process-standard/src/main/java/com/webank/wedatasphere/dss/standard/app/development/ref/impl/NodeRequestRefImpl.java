@@ -20,8 +20,7 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 
 import java.util.Map;
 
-
-public class NodeRequestRefImpl extends CommonRequestRefImpl implements NodeRequestRef{
+public class NodeRequestRefImpl extends CommonRequestRefImpl implements NodeRequestRef {
 
     protected String nodeType;
 
@@ -49,7 +48,7 @@ public class NodeRequestRefImpl extends CommonRequestRefImpl implements NodeRequ
 
     @Override
     public String getName() {
-        if(name == null){
+        if (name == null) {
             name = jobContent.get("title").toString();
         }
         return name;

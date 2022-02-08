@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
-import org.apache.commons.lang.StringUtils;
-
 
 public abstract class Builder {
 
@@ -34,41 +34,44 @@ public abstract class Builder {
 
     protected abstract void fillCommonLinkisJobInfo(CommonLinkisJob linkisAppConnJob);
 
-
     public Job build() throws Exception {
 
         LinkisJob job = null;
         String jobType = getJobType();
         String[] jobTypeSplit = jobType.split("\\.");
         if (jobTypeSplit.length < 3) {
-            throw new LinkisJobExecutionErrorException(90100, "This is not Linkis job type,this jobtype is " + jobType);
+            throw new LinkisJobExecutionErrorException(
+                    90100, "This is not Linkis job type,this jobtype is " + jobType);
         }
         String engineType = jobTypeSplit[1];
-        //delete linkis.engineType
-        String runType = StringUtils.substringAfterLast(jobType, jobTypeSplit[0] + "." + jobTypeSplit[1] + ".");
+        // delete linkis.engineType
+        String runType =
+                StringUtils.substringAfterLast(
+                        jobType, jobTypeSplit[0] + "." + jobTypeSplit[1] + ".");
 
         if (LinkisJobExecutionConfiguration.LINKIS_CONTROL_EMPTY_NODE.equalsIgnoreCase(jobType)) {
-            job = new AbstractCommonLinkisJob() {
-                @Override
-                public String getSubmitUser() {
-                    return null;
-                }
+            job =
+                    new AbstractCommonLinkisJob() {
+                        @Override
+                        public String getSubmitUser() {
+                            return null;
+                        }
 
-                @Override
-                public String getUser() {
-                    return null;
-                }
+                        @Override
+                        public String getUser() {
+                            return null;
+                        }
 
-                @Override
-                public String getJobName() {
-                    return null;
-                }
-            };
+                        @Override
+                        public String getJobName() {
+                            return null;
+                        }
+                    };
 
             job.setJobType(JobTypeEnum.EmptyJob);
             return job;
         }
-        //update by peaceWong
+        // update by peaceWong
         if (LinkisJobExecutionUtils.isCommonAppConnJob(engineType)) {
             job = creatLinkisJob(false);
             job.setJobType(JobTypeEnum.CommonJob);
@@ -85,5 +88,4 @@ public abstract class Builder {
 
         return job;
     }
-
 }

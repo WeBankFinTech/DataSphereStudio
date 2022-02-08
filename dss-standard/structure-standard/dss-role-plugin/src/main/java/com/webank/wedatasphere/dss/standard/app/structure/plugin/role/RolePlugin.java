@@ -18,9 +18,9 @@ package com.webank.wedatasphere.dss.standard.app.structure.plugin.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.plugin.role.impl.OriginRolePlugin;
 
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
 
 public interface RolePlugin {
 
@@ -31,5 +31,4 @@ public interface RolePlugin {
     static RolePlugin getRolePlugin() {
         return OriginRolePlugin.getRolePlugin();
     }
-
 }

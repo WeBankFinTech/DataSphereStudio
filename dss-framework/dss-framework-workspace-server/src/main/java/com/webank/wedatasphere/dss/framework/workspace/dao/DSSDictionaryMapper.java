@@ -16,12 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import org.apache.ibatis.annotations.Mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 
 @Mapper
-public interface DSSDictionaryMapper extends BaseMapper<DSSDictionary> {
-
-}
+public interface DSSDictionaryMapper extends BaseMapper<DSSDictionary> {}

@@ -28,5 +28,4 @@ public class DolphinSchedulerWorkflowStandard extends WorkflowConversionIntegrat
     public RefQueryService getQueryService(AppInstance appInstance) {
         return DolphinSchedulerSecurityService.getInstance(appInstance.getBaseUrl());
     }
-
 }

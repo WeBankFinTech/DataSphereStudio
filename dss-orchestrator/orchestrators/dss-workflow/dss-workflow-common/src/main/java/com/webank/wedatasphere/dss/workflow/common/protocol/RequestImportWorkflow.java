@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.workflow.common.protocol;
 
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 
-
 public class RequestImportWorkflow {
     private String userName;
     private String resourceId;
@@ -31,7 +30,6 @@ public class RequestImportWorkflow {
     private String workspaceStr;
     private String contextId;
 
-
     public String getContextId() {
         return contextId;
     }
@@ -39,8 +37,6 @@ public class RequestImportWorkflow {
     public void setContextId(String contextId) {
         this.contextId = contextId;
     }
-
-
 
     public String getUserName() {
         return userName;
@@ -114,16 +110,17 @@ public class RequestImportWorkflow {
         this.workspaceStr = workspaceStr;
     }
 
-    public RequestImportWorkflow(String userName,
-                                 String resourceId,
-                                 String bmlVersion,
-                                 Long projectId,
-                                 String projectName,
-                                 IOEnv sourceEnv,
-                                 String orcVersion,
-                                 String workspaceName,
-                                 String workspaceStr,
-                                 String contextId) {
+    public RequestImportWorkflow(
+            String userName,
+            String resourceId,
+            String bmlVersion,
+            Long projectId,
+            String projectName,
+            IOEnv sourceEnv,
+            String orcVersion,
+            String workspaceName,
+            String workspaceStr,
+            String contextId) {
         this.userName = userName;
         this.resourceId = resourceId;
         this.bmlVersion = bmlVersion;
@@ -135,6 +132,4 @@ public class RequestImportWorkflow {
         this.workspaceStr = workspaceStr;
         this.contextId = contextId;
     }
-
-
 }

@@ -16,13 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.exception;
 
-
 public class LambdaWarnException extends DSSProjectWarnException {
-
 
     public LambdaWarnException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
-
-
 }

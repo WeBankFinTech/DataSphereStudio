@@ -20,30 +20,34 @@ import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowUpdateRequestRef
 import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowUpdateResponseRef;
 import com.webank.wedatasphere.dss.common.protocol.RequestUpdateWorkflow;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
-import org.apache.linkis.rpc.Sender;
 
+import org.apache.linkis.rpc.Sender;
 
 public class WorkflowTaskUpdateOperation implements RefUpdateOperation<WorkflowUpdateRequestRef> {
 
     private DevelopmentService developmentService;
 
-    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
+    private final Sender sender =
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
     @Override
-    public WorkflowUpdateResponseRef updateRef(WorkflowUpdateRequestRef workflowUpdateRequestRef) throws ExternalOperationFailedException {
+    public WorkflowUpdateResponseRef updateRef(WorkflowUpdateRequestRef workflowUpdateRequestRef)
+            throws ExternalOperationFailedException {
         WorkflowUpdateResponseRef workflowUpdateResponseRef = null;
         String userName = workflowUpdateRequestRef.getUserName();
         Long flowID = workflowUpdateRequestRef.getOrcId();
         String flowName = workflowUpdateRequestRef.getOrcName();
         String description = workflowUpdateRequestRef.getDescription();
         String uses = workflowUpdateRequestRef.getUses();
-        RequestUpdateWorkflow requestUpdateWorkflow = new RequestUpdateWorkflow(userName, flowID, flowName, description, uses);
+        RequestUpdateWorkflow requestUpdateWorkflow =
+                new RequestUpdateWorkflow(userName, flowID, flowName, description, uses);
         if (null != sender) {
-            ResponseUpdateWorkflow responseUpdateWorkflow = (ResponseUpdateWorkflow) sender.ask(requestUpdateWorkflow);
+            ResponseUpdateWorkflow responseUpdateWorkflow =
+                    (ResponseUpdateWorkflow) sender.ask(requestUpdateWorkflow);
             workflowUpdateResponseRef = new WorkflowUpdateResponseRef();
             workflowUpdateResponseRef.setJobStatus(responseUpdateWorkflow.getJobStatus());
         } else {

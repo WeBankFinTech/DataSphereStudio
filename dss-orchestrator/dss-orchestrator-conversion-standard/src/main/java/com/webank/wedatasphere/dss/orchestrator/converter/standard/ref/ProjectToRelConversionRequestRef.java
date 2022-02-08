@@ -16,15 +16,14 @@
 
 package com.webank.wedatasphere.dss.orchestrator.converter.standard.ref;
 
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
-import java.util.List;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 
+import java.util.List;
 
 public interface ProjectToRelConversionRequestRef extends DSSToRelConversionRequestRef {
 
     DSSProject getDSSProject();
 
     List<DSSOrchestration> getDSSOrcList();
-
 }

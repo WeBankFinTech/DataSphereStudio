@@ -18,9 +18,10 @@ package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 
 import org.apache.linkis.httpclient.request.POSTAction;
 
-public class FlowScheduleAction extends POSTAction  {
+public class FlowScheduleAction extends POSTAction {
 
     private String url;
+
     @Override
     public String getRequestPayload() {
         return "";

@@ -16,6 +16,10 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -29,9 +33,6 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -49,14 +50,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private FlowMapper flowMapper;
-    @Autowired
-    private NodeInputService nodeInputService;
-    @Autowired
-    private WorkFlowParser workFlowParser;
-    @Autowired
-    private BMLService bmlService;
+    @Autowired private FlowMapper flowMapper;
+    @Autowired private NodeInputService nodeInputService;
+    @Autowired private WorkFlowParser workFlowParser;
+    @Autowired private BMLService bmlService;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -73,7 +70,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private DSSFlow genDSSFlowTree(Long parentFlowId) {
         DSSFlow cyFlow = flowMapper.selectFlowByID(parentFlowId);
         String userName = cyFlow.getCreator();
-        Map<String, Object> query = bmlService.query(userName, cyFlow.getResourceId(), cyFlow.getBmlVersion());
+        Map<String, Object> query =
+                bmlService.query(userName, cyFlow.getResourceId(), cyFlow.getBmlVersion());
         cyFlow.setFlowJson(query.get("string").toString());
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(parentFlowId);
         for (Long subFlowID : subFlowIDs) {
@@ -90,8 +88,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
-    public DSSFlow addFlow(DSSFlow dssFlow,
-                               String contextID) throws DSSErrorException {
+    public DSSFlow addFlow(DSSFlow dssFlow, String contextID) throws DSSErrorException {
         try {
             flowMapper.insertFlow(dssFlow);
         } catch (DuplicateKeyException e) {
@@ -106,8 +103,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("Generate contextID null.");
         }
         String jsonFlow = new Gson().toJson(contextIDMap);
-        Map<String, Object> bmlReturnMap = bmlService.upload(userName, jsonFlow, UUID.randomUUID().toString() + ".json",
-                dssFlow.getName());
+        Map<String, Object> bmlReturnMap =
+                bmlService.upload(
+                        userName,
+                        jsonFlow,
+                        UUID.randomUUID().toString() + ".json",
+                        dssFlow.getName());
 
         dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
 
@@ -116,7 +117,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (!dssFlow.getRootFlow()) {
             parentFlowID = flowMapper.getParentFlowID(dssFlow.getId());
         }
-        //todo update dssflow
+        // todo update dssflow
         contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
         flowMapper.updateFlowInputInfo(dssFlow);
         return dssFlow;
@@ -125,11 +126,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
-    public DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr) throws DSSErrorException {
+    public DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr)
+            throws DSSErrorException {
         DSSFlow parentFlow = flowMapper.selectFlowByID(parentFlowID);
         DSSFlow.setProjectID(parentFlow.getProjectID());
         DSSFlow subFlow = addFlow(DSSFlow, contextIDStr);
-        //数据库中插入关联信息
+        // 数据库中插入关联信息
         flowMapper.insertFlowRelation(subFlow.getId(), parentFlowID);
         return subFlow;
     }
@@ -137,9 +139,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public DSSFlow getLatestVersionFlow(Long flowID) {
         DSSFlow DSSFlow = getFlowByID(flowID);
-        //todo update
+        // todo update
         String userName = DSSFlow.getCreator();
-        Map<String, Object> query = bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
+        Map<String, Object> query =
+                bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
         DSSFlow.setFlowJson(query.get("string").toString());
         return DSSFlow;
     }
@@ -149,7 +152,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow DSSFlow = getFlowByID(flowID);
 
         String userName = DSSFlow.getCreator();
-        Map<String, Object> query = bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
+        Map<String, Object> query =
+                bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
         DSSFlow.setFlowJson(query.get("string").toString());
         return DSSFlow;
     }
@@ -170,21 +174,24 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
     public void batchDeleteFlow(List<Long> flowIDlist) {
-        flowIDlist.stream().forEach(f -> {
-            deleteFlow(f);
-        });
+        flowIDlist.stream()
+                .forEach(
+                        f -> {
+                            deleteFlow(f);
+                        });
     }
 
     /*@Lock*/
     @Transactional(rollbackFor = {DSSErrorException.class})
     @Override
-    public String saveFlow(Long flowID,
-                           String jsonFlow,
-                           String comment,
-                           String userName,
-                           String workspaceName,
-                           String projectName
-    ) throws DSSErrorException {
+    public String saveFlow(
+            Long flowID,
+            String jsonFlow,
+            String comment,
+            String userName,
+            String workspaceName,
+            String projectName)
+            throws DSSErrorException {
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -197,9 +204,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long parentFlowID = flowMapper.getParentFlowID(flowID);
 
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
-        jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
-                workspaceName, projectName, dssFlow.getName(), userName, false);
-
+        jsonFlow =
+                contextService.checkAndCreateContextID(
+                        jsonFlow,
+                        dssFlow.getBmlVersion(),
+                        workspaceName,
+                        projectName,
+                        dssFlow.getName(),
+                        userName,
+                        false);
 
         Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
 
@@ -208,12 +221,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         dssFlow.setDescription(comment);
         dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
         dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
-        //todo 数据库增加版本更新
+        // todo 数据库增加版本更新
         flowMapper.updateFlowInputInfo(dssFlow);
 
         try {
-            contextService.checkAndSaveContext(jsonFlow,  String.valueOf(parentFlowID));
-        }  catch (DSSErrorException e) {
+            contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
+        } catch (DSSErrorException e) {
             logger.error("Failed to saveContext: ", e);
         }
 
@@ -260,25 +273,36 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         flowMapper.deleteFlowBaseInfo(flowID);
         flowMapper.deleteFlowRelation(flowID);
-        //第一期没有工作流的发布，所以不需要删除dws工作流的发布表
+        // 第一期没有工作流的发布，所以不需要删除dws工作流的发布表
     }
 
-
     @Override
-    public DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version,String contextIdStr) throws DSSErrorException, IOException {
+    public DSSFlow copyRootFlow(
+            Long rootFlowId,
+            String userName,
+            String workspaceName,
+            String projectName,
+            String version,
+            String contextIdStr)
+            throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName);
-        updateFlowJson(userName, workspaceName, projectName, rootFlowWithSubFlows, version, null,contextIdStr);
+        updateFlowJson(
+                userName,
+                workspaceName,
+                projectName,
+                rootFlowWithSubFlows,
+                version,
+                null,
+                contextIdStr);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         return copyFlow;
     }
 
-
-    private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow DSSFlow,
-                                              String userName) {
+    private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow DSSFlow, String userName) {
         DSSFlow cyFlow = new DSSFlow();
         BeanUtils.copyProperties(DSSFlow, cyFlow, "children", "flowVersions");
-        //封装flow信息
+        // 封装flow信息
         cyFlow.setCreator(userName);
         cyFlow.setCreateTime(new Date());
         cyFlow.setId(null);
@@ -296,32 +320,52 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return cyFlow;
     }
 
-    private void updateFlowJson(String userName, String workspaceName, String projectName, DSSFlow rootFlow, String version, Long parentFlowId,String contextIdStr) throws DSSErrorException, IOException {
-        String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
-        //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
+    private void updateFlowJson(
+            String userName,
+            String workspaceName,
+            String projectName,
+            DSSFlow rootFlow,
+            String version,
+            Long parentFlowId,
+            String contextIdStr)
+            throws DSSErrorException, IOException {
+        String flowJson =
+                bmlService.readFlowJsonFromBML(
+                        userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
+        // 如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextId(flowJson,contextIdStr);
+        String updateFlowJson = updateFlowContextId(flowJson, contextIdStr);
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
-                updateFlowJson(userName, workspaceName, projectName, subflow, version, rootFlow.getId(),contextIdStr);
+                updateFlowJson(
+                        userName,
+                        workspaceName,
+                        projectName,
+                        subflow,
+                        version,
+                        rootFlow.getId(),
+                        contextIdStr);
             }
         }
-        DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
-        //todo add dssflow to database
+        DSSFlow updateDssFlow =
+                uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
+        // todo add dssflow to database
         flowMapper.updateFlowInputInfo(updateDssFlow);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));
     }
 
+    private DSSFlow uploadFlowJsonToBml(
+            String userName, String projectName, DSSFlow dssFlow, String flowJson) {
 
-    private DSSFlow uploadFlowJsonToBml(String userName, String projectName, DSSFlow dssFlow, String flowJson) {
-
-        //上传文件获取resourceId和version save应该是已经有
+        // 上传文件获取resourceId和version save应该是已经有
         Map<String, Object> bmlReturnMap;
 
-        //上传文件获取resourceId和version save应该是已经有
-        bmlReturnMap = bmlService.upload(userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
+        // 上传文件获取resourceId和version save应该是已经有
+        bmlReturnMap =
+                bmlService.upload(
+                        userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
 
         dssFlow.setCreator(userName);
         dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
@@ -329,23 +373,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         dssFlow.setDescription("copy update workflow");
         dssFlow.setSource("copy更新");
 
-        //version表中插入数据
+        // version表中插入数据
         return dssFlow;
     }
 
-
-    private String updateFlowContextId(String flowJson,String contextIdStr) throws  IOException {
-//        String parentFlowIdStr = null;
-//        if (parentFlowId != null) {
-//            parentFlowIdStr = parentFlowId.toString();
-//        }
-//        String contextID = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspace, projectName, flowName, flowVersion, userName);
-        String updatedFlowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "contextID", contextIdStr);
+    private String updateFlowContextId(String flowJson, String contextIdStr) throws IOException {
+        //        String parentFlowIdStr = null;
+        //        if (parentFlowId != null) {
+        //            parentFlowIdStr = parentFlowId.toString();
+        //        }
+        //        String contextID = contextService.checkAndInitContext(flowJson, parentFlowIdStr,
+        // workspace, projectName, flowName, flowVersion, userName);
+        String updatedFlowJson =
+                workFlowParser.updateFlowJsonWithKey(flowJson, "contextID", contextIdStr);
         return updatedFlowJson;
     }
 
-
-    private String updateWorkFlowNodeJson(String userName, String projectName, String flowJson, DSSFlow DSSFlow) throws DSSErrorException, IOException {
+    private String updateWorkFlowNodeJson(
+            String userName, String projectName, String flowJson, DSSFlow DSSFlow)
+            throws DSSErrorException, IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
         if (nodeJsonList == null) {
             throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败" + DSSFlow.getName());
@@ -360,17 +406,23 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             for (String nodeJson : nodeJsonList) {
                 String updateNodeJson = nodeJson;
 
-                Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
-                //更新subflowID
+                Map<String, Object> nodeJsonMap =
+                        BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
+                // 更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
                 if ("workflow.subflow".equals(nodeType)) {
                     String subFlowName = nodeJsonMap.get("title").toString();
-                    List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
-                            subflow.getName().equals(subFlowName)
-                    ).collect(Collectors.toList());
+                    List<DSSFlow> DSSFlowList =
+                            subflows.stream()
+                                    .filter(subflow -> subflow.getName().equals(subFlowName))
+                                    .collect(Collectors.toList());
                     if (DSSFlowList.size() == 1) {
-                        updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, DSSFlowList.get(0).getId());
-                        nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+                        updateNodeJson =
+                                nodeInputService.updateNodeSubflowID(
+                                        updateNodeJson, DSSFlowList.get(0).getId());
+                        nodeJsonMap =
+                                BDPJettyServerHelper.jacksonJson()
+                                        .readValue(updateNodeJson, Map.class);
                         nodeJsonListRes.add(nodeJsonMap);
                     } else if (DSSFlowList.size() > 1) {
                         logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
@@ -380,7 +432,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                     }
                 } else {
-                    //todo  appconn节点的copy和json更新
+                    // todo  appconn节点的copy和json更新
                     nodeJsonListRes.add(nodeJsonMap);
                 }
             }
@@ -389,12 +441,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
     }
 
-
     private void persistenceFlowRelation(Long flowID, Long parentFlowID) {
         DSSFlowRelation relation = flowMapper.selectFlowRelation(flowID, parentFlowID);
         if (relation == null) {
             flowMapper.insertFlowRelation(flowID, parentFlowID);
         }
     }
-
 }

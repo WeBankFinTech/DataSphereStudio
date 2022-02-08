@@ -19,17 +19,14 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 import java.io.Serializable;
 import java.util.Map;
 
-
 public class DSSWorkspaceComponentPrivVO extends AbstractDSSVO implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     private int id;
     private String name;
     private Map<String, Boolean> componentPrivs;
 
-
-    public DSSWorkspaceComponentPrivVO() {
-    }
+    public DSSWorkspaceComponentPrivVO() {}
 
     public DSSWorkspaceComponentPrivVO(int id, String name, Map<String, Boolean> componentPrivs) {
         this.id = id;
@@ -63,10 +60,14 @@ public class DSSWorkspaceComponentPrivVO extends AbstractDSSVO implements Serial
 
     @Override
     public String toString() {
-        return "DSSWorkspaceComponentPrivVO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", componentPrivs=" + componentPrivs +
-                '}';
+        return "DSSWorkspaceComponentPrivVO{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", componentPrivs="
+                + componentPrivs
+                + '}';
     }
 }

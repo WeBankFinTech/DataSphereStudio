@@ -16,10 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import org.apache.ibatis.annotations.*;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 
 @Mapper
 public interface DSSWorkspaceInfoMapper {
@@ -32,10 +31,10 @@ public interface DSSWorkspaceInfoMapper {
 
     @Select("select * from dss_workspace where id = #{workspaceId}")
     @Results({
-            @Result(property = "createBy", column = "create_by"),
-            @Result(property = "createTime", column = "create_time"),
-            @Result(property = "lastUpdateTime", column = "last_update_time"),
-            @Result(property = "lastUpdateUser", column = "last_update_user"),
+        @Result(property = "createBy", column = "create_by"),
+        @Result(property = "createTime", column = "create_time"),
+        @Result(property = "lastUpdateTime", column = "last_update_time"),
+        @Result(property = "lastUpdateUser", column = "last_update_user"),
     })
     DSSWorkspace getWorkspace(@Param("workspaceId") int workspaceId);
 }

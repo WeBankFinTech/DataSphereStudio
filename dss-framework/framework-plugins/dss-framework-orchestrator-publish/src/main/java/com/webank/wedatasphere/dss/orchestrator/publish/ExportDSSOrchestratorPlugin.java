@@ -21,27 +21,30 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.List;
 import java.util.Map;
 
-
 public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
+    Map<String, Object> exportOrchestrator(
+            String userName,
+            String workspaceName,
+            Long orchestratorId,
+            Long orcVersionId,
+            String projectName,
+            List<DSSLabel> dssLabels,
+            boolean addOrcVersion,
+            Workspace workspace)
+            throws DSSErrorException;
 
-    Map<String,Object> exportOrchestrator(String userName,
-        String workspaceName,
-        Long orchestratorId,
-        Long orcVersionId,
-        String projectName,
-        List<DSSLabel> dssLabels,
-        boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
-
-    Long orchestratorVersionIncrease(Long orcId,
-        String userName,
-        String comment,
-        String workspaceName,
-        DSSOrchestratorInfo dssOrchestratorInfo,
-        String projectName,
-        List<DSSLabel> dssLabels) throws DSSErrorException;
-
+    Long orchestratorVersionIncrease(
+            Long orcId,
+            String userName,
+            String comment,
+            String workspaceName,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            String projectName,
+            List<DSSLabel> dssLabels)
+            throws DSSErrorException;
 }

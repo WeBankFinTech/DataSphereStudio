@@ -19,11 +19,11 @@ package com.webank.wedatasphere.dss.standard.app.sso.origin.filter.spring;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.plugin.OriginSSOPluginFilter;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.UserInterceptor;
 
-import javax.servlet.FilterConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.servlet.FilterConfig;
 
 @Component
 public class SpringOriginSSOPluginFilter extends OriginSSOPluginFilter {
@@ -31,7 +31,8 @@ public class SpringOriginSSOPluginFilter extends OriginSSOPluginFilter {
     @Override
     public UserInterceptor getUserInterceptor(FilterConfig filterConfig) {
         WebApplicationContext webApplicationContext =
-            WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
+                WebApplicationContextUtils.getRequiredWebApplicationContext(
+                        filterConfig.getServletContext());
         return webApplicationContext.getBean(UserInterceptor.class);
     }
 }

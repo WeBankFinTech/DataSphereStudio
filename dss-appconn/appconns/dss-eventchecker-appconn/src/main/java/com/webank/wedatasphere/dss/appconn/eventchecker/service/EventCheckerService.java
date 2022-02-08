@@ -35,28 +35,26 @@ public class EventCheckerService {
     }
 
     public boolean sendMsg(int jobId, Properties props, Logger log) {
-        if(props!=null){
-            return new EventCheckSender(props).sendMsg(jobId,props,log);
-        }else{
+        if (props != null) {
+            return new EventCheckSender(props).sendMsg(jobId, props, log);
+        } else {
             log.error("create EventCheckSender failed {}");
             return false;
         }
     }
 
     /**
-     * Receiving a message first queries the consumption record,
-     * and then starts to consume after the last consumption, and no consumption
-     * starts after the job starts. The received message is performed in an active
-     * query manner, and the target message is repeatedly queried within a time period
-     * when the set target is not exceeded.
+     * Receiving a message first queries the consumption record, and then starts to consume after
+     * the last consumption, and no consumption starts after the job starts. The received message is
+     * performed in an active query manner, and the target message is repeatedly queried within a
+     * time period when the set target is not exceeded.
      */
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
-        if(props!=null){
-            return new DefaultEventcheckReceiver(props).reciveMsg(jobId,props,log);
-        }else{
+        if (props != null) {
+            return new DefaultEventcheckReceiver(props).reciveMsg(jobId, props, log);
+        } else {
             log.error("create EventCheckSender failed {}");
             return false;
         }
     }
-
 }

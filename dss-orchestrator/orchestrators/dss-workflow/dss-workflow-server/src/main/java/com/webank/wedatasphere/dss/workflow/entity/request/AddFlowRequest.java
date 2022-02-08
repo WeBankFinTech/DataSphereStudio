@@ -8,7 +8,7 @@ public class AddFlowRequest {
     private String workspaceName;
     private String projectName;
     private String version;
-    private String description ;
+    private String description;
     private Long parentFlowID;
     private String uses;
     private LabelRouteVO labels;

@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
-
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-
 
 public class ResponseCreateWorkflow {
 

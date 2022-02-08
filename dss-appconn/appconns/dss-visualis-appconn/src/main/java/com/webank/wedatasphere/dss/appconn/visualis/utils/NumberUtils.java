@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
 public class NumberUtils {
 
-    public static Integer getInt(Object original){
-        if(original instanceof Double){
+    public static Integer getInt(Object original) {
+        if (original instanceof Double) {
             return ((Double) original).intValue();
         }
         return (Integer) original;
@@ -30,5 +30,4 @@ public class NumberUtils {
         Integer intValue = doubleValue.intValue();
         return intValue.toString();
     }
-
 }

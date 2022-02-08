@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public interface RefFactory {
 
     RefFactory INSTANCE = new DefaultRefFactory();
@@ -26,15 +25,16 @@ public interface RefFactory {
     <R extends Ref> R newRef(Class<R> clazz) throws DSSErrorException;
 
     /**
-     * We need to instantiate Ref, because each Ref is instantiated in a different AppConn,
-     * so their ClassLoader is also different from the main ClassLoader,
-     * so we need to pass in the ClassLoader that instantiates the AppConn.
+     * We need to instantiate Ref, because each Ref is instantiated in a different AppConn, so their
+     * ClassLoader is also different from the main ClassLoader, so we need to pass in the
+     * ClassLoader that instantiates the AppConn.
+     *
      * @param clazz The interface inherited by the class that needs to be instantiated.
      * @param classLoader Instantiate the classloader of appConn.
      * @param packageName package name.
      * @return return a instance of R.
      * @throws DSSErrorException
      */
-    <R extends Ref> R newRef(Class<R> clazz, ClassLoader classLoader, String packageName) throws DSSErrorException;
-
+    <R extends Ref> R newRef(Class<R> clazz, ClassLoader classLoader, String packageName)
+            throws DSSErrorException;
 }

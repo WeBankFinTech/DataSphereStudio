@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import java.util.Date;
 
-
 public interface Role {
 
     String getName();
@@ -34,5 +33,4 @@ public interface Role {
     String getUpdator();
 
     String getLastUpdateTime();
-
 }

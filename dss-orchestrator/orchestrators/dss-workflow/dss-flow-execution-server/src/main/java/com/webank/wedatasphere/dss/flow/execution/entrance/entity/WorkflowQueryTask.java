@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.entity;
 
 import java.util.Date;
 
-
 public class WorkflowQueryTask {
     private Long taskID;
     private String instance;

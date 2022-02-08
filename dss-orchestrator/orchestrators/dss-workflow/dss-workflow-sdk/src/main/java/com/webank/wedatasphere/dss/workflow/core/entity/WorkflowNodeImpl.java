@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 
 import java.util.List;
 
-
 public class WorkflowNodeImpl implements WorkflowNode {
 
     private DSSNode dssNode;

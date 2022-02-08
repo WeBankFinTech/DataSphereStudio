@@ -16,16 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.project.utils;
 
-
 public enum ApplicationArea {
-    //  Operational optimization, risk management, marketing recommendation, trend prediction, customer management
+    //  Operational optimization, risk management, marketing recommendation, trend prediction,
+    // customer management
     //  运营优化,风险管理,营销推荐,趋势预测,客户管理;
-    OO("运营优化","Operational Optimization",0),
-    RM("风险管理","Risk Management",1),
-    MR("营销推荐","Marketing Recommendation",2),
-    TP("趋势预测","Trend Prediction",3),
-    CM("客户管理","Customer Management",4);
-
+    OO("运营优化", "Operational Optimization", 0),
+    RM("风险管理", "Risk Management", 1),
+    MR("营销推荐", "Marketing Recommendation", 2),
+    TP("趋势预测", "Trend Prediction", 3),
+    CM("客户管理", "Customer Management", 4);
 
     private int id;
     private String name;
@@ -41,12 +40,11 @@ public enum ApplicationArea {
         return name;
     }
 
-    public int getId(){
+    public int getId() {
         return this.id;
     }
 
-    public String getEnName(){
+    public String getEnName() {
         return this.enName;
     }
-
 }

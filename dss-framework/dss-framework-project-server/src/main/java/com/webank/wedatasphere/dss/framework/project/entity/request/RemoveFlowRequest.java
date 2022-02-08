@@ -18,8 +18,6 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-
 
 @XmlRootElement
 public class RemoveFlowRequest {
@@ -58,10 +56,14 @@ public class RemoveFlowRequest {
 
     @Override
     public String toString() {
-        return "RemoveFlowRequest{" +
-                "orchestratorId=" + orchestratorId +
-                ", projectId=" + projectId +
-                ", orchestratorName='" + orchestratorName + '\'' +
-                '}';
+        return "RemoveFlowRequest{"
+                + "orchestratorId="
+                + orchestratorId
+                + ", projectId="
+                + projectId
+                + ", orchestratorName='"
+                + orchestratorName
+                + '\''
+                + '}';
     }
 }

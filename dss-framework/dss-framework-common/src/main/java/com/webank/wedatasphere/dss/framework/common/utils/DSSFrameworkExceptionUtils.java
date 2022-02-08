@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.common.utils;
 
-
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkRuntimeException;
 import com.webank.wedatasphere.dss.framework.common.exception.ThrowingConsumer;
 import com.webank.wedatasphere.dss.framework.common.exception.ThrowingFunction;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 
 public class DSSFrameworkExceptionUtils {
 
@@ -37,19 +35,19 @@ public class DSSFrameworkExceptionUtils {
             try {
                 throwingConsumer.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
+                LOGGER.error("execute failed,reason:", e);
                 throw new DSSFrameworkRuntimeException(e.getMessage());
             }
         };
     }
 
-    public static <T,R, E extends Exception> Function<T,R> map(
-            ThrowingFunction<T,R, E> throwingFunction) {
+    public static <T, R, E extends Exception> Function<T, R> map(
+            ThrowingFunction<T, R, E> throwingFunction) {
         return i -> {
             try {
                 return throwingFunction.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
+                LOGGER.error("execute failed,reason:", e);
                 throw new DSSFrameworkRuntimeException(e.getMessage());
             }
         };

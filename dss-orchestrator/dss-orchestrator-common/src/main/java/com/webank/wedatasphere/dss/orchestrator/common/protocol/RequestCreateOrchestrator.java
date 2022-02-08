@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import java.util.List;
 
+import java.util.List;
 
 public class RequestCreateOrchestrator {
 
@@ -31,13 +31,14 @@ public class RequestCreateOrchestrator {
     private DSSOrchestratorInfo dssOrchestratorInfo;
     private List<DSSLabel> dssLabels;
 
-    public RequestCreateOrchestrator(String userName,
-                                     String workspaceName,
-                                     String projectName,
-                                     Long projectId,
-                                     String description,
-                                     DSSOrchestratorInfo dssOrchestratorInfo,
-                                     List<DSSLabel> dssLabels) {
+    public RequestCreateOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long projectId,
+            String description,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.workspaceName = workspaceName;
         this.projectName = projectName;
@@ -46,10 +47,6 @@ public class RequestCreateOrchestrator {
         this.dssOrchestratorInfo = dssOrchestratorInfo;
         this.dssLabels = dssLabels;
     }
-
-
-
-
 
     public String getUserName() {
         return userName;
@@ -106,7 +103,4 @@ public class RequestCreateOrchestrator {
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
     }
-
-
-
 }

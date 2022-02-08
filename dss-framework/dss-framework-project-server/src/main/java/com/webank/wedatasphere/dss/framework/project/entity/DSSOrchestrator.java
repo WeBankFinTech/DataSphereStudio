@@ -17,90 +17,59 @@
 package com.webank.wedatasphere.dss.framework.project.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.*;
 
-
 @TableName(value = "dss_project_orchestrator")
 public class DSSOrchestrator implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
+    /** 主键ID */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 空间id
-     */
+    /** 空间id */
     private Long workspaceId;
 
-    /**
-     * 工程id
-     */
+    /** 工程id */
     private Long projectId;
 
-    /**
-     * 编排模式id（工作流,调用orchestrator服务返回的orchestratorId）
-     */
+    /** 编排模式id（工作流,调用orchestrator服务返回的orchestratorId） */
     private Long orchestratorId;
 
-    /**
-     * 编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId）
-     */
+    /** 编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId） */
     private Long orchestratorVersionId;
 
-    /**
-     * 编排名称
-     */
+    /** 编排名称 */
     private String orchestratorName;
 
-    /**
-     * 编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_orchestratorment_mode)
-     */
+    /** 编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_orchestratorment_mode) */
     private String orchestratorMode;
 
-    /**
-     * 编排方式
-     */
-    private String  orchestratorWay;
+    /** 编排方式 */
+    private String orchestratorWay;
 
-    /**
-     * 用途
-     */
+    /** 用途 */
     private String uses;
 
-    /**
-     * 描述
-     */
+    /** 描述 */
     private String description;
 
-    /**
-     * 创建人
-     */
+    /** 创建人 */
     private String createUser;
 
-    /**
-     * 创建时间
-     */
+    /** 创建时间 */
     private Date createTime;
 
-    /**
-     * 更新人
-     */
+    /** 更新人 */
     private String updateUser;
 
-    /**
-     * 更新时间
-     */
+    /** 更新时间 */
     private Date updateTime;
-
 
     public Long getId() {
         return id;
@@ -216,21 +185,42 @@ public class DSSOrchestrator implements Serializable {
 
     @Override
     public String toString() {
-        return "DSSOrchestrator{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", projectId=" + projectId +
-                ", orchestratorId=" + orchestratorId +
-                ", orchestratorVersionId=" + orchestratorVersionId +
-                ", orchestratorName='" + orchestratorName + '\'' +
-                ", orchestratorMode='" + orchestratorMode + '\'' +
-                ", orchestratorWay='" + orchestratorWay + '\'' +
-                ", uses='" + uses + '\'' +
-                ", description='" + description + '\'' +
-                ", createUser='" + createUser + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
-                '}';
+        return "DSSOrchestrator{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", projectId="
+                + projectId
+                + ", orchestratorId="
+                + orchestratorId
+                + ", orchestratorVersionId="
+                + orchestratorVersionId
+                + ", orchestratorName='"
+                + orchestratorName
+                + '\''
+                + ", orchestratorMode='"
+                + orchestratorMode
+                + '\''
+                + ", orchestratorWay='"
+                + orchestratorWay
+                + '\''
+                + ", uses='"
+                + uses
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + ", createUser='"
+                + createUser
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateUser='"
+                + updateUser
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + '}';
     }
 }

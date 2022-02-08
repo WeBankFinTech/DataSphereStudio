@@ -19,16 +19,16 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 import com.webank.wedatasphere.dss.standard.app.development.listener.scheduler.ListenerEventBusRefExecutionScheduler;
 import com.webank.wedatasphere.dss.standard.app.development.listener.scheduler.LongTermRefExecutionScheduler;
 
-
 public class SchedulerManager {
 
-    private static LongTermRefExecutionScheduler scheduler = new ListenerEventBusRefExecutionScheduler();
+    private static LongTermRefExecutionScheduler scheduler =
+            new ListenerEventBusRefExecutionScheduler();
 
-    static{
-        ((ListenerEventBusRefExecutionScheduler)scheduler).start();
+    static {
+        ((ListenerEventBusRefExecutionScheduler) scheduler).start();
     }
 
-    public static LongTermRefExecutionScheduler getScheduler(){
+    public static LongTermRefExecutionScheduler getScheduler() {
         return scheduler;
     }
 }

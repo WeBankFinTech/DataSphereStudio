@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
-
 public interface ProcessNode {
 
     Integer getIndex();
@@ -24,5 +23,4 @@ public interface ProcessNode {
     String getName();
 
     String getChName();
-
 }

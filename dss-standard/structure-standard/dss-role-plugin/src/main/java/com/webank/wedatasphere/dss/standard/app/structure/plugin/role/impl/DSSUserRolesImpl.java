@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.plugin.role.DSSUserRol
 
 import java.util.List;
 
-
 public class DSSUserRolesImpl implements DSSUserRoles {
 
     private List<String> roles;

@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
 
-
 public interface CommonRequestRef extends WorkspaceRequestRef {
 
     void setUserName(String userName);
@@ -49,9 +48,7 @@ public interface CommonRequestRef extends WorkspaceRequestRef {
 
     String getWorkspaceName();
 
-
     String getContextID();
-
 
     void setContextID(String contextIDStr);
 

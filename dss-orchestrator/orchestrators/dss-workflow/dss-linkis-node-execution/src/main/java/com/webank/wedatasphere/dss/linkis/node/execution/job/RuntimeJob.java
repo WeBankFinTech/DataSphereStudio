@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-
-public interface RuntimeJob {
-}
+public interface RuntimeJob {}

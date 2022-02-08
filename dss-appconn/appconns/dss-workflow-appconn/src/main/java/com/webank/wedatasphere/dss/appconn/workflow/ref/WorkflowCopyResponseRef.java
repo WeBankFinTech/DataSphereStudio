@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyRespo
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 
-
-public class WorkflowCopyResponseRef extends CommonResponseRef implements OrchestratorCopyResponseRef{
+public class WorkflowCopyResponseRef extends CommonResponseRef
+        implements OrchestratorCopyResponseRef {
 
     private DSSFlow dssFlow;
 

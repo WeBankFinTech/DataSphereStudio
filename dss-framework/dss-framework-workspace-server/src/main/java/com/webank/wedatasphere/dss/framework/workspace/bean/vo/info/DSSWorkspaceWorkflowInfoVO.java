@@ -16,21 +16,22 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo.info;
 
+public class DSSWorkspaceWorkflowInfoVO extends AbstractWorkspaceComponentInfoVO {
 
-public class DSSWorkspaceWorkflowInfoVO extends AbstractWorkspaceComponentInfoVO{
+    // private static final String WORKFLOW_DESC = "DSS系统工作流开发是支持以可视化编辑方式进行工作流编排，" +
+    // "同时支持工作流实时执行并能够一键发布到WTSS进行定时调度的组件，工作流开发已经支持Scriptis、Visualis以及Qualitis等子系统的接入。";
 
-    //private static final String WORKFLOW_DESC = "DSS系统工作流开发是支持以可视化编辑方式进行工作流编排，" +
-            //"同时支持工作流实时执行并能够一键发布到WTSS进行定时调度的组件，工作流开发已经支持Scriptis、Visualis以及Qualitis等子系统的接入。";
-
-    private static final String WORKFLOW_DESC = "DataSphere Studio workflow development is a component which supports workflow editing " +
-            "through visual editing, and supports real-time execution of workflows and releasing workflows to WTSS by one-click scheduling as well. " +
-            "Now it has supported the connection of subsystems such as Scriptis, Visualis, and Qualitis etc. ";
+    private static final String WORKFLOW_DESC =
+            "DataSphere Studio workflow development is a component which supports workflow editing "
+                    + "through visual editing, and supports real-time execution of workflows and releasing workflows to WTSS by one-click scheduling as well. "
+                    + "Now it has supported the connection of subsystems such as Scriptis, Visualis, and Qualitis etc. ";
 
     private static final String WORKFLOW_BUTTON_TEXT = "Enter Workflow Development";
 
     private static final String WORKFLOW_ICON = "fi-workflow";
 
-    private static final String WORKFLOW_MANUAL_URL = "http://127.0.0.1:8088/wiki/scriptis/manual/feature_overview_cn.html";
+    private static final String WORKFLOW_MANUAL_URL =
+            "http://127.0.0.1:8088/wiki/scriptis/manual/feature_overview_cn.html";
 
     private static final String WORKFLOW_TITLE = "Workflow Development";
 
@@ -41,5 +42,4 @@ public class DSSWorkspaceWorkflowInfoVO extends AbstractWorkspaceComponentInfoVO
         this.setIcon(WORKFLOW_ICON);
         this.setUserManualUrl(WORKFLOW_MANUAL_URL);
     }
-    
 }

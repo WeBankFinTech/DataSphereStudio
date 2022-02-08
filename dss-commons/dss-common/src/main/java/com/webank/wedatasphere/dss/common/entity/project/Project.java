@@ -32,6 +32,4 @@ public interface Project {
     String getCreateBy();
 
     void setCreateBy(String createBy);
-
-
 }

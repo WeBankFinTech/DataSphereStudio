@@ -16,14 +16,16 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class VisualisProjectResponseRef extends AbstractResponseRef implements ProjectResponseRef {
 

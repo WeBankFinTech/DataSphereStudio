@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 @XmlRootElement
 public class ProjectDeleteRequest {
 
@@ -58,10 +57,13 @@ public class ProjectDeleteRequest {
 
     @Override
     public String toString() {
-        return "ProjectDeleteRequest{" +
-                "id=" + id +
-                ", sure=" + sure +
-                ", ifDelOtherSys=" + ifDelOtherSys +
-                '}';
+        return "ProjectDeleteRequest{"
+                + "id="
+                + id
+                + ", sure="
+                + sure
+                + ", ifDelOtherSys="
+                + ifDelOtherSys
+                + '}';
     }
 }

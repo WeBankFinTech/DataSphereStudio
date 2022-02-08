@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.request;
 
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-
 
 public interface SSORequestOperation<T, R> extends Operation {
 
     R requestWithSSO(SSOUrlBuilderOperation urlBuilder, T req) throws AppStandardErrorException;
-
 }

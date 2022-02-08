@@ -18,11 +18,9 @@ package com.webank.wedatasphere.dss.orchestrator.core.plugin;
 
 import java.io.Closeable;
 
-
 public interface DSSOrchestratorPlugin extends Closeable {
 
     void init();
 
     boolean isReady();
-
 }

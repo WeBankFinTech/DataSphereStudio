@@ -16,12 +16,10 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
+
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class DSSCommonResponseRef extends CommonResponseRef {
 
@@ -45,8 +43,8 @@ public class DSSCommonResponseRef extends CommonResponseRef {
         }
     }
 
-    public static Integer getInt(Object original){
-        if(original instanceof Double){
+    public static Integer getInt(Object original) {
+        if (original instanceof Double) {
             return ((Double) original).intValue();
         }
         return (Integer) original;

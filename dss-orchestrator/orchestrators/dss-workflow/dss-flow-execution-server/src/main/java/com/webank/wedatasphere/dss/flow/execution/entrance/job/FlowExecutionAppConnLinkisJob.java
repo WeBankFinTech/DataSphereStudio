@@ -19,27 +19,21 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractAppConnLinkisJob;
 
-
 public class FlowExecutionAppConnLinkisJob extends AbstractAppConnLinkisJob {
-
 
     @Override
     public String getSubmitUser() {
         return getJobProps().get(FlowExecutionEntranceConfiguration.FLOW_SUBMIT_USER());
     }
 
-
-
     @Override
     public String getUser() {
-       return getSubmitUser();
-        //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
+        return getSubmitUser();
+        // return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
     }
 
     @Override
     public String getJobName() {
         return getJobProps().get(FlowExecutionEntranceConfiguration.JOB_ID());
     }
-
-
 }

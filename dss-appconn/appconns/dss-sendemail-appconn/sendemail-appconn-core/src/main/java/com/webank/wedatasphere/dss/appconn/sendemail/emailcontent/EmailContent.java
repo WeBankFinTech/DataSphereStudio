@@ -21,5 +21,4 @@ public interface EmailContent<T> {
     T getContent();
 
     void setContent(T content);
-
 }

@@ -28,28 +28,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 @Component
 public class OrchestratorManager {
 
-    private final static Logger logger = LoggerFactory.getLogger(OrchestratorManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrchestratorManager.class);
 
     private Map<String, DSSOrchestrator> cacheDssOrchestrator = new ConcurrentHashMap<>();
 
-    @Autowired
-    private DefaultOrchestratorLoader defaultOrchestratorLoader;
+    @Autowired private DefaultOrchestratorLoader defaultOrchestratorLoader;
 
-    public DSSOrchestrator getOrCreateOrchestrator(String userName,
-                                                   String workspaceName,
-                                                   String typeName,
-                                                   String appConnName,
-                                                   List<DSSLabel> dssLabels) {
+    public DSSOrchestrator getOrCreateOrchestrator(
+            String userName,
+            String workspaceName,
+            String typeName,
+            String appConnName,
+            List<DSSLabel> dssLabels) {
         String findKey = getCacheKey(userName, workspaceName, typeName, appConnName);
         DSSOrchestrator dssOrchestrator = cacheDssOrchestrator.get(findKey);
         if (null == dssOrchestrator) {
             try {
 
-                dssOrchestrator = defaultOrchestratorLoader.loadOrchestrator(userName, workspaceName, typeName, appConnName, dssLabels);
+                dssOrchestrator =
+                        defaultOrchestratorLoader.loadOrchestrator(
+                                userName, workspaceName, typeName, appConnName, dssLabels);
 
                 cacheDssOrchestrator.put(findKey, dssOrchestrator);
             } catch (AppConnErrorException e) {
@@ -59,7 +60,8 @@ public class OrchestratorManager {
         return dssOrchestrator;
     }
 
-    protected String getCacheKey(String userName, String workspaceName, String typeName, String appConnName) {
+    protected String getCacheKey(
+            String userName, String workspaceName, String typeName, String appConnName) {
         return userName + "_" + workspaceName + "_" + typeName + "_" + appConnName;
     }
 }

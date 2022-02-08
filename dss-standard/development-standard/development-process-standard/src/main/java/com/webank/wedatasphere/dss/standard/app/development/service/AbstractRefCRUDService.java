@@ -25,15 +25,18 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
-public abstract class AbstractRefCRUDService extends AbstractDevelopmentService implements RefCRUDService {
+public abstract class AbstractRefCRUDService extends AbstractDevelopmentService
+        implements RefCRUDService {
 
-    protected abstract <K extends CreateRequestRef> RefCreationOperation<K> createRefCreationOperation();
+    protected abstract <K extends CreateRequestRef>
+            RefCreationOperation<K> createRefCreationOperation();
 
     protected abstract <K extends CopyRequestRef> RefCopyOperation<K> createRefCopyOperation();
 
     protected abstract <K extends RequestRef> RefUpdateOperation<K> createRefUpdateOperation();
 
-    protected abstract <K extends DeleteRequestRef> RefDeletionOperation<K> createRefDeletionOperation();
+    protected abstract <K extends DeleteRequestRef>
+            RefDeletionOperation<K> createRefDeletionOperation();
 
     @Override
     public <K extends CreateRequestRef> RefCreationOperation<K> getRefCreationOperation() {
@@ -42,7 +45,7 @@ public abstract class AbstractRefCRUDService extends AbstractDevelopmentService 
 
     @Override
     public <K extends CopyRequestRef> RefCopyOperation<K> getRefCopyOperation() {
-         return getOrCreate(this::createRefCopyOperation, RefCopyOperation.class);
+        return getOrCreate(this::createRefCopyOperation, RefCopyOperation.class);
     }
 
     @Override
@@ -54,5 +57,4 @@ public abstract class AbstractRefCRUDService extends AbstractDevelopmentService 
     public <K extends DeleteRequestRef> RefDeletionOperation<K> getRefDeletionOperation() {
         return getOrCreate(this::createRefDeletionOperation, RefDeletionOperation.class);
     }
-
 }

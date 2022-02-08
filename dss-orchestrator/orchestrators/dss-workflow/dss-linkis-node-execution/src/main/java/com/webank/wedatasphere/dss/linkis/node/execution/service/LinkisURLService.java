@@ -16,17 +16,20 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.service;
 
+import org.apache.linkis.common.utils.ClassUtils;
+
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionWarnException;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.LinkisURLServiceImpl;
-import org.apache.linkis.common.utils.ClassUtils;
-import java.util.Optional;
 
+import java.util.Optional;
 
 public interface LinkisURLService {
 
     /**
-     * Get Linkis gateway url by job. If multi-Linkis cluster is needed, user can override this method to provide different urls by job.
+     * Get Linkis gateway url by job. If multi-Linkis cluster is needed, user can override this
+     * method to provide different urls by job.
+     *
      * @param job this nodeJob
      * @return a accessiable Linkis gateway url.
      */
@@ -34,6 +37,7 @@ public interface LinkisURLService {
 
     /**
      * Get default Linkis gateway url by job.
+     *
      * @param job this nodeJob
      * @return a accessiable Linkis gateway url.
      */
@@ -41,24 +45,30 @@ public interface LinkisURLService {
 
     class Factory {
 
-        private Factory() {
-        }
+        private Factory() {}
 
         private static LinkisURLService linkisURLService;
 
         public static LinkisURLService getLinkisURLService() {
-            if(linkisURLService != null) {
+            if (linkisURLService != null) {
                 return linkisURLService;
             }
             synchronized (Factory.class) {
-                if(linkisURLService == null) {
-                    Optional<Class<? extends LinkisURLService>> clazz = ClassUtils.reflections().getSubTypesOf(LinkisURLService.class).stream().filter(c -> !ClassUtils.isInterfaceOrAbstract(c) &&
-                        !LinkisURLServiceImpl.class.isAssignableFrom(c)).findFirst();
-                    if(clazz.isPresent()) {
+                if (linkisURLService == null) {
+                    Optional<Class<? extends LinkisURLService>> clazz =
+                            ClassUtils.reflections().getSubTypesOf(LinkisURLService.class).stream()
+                                    .filter(
+                                            c ->
+                                                    !ClassUtils.isInterfaceOrAbstract(c)
+                                                            && !LinkisURLServiceImpl.class
+                                                                    .isAssignableFrom(c))
+                                    .findFirst();
+                    if (clazz.isPresent()) {
                         try {
                             linkisURLService = clazz.get().newInstance();
                         } catch (Exception e) {
-                            throw new LinkisJobExecutionWarnException(24335, "Get LinkisURLService failed!", e);
+                            throw new LinkisJobExecutionWarnException(
+                                    24335, "Get LinkisURLService failed!", e);
                         }
                     } else {
                         linkisURLService = new LinkisURLServiceImpl();
@@ -67,7 +77,5 @@ public interface LinkisURLService {
             }
             return linkisURLService;
         }
-
     }
-
 }

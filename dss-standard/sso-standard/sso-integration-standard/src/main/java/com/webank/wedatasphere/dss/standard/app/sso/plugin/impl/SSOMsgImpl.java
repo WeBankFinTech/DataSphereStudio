@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.sso.plugin.impl;
 
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOMsg;
 
-
 public class SSOMsgImpl implements SSOMsg {
 
     private String redirectUrl;

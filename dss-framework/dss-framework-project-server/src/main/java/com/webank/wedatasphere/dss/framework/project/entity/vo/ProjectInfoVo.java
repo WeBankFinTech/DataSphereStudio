@@ -18,10 +18,9 @@ package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
 import java.io.Serializable;
 
-
 public class ProjectInfoVo implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long workspaceId;
     private String projectName;

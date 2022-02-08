@@ -17,8 +17,9 @@
 package com.webank.wedatasphere.dss.common.entity;
 
 public enum IOEnv {
-    /**
-     *
-     */
-    BDP_DEV,BDP_PRODUCTION,BDAP_DEV,BDAP_PRODUCTION
+    /** */
+    BDP_DEV,
+    BDP_PRODUCTION,
+    BDAP_DEV,
+    BDAP_PRODUCTION
 }

@@ -17,36 +17,23 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
-import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractCommonLinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
-import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
-import org.apache.linkis.ujes.client.response.JobExecuteResult;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 
 public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
-
 
     @Override
     public String getSubmitUser() {
         return getJobProps().get(FlowExecutionEntranceConfiguration.FLOW_SUBMIT_USER());
     }
 
-
     @Override
     public String getUser() {
         return getSubmitUser();
-        //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
+        // return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
     }
 
     @Override
     public String getJobName() {
         return getJobProps().get(FlowExecutionEntranceConfiguration.JOB_ID());
     }
-
-
 }

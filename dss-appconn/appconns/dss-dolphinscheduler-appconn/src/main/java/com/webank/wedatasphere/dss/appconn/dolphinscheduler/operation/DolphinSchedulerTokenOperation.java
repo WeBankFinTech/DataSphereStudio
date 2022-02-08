@@ -1,22 +1,5 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Interner;
-import com.google.common.collect.Interners;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerAccessToken;
@@ -38,6 +21,25 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The type Dolphin scheduler token operation.
  *
@@ -46,7 +48,8 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
  */
 public class DolphinSchedulerTokenOperation implements RefQueryOperation {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerTokenOperation.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DolphinSchedulerTokenOperation.class);
 
     // token提前30s过期
     private static final int expireTimeGap = 30000;
@@ -103,24 +106,38 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
 
         this.verifyUserNameUrl =
-            baseUrl.endsWith("/") ? baseUrl + "users/verify-user-name" : baseUrl + "/users/verify-user-name";
-        this.createUserUrl = baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
-        this.queryUserPageUrl = baseUrl.endsWith("/") ? baseUrl + "users/list-paging" : baseUrl + "/users/list-paging";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "users/verify-user-name"
+                        : baseUrl + "/users/verify-user-name";
+        this.createUserUrl =
+                baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
+        this.queryUserPageUrl =
+                baseUrl.endsWith("/")
+                        ? baseUrl + "users/list-paging"
+                        : baseUrl + "/users/list-paging";
 
         this.queryAccessTokenListUrl =
-            baseUrl.endsWith("/") ? baseUrl + "access-token/list-paging" : baseUrl + "/access-token/list-paging";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "access-token/list-paging"
+                        : baseUrl + "/access-token/list-paging";
         this.generateTokenUrl =
-            baseUrl.endsWith("/") ? baseUrl + "access-token/generate" : baseUrl + "/access-token/generate";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "access-token/generate"
+                        : baseUrl + "/access-token/generate";
         this.createTokenUrl =
-            baseUrl.endsWith("/") ? baseUrl + "access-token/create" : baseUrl + "/access-token/create";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "access-token/create"
+                        : baseUrl + "/access-token/create";
         this.updateTokenUrl =
-            baseUrl.endsWith("/") ? baseUrl + "access-token/update" : baseUrl + "/access-token/update";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "access-token/update"
+                        : baseUrl + "/access-token/update";
     }
 
     @Override
     public ResponseRef query(RequestRef ref) throws ExternalOperationFailedException {
-        CommonRequestRef requestRef = (CommonRequestRef)ref;
-        String userName = (String)requestRef.getParameter("userName");
+        CommonRequestRef requestRef = (CommonRequestRef) ref;
+        String userName = (String) requestRef.getParameter("userName");
 
         Map<String, String> result = new HashMap<>();
         if (Constant.DS_ADMIN_USERNAME.equals(userName)) {
@@ -139,9 +156,7 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
     }
 
     @Override
-    public void setDevelopmentService(DevelopmentService service) {
-
-    }
+    public void setDevelopmentService(DevelopmentService service) {}
 
     /**
      * 验证用户名是否可用.
@@ -152,17 +167,21 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
      */
     private boolean verifyUserName(String userName) throws ExternalOperationFailedException {
         String url = this.verifyUserNameUrl + "?userName=" + userName;
-        DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
+        DolphinSchedulerHttpGet httpGet =
+                new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
 
         int httpStatusCode = 0;
-        try (CloseableHttpResponse response = this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet)) {
+        try (CloseableHttpResponse response =
+                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet)) {
             HttpEntity ent = response.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
             httpStatusCode = response.getStatusLine().getStatusCode();
             if (HttpStatus.SC_OK != httpStatusCode) {
-                logger.error("Dolphin Scheduler验证用户名失败，response status为{}", response.getStatusLine());
+                logger.error(
+                        "Dolphin Scheduler验证用户名失败，response status为{}", response.getStatusLine());
                 throw new ExternalOperationFailedException(90051, "调度中心验证用户名失败");
-            } else if (DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+            } else if (DolphinAppConnUtils.getCodeFromEntity(entString)
+                    == Constant.DS_RESULT_CODE_SUCCESS) {
                 return true;
             } else {
                 return false;
@@ -191,16 +210,19 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
             uriBuilder.addParameter("email", "xx@qq.com");
             uriBuilder.addParameter("queue", "default");
             DolphinSchedulerHttpPost httpPost =
-                new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
+                    new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
             httpResponse = this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()
-                && Constant.DS_RESULT_CODE_SUCCESS == DolphinAppConnUtils.getCodeFromEntity(entString)) {
-                logger.info("Dolphin Scheduler新建用户 {} 成功, 返回的信息是 {}", userName,
-                    DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
+                    && Constant.DS_RESULT_CODE_SUCCESS
+                            == DolphinAppConnUtils.getCodeFromEntity(entString)) {
+                logger.info(
+                        "Dolphin Scheduler新建用户 {} 成功, 返回的信息是 {}",
+                        userName,
+                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
             } else {
                 throw new ExternalOperationFailedException(90052, "调度中心新建用户失败, 原因:" + entString);
             }
@@ -216,14 +238,17 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
     private String getUserId(String userName) throws ExternalOperationFailedException {
         int i = 1;
         while (true) {
-            String url = this.queryUserPageUrl + "?pageNo=" + i + "&pageSize=10&searchVal=" + userName;
-            DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
+            String url =
+                    this.queryUserPageUrl + "?pageNo=" + i + "&pageSize=10&searchVal=" + userName;
+            DolphinSchedulerHttpGet httpGet =
+                    new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
             try (CloseableHttpResponse httpResponse =
-                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);) {
+                    this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet); ) {
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                    && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                        && DolphinAppConnUtils.getCodeFromEntity(entString)
+                                == Constant.DS_RESULT_CODE_SUCCESS) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode jsonNode = mapper.readTree(entString);
                     JsonNode data = jsonNode.get("data");
@@ -251,7 +276,8 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private Map<String, String> getToken(String userName, String userId) throws ExternalOperationFailedException {
+    private Map<String, String> getToken(String userName, String userId)
+            throws ExternalOperationFailedException {
         DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
         // 该用户有token
         if (accessToken != null) {
@@ -272,29 +298,35 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         // 该用户没有相应的token，执行创建操作
         String expireTime = DateUtil.addHours(new Date(), 2);
         return createToken(userName, userId, expireTime);
-
     }
 
     /**
      * 查找用户的accessToken，没有则返回null.
-     * 
+     *
      * @param userName
      * @param userId
      * @return
      * @throws ExternalOperationFailedException
      */
     private DolphinSchedulerAccessToken getTokenByUserName(String userName, String userId)
-        throws ExternalOperationFailedException {
+            throws ExternalOperationFailedException {
         int i = 1;
         while (true) {
-            String url = this.queryAccessTokenListUrl + "?pageNo=" + i + "&pageSize=10&searchVal=" + userName;
-            DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
+            String url =
+                    this.queryAccessTokenListUrl
+                            + "?pageNo="
+                            + i
+                            + "&pageSize=10&searchVal="
+                            + userName;
+            DolphinSchedulerHttpGet httpGet =
+                    new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
             try (CloseableHttpResponse httpResponse =
-                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);) {
+                    this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet); ) {
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                    && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                        && DolphinAppConnUtils.getCodeFromEntity(entString)
+                                == Constant.DS_RESULT_CODE_SUCCESS) {
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode jsonNode = mapper.readTree(entString);
                     JsonNode data = jsonNode.get("data");
@@ -323,14 +355,16 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
     }
 
     private Map<String, String> createToken(String userName, String userId, String expireTime)
-        throws ExternalOperationFailedException {
+            throws ExternalOperationFailedException {
         Map<String, String> result = new HashMap<>();
         synchronized (pool.intern(userId)) {
             DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
             // 已有token未过期，返回该token
             if (accessToken != null) {
                 result.put("token", accessToken.getToken());
-                result.put("expire_time", String.valueOf(accessToken.getExpireTime().getTime() - expireTimeGap));
+                result.put(
+                        "expire_time",
+                        String.valueOf(accessToken.getExpireTime().getTime() - expireTimeGap));
                 return result;
             }
 
@@ -342,18 +376,22 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
                 uriBuilder.addParameter("expireTime", expireTime);
                 uriBuilder.addParameter("token", token);
                 DolphinSchedulerHttpPost httpPost =
-                    new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
+                        new DolphinSchedulerHttpPost(
+                                uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
                 CloseableHttpResponse httpResponse =
-                    this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
+                        this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()
-                    && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                        && DolphinAppConnUtils.getCodeFromEntity(entString)
+                                == Constant.DS_RESULT_CODE_SUCCESS) {
                     // 提前30s过期，方便刷新
-                    long expireTimeStamp = DateUtil.strToTimeStamp(expireTime, DateUtil.FORMAT_LONG) - expireTimeGap;
+                    long expireTimeStamp =
+                            DateUtil.strToTimeStamp(expireTime, DateUtil.FORMAT_LONG)
+                                    - expireTimeGap;
                     result.put("token", token);
-//                    result.put("token","fcdd944c03d5792719781f2c6e7b7542");
+                    //                    result.put("token","fcdd944c03d5792719781f2c6e7b7542");
                     result.put("expire_time", String.valueOf(expireTimeStamp));
                     return result;
                 } else {
@@ -368,8 +406,9 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private Map<String, String> updateToken(int tokenId, String userName, String userId, String expireTime)
-        throws ExternalOperationFailedException {
+    private Map<String, String> updateToken(
+            int tokenId, String userName, String userId, String expireTime)
+            throws ExternalOperationFailedException {
         Map<String, String> result = new HashMap<>();
         synchronized (pool.intern(userId)) {
             DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
@@ -389,15 +428,19 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
                 uriBuilder.addParameter("expireTime", expireTime);
                 uriBuilder.addParameter("token", token);
                 DolphinSchedulerHttpPost httpPost =
-                    new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
+                        new DolphinSchedulerHttpPost(
+                                uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
                 CloseableHttpResponse httpResponse =
-                    this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
+                        this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                    && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
-                    expireTimeStamp = DateUtil.strToTimeStamp(expireTime, DateUtil.FORMAT_LONG) - expireTimeGap;
+                        && DolphinAppConnUtils.getCodeFromEntity(entString)
+                                == Constant.DS_RESULT_CODE_SUCCESS) {
+                    expireTimeStamp =
+                            DateUtil.strToTimeStamp(expireTime, DateUtil.FORMAT_LONG)
+                                    - expireTimeGap;
                     result.put("token", token);
                     result.put("expire_time", String.valueOf(expireTimeStamp));
                     return result;
@@ -413,20 +456,22 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private String generateToken(String userId, String expireTime) throws ExternalOperationFailedException {
+    private String generateToken(String userId, String expireTime)
+            throws ExternalOperationFailedException {
         try {
             URIBuilder uriBuilder = new URIBuilder(this.generateTokenUrl);
             uriBuilder.addParameter("userId", userId);
             uriBuilder.addParameter("expireTime", expireTime);
             DolphinSchedulerHttpPost httpPost =
-                new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
+                    new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
             CloseableHttpResponse httpResponse =
-                this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
+                    this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()
-                && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                    && DolphinAppConnUtils.getCodeFromEntity(entString)
+                            == Constant.DS_RESULT_CODE_SUCCESS) {
                 return DolphinAppConnUtils.getValueFromEntity(entString, "data");
             } else {
                 logger.error("Dolphin Scheduler生成access token失败，返回的信息是 {}", entString);
@@ -438,5 +483,4 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
             throw new ExternalOperationFailedException(90053, "调度中心生成token失败", e);
         }
     }
-
 }

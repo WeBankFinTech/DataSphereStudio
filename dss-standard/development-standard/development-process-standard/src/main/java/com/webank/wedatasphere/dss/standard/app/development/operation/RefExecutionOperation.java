@@ -21,9 +21,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefExecutionOperation
-        extends DevelopmentOperation<RequestRef, ResponseRef> {
+public interface RefExecutionOperation extends DevelopmentOperation<RequestRef, ResponseRef> {
 
     ResponseRef execute(ExecutionRequestRef requestRef) throws ExternalOperationFailedException;
-
 }

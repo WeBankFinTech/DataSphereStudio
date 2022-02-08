@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.appconn.entity;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 
-
 public class AppConnResource {
 
     private Resource resource;

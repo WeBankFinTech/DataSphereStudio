@@ -16,37 +16,51 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
-import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.UJESClientImpl;
 
+import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-
 public class LinkisUjesClientUtils {
 
-    public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps){
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
-                .addServerUrl(url)
-                .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
-                .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
-                .loadbalancerEnabled(true)
-                .maxConnectionSize(5)
-                .retryEnabled(false).readTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
-                .setAuthenticationStrategy(new TokenAuthenticationStrategy())
-                .setAuthTokenKey(user).setAuthTokenValue(token)))
-                .setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
+    public static DWSClientConfig getClientConfig(
+            String url, String user, String token, Map<String, String> jobProps) {
+        DWSClientConfig clientConfig =
+                ((DWSClientConfigBuilder)
+                                (DWSClientConfigBuilder.newBuilder()
+                                        .addServerUrl(url)
+                                        .connectionTimeout(
+                                                LinkisJobExecutionConfiguration
+                                                        .LINKIS_CONNECTION_TIMEOUT
+                                                        .getValue(jobProps))
+                                        .discoveryEnabled(false)
+                                        .discoveryFrequency(1, TimeUnit.MINUTES)
+                                        .loadbalancerEnabled(true)
+                                        .maxConnectionSize(5)
+                                        .retryEnabled(false)
+                                        .readTimeout(
+                                                LinkisJobExecutionConfiguration
+                                                        .LINKIS_CONNECTION_TIMEOUT
+                                                        .getValue(jobProps))
+                                        .setAuthenticationStrategy(
+                                                new TokenAuthenticationStrategy())
+                                        .setAuthTokenKey(user)
+                                        .setAuthTokenValue(token)))
+                        .setDWSVersion(
+                                LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(
+                                        jobProps))
+                        .build();
         return clientConfig;
     }
 
-    public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps){
-        return new UJESClientImpl(getClientConfig(url,user,token, jobProps));
+    public static UJESClient getUJESClient(
+            String url, String user, String token, Map<String, String> jobProps) {
+        return new UJESClientImpl(getClientConfig(url, user, token, jobProps));
     }
-
-
-
 }

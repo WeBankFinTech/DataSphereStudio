@@ -22,7 +22,7 @@ public class AzkabanSubFlowJobTuning implements LinkisJobTuning {
     public LinkisJob tuningJob(LinkisJob job) {
         job.setType("flow");
         job.setLinkistype(null);
-        job.getConf().put("flow.name",job.getName() + "_");
+        job.getConf().put("flow.name", job.getName() + "_");
         return job;
     }
 

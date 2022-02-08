@@ -16,18 +16,17 @@
 
 package com.webank.wedatasphere.dss.orchestrator.core.plugin;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 
 public class AbstractDSSOrchestratorPlugin implements DSSOrchestratorPlugin {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void init() {
-    }
+    public void init() {}
 
     @Override
     public boolean isReady() {
@@ -35,6 +34,5 @@ public class AbstractDSSOrchestratorPlugin implements DSSOrchestratorPlugin {
     }
 
     @Override
-    public void close() throws IOException {
-    }
+    public void close() throws IOException {}
 }

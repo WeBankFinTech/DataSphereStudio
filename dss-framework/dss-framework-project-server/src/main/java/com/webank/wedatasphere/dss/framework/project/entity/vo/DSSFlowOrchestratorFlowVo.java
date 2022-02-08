@@ -18,16 +18,13 @@ package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
 import java.util.List;
 
-
 public class DSSFlowOrchestratorFlowVo {
 
     private Integer orchestratorId;
 
     private String orchestratorVersion;
 
-    /**
-     * flowId 传递到前端让前端使用进行工作流的渲染
-     */
+    /** flowId 传递到前端让前端使用进行工作流的渲染 */
     private String flowId;
 
     private String description;

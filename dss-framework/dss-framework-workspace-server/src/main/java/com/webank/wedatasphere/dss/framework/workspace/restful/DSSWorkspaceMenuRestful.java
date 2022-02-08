@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -18,6 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import org.apache.linkis.server.Message;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuComponentUrl;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.info.AbstractWorkspaceComponentInfoVO;
@@ -27,11 +28,9 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.info.DSSWorkspace
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
-import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,37 +39,32 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
 
-
-/**
- * created by cooperyang on 2020/3/17
- * Description:
- */
-@RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
+/** created by cooperyang on 2020/3/17 Description: */
+@RequestMapping(
+        path = "/dss/framework/workspace",
+        produces = {"application/json"})
 @RestController
 public class DSSWorkspaceMenuRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceMenuRestful.class);
 
-    @Autowired
-    private DSSWorkspaceMenuService dssWorkspaceMenuService;
-    @Autowired
-    private WorkspaceDBHelper workspaceDBHelper;
-    @Autowired
-    private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
+    @Autowired private DSSWorkspaceMenuService dssWorkspaceMenuService;
+    @Autowired private WorkspaceDBHelper workspaceDBHelper;
+    @Autowired private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
     private Map<Integer, Class<? extends AbstractWorkspaceComponentInfoVO>> components;
 
     @PostConstruct
-    public void init(){
-        //todo 要从dss_menu_component_url这个表去拿
-        List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
+    public void init() {
+        // todo 要从dss_menu_component_url这个表去拿
+        List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls =
+                dssWorkspaceRoleMapper.getMenuComponentUrl();
 
         components = new HashMap<>();
         components.put(16, DSSWorkspaceScriptisInfoVO.class);
@@ -78,29 +72,32 @@ public class DSSWorkspaceMenuRestful {
         components.put(12, DSSWorkspaceWorkflowInfoVO.class);
     }
 
-
-    @RequestMapping(path ="getStatistics", method = RequestMethod.GET)
-    public Message getStatistics(@Context HttpServletRequest request,
-                                  @QueryParam(WORKSPACE_ID_STR) int workspaceId, @QueryParam("componentId") int componentId){
+    @RequestMapping(path = "getStatistics", method = RequestMethod.GET)
+    public Message getStatistics(
+            @Context HttpServletRequest request,
+            @QueryParam(WORKSPACE_ID_STR) int workspaceId,
+            @QueryParam("componentId") int componentId) {
         Class<? extends AbstractWorkspaceComponentInfoVO> clazz = components.get(componentId);
         AbstractWorkspaceComponentInfoVO vo;
-        List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
+        List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls =
+                dssWorkspaceRoleMapper.getMenuComponentUrl();
         try {
             vo = clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            LOGGER.info("instantiate a vo failed reason is ",e);
+            LOGGER.info("instantiate a vo failed reason is ", e);
             return Message.error("不能获取到相应的信息");
         }
-        if(workspaceDBHelper.getComponentUrlsById(componentId) != null){
+        if (workspaceDBHelper.getComponentUrlsById(componentId) != null) {
             vo.setComponentUrl(workspaceDBHelper.getComponentUrlsById(componentId).get(0));
         }
-        dssWorkspaceMenuComponentUrls.stream().forEach(url -> {
-            if (url.getMenuId() == componentId){
-                vo.setUserManualUrl(url.getManulUrl());
-            }
-        });
+        dssWorkspaceMenuComponentUrls.stream()
+                .forEach(
+                        url -> {
+                            if (url.getMenuId() == componentId) {
+                                vo.setUserManualUrl(url.getManulUrl());
+                            }
+                        });
         Message message = Message.ok().data("statistic", vo).data("workspaceId", workspaceId);
         return message;
     }
-
 }

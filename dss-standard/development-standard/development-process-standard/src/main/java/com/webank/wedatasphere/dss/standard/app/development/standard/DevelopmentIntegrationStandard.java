@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.standard;
 
-
 import com.webank.wedatasphere.dss.standard.app.development.service.*;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
@@ -34,7 +33,6 @@ public interface DevelopmentIntegrationStandard extends AppIntegrationStandard<S
 
     RefQueryService getRefQueryService(AppInstance appInstance);
 
-
     @Override
     default String getStandardName() {
         return "developmentIntegrationStandard";
@@ -49,5 +47,4 @@ public interface DevelopmentIntegrationStandard extends AppIntegrationStandard<S
     default boolean isNecessary() {
         return false;
     }
-
 }

@@ -21,11 +21,11 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import java.util.List;
 import java.util.Map;
 
-
 public interface CSTableService {
 
-    List<Map<String, Object>> queryTables(String dbName, String contextIDStr, String nodeName) throws DSSErrorException;
+    List<Map<String, Object>> queryTables(String dbName, String contextIDStr, String nodeName)
+            throws DSSErrorException;
 
-    List<Map<String, Object>>  queryTableMeta(String dbName, String contextIDStr, String contextKeyStr) throws DSSErrorException;
-
+    List<Map<String, Object>> queryTableMeta(
+            String dbName, String contextIDStr, String contextKeyStr) throws DSSErrorException;
 }

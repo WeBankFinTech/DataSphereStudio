@@ -23,11 +23,12 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.core.AbstractAppIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
+
 import java.io.IOException;
 
-
-public abstract class AbstractConversionIntegrationStandard extends AbstractAppIntegrationStandard<ConversionService, SSORequestService>
-    implements ConversionIntegrationStandard {
+public abstract class AbstractConversionIntegrationStandard
+        extends AbstractAppIntegrationStandard<ConversionService, SSORequestService>
+        implements ConversionIntegrationStandard {
 
     private String appConnName;
 
@@ -37,12 +38,19 @@ public abstract class AbstractConversionIntegrationStandard extends AbstractAppI
 
     @Override
     public DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance) {
-        return getOrCreate(appInstance, this::createDSSToRelConversionService, DSSToRelConversionService.class);
+        return getOrCreate(
+                appInstance,
+                this::createDSSToRelConversionService,
+                DSSToRelConversionService.class);
     }
 
     @Override
-    public RelToOrchestratorConversionService getRelToDSSConversionService(AppInstance appInstance) {
-        return getOrCreate(appInstance, this::createRelToDSSConversionService, RelToOrchestratorConversionService.class);
+    public RelToOrchestratorConversionService getRelToDSSConversionService(
+            AppInstance appInstance) {
+        return getOrCreate(
+                appInstance,
+                this::createRelToDSSConversionService,
+                RelToOrchestratorConversionService.class);
     }
 
     @Override
@@ -52,9 +60,7 @@ public abstract class AbstractConversionIntegrationStandard extends AbstractAppI
     }
 
     @Override
-    public void init() throws AppStandardErrorException {
-
-    }
+    public void init() throws AppStandardErrorException {}
 
     @Override
     public String getAppConnName() {
@@ -67,7 +73,5 @@ public abstract class AbstractConversionIntegrationStandard extends AbstractAppI
     }
 
     @Override
-    public void close() throws IOException {
-
-    }
+    public void close() throws IOException {}
 }

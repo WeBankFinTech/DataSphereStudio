@@ -15,31 +15,31 @@
  */
 
 package com.webank.wedatasphere.dss.workflow.entity;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
+import java.util.Map;
 
 public class CommonAppConnNode extends AbstractAppConnNode {
 
     private Map<String, Object> params;
 
-    public CommonAppConnNode(String projectName, long projectId , String flowName, long flowId, String nodeName,
-                             String type, Map<String, Object> jobContent){
+    public CommonAppConnNode(
+            String projectName,
+            long projectId,
+            String flowName,
+            long flowId,
+            String nodeName,
+            String type,
+            Map<String, Object> jobContent) {
         super(projectName, projectId, flowName, flowId, nodeName, type, jobContent);
     }
 
-    public CommonAppConnNode(){
+    public CommonAppConnNode() {}
 
-    }
-
-
-    public void setParams(Map<String, Object> params){
+    public void setParams(Map<String, Object> params) {
         this.params = params;
     }
 
-    public Map<String, Object> getParams(){
+    public Map<String, Object> getParams() {
         return this.params;
     }
-
 }

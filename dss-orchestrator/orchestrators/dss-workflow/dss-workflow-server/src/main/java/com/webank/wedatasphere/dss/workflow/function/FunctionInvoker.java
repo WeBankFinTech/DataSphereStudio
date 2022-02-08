@@ -26,23 +26,23 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-
 @Component
 public class FunctionInvoker {
 
-    @Autowired
-    private WorkflowNodeService workflowNodeService;
-
+    @Autowired private WorkflowNodeService workflowNodeService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public void nodeServiceFunction(String userName, Map<String, Object> requestBody, AbstractAppConnNode node, NodeServiceFunction function) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
-         Map<String, Object> jobContent = null;
+    public void nodeServiceFunction(
+            String userName,
+            Map<String, Object> requestBody,
+            AbstractAppConnNode node,
+            NodeServiceFunction function)
+            throws IllegalAccessException, ExternalOperationFailedException,
+                    InstantiationException {
+        Map<String, Object> jobContent = null;
         logger.info("appConn NodeService is exist");
         jobContent = function.accept(userName, workflowNodeService, node, requestBody);
         node.setJobContent(jobContent);
-
     }
-
-
 }

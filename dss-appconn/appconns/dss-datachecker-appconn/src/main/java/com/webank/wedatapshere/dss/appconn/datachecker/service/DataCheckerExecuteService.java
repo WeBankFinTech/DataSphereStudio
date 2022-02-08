@@ -22,12 +22,11 @@ import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefE
 
 public class DataCheckerExecuteService extends AbstractRefExecutionService {
 
-
     @Override
     public RefExecutionOperation createRefExecutionOperation() {
-        DataCheckerRefExecutionOperation dataCheckerRefExecutionOperation = new DataCheckerRefExecutionOperation();
+        DataCheckerRefExecutionOperation dataCheckerRefExecutionOperation =
+                new DataCheckerRefExecutionOperation();
         dataCheckerRefExecutionOperation.setDevelopmentService(this);
         return dataCheckerRefExecutionOperation;
     }
-
 }

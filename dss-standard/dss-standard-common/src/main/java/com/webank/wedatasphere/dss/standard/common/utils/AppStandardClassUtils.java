@@ -17,15 +17,19 @@
 package com.webank.wedatasphere.dss.standard.common.utils;
 
 import com.webank.wedatasphere.dss.common.utils.ClassUtils.ClassHelper;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
+
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is defined for AppConn jar, if some classes in AppConn want to load a class in AppConn jar.
+ * This class is defined for AppConn jar, if some classes in AppConn want to load a class in AppConn
+ * jar.
  */
 public class AppStandardClassUtils extends ClassHelper {
 
@@ -34,10 +38,11 @@ public class AppStandardClassUtils extends ClassHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppStandardClassUtils.class);
 
-    public static ClassLoader getClassLoader(String appConnName, Supplier<ClassLoader> createClassLoader) {
-        if(!CLASS_LOADER_MAP.containsKey(appConnName)) {
+    public static ClassLoader getClassLoader(
+            String appConnName, Supplier<ClassLoader> createClassLoader) {
+        if (!CLASS_LOADER_MAP.containsKey(appConnName)) {
             synchronized (AppStandardClassUtils.class) {
-                if(!CLASS_LOADER_MAP.containsKey(appConnName)) {
+                if (!CLASS_LOADER_MAP.containsKey(appConnName)) {
                     CLASS_LOADER_MAP.put(appConnName, createClassLoader.get());
                     LOGGER.info("Has stored {} ClassLoader.", CLASS_LOADER_MAP.size());
                 }
@@ -47,9 +52,9 @@ public class AppStandardClassUtils extends ClassHelper {
     }
 
     public static AppStandardClassUtils getInstance(String appConnName) {
-        if(!INSTANCES.containsKey(appConnName)) {
+        if (!INSTANCES.containsKey(appConnName)) {
             synchronized (AppStandardClassUtils.class) {
-                if(!INSTANCES.containsKey(appConnName)) {
+                if (!INSTANCES.containsKey(appConnName)) {
                     INSTANCES.put(appConnName, new AppStandardClassUtils(appConnName));
                     LOGGER.info("Has stored {} AppStandardClassUtils.", INSTANCES.size());
                 }
@@ -67,15 +72,18 @@ public class AppStandardClassUtils extends ClassHelper {
 
     @Override
     protected Reflections getReflections(Class<?> clazz) {
-        if(reflection == null) {
+        if (reflection == null) {
             synchronized (this) {
-                if(reflection == null) {
+                if (reflection == null) {
                     ClassLoader classLoader = clazz.getClassLoader();
-                    reflection = new Reflections("com.webank.wedatasphere.dss", CLASS_LOADER_MAP.get(appConnName), classLoader);
+                    reflection =
+                            new Reflections(
+                                    "com.webank.wedatasphere.dss",
+                                    CLASS_LOADER_MAP.get(appConnName),
+                                    classLoader);
                 }
             }
         }
         return reflection;
     }
-
 }

@@ -17,30 +17,30 @@
 package com.webank.wedatasphere.dss.appconn.eventchecker.standard;
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.service.EventCheckerExecuteService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefExecutionService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EventCheckerDevelopmentStandard extends OnlyExecutionDevelopmentStandard {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventCheckerDevelopmentStandard.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(EventCheckerDevelopmentStandard.class);
 
     @Override
     protected RefExecutionService createRefExecutionService() {
         return new EventCheckerExecuteService();
     }
 
-
     @Override
     public void init() {
         LOGGER.info("class EventCheckerDevelopmentStandard init");
     }
 
-
     @Override
     public String getStandardName() {
         return "EventCheckDevelopmentStandard";
     }
-
 }

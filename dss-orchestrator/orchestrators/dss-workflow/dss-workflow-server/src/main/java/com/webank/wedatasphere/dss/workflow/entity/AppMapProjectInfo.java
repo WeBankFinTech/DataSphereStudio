@@ -71,5 +71,4 @@ public class AppMapProjectInfo {
     public void setAppTag(String appTag) {
         this.appTag = appTag;
     }
-
 }

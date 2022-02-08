@@ -17,11 +17,12 @@
 package com.webank.wedatasphere.dss.common.label;
 
 import org.apache.linkis.manager.label.entity.Label;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LabelInstanceFactory {
 
@@ -40,7 +41,8 @@ public class LabelInstanceFactory {
 
     public Map<String, DSSLabel> getLabelsMap() {
         HashMap<String, DSSLabel> resultLabels = new HashMap<>();
-        labels.entrySet().stream().map(item -> resultLabels.put(item.getKey(), (DSSLabel) item.getValue()));
+        labels.entrySet().stream()
+                .map(item -> resultLabels.put(item.getKey(), (DSSLabel) item.getValue()));
         return resultLabels;
     }
 

@@ -16,10 +16,10 @@
 
 package com.webank.wedatasphere.dss.appconn.loader.loader;
 
-
-import com.webank.wedatasphere.dss.appconn.loader.conf.AppConnLoaderConf;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
+
+import com.webank.wedatasphere.dss.appconn.loader.conf.AppConnLoaderConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,23 +31,31 @@ public class AppConnLoaderFactory {
     private static AppConnLoader appConnLoader = null;
 
     @SuppressWarnings("unchecked")
-    public static AppConnLoader getAppConnLoader(){
-        if (appConnLoader == null){
-            synchronized (AppConnLoaderFactory.class){
-                if (appConnLoader == null){
+    public static AppConnLoader getAppConnLoader() {
+        if (appConnLoader == null) {
+            synchronized (AppConnLoaderFactory.class) {
+                if (appConnLoader == null) {
                     // The corresponding classes can be loaded by configuration
                     String className = AppConnLoaderConf.CLASS_LOADER_CLASS_NAME().getValue();
-                    if (StringUtils.isNotBlank(className)){
-                        try{
+                    if (StringUtils.isNotBlank(className)) {
+                        try {
                             clazz = ClassUtils.getClass(className);
-                        }catch(ClassNotFoundException e){
-                            logger.warn(String.format("Can not get AppConnLoader class %s, CommonAppConnLoader will be used by default.", className), e);
+                        } catch (ClassNotFoundException e) {
+                            logger.warn(
+                                    String.format(
+                                            "Can not get AppConnLoader class %s, CommonAppConnLoader will be used by default.",
+                                            className),
+                                    e);
                         }
                     }
                     try {
                         appConnLoader = clazz.newInstance();
                     } catch (Exception e) {
-                        logger.error(String.format("Can not initialize AppConnLoader class %s.", clazz.getSimpleName()), e);
+                        logger.error(
+                                String.format(
+                                        "Can not initialize AppConnLoader class %s.",
+                                        clazz.getSimpleName()),
+                                e);
                     }
                     logger.info("Use {} to load all AppConns.", clazz.getSimpleName());
                 }
@@ -55,5 +63,4 @@ public class AppConnLoaderFactory {
         }
         return appConnLoader;
     }
-
 }

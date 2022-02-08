@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 
-
 public interface RoleService extends StructureService {
 
     RoleCreationOperation createRoleCreationOperation();
@@ -28,5 +27,4 @@ public interface RoleService extends StructureService {
     RoleDeletionOperation createRoleDeletionOperation();
 
     RoleUrlOperation createRoleUrlOperation();
-
 }

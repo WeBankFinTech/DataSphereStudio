@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.workflow.common.entity;
 
 import java.util.Date;
 
-
 public class DWSFlowVersion implements FlowVersion, Comparable<DWSFlowVersion> {
     private Long id;
     private Long flowID;
@@ -31,12 +30,10 @@ public class DWSFlowVersion implements FlowVersion, Comparable<DWSFlowVersion> {
     private DWSFlowPublishHistory publishHistory;
     private String json;
     private String updator;
-    private Boolean isNotPublished;  //true 未发过版，false已经过版
+    private Boolean isNotPublished; // true 未发过版，false已经过版
     private Long projectVersionID;
     private Long oldFlowID;
-    /**
-     * 工作流是否被锁
-     */
+    /** 工作流是否被锁 */
     private Boolean isFlowEditLockExist;
 
     public Boolean getFlowEditLockExist() {
@@ -47,9 +44,7 @@ public class DWSFlowVersion implements FlowVersion, Comparable<DWSFlowVersion> {
         isFlowEditLockExist = flowEditLockExist;
     }
 
-    /**
-     * 工作流编辑锁，打开自动获取，超时自动释放
-     */
+    /** 工作流编辑锁，打开自动获取，超时自动释放 */
     private String flowEditLock;
 
     public String getFlowEditLock() {

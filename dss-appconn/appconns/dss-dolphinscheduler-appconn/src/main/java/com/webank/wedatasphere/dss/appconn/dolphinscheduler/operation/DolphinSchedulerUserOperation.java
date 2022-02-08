@@ -1,21 +1,5 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpGet;
@@ -25,7 +9,25 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConn
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.linkis.common.utils.JsonUtils;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Dolphin scheduler user operation.
@@ -35,7 +37,8 @@ import org.apache.linkis.common.utils.JsonUtils;
  */
 public class DolphinSchedulerUserOperation {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerUserOperation.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DolphinSchedulerUserOperation.class);
 
     private SSOUrlBuilderOperation ssoUrlBuilderOperation;
 
@@ -55,34 +58,42 @@ public class DolphinSchedulerUserOperation {
         this.getOperation = new DolphinSchedulerGetRequestOperation(baseUrl);
         this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
 
-        this.listPagingUrl = baseUrl.endsWith("/") ? baseUrl + "users/list-paging" : baseUrl + "/users/list-paging";
-        this.createUserUrl = baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
+        this.listPagingUrl =
+                baseUrl.endsWith("/")
+                        ? baseUrl + "users/list-paging"
+                        : baseUrl + "/users/list-paging";
+        this.createUserUrl =
+                baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
         this.grantProjectUrl =
-            baseUrl.endsWith("/") ? baseUrl + "users/grant-project" : baseUrl + "/users/grant-project";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "users/grant-project"
+                        : baseUrl + "/users/grant-project";
         this.authedProjectUrl =
-            baseUrl.endsWith("/") ? baseUrl + "projects/authed-project" : baseUrl + "/projects/authed-project";
+                baseUrl.endsWith("/")
+                        ? baseUrl + "projects/authed-project"
+                        : baseUrl + "/projects/authed-project";
     }
 
     /**
      * Gets user id.
      *
-     * @param userName
-     *            the user name
+     * @param userName the user name
      * @return the user id，查询不到该用户时，返回null
-     * @throws ExternalOperationFailedException
-     *             the external operation failed exception
+     * @throws ExternalOperationFailedException the external operation failed exception
      */
     public Long getUserId(String userName) throws ExternalOperationFailedException {
         int i = 1;
         while (true) {
             String url = this.listPagingUrl + "?pageNo=" + i + "&pageSize=10&searchVal=" + userName;
-            DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
+            DolphinSchedulerHttpGet httpGet =
+                    new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
             try (CloseableHttpResponse httpResponse =
-                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);) {
+                    this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet); ) {
                 HttpEntity ent = httpResponse.getEntity();
                 String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
                 if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                    && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                        && DolphinAppConnUtils.getCodeFromEntity(entString)
+                                == Constant.DS_RESULT_CODE_SUCCESS) {
                     ObjectMapper mapper = JsonUtils.jackson();
                     JsonNode jsonNode = mapper.readTree(entString);
                     JsonNode data = jsonNode.get("data");
@@ -127,16 +138,19 @@ public class DolphinSchedulerUserOperation {
             uriBuilder.addParameter("email", "xx@chinatelecom.cn");
             uriBuilder.addParameter("queue", "default");
             DolphinSchedulerHttpPost httpPost =
-                new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
+                    new DolphinSchedulerHttpPost(uriBuilder.build(), Constant.DS_ADMIN_USERNAME);
 
             httpResponse = this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
 
             if (HttpStatus.SC_CREATED == httpResponse.getStatusLine().getStatusCode()
-                && Constant.DS_RESULT_CODE_SUCCESS == DolphinAppConnUtils.getCodeFromEntity(entString)) {
-                logger.info("DolphinScheduler新建用户 {} 成功, 返回的信息是 {}", userName,
-                    DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
+                    && Constant.DS_RESULT_CODE_SUCCESS
+                            == DolphinAppConnUtils.getCodeFromEntity(entString)) {
+                logger.info(
+                        "DolphinScheduler新建用户 {} 成功, 返回的信息是 {}",
+                        userName,
+                        DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
             } else {
                 throw new ExternalOperationFailedException(90002, "调度中心新建用户失败, 原因:" + entString);
             }
@@ -152,17 +166,13 @@ public class DolphinSchedulerUserOperation {
     /**
      * Grant project.
      *
-     * @param userName
-     *            the user name
-     * @param projectId
-     *            the project id
-     * @param cancelGrant
-     *            the cancel grant，是否取消授权
-     * @throws ExternalOperationFailedException
-     *             the external operation failed exception
+     * @param userName the user name
+     * @param projectId the project id
+     * @param cancelGrant the cancel grant，是否取消授权
+     * @throws ExternalOperationFailedException the external operation failed exception
      */
     public void grantProject(String userName, Long projectId, boolean cancelGrant)
-        throws ExternalOperationFailedException {
+            throws ExternalOperationFailedException {
         // 如果待授权用户不存在，则新建
         Long userId = getUserId(userName);
         if (userId == null) {
@@ -186,15 +196,21 @@ public class DolphinSchedulerUserOperation {
 
         CloseableHttpResponse httpResponse = null;
         try {
-            String url = this.grantProjectUrl + "?userId=" + userId + "&projectIds="
-                + URLEncoder.encode(StringUtils.join(authedProjectIds, ","), "utf-8");
-            DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(url, Constant.DS_ADMIN_USERNAME);
+            String url =
+                    this.grantProjectUrl
+                            + "?userId="
+                            + userId
+                            + "&projectIds="
+                            + URLEncoder.encode(StringUtils.join(authedProjectIds, ","), "utf-8");
+            DolphinSchedulerHttpPost httpPost =
+                    new DolphinSchedulerHttpPost(url, Constant.DS_ADMIN_USERNAME);
 
             httpResponse = this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
             if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                    && DolphinAppConnUtils.getCodeFromEntity(entString)
+                            == Constant.DS_RESULT_CODE_SUCCESS) {
                 return;
             } else {
                 logger.error("DolphinScheduler项目授权失败，返回的信息是 {}", entString);
@@ -209,17 +225,20 @@ public class DolphinSchedulerUserOperation {
         }
     }
 
-    private List<Long> getAuthedProjectIds(Long userId, String userName) throws ExternalOperationFailedException {
+    private List<Long> getAuthedProjectIds(Long userId, String userName)
+            throws ExternalOperationFailedException {
         List<Long> projectIds = new ArrayList<>();
 
         String url = this.authedProjectUrl + "?userId=" + userId;
-        DolphinSchedulerHttpGet httpGet = new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
+        DolphinSchedulerHttpGet httpGet =
+                new DolphinSchedulerHttpGet(url, Constant.DS_ADMIN_USERNAME);
         try (CloseableHttpResponse httpResponse =
-            this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet);) {
+                this.getOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpGet); ) {
             HttpEntity ent = httpResponse.getEntity();
             String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
             if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
+                    && DolphinAppConnUtils.getCodeFromEntity(entString)
+                            == Constant.DS_RESULT_CODE_SUCCESS) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(entString);
                 JsonNode data = jsonNode.get("data");
@@ -239,5 +258,4 @@ public class DolphinSchedulerUserOperation {
             throw new ExternalOperationFailedException(90003, "调度中心获取用户已授权项目列表失败", e);
         }
     }
-
 }

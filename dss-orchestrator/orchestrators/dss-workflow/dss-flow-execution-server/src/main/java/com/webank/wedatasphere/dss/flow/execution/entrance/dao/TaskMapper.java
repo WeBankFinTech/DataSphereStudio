@@ -16,11 +16,12 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.dao;
 
-import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
 import org.apache.ibatis.annotations.Param;
+
+import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
+
 import java.util.Date;
 import java.util.List;
-
 
 public interface TaskMapper {
 
@@ -30,10 +31,15 @@ public interface TaskMapper {
 
     void updateTask(WorkflowQueryTask queryTask);
 
-    List<WorkflowQueryTask> search(@Param("taskID") Long taskID, @Param("umUser") String username, @Param("status") List<String> status,
-                           @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("executeApplicationName") String executeApplicationName,
-                           @Param("instance") String instance, @Param("execId") String execId);
+    List<WorkflowQueryTask> search(
+            @Param("taskID") Long taskID,
+            @Param("umUser") String username,
+            @Param("status") List<String> status,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("executeApplicationName") String executeApplicationName,
+            @Param("instance") String instance,
+            @Param("execId") String execId);
 
     String selectTaskStatusForUpdate(Long taskID);
-
 }

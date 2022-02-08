@@ -16,15 +16,16 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
+
+import com.google.gson.Gson;
+
 public class SchedulisUtils {
 
-
-    public static String handleSchedulisResponse(String response){
+    public static String handleSchedulisResponse(String response) {
         Gson gson = new Gson();
         Object object = gson.fromJson(response, Object.class);
         String status = null;
@@ -45,5 +46,4 @@ public class SchedulisUtils {
         }
         return "success";
     }
-
 }

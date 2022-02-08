@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
 
 public class ExternalOperationFailedException extends AppStandardErrorException {
 
-    public ExternalOperationFailedException(int errorCode, String message){
+    public ExternalOperationFailedException(int errorCode, String message) {
         super(errorCode, message);
     }
 

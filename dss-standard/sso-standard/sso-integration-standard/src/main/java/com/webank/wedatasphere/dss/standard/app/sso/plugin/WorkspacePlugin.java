@@ -18,14 +18,13 @@ package com.webank.wedatasphere.dss.standard.app.sso.plugin;
 
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.List;
 
 public interface WorkspacePlugin extends Operation {
 
     List<String> getAllUsers(HttpServletRequest req);
 
     String getWorkspaceName(HttpServletRequest req);
-
 }

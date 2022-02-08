@@ -21,7 +21,6 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import org.springframework.beans.BeanUtils;
 
-
 public class WorkflowContextParser implements WorkflowParser {
 
     @Override

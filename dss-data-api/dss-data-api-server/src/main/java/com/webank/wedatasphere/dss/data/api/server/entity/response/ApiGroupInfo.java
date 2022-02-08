@@ -1,8 +1,10 @@
 package com.webank.wedatasphere.dss.data.api.server.entity.response;
 
+import java.util.List;
+
+
 import lombok.Data;
 
-import java.util.List;
 @Data
 public class ApiGroupInfo {
     private int groupId;

@@ -15,7 +15,6 @@
  */
 package com.webank.wedatasphere.dss.data.api.server.entity;
 
-
 public class VariableString {
     private String path;
 

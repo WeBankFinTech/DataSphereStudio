@@ -1,12 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type Dolphin scheduler flow.
@@ -142,6 +142,5 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
         public String getEndPointTargetId() {
             return this.endPointTargetId;
         }
-
     }
 }

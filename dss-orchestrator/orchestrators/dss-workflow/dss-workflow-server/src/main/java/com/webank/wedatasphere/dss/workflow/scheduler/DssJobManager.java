@@ -16,9 +16,10 @@
 
 package com.webank.wedatasphere.dss.workflow.scheduler;
 
+import org.apache.linkis.common.utils.Utils;
+
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import org.apache.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-
 public abstract class DssJobManager implements DssJobListener {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final Map<Long, DssJobInfo> cacheMap = new ConcurrentHashMap<>();
 
-    private final Map<Long, DssJobInfo> secondCacheMap = new ConcurrentHashMap<>();//执行完成后将放入二级缓存,只有qurey的时候才去掉
+    private final Map<Long, DssJobInfo> secondCacheMap =
+            new ConcurrentHashMap<>(); // 执行完成后将放入二级缓存,只有qurey的时候才去掉
 
     private List<DssJobHook> jobHooks = new ArrayList<>();
 
@@ -47,29 +48,57 @@ public abstract class DssJobManager implements DssJobListener {
 
     {
         logger.info("定时线程开启...");
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (secondCacheMap) {
-                    secondCacheMap.entrySet().stream()
-                            .filter(f -> (f.getValue().getStatus() == DssJobStatus.Succeed || f.getValue().getStatus() == DssJobStatus.Failed) && f.getValue().timeout())
-                            .forEach(f -> {
-                                logger.info("开始remove second cache过期记录：{},更新时间{}", f.getKey(), f.getValue().getUpdateTime());
-                                secondCacheMap.remove(f.getKey());
-                            });
-                }
-            }
-        }, 1, 1, TimeUnit.MINUTES);
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (cacheMap) {
-                    cacheMap.forEach((k, v) -> {
-                        logger.info("cache中id为：{}状态为：{}更新时间为：{}", k, v.getStatus(), v.getUpdateTime());
-                    });
-                }
-            }
-        }, 1, 10, TimeUnit.MINUTES);
+        Utils.defaultScheduler()
+                .scheduleAtFixedRate(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                synchronized (secondCacheMap) {
+                                    secondCacheMap.entrySet().stream()
+                                            .filter(
+                                                    f ->
+                                                            (f.getValue().getStatus()
+                                                                                    == DssJobStatus
+                                                                                            .Succeed
+                                                                            || f.getValue()
+                                                                                            .getStatus()
+                                                                                    == DssJobStatus
+                                                                                            .Failed)
+                                                                    && f.getValue().timeout())
+                                            .forEach(
+                                                    f -> {
+                                                        logger.info(
+                                                                "开始remove second cache过期记录：{},更新时间{}",
+                                                                f.getKey(),
+                                                                f.getValue().getUpdateTime());
+                                                        secondCacheMap.remove(f.getKey());
+                                                    });
+                                }
+                            }
+                        },
+                        1,
+                        1,
+                        TimeUnit.MINUTES);
+        Utils.defaultScheduler()
+                .scheduleAtFixedRate(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                synchronized (cacheMap) {
+                                    cacheMap.forEach(
+                                            (k, v) -> {
+                                                logger.info(
+                                                        "cache中id为：{}状态为：{}更新时间为：{}",
+                                                        k,
+                                                        v.getStatus(),
+                                                        v.getUpdateTime());
+                                            });
+                                }
+                            }
+                        },
+                        1,
+                        10,
+                        TimeUnit.MINUTES);
     }
 
     @Override
@@ -151,7 +180,8 @@ public abstract class DssJobManager implements DssJobListener {
         job.setStatus(DssJobStatus.Inited);
         jobHooks.forEach(h -> h.preExecute(job));
         Future<?> submit = DssJobThreadPool.get().submit(job);
-        DssJobDeamon deamon = new DssJobDeamon(submit, (int) DSSWorkFlowConstant.PUBLISH_TIMEOUT.getValue());
+        DssJobDeamon deamon =
+                new DssJobDeamon(submit, (int) DSSWorkFlowConstant.PUBLISH_TIMEOUT.getValue());
         deamon.setId(job.getId());
         DssJobThreadPool.getDeamon().execute(deamon);
     }
@@ -163,10 +193,10 @@ public abstract class DssJobManager implements DssJobListener {
                 return jobInfo;
             } else {
                 DssJobInfo remove = secondCacheMap.remove(id);
-                if (remove == null) throw new DSSErrorException(90021, String.format("the id %s is not exist", id));
+                if (remove == null)
+                    throw new DSSErrorException(90021, String.format("the id %s is not exist", id));
                 return remove;
             }
         }
     }
-
 }

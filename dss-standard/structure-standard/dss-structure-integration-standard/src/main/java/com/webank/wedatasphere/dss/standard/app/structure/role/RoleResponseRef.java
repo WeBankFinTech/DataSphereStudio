@@ -18,5 +18,4 @@ package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-public interface RoleResponseRef extends ResponseRef {
-}
+public interface RoleResponseRef extends ResponseRef {}

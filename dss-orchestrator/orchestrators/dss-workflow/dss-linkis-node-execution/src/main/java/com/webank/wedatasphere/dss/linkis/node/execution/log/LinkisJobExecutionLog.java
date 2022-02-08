@@ -16,23 +16,23 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.log;
 
-
 public abstract class LinkisJobExecutionLog {
 
-   public  void info(Object message){
-       info(message, null);
-   }
-   public abstract void info(Object message, Throwable t);
+    public void info(Object message) {
+        info(message, null);
+    }
 
-   public  void warn(Object message){
-       warn(message, null);
-   }
-   public abstract void warn(Object message, Throwable t);
+    public abstract void info(Object message, Throwable t);
 
-   public  void error(Object message){
-       error(message, null);
-   }
-   public abstract void error(Object message, Throwable t);
+    public void warn(Object message) {
+        warn(message, null);
+    }
 
+    public abstract void warn(Object message, Throwable t);
 
+    public void error(Object message) {
+        error(message, null);
+    }
+
+    public abstract void error(Object message, Throwable t);
 }

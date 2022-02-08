@@ -25,7 +25,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletio
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefCRUDService;
 
-public class OrchestratorCRUDService  extends AbstractRefCRUDService {
+public class OrchestratorCRUDService extends AbstractRefCRUDService {
 
     @Override
     protected RefCreationOperation createRefCreationOperation() {
@@ -46,5 +46,4 @@ public class OrchestratorCRUDService  extends AbstractRefCRUDService {
     protected RefDeletionOperation createRefDeletionOperation() {
         return new OrchestratorFrameworkDeleteOperation();
     }
-
 }

@@ -22,53 +22,62 @@ import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class WorkflowRefExportOperation implements RefExportOperation<WorkflowExportRequestRef> {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowRefExportOperation.class);
 
     private DevelopmentService developmentService;
 
-
     @Override
-    public WorkflowExportResponseRef exportRef(WorkflowExportRequestRef workflowExportRequestRef) throws ExternalOperationFailedException {
+    public WorkflowExportResponseRef exportRef(WorkflowExportRequestRef workflowExportRequestRef)
+            throws ExternalOperationFailedException {
 
         String userName = workflowExportRequestRef.getUserName();
-        //todo
+        // todo
         long flowId = workflowExportRequestRef.getAppId();
         Long projectId = workflowExportRequestRef.getProjectId();
         String projectName = workflowExportRequestRef.getProjectName();
-        RequestExportWorkflow requestExportWorkflow = new RequestExportWorkflow(userName,
-                flowId,
-                projectId,
-                projectName,
-                BDPJettyServerHelper.gson().toJson(workflowExportRequestRef.getWorkspace()),
-                workflowExportRequestRef.getDSSLabels());
+        RequestExportWorkflow requestExportWorkflow =
+                new RequestExportWorkflow(
+                        userName,
+                        flowId,
+                        projectId,
+                        projectName,
+                        BDPJettyServerHelper.gson().toJson(workflowExportRequestRef.getWorkspace()),
+                        workflowExportRequestRef.getDSSLabels());
         ResponseExportWorkflow responseExportWorkflow = null;
-        try{
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(workflowExportRequestRef.getDSSLabels());
+        try {
+            Sender sender =
+                    DSSSenderServiceFactory.getOrCreateServiceInstance()
+                            .getWorkflowSender(workflowExportRequestRef.getDSSLabels());
             responseExportWorkflow = (ResponseExportWorkflow) sender.ask(requestExportWorkflow);
-        }catch(final Exception t){
-            DSSExceptionUtils.dealErrorException(60025, "failed to get rpc message", t, ExternalOperationFailedException.class);
+        } catch (final Exception t) {
+            DSSExceptionUtils.dealErrorException(
+                    60025, "failed to get rpc message", t, ExternalOperationFailedException.class);
         }
         if (null != responseExportWorkflow) {
             WorkflowExportResponseRef workflowExportResponseRef = new WorkflowExportResponseRef();
             workflowExportResponseRef.setFlowID(responseExportWorkflow.flowID());
             workflowExportResponseRef.setResourceId(responseExportWorkflow.resourceId());
             workflowExportResponseRef.setVersion(responseExportWorkflow.version());
-            workflowExportResponseRef.addResponse("resourceId", responseExportWorkflow.resourceId());
+            workflowExportResponseRef.addResponse(
+                    "resourceId", responseExportWorkflow.resourceId());
             workflowExportResponseRef.addResponse("version", responseExportWorkflow.version());
             workflowExportResponseRef.addResponse("flowID", responseExportWorkflow.flowID());
             return workflowExportResponseRef;
         } else {
-            throw new ExternalOperationFailedException(100085, "Error ask workflow to export!", null);
+            throw new ExternalOperationFailedException(
+                    100085, "Error ask workflow to export!", null);
         }
     }
 
@@ -76,5 +85,4 @@ public class WorkflowRefExportOperation implements RefExportOperation<WorkflowEx
     public void setDevelopmentService(DevelopmentService service) {
         this.developmentService = service;
     }
-
 }

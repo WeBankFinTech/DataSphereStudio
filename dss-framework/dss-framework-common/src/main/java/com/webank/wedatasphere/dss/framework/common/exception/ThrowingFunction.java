@@ -16,8 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.common.exception;
 
-
 @FunctionalInterface
-public interface ThrowingFunction <T,R,E extends Exception> {
+public interface ThrowingFunction<T, R, E extends Exception> {
     R accept(T t) throws E;
 }

@@ -56,11 +56,6 @@ public class Layout {
 
     @Override
     public String toString() {
-        return "Layout{" +
-                "x=" + x +
-                ", y=" + y +
-                ", width=" + width +
-                ", height=" + height +
-                '}';
+        return "Layout{" + "x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + '}';
     }
 }

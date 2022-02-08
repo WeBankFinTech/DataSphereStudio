@@ -18,16 +18,16 @@ package com.webank.wedatasphere.dss.framework.common.exception;
 
 import org.apache.linkis.common.exception.WarnException;
 
-
 public class DSSFrameworkWarnException extends WarnException {
-    public DSSFrameworkWarnException(int errorCode, String errorDesc){
+    public DSSFrameworkWarnException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
 
-    public static void dealWarnException(int errorCode, String errorDesc, Throwable t) throws DSSFrameworkWarnException {
-        DSSFrameworkWarnException dssFrameworkWarnException = new DSSFrameworkWarnException(errorCode, errorDesc);
+    public static void dealWarnException(int errorCode, String errorDesc, Throwable t)
+            throws DSSFrameworkWarnException {
+        DSSFrameworkWarnException dssFrameworkWarnException =
+                new DSSFrameworkWarnException(errorCode, errorDesc);
         dssFrameworkWarnException.initCause(t);
         throw dssFrameworkWarnException;
     }
-
 }

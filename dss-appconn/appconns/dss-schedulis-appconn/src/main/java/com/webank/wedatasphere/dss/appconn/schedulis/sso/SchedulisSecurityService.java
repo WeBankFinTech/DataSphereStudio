@@ -16,12 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.sso;
 
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
-import org.apache.linkis.common.exception.ErrorException;
-import org.apache.linkis.common.utils.Utils;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -36,8 +32,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,10 +43,14 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class SchedulisSecurityService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SchedulisSecurityService.class);
-
 
     private String securityUrl = "";
     private static final String USER_NAME_KEY = "username";
@@ -64,17 +64,14 @@ public final class SchedulisSecurityService {
 
     private static final String CIPHER_STR = "userpwd";
 
-
     private static final String SUPER_USER = "dws-wtss";
     private static final String SUPER_USER_CIPHER = "WeBankBDPWTSS&DWS@2019";
 
     private static final String SUPER_USER_STR = "superUser";
     private static final String SUPER_USER_CIPHER_STR = "superUserPwd";
 
-
-    private Cache<String, Cookie> cookieCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(30 * 60, TimeUnit.SECONDS)
-            .build();
+    private Cache<String, Cookie> cookieCache =
+            CacheBuilder.newBuilder().expireAfterAccess(30 * 60, TimeUnit.SECONDS).build();
 
     private static SchedulisSecurityService instance;
 
@@ -94,18 +91,25 @@ public final class SchedulisSecurityService {
     }
 
     static {
-        Utils.defaultScheduler().scheduleAtFixedRate(()->{
-            LOGGER.info("开始读取用户token文件");
-            Properties properties = new Properties();
-            try {
-                properties.load(SchedulisSecurityService.class.getClassLoader().getResourceAsStream("token.properties"));
-                userToken = properties;
-            } catch (IOException e) {
-                LOGGER.error("读取文件失败:",e);
-            }
-        },0,10, TimeUnit.MINUTES);
+        Utils.defaultScheduler()
+                .scheduleAtFixedRate(
+                        () -> {
+                            LOGGER.info("开始读取用户token文件");
+                            Properties properties = new Properties();
+                            try {
+                                properties.load(
+                                        SchedulisSecurityService.class
+                                                .getClassLoader()
+                                                .getResourceAsStream("token.properties"));
+                                userToken = properties;
+                            } catch (IOException e) {
+                                LOGGER.error("读取文件失败:", e);
+                            }
+                        },
+                        0,
+                        10,
+                        TimeUnit.MINUTES);
     }
-
 
     public Cookie login(String user) throws Exception {
         synchronized (user.intern()) {
@@ -120,14 +124,13 @@ public final class SchedulisSecurityService {
     }
 
     private String getUserToken(String user) {
-        //直接从配置文件中读取，有需求可以自己实现
+        // 直接从配置文件中读取，有需求可以自己实现
         Object token = userToken.get(user);
         if (token == null) {
             return "";
         }
         return token.toString();
     }
-
 
     private Cookie getCookie(String user, String token) throws Exception {
         HttpPost httpPost = new HttpPost(securityUrl);
@@ -154,7 +157,11 @@ public final class SchedulisSecurityService {
             response = httpClient.execute(httpPost, context);
             HttpEntity entity = response.getEntity();
             responseContent = EntityUtils.toString(entity, "utf-8");
-            LOGGER.info("Get azkaban response code is " + response.getStatusLine().getStatusCode() + ",response: " + responseContent);
+            LOGGER.info(
+                    "Get azkaban response code is "
+                            + response.getStatusLine().getStatusCode()
+                            + ",response: "
+                            + responseContent);
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new ErrorException(90041, responseContent);
             }
@@ -165,12 +172,13 @@ public final class SchedulisSecurityService {
         }
         List<Cookie> cookies = context.getCookieStore().getCookies();
         Optional<Cookie> cookie = cookies.stream().filter(this::findSessionId).findAny();
-        return cookie.orElseThrow(() -> new ErrorException(90041, "Get azkaban session is null : " + responseContent));
+        return cookie.orElseThrow(
+                () ->
+                        new ErrorException(
+                                90041, "Get azkaban session is null : " + responseContent));
     }
 
     private boolean findSessionId(Cookie cookie) {
         return SESSION_ID_KEY.equals(cookie.getName());
     }
-
-
 }

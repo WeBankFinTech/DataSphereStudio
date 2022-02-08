@@ -30,28 +30,27 @@ public class SendEmailAppConn extends AbstractAppConn implements OnlyDevelopment
 
     @Override
     protected void initialize() {
-        standard = new OnlyExecutionDevelopmentStandard() {
-            @Override
-            public void close() {
-            }
-
-            @Override
-            protected RefExecutionService createRefExecutionService() {
-                return new AbstractRefExecutionService() {
-                    private RefExecutionOperation refExecutionOperation = new SendEmailRefExecutionOperation();
+        standard =
+                new OnlyExecutionDevelopmentStandard() {
+                    @Override
+                    public void close() {}
 
                     @Override
-                    public RefExecutionOperation createRefExecutionOperation() {
-                        return refExecutionOperation;
+                    protected RefExecutionService createRefExecutionService() {
+                        return new AbstractRefExecutionService() {
+                            private RefExecutionOperation refExecutionOperation =
+                                    new SendEmailRefExecutionOperation();
+
+                            @Override
+                            public RefExecutionOperation createRefExecutionOperation() {
+                                return refExecutionOperation;
+                            }
+                        };
                     }
+
+                    @Override
+                    public void init() {}
                 };
-            }
-
-            @Override
-            public void init() {
-
-            }
-        };
     }
 
     @Override

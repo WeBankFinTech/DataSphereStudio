@@ -19,16 +19,14 @@ package com.webank.wedatasphere.dss.framework.project.entity.po;
 import java.util.Date;
 import java.util.List;
 
-
 public class DSSProjectPo {
-
 
     private Long id;
     private String name;
     private String description;
     private String source;
     private Date createTime;
-    private String createBy; //兼容Visualis  后修改类型
+    private String createBy; // 兼容Visualis  后修改类型
     private Date updateTime;
     private Long orgID;
     private Boolean visibility;
@@ -52,7 +50,6 @@ public class DSSProjectPo {
 
     private List<String> accessUsers;
     private List<String> editUsers;
-
 
     public Long getId() {
         return id;
@@ -85,8 +82,6 @@ public class DSSProjectPo {
     public void setSource(String source) {
         this.source = source;
     }
-
-
 
     public Date getCreateTime() {
         return createTime;
@@ -224,7 +219,6 @@ public class DSSProjectPo {
         this.editUsers = editUsers;
     }
 
-
     public String getWorkspaceName() {
         return workspaceName;
     }
@@ -232,7 +226,6 @@ public class DSSProjectPo {
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
     }
-
 
     public String getUsername() {
         return username;

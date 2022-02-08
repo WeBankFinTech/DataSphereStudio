@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisCommonResponseRef;
 import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisOpenRequestRef;
 import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisOpenResponseRef;
@@ -26,7 +28,6 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,36 +40,63 @@ public class VisualisRefQueryOperation implements RefQueryOperation<OpenRequestR
     public ResponseRef query(OpenRequestRef ref) throws ExternalOperationFailedException {
         VisualisOpenRequestRef visualisOpenRequestRef = (VisualisOpenRequestRef) ref;
         try {
-            String externalContent = BDPJettyServerHelper.jacksonJson().writeValueAsString(visualisOpenRequestRef.getJobContent());
+            String externalContent =
+                    BDPJettyServerHelper.jacksonJson()
+                            .writeValueAsString(visualisOpenRequestRef.getJobContent());
             Long projectId = (Long) visualisOpenRequestRef.getParameter("projectId");
             String baseUrl = visualisOpenRequestRef.getParameter("redirectUrl").toString();
             String jumpUrl = baseUrl;
-            if("linkis.appconn.visualis.widget".equalsIgnoreCase(visualisOpenRequestRef.getType())){
-                VisualisCommonResponseRef widgetCreateResponseRef = new VisualisCommonResponseRef(externalContent);
-                jumpUrl = URLUtils.getUrl(baseUrl, URLUtils.WIDGET_JUMP_URL_FORMAT, projectId.toString(), widgetCreateResponseRef.getWidgetId());
-            } else if("linkis.appconn.visualis.display".equalsIgnoreCase(visualisOpenRequestRef.getType())){
-                VisualisCommonResponseRef displayCreateResponseRef = new VisualisCommonResponseRef(externalContent);
-                jumpUrl = URLUtils.getUrl(baseUrl, URLUtils.DISPLAY_JUMP_URL_FORMAT, projectId.toString(), displayCreateResponseRef.getDisplayId());
-            }else if("linkis.appconn.visualis.dashboard".equalsIgnoreCase(visualisOpenRequestRef.getType())){
-                VisualisCommonResponseRef dashboardCreateResponseRef = new VisualisCommonResponseRef(externalContent);
-                jumpUrl = URLUtils.getUrl(baseUrl, URLUtils.DASHBOARD_JUMP_URL_FORMAT, projectId.toString(), dashboardCreateResponseRef.getDashboardId(), visualisOpenRequestRef.getName());
+            if ("linkis.appconn.visualis.widget"
+                    .equalsIgnoreCase(visualisOpenRequestRef.getType())) {
+                VisualisCommonResponseRef widgetCreateResponseRef =
+                        new VisualisCommonResponseRef(externalContent);
+                jumpUrl =
+                        URLUtils.getUrl(
+                                baseUrl,
+                                URLUtils.WIDGET_JUMP_URL_FORMAT,
+                                projectId.toString(),
+                                widgetCreateResponseRef.getWidgetId());
+            } else if ("linkis.appconn.visualis.display"
+                    .equalsIgnoreCase(visualisOpenRequestRef.getType())) {
+                VisualisCommonResponseRef displayCreateResponseRef =
+                        new VisualisCommonResponseRef(externalContent);
+                jumpUrl =
+                        URLUtils.getUrl(
+                                baseUrl,
+                                URLUtils.DISPLAY_JUMP_URL_FORMAT,
+                                projectId.toString(),
+                                displayCreateResponseRef.getDisplayId());
+            } else if ("linkis.appconn.visualis.dashboard"
+                    .equalsIgnoreCase(visualisOpenRequestRef.getType())) {
+                VisualisCommonResponseRef dashboardCreateResponseRef =
+                        new VisualisCommonResponseRef(externalContent);
+                jumpUrl =
+                        URLUtils.getUrl(
+                                baseUrl,
+                                URLUtils.DASHBOARD_JUMP_URL_FORMAT,
+                                projectId.toString(),
+                                dashboardCreateResponseRef.getDashboardId(),
+                                visualisOpenRequestRef.getName());
             } else {
-                throw new ExternalOperationFailedException(90177, "Unknown task type " + visualisOpenRequestRef.getType(), null);
+                throw new ExternalOperationFailedException(
+                        90177, "Unknown task type " + visualisOpenRequestRef.getType(), null);
             }
             String retJumpUrl = getEnvUrl(jumpUrl, visualisOpenRequestRef);
-            Map<String,String> retMap = new HashMap<>();
-            retMap.put("jumpUrl",retJumpUrl);
+            Map<String, String> retMap = new HashMap<>();
+            retMap.put("jumpUrl", retJumpUrl);
             return new VisualisOpenResponseRef(DSSCommonUtils.COMMON_GSON.toJson(retMap), 0);
         } catch (Exception e) {
             throw new ExternalOperationFailedException(90177, "Failed to parse jobContent ", e);
         }
     }
 
-    public String getEnvUrl(String url, VisualisOpenRequestRef visualisOpenRequestRef ){
-        String env = ((Map<String, Object>) visualisOpenRequestRef.getParameter("params")).get(DSSCommonUtils.DSS_LABELS_KEY).toString();
+    public String getEnvUrl(String url, VisualisOpenRequestRef visualisOpenRequestRef) {
+        String env =
+                ((Map<String, Object>) visualisOpenRequestRef.getParameter("params"))
+                        .get(DSSCommonUtils.DSS_LABELS_KEY)
+                        .toString();
         return url + "?env=" + env.toLowerCase();
     }
-
 
     @Override
     public void setDevelopmentService(DevelopmentService service) {

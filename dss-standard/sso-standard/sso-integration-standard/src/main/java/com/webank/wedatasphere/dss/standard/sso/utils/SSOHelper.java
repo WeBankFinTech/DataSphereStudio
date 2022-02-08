@@ -19,28 +19,36 @@ package com.webank.wedatasphere.dss.standard.sso.utils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
+
 import org.apache.linkis.common.conf.Configuration;
-import java.util.Arrays;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
 
 public class SSOHelper {
 
-    public static Workspace getWorkspace(HttpServletRequest request){
+    public static Workspace getWorkspace(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        Cookie workspaceCookie = Arrays.stream(cookies).
-                filter(cookie -> "workspaceId".equals(cookie.getName())).findAny().orElse(null);
+        Cookie workspaceCookie =
+                Arrays.stream(cookies)
+                        .filter(cookie -> "workspaceId".equals(cookie.getName()))
+                        .findAny()
+                        .orElse(null);
         Workspace workspace = new Workspace();
         if (workspaceCookie != null) {
             workspace.setWorkspaceName(workspaceCookie.getValue());
         }
         SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
-        Arrays.stream(cookies).forEach(cookie -> ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue()));
+        Arrays.stream(cookies)
+                .forEach(
+                        cookie ->
+                                ssoUrlBuilderOperation.addCookie(
+                                        cookie.getName(), cookie.getValue()));
         ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
         ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
         workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
         return workspace;
     }
-
 }

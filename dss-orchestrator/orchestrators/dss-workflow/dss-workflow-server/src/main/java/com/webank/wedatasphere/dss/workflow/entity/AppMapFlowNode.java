@@ -25,7 +25,7 @@ public class AppMapFlowNode {
     private String appTag;
     private String key;
     private String title;
-    
+
     private String isRootFlow;
 
     public String getIsRootFlow() {
@@ -35,8 +35,6 @@ public class AppMapFlowNode {
     public void setIsRootFlow(String isRootFlow) {
         this.isRootFlow = isRootFlow;
     }
-
-
 
     public String getId() {
         return id;
@@ -95,10 +93,13 @@ public class AppMapFlowNode {
     }
 
     private AppMapProjectInfo projectData;
-    private HashMap<String,Object> layout=new HashMap<String ,Object>(){{
-     put("height",120);
-     put("width",200);
-     put("x","");
-     put("y","");}
-    };
+    private HashMap<String, Object> layout =
+            new HashMap<String, Object>() {
+                {
+                    put("height", 120);
+                    put("width", 200);
+                    put("x", "");
+                    put("y", "");
+                }
+            };
 }

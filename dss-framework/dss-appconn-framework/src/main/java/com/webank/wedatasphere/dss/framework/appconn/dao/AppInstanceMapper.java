@@ -16,25 +16,20 @@
 
 package com.webank.wedatasphere.dss.framework.appconn.dao;
 
-
-import com.webank.wedatasphere.dss.framework.appconn.entity.AppInstanceBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.webank.wedatasphere.dss.framework.appconn.entity.AppInstanceBean;
 
+import java.util.List;
 
 @Mapper
 public interface AppInstanceMapper {
 
-    /**
-     * get instance by appconnid
-     * */
+    /** get instance by appconnid */
     List<AppInstanceBean> getAppInstancesByAppConnId(@Param("appConnId") Long appConnId);
 
-    /**
-     * get instance by appconnid and label
-     * */
-    List<AppInstanceBean> getAppInstance(@Param("appConnId") Long appConnId,
-                                         @Param("label") String label);
+    /** get instance by appconnid and label */
+    List<AppInstanceBean> getAppInstance(
+            @Param("appConnId") Long appConnId, @Param("label") String label);
 }

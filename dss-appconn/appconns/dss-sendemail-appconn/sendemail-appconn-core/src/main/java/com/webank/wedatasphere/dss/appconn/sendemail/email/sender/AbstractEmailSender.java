@@ -16,21 +16,24 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email.sender;
 
+import org.apache.linkis.common.utils.Utils;
+
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.EmailSender;
-import org.apache.linkis.common.utils.Utils;
-import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.Future;
+
+import scala.runtime.BoxedUnit;
 
 public abstract class AbstractEmailSender implements EmailSender {
 
     @Override
     public Future<BoxedUnit> sendAsync(Email email) {
-        return Utils.defaultScheduler().submit(() -> {
-            send(email);
-            return BoxedUnit.UNIT;
-        });
+        return Utils.defaultScheduler()
+                .submit(
+                        () -> {
+                            send(email);
+                            return BoxedUnit.UNIT;
+                        });
     }
-
 }

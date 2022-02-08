@@ -16,12 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.request;
 
-
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
-
 
 public interface SSORequestService extends AppService {
 
     SSORequestOperation createSSORequestOperation(String appName);
-
 }

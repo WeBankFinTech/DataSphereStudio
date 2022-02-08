@@ -16,7 +16,13 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.status;
 
-
 public enum TaskStatus {
-    Inited, WaitForRetry, Scheduled, Running, Succeed, Failed, Cancelled, Timeout
+    Inited,
+    WaitForRetry,
+    Scheduled,
+    Running,
+    Succeed,
+    Failed,
+    Cancelled,
+    Timeout
 }

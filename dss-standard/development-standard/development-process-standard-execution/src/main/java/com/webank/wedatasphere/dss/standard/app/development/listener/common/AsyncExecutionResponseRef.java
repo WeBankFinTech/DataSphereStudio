@@ -16,11 +16,10 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.async.RefExecutionResponseListener;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.LongTermRefExecutionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-
 
 public interface AsyncExecutionResponseRef extends ResponseRef {
 
@@ -51,5 +50,4 @@ public interface AsyncExecutionResponseRef extends ResponseRef {
     long getMaxLoopTime();
 
     void setMaxLoopTime(long maxLoopTime);
-
 }

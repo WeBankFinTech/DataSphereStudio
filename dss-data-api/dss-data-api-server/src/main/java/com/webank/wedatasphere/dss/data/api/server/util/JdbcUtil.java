@@ -1,13 +1,15 @@
 package com.webank.wedatasphere.dss.data.api.server.util;
 
-import com.alibaba.druid.util.JdbcConstants;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
-import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+
+import com.alibaba.druid.util.JdbcConstants;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JdbcUtil {
@@ -18,7 +20,8 @@ public class JdbcUtil {
         return resultSet;
     }
 
-    public static Connection getConnection(DataSource ds) throws SQLException, ClassNotFoundException {
+    public static Connection getConnection(DataSource ds)
+            throws SQLException, ClassNotFoundException {
         String url = ds.getUrl();
         switch (ds.getType()) {
             case JdbcConstants.MYSQL:
@@ -53,6 +56,7 @@ public class JdbcUtil {
 
     /**
      * 查询库中所有表
+     *
      * @param conn
      * @param type
      * @return
@@ -68,15 +72,15 @@ public class JdbcUtil {
                     sql = "show tables";
                     break;
                 case "POSTGRESQL":
-                    sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name";
+                    sql =
+                            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name";
                     break;
-                // TODO
+                    // TODO
                 case "SQLSERVER":
                     sql = "select * from sys.tables";
                     break;
                 default:
                     sql = "show tables";
-
             }
 
             pst = conn.prepareStatement(sql);
@@ -92,10 +96,8 @@ public class JdbcUtil {
             return null;
         } finally {
             try {
-                if (pst != null)
-                    pst.close();
-                if (conn != null)
-                    conn.close();
+                if (pst != null) pst.close();
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -104,12 +106,14 @@ public class JdbcUtil {
 
     /**
      * 查询表所有字段
+     *
      * @param conn
      * @param type
      * @param table
      * @return
      */
-    public static List<HashMap> getRDBMSColumnProperties(Connection conn, String type, String table) {
+    public static List<HashMap> getRDBMSColumnProperties(
+            Connection conn, String type, String table) {
         List<HashMap> list = new ArrayList<>();
 
         ResultSet resultSet = null;
@@ -124,12 +128,12 @@ public class JdbcUtil {
             }
             log.info(sql);
 
-             resultSet = conn.prepareStatement(sql).executeQuery();
+            resultSet = conn.prepareStatement(sql).executeQuery();
             while (resultSet.next()) {
                 HashMap<String, String> colProp = new HashMap<>();
-                colProp.put("Comment",resultSet.getString("Comment"));
-                colProp.put("fieldType",resultSet.getString("Type"));
-                colProp.put("columnName",resultSet.getString("Field"));
+                colProp.put("Comment", resultSet.getString("Comment"));
+                colProp.put("fieldType", resultSet.getString("Type"));
+                colProp.put("columnName", resultSet.getString("Field"));
 
                 list.add(colProp);
             }
@@ -139,14 +143,11 @@ public class JdbcUtil {
             return null;
         } finally {
             try {
-                if (resultSet != null)
-                    resultSet.close();
-                if (conn != null)
-                    conn.close();
+                if (resultSet != null) resultSet.close();
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
-
 }

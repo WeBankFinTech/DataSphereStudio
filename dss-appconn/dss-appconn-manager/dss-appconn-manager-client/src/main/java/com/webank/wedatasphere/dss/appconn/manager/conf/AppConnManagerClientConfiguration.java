@@ -20,9 +20,8 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class AppConnManagerClientConfiguration {
 
-    public final static CommonVars<String> DSS_APPCONN_CLIENT_TOKEN = CommonVars.apply("wds.dss.appconn.client.user.token","WS-AUTH");
-    public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.dss.appconn.client.user","ws");
-
-
-
+    public static final CommonVars<String> DSS_APPCONN_CLIENT_TOKEN =
+            CommonVars.apply("wds.dss.appconn.client.user.token", "WS-AUTH");
+    public static final CommonVars<String> LINKIS_ADMIN_USER =
+            CommonVars.apply("wds.dss.appconn.client.user", "ws");
 }

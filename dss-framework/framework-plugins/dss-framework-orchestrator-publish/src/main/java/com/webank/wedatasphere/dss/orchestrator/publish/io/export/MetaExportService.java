@@ -16,22 +16,16 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.io.export;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 
 import java.io.IOException;
 
-
 public interface MetaExportService {
 
-
     /**
-     *
      * @param dssOrchestratorInfo
      * @param savePath
      * @throws IOException
      */
     void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException;
-
-
 }

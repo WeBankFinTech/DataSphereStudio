@@ -26,5 +26,4 @@ public class VisualisRefExportService extends AbstractRefExportService {
     public RefExportOperation createRefExportOperation() {
         return new VisualisRefExportOperation(this);
     }
-
 }

@@ -15,11 +15,11 @@
  */
 
 package com.webank.wedatasphere.dss.standard.common.desc;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
 import java.util.Map;
-
 
 public interface AppInstance {
 
@@ -30,5 +30,4 @@ public interface AppInstance {
     Map<String, Object> getConfig();
 
     List<DSSLabel> getLabels();
-
 }

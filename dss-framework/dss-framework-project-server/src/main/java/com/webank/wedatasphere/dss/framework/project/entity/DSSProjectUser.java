@@ -23,11 +23,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_project_user")
 public class DSSProjectUser implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -38,16 +37,12 @@ public class DSSProjectUser implements Serializable {
 
     private Long workspaceId;
 
-    /**
-     * 权限等级：1-查看，2-编辑，3-发布
-     */
+    /** 权限等级：1-查看，2-编辑，3-发布 */
     private Integer priv;
 
     private Date lastUpdateTime;
 
-    public DSSProjectUser() {
-    }
-
+    public DSSProjectUser() {}
 
     public DSSProjectUser(Long workspaceId, Long projectId, String username, int priv) {
         this.workspaceId = workspaceId;

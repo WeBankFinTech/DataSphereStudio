@@ -30,32 +30,40 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.AbstractJsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 public class WorkflowToRelConversionOperation extends DSSToRelConversionOperation {
 
     private List<WorkflowToRelConverter> workflowToRelConverters;
     private WorkflowToRelSynchronizer workflowToRelSynchronizer;
 
-    public WorkflowToRelConversionOperation(){
-    }
+    public WorkflowToRelConversionOperation() {}
 
     @Override
     public void init() {
         String appConnName = getConversionService().getAppStandard().getAppConnName();
-        workflowToRelConverters = AppStandardClassUtils.getInstance(appConnName).getInstances(WorkflowToRelConverter.class).stream().sorted(Comparator.comparingInt(WorkflowToRelConverter::getOrder))
-            .collect(Collectors.toList());
-        workflowToRelSynchronizer = AppStandardClassUtils.getInstance(appConnName).getInstanceOrWarn(WorkflowToRelSynchronizer.class);
+        workflowToRelConverters =
+                AppStandardClassUtils.getInstance(appConnName)
+                        .getInstances(WorkflowToRelConverter.class).stream()
+                        .sorted(Comparator.comparingInt(WorkflowToRelConverter::getOrder))
+                        .collect(Collectors.toList());
+        workflowToRelSynchronizer =
+                AppStandardClassUtils.getInstance(appConnName)
+                        .getInstanceOrWarn(WorkflowToRelSynchronizer.class);
         workflowToRelSynchronizer.setAppInstance(getConversionService().getAppInstance());
-        workflowToRelSynchronizer.setSSORequestService(getConversionService().getSSORequestService());
+        workflowToRelSynchronizer.setSSORequestService(
+                getConversionService().getSSORequestService());
         JsonToFlowParser parser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-        if(parser instanceof AbstractJsonToFlowParser) {
+        if (parser instanceof AbstractJsonToFlowParser) {
             String packageName = WorkflowParser.class.getPackage().getName();
-            List<WorkflowParser> workflowParsers = AppStandardClassUtils.getInstance(appConnName).getInstances(WorkflowParser.class).stream()
-                .filter(p -> !p.getClass().getName().startsWith(packageName)).collect(Collectors.toList());
+            List<WorkflowParser> workflowParsers =
+                    AppStandardClassUtils.getInstance(appConnName)
+                            .getInstances(WorkflowParser.class).stream()
+                            .filter(p -> !p.getClass().getName().startsWith(packageName))
+                            .collect(Collectors.toList());
             ((AbstractJsonToFlowParser) parser).addWorkflowParsers(workflowParsers);
         }
     }
@@ -63,10 +71,16 @@ public class WorkflowToRelConversionOperation extends DSSToRelConversionOperatio
     @Override
     public ResponseRef convert(DSSToRelConversionRequestRef ref) {
         List<Workflow> workflows;
-        if(ref instanceof ProjectToRelConversionRequestRef) {
+        if (ref instanceof ProjectToRelConversionRequestRef) {
             ProjectToRelConversionRequestRef projectRef = (ProjectToRelConversionRequestRef) ref;
-            workflows = projectRef.getDSSOrcList().stream().map(flow -> WorkflowFactory.INSTANCE.getJsonToFlowParser().parse((DSSFlow) flow))
-                .collect(Collectors.toList());
+            workflows =
+                    projectRef.getDSSOrcList().stream()
+                            .map(
+                                    flow ->
+                                            WorkflowFactory.INSTANCE
+                                                    .getJsonToFlowParser()
+                                                    .parse((DSSFlow) flow))
+                            .collect(Collectors.toList());
         } else {
             return CommonResponseRef.error("Not support ref " + ref.getClass().getSimpleName());
         }
@@ -75,13 +89,13 @@ public class WorkflowToRelConversionOperation extends DSSToRelConversionOperatio
         return CommonResponseRef.success("All workflow convert succeed!");
     }
 
-    protected ConvertedRel tryConvert(List<Workflow> workflows, DSSToRelConversionRequestRef ref){
+    protected ConvertedRel tryConvert(List<Workflow> workflows, DSSToRelConversionRequestRef ref) {
         PreConversionRelImpl rel = new PreConversionRelImpl();
         rel.setWorkflows(workflows);
         rel.setDSSToRelConversionRequestRef(ref);
         ConvertedRel convertedRel = null;
-        for (WorkflowToRelConverter workflowToRelConverter: workflowToRelConverters) {
-            if(convertedRel == null) {
+        for (WorkflowToRelConverter workflowToRelConverter : workflowToRelConverters) {
+            if (convertedRel == null) {
                 convertedRel = workflowToRelConverter.convertToRel(rel);
             } else {
                 convertedRel = workflowToRelConverter.convertToRel(convertedRel);

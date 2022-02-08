@@ -16,15 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.core.ext;
 
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 
-/**
- * Only the third level standard
- * */
+/** Only the third level standard */
 public interface OnlyDevelopmentAppConn extends AppConn {
 
     DevelopmentIntegrationStandard getOrCreateDevelopmentStandard();
-
 }

@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-
 public class DSSWorkspaceComponent {
     private int id;
     private String componentName;

@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public abstract class AbstractRequestRef implements RequestRef {
 
     private Map<String, Object> parameters = new HashMap<>();

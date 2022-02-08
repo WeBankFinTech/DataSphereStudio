@@ -31,17 +31,17 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdgeImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 public class WorkflowDAGParser implements WorkflowParser {
 
     private List<WorkflowNodeParser> workflowNodeParsers;
 
     public synchronized void addWorkflowNodeParser(WorkflowNodeParser workflowNodeParser) {
-        if(workflowNodeParsers == null) {
+        if (workflowNodeParsers == null) {
             workflowNodeParsers = new ArrayList<>();
         }
         this.workflowNodeParsers.add(workflowNodeParser);
@@ -53,7 +53,7 @@ public class WorkflowDAGParser implements WorkflowParser {
 
     @Override
     public void init() {
-        if(workflowNodeParsers == null) {
+        if (workflowNodeParsers == null) {
             workflowNodeParsers = ClassUtils.getInstances(WorkflowNodeParser.class);
         } else {
             workflowNodeParsers.addAll(ClassUtils.getInstances(WorkflowNodeParser.class));
@@ -64,30 +64,35 @@ public class WorkflowDAGParser implements WorkflowParser {
     public Workflow parse(JsonObject flowJson, Workflow workflow) {
         JsonArray nodeJsonArray = flowJson.getAsJsonArray("nodes");
         Gson gson = DSSCommonUtils.COMMON_GSON;
-        List<DSSNode> dwsNodes = gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
-        }.getType());
+        List<DSSNode> dwsNodes =
+                gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {}.getType());
         List<WorkflowNode> workflowNodeList = new ArrayList<>();
         List<WorkflowNodeEdge> workflowNodeEdgeList = new ArrayList<>();
         if (null != dwsNodes) {
             for (DSSNode dwsNode : dwsNodes) {
-                Optional<WorkflowNodeParser> firstNodeParser = workflowNodeParsers.stream()
-                    .filter(p -> p.ifNodeCanParse(dwsNode))
-                    .min((p1, p2) -> p2.getOrder() - p1.getOrder());
-                WorkflowNode workflowNode = firstNodeParser.orElseThrow(() -> new IllegalArgumentException("NodeParser个数应该大于0")).parseNode(dwsNode);
+                Optional<WorkflowNodeParser> firstNodeParser =
+                        workflowNodeParsers.stream()
+                                .filter(p -> p.ifNodeCanParse(dwsNode))
+                                .min((p1, p2) -> p2.getOrder() - p1.getOrder());
+                WorkflowNode workflowNode =
+                        firstNodeParser
+                                .orElseThrow(
+                                        () -> new IllegalArgumentException("NodeParser个数应该大于0"))
+                                .parseNode(dwsNode);
                 workflowNodeList.add(workflowNode);
             }
         }
         JsonArray edgeJsonArray = flowJson.getAsJsonArray("edges");
-        List<DSSEdge> dwsEdges = gson.fromJson(edgeJsonArray, new TypeToken<List<DSSEdgeDefault>>() {
-        }.getType());
-        if (dwsEdges != null){
+        List<DSSEdge> dwsEdges =
+                gson.fromJson(edgeJsonArray, new TypeToken<List<DSSEdgeDefault>>() {}.getType());
+        if (dwsEdges != null) {
             for (DSSEdge dwsEdge : dwsEdges) {
                 WorkflowNodeEdge workflowNodeEdge = new WorkflowNodeEdgeImpl();
                 workflowNodeEdge.setDSSEdge(dwsEdge);
                 workflowNodeEdgeList.add(workflowNodeEdge);
             }
         }
-        if(workflow instanceof WorkflowImpl) {
+        if (workflow instanceof WorkflowImpl) {
             WorkflowImpl workflow1 = (WorkflowImpl) workflow;
             workflow1.setWorkflowNodeEdges(workflowNodeEdgeList);
             workflow1.setWorkflowNodes(workflowNodeList);

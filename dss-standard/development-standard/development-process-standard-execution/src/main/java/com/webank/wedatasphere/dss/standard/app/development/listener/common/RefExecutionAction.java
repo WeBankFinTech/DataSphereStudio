@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext;
 
-
 public interface RefExecutionAction {
 
     ExecutionRequestRefContext getExecutionRequestRefContext();
-
 }

@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.core.ext;
 
-/**
- * Including the first, second and third level standards
- * */
-public interface ThirdlyAppConn extends OnlySSOAppConn, OnlyStructureAppConn, OnlyDevelopmentAppConn{
-}
+/** Including the first, second and third level standards */
+public interface ThirdlyAppConn
+        extends OnlySSOAppConn, OnlyStructureAppConn, OnlyDevelopmentAppConn {}

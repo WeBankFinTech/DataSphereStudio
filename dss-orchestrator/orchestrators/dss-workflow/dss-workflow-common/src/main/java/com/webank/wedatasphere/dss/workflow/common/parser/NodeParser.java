@@ -16,18 +16,20 @@
 
 package com.webank.wedatasphere.dss.workflow.common.parser;
 
-
 import com.webank.wedatasphere.dss.common.entity.Resource;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
 public interface NodeParser {
     String updateNodeResource(String nodeJson, List<Resource> resources) throws IOException;
+
     String updateNodeJobContent(String nodeJson, Map<String, Object> content) throws IOException;
+
     String updateSubFlowID(String nodeJson, long subflowId) throws IOException;
+
     String getNodeValue(String key, String nodeJson) throws IOException;
+
     List<Resource> getNodeResource(String nodeJson);
 }

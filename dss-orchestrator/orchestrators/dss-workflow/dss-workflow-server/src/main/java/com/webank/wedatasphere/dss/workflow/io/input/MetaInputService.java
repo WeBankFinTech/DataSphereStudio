@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input;
 
-
-
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 
@@ -29,5 +27,4 @@ public interface MetaInputService {
     List<DSSFlow> inputFlow(String basePath) throws IOException;
 
     List<DSSFlowRelation> inputFlowRelation(String basePath) throws IOException;
-
 }

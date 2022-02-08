@@ -16,18 +16,19 @@
 
 package com.webank.wedatasphere.dss.standard.common.desc;
 
-
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
+
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppDescImpl implements AppDesc {
 
@@ -51,20 +52,21 @@ public class AppDescImpl implements AppDesc {
     }
 
     @Override
-    public List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels) throws NoSuchAppInstanceException{
+    public List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels)
+            throws NoSuchAppInstanceException {
         // todo~！
         // 1. 通过用户自定义的比较器完成的排序，返回最前一个appInstance
         // 2. 返回与labels完全匹配的appInstance
         AppInstance targetAppInstance = null;
         int similarity = 0;
         int maxSimilarity = 0;
-        for(AppInstance appInstance: appInstances) {
+        for (AppInstance appInstance : appInstances) {
             similarity = 0;
             List<DSSLabel> targetLabels = appInstance.getLabels();
-            for(DSSLabel label: targetLabels) {
-                for(DSSLabel userLabel: labels) {
+            for (DSSLabel label : targetLabels) {
+                for (DSSLabel userLabel : labels) {
                     // if user's label equal the target label, then the similarity increase.
-                    if (isEqualLabel(userLabel,label)) {
+                    if (isEqualLabel(userLabel, label)) {
                         similarity++;
                     }
                     // if current similarity bigger than the maxSimilarity.
@@ -76,15 +78,15 @@ public class AppDescImpl implements AppDesc {
             }
         }
         // if all the labels is different form the target, then return null.
-        if(maxSimilarity <= 0) {
+        if (maxSimilarity <= 0) {
             LOG.error("{} has no such AppInstance machs the labels: {}", appName, labels);
             throw new NoSuchAppInstanceException(60002, "No such AppInstance machs the labels.");
         }
         return Arrays.asList(targetAppInstance);
     }
 
-    //判断两个label是否相等
-    public boolean isEqualLabel(DSSLabel userLabel,DSSLabel label){
+    // 判断两个label是否相等
+    public boolean isEqualLabel(DSSLabel userLabel, DSSLabel label) {
         boolean flag = false;
 
         DSSLabel tempUserLabel = (DSSLabel) userLabel;

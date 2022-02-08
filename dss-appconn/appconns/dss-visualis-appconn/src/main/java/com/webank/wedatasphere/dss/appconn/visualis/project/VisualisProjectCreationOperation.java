@@ -16,6 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
+import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.conf.ServerConfiguration;
+
 import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
@@ -26,35 +31,36 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreatio
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import org.apache.linkis.server.conf.ServerConfiguration;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class VisualisProjectCreationOperation implements ProjectCreationOperation {
 
     private static Logger logger = LoggerFactory.getLogger(VisualisProjectCreationOperation.class);
-    private final static String projectUrl = "/api/rest_s/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/projects";
+    private static final String projectUrl =
+            "/api/rest_s/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/projects";
     private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
     private StructureService structureService;
 
-    public VisualisProjectCreationOperation(StructureService service, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) {
+    public VisualisProjectCreationOperation(
+            StructureService service,
+            SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) {
         this.structureService = service;
         this.ssoRequestOperation = ssoRequestOperation;
     }
+
     private String getAppName() {
         return VisualisAppConn.VISUALIS_APPCONN_NAME;
     }
 
     @Override
-    public void init() {
-    }
+    public void init() {}
 
     @Override
-    public ProjectResponseRef createProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef createProject(ProjectRequestRef projectRef)
+            throws ExternalOperationFailedException {
         String url = getBaseUrl() + projectUrl;
         VisualisPostAction visualisPostAction = new VisualisPostAction();
         visualisPostAction.setUser(projectRef.getCreateBy());
@@ -62,7 +68,8 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
         visualisPostAction.addRequestPayload("description", projectRef.getDescription());
         visualisPostAction.addRequestPayload("pic", "6");
         visualisPostAction.addRequestPayload("visibility", true);
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = projectRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+        SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                projectRef.getWorkspace().getSSOUrlBuilderOperation().copy();
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
         ssoUrlBuilderOperation.setWorkspace(projectRef.getWorkspace().getWorkspaceName());
@@ -71,12 +78,15 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
         HttpResult httpResult = null;
         try {
             visualisPostAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
-            httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, visualisPostAction);
+            httpResult =
+                    this.ssoRequestOperation.requestWithSSO(
+                            ssoUrlBuilderOperation, visualisPostAction);
             response = httpResult.getResponseBody();
             resMap = BDPJettyServerHelper.jacksonJson().readValue(response, Map.class);
         } catch (Exception e) {
             logger.error("Create Visualis Project Exception", e);
-            throw new ExternalOperationFailedException(90176, "Create Visualis Project Exception", e);
+            throw new ExternalOperationFailedException(
+                    90176, "Create Visualis Project Exception", e);
         }
         Map<String, Object> header = (Map<String, Object>) resMap.get("header");
         int code = (int) header.get("code");
@@ -103,7 +113,7 @@ public class VisualisProjectCreationOperation implements ProjectCreationOperatio
         this.structureService = service;
     }
 
-    private String getBaseUrl(){
+    private String getBaseUrl() {
         return structureService.getAppInstance().getBaseUrl();
     }
 }

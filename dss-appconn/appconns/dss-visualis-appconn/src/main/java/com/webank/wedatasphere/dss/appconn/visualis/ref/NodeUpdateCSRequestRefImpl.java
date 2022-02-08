@@ -19,7 +19,4 @@ package com.webank.wedatasphere.dss.appconn.visualis.ref;
 import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateCSRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.NodeRequestRefImpl;
 
-
-public class NodeUpdateCSRequestRefImpl extends NodeRequestRefImpl implements  UpdateCSRequestRef {
-
-}
+public class NodeUpdateCSRequestRefImpl extends NodeRequestRefImpl implements UpdateCSRequestRef {}

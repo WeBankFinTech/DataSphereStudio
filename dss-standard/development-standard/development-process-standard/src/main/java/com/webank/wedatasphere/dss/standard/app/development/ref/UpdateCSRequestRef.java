@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-public interface UpdateCSRequestRef extends NodeRequestRef {
-
-}
+public interface UpdateCSRequestRef extends NodeRequestRef {}

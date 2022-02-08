@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.Arrays;
-
-
 public class DSSDatasourceVO {
     private int id;
     private String name;
@@ -30,10 +27,18 @@ public class DSSDatasourceVO {
     private String lastUpdater;
     private String lastUpdateTime;
 
-    public DSSDatasourceVO() {
-    }
+    public DSSDatasourceVO() {}
 
-    public DSSDatasourceVO(int id, String name, String type, String createTime, String env, String creator, String responser, String lastUpdater, String lastUpdateTime) {
+    public DSSDatasourceVO(
+            int id,
+            String name,
+            String type,
+            String createTime,
+            String env,
+            String creator,
+            String responser,
+            String lastUpdater,
+            String lastUpdateTime) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -116,8 +121,4 @@ public class DSSDatasourceVO {
     public void setLastUpdateTime(String lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
-
-
-
-
 }

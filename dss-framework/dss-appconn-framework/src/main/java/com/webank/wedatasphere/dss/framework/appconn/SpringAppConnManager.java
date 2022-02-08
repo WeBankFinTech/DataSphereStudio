@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.appconn;
 
+import org.apache.linkis.DataWorkCloudApplication;
+
 import com.webank.wedatasphere.dss.appconn.manager.impl.AbstractAppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
-import org.apache.linkis.DataWorkCloudApplication;
-
 
 public class SpringAppConnManager extends AbstractAppConnManager {
 
@@ -31,6 +31,7 @@ public class SpringAppConnManager extends AbstractAppConnManager {
 
     @Override
     protected AppConnResourceService createAppConnResourceService() {
-        return DataWorkCloudApplication.getApplicationContext().getBean(AppConnResourceService.class);
+        return DataWorkCloudApplication.getApplicationContext()
+                .getBean(AppConnResourceService.class);
     }
 }

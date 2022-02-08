@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 import org.apache.linkis.httpclient.request.GetAction;
 import org.apache.linkis.httpclient.request.UserAction;
 
-public class FlowScheduleGetAction extends GetAction  implements UserAction {
+public class FlowScheduleGetAction extends GetAction implements UserAction {
 
     String url;
     String user;
@@ -42,6 +42,4 @@ public class FlowScheduleGetAction extends GetAction  implements UserAction {
     public String getUser() {
         return user;
     }
-
-
 }

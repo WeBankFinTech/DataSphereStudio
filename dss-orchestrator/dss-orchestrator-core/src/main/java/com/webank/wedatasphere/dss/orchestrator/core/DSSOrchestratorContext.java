@@ -18,10 +18,10 @@ package com.webank.wedatasphere.dss.orchestrator.core;
 
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
+
 import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
-
 
 public interface DSSOrchestratorContext extends Closeable {
 
@@ -32,10 +32,15 @@ public interface DSSOrchestratorContext extends Closeable {
     List<DSSOrchestratorPlugin> getOrchestratorPlugins();
 
     default <T extends DSSOrchestratorPlugin> T getDSSOrchestratorPlugin(Class<T> clazz) {
-        return (T) getOrchestratorPlugins().stream().filter(clazz::isInstance)
-            .findFirst().orElseThrow(() -> new DSSRuntimeException(50321, "Cannot find " + clazz.getSimpleName()));
+        return (T)
+                getOrchestratorPlugins().stream()
+                        .filter(clazz::isInstance)
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new DSSRuntimeException(
+                                                50321, "Cannot find " + clazz.getSimpleName()));
     }
 
     boolean isActive();
-
 }

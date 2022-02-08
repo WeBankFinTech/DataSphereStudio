@@ -16,57 +16,71 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.service;
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanUserEntity;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
+
 import org.apache.linkis.common.conf.CommonVars;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AzkabanUserService {
 
     private static Map<String, String> schedulisUserMap = new HashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkabanUserService.class);
-    private static final String ADMIN_USER = CommonVars.apply("wds.dss.schedulis.admin.user", "superadmin").getValue();
+    private static final String ADMIN_USER =
+            CommonVars.apply("wds.dss.schedulis.admin.user", "superadmin").getValue();
 
-    private static void requestUserId(String baseUrl, SSORequestService ssoRequestService, Workspace workspace) {
-            try {
-                Map<String,Object> params = new HashMap<>();
-                params.put("page", "1");
-                params.put("pageSize", "10000");
-                params.put("ajax","loadSystemUserSelectData");
-                baseUrl = !baseUrl.endsWith("/") ? (baseUrl + "/") : baseUrl;
-                String finalUrl = baseUrl + "system";
-                LOGGER.info("Request User info from wtss url: "+finalUrl);
-                String response = SSORequestWTSS.requestWTSSWithSSOGet(finalUrl,params,ssoRequestService,workspace);
-                Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
-                if (map.get("systemUserList") instanceof List){
-                    ((List<Object>) map.get("systemUserList")).forEach(e -> {
-                        AzkabanUserEntity entity =  new Gson().fromJson(e.toString(), AzkabanUserEntity.class);
-                        schedulisUserMap.put(entity.getUsername(),entity.getId());
-                    });
-                }
-            } catch (Exception e) {
-                LOGGER.error("get user from wtss failed。", e);
+    private static void requestUserId(
+            String baseUrl, SSORequestService ssoRequestService, Workspace workspace) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("page", "1");
+            params.put("pageSize", "10000");
+            params.put("ajax", "loadSystemUserSelectData");
+            baseUrl = !baseUrl.endsWith("/") ? (baseUrl + "/") : baseUrl;
+            String finalUrl = baseUrl + "system";
+            LOGGER.info("Request User info from wtss url: " + finalUrl);
+            String response =
+                    SSORequestWTSS.requestWTSSWithSSOGet(
+                            finalUrl, params, ssoRequestService, workspace);
+            Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
+            if (map.get("systemUserList") instanceof List) {
+                ((List<Object>) map.get("systemUserList"))
+                        .forEach(
+                                e -> {
+                                    AzkabanUserEntity entity =
+                                            new Gson()
+                                                    .fromJson(
+                                                            e.toString(), AzkabanUserEntity.class);
+                                    schedulisUserMap.put(entity.getUsername(), entity.getId());
+                                });
             }
-
+        } catch (Exception e) {
+            LOGGER.error("get user from wtss failed。", e);
+        }
     }
 
-    public static String getUserIdByName(String username, String baseUrl, SSORequestService ssoRequestService, Workspace workspace) {
-        if(schedulisUserMap.containsKey(username)) {
+    public static String getUserIdByName(
+            String username,
+            String baseUrl,
+            SSORequestService ssoRequestService,
+            Workspace workspace) {
+        if (schedulisUserMap.containsKey(username)) {
             return schedulisUserMap.get(username);
-        }else{
-            requestUserId(baseUrl,ssoRequestService,workspace);
+        } else {
+            requestUserId(baseUrl, ssoRequestService, workspace);
             return schedulisUserMap.get(username);
         }
-
     }
 }

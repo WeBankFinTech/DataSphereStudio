@@ -22,5 +22,4 @@ import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard;
 public interface OnlySSOAppConn extends AppConn {
 
     SSOIntegrationStandard getOrCreateSSOStandard();
-
 }

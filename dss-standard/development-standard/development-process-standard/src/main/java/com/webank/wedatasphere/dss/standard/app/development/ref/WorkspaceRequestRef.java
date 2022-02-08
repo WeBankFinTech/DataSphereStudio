@@ -21,12 +21,9 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
 public interface WorkspaceRequestRef extends RequestRef {
 
-    default void setWorkspace(Workspace workspace){
+    default void setWorkspace(Workspace workspace) {}
 
-    }
-
-    default Workspace getWorkspace(){
+    default Workspace getWorkspace() {
         return null;
     }
-
 }

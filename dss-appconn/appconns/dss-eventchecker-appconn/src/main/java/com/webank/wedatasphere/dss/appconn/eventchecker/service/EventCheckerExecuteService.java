@@ -24,9 +24,9 @@ public class EventCheckerExecuteService extends AbstractRefExecutionService {
 
     @Override
     public RefExecutionOperation createRefExecutionOperation() {
-        EventCheckerRefExecutionOperation eventCheckerRefExecutionOperation = new EventCheckerRefExecutionOperation();
+        EventCheckerRefExecutionOperation eventCheckerRefExecutionOperation =
+                new EventCheckerRefExecutionOperation();
         eventCheckerRefExecutionOperation.setDevelopmentService(this);
         return eventCheckerRefExecutionOperation;
     }
-
 }

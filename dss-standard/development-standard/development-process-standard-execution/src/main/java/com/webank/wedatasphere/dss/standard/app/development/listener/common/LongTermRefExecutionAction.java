@@ -16,11 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
-
 public interface LongTermRefExecutionAction extends RefExecutionAction {
 
     void setSchedulerId(int schedulerId);
 
     int getSchedulerId();
-
 }

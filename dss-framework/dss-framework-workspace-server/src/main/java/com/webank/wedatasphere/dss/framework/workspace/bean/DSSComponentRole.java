@@ -23,10 +23,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_component_role")
 public class DSSComponentRole implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -42,7 +41,6 @@ public class DSSComponentRole implements Serializable {
     private Date updateTime;
 
     private String updateby;
-
 
     public Long getId() {
         return id;

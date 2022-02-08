@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity;
 
 import java.util.Date;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**

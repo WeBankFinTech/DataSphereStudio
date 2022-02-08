@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.structure.project.plugin;
 
 import java.util.List;
 
-
 public interface ProjectAuth {
 
     String getWorkspaceName();
@@ -36,5 +35,4 @@ public interface ProjectAuth {
     default List<String> getDeleteUsers() {
         return getEditUsers();
     }
-
 }

@@ -16,11 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 
 import java.util.List;
-
 
 public class ResponseQueryOrchestrator {
 
@@ -37,6 +35,4 @@ public class ResponseQueryOrchestrator {
     public void setOrchestratorVoes(List<OrchestratorVo> orchestratorVoes) {
         this.orchestratorVoes = orchestratorVoes;
     }
-
-
 }

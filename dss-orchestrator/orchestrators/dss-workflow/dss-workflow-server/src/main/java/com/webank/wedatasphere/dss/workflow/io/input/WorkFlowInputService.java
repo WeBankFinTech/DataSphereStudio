@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input;
 
-
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -29,7 +28,6 @@ import java.util.List;
 public interface WorkFlowInputService {
 
     /**
-     *
      * @param userName
      * @param dssFlow
      * @param projectName
@@ -38,13 +36,24 @@ public interface WorkFlowInputService {
      * @param workspace
      * @param orcVersion
      * @throws DSSErrorException
-
      * @throws IOException
      */
-    void inputWorkFlow(String userName, String workspaceName, DSSFlow dssFlow, String version, String projectName, String inputProjectPath, Long parentFlowId, Workspace workspace, String orcVersion,String contextId) throws DSSErrorException,IOException;
+    void inputWorkFlow(
+            String userName,
+            String workspaceName,
+            DSSFlow dssFlow,
+            String version,
+            String projectName,
+            String inputProjectPath,
+            Long parentFlowId,
+            Workspace workspace,
+            String orcVersion,
+            String contextId)
+            throws DSSErrorException, IOException;
 
     /**
      * save flow to db
+     *
      * @param projectId
      * @param userName
      * @param dssFlows
@@ -52,5 +61,10 @@ public interface WorkFlowInputService {
      * @param sourceEnv
      * @return
      */
-    List<DSSFlow> persistenceFlow(Long projectId, String userName, List<DSSFlow> dssFlows, List<DSSFlowRelation> DSSFlowRelations, IOEnv sourceEnv);
+    List<DSSFlow> persistenceFlow(
+            Long projectId,
+            String userName,
+            List<DSSFlow> dssFlows,
+            List<DSSFlowRelation> DSSFlowRelations,
+            IOEnv sourceEnv);
 }

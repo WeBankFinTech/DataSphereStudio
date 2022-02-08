@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-
-public interface ImportRequestRef extends WorkspaceRequestRef {
-}
+public interface ImportRequestRef extends WorkspaceRequestRef {}

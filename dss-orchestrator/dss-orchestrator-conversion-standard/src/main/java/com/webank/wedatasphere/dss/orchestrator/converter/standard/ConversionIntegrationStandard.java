@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-
 public interface ConversionIntegrationStandard extends AppIntegrationStandard<SSORequestService> {
 
     DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance);

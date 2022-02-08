@@ -16,19 +16,20 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.async.RefExecutionResponseListener;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.LongTermRefExecutionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AsyncResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-
-public class AsyncResponseRefImpl extends AbstractResponseRef implements AsyncResponseRef, AsyncExecutionResponseRef {
+public class AsyncResponseRefImpl extends AbstractResponseRef
+        implements AsyncResponseRef, AsyncExecutionResponseRef {
 
     private RefExecutionAction action;
     private ExecutionRequestRef requestRef;
@@ -40,9 +41,7 @@ public class AsyncResponseRefImpl extends AbstractResponseRef implements AsyncRe
     private long maxLoopTime = -1;
     private final Object lock = new Object();
 
-    /**
-     * 通过监听的方式，任务一旦完成，我们就通知上层
-     */
+    /** 通过监听的方式，任务一旦完成，我们就通知上层 */
     private List<RefExecutionResponseListener> listeners = new ArrayList<>();
 
     public AsyncResponseRefImpl(String responseBody, int status) {
@@ -111,7 +110,7 @@ public class AsyncResponseRefImpl extends AbstractResponseRef implements AsyncRe
     @Override
     public void waitForCompleted() throws InterruptedException {
         synchronized (lock) {
-            while(!isCompleted) {
+            while (!isCompleted) {
                 lock.wait(2000);
             }
         }
@@ -151,7 +150,7 @@ public class AsyncResponseRefImpl extends AbstractResponseRef implements AsyncRe
 
     @Override
     public Map<String, Object> toMap() {
-        if(response != null) {
+        if (response != null) {
             return response.toMap();
         }
         return null;
@@ -159,7 +158,7 @@ public class AsyncResponseRefImpl extends AbstractResponseRef implements AsyncRe
 
     @Override
     public String getErrorMsg() {
-        if(response != null) {
+        if (response != null) {
             return response.getErrorMsg();
         }
         return null;

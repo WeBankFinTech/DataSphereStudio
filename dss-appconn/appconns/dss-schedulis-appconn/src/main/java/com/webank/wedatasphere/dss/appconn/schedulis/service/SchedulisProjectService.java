@@ -27,8 +27,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUrlOper
 
 public class SchedulisProjectService extends ProjectService {
 
-    public SchedulisProjectService(){
-    }
+    public SchedulisProjectService() {}
 
     @Override
     protected ProjectCreationOperation createProjectCreationOperation() {

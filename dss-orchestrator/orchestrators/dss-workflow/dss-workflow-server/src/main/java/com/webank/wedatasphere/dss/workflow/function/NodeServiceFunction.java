@@ -22,7 +22,11 @@ import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 
 import java.util.Map;
 
-
-public interface NodeServiceFunction{
-    Map<String,Object> accept(String userName, WorkflowNodeService nodeService, AbstractAppConnNode node, Map<String, Object> requestBody) throws ExternalOperationFailedException, IllegalAccessException, InstantiationException;
+public interface NodeServiceFunction {
+    Map<String, Object> accept(
+            String userName,
+            WorkflowNodeService nodeService,
+            AbstractAppConnNode node,
+            Map<String, Object> requestBody)
+            throws ExternalOperationFailedException, IllegalAccessException, InstantiationException;
 }

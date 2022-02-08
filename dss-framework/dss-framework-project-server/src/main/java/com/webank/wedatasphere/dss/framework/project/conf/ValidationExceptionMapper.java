@@ -16,9 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.conf;
 
+import org.apache.linkis.server.Message;
 
 import com.webank.wedatasphere.dss.common.utils.MessageUtils;
-import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +29,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-
-
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ValidationException> {
 
@@ -38,11 +36,12 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
     @Override
     public Response toResponse(ValidationException e) {
-        if (LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("failed to validate request bean", e);
         }
         StringBuilder strBuilder = new StringBuilder();
-        for (ConstraintViolation<?> cv : ((ConstraintViolationException) e).getConstraintViolations()) {
+        for (ConstraintViolation<?> cv :
+                ((ConstraintViolationException) e).getConstraintViolations()) {
             strBuilder.append(cv.getMessage()).append(";");
         }
         Message message = Message.error(strBuilder.toString());

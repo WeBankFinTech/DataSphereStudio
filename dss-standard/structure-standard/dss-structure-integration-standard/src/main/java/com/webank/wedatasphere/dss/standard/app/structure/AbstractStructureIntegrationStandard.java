@@ -25,8 +25,9 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 import java.io.IOException;
 
-public abstract class AbstractStructureIntegrationStandard extends AbstractAppIntegrationStandard<StructureService, SSORequestService>
-    implements StructureIntegrationStandard {
+public abstract class AbstractStructureIntegrationStandard
+        extends AbstractAppIntegrationStandard<StructureService, SSORequestService>
+        implements StructureIntegrationStandard {
 
     protected abstract ProjectService createProjectService();
 
@@ -44,8 +45,7 @@ public abstract class AbstractStructureIntegrationStandard extends AbstractAppIn
     }
 
     @Override
-    public void init()  {
-    }
+    public void init() {}
 
     @Override
     public RoleService getRoleService(AppInstance appInstance) {
@@ -63,8 +63,5 @@ public abstract class AbstractStructureIntegrationStandard extends AbstractAppIn
     }
 
     @Override
-    public void close() throws IOException {
-
-    }
-
+    public void close() throws IOException {}
 }

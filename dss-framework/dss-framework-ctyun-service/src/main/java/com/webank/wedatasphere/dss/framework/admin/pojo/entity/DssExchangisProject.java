@@ -2,10 +2,7 @@ package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
 import java.util.List;
 
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/18-01-18-14:05
- */
+/** @Auther: Han Tang @Date: 2022/1/18-01-18-14:05 */
 public class DssExchangisProject {
     private int id;
     private String projectName;
@@ -88,6 +85,4 @@ public class DssExchangisProject {
     public void setChildren(List<DssExchangisProject> children) {
         this.children = children;
     }
-
-
 }

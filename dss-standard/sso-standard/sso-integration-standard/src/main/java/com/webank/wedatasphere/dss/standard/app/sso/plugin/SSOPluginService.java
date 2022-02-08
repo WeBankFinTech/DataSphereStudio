@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.standard.app.sso.plugin;
 
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
-import java.io.Closeable;
 
+import java.io.Closeable;
 
 public interface SSOPluginService extends AppService, Closeable {
 
@@ -32,5 +32,4 @@ public interface SSOPluginService extends AppService, Closeable {
     default DssMsgCacheOperation createDssMsgCacheOperation() {
         return DssMsgCacheOperationImpl.getDssMsgCacheOperation();
     }
-
 }

@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.util.Date;
 
-
 public class DSSProjectUserVo {
     private int id;
     private int projectId;
@@ -55,8 +54,6 @@ public class DSSProjectUserVo {
         this.workspaceId = workspaceId;
     }
 
-
-
     public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
@@ -78,5 +75,4 @@ public class DSSProjectUserVo {
 
     private int priv_param;
     private Date lastUpdateTime;
-
 }

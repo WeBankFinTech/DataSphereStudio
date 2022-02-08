@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.entity.vo;
 
-
-
 import com.webank.wedatasphere.dss.workflow.entity.NodeUiType;
 
 import java.util.List;
@@ -36,8 +34,8 @@ public class NodeUiVO implements Comparable<NodeUiVO> {
     private Boolean isAdvanced;
     private Integer order;
     private Boolean isBaseInfo;
-    private Integer nodeMenuType;//1为右边栏
-    private String position;//存放位置  nodes /nodes.params.startup/nodes.params.runtime
+    private Integer nodeMenuType; // 1为右边栏
+    private String position; // 存放位置  nodes /nodes.params.startup/nodes.params.runtime
     private List<NodeUiValidateVO> nodeUiValidateVOS;
 
     public List<NodeUiValidateVO> getNodeUiValidateVOS() {

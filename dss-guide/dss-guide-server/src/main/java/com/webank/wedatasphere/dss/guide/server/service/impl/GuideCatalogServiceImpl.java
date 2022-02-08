@@ -1,26 +1,27 @@
 package com.webank.wedatasphere.dss.guide.server.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.guide.server.dao.GuideCatalogMapper;
 import com.webank.wedatasphere.dss.guide.server.dao.GuideChapterMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideCatalog;
 import com.webank.wedatasphere.dss.guide.server.entity.response.GuideCatalogDetail;
 import com.webank.wedatasphere.dss.guide.server.service.GuideCatalogService;
-import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.AllArgsConstructor;
+
 /**
- * @author suyc
- * @Classname GuideCatalogServiceImpl
- * @Description TODO
- * @Date 2022/1/14 13:56
- * @Created by suyc
+ * @author suyc @Classname GuideCatalogServiceImpl @Description TODO @Date 2022/1/14 13:56 @Created
+ *     by suyc
  */
 @Service
 @AllArgsConstructor
-public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, GuideCatalog> implements GuideCatalogService {
+public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, GuideCatalog>
+        implements GuideCatalogService {
     private GuideCatalogMapper guideCatalogMapper;
     private GuideChapterMapper guideChapterMapper;
 
@@ -28,10 +29,9 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
     public boolean saveGuideCatalog(GuideCatalog guideCatalog) {
         Long id = guideCatalog.getId();
 
-        if(id != null){
+        if (id != null) {
             return this.updateById(guideCatalog);
-        }
-        else {
+        } else {
             return this.save(guideCatalog);
         }
     }
@@ -48,14 +48,13 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
 
     @Override
     public GuideCatalogDetail queryGuideCatalogDetailById(Long id) {
-        GuideCatalogDetail guideCatalogDetail =new GuideCatalogDetail();
+        GuideCatalogDetail guideCatalogDetail = new GuideCatalogDetail();
 
         guideCatalogDetail.setId(id);
         guideCatalogDetail.setChildrenCatalog(guideCatalogMapper.queryGuideCatalogChildrenById(id));
-        guideCatalogDetail.setChildrenChapter(guideChapterMapper.queryGuideChapterListByCatalogId(id));
+        guideCatalogDetail.setChildrenChapter(
+                guideChapterMapper.queryGuideChapterListByCatalogId(id));
 
         return guideCatalogDetail;
     }
-
-
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class BatchDeleteAppConnNodeRequest {
 
-    private List<Map<String,Object>> nodes;
+    private List<Map<String, Object>> nodes;
     private LabelRouteVO labels;
 
     public List<Map<String, Object>> getNodes() {

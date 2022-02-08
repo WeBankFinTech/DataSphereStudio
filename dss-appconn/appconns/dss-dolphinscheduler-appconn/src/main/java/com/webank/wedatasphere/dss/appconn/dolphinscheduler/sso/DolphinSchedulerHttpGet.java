@@ -28,5 +28,4 @@ public class DolphinSchedulerHttpGet extends HttpGet implements UserInfo {
     public String getUser() {
         return user;
     }
-
 }

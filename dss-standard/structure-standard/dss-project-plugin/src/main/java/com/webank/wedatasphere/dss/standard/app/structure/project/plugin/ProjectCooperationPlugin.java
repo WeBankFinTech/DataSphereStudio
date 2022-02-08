@@ -18,11 +18,9 @@ package com.webank.wedatasphere.dss.standard.app.structure.project.plugin;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 public interface ProjectCooperationPlugin {
 
     ProjectAuth getProjectAuth(HttpServletRequest request, String projectId);
 
     ProjectAuth getProjectAuthByName(HttpServletRequest request, String projectName);
-
 }

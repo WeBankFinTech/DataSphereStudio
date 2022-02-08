@@ -19,10 +19,14 @@ package com.webank.wedatasphere.dss.standard.app.development.listener;
 public interface ExecutionLogListener {
 
     void onInfo(String log);
-    void onERROR(String log);
-    void onWarn(String log);
-    void onSystemInfo(String log);
-    void onSystemError(String log);
-    void onSystemWarn(String log);
 
+    void onERROR(String log);
+
+    void onWarn(String log);
+
+    void onSystemInfo(String log);
+
+    void onSystemError(String log);
+
+    void onSystemWarn(String log);
 }

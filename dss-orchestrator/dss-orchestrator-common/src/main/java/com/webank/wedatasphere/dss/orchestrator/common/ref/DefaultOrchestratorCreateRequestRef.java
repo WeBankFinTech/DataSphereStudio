@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-
-public class DefaultOrchestratorCreateRequestRef extends CommonRequestRefImpl implements OrchestratorCreateRequestRef {
-
+public class DefaultOrchestratorCreateRequestRef extends CommonRequestRefImpl
+        implements OrchestratorCreateRequestRef {
 
     private DSSOrchestratorInfo dssOrchestratorInfo;
 
@@ -36,18 +34,31 @@ public class DefaultOrchestratorCreateRequestRef extends CommonRequestRefImpl im
         this.dssOrchestratorInfo = dssOrchestratorInfo;
     }
 
-
     @Override
     public String toString() {
-        return "WorkflowOrchestratorCreateRequestRef{" +
-                "username='" + userName + '\'' +
-                ", workspaceName='" + workspaceName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", projectId=" + projectId +
-                ", contextIDStr='" + contextID + '\'' +
-                ", dssLabels=" + dssLabelList +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                '}';
+        return "WorkflowOrchestratorCreateRequestRef{"
+                + "username='"
+                + userName
+                + '\''
+                + ", workspaceName='"
+                + workspaceName
+                + '\''
+                + ", projectName='"
+                + projectName
+                + '\''
+                + ", projectId="
+                + projectId
+                + ", contextIDStr='"
+                + contextID
+                + '\''
+                + ", dssLabels="
+                + dssLabelList
+                + ", name='"
+                + name
+                + '\''
+                + ", type='"
+                + type
+                + '\''
+                + '}';
     }
 }

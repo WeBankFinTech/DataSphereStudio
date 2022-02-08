@@ -21,10 +21,13 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.Developmen
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppSingletonIntegrationServiceImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDevelopmentService extends AppSingletonIntegrationServiceImpl<DevelopmentOperation, SSORequestService> implements DevelopmentService {
+public abstract class AbstractDevelopmentService
+        extends AppSingletonIntegrationServiceImpl<DevelopmentOperation, SSORequestService>
+        implements DevelopmentService {
 
     private List<DSSLabel> dssLabels = new ArrayList<>();
     private DevelopmentIntegrationStandard appStandard;

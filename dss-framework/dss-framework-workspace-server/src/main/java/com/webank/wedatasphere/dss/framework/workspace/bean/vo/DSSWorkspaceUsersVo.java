@@ -2,9 +2,7 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.util.List;
 
-/**
- * Created by schumiyi on 2021/6/3
- */
+/** Created by schumiyi on 2021/6/3 */
 public class DSSWorkspaceUsersVo {
 
     private List<String> editUsers;

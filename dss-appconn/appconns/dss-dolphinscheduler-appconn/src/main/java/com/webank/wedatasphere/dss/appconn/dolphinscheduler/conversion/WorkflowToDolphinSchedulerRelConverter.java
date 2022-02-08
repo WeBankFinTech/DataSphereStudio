@@ -1,17 +1,5 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerConvertedRel;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerWorkflow;
@@ -25,6 +13,20 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The type Workflow to dolphin scheduler rel converter.
  *
@@ -33,16 +35,20 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
  */
 public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConverter {
 
-    public static final Logger logger = LoggerFactory.getLogger(WorkflowToDolphinSchedulerRelConverter.class);
+    public static final Logger logger =
+            LoggerFactory.getLogger(WorkflowToDolphinSchedulerRelConverter.class);
 
     private static NodeConverter nodeConverter = new NodeConverter();
 
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
-        DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)rel;
+        DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel =
+                (DolphinSchedulerConvertedRel) rel;
         List<Workflow> workflows = dolphinSchedulerConvertedRel.getWorkflows();
         List<Workflow> dolphinSchedulerWorkflows =
-            workflows.stream().map(workflow -> convertWorkflow(workflow)).collect(Collectors.toList());
+                workflows.stream()
+                        .map(workflow -> convertWorkflow(workflow))
+                        .collect(Collectors.toList());
         dolphinSchedulerConvertedRel.setWorkflows(dolphinSchedulerWorkflows);
         return dolphinSchedulerConvertedRel;
     }
@@ -69,7 +75,7 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
             logger.error(e.getMessage(), e);
         }
         DolphinSchedulerWorkflow.ProcessDefinitionJson processDefinitionJson =
-            new DolphinSchedulerWorkflow.ProcessDefinitionJson();
+                new DolphinSchedulerWorkflow.ProcessDefinitionJson();
         Map<String, DolphinSchedulerWorkflow.LocationInfo> locations = new HashMap<>();
         for (WorkflowNode workflowNode : workflow.getWorkflowNodes()) {
             DSSNode node = workflowNode.getDSSNode();
@@ -77,11 +83,12 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
             DolphinSchedulerTask dolphinSchedulerTask = nodeConverter.conversion(node);
             processDefinitionJson.addTask(dolphinSchedulerTask);
 
-            DolphinSchedulerWorkflow.LocationInfo locationInfo = new DolphinSchedulerWorkflow.LocationInfo();
+            DolphinSchedulerWorkflow.LocationInfo locationInfo =
+                    new DolphinSchedulerWorkflow.LocationInfo();
             locationInfo.setName(node.getName());
             locationInfo.setTargetarr(StringUtils.join(node.getDependencys(), ","));
-            locationInfo.setX((int)node.getLayout().getX());
-            locationInfo.setY((int)node.getLayout().getY());
+            locationInfo.setX((int) node.getLayout().getX());
+            locationInfo.setY((int) node.getLayout().getY());
             locations.put(node.getId(), locationInfo);
         }
 
@@ -89,7 +96,8 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         List<DolphinSchedulerWorkflow.Connect> connects = new LinkedList<>();
         for (WorkflowNodeEdge edge : workflowNodeEdges) {
             connects.add(
-                new DolphinSchedulerWorkflow.Connect(edge.getDSSEdge().getSource(), edge.getDSSEdge().getTarget()));
+                    new DolphinSchedulerWorkflow.Connect(
+                            edge.getDSSEdge().getSource(), edge.getDSSEdge().getTarget()));
         }
 
         dolphinSchedulerWorkflow.setProcessDefinitionJson(processDefinitionJson);

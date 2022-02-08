@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
+import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.webank.wedatasphere.dss.appconn.orchestrator.ref.DefaultOrchestratorExportResponseRef;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportOrchestrator;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -24,44 +27,63 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestExportOrc
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportResponseRef;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.rpc.Sender;
-import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkExportOperation implements RefExportOperation<OrchestratorExportRequestRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkExportOperation.class);
+public class OrchestratorFrameworkExportOperation
+        implements RefExportOperation<OrchestratorExportRequestRef> {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(OrchestratorFrameworkExportOperation.class);
 
-    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
-    private  DevelopmentService service;
+    private final Sender sender =
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    private DevelopmentService service;
 
     @Override
-    public OrchestratorExportResponseRef exportRef(OrchestratorExportRequestRef requestRef) throws ExternalOperationFailedException {
-        if (null == requestRef){
+    public OrchestratorExportResponseRef exportRef(OrchestratorExportRequestRef requestRef)
+            throws ExternalOperationFailedException {
+        if (null == requestRef) {
             LOGGER.error("request ref for exporting is null, it is a fatal error");
             return null;
         }
-        LOGGER.info("Begin to ask to export orchestrator, requestRef is {}", DSSCommonUtils.COMMON_GSON.toJson(requestRef));
-        RequestExportOrchestrator exportRequest = new RequestExportOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspaceName(), requestRef.getOrcId(), -1L,
-                requestRef.getProjectName(), requestRef.getDSSLabels(), requestRef.getAddOrcVersionFlag(),
-                BDPJettyServerHelper.gson().toJson(requestRef.getWorkspace()));
+        LOGGER.info(
+                "Begin to ask to export orchestrator, requestRef is {}",
+                DSSCommonUtils.COMMON_GSON.toJson(requestRef));
+        RequestExportOrchestrator exportRequest =
+                new RequestExportOrchestrator(
+                        requestRef.getUserName(),
+                        requestRef.getWorkspaceName(),
+                        requestRef.getOrcId(),
+                        -1L,
+                        requestRef.getProjectName(),
+                        requestRef.getDSSLabels(),
+                        requestRef.getAddOrcVersionFlag(),
+                        BDPJettyServerHelper.gson().toJson(requestRef.getWorkspace()));
         ResponseExportOrchestrator exportResponse = null;
-        try{
+        try {
             exportResponse = (ResponseExportOrchestrator) sender.ask(exportRequest);
-        }catch(final Throwable e){
-            DSSExceptionUtils.dealErrorException(60015, "export orchestrator ref failed", e,
+        } catch (final Throwable e) {
+            DSSExceptionUtils.dealErrorException(
+                    60015,
+                    "export orchestrator ref failed",
+                    e,
                     ExternalOperationFailedException.class);
         }
-        LOGGER.info("End to ask to export orchestrator, responseRef is {}", DSSCommonUtils.COMMON_GSON.toJson(exportResponse));
-        if(exportResponse == null){
+        LOGGER.info(
+                "End to ask to export orchestrator, responseRef is {}",
+                DSSCommonUtils.COMMON_GSON.toJson(exportResponse));
+        if (exportResponse == null) {
             LOGGER.error("exportResponse is null, it means export is failed");
-            DSSExceptionUtils.dealErrorException(63323, "exportResponse is null, it means export is failed", ExternalOperationFailedException.class);
+            DSSExceptionUtils.dealErrorException(
+                    63323,
+                    "exportResponse is null, it means export is failed",
+                    ExternalOperationFailedException.class);
         }
-        DefaultOrchestratorExportResponseRef exportResponseRef = new DefaultOrchestratorExportResponseRef();
+        DefaultOrchestratorExportResponseRef exportResponseRef =
+                new DefaultOrchestratorExportResponseRef();
         exportResponseRef.setBmlVersion(exportResponse.version());
         exportResponseRef.setResourceId(exportResponse.resourceId());
         exportResponseRef.setOrchestratorVersionId(exportResponse.orcVersionId());

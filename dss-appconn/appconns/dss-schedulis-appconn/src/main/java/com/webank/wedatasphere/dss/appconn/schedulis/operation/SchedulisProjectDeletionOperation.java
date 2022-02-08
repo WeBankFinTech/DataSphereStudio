@@ -25,25 +25,30 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequest
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import java.util.HashMap;
 import java.util.Map;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SchedulisProjectDeletionOperation implements ProjectDeletionOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectDeletionOperation.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(SchedulisProjectDeletionOperation.class);
 
     private ProjectService schedulisProjectService;
     private String managerUrl;
 
-    public SchedulisProjectDeletionOperation(){
-    }
+    public SchedulisProjectDeletionOperation() {}
 
     @Override
     public void init() {
-        managerUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
+        managerUrl =
+                this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/")
+                        ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager"
+                        : this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
     }
 
     @Override
@@ -53,18 +58,26 @@ public class SchedulisProjectDeletionOperation implements ProjectDeletionOperati
     }
 
     @Override
-    public ProjectResponseRef deleteProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef deleteProject(ProjectRequestRef projectRef)
+            throws ExternalOperationFailedException {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("project", projectRef.getName());
             params.put("delete", "true");
-            String responseContent =SSORequestWTSS.requestWTSSWithSSOGet(this.managerUrl,params,this.schedulisProjectService.getSSORequestService(),projectRef.getWorkspace());
-            LOGGER.info(" deleteWtssProject --response-->{}",responseContent);
-        } catch (Exception e){
-            SchedulisExceptionUtils.dealErrorException(60052, "failed to delete project in schedulis", e,
+            String responseContent =
+                    SSORequestWTSS.requestWTSSWithSSOGet(
+                            this.managerUrl,
+                            params,
+                            this.schedulisProjectService.getSSORequestService(),
+                            projectRef.getWorkspace());
+            LOGGER.info(" deleteWtssProject --response-->{}", responseContent);
+        } catch (Exception e) {
+            SchedulisExceptionUtils.dealErrorException(
+                    60052,
+                    "failed to delete project in schedulis",
+                    e,
                     ExternalOperationFailedException.class);
         }
         return new SchedulisProjectResponseRef();
     }
-
 }

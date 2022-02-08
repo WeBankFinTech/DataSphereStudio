@@ -17,5 +17,6 @@
 package com.webank.wedatasphere.dss.common.entity;
 
 public enum PublishType {
-    FULL,DELTA
+    FULL,
+    DELTA
 }

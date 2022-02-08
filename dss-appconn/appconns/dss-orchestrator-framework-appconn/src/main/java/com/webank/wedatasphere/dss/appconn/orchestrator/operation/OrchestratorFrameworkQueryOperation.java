@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
+import org.apache.linkis.rpc.Sender;
+
 import com.webank.wedatasphere.dss.appconn.orchestrator.ref.DefaultOrchestratorQueryResponseRef;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryOrchestrator;
@@ -23,32 +25,38 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseQueryOrc
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryResponseRef;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkQueryOperation implements RefQueryOperation<OrchestratorQueryRequestRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkQueryOperation.class);
+public class OrchestratorFrameworkQueryOperation
+        implements RefQueryOperation<OrchestratorQueryRequestRef> {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(OrchestratorFrameworkQueryOperation.class);
 
-    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    private final Sender sender =
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
     private DevelopmentService developmentService;
 
     @Override
-    public OrchestratorQueryResponseRef query(OrchestratorQueryRequestRef requestRef) throws ExternalOperationFailedException {
+    public OrchestratorQueryResponseRef query(OrchestratorQueryRequestRef requestRef)
+            throws ExternalOperationFailedException {
         if (null == requestRef) {
             LOGGER.error("request of query is null");
             return null;
         }
         LOGGER.info("Begin to ask to create orchestrator, requestRef is {}", requestRef);
-        RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(requestRef.getOrchestratorIdList());
+        RequestQueryOrchestrator queryRequest =
+                new RequestQueryOrchestrator(requestRef.getOrchestratorIdList());
         ResponseQueryOrchestrator queryResponse = null;
         try {
             queryResponse = (ResponseQueryOrchestrator) sender.ask(queryRequest);
         } catch (Exception e) {
-            DSSExceptionUtils.dealErrorException(60015, "create orchestrator ref failed",
+            DSSExceptionUtils.dealErrorException(
+                    60015,
+                    "create orchestrator ref failed",
                     ExternalOperationFailedException.class);
         }
         if (queryResponse == null) {

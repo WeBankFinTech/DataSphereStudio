@@ -16,11 +16,13 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
+
+
+import com.google.gson.Gson;
 
 public class AzkabanUtils {
     public static String handleAzkabanEntity(String entityString) throws IOException {
@@ -45,7 +47,8 @@ public class AzkabanUtils {
         return "success";
     }
 
-    public static String getValueFromEntity(String entityString, String searchKey) throws IOException {
+    public static String getValueFromEntity(String entityString, String searchKey)
+            throws IOException {
         Gson gson = new Gson();
         Object object = gson.fromJson(entityString, Object.class);
         String status = null;

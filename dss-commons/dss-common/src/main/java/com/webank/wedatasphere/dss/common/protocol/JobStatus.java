@@ -18,10 +18,7 @@ package com.webank.wedatasphere.dss.common.protocol;
 
 public enum JobStatus {
 
-    /**
-     * JobStatus是用来进行发布任务的状态的追踪
-     */
-
+    /** JobStatus是用来进行发布任务的状态的追踪 */
     Inited("Inited", 1),
     Running("Running", 2),
     Success("Success", 3),
@@ -30,14 +27,12 @@ public enum JobStatus {
     private String status;
     private int index;
 
-    private JobStatus(String status, int index){
+    private JobStatus(String status, int index) {
         this.status = status;
         this.index = index;
     }
 
-    public static boolean isSuccess(String status){
+    public static boolean isSuccess(String status) {
         return Success.status.equals(status);
     }
-
-
 }

@@ -18,15 +18,14 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-
 public interface DSSWorkspaceConstant {
     public static final String WORKSPACE_ID_STR = "workspaceId";
 
-    public static final CommonVars<String> DEFAULT_WORKSPACE_NAME
-            = CommonVars.apply("wds.dss.workspace.default.name", "bdapWorkspace");
+    public static final CommonVars<String> DEFAULT_WORKSPACE_NAME =
+            CommonVars.apply("wds.dss.workspace.default.name", "bdapWorkspace");
 
     public static final String COMMON_URL_PREFIX = "/workspaceHome/common/";
 
-    CommonVars<String> DEFAULT_DEMO_WORKSPACE_NAME = CommonVars.apply("wds.dss.default.demo.workspace", "WDS_DSS_DEMO");
-
+    CommonVars<String> DEFAULT_DEMO_WORKSPACE_NAME =
+            CommonVars.apply("wds.dss.default.demo.workspace", "WDS_DSS_DEMO");
 }

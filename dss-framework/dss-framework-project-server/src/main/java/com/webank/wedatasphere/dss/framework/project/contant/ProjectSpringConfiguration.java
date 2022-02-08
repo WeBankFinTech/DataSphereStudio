@@ -30,5 +30,4 @@ public class ProjectSpringConfiguration {
     public DSSProjectService createProjectService() {
         return new DSSProjectServiceImpl();
     }
-
 }

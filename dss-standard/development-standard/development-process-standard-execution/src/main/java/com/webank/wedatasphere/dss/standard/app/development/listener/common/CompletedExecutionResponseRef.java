@@ -17,9 +17,9 @@
 package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
+
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class CompletedExecutionResponseRef extends AbstractResponseRef {
 
@@ -34,7 +34,7 @@ public class CompletedExecutionResponseRef extends AbstractResponseRef {
     }
 
     public void setIsSucceed(boolean isSucceed) {
-        if(isSucceed) {
+        if (isSucceed) {
             status = 200;
         } else {
             status = 400;
@@ -60,7 +60,7 @@ public class CompletedExecutionResponseRef extends AbstractResponseRef {
 
     @Override
     public Map<String, Object> toMap() {
-        if(responseMap == null || (Integer) responseMap.get("status") == -1) {
+        if (responseMap == null || (Integer) responseMap.get("status") == -1) {
             responseMap = new HashMap<>(3);
             responseMap.put("errorMsg", errorMsg);
             responseMap.put("status", status);

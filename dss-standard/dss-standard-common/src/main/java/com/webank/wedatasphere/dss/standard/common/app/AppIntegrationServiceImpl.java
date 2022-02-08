@@ -16,13 +16,12 @@
 
 package com.webank.wedatasphere.dss.standard.common.app;
 
-
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
 import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl;
 
-
-public class AppIntegrationServiceImpl<T extends AppService> extends AppServiceImpl implements AppIntegrationService<T> {
+public class AppIntegrationServiceImpl<T extends AppService> extends AppServiceImpl
+        implements AppIntegrationService<T> {
 
     private T ssoRequestService;
     private AppInstance appInstance;

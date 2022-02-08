@@ -18,44 +18,27 @@ package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
 import java.util.List;
 
-
-
 public class DSSProjectDetailVo extends DSSProjectVo {
 
-    /**
-     * 发布用户 list
-     */
+    /** 发布用户 list */
     private List<String> releaseUsers;
 
-    /**
-     * 编辑用户 list
-     */
+    /** 编辑用户 list */
     private List<String> editUsers;
 
-    /**
-     * 查看用户 list
-     */
+    /** 查看用户 list */
     private List<String> accessUsers;
 
-    /**
-     * 开发的模式，主要是工作流和应用工具
-     */
+    /** 开发的模式，主要是工作流和应用工具 */
     private String projectMode;
 
-    /**
-     * 应用领域，不为空
-     */
+    /** 应用领域，不为空 */
     private String applicationArea;
 
-
-    /**
-     * 使用业务
-     */
+    /** 使用业务 */
     private String business;
 
-
     private String description;
-
 
     public List<String> getEditUsers() {
         return editUsers;

@@ -17,12 +17,12 @@
 package com.webank.wedatasphere.dss.framework.appconn.entity;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
-import java.io.Serializable;
 
+import java.io.Serializable;
 
 public class AppInstanceBean implements AppInstanceInfo, Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     private Long id;
     private Long appConnId;
@@ -100,11 +100,17 @@ public class AppInstanceBean implements AppInstanceInfo, Serializable {
 
     @Override
     public String toString() {
-        return "AppInstanceBean{" +
-                "id=" + id +
-                ", appConnId=" + appConnId +
-                ", label='" + label + '\'' +
-                ", url='" + url + '\'' +
-                '}';
+        return "AppInstanceBean{"
+                + "id="
+                + id
+                + ", appConnId="
+                + appConnId
+                + ", label='"
+                + label
+                + '\''
+                + ", url='"
+                + url
+                + '\''
+                + '}';
     }
 }

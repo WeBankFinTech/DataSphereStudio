@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.standard.common.app;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
 
-
 public interface AppIntegrationService<T extends AppService> extends AppService {
 
     void setSSORequestService(T ssoRequestService);
@@ -29,5 +28,4 @@ public interface AppIntegrationService<T extends AppService> extends AppService 
     AppInstance getAppInstance();
 
     void setAppInstance(AppInstance appInstance);
-
 }

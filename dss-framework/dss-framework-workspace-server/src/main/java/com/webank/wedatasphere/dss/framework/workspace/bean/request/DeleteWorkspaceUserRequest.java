@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class DeleteWorkspaceUserRequest implements Serializable {
 
     private int workspaceId;
-    private String username ;
+    private String username;
 
     public int getWorkspaceId() {
         return workspaceId;

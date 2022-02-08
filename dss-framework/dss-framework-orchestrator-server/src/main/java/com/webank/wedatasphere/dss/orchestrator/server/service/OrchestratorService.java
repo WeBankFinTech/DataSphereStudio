@@ -16,14 +16,13 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
-
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import java.util.List;
 
+import java.util.List;
 
 public interface OrchestratorService {
     /**
@@ -32,36 +31,40 @@ public interface OrchestratorService {
      * @param dssOrchestratorInfo
      * @return
      */
-    OrchestratorVo createOrchestrator(String userName,
-                                      String workspaceName,
-                                      String projectName,
-                                      Long projectId,
-                                      String description,
-                                      DSSOrchestratorInfo dssOrchestratorInfo,
-                                      List<DSSLabel> dssLabels) throws Exception;
-
+    OrchestratorVo createOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long projectId,
+            String description,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            List<DSSLabel> dssLabels)
+            throws Exception;
 
     /**
      * 更新编排，更新编排的基本信息
      *
      * @param dssOrchestratorInfo
      */
-    void updateOrchestrator(String userName,
-                            String workspaceName,
-                            DSSOrchestratorInfo dssOrchestratorInfo,
-                            List<DSSLabel> dssLabels) throws Exception;
+    void updateOrchestrator(
+            String userName,
+            String workspaceName,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            List<DSSLabel> dssLabels)
+            throws Exception;
 
     /**
      * 删除编排，根据编排ID删除一个编排
      *
      * @param orchestratorInfoId
      */
-    void deleteOrchestrator(String userName,
-                            String workspaceName,
-                            String projectName,
-                            Long orchestratorInfoId,
-                            List<DSSLabel> dssLabels) throws Exception;
-
+    void deleteOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long orchestratorInfoId,
+            List<DSSLabel> dssLabels)
+            throws Exception;
 
     /**
      * 返回一个编排，包含编排的基本信息和最新版本信息
@@ -77,10 +80,11 @@ public interface OrchestratorService {
      * @param orchestratorIds
      * @return
      */
-
     List<OrchestratorVo> getOrchestratorVoList(List<Long> orchestratorIds);
 
-    String openOrchestrator(String userName, String workspaceName, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception;
+    String openOrchestrator(
+            String userName, String workspaceName, Long orchestratorId, List<DSSLabel> dssLabels)
+            throws Exception;
     /**
      * 获取编排模式下的版本号
      *
@@ -89,11 +93,18 @@ public interface OrchestratorService {
      */
     List<DSSOrchestratorVersion> getVersionByOrchestratorId(Long orchestratorId);
 
-//    OrchestratorInfo getOrchestratorInfo(String username, Long workflowId);
+    //    OrchestratorInfo getOrchestratorInfo(String username, Long workflowId);
 
-    List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
+    List<DSSOrchestratorVersion> getOrchestratorVersions(
+            String username, Long projectId, Long orchestratorId);
 
-    String rollbackOrchestrator(String username, Long projectId, String projectName,
-                                Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception;
-
+    String rollbackOrchestrator(
+            String username,
+            Long projectId,
+            String projectName,
+            Long orchestratorId,
+            String version,
+            DSSLabel dssLabel,
+            Workspace workspace)
+            throws Exception;
 }

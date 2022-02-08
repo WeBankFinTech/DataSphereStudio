@@ -18,10 +18,9 @@ package com.webank.wedatasphere.dss.framework.common.exception;
 
 import org.apache.linkis.common.exception.WarnException;
 
-
 public class DSSFrameworkRuntimeException extends WarnException {
 
-    public DSSFrameworkRuntimeException(String msg){
+    public DSSFrameworkRuntimeException(String msg) {
         super(100000, msg);
     }
 }

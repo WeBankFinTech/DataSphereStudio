@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.orange.node.SqlNode;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
 public class Cache {
 
     ConcurrentHashMap<String, SqlNode> nodeCache = new ConcurrentHashMap<>();

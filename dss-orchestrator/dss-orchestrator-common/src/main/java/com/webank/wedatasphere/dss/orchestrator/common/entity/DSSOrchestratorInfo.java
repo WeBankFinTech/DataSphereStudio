@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 import java.util.Date;
 import java.util.List;
 
-
 public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private Long id;
@@ -44,15 +43,20 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private String secondaryType;
 
-    public DSSOrchestratorInfo() {
+    public DSSOrchestratorInfo() {}
 
-    }
-
-    public DSSOrchestratorInfo(String name, String type,
-                               String desc, String creator,
-                               Date createTime, String uses,
-                               String appConnName, Long projectId, String secondaryType,
-                               List<String> linkedAppConnNames, String comment) {
+    public DSSOrchestratorInfo(
+            String name,
+            String type,
+            String desc,
+            String creator,
+            Date createTime,
+            String uses,
+            String appConnName,
+            Long projectId,
+            String secondaryType,
+            List<String> linkedAppConnNames,
+            String comment) {
         this.name = name;
         this.type = type;
         this.desc = desc;
@@ -74,7 +78,6 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
         this.secondaryType = secondaryType;
     }
 
-
     public String getUUID() {
         return uuid;
     }
@@ -83,10 +86,7 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
         this.uuid = uuid;
     }
 
-
-    /**
-     * 用来存储该编排可以支持的节点类型名称
-     */
+    /** 用来存储该编排可以支持的节点类型名称 */
     private List<String> linkedAppConnNames;
 
     public List<String> getLinkedAppConnNames() {
@@ -96,7 +96,6 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
     public void setLinkedAppConnNames(List<String> linkedAppConnNames) {
         this.linkedAppConnNames = linkedAppConnNames;
     }
-
 
     public String getUses() {
         return uses;
@@ -189,20 +188,42 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     @Override
     public String toString() {
-        return "DSSOrchestratorInfo{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", desc='" + desc + '\'' +
-                ", creator='" + creator + '\'' +
-                ", createTime=" + createTime +
-                ", uses='" + uses + '\'' +
-                ", appConnName='" + appConnName + '\'' +
-                ", projectId=" + projectId +
-                ", uuid='" + uuid + '\'' +
-                ", secondaryType='" + secondaryType + '\'' +
-                ", linkedAppConnNames=" + linkedAppConnNames +
-                ", comment='" + comment + '\'' +
-                '}';
+        return "DSSOrchestratorInfo{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", type='"
+                + type
+                + '\''
+                + ", desc='"
+                + desc
+                + '\''
+                + ", creator='"
+                + creator
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", uses='"
+                + uses
+                + '\''
+                + ", appConnName='"
+                + appConnName
+                + '\''
+                + ", projectId="
+                + projectId
+                + ", uuid='"
+                + uuid
+                + '\''
+                + ", secondaryType='"
+                + secondaryType
+                + '\''
+                + ", linkedAppConnNames="
+                + linkedAppConnNames
+                + ", comment='"
+                + comment
+                + '\''
+                + '}';
     }
 }

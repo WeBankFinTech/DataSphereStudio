@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.ref;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
 
-public class WorkflowImportResponseRef  extends CommonResponseRef  {
+public class WorkflowImportResponseRef extends CommonResponseRef {
 
     private JobStatus status;
 
@@ -31,5 +31,4 @@ public class WorkflowImportResponseRef  extends CommonResponseRef  {
     public int getStatus() {
         return this.status.ordinal();
     }
-
 }

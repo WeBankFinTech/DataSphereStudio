@@ -16,17 +16,14 @@
 
 package com.webank.wedatasphere.dss.orchestrator.core.type;
 
-
 public enum OrchestratorKindEnum {
 
-    /**
-     * 编排模式的多种类型
-     */
-    WORKFLOW(1, "workflow","工作流"),
+    /** 编排模式的多种类型 */
+    WORKFLOW(1, "workflow", "工作流"),
     SINGLE_TASK(2, "singleTask", "单任务"),
-    COMBINED(3,"combined", "组合编排");
+    COMBINED(3, "combined", "组合编排");
 
-    private OrchestratorKindEnum(int index, String name, String chName){
+    private OrchestratorKindEnum(int index, String name, String chName) {
         this.index = index;
         this.name = name;
         this.chName = chName;
@@ -50,7 +47,7 @@ public enum OrchestratorKindEnum {
         return chName;
     }
 
-    public static OrchestratorKindEnum getType(int index){
+    public static OrchestratorKindEnum getType(int index) {
         for (OrchestratorKindEnum type : values()) {
             if (type.getIndex() == index) {
                 return type;
@@ -58,5 +55,4 @@ public enum OrchestratorKindEnum {
         }
         return WORKFLOW;
     }
-
 }

@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
 public class StaffInfoVO {
     private String id;
     private String username;

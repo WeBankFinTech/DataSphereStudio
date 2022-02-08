@@ -23,21 +23,23 @@ import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
+
 import java.util.List;
 import java.util.Map;
-
 
 public class WorkflowPropsParser implements WorkflowParser {
 
     @Override
     public Workflow parse(JsonObject flowJson, Workflow workflow) {
         JsonArray proJsonArray = flowJson.getAsJsonArray("props");
-        List<Map<String, Object>> props = DSSCommonUtils.COMMON_GSON.fromJson(proJsonArray, new TypeToken<List<Map<String, Object>>>() {
-        }.getType());
+        List<Map<String, Object>> props =
+                DSSCommonUtils.COMMON_GSON.fromJson(
+                        proJsonArray, new TypeToken<List<Map<String, Object>>>() {}.getType());
         JsonArray resourcesJsonArray = flowJson.getAsJsonArray("resources");
-        List<Resource> resources = DSSCommonUtils.COMMON_GSON.fromJson(resourcesJsonArray, new TypeToken<List<Resource>>() {
-        }.getType());
-        if(workflow instanceof WorkflowImpl) {
+        List<Resource> resources =
+                DSSCommonUtils.COMMON_GSON.fromJson(
+                        resourcesJsonArray, new TypeToken<List<Resource>>() {}.getType());
+        if (workflow instanceof WorkflowImpl) {
             WorkflowImpl workflow1 = (WorkflowImpl) workflow;
             workflow1.setFlowResources(resources);
             workflow1.setFlowProperties(props);

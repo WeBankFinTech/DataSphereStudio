@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext;
 
-
 public abstract class AbstractRefExecutionAction implements RefExecutionAction {
 
     private String id;
@@ -47,7 +46,8 @@ public abstract class AbstractRefExecutionAction implements RefExecutionAction {
         return executionRequestRefContext;
     }
 
-    public void setExecutionRequestRefContext(ExecutionRequestRefContext executionRequestRefContext) {
+    public void setExecutionRequestRefContext(
+            ExecutionRequestRefContext executionRequestRefContext) {
         this.executionRequestRefContext = executionRequestRefContext;
     }
 }

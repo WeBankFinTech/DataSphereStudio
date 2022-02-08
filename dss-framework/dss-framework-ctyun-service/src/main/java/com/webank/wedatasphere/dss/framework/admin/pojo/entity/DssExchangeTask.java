@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/18-01-18-15:58
- */
+/** @Auther: Han Tang @Date: 2022/1/18-01-18-15:58 */
 public class DssExchangeTask {
     private int id;
     private String jobName;
@@ -59,6 +56,4 @@ public class DssExchangeTask {
     public void setJobStatus(String jobStatus) {
         this.jobStatus = jobStatus;
     }
-
-
 }

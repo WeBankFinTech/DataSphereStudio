@@ -16,6 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.project.dao;
 
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.po.DSSProjectPo;
@@ -23,13 +28,8 @@ import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
-
 
 @Mapper
 public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
@@ -42,36 +42,40 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
     @Select("select `name` from dss_project where `id` = #{projectId}")
     String getProjectNameById(@Param("projectId") Long projectId);
 
-
-    @Select("select `id` from dss_project where `workspace_id` = #{workspaceId} and visible = #{visible}")
-    List<Long> getProjectIdsByWorkspaceId(@Param("workspaceId") Long workspaceId,@Param("visible")int visible);
-
+    @Select(
+            "select `id` from dss_project where `workspace_id` = #{workspaceId} and visible = #{visible}")
+    List<Long> getProjectIdsByWorkspaceId(
+            @Param("workspaceId") Long workspaceId, @Param("visible") int visible);
 
     List<QueryProjectVo> getListByParam(ProjectQueryRequest projectRequest);
 
-    /**
-     * 获取工程详情：工程名称、空间名称
-     */
+    /** 获取工程详情：工程名称、空间名称 */
     ProjectInfoVo getProjectInfoById(@Param("id") Long id);
 
     void saveProjectRelation(List<ProjectRelationPo> projectRelationPoList);
 
-    @Select("select `appconn_instance_project_id` from dss_appconn_project_relation " +
-            "where `project_id` = #{dssProjectId} and `appconn_instance_id` = #{appInstanceId}")
-    Long getAppConnProjectId(@Param("appInstanceId")Long appInstanceId, @Param("dssProjectId")Long dssProjectId);
-
+    @Select(
+            "select `appconn_instance_project_id` from dss_appconn_project_relation "
+                    + "where `project_id` = #{dssProjectId} and `appconn_instance_id` = #{appInstanceId}")
+    Long getAppConnProjectId(
+            @Param("appInstanceId") Long appInstanceId, @Param("dssProjectId") Long dssProjectId);
 
     @Update("update dss_project set `visible` = 0 where `id` = #{projectId}")
-    void deleteProject(@Param("projectId")Long projectId);
+    void deleteProject(@Param("projectId") Long projectId);
 
-    @Select("SELECT a.url FROM dss_appconn_instance a LEFT JOIN dss_appconn b ON a.appconn_id = b.id WHERE b.appconn_name=#{schedulisName} LIMIT 1")
-    String getSchedualisUrl(@Param("schedulisName")String schedulisName);
+    @Select(
+            "SELECT a.url FROM dss_appconn_instance a LEFT JOIN dss_appconn b ON a.appconn_id = b.id WHERE b.appconn_name=#{schedulisName} LIMIT 1")
+    String getSchedualisUrl(@Param("schedulisName") String schedulisName);
 
-    @Select("SELECT a.appconn_instance_project_id FROM dss_appconn_project_relation a WHERE a.appconn_instance_id = 1 AND a.project_id = #{projectId} LIMIT 1")
-    Long getSchedulisProjectId(@Param("projectId")Long projectId);
+    @Select(
+            "SELECT a.appconn_instance_project_id FROM dss_appconn_project_relation a WHERE a.appconn_instance_id = 1 AND a.project_id = #{projectId} LIMIT 1")
+    Long getSchedulisProjectId(@Param("projectId") Long projectId);
 
-    @Update("update dss_appconn_project_relation set appconn_instance_project_id = #{schedulisProjectId} WHERE appconn_instance_id = 1 AND  project_id = #{projectId} ")
-    int updateSchedulisProjectId(@Param("schedulisProjectId")Long schedulisProjectId,@Param("projectId")Long projectId);
+    @Update(
+            "update dss_appconn_project_relation set appconn_instance_project_id = #{schedulisProjectId} WHERE appconn_instance_id = 1 AND  project_id = #{projectId} ")
+    int updateSchedulisProjectId(
+            @Param("schedulisProjectId") Long schedulisProjectId,
+            @Param("projectId") Long projectId);
 
     List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 
@@ -82,6 +86,4 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
     @Update("DELETE FROM dss_project where `id` = #{projectId}")
     void deleteProjectInfo(@Param("projectId") Long projectId);
-
-
 }

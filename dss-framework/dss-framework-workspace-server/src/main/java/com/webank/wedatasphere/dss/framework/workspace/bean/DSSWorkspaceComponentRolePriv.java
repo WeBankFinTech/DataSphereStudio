@@ -20,7 +20,6 @@ import com.google.common.base.Objects;
 
 import java.util.Date;
 
-
 public class DSSWorkspaceComponentRolePriv {
     private Integer id;
     private Integer workspaceId;
@@ -95,8 +94,7 @@ public class DSSWorkspaceComponentRolePriv {
             return false;
         }
         DSSWorkspaceComponentRolePriv that = (DSSWorkspaceComponentRolePriv) o;
-        return Objects.equal(componentId, that.componentId) &&
-                Objects.equal(roleId, that.roleId);
+        return Objects.equal(componentId, that.componentId) && Objects.equal(roleId, that.roleId);
     }
 
     @Override

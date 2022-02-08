@@ -16,19 +16,17 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.ref;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-public class DefaultOrchestratorExportRequestRef extends CommonRequestRefImpl implements OrchestratorExportRequestRef {
-
+public class DefaultOrchestratorExportRequestRef extends CommonRequestRefImpl
+        implements OrchestratorExportRequestRef {
 
     private Long appId;
 
     private Long orchestratorVersionId;
 
     private boolean addOrcVersion;
-
 
     @Override
     public void setAppId(Long appId) {
@@ -45,12 +43,10 @@ public class DefaultOrchestratorExportRequestRef extends CommonRequestRefImpl im
         this.orchestratorVersionId = orchestratorVersionId;
     }
 
-
     @Override
     public Long getOrchestratorVersionId() {
         return orchestratorVersionId;
     }
-
 
     @Override
     public boolean getAddOrcVersionFlag() {
@@ -61,5 +57,4 @@ public class DefaultOrchestratorExportRequestRef extends CommonRequestRefImpl im
     public void setAddOrcVersionFlag(boolean addOrcVersion) {
         this.addOrcVersion = addOrcVersion;
     }
-
 }

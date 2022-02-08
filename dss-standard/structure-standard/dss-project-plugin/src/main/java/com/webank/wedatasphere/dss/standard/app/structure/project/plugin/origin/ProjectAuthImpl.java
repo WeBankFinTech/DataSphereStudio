@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.Project
 
 import java.util.List;
 
-
 public class ProjectAuthImpl implements ProjectAuth {
 
     private String workspaceName;
@@ -87,7 +86,7 @@ public class ProjectAuthImpl implements ProjectAuth {
 
     @Override
     public List<String> getDeleteUsers() {
-        if(deleteUsers == null || deleteUsers.isEmpty()) {
+        if (deleteUsers == null || deleteUsers.isEmpty()) {
             return editUsers;
         }
         return deleteUsers;
@@ -99,13 +98,22 @@ public class ProjectAuthImpl implements ProjectAuth {
 
     @Override
     public String toString() {
-        return "ProjectAuthImpl(" +
-            "workspaceName='" + workspaceName + '\'' +
-            ", projectId='" + projectId + '\'' +
-            ", projectName='" + projectName + '\'' +
-            ", editUsers=" + editUsers +
-            ", accessUsers=" + accessUsers +
-            ", deleteUsers=" + deleteUsers +
-            ')';
+        return "ProjectAuthImpl("
+                + "workspaceName='"
+                + workspaceName
+                + '\''
+                + ", projectId='"
+                + projectId
+                + '\''
+                + ", projectName='"
+                + projectName
+                + '\''
+                + ", editUsers="
+                + editUsers
+                + ", accessUsers="
+                + accessUsers
+                + ", deleteUsers="
+                + deleteUsers
+                + ')';
     }
 }

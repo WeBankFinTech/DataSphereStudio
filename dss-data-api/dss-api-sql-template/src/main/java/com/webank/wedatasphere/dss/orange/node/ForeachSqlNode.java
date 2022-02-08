@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class ForeachSqlNode implements SqlNode {
 
     String collection;
@@ -23,7 +22,14 @@ public class ForeachSqlNode implements SqlNode {
 
     String indexDataName;
 
-    public ForeachSqlNode(String collection, String open, String close, String separator, String item, String index, SqlNode contents) {
+    public ForeachSqlNode(
+            String collection,
+            String open,
+            String close,
+            String separator,
+            String item,
+            String index,
+            SqlNode contents) {
         this.collection = collection;
         this.open = open;
         this.close = close;
@@ -37,7 +43,7 @@ public class ForeachSqlNode implements SqlNode {
 
     @Override
     public void apply(Context context) {
-        context.appendSql(" ");//标签类SqlNode先拼接空格，和前面的内容隔开
+        context.appendSql(" "); // 标签类SqlNode先拼接空格，和前面的内容隔开
         Iterable<?> iterable = OgnlUtil.getIterable(collection, context.getData());
         int currentIndex = 0;
 
@@ -49,7 +55,7 @@ public class ForeachSqlNode implements SqlNode {
         for (Object o : iterable) {
 
             ((ArrayList<Integer>) context.getData().get(indexDataName)).add(currentIndex);
-            //不是第一次，需要拼接分隔符
+            // 不是第一次，需要拼接分隔符
             if (currentIndex != 0) {
                 context.appendSql(separator);
             }
@@ -62,7 +68,6 @@ public class ForeachSqlNode implements SqlNode {
         }
 
         context.appendSql(close);
-
     }
 
     @Override
@@ -70,34 +75,37 @@ public class ForeachSqlNode implements SqlNode {
         set.add(collection);
         Set<String> temp = new HashSet<>();
         contents.applyParameter(set);
-        for (String key: temp){
-            if (key.matches(item + "[.,:\\s\\[]"))
-                continue;
-            if (key.matches(index + "[.,:\\s\\[]"))
-                continue;
+        for (String key : temp) {
+            if (key.matches(item + "[.,:\\s\\[]")) continue;
+            if (key.matches(index + "[.,:\\s\\[]")) continue;
             set.add(key);
         }
     }
 
     public String getChildText(Context proxy, int currentIndex) {
-        String newItem = String.format("%s[%d]", collection, currentIndex);  //ognl可以直接获取  aaa[0]  形式的值
+        String newItem =
+                String.format("%s[%d]", collection, currentIndex); // ognl可以直接获取  aaa[0]  形式的值
         String newIndex = String.format("%s[%d]", indexDataName, currentIndex);
         this.contents.apply(proxy);
         String sql = proxy.getSql();
-        TokenParser tokenParser = new TokenParser("#{", "}", new TokenHandler() {
-            @Override
-            public String handleToken(String content) {
-                //item替换成自己的变量名: item[0]  item[1] item[2] ......
-                String replace = RegexUtil.replace(content, item, newItem);
-                if (replace.equals(content))
-                    //index替换成自己的变量名: __index_xxx[0]  __index_xxx[1] __index_xxx[2] ......
-                    replace = RegexUtil.replace(content, index, newIndex);
-                StringBuilder builder = new StringBuilder();
-                return builder.append("#{").append(replace).append("}").toString();
-            }
-        });
+        TokenParser tokenParser =
+                new TokenParser(
+                        "#{",
+                        "}",
+                        new TokenHandler() {
+                            @Override
+                            public String handleToken(String content) {
+                                // item替换成自己的变量名: item[0]  item[1] item[2] ......
+                                String replace = RegexUtil.replace(content, item, newItem);
+                                if (replace.equals(content))
+                                    // index替换成自己的变量名: __index_xxx[0]  __index_xxx[1] __index_xxx[2]
+                                    // ......
+                                    replace = RegexUtil.replace(content, index, newIndex);
+                                StringBuilder builder = new StringBuilder();
+                                return builder.append("#{").append(replace).append("}").toString();
+                            }
+                        });
         String parse = tokenParser.parse(sql);
         return parse;
     }
-
 }

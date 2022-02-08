@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
-
-
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 
@@ -39,7 +37,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         initReceiverTimes();
     }
 
-    private void initReceiverTimes(){
+    private void initReceiverTimes() {
         todayStartTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 00:00:00");
         todayEndTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 23:59:59");
         allStartTime = DateFormatUtils.format(new Date(), "10000-01-01  00:00:00");
@@ -50,69 +48,72 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
     @Override
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
         boolean result = false;
-        try{
-            String lastMsgId = getOffset(jobId,props,log);
-            String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
-            if(executeType!=null && executeType.length ==3){
-                String[] consumedMsgInfo = getMsg(props, log,executeType);
-                if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
-                    result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
+        try {
+            String lastMsgId = getOffset(jobId, props, log);
+            String[] executeType = createExecuteType(jobId, props, log, lastMsgId);
+            if (executeType != null && executeType.length == 3) {
+                String[] consumedMsgInfo = getMsg(props, log, executeType);
+                if (consumedMsgInfo != null && consumedMsgInfo.length == 4) {
+                    result = updateMsgOffset(jobId, props, log, consumedMsgInfo, lastMsgId);
                 }
-            }else{
+            } else {
                 log.error("executeType error {} " + executeType.toString());
                 return result;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("EventChecker failed to receive the message {}" + e);
             return result;
         }
         return result;
     }
 
-    private String[] createExecuteType(int jobId, Properties props, Logger log,String lastMsgId){
-        boolean receiveTodayFlag = (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
-        boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
+    private String[] createExecuteType(int jobId, Properties props, Logger log, String lastMsgId) {
+        boolean receiveTodayFlag =
+                (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
+        boolean afterSendFlag =
+                (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
         String[] executeType = null;
         try {
-            if ("0".equals(lastMsgId)){
-                if(receiveTodayFlag){
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,todayEndTime,"0"};
-                    }else{
-                        executeType = new String[]{todayStartTime,todayEndTime,"0"};
+            if ("0".equals(lastMsgId)) {
+                if (receiveTodayFlag) {
+                    if (afterSendFlag) {
+                        executeType = new String[] {nowStartTime, todayEndTime, "0"};
+                    } else {
+                        executeType = new String[] {todayStartTime, todayEndTime, "0"};
                     }
-                }else{
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,allEndTime,"0"};
-                    }else{
-                        executeType = new String[]{allStartTime,allEndTime,"0"};
+                } else {
+                    if (afterSendFlag) {
+                        executeType = new String[] {nowStartTime, allEndTime, "0"};
+                    } else {
+                        executeType = new String[] {allStartTime, allEndTime, "0"};
                     }
                 }
-            }else{
-                if(receiveTodayFlag){
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,todayEndTime,lastMsgId};
-                    }else{
-                        executeType = new String[]{todayStartTime,todayEndTime,lastMsgId};
+            } else {
+                if (receiveTodayFlag) {
+                    if (afterSendFlag) {
+                        executeType = new String[] {nowStartTime, todayEndTime, lastMsgId};
+                    } else {
+                        executeType = new String[] {todayStartTime, todayEndTime, lastMsgId};
                     }
-                }else{
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,allEndTime,lastMsgId};
-                    }else{
-                        executeType = new String[]{allStartTime,allEndTime,lastMsgId};
+                } else {
+                    if (afterSendFlag) {
+                        executeType = new String[] {nowStartTime, allEndTime, lastMsgId};
+                    } else {
+                        executeType = new String[] {allStartTime, allEndTime, lastMsgId};
                     }
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error("create executeType failed {}" + e);
         }
         return executeType;
     }
 
-    private void waitForTime(Logger log,Long waitTime){
+    private void waitForTime(Logger log, Long waitTime) {
         String waitForTime = wait_for_time;
-        String formatWaitForTime = DateFormatUtils.format(new Date(),"yyyy-MM-dd " + waitForTime + ":00");
-        DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formatWaitForTime =
+                DateFormatUtils.format(new Date(), "yyyy-MM-dd " + waitForTime + ":00");
+        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date targetWaitTime = null;
         try {
             targetWaitTime = fmt.parse(formatWaitForTime);
@@ -122,21 +123,25 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
 
         log.info("It will success at a specified time: " + targetWaitTime);
         long wt = targetWaitTime.getTime() - System.currentTimeMillis();
-        if(wt > 0){
-            //wt must less than wait.time
-            if(wt <= waitTime){
-                log.info("EventChecker will wait "+ wt + " milliseconds before starting execution");
+        if (wt > 0) {
+            // wt must less than wait.time
+            if (wt <= waitTime) {
+                log.info(
+                        "EventChecker will wait " + wt + " milliseconds before starting execution");
                 try {
                     Thread.sleep(wt);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException("EventChecker throws an exception during the waiting time {}"+e);
+                    throw new RuntimeException(
+                            "EventChecker throws an exception during the waiting time {}" + e);
                 }
-            }else{
-                throw new RuntimeException("The waiting time from Job starttime to wait.for.time"+ wt +"(ms) greater than wait.time , unreasonable setting！");
+            } else {
+                throw new RuntimeException(
+                        "The waiting time from Job starttime to wait.for.time"
+                                + wt
+                                + "(ms) greater than wait.time , unreasonable setting！");
             }
-        }else{
+        } else {
             log.info("EventChecker has reached the specified time");
         }
     }
-
 }

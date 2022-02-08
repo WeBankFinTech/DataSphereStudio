@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.converter.standard.ref;
 
-
 public interface DSSToRelConversionRequestRef extends ConversionRequestRef {
 
     String getUserName();
-
 }

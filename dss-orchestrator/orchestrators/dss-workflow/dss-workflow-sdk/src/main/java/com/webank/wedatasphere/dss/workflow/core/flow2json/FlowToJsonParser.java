@@ -20,16 +20,16 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSJsonFlow;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 
 /**
- * Used to parse a workflow to DSSJsonFlow, it is useful when we want to use
- * Workflow java SDK to create workflows and store it to db.
+ * Used to parse a workflow to DSSJsonFlow, it is useful when we want to use Workflow java SDK to
+ * create workflows and store it to db.
  */
 public interface FlowToJsonParser {
 
     /**
      * TODO wait for implementation.
+     *
      * @param workflow
      * @return
      */
     DSSJsonFlow parse(Workflow workflow);
-
 }

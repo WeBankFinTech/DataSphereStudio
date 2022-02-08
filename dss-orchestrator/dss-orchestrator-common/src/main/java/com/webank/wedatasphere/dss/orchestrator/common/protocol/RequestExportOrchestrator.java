@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import java.util.List;
 
+import java.util.List;
 
 public class RequestExportOrchestrator {
 
@@ -31,14 +31,15 @@ public class RequestExportOrchestrator {
     private Boolean addOrcVersion;
     private String workspaceStr;
 
-    public RequestExportOrchestrator(String userName,
-                                     String workspaceName,
-                                     Long orchestratorId,
-                                     Long orcVersionId,
-                                     String projectName,
-                                     List<DSSLabel> dssLabels,
-                                     Boolean addOrcVersion,
-                                     String workspaceStr) {
+    public RequestExportOrchestrator(
+            String userName,
+            String workspaceName,
+            Long orchestratorId,
+            Long orcVersionId,
+            String projectName,
+            List<DSSLabel> dssLabels,
+            Boolean addOrcVersion,
+            String workspaceStr) {
         this.userName = userName;
         this.workspaceName = workspaceName;
         this.orcVersionId = orcVersionId;

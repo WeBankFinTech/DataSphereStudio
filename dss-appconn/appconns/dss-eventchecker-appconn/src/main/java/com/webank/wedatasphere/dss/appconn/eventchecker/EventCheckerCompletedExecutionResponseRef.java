@@ -22,6 +22,7 @@ import java.util.Map;
 
 public class EventCheckerCompletedExecutionResponseRef extends CompletedExecutionResponseRef {
     private Exception exception;
+
     public void setException(Exception exception) {
         this.exception = exception;
     }
@@ -39,7 +40,7 @@ public class EventCheckerCompletedExecutionResponseRef extends CompletedExecutio
         super(responseBody, status);
     }
 
-    public void setStatus(int status){
+    public void setStatus(int status) {
         this.status = status;
     }
 

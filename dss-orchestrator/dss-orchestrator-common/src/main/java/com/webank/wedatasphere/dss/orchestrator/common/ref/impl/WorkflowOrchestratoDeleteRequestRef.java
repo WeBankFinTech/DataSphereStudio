@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref.impl;
 
-
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorDeleteRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-public class WorkflowOrchestratoDeleteRequestRef extends CommonRequestRefImpl implements OrchestratorDeleteRequestRef {
+public class WorkflowOrchestratoDeleteRequestRef extends CommonRequestRefImpl
+        implements OrchestratorDeleteRequestRef {
 
     private Long orchestratorId;
 
@@ -30,9 +30,7 @@ public class WorkflowOrchestratoDeleteRequestRef extends CommonRequestRefImpl im
     }
 
     @Override
-    public void setAppId(Long appId) {
-
-    }
+    public void setAppId(Long appId) {}
 
     @Override
     public Long getAppId() {
@@ -46,12 +44,20 @@ public class WorkflowOrchestratoDeleteRequestRef extends CommonRequestRefImpl im
 
     @Override
     public String toString() {
-        return "WorkflowOrchestratoDeleteRequestRef{" +
-                "userName='" + userName + '\'' +
-                ", workspaceName='" + workspaceName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", orchestratorId=" + orchestratorId +
-                ", dssLabels=" + dssLabelList +
-                '}';
+        return "WorkflowOrchestratoDeleteRequestRef{"
+                + "userName='"
+                + userName
+                + '\''
+                + ", workspaceName='"
+                + workspaceName
+                + '\''
+                + ", projectName='"
+                + projectName
+                + '\''
+                + ", orchestratorId="
+                + orchestratorId
+                + ", dssLabels="
+                + dssLabelList
+                + '}';
     }
 }

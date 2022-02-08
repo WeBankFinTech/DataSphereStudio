@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.workflow.core.builder.WorkflowBuilder;
 import com.webank.wedatasphere.dss.workflow.core.flow2json.FlowToJsonParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 
-
 public interface WorkflowFactory {
 
     WorkflowBuilder createWorkflowBuilder();
@@ -30,5 +29,4 @@ public interface WorkflowFactory {
     FlowToJsonParser getFlowToJsonParser();
 
     WorkflowFactory INSTANCE = WorkflowFactoryImpl.createInstance();
-
 }

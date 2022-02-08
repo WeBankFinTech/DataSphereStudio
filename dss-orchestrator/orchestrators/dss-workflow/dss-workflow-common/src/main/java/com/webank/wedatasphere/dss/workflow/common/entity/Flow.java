@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.common.entity;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
+
 import java.util.List;
 
 public interface Flow extends DSSOrchestration {
@@ -36,5 +37,4 @@ public interface Flow extends DSSOrchestration {
     List<? extends Flow> getChildren();
 
     void setChildren(List<? extends Flow> children);
-
 }

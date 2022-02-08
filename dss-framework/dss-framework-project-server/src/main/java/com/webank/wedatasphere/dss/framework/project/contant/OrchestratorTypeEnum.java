@@ -16,16 +16,16 @@
 
 package com.webank.wedatasphere.dss.framework.project.contant;
 
-import com.webank.wedatasphere.dss.orchestrator.core.type.OrchestratorKindEnum;
 import org.apache.commons.lang.StringUtils;
+
+import com.webank.wedatasphere.dss.orchestrator.core.type.OrchestratorKindEnum;
 
 import java.util.Arrays;
 
 public enum OrchestratorTypeEnum {
-
     WORKFLOW("'pom_work_flow'", 1, "工作流"),
-    SINGLE_TASK("'pom_single_task'",2,  "单任务"),
-    COMBINED("'pom_consist_orchestrator'",3,  "组合编排");
+    SINGLE_TASK("'pom_single_task'", 2, "单任务"),
+    COMBINED("'pom_consist_orchestrator'", 3, "组合编排");
 
     private String key;
     private Integer type;
@@ -61,7 +61,7 @@ public enum OrchestratorTypeEnum {
         this.name = name;
     }
 
-    public static Integer getTypeByKey(String key){
+    public static Integer getTypeByKey(String key) {
         return Arrays.stream(OrchestratorTypeEnum.values())
                 .filter(a -> a.getKey().equals(key))
                 .map(OrchestratorTypeEnum::getType)
@@ -70,19 +70,18 @@ public enum OrchestratorTypeEnum {
     }
 
     public static String getKeyByOrcType(String type) {
-        int index = Arrays.stream(OrchestratorKindEnum.values())
-                .filter(a -> a.getName().equals(type))
-                .map(OrchestratorKindEnum::getIndex)
-                .findFirst()
-                .orElse(0);
-        String key = Arrays.stream(OrchestratorTypeEnum.values())
-                .filter(a -> a.getType().equals(index))
-                .map(OrchestratorTypeEnum::getKey)
-                .findFirst()
-                .orElse(null);
+        int index =
+                Arrays.stream(OrchestratorKindEnum.values())
+                        .filter(a -> a.getName().equals(type))
+                        .map(OrchestratorKindEnum::getIndex)
+                        .findFirst()
+                        .orElse(0);
+        String key =
+                Arrays.stream(OrchestratorTypeEnum.values())
+                        .filter(a -> a.getType().equals(index))
+                        .map(OrchestratorTypeEnum::getKey)
+                        .findFirst()
+                        .orElse(null);
         return StringUtils.isNotBlank(key) ? key.replace("'", "") : null;
     }
-
-
-
 }

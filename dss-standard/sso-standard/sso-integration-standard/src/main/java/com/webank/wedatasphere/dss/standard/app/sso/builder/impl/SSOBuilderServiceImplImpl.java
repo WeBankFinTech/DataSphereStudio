@@ -21,15 +21,14 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl;
 
-
 public class SSOBuilderServiceImplImpl extends AppServiceImpl implements SSOBuilderService {
 
     private static SSOBuilderService ssoBuilderService;
 
     public static SSOBuilderService getSSOBuilderService() {
-        if(ssoBuilderService == null) {
+        if (ssoBuilderService == null) {
             synchronized (SSOBuilderServiceImplImpl.class) {
-                if(ssoBuilderService == null) {
+                if (ssoBuilderService == null) {
                     ssoBuilderService = new SSOBuilderServiceImplImpl();
                 }
             }
@@ -46,5 +45,4 @@ public class SSOBuilderServiceImplImpl extends AppServiceImpl implements SSOBuil
     public DssMsgBuilderOperation createDssMsgBuilderOperation() {
         return new DssMsgBuilderOperationImpl();
     }
-
 }

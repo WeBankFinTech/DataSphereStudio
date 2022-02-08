@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.po;
 
-
 public class ProjectRelationPo {
 
     private Long dssProjectId;
@@ -24,7 +23,6 @@ public class ProjectRelationPo {
     private Long appInstanceId;
 
     private Long appInstanceProjectId;
-
 
     public ProjectRelationPo(Long dssProjectId, Long appInstanceId, Long appInstanceProjectId) {
         this.dssProjectId = dssProjectId;

@@ -18,11 +18,9 @@ package com.webank.wedatasphere.dss.standard.app.sso.plugin.filter;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 public interface UserInterceptor {
 
     boolean isUserExistInSession(HttpServletRequest req);
 
     String getUser(HttpServletRequest req);
-
 }

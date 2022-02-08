@@ -17,7 +17,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
 import java.util.Map;
 
-
 public class OnestopMenuAppInstanceVo {
     private Long id;
     private String title;
@@ -34,7 +33,7 @@ public class OnestopMenuAppInstanceVo {
     private String icon;
     private Integer order;
     private Map<String, String> nameAndUrls;
-    //图片
+    // 图片
     private String image;
 
     public String getImage() {

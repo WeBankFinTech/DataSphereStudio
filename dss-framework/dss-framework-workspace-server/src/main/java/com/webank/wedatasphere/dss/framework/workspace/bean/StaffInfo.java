@@ -19,31 +19,39 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffInfo {
     @JsonProperty(value = "ID")
     private String id;
+
     @JsonProperty(value = "StaffID")
     private String staffId;
+
     @JsonProperty(value = "OID")
     private String oId;
+
     @JsonProperty(value = "ChineseName")
     private String chineseName;
+
     @JsonProperty(value = "EnglishName")
     private String englishName;
+
     @JsonProperty(value = "FullName")
     private String fullName;
+
     @JsonProperty(value = "OrgName")
     private String orgName;
+
     @JsonProperty(value = "OrgFullName")
     private String orgFullName;
+
     @JsonProperty(value = "Status")
     private String status;
+
     @JsonProperty(value = "PersonGroup")
     private String personGroup;
 
-    public StaffInfo(String id,String englishName, String orgFullName){
+    public StaffInfo(String id, String englishName, String orgFullName) {
         this.id = id;
         this.englishName = englishName;
         this.orgFullName = orgFullName;
@@ -131,17 +139,37 @@ public class StaffInfo {
 
     @Override
     public String toString() {
-        return "StaffInfo{" +
-                "id='" + id + '\'' +
-                ", staffId='" + staffId + '\'' +
-                ", oId='" + oId + '\'' +
-                ", chineseName='" + chineseName + '\'' +
-                ", englishName='" + englishName + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", orgName='" + orgName + '\'' +
-                ", orgFullName='" + orgFullName + '\'' +
-                ", status='" + status + '\'' +
-                ", personGroup='" + personGroup + '\'' +
-                '}';
+        return "StaffInfo{"
+                + "id='"
+                + id
+                + '\''
+                + ", staffId='"
+                + staffId
+                + '\''
+                + ", oId='"
+                + oId
+                + '\''
+                + ", chineseName='"
+                + chineseName
+                + '\''
+                + ", englishName='"
+                + englishName
+                + '\''
+                + ", fullName='"
+                + fullName
+                + '\''
+                + ", orgName='"
+                + orgName
+                + '\''
+                + ", orgFullName='"
+                + orgFullName
+                + '\''
+                + ", status='"
+                + status
+                + '\''
+                + ", personGroup='"
+                + personGroup
+                + '\''
+                + '}';
     }
 }

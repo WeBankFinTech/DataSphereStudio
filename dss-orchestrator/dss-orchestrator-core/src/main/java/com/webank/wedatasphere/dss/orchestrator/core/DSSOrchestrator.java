@@ -18,51 +18,54 @@ package com.webank.wedatasphere.dss.orchestrator.core;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+
 import java.util.List;
-
-
 
 public interface DSSOrchestrator {
 
-   /**
-    * 返回Orchestrator的名称，如workflow
-    * @return
-    */
-   String getName();
+    /**
+     * 返回Orchestrator的名称，如workflow
+     *
+     * @return
+     */
+    String getName();
 
+    /**
+     * 返回编排关联的AppConn
+     *
+     * @return
+     */
+    AppConn getAppConn();
 
-   /**
-    * 返回编排关联的AppConn
-    * @return
-    */
-   AppConn getAppConn();
+    DSSOrchestratorContext getDSSOrchestratorContext();
 
-   DSSOrchestratorContext getDSSOrchestratorContext();
+    void setAppConn(AppConn appConn);
 
-  void setAppConn(AppConn appConn);
+    /**
+     * 添加当前编排需要使用到在appconn
+     *
+     * @param appconn
+     */
+    void addLinkedAppConn(AppConn appconn);
 
-   /**
-    *添加当前编排需要使用到在appconn
-    * @param appconn
-    */
-   void addLinkedAppConn(AppConn appconn);
+    /**
+     * 为编排提供标签说明，如DEV
+     *
+     * @param dssLabel
+     */
+    void addLinkedDssLabels(DSSLabel dssLabel);
 
+    /**
+     * 返回所有已经关联到的AppConn
+     *
+     * @return
+     */
+    List<AppConn> getLinkedAppConn();
 
-   /**
-    * 为编排提供标签说明，如DEV
-    * @param dssLabel
-    */
-   void addLinkedDssLabels(DSSLabel dssLabel);
-
-   /**
-    * 返回所有已经关联到的AppConn
-    * @return
-    */
-   List<AppConn> getLinkedAppConn();
-
-   /**
-    * 用于工具条功能按钮展示，可以查到该模式可以提供的功能按钮
-    * @return
-    */
-   List<String> getToolBars();
+    /**
+     * 用于工具条功能按钮展示，可以查到该模式可以提供的功能按钮
+     *
+     * @return
+     */
+    List<String> getToolBars();
 }

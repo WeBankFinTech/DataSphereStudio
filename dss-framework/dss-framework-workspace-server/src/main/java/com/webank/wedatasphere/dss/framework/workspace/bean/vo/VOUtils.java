@@ -16,13 +16,4 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-
-public class VOUtils {
-}
+public class VOUtils {}

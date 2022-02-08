@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2019 WeBank
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,36 +16,42 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.CompletedExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.conf.RefExecutionConfiguration;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 public abstract class CallbackLongTermRefExecutionOperation extends LongTermRefExecutionOperation {
 
-    protected Map<RefExecutionAction, AsyncExecutionResponseRef> asyncResponses = new ConcurrentHashMap<RefExecutionAction, AsyncExecutionResponseRef>();
+    protected Map<RefExecutionAction, AsyncExecutionResponseRef> asyncResponses =
+            new ConcurrentHashMap<RefExecutionAction, AsyncExecutionResponseRef>();
 
-    public String getCallbackURL(ExecutionRequestRefContext executionRequestRefContext){
+    public String getCallbackURL(ExecutionRequestRefContext executionRequestRefContext) {
         String urlSuffix = RefExecutionConfiguration.CALL_BACK_URL().getValue();
         return executionRequestRefContext.getGatewayUrl() + urlSuffix;
     }
 
     public abstract void acceptCallback(Map<String, Object> callbackMap);
 
-    protected void markCompleted(RefExecutionAction action, CompletedExecutionResponseRef resultResponse) {
+    protected void markCompleted(
+            RefExecutionAction action, CompletedExecutionResponseRef resultResponse) {
         AsyncExecutionResponseRef response = asyncResponses.get(action);
         asyncResponses.remove(action);
         response.setCompleted(resultResponse);
     }
 
     @Override
-    protected AsyncExecutionResponseRef createAsyncResponseRef(ExecutionRequestRef requestRef, RefExecutionAction action) {
+    protected AsyncExecutionResponseRef createAsyncResponseRef(
+            ExecutionRequestRef requestRef, RefExecutionAction action) {
         AsyncExecutionResponseRef response = super.createAsyncResponseRef(requestRef, action);
-        response.setAskStatePeriod(RefExecutionConfiguration.CALLBACK_REF_EXECUTION_REFRESH_INTERVAL().getValue().toLong());
+        response.setAskStatePeriod(
+                RefExecutionConfiguration.CALLBACK_REF_EXECUTION_REFRESH_INTERVAL()
+                        .getValue()
+                        .toLong());
         asyncResponses.put(action, response);
         return response;
     }

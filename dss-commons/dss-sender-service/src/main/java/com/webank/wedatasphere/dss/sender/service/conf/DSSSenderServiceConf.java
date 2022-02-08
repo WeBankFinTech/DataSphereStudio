@@ -20,12 +20,12 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class DSSSenderServiceConf {
     public static final CommonVars<String> ORCHESTRATOR_SERVER_DEV_NAME =
-            CommonVars.apply("wds.dss.orc.server.dev.name", "DSS-Framework-Orchestrator-Server-Dev");
+            CommonVars.apply(
+                    "wds.dss.orc.server.dev.name", "DSS-Framework-Orchestrator-Server-Dev");
 
     public static final CommonVars<String> DSS_WORKFLOW_APPLICATION_NAME_DEV =
             CommonVars.apply("wds.dss.workflow.name.dev", "dss-workflow-server-dev");
 
     public static final CommonVars<String> PROJECT_SERVER_NAME =
             CommonVars.apply("wds.dss.project.sever.name", "dss-framework-project-server");
-
 }

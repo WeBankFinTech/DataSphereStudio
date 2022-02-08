@@ -18,20 +18,17 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 public class SidebarContentVO {
 
-    //名称
+    // 名称
     private String name;
-    //标题
+    // 标题
     private String title;
 
     private String url;
-    /**
-     * url类型: 0-内部系统，1-外部系统；默认是内部
-     */
+    /** url类型: 0-内部系统，1-外部系统；默认是内部 */
     private Integer urlType;
-    /**
-     * icon是表示Content的图标，如果为空就是没有
-     */
+    /** icon是表示Content的图标，如果为空就是没有 */
     private String icon;
+
     public String getTitle() {
         return title;
     }

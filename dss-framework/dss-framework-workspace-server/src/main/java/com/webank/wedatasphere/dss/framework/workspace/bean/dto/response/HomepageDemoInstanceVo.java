@@ -15,7 +15,6 @@
  */
 package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
-
 public class HomepageDemoInstanceVo {
 
     private Long id;

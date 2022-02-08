@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-
 public class OrchestratorConf {
-    public static final CommonVars<String> DSS_UPLOAD_PATH = CommonVars.apply("wds.dss.file.upload.dir", "/appcom/tmp/uploads");
+    public static final CommonVars<String> DSS_UPLOAD_PATH =
+            CommonVars.apply("wds.dss.file.upload.dir", "/appcom/tmp/uploads");
 }

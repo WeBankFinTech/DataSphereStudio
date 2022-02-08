@@ -24,7 +24,7 @@ import java.util.List;
 
 public interface MetaExportService {
 
-
-    void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException;
-
+    void exportFlowBaseInfo(
+            List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath)
+            throws IOException;
 }

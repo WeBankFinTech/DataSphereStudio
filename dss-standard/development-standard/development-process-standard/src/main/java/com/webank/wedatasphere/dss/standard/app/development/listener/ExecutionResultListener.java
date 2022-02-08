@@ -22,7 +22,8 @@ import org.apache.linkis.common.io.Record;
 public interface ExecutionResultListener {
 
     void setResultSetType(String resultSetType);
-    void onResultMetaData(MetaData metaData);
-    void onResultSetRecord(Record record);
 
+    void onResultMetaData(MetaData metaData);
+
+    void onResultSetRecord(Record record);
 }

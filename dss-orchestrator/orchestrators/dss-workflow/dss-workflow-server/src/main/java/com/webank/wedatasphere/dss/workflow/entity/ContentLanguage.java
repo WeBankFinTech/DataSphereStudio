@@ -17,7 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 public enum ContentLanguage {
-    en("en"), zh_CN("zh-CN");
+    en("en"),
+    zh_CN("zh-CN");
     private String name;
 
     ContentLanguage(String name) {

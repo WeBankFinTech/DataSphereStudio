@@ -17,12 +17,10 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
-
 
 @TableName(value = "dss_user")
 public class DSSUser implements Serializable {
@@ -40,8 +38,7 @@ public class DSSUser implements Serializable {
 
     private Boolean isAdmin;
 
-    public DSSUser() {
-    }
+    public DSSUser() {}
 
     public DSSUser(Long id, String username, String name, Boolean isFirstLogin, Boolean isAdmin) {
         this.id = id;

@@ -16,17 +16,14 @@
 
 package com.webank.wedatasphere.dss.workflow.dao;
 
-
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
-import java.util.List;
 
+import java.util.List;
 
 public interface NodeInfoMapper {
 
     List<NodeGroup> listNodeGroups();
 
     NodeInfo getWorkflowNodeByType(String nodeType);
-
 }
-

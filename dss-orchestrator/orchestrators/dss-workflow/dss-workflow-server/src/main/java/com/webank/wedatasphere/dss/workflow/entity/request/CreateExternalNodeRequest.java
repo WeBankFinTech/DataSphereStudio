@@ -2,11 +2,9 @@ package com.webank.wedatasphere.dss.workflow.entity.request;
 
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
-import java.util.List;
 import java.util.Map;
 
 public class CreateExternalNodeRequest {
-
 
     private Long projectID;
     private String nodeType;

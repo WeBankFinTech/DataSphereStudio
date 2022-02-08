@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo.info;
 
 import java.util.List;
 
-
 public abstract class AbstractWorkspaceComponentInfoVO {
 
     private String title;
@@ -41,7 +40,7 @@ public abstract class AbstractWorkspaceComponentInfoVO {
         return title;
     }
 
-    public static class ComponentStatistic{
+    public static class ComponentStatistic {
         private String name;
         private String value;
 
@@ -66,7 +65,6 @@ public abstract class AbstractWorkspaceComponentInfoVO {
             this.value = value;
         }
     }
-
 
     public void setTitle(String title) {
         this.title = title;
@@ -95,7 +93,6 @@ public abstract class AbstractWorkspaceComponentInfoVO {
     public void setButtonText(String buttonText) {
         this.buttonText = buttonText;
     }
-
 
     public List<ComponentStatistic> getStatistics() {
         return statistics;

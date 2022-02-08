@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
-import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.log.LogUtils;
 import org.apache.linkis.entrance.EntranceServer;
 import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
@@ -32,14 +29,19 @@ import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.scheduler.queue.Job;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+
+import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import scala.Option;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.Map;
 
+import scala.Option;
 
 @RequestMapping(path = "/dss/flow/entrance")
 @RestController
@@ -51,56 +53,77 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 
     @Override
     @EntranceServerBeanAnnotation.EntranceServerAutowiredAnnotation
-    public void setEntranceServer(EntranceServer entranceServer){
+    public void setEntranceServer(EntranceServer entranceServer) {
         super.setEntranceServer(entranceServer);
         this.entranceServer = entranceServer;
     }
 
     /**
-     * The execute function handles the request submitted by the user to execute the task, and the execution ID is returned to the user.
-     * execute函数处理的是用户提交执行任务的请求，返回给用户的是执行ID
-     * json Incoming key-value pair(传入的键值对)
-     * Repsonse
+     * The execute function handles the request submitted by the user to execute the task, and the
+     * execution ID is returned to the user. execute函数处理的是用户提交执行任务的请求，返回给用户的是执行ID json Incoming
+     * key-value pair(传入的键值对) Repsonse
      */
     @Override
-    @RequestMapping(value = "/execute",method = RequestMethod.POST)
+    @RequestMapping(value = "/execute", method = RequestMethod.POST)
     public Message execute(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
-//        try{
+        //        try{
         logger.info("Begin to get an execID");
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
         json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         params.put("workspace", workspace);
-        String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
+        String label =
+                ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY))
+                        .get("route")
+                        .toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();
         JobRequest task = ((EntranceJob) job).getJobRequest();
         Long taskID = task.getId();
-        pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
-        pushLog("************************************SCRIPT CODE************************************", job);
+        pushLog(
+                LogUtils.generateInfo(
+                        "You have submitted a new job, script code (after variable substitution) is"),
+                job);
+        pushLog(
+                "************************************SCRIPT CODE************************************",
+                job);
         pushLog(task.getExecutionCode(), job);
-        pushLog("************************************SCRIPT CODE************************************", job);
-        pushLog(LogUtils.generateInfo("Your job is accepted,  jobID is " + execID + " and taskID is " + taskID + ". Please wait it to be scheduled"), job);
-        execID = ZuulEntranceUtils.generateExecID(execID, Sender.getThisServiceInstance().getApplicationName(), new String[]{Sender.getThisInstance()});
+        pushLog(
+                "************************************SCRIPT CODE************************************",
+                job);
+        pushLog(
+                LogUtils.generateInfo(
+                        "Your job is accepted,  jobID is "
+                                + execID
+                                + " and taskID is "
+                                + taskID
+                                + ". Please wait it to be scheduled"),
+                job);
+        execID =
+                ZuulEntranceUtils.generateExecID(
+                        execID,
+                        Sender.getThisServiceInstance().getApplicationName(),
+                        new String[] {Sender.getThisInstance()});
         message = Message.ok();
         message.setMethod("/api/entrance/execute");
         message.data("execID", execID);
         message.data("taskID", taskID);
         logger.info("End to get an an execID: {}, taskID: {}", execID, taskID);
-//        }catch(ErrorException e){
-//            message = Message.error(e.getDesc());
-//            message.setStatus(1);
-//            message.setMethod("/api/entrance/execute");
-//        }
+        //        }catch(ErrorException e){
+        //            message = Message.error(e.getDesc());
+        //            message.setStatus(1);
+        //            message.setMethod("/api/entrance/execute");
+        //        }
         return message;
-
     }
 
     @Override
-    @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
-    public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
+    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET)
+    public Message status(
+            @PathVariable("id") String id,
+            @RequestParam(required = false, name = "taskID") String taskID) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = Option.apply(null);
@@ -108,7 +131,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             job = entranceServer.getJob(realId);
         } catch (Exception e) {
             logger.warn("获取任务 {} 状态时出现错误", realId, e);
-            //如果获取错误了,证明在内存中已经没有了,去jobhistory找寻一下taskID代表的任务的状态，然后返回
+            // 如果获取错误了,证明在内存中已经没有了,去jobhistory找寻一下taskID代表的任务的状态，然后返回
             long realTaskID = Long.parseLong(taskID);
             String status = JobHistoryHelper.getStatusByTaskID(realTaskID);
             message = Message.ok();
@@ -121,7 +144,9 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             message.setMethod("/api/entrance/" + id + "/status");
             message.data("status", job.get().getState().toString()).data("execID", id);
         } else {
-            message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
+            message =
+                    Message.error(
+                            "ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }
         return message;
     }

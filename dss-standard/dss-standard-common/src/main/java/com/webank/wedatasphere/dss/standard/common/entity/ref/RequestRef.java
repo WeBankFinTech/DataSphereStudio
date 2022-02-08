@@ -15,12 +15,12 @@
  */
 
 package com.webank.wedatasphere.dss.standard.common.entity.ref;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 
 public interface RequestRef extends Ref {
 
@@ -34,8 +34,7 @@ public interface RequestRef extends Ref {
 
     String getType();
 
-    default List<DSSLabel> getDSSLabels(){
+    default List<DSSLabel> getDSSLabels() {
         return new ArrayList<>();
     }
-
 }

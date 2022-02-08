@@ -17,22 +17,22 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+
 import java.util.List;
 
-
 public class RequestDeleteOrchestrator {
-   private String userName;
-   private String  workspaceName;
-   private String   projectName;
-   private Long orchestratorId;
-   private List<DSSLabel> dssLabels;
+    private String userName;
+    private String workspaceName;
+    private String projectName;
+    private Long orchestratorId;
+    private List<DSSLabel> dssLabels;
 
-
-    public RequestDeleteOrchestrator(String userName,
-                                     String workspaceName,
-                                     String projectName,
-                                     Long orchestratorId,
-                                     List<DSSLabel> dssLabels) {
+    public RequestDeleteOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long orchestratorId,
+            List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.workspaceName = workspaceName;
         this.projectName = projectName;
@@ -79,8 +79,4 @@ public class RequestDeleteOrchestrator {
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
     }
-
-
-
-
 }

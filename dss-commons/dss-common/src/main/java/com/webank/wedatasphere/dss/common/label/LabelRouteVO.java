@@ -27,6 +27,4 @@ public class LabelRouteVO {
     public void setRoute(String route) {
         this.route = route;
     }
-
-
 }

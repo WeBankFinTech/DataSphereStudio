@@ -3,11 +3,13 @@ package com.webank.wedatasphere.dss.orange.tag;
 import com.webank.wedatasphere.dss.orange.node.ForeachSqlNode;
 import com.webank.wedatasphere.dss.orange.node.MixedSqlNode;
 import com.webank.wedatasphere.dss.orange.node.SqlNode;
+
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Element;
 
 import java.util.List;
 
+
+import org.dom4j.Element;
 
 public class ForeachHandler implements TagHandler {
     @Override
@@ -31,8 +33,15 @@ public class ForeachHandler implements TagHandler {
             index = "index";
         }
 
-        ForeachSqlNode foreachSqlNode = new ForeachSqlNode(collection, open, close, separator, item, index, new MixedSqlNode(contents));
+        ForeachSqlNode foreachSqlNode =
+                new ForeachSqlNode(
+                        collection,
+                        open,
+                        close,
+                        separator,
+                        item,
+                        index,
+                        new MixedSqlNode(contents));
         targetContents.add(foreachSqlNode);
-
     }
 }

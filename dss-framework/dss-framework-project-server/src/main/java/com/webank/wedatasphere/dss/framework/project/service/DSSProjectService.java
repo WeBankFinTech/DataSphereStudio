@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -31,36 +28,34 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-public interface DSSProjectService  extends IService<DSSProjectDO> {
+import java.util.List;
+import java.util.Map;
 
+public interface DSSProjectService extends IService<DSSProjectDO> {
 
     DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest);
 
-
-    void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
-
+    void modifyProject(String username, ProjectModifyRequest modifyRequest)
+            throws DSSProjectErrorException;
 
     DSSProjectDO getProjectByName(String name);
 
-
     DSSProjectDO getProjectById(Long id);
 
-
     List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest);
-
 
     ProjectInfoVo getProjectInfoById(Long id);
 
     void saveProjectRelation(DSSProjectDO project, Map<AppInstance, Long> projectMap);
 
-    Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception;
+    Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels)
+            throws Exception;
 
     void deleteProject(Long projectId);
 
     List<String> getProjectAbilities(String username);
 
-
     Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
-    boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
 
+    boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException;
 }

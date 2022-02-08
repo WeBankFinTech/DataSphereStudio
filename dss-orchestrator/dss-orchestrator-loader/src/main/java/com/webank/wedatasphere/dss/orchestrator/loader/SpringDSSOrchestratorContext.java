@@ -20,33 +20,38 @@ import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.core.impl.AbstractDSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SpringDSSOrchestratorContext extends AbstractDSSOrchestratorContext {
 
     private final Logger LOGGER = LoggerFactory.getLogger(SpringDSSOrchestratorContext.class);
 
-    @Autowired
-    private List<DSSOrchestratorPlugin> dssOrchestratorPlugins;
+    @Autowired private List<DSSOrchestratorPlugin> dssOrchestratorPlugins;
 
     @Override
     @PostConstruct
     public void initialize() {
-        if(dssOrchestratorPlugins == null || dssOrchestratorPlugins.isEmpty()) {
+        if (dssOrchestratorPlugins == null || dssOrchestratorPlugins.isEmpty()) {
             dssOrchestratorPlugins = ClassUtils.getInstances(DSSOrchestratorPlugin.class);
         } else {
-            List<DSSOrchestratorPlugin> others = ClassUtils.getClasses(DSSOrchestratorPlugin.class).stream()
-                .filter(clazz -> dssOrchestratorPlugins.stream().noneMatch(clazz::isInstance))
-                .map(DSSExceptionUtils.map(Class::newInstance)).collect(Collectors.toList());
+            List<DSSOrchestratorPlugin> others =
+                    ClassUtils.getClasses(DSSOrchestratorPlugin.class).stream()
+                            .filter(
+                                    clazz ->
+                                            dssOrchestratorPlugins.stream()
+                                                    .noneMatch(clazz::isInstance))
+                            .map(DSSExceptionUtils.map(Class::newInstance))
+                            .collect(Collectors.toList());
             dssOrchestratorPlugins.addAll(others);
         }
         dssOrchestratorPlugins.forEach(DSSOrchestratorPlugin::init);

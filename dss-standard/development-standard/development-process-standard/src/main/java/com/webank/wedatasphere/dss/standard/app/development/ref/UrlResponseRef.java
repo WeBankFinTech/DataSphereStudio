@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.standard.app.development.ref;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-
 public interface UrlResponseRef extends ResponseRef {
 
     String getUrl();
-
 }

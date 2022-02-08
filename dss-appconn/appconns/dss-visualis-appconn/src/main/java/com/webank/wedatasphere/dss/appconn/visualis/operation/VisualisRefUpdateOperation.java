@@ -16,6 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
@@ -23,20 +28,16 @@ import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPutAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisNodeUtils;
-import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateCSRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateCSRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.Map;
 
@@ -48,7 +49,8 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
     public VisualisRefUpdateOperation(DevelopmentService developmentService) {
         this.developmentService = developmentService;
 
-        this.ssoRequestOperation = developmentService.getSSORequestService().createSSORequestOperation(getAppName());
+        this.ssoRequestOperation =
+                developmentService.getSSORequestService().createSSORequestOperation(getAppName());
     }
 
     private String getAppName() {
@@ -56,44 +58,59 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
     }
 
     @Override
-    public ResponseRef updateRef(UpdateRequestRef requestRef) throws ExternalOperationFailedException {
+    public ResponseRef updateRef(UpdateRequestRef requestRef)
+            throws ExternalOperationFailedException {
         if (!(requestRef instanceof UpdateCSRequestRef)) {
             NodeRequestRef visualisUpdateRequestRef = (NodeRequestRef) requestRef;
-            if ("linkis.appconn.visualis.widget".equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
+            if ("linkis.appconn.visualis.widget"
+                    .equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
                 return updateWidget(visualisUpdateRequestRef);
-            } else if ("linkis.appconn.visualis.display".equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
+            } else if ("linkis.appconn.visualis.display"
+                    .equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
                 return updateDisplay(visualisUpdateRequestRef);
-            } else if ("linkis.appconn.visualis.dashboard".equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
+            } else if ("linkis.appconn.visualis.dashboard"
+                    .equalsIgnoreCase(visualisUpdateRequestRef.getNodeType())) {
                 return updateDashboardPortal(visualisUpdateRequestRef);
             } else {
-                throw new ExternalOperationFailedException(90177, "Unknown task type " + visualisUpdateRequestRef.getNodeType(), null);
+                throw new ExternalOperationFailedException(
+                        90177, "Unknown task type " + visualisUpdateRequestRef.getNodeType(), null);
             }
         } else {
             NodeRequestRef visualisUpdateCSRequestRef = (NodeRequestRef) requestRef;
-            if ("linkis.appconn.visualis.widget".equalsIgnoreCase(visualisUpdateCSRequestRef.getNodeType())) {
+            if ("linkis.appconn.visualis.widget"
+                    .equalsIgnoreCase(visualisUpdateCSRequestRef.getNodeType())) {
                 return updateWidgetCS(visualisUpdateCSRequestRef);
             } else {
-                throw new ExternalOperationFailedException(90177, "Unknown task type " + visualisUpdateCSRequestRef.getNodeType(), null);
+                throw new ExternalOperationFailedException(
+                        90177,
+                        "Unknown task type " + visualisUpdateCSRequestRef.getNodeType(),
+                        null);
             }
         }
-
     }
 
-    private ResponseRef updateWidgetCS(NodeRequestRef visualisUpdateCSRequestRef) throws ExternalOperationFailedException {
+    private ResponseRef updateWidgetCS(NodeRequestRef visualisUpdateCSRequestRef)
+            throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.widgetContextUrl;
         VisualisPostAction postAction = new VisualisPostAction();
         try {
-            postAction.addRequestPayload("id", Integer.parseInt(VisualisNodeUtils.getId(visualisUpdateCSRequestRef)));
-            postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, visualisUpdateCSRequestRef.getContextID());
+            postAction.addRequestPayload(
+                    "id", Integer.parseInt(VisualisNodeUtils.getId(visualisUpdateCSRequestRef)));
+            postAction.addRequestPayload(
+                    CSCommonUtils.CONTEXT_ID_STR, visualisUpdateCSRequestRef.getContextID());
             postAction.setUser(visualisUpdateCSRequestRef.getUserName());
-            SSOUrlBuilderOperation ssoUrlBuilderOperation = visualisUpdateCSRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+            SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                    visualisUpdateCSRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
             ssoUrlBuilderOperation.setAppName(getAppName());
             ssoUrlBuilderOperation.setReqUrl(url);
-            ssoUrlBuilderOperation.setWorkspace(visualisUpdateCSRequestRef.getWorkspace().getWorkspaceName());
+            ssoUrlBuilderOperation.setWorkspace(
+                    visualisUpdateCSRequestRef.getWorkspace().getWorkspaceName());
             postAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
-            HttpResult httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, postAction);
+            HttpResult httpResult =
+                    this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, postAction);
             String response = httpResult.getResponseBody();
-            Map<String, Object> resMap = BDPJettyServerHelper.jacksonJson().readValue(response, Map.class);
+            Map<String, Object> resMap =
+                    BDPJettyServerHelper.jacksonJson().readValue(response, Map.class);
             int status = (int) resMap.get("status");
             if (status != 0) {
                 String errorMsg = resMap.get("message").toString();
@@ -105,7 +122,8 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
         }
     }
 
-    private ResponseRef updateDashboardPortal(NodeRequestRef visualisUpdateRequestRef) throws ExternalOperationFailedException {
+    private ResponseRef updateDashboardPortal(NodeRequestRef visualisUpdateRequestRef)
+            throws ExternalOperationFailedException {
         String url = null;
         String id = null;
         try {
@@ -123,10 +141,12 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
         putAction.addRequestPayload("publish", true);
         putAction.addRequestPayload("roleIds", Lists.newArrayList());
         putAction.setUser(visualisUpdateRequestRef.getUserName());
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+        SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
-        ssoUrlBuilderOperation.setWorkspace(visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
+        ssoUrlBuilderOperation.setWorkspace(
+                visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
         String response = "";
         Map<String, Object> resMap = Maps.newHashMap();
         HttpResult httpResult = null;
@@ -147,7 +167,8 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
         return new CommonResponseRef();
     }
 
-    private ResponseRef updateDisplay(NodeRequestRef visualisUpdateRequestRef) throws ExternalOperationFailedException {
+    private ResponseRef updateDisplay(NodeRequestRef visualisUpdateRequestRef)
+            throws ExternalOperationFailedException {
         String url = null;
         String id = null;
         try {
@@ -166,10 +187,12 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
         putAction.addRequestPayload("publish", true);
         putAction.addRequestPayload("roleIds", Lists.newArrayList());
         putAction.setUser(visualisUpdateRequestRef.getUserName());
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+        SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
-        ssoUrlBuilderOperation.setWorkspace(visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
+        ssoUrlBuilderOperation.setWorkspace(
+                visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
         String response = "";
         Map<String, Object> resMap = Maps.newHashMap();
         HttpResult httpResult = null;
@@ -190,26 +213,31 @@ public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequ
         return new CommonResponseRef();
     }
 
-    private ResponseRef updateWidget(NodeRequestRef visualisUpdateRequestRef) throws ExternalOperationFailedException {
+    private ResponseRef updateWidget(NodeRequestRef visualisUpdateRequestRef)
+            throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.widgetUpdateUrl;
         VisualisPostAction postAction = new VisualisPostAction();
         try {
-            postAction.addRequestPayload("id", Long.parseLong(VisualisNodeUtils.getId(visualisUpdateRequestRef)));
+            postAction.addRequestPayload(
+                    "id", Long.parseLong(VisualisNodeUtils.getId(visualisUpdateRequestRef)));
         } catch (Exception e) {
             throw new ExternalOperationFailedException(90177, "Update Widget Exception", e);
         }
         postAction.addRequestPayload("name", visualisUpdateRequestRef.getName());
         postAction.setUser(visualisUpdateRequestRef.getUserName());
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+        SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                visualisUpdateRequestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
-        ssoUrlBuilderOperation.setWorkspace(visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
+        ssoUrlBuilderOperation.setWorkspace(
+                visualisUpdateRequestRef.getWorkspace().getWorkspaceName());
         String response = "";
         Map<String, Object> resMap = Maps.newHashMap();
         HttpResult httpResult = null;
         try {
             postAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
-            httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, postAction);
+            httpResult =
+                    this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, postAction);
             response = httpResult.getResponseBody();
             resMap = BDPJettyServerHelper.jacksonJson().readValue(response, Map.class);
         } catch (Exception e) {

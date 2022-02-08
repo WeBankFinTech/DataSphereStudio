@@ -19,16 +19,22 @@ package com.webank.wedatasphere.dss.sender.service.impl;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderService;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
+
 import org.apache.linkis.rpc.Sender;
+
 import java.util.List;
 
 public class DSSSenderServiceImpl implements DSSSenderService {
 
-    private final Sender orcSender = Sender.getSender(DSSSenderServiceConf.ORCHESTRATOR_SERVER_DEV_NAME.getValue());
+    private final Sender orcSender =
+            Sender.getSender(DSSSenderServiceConf.ORCHESTRATOR_SERVER_DEV_NAME.getValue());
 
-    private final Sender workflowSender = Sender.getSender(DSSSenderServiceConf.DSS_WORKFLOW_APPLICATION_NAME_DEV.getValue());
+    private final Sender workflowSender =
+            Sender.getSender(DSSSenderServiceConf.DSS_WORKFLOW_APPLICATION_NAME_DEV.getValue());
 
-    private final Sender projectSender = Sender.getSender(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue());
+    private final Sender projectSender =
+            Sender.getSender(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue());
+
     @Override
     public Sender getOrcSender() {
         return orcSender;
@@ -63,5 +69,4 @@ public class DSSSenderServiceImpl implements DSSSenderService {
     public Sender getProjectServerSender() {
         return projectSender;
     }
-
 }

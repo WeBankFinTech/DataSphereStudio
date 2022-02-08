@@ -16,25 +16,20 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
-
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportRequestRef;
 
 public interface OrchestratorExportRequestRef extends ExportRequestRef, CommonRequestRef {
 
-     void setAppId(Long appId);
+    void setAppId(Long appId);
 
-     Long getAppId();
+    Long getAppId();
 
-     void setOrchestratorVersionId(Long orchestratorVersionId);
+    void setOrchestratorVersionId(Long orchestratorVersionId);
 
-     Long getOrchestratorVersionId();
+    Long getOrchestratorVersionId();
 
-     boolean getAddOrcVersionFlag();
+    boolean getAddOrcVersionFlag();
 
-     void setAddOrcVersionFlag(boolean addOrcVersion);
-
-
-
+    void setAddOrcVersionFlag(boolean addOrcVersion);
 }

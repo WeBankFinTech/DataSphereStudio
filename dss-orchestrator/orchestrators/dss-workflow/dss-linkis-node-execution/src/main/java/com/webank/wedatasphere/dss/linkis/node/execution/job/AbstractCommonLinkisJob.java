@@ -16,20 +16,17 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
-import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
-import java.util.ArrayList;
+import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
+import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
+
 import java.util.List;
 import java.util.Map;
-
 
 public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
 
     private Map<String, String> jobProps;
-
-
 
     private Map<String, String> source;
 
@@ -45,8 +42,6 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
 
     private String runType;
 
-
-
     private Map<String, Object> params;
 
     private Map<String, Object> runtimeParams;
@@ -57,15 +52,11 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
 
     private int logFromLine;
 
-
     private List<BMLResource> jobResourceList;
 
     private List<BMLResource> projectResourceList;
 
     private Map<String, List<BMLResource>> fLowNameAndResources;
-
-
-
 
     @Override
     public Map<String, String> getSource() {
@@ -76,7 +67,6 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
     public JobTypeEnum getJobType() {
         return this.jobType;
     }
-
 
     @Override
     public Map<String, Object> getVariables() {
@@ -107,8 +97,6 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
     public String getRunType() {
         return this.runType;
     }
-
-
 
     @Override
     public Map<String, Object> getParams() {
@@ -155,7 +143,6 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
         this.logFromLine = index;
     }
 
-
     @Override
     public void setSource(Map<String, String> source) {
         this.source = source;
@@ -201,13 +188,10 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
         this.logObj = logObj;
     }
 
-
     @Override
     public List<BMLResource> getJobResourceList() {
         return this.jobResourceList;
     }
-
-
 
     @Override
     public List<BMLResource> getProjectResourceList() {
@@ -233,5 +217,4 @@ public abstract class AbstractCommonLinkisJob extends CommonLinkisJob {
     public void setFlowNameAndResources(Map<String, List<BMLResource>> fLowNameAndResources) {
         this.fLowNameAndResources = fLowNameAndResources;
     }
-
 }

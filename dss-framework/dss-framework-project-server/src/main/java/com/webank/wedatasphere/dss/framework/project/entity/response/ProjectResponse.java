@@ -20,29 +20,28 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-
 public class ProjectResponse implements Serializable {
-    private static final long serialVersionUID=1L;
-    //工程id
+    private static final long serialVersionUID = 1L;
+    // 工程id
     private Long id;
-    //应用领域
+    // 应用领域
     private Integer applicationArea;
-    //业务
+    // 业务
     private String business;
-    //创建人
+    // 创建人
     private String createBy;
-    //工程描述
+    // 工程描述
     private String description;
-    //工程名称
+    // 工程名称
     private String name;
     //
     private String source;
-    //产品
+    // 产品
     private String product;
     private Boolean isArchive;
-    //工程创建时间
+    // 工程创建时间
     private Date createTime;
-    //工程修改时间
+    // 工程修改时间
     private Date updateTime;
 
     public Boolean getEditable() {
@@ -55,29 +54,19 @@ public class ProjectResponse implements Serializable {
 
     private Boolean editable;
 
-    /**
-     * 发布用户 list
-     */
+    /** 发布用户 list */
     private List<String> releaseUsers;
 
-    /**
-     * 编辑用户 list
-     */
+    /** 编辑用户 list */
     private List<String> editUsers;
 
-    /**
-     * 查看用户 list
-     */
+    /** 查看用户 list */
     private List<String> accessUsers;
 
-    /**
-     * 开发流程 list
-     */
+    /** 开发流程 list */
     private List<String> devProcessList;
 
-    /**
-     * 编码模式 list
-     */
+    /** 编码模式 list */
     private List<String> orchestratorModeList;
 
     public Date getCreateTime() {
@@ -210,24 +199,47 @@ public class ProjectResponse implements Serializable {
 
     @Override
     public String toString() {
-        return "ResponseProjectVo{" +
-                "id=" + id +
-                ", applicationArea=" + applicationArea +
-                ", business='" + business + '\'' +
-                ", createBy='" + createBy + '\'' +
-                ", description='" + description + '\'' +
-                ", name='" + name + '\'' +
-                ", source='" + source + '\'' +
-                ", product='" + product + '\'' +
-                ", isArchive=" + isArchive +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", releaseUsers=" + releaseUsers +
-                ", editUsers=" + editUsers +
-                ", accessUsers=" + accessUsers +
-                ", devProcessList=" + devProcessList +
-                ", orchestratorModeList=" + orchestratorModeList +
-                ", editable=" + editable +
-                '}';
+        return "ResponseProjectVo{"
+                + "id="
+                + id
+                + ", applicationArea="
+                + applicationArea
+                + ", business='"
+                + business
+                + '\''
+                + ", createBy='"
+                + createBy
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + ", name='"
+                + name
+                + '\''
+                + ", source='"
+                + source
+                + '\''
+                + ", product='"
+                + product
+                + '\''
+                + ", isArchive="
+                + isArchive
+                + ", createTime="
+                + createTime
+                + ", updateTime="
+                + updateTime
+                + ", releaseUsers="
+                + releaseUsers
+                + ", editUsers="
+                + editUsers
+                + ", accessUsers="
+                + accessUsers
+                + ", devProcessList="
+                + devProcessList
+                + ", orchestratorModeList="
+                + orchestratorModeList
+                + ", editable="
+                + editable
+                + '}';
     }
 }

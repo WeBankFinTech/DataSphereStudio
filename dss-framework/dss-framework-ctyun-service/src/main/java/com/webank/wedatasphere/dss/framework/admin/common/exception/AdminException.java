@@ -1,12 +1,12 @@
 package com.webank.wedatasphere.dss.framework.admin.common.exception;
 
-
 import com.webank.wedatasphere.dss.framework.admin.common.domain.ResponseEnum;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
 
-//@Data
-//@NoArgsConstructor
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
+
+// @Data
+// @NoArgsConstructor
 public class AdminException extends RuntimeException {
 
     public Integer getCode() {
@@ -26,25 +26,19 @@ public class AdminException extends RuntimeException {
         this.message = message;
     }
 
-    /**
-     * 错误码
-     */
+    /** 错误码 */
     private Integer code;
-    /**
-     * 错误信息
-     */
+    /** 错误信息 */
     private String message;
 
-    /**
-     * @param message 错误消息
-     */
+    /** @param message 错误消息 */
     public AdminException(String message) {
         this.message = message;
     }
 
     /**
      * @param message 错误消息
-     * @param code    错误码
+     * @param code 错误码
      */
     public AdminException(String message, Integer code) {
         this.message = message;
@@ -53,8 +47,8 @@ public class AdminException extends RuntimeException {
 
     /**
      * @param message 错误消息
-     * @param code    错误码
-     * @param cause   原始异常对象
+     * @param code 错误码
+     * @param cause 原始异常对象
      */
     public AdminException(String message, Integer code, Throwable cause) {
         super(cause);
@@ -62,9 +56,7 @@ public class AdminException extends RuntimeException {
         this.code = code;
     }
 
-    /**
-     * @param resultCodeEnum 接收枚举类型
-     */
+    /** @param resultCodeEnum 接收枚举类型 */
     public AdminException(ResponseEnum resultCodeEnum) {
         this.message = resultCodeEnum.getMessage();
         this.code = resultCodeEnum.getStatus();
@@ -72,7 +64,7 @@ public class AdminException extends RuntimeException {
 
     /**
      * @param resultCodeEnum 接收枚举类型
-     * @param cause          原始异常对象
+     * @param cause 原始异常对象
      */
     public AdminException(ResponseEnum resultCodeEnum, Throwable cause) {
         super(cause);

@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
+import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
@@ -47,69 +50,76 @@ import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import org.apache.linkis.rpc.Sender;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
-public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
+public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private NodeInfoMapper nodeInfoMapper;
+    @Autowired private NodeInfoMapper nodeInfoMapper;
 
-    private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
+    private Sender projectSender =
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
 
     @Override
     public List<NodeGroup> listNodeGroups() {
-        //cache
+        // cache
         return nodeInfoMapper.listNodeGroups();
     }
 
     @Override
-    public Map<String, Object> createNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+    public Map<String, Object> createNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
 
-        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
-        if(null != developmentIntegrationStandard)
-        {
+        DevelopmentIntegrationStandard developmentIntegrationStandard =
+                ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
+        if (null != developmentIntegrationStandard) {
             String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
             AppInstance appInstance = getAppInstance(appConn, label);
-            RefCreationOperation refCreationOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefCreationOperation();
+            RefCreationOperation refCreationOperation =
+                    developmentIntegrationStandard
+                            .getRefCRUDService(appInstance)
+                            .getRefCreationOperation();
 
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
 
             NodeRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils
-                        .newAppConnRef(NodeRequestRef.class, refCreationOperation.getClass().getClassLoader(), appConn.getAppDesc().getAppName().toLowerCase());
+                ref =
+                        AppConnRefFactoryUtils.newAppConnRef(
+                                NodeRequestRef.class,
+                                refCreationOperation.getClass().getClassLoader(),
+                                appConn.getAppDesc().getAppName().toLowerCase());
             } catch (Exception e) {
                 logger.error("Failed to create CreateNodeRequestRef", e);
             }
-            //todo set create node params
+            // todo set create node params
             ref.setUserName(userName);
             ref.setWorkspace(workspace);
             ref.setJobContent(node.getJobContent());
             ref.setName(node.getName());
-            if(ref.getName() == null){
+            if (ref.getName() == null) {
                 ref.setName(node.getJobContent().get("title").toString());
             }
             ref.setOrcId(node.getFlowId());
             ref.setOrcName(node.getFlowName());
 
             // parse to external ProjectId
-            ref.setProjectId(parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
+            ref.setProjectId(
+                    parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
             ref.setProjectName(node.getProjectName());
             ref.setNodeType(node.getNodeType());
 
-            ResponseRef responseRef =  refCreationOperation.createRef(ref);
+            ResponseRef responseRef = refCreationOperation.createRef(ref);
             return responseRef.toMap();
         }
         return null;
@@ -119,7 +129,7 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         AppInstance appInstance = null;
         for (AppInstance instance : appConn.getAppDesc().getAppInstances()) {
             for (DSSLabel dssLabel : instance.getLabels()) {
-                if(((EnvDSSLabel)dssLabel).getEnv().equalsIgnoreCase(label)){
+                if (((EnvDSSLabel) dssLabel).getEnv().equalsIgnoreCase(label)) {
                     appInstance = instance;
                     break;
                 }
@@ -128,28 +138,37 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
         return appInstance;
     }
 
-    private Long parseProjectId(Long dssProjectId, String appconnName, String labels){
+    private Long parseProjectId(Long dssProjectId, String appconnName, String labels) {
         DSSLabel dssLabel = new EnvDSSLabel(labels);
-        ProjectRelationRequest projectRelationRequest = new ProjectRelationRequest(dssProjectId, appconnName, Lists.newArrayList(dssLabel));
-        ProjectRelationResponse projectRelationResponse = (ProjectRelationResponse) projectSender.ask(projectRelationRequest);
+        ProjectRelationRequest projectRelationRequest =
+                new ProjectRelationRequest(dssProjectId, appconnName, Lists.newArrayList(dssLabel));
+        ProjectRelationResponse projectRelationResponse =
+                (ProjectRelationResponse) projectSender.ask(projectRelationRequest);
         return projectRelationResponse.getAppInstanceProjectId();
     }
 
     @Override
-    public void deleteNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+    public void deleteNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
-        if(null != developmentIntegrationStandard)
-        {
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =
+                ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
+        if (null != developmentIntegrationStandard) {
             String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
             AppInstance appInstance = getAppInstance(appConn, label);
-            RefDeletionOperation refDeletionOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefDeletionOperation();
+            RefDeletionOperation refDeletionOperation =
+                    developmentIntegrationStandard
+                            .getRefCRUDService(appInstance)
+                            .getRefDeletionOperation();
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
             NodeRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
-                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
+                ref =
+                        AppConnRefFactoryUtils.newAppConnRefByPackageName(
+                                NodeRequestRef.class,
+                                appConn.getClass().getClassLoader(),
+                                appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create DeleteNodeRequestRef", e);
             }
@@ -164,24 +183,30 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
             ref.setNodeType(node.getNodeType());
             refDeletionOperation.deleteRef(ref);
         }
-
     }
 
     @Override
-    public Map<String, Object> updateNode(String userName, AbstractAppConnNode node) throws ExternalOperationFailedException {
+    public Map<String, Object> updateNode(String userName, AbstractAppConnNode node)
+            throws ExternalOperationFailedException {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
-        if(null != developmentIntegrationStandard)
-        {
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =
+                ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
+        if (null != developmentIntegrationStandard) {
             String label = node.getJobContent().get(DSSCommonUtils.DSS_LABELS_KEY).toString();
             AppInstance appInstance = getAppInstance(appConn, label);
-            RefUpdateOperation refUpdateOperation = developmentIntegrationStandard.getRefCRUDService(appInstance).getRefUpdateOperation();
+            RefUpdateOperation refUpdateOperation =
+                    developmentIntegrationStandard
+                            .getRefCRUDService(appInstance)
+                            .getRefUpdateOperation();
             Workspace workspace = (Workspace) node.getJobContent().get("workspace");
             NodeRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(NodeRequestRef.class,
-                        appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
+                ref =
+                        AppConnRefFactoryUtils.newAppConnRefByPackageName(
+                                NodeRequestRef.class,
+                                appConn.getClass().getClassLoader(),
+                                appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create UpdateNodeRequestRef", e);
             }
@@ -196,10 +221,9 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
             ref.setNodeType(node.getNodeType());
             ResponseRef responseRef = refUpdateOperation.updateRef(ref);
             return responseRef.toMap();
-        }else {
+        } else {
             return null;
         }
-
     }
 
     @Override
@@ -208,14 +232,11 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     @Override
-    public void copyNode(String userName, AbstractAppConnNode newNode, AbstractAppConnNode oldNode) {
-
-    }
+    public void copyNode(
+            String userName, AbstractAppConnNode newNode, AbstractAppConnNode oldNode) {}
 
     @Override
-    public void setNodeReadOnly(String userName, AbstractAppConnNode node) {
-
-    }
+    public void setNodeReadOnly(String userName, AbstractAppConnNode node) {}
 
     @Override
     public List<AbstractAppConnNode> listNodes(String userName, AbstractAppConnNode node) {
@@ -228,29 +249,45 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     @Override
-    public Map<String, Object> importNode(String userName, AbstractAppConnNode node, Map<String, Object> resourceMap,
-        Workspace workspace, String orcVersion) throws Exception {
+    public Map<String, Object> importNode(
+            String userName,
+            AbstractAppConnNode node,
+            Map<String, Object> resourceMap,
+            Workspace workspace,
+            String orcVersion)
+            throws Exception {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
         EnvDSSLabel dssLabel = new EnvDSSLabel(DSSWorkFlowConstant.DSS_IMPORT_ENV.getValue());
         if (appConn != null) {
-            DevelopmentIntegrationStandard devStand =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
+            DevelopmentIntegrationStandard devStand =
+                    ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
             if (null != devStand) {
 
                 AppInstance appInstance = getAppInstance(appConn, dssLabel.getEnv());
 
-                RefImportService refImportService =  devStand.getRefImportService(appInstance);
-                ImportRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRef(ImportRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
-                //todo request param def
+                RefImportService refImportService = devStand.getRefImportService(appInstance);
+                ImportRequestRef requestRef =
+                        AppConnRefFactoryUtils.newAppConnRef(
+                                ImportRequestRef.class,
+                                appConn.getClass().getClassLoader(),
+                                appConn.getClass().getPackage().getName());
+                // todo request param def
                 requestRef.setParameter("jobContent", node.getJobContent());
-                requestRef.setParameter("projectId", parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), dssLabel.getEnv()));
+                requestRef.setParameter(
+                        "projectId",
+                        parseProjectId(
+                                node.getProjectId(),
+                                appConn.getAppDesc().getAppName(),
+                                dssLabel.getEnv()));
                 requestRef.setParameter("nodeType", node.getNodeType());
                 requestRef.setParameter("orcVersion", orcVersion);
                 requestRef.setParameter("user", userName);
                 requestRef.getParameters().putAll(resourceMap);
                 requestRef.setWorkspace(workspace);
                 if (null != refImportService) {
-                    ResponseRef responseRef = refImportService.getRefImportOperation().importRef(requestRef);
+                    ResponseRef responseRef =
+                            refImportService.getRefImportOperation().importRef(requestRef);
                     return responseRef.toMap();
                 }
             }
@@ -259,26 +296,43 @@ public class WorkflowNodeServiceImpl  implements WorkflowNodeService {
     }
 
     @Override
-    public String getNodeJumpUrl(Map<String, Object> params, AbstractAppConnNode node) throws ExternalOperationFailedException {
+    public String getNodeJumpUrl(Map<String, Object> params, AbstractAppConnNode node)
+            throws ExternalOperationFailedException {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-        AppConn appConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
-        DevelopmentIntegrationStandard developmentIntegrationStandard =((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
-        if(null != developmentIntegrationStandard){
+        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        DevelopmentIntegrationStandard developmentIntegrationStandard =
+                ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
+        if (null != developmentIntegrationStandard) {
             String label = params.get(DSSCommonUtils.DSS_LABELS_KEY).toString();
             AppInstance appInstance = getAppInstance(appConn, label);
-            RefQueryOperation refQueryOperation = developmentIntegrationStandard.getRefQueryService(appInstance).getRefQueryOperation();
+            RefQueryOperation refQueryOperation =
+                    developmentIntegrationStandard
+                            .getRefQueryService(appInstance)
+                            .getRefQueryOperation();
 
-            String redirectUrl = (String) appInstance.getConfig().get(AppInstanceConstants.REDIRECT_URL);
+            String redirectUrl =
+                    (String) appInstance.getConfig().get(AppInstanceConstants.REDIRECT_URL);
             OpenRequestRef ref = null;
             try {
-                ref = AppConnRefFactoryUtils.newAppConnRefByPackageName(OpenRequestRef.class, appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
+                ref =
+                        AppConnRefFactoryUtils.newAppConnRefByPackageName(
+                                OpenRequestRef.class,
+                                appConn.getClass().getClassLoader(),
+                                appConn.getClass().getPackage().getName());
             } catch (Exception e) {
                 logger.error("Failed to create UpdateNodeRequestRef", e);
             }
             ref.setParameter("params", params);
-            ref.setParameter("projectId", parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
+            ref.setParameter(
+                    "projectId",
+                    parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), label));
             try {
-                ref.setParameter("node", BDPJettyServerHelper.jacksonJson().readValue(BDPJettyServerHelper.jacksonJson().writeValueAsString(node), Map.class));
+                ref.setParameter(
+                        "node",
+                        BDPJettyServerHelper.jacksonJson()
+                                .readValue(
+                                        BDPJettyServerHelper.jacksonJson().writeValueAsString(node),
+                                        Map.class));
             } catch (Exception e) {
                 logger.error("Failed to convert node to map", e);
             }

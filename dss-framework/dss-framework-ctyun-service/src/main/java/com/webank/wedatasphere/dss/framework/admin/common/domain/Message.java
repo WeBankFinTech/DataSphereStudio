@@ -1,10 +1,11 @@
 package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
-//import lombok.Data;
+// import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
-//@Data
+
+// @Data
 public class Message {
     public String getMethod() {
         return method;
@@ -40,12 +41,10 @@ public class Message {
 
     private String method;
     private Integer status;
-    private String  message;
+    private String message;
     private Map<String, Object> data = new HashMap<>();
 
-    public Message() {
-    }
-
+    public Message() {}
 
     /**
      * 返回成功结果
@@ -58,7 +57,6 @@ public class Message {
         message.setMessage(ResponseEnum.SUCCESS.getMessage());
         return message;
     }
-
 
     /**
      * 返回失败结果
@@ -129,5 +127,4 @@ public class Message {
         this.setStatus(code);
         return this;
     }
-
 }

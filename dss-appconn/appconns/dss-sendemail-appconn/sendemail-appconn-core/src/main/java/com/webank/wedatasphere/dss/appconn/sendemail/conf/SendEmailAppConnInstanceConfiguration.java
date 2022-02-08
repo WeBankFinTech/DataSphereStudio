@@ -29,27 +29,33 @@ import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.Picture
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.TableEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailRefExecutionHook;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class SendEmailAppConnInstanceConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(SendEmailAppConnInstanceConfiguration.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SendEmailAppConnInstanceConfiguration.class);
 
     private static final EmailGenerator EMAIL_GENERATOR = new MultiContentEmailGenerator();
 
     private static final EmailSender EMAIL_SENDER = createEmailSender();
 
-    private static final EmailContentGenerator[] EMAIL_CONTENT_GENERATOR = createEmailContentGenerators();
+    private static final EmailContentGenerator[] EMAIL_CONTENT_GENERATOR =
+            createEmailContentGenerators();
 
     private static final EmailContentParser[] emailContentParsers = createEmailContentParsers();
 
-    private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks = createSendEmailRefExecutionHooks();
+    private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks =
+            createSendEmailRefExecutionHooks();
 
     private static EmailSender createEmailSender() {
-        EmailSender emailSender = ClassUtils.getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
-        logger.info("Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
+        EmailSender emailSender =
+                ClassUtils.getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
+        logger.info(
+                "Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
         return emailSender;
     }
 
@@ -58,12 +64,17 @@ public class SendEmailAppConnInstanceConfiguration {
     }
 
     private static EmailContentParser[] createEmailContentParsers() {
-        return new EmailContentParser[] {FileEmailContentParser$.MODULE$,
-            HtmlEmailContentParser$.MODULE$, PictureEmailContentParser$.MODULE$, TableEmailContentParser$.MODULE$};
+        return new EmailContentParser[] {
+            FileEmailContentParser$.MODULE$,
+            HtmlEmailContentParser$.MODULE$,
+            PictureEmailContentParser$.MODULE$,
+            TableEmailContentParser$.MODULE$
+        };
     }
 
     private static SendEmailRefExecutionHook[] createSendEmailRefExecutionHooks() {
-        List<SendEmailRefExecutionHook> hooks = ClassUtils.getInstances(SendEmailRefExecutionHook.class);
+        List<SendEmailRefExecutionHook> hooks =
+                ClassUtils.getInstances(SendEmailRefExecutionHook.class);
         logger.info("SendEmailRefExecutionHook list is {}.", hooks);
         return hooks.toArray(new SendEmailRefExecutionHook[0]);
     }
@@ -72,14 +83,13 @@ public class SendEmailAppConnInstanceConfiguration {
         return EMAIL_SENDER;
     }
 
-    public static void init(){
+    public static void init() {
         logger.info("init SendEmailAppConnInstanceConfiguration");
     }
 
     public static EmailGenerator getEmailGenerator() {
         return EMAIL_GENERATOR;
     }
-
 
     public static EmailContentGenerator[] getEmailContentGenerators() {
         return EMAIL_CONTENT_GENERATOR;
@@ -92,5 +102,4 @@ public class SendEmailAppConnInstanceConfiguration {
     public static SendEmailRefExecutionHook[] getSendEmailRefExecutionHooks() {
         return sendEmailRefExecutionHooks;
     }
-
 }

@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.workflow.parser;
 
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -25,7 +27,6 @@ import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -41,8 +42,10 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray resourcesJsonArray = jsonObject.getAsJsonArray("resources");
-        List<Resource> resources = gson.fromJson(resourcesJsonArray, new com.google.gson.reflect.TypeToken<List<Resource>>() {
-        }.getType());
+        List<Resource> resources =
+                gson.fromJson(
+                        resourcesJsonArray,
+                        new com.google.gson.reflect.TypeToken<List<Resource>>() {}.getType());
         return resources;
     }
 
@@ -52,8 +55,8 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
-        List<DSSNode> dwsNodes = gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
-        }.getType());
+        List<DSSNode> dwsNodes =
+                gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {}.getType());
         return dwsNodes;
     }
 
@@ -63,36 +66,36 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
-        if(nodeJsonArray==null){
+        if (nodeJsonArray == null) {
             return null;
         }
-        List<Object> nodeJsonList = gson.fromJson(nodeJsonArray.toString(), new TypeToken<List<Object>>() {
-        }.getType());
+        List<Object> nodeJsonList =
+                gson.fromJson(nodeJsonArray.toString(), new TypeToken<List<Object>>() {}.getType());
         return nodeJsonList.stream().map(gson::toJson).collect(Collectors.toList());
     }
 
     @Override
-    public String updateFlowJsonWithKey(String workFlowJson, String key, Object value) throws IOException {
-        if(value == null || key == null){
+    public String updateFlowJsonWithKey(String workFlowJson, String key, Object value)
+            throws IOException {
+        if (value == null || key == null) {
             return workFlowJson;
         }
-        Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
+        Map<String, Object> flowJsonObject =
+                BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
 
-
-        flowJsonObject.replace(key,value);
+        flowJsonObject.replace(key, value);
         String updatedJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
         return updatedJson;
     }
 
     @Override
     public String getValueWithKey(String workFlowJson, String key) throws IOException {
-        if(key == null){
+        if (key == null) {
             return null;
         }
-        Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
-
+        Map<String, Object> flowJsonObject =
+                BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
 
         return flowJsonObject.get(key).toString();
-
     }
 }

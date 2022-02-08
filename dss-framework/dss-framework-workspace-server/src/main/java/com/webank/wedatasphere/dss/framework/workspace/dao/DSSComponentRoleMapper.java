@@ -16,18 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSComponentRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentPriv;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepage;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-
 public interface DSSComponentRoleMapper extends BaseMapper<DSSComponentRole> {
 
-
     public void insertBatch(@Param("list") List<DSSWorkspaceComponentPriv> list);
-
 }

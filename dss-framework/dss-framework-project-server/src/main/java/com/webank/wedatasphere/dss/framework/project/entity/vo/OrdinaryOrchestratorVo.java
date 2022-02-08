@@ -16,8 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
-
-public class OrdinaryOrchestratorVo extends AbstractOrchestratorVo{
+public class OrdinaryOrchestratorVo extends AbstractOrchestratorVo {
 
     @Override
     String getType() {

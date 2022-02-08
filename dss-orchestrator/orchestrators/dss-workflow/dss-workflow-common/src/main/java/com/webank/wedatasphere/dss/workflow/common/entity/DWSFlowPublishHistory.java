@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.workflow.common.entity;
 
-
-public class DWSFlowPublishHistory {
-}
+public class DWSFlowPublishHistory {}

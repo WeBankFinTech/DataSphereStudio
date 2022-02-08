@@ -17,11 +17,10 @@
 package com.webank.wedatasphere.dss.orchestrator.core.impl;
 
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
-
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
+
 import java.util.Arrays;
 import java.util.List;
-
 
 abstract class AbstractOrchestrator implements DSSOrchestrator {
 
@@ -29,7 +28,7 @@ abstract class AbstractOrchestrator implements DSSOrchestrator {
 
     @Override
     public List<String> getToolBars() {
-        String[] toolNames = {"参数", "资源", "执行", "发布","保存"};
+        String[] toolNames = {"参数", "资源", "执行", "发布", "保存"};
         return Arrays.asList(toolNames);
     }
 
@@ -37,9 +36,9 @@ abstract class AbstractOrchestrator implements DSSOrchestrator {
 
     @Override
     public DSSOrchestratorContext getDSSOrchestratorContext() {
-        if(dssOrchestratorContext == null) {
+        if (dssOrchestratorContext == null) {
             synchronized (this) {
-                if(dssOrchestratorContext == null) {
+                if (dssOrchestratorContext == null) {
                     dssOrchestratorContext = createOrchestratorContext();
                 }
             }

@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
-
 public interface ProjectRequestRef extends RequestRef {
 
     String getWorkspaceName();
@@ -45,11 +44,9 @@ public interface ProjectRequestRef extends RequestRef {
 
     void setUpdateBy(String updateBy);
 
-    default void setWorkspace(Workspace workspace){
+    default void setWorkspace(Workspace workspace) {}
 
-    }
-
-    default Workspace getWorkspace(){
+    default Workspace getWorkspace() {
         return null;
     }
 }

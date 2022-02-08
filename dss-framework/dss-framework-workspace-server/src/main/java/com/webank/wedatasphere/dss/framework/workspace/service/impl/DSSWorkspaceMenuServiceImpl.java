@@ -28,36 +28,38 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 @Service
 public class DSSWorkspaceMenuServiceImpl implements DSSWorkspaceMenuService {
 
+    @Autowired private DSSWorkspaceMenuMapper dssWorkspaceMenuMapper;
 
-    @Autowired
-    private DSSWorkspaceMenuMapper dssWorkspaceMenuMapper;
-
-    @Autowired
-    private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
+    @Autowired private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
 
     @Override
-    public List<DSSMenu> getRealComponents(List<DSSMenu> subMenus, String workspaceId, String username) {
+    public List<DSSMenu> getRealComponents(
+            List<DSSMenu> subMenus, String workspaceId, String username) {
         Set<DSSMenu> dssMenuSet = new HashSet<>(subMenus);
-        subMenus.forEach(subMenu -> {
-            if (subMenu.isComponent()){
-                int applicationId = subMenu.getApplicationId();
-                List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId),username);
-                int priv = 0;
-                for (Integer role : roles) {
-                    Integer rolePriv = dssWorkspaceMenuMapper.getOneCompoentRolePriv(Integer.parseInt(workspaceId), role, applicationId);
-                    if(rolePriv != null){
-                        priv += rolePriv;
+        subMenus.forEach(
+                subMenu -> {
+                    if (subMenu.isComponent()) {
+                        int applicationId = subMenu.getApplicationId();
+                        List<Integer> roles =
+                                dssWorkspaceUserMapper.getRoleInWorkspace(
+                                        Integer.parseInt(workspaceId), username);
+                        int priv = 0;
+                        for (Integer role : roles) {
+                            Integer rolePriv =
+                                    dssWorkspaceMenuMapper.getOneCompoentRolePriv(
+                                            Integer.parseInt(workspaceId), role, applicationId);
+                            if (rolePriv != null) {
+                                priv += rolePriv;
+                            }
+                        }
+                        if (priv == 0) {
+                            dssMenuSet.remove(subMenu);
+                        }
                     }
-                }
-                if (priv == 0){
-                    dssMenuSet.remove(subMenu);
-                }
-            }
-        });
+                });
         return new ArrayList<>(dssMenuSet);
     }
 }

@@ -16,10 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import org.apache.linkis.common.conf.CommonVars;
+
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
-import org.apache.linkis.common.conf.CommonVars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,25 +30,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service
 public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserServiceImpl.class);
-    @Autowired
-    private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
-
+    @Autowired private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
 
     final CommonVars<String> staff = CommonVars.apply("wds.dss.workspace.staffs", "tom,alex,bob");
 
-
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+    public void updateWorkspaceUser(
+            List<Integer> roles, int workspaceId, String userName, String creator) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
-        roles.forEach(role ->{
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator,String.valueOf(0));
-        });
+        roles.forEach(
+                role -> {
+                    dssWorkspaceUserMapper.setUserRoleInWorkspace(
+                            workspaceId, role, userName, creator, String.valueOf(0));
+                });
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         String[] staffs = staff.getValue().split(",");
         List<StaffInfoVO> staffInfoVOs = new ArrayList<>();
         int count = 1;
-        for (String s : staffs){
+        for (String s : staffs) {
             StaffInfoVO staffInfoVO = new StaffInfoVO();
             staffInfoVO.setUsername(s);
             staffInfoVO.setDepartment("wds");
@@ -75,17 +75,15 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         return staffInfoVOs;
     }
 
-
-
     @Override
     public List<String> getAllWorkspaceUsers(int workspaceId) {
         return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
     }
 
     @Override
-    public    List<Integer>   getUserWorkspaceIds(String userName){
+    public List<Integer> getUserWorkspaceIds(String userName) {
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
-        return  tempWorkspaceIds;
+        return tempWorkspaceIds;
     }
 
     @Override

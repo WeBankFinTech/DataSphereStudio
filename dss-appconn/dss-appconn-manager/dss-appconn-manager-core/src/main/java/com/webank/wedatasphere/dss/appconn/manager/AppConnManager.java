@@ -17,40 +17,41 @@
 package com.webank.wedatasphere.dss.appconn.manager;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.core.exception.AppConnErrorException;
 import com.webank.wedatasphere.dss.appconn.core.exception.AppConnWarnException;
 import com.webank.wedatasphere.dss.appconn.manager.impl.AbstractAppConnManager;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public interface AppConnManager {
 
-    /**
-     * init AppConnManager
-     */
+    /** init AppConnManager */
     void init();
 
-    /**
-     * get all AppConns
-     */
+    /** get all AppConns */
     List<AppConn> listAppConns();
 
     default <T extends AppConn> List<T> listAppConns(Class<T> appConnClass) {
-        return listAppConns().stream().filter(appConnClass::isInstance).map(appConn -> (T) appConn).collect(Collectors.toList());
+        return listAppConns().stream()
+                .filter(appConnClass::isInstance)
+                .map(appConn -> (T) appConn)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Returns an appconn by its name
-     */
+    /** Returns an appconn by its name */
     AppConn getAppConn(String appConnName);
 
     default <T extends AppConn> T getAppConn(Class<T> appConnClass) {
-        List<AppConn> appConns = listAppConns().stream().filter(appConnClass::isInstance).collect(Collectors.toList());
-        if(appConns.isEmpty()) {
-            throw new AppConnWarnException(25344, "Cannot find a AppConn instance for " + appConnClass.getSimpleName());
-        } else if(appConns.size() > 1) {
-            throw new AppConnWarnException(25344, "More than one AppConn instances is found, list: " + appConns);
+        List<AppConn> appConns =
+                listAppConns().stream()
+                        .filter(appConnClass::isInstance)
+                        .collect(Collectors.toList());
+        if (appConns.isEmpty()) {
+            throw new AppConnWarnException(
+                    25344, "Cannot find a AppConn instance for " + appConnClass.getSimpleName());
+        } else if (appConns.size() > 1) {
+            throw new AppConnWarnException(
+                    25344, "More than one AppConn instances is found, list: " + appConns);
         }
         return (T) appConns.get(0);
     }
@@ -64,5 +65,4 @@ public interface AppConnManager {
     static AppConnManager getAppConnManager() {
         return AbstractAppConnManager.getAppConnManager();
     }
-
 }

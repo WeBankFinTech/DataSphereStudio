@@ -17,10 +17,11 @@
 package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommonResponseRef extends AbstractResponseRef {
 
@@ -30,15 +31,15 @@ public class CommonResponseRef extends AbstractResponseRef {
     }
 
     protected void init() {
-        if(StringUtils.isNotBlank(responseBody)) {
+        if (StringUtils.isNotBlank(responseBody)) {
             responseMap = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
         } else {
             responseMap = new HashMap<>();
         }
     }
 
-    public CommonResponseRef(){
-        this("",0);
+    public CommonResponseRef() {
+        this("", 0);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class CommonResponseRef extends AbstractResponseRef {
         return this.responseMap.get(key);
     }
 
-    public void addResponse(String key, Object value){
+    public void addResponse(String key, Object value) {
         this.responseMap.put(key, value);
     }
 

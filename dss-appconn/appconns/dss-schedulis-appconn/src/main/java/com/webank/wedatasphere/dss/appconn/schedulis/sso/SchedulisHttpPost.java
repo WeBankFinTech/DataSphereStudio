@@ -18,11 +18,11 @@ package com.webank.wedatasphere.dss.appconn.schedulis.sso;
 
 import org.apache.http.client.methods.HttpPost;
 
-public class SchedulisHttpPost extends HttpPost implements UserInfo{
+public class SchedulisHttpPost extends HttpPost implements UserInfo {
 
     private String user;
 
-    public SchedulisHttpPost(String url, String user){
+    public SchedulisHttpPost(String url, String user) {
         super(url);
         this.user = user;
     }
@@ -31,6 +31,4 @@ public class SchedulisHttpPost extends HttpPost implements UserInfo{
     public String getUser() {
         return user;
     }
-
-
 }

@@ -20,18 +20,15 @@ import com.webank.wedatasphere.dss.workflow.scheduler.DssJob;
 
 public class PublishJob extends DssJob {
 
-
-
     private String comment;
 
     private Long[] flowIDs;
-
 
     @Override
     public void run() {
         try {
             dssJobListener.onJobRunning(this, "导出job正在运行：" + id);
-            //todo 工作流发布逻辑
+            // todo 工作流发布逻辑
 
             dssJobListener.onJobSucceed(this, "导出job执行成功：" + id);
         } catch (Throwable e) {
@@ -41,8 +38,6 @@ public class PublishJob extends DssJob {
             dssJobListener.onJobFailed(this, "导出job执行失败：" + errorMsg);
         }
     }
-
-
 
     public Long[] getFlowIDs() {
         return flowIDs;
@@ -59,6 +54,4 @@ public class PublishJob extends DssJob {
     public void setComment(String comment) {
         this.comment = comment;
     }
-
-
 }

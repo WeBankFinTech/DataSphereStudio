@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.entity;
 
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class NodeUi implements Serializable {
     private Boolean isAdvanced;
     private Integer order;
     private Boolean isBaseInfo;
-    private Integer nodeMenuType;//1为右边栏
+    private Integer nodeMenuType; // 1为右边栏
     private String position;
 
     private List<NodeUiValidate> nodeUiValidates;

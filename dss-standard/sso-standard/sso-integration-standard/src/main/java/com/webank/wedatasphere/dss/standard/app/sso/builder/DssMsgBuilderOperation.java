@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
 import java.util.Map;
 
-
 public interface DssMsgBuilderOperation extends Operation {
 
     DssMsgBuilderOperation setQueryString(String queryString);
@@ -43,5 +42,4 @@ public interface DssMsgBuilderOperation extends Operation {
 
         Map<String, String> getCookies();
     }
-
 }

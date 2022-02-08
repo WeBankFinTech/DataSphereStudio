@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-
-public enum  JobTypeEnum {
-    CommonJob, EmptyJob
+public enum JobTypeEnum {
+    CommonJob,
+    EmptyJob
 }

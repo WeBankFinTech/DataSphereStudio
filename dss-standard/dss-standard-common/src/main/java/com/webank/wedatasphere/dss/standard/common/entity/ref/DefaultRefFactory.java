@@ -18,7 +18,9 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+
 import org.apache.linkis.common.utils.ClassUtils;
+
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -26,6 +28,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -37,7 +41,7 @@ public class DefaultRefFactory implements RefFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRefFactory.class);
 
-    private class RefKey{
+    private class RefKey {
         private ClassLoader classLoader;
         private Class<? extends Ref> clazz;
         private String packageName;
@@ -58,9 +62,9 @@ public class DefaultRefFactory implements RefFactory {
                 return false;
             }
             RefKey refKey = (RefKey) o;
-            return com.google.common.base.Objects.equal(classLoader, refKey.classLoader) &&
-                    com.google.common.base.Objects.equal(clazz, refKey.clazz) &&
-                    com.google.common.base.Objects.equal(packageName, refKey.packageName);
+            return com.google.common.base.Objects.equal(classLoader, refKey.classLoader)
+                    && com.google.common.base.Objects.equal(clazz, refKey.clazz)
+                    && com.google.common.base.Objects.equal(packageName, refKey.packageName);
         }
 
         @Override
@@ -69,14 +73,11 @@ public class DefaultRefFactory implements RefFactory {
         }
     }
 
-
-
     private Map<RefKey, Class<? extends Ref>> cacheMap = new ConcurrentHashMap<>(16);
-
 
     @Override
     public <R extends Ref> R newRef(Class<R> clazz) throws DSSErrorException {
-        if(!ClassUtils.isInterfaceOrAbstract(clazz)) {
+        if (!ClassUtils.isInterfaceOrAbstract(clazz)) {
             return DSSExceptionUtils.tryAndWarn(Void -> clazz.newInstance());
         } else {
             return com.webank.wedatasphere.dss.common.utils.ClassUtils.getInstance(clazz);
@@ -84,12 +85,13 @@ public class DefaultRefFactory implements RefFactory {
     }
 
     @Override
-    public <R extends Ref> R newRef(Class<R> clazz, ClassLoader classLoader, String packageName) throws DSSErrorException {
+    public <R extends Ref> R newRef(Class<R> clazz, ClassLoader classLoader, String packageName)
+            throws DSSErrorException {
         RefKey refKey = new RefKey(classLoader, clazz, packageName);
         Class<? extends Ref> refClass = cacheMap.get(refKey);
-        if(cacheMap.containsKey(refKey) && refClass != null){
+        if (cacheMap.containsKey(refKey) && refClass != null) {
             return DSSExceptionUtils.tryAndWarn(Void -> (R) refClass.newInstance());
-        } else if(cacheMap.containsKey(refKey) && refClass == null)  {
+        } else if (cacheMap.containsKey(refKey) && refClass == null) {
             return newRef(clazz);
         }
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
@@ -97,27 +99,42 @@ public class DefaultRefFactory implements RefFactory {
         configurationBuilder.addClassLoader(clazz.getClassLoader());
         configurationBuilder.forPackages(packageName);
         Collection<URL> urls = ClasspathHelper.forClassLoader(classLoader);
-        configurationBuilder.addUrls(urls.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        configurationBuilder.addUrls(
+                urls.stream().filter(Objects::nonNull).collect(Collectors.toList()));
         configurationBuilder.addScanners(new SubTypesScanner());
         Reflections reflections = new Reflections(configurationBuilder);
-        Set<? extends Class<? extends R>> subClasses = reflections.getSubTypesOf(clazz).stream()
-                .filter(c -> !ClassUtils.isInterfaceOrAbstract(c)).collect(Collectors.toSet());
-        if(subClasses.isEmpty()){
+        Set<? extends Class<? extends R>> subClasses =
+                reflections.getSubTypesOf(clazz).stream()
+                        .filter(c -> !ClassUtils.isInterfaceOrAbstract(c))
+                        .collect(Collectors.toSet());
+        if (subClasses.isEmpty()) {
             // Put null, so just search it in one time.
             cacheMap.put(refKey, null);
             return newRef(clazz);
         } else {
             Set<? extends Class<? extends R>> realSubClasses = subClasses;
             if (subClasses.size() > 1) {
-                LOGGER.warn("subClass of {} size is {}, classes are {}", clazz.getName(), subClasses.size(), subClasses);
-                realSubClasses = subClasses.stream().filter(subClass -> subClass.getName().contains(packageName) && !((Class) subClass).isInterface()).collect(Collectors.toSet());
+                LOGGER.warn(
+                        "subClass of {} size is {}, classes are {}",
+                        clazz.getName(),
+                        subClasses.size(),
+                        subClasses);
+                realSubClasses =
+                        subClasses.stream()
+                                .filter(
+                                        subClass ->
+                                                subClass.getName().contains(packageName)
+                                                        && !((Class) subClass).isInterface())
+                                .collect(Collectors.toSet());
                 LOGGER.warn("realSubClasses is {} ", realSubClasses);
             }
-            if (realSubClasses.size() > 1){
+            if (realSubClasses.size() > 1) {
                 LOGGER.error("realSubClasses size is bigger than 1");
-                DSSExceptionUtils.dealErrorException(60091, "too many subclass of " + clazz.getName() + "in " + packageName,
+                DSSExceptionUtils.dealErrorException(
+                        60091,
+                        "too many subclass of " + clazz.getName() + "in " + packageName,
                         DSSErrorException.class);
-            } else if(realSubClasses.size() == 0) {
+            } else if (realSubClasses.size() == 0) {
                 // Put null, so just search it in one time.
                 cacheMap.put(refKey, null);
                 return newRef(clazz);
@@ -127,5 +144,4 @@ public class DefaultRefFactory implements RefFactory {
             return DSSExceptionUtils.tryAndWarn(Void -> subClass.newInstance());
         }
     }
-
 }

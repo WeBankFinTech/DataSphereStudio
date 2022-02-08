@@ -23,11 +23,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_menu_role")
 public class DSSMenuRole implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -102,14 +101,22 @@ public class DSSMenuRole implements Serializable {
 
     @Override
     public String toString() {
-        return "DssMenuRole{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", menuId=" + menuId +
-                ", roleId=" + roleId +
-                ", priv=" + priv +
-                ", updateTime=" + updateTime +
-                ", updateby='" + updateby + '\'' +
-                '}';
+        return "DssMenuRole{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", menuId="
+                + menuId
+                + ", roleId="
+                + roleId
+                + ", priv="
+                + priv
+                + ", updateTime="
+                + updateTime
+                + ", updateby='"
+                + updateby
+                + '\''
+                + '}';
     }
 }

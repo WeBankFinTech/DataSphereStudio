@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.standard.common.service;
 
-
 public interface AppService {
 
     Operation createOperation(Class<? extends Operation> clazz);
@@ -24,5 +23,4 @@ public interface AppService {
     boolean isOperationExists(Class<? extends Operation> clazz);
 
     boolean isOperationNecessary(Class<? extends Operation> clazz);
-
 }

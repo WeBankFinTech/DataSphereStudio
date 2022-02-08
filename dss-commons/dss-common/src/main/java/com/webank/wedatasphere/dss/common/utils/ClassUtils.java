@@ -18,21 +18,26 @@ package com.webank.wedatasphere.dss.common.utils;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.exception.ExceptionUtils;
+
+
 import org.reflections.Reflections;
 
 public class ClassUtils {
 
-    private static final ClassHelper CLASS_HELPER = new ClassHelper() {
-        @Override
-        protected Reflections getReflections(Class<?> clazz) {
-            return org.apache.linkis.common.utils.ClassUtils.reflections();
-        }
-    };
+    private static final ClassHelper CLASS_HELPER =
+            new ClassHelper() {
+                @Override
+                protected Reflections getReflections(Class<?> clazz) {
+                    return org.apache.linkis.common.utils.ClassUtils.reflections();
+                }
+            };
 
     public static <T> T getInstance(Class<T> clazz) throws DSSErrorException {
         return CLASS_HELPER.getInstance(clazz);
@@ -46,7 +51,8 @@ public class ClassUtils {
         return CLASS_HELPER.getInstanceOrDefault(clazz, defaultValue);
     }
 
-    public static <T> T getInstanceOrDefault(Class<T> clazz, Predicate<Class<? extends T>> filterOp, T defaultValue) {
+    public static <T> T getInstanceOrDefault(
+            Class<T> clazz, Predicate<Class<? extends T>> filterOp, T defaultValue) {
         return CLASS_HELPER.getInstanceOrDefault(clazz, filterOp, defaultValue);
     }
 
@@ -63,19 +69,36 @@ public class ClassUtils {
         protected abstract Reflections getReflections(Class<?> clazz);
 
         public <T> T getInstance(Class<T> clazz) throws DSSErrorException {
-            List<Class<? extends T>> factoryClasses = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c)).collect(Collectors.toList());
-            if(factoryClasses.isEmpty()) {
-                DSSExceptionUtils.dealErrorException(60053, "Cannot find instance for " + clazz.getSimpleName(), DSSErrorException.class);
-            } else if(factoryClasses.size() > 1) {
-                DSSExceptionUtils.dealErrorException(60053, "Too many instances for " + clazz.getSimpleName() + ", exists: " + factoryClasses,
-                    DSSErrorException.class);
+            List<Class<? extends T>> factoryClasses =
+                    getReflections(clazz).getSubTypesOf(clazz).stream()
+                            .filter(
+                                    c ->
+                                            !org.apache.linkis.common.utils.ClassUtils
+                                                    .isInterfaceOrAbstract(c))
+                            .collect(Collectors.toList());
+            if (factoryClasses.isEmpty()) {
+                DSSExceptionUtils.dealErrorException(
+                        60053,
+                        "Cannot find instance for " + clazz.getSimpleName(),
+                        DSSErrorException.class);
+            } else if (factoryClasses.size() > 1) {
+                DSSExceptionUtils.dealErrorException(
+                        60053,
+                        "Too many instances for "
+                                + clazz.getSimpleName()
+                                + ", exists: "
+                                + factoryClasses,
+                        DSSErrorException.class);
             }
             T t = null;
             try {
                 t = factoryClasses.get(0).newInstance();
             } catch (Exception e) {
-                DSSExceptionUtils.dealErrorException(60053, "Instance " + clazz.getSimpleName() + " failed", e, DSSErrorException.class);
+                DSSExceptionUtils.dealErrorException(
+                        60053,
+                        "Instance " + clazz.getSimpleName() + " failed",
+                        e,
+                        DSSErrorException.class);
             }
             return t;
         }
@@ -84,37 +107,56 @@ public class ClassUtils {
             try {
                 return getInstance(clazz);
             } catch (DSSErrorException e) {
-                DSSExceptionUtils.dealWarnException(60053, e.getDesc(), ExceptionUtils.getCause(e), DSSRuntimeException.class);
+                DSSExceptionUtils.dealWarnException(
+                        60053, e.getDesc(), ExceptionUtils.getCause(e), DSSRuntimeException.class);
             }
             return null;
         }
 
         public <T> T getInstanceOrDefault(Class<T> clazz, T defaultValue) {
-            Optional<T> optional = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
-                    !c.isInstance(defaultValue)).findFirst().map(DSSExceptionUtils.map(Class::newInstance));
+            Optional<T> optional =
+                    getReflections(clazz).getSubTypesOf(clazz).stream()
+                            .filter(
+                                    c ->
+                                            !org.apache.linkis.common.utils.ClassUtils
+                                                            .isInterfaceOrAbstract(c)
+                                                    && !c.isInstance(defaultValue))
+                            .findFirst()
+                            .map(DSSExceptionUtils.map(Class::newInstance));
             return optional.orElse(defaultValue);
         }
 
-        public <T> T getInstanceOrDefault(Class<T> clazz, Predicate<Class<? extends T>> filterOp, T defaultValue) {
-            Optional<T> optional = getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) &&
-                    filterOp.test(c)).findFirst().map(DSSExceptionUtils.map(Class::newInstance));
+        public <T> T getInstanceOrDefault(
+                Class<T> clazz, Predicate<Class<? extends T>> filterOp, T defaultValue) {
+            Optional<T> optional =
+                    getReflections(clazz).getSubTypesOf(clazz).stream()
+                            .filter(
+                                    c ->
+                                            !org.apache.linkis.common.utils.ClassUtils
+                                                            .isInterfaceOrAbstract(c)
+                                                    && filterOp.test(c))
+                            .findFirst()
+                            .map(DSSExceptionUtils.map(Class::newInstance));
             return optional.orElse(defaultValue);
         }
 
         public <T> List<T> getInstances(Class<T> clazz) {
-            return getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
-                .map(DSSExceptionUtils.map(Class::newInstance)).collect(Collectors.toList());
+            return getReflections(clazz).getSubTypesOf(clazz).stream()
+                    .filter(
+                            c ->
+                                    !org.apache.linkis.common.utils.ClassUtils
+                                            .isInterfaceOrAbstract(c))
+                    .map(DSSExceptionUtils.map(Class::newInstance))
+                    .collect(Collectors.toList());
         }
 
         public <T> List<Class<? extends T>> getClasses(Class<T> clazz) {
-            return getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
-                .collect(Collectors.toList());
+            return getReflections(clazz).getSubTypesOf(clazz).stream()
+                    .filter(
+                            c ->
+                                    !org.apache.linkis.common.utils.ClassUtils
+                                            .isInterfaceOrAbstract(c))
+                    .collect(Collectors.toList());
         }
-
     }
-
 }

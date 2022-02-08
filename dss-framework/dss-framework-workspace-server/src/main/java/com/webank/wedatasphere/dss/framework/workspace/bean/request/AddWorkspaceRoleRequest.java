@@ -6,7 +6,7 @@ import java.util.List;
 public class AddWorkspaceRoleRequest implements Serializable {
 
     private int workspaceId;
-    private String roleName ;
+    private String roleName;
     private List<Integer> menuIds;
     private List<Integer> componentIds;
 

@@ -22,15 +22,18 @@ public interface ExecutionRequestRef extends WorkspaceRequestRef {
 
     /**
      * 获取的node所属的project的id
+     *
      * @return
      */
     long getProjectId();
 
     /**
      * 获取node所属的project的name
+     *
      * @return
      */
     String getProjectName();
+
     String getOrchestratorName();
 
     String getOrchestratorVersion();
@@ -39,8 +42,8 @@ public interface ExecutionRequestRef extends WorkspaceRequestRef {
 
     /**
      * 获取到Node的执行内容,执行内容是以Map的形式的
+     *
      * @return
      */
     Map<String, Object> getJobContent();
-
 }

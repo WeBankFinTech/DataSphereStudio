@@ -23,16 +23,17 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailV
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
-
 public interface DSSFrameworkProjectService {
 
     DSSProjectDetailVo getProjectSettings(Long projectId);
 
-
-    DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception;
+    DSSProjectVo createProject(
+            ProjectCreateRequest projectCreateRequest, String username, Workspace workspace)
+            throws Exception;
 
     void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws Exception;
 
-    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)
-        throws Exception;
+    void deleteProject(
+            String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)
+            throws Exception;
 }

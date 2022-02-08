@@ -23,11 +23,10 @@ import java.util.Map;
 public class DataCheckerCompletedExecutionResponseRef extends CompletedExecutionResponseRef {
 
     private Exception exception;
+
     public void setException(Exception exception) {
         this.exception = exception;
     }
-
-
 
     public DataCheckerCompletedExecutionResponseRef(int status) {
         super(status);
@@ -37,14 +36,12 @@ public class DataCheckerCompletedExecutionResponseRef extends CompletedExecution
         super(responseBody, status);
     }
 
-    public void setStatus(int status){
+    public void setStatus(int status) {
         this.status = status;
     }
-
 
     @Override
     public Map<String, Object> toMap() {
         return null;
     }
-
 }

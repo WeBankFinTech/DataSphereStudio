@@ -16,10 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.Arrays;
-
-
-public class DSSPublicTableVO extends AbstractDSSVO{
+public class DSSPublicTableVO extends AbstractDSSVO {
     private int id;
     private String name;
     private String status;
@@ -30,10 +27,18 @@ public class DSSPublicTableVO extends AbstractDSSVO{
     private String lastOperator;
     private String lastOperateTime;
 
-    public DSSPublicTableVO() {
-    }
+    public DSSPublicTableVO() {}
 
-    public DSSPublicTableVO(int id, String name, String status, String type, Boolean isPartitionTable, String creator, String authority, String lastOperator, String lastOperateTime) {
+    public DSSPublicTableVO(
+            int id,
+            String name,
+            String status,
+            String type,
+            Boolean isPartitionTable,
+            String creator,
+            String authority,
+            String lastOperator,
+            String lastOperateTime) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -116,8 +121,4 @@ public class DSSPublicTableVO extends AbstractDSSVO{
     public void setLastOperateTime(String lastOperateTime) {
         this.lastOperateTime = lastOperateTime;
     }
-
-
-
-
 }

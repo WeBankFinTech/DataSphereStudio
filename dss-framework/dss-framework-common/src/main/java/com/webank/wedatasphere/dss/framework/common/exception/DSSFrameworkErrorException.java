@@ -18,22 +18,22 @@ package com.webank.wedatasphere.dss.framework.common.exception;
 
 import org.apache.linkis.common.exception.ErrorException;
 
-
 public class DSSFrameworkErrorException extends ErrorException {
 
-    public DSSFrameworkErrorException(int errorCode, String errorDesc){
+    public DSSFrameworkErrorException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
 
-    public static void dealErrorException(int errorCode, String errorDesc, Throwable t) throws DSSFrameworkErrorException{
-        DSSFrameworkErrorException dssFrameworkErrorException = new DSSFrameworkErrorException(errorCode, errorDesc);
+    public static void dealErrorException(int errorCode, String errorDesc, Throwable t)
+            throws DSSFrameworkErrorException {
+        DSSFrameworkErrorException dssFrameworkErrorException =
+                new DSSFrameworkErrorException(errorCode, errorDesc);
         dssFrameworkErrorException.initCause(t);
         throw dssFrameworkErrorException;
     }
 
-    public static void dealErrorException(int errorCode, String errorDesc) throws DSSFrameworkErrorException{
+    public static void dealErrorException(int errorCode, String errorDesc)
+            throws DSSFrameworkErrorException {
         throw new DSSFrameworkErrorException(errorCode, errorDesc);
     }
-
-
 }

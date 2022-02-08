@@ -16,21 +16,19 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.HashMap;
 import java.util.Map;
 
-
-public class DSSWorkspaceScriptisStatiticVO extends DSSWorkspaceStatisticVO{
+public class DSSWorkspaceScriptisStatiticVO extends DSSWorkspaceStatisticVO {
     private String name;
 
     private String status;
 
     private Map<String, Object> statistics;
 
-    public DSSWorkspaceScriptisStatiticVO() {
-    }
+    public DSSWorkspaceScriptisStatiticVO() {}
 
-    public DSSWorkspaceScriptisStatiticVO(String name, String status, Map<String, Object> statistics) {
+    public DSSWorkspaceScriptisStatiticVO(
+            String name, String status, Map<String, Object> statistics) {
         this.name = name;
         this.status = status;
         this.statistics = statistics;
@@ -59,7 +57,4 @@ public class DSSWorkspaceScriptisStatiticVO extends DSSWorkspaceStatisticVO{
     public void setStatistics(Map<String, Object> statistics) {
         this.statistics = statistics;
     }
-
-
-
 }

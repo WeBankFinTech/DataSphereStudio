@@ -1,35 +1,31 @@
 package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotEmpty;
+
+import java.util.Date;
+
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
-
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/10-01-10-15:48
- */
-
-
-
+/** @Auther: Han Tang @Date: 2022/1/10-01-10-15:48 */
 @TableName(value = "dss_download_audit")
 public class DssScriptDownloadAudit {
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer  id;
-    private String  creator;
-    private String  tenant;
-    private String  path;
-     @TableField("`sql`")
+    private Integer id;
+
+    private String creator;
+    private String tenant;
+    private String path;
+
+    @TableField("`sql`")
     @NotEmpty(message = "查询语句不能为空")
-    private String  sql;
+    private String sql;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -82,5 +78,4 @@ public class DssScriptDownloadAudit {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
-
 }

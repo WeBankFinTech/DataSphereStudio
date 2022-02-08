@@ -63,5 +63,4 @@ public class DolphinSchedulerTask {
     public List<String> getPreTasks() {
         return this.preTasks;
     }
-
 }

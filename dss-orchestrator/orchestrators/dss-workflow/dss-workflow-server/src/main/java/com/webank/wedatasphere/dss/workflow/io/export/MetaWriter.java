@@ -16,9 +16,10 @@
 
 package com.webank.wedatasphere.dss.workflow.io.export;
 
+import org.apache.commons.io.IOUtils;
+
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class MetaWriter<T> {
         writeComment();
         writeHead();
         writeBody();
-        //table 添加换行符进行转流
+        // table 添加换行符进行转流
         String tableStr = table.stream().reduce((a, b) -> a + "\n" + b).orElse("") + "\n";
         logger.info("\n" + tableStr);
         return new ByteArrayInputStream(tableStr.getBytes());
@@ -125,17 +126,13 @@ public class MetaWriter<T> {
         return strs.stream().reduce((a, b) -> a + seperator + b).orElse("");
     }
 
-    /**
-     * 写表的头部
-     * 1.过滤ignore的属性
-     * 2.驼峰转mysql的 _ (暂时略过)
-     * 3.写入List<String> table
-     */
+    /** 写表的头部 1.过滤ignore的属性 2.驼峰转mysql的 _ (暂时略过) 3.写入List<String> table */
     private void writeHead() {
-        fields = Arrays.stream(tClass.getDeclaredFields())
-                .map(Field::getName)
-                .filter(n -> !ignoreFields.contains(n))
-                .collect(Collectors.toList());
+        fields =
+                Arrays.stream(tClass.getDeclaredFields())
+                        .map(Field::getName)
+                        .filter(n -> !ignoreFields.contains(n))
+                        .collect(Collectors.toList());
         table.add(reduce(fields));
     }
 
@@ -150,13 +147,13 @@ public class MetaWriter<T> {
         return null;
     }
 
-    /**
-     * 写comment,包括表名,class名,和外部自定义的comment
-     */
+    /** 写comment,包括表名,class名,和外部自定义的comment */
     private void writeComment() {
         table.add(connectCommentPrefix(String.format("tableName:%s", tableName)));
         table.add(connectCommentPrefix(String.format("class:%s", tClass.getName())));
-        table.add(connectCommentPrefix(String.format("env:%s", DSSWorkFlowConstant.DSS_EXPORT_ENV.getValue())));
+        table.add(
+                connectCommentPrefix(
+                        String.format("env:%s", DSSWorkFlowConstant.DSS_EXPORT_ENV.getValue())));
         comments.stream().map(this::connectCommentPrefix).forEach(table::add);
     }
 
@@ -169,5 +166,4 @@ public class MetaWriter<T> {
     private String connectCommentPrefix(String str) {
         return commentPrefix + str;
     }
-
 }

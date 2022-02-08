@@ -16,11 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.common.core;
 
-
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 
 import java.io.Closeable;
-
 
 public interface AppStandard extends Closeable {
 
@@ -31,11 +29,11 @@ public interface AppStandard extends Closeable {
     void init() throws AppStandardErrorException;
 
     /**
-     *  是否必须
+     * 是否必须
+     *
      * @return true 表示必须，false表示非必须标准
      */
     default boolean isNecessary() {
         return false;
     }
-
 }

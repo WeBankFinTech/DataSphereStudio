@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 public class RequestOrchestratorVersion {
 
     private String username;
@@ -24,8 +23,8 @@ public class RequestOrchestratorVersion {
     private Long orchestratorId;
     private String dssLabel;
 
-
-    public static RequestOrchestratorVersion newInstance(String username, Long projectId, Long orchestratorId, String dssLabel) {
+    public static RequestOrchestratorVersion newInstance(
+            String username, Long projectId, Long orchestratorId, String dssLabel) {
         RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
         requestOrchestratorVersion.setOrchestratorId(orchestratorId);
         requestOrchestratorVersion.setDssLabel(dssLabel);
@@ -33,7 +32,6 @@ public class RequestOrchestratorVersion {
         requestOrchestratorVersion.setUsername(username);
         return requestOrchestratorVersion;
     }
-
 
     public String getUsername() {
         return username;

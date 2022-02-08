@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 
-
 public interface RefExecutionService extends DevelopmentService {
-     RefExecutionOperation getRefExecutionOperation();
+    RefExecutionOperation getRefExecutionOperation();
 }

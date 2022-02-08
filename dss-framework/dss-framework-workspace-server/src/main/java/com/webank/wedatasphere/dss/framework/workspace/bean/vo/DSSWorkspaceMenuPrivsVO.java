@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
 public class DSSWorkspaceMenuPrivsVO {
     public int getRoleId() {
         return roleId;

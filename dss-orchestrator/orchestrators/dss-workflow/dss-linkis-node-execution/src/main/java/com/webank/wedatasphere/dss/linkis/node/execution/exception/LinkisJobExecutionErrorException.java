@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.exception;
 
-
 import org.apache.linkis.common.exception.ErrorException;
-
 
 public class LinkisJobExecutionErrorException extends ErrorException {
     public LinkisJobExecutionErrorException(int errCode, String desc) {

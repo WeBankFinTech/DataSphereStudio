@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import java.util.Map;
 
-
 public interface ResponseRef extends Ref {
 
     Object getValue(String key);
@@ -36,5 +35,4 @@ public interface ResponseRef extends Ref {
     default boolean isFailed() {
         return !isSucceed();
     }
-
 }

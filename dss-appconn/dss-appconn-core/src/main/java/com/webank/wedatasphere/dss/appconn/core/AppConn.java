@@ -27,14 +27,12 @@ public interface AppConn {
     void init() throws AppConnErrorException;
 
     /**
-     * 1. Get the dssappconnbean table record
-     * 2. Do a traversal to get all appinstances under each appconn
-     * 3. Instantiate the real appconn interface
+     * 1. Get the dssappconnbean table record 2. Do a traversal to get all appinstances under each
+     * appconn 3. Instantiate the real appconn interface
      */
     List<AppStandard> getAppStandards();
 
     AppDesc getAppDesc();
 
     void setAppDesc(AppDesc appDesc);
-
 }

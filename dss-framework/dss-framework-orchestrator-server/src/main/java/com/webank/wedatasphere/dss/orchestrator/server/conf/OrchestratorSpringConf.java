@@ -21,13 +21,11 @@ import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImp
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class OrchestratorSpringConf {
 
     @Bean(name = "contextService")
-    public ContextService createContextService(){
+    public ContextService createContextService() {
         return ContextServiceImpl.getInstance();
     }
-
 }

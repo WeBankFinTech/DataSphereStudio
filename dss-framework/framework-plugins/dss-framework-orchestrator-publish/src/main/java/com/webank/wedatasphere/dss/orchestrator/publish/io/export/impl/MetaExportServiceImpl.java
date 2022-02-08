@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.io.export.impl;
 
-
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
@@ -24,38 +23,34 @@ import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import java.io.*;
 
+import java.io.*;
 
 @Service
 public class MetaExportServiceImpl implements MetaExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     private final String fileName = "meta.txt";
 
-
     @Override
-    public void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException {
+    public void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath)
+            throws IOException {
 
-        try (
-                OutputStream outputStream = generateOutputStream(savePath)
-        ) {
+        try (OutputStream outputStream = generateOutputStream(savePath)) {
             exportOrchestratorBaseInfo(dssOrchestratorInfo, outputStream);
         }
     }
-
 
     private OutputStream generateOutputStream(String basePath) throws IOException {
         return IoUtils.generateExportOutputStream(basePath + File.separator + fileName);
     }
 
+    private void exportOrchestratorBaseInfo(
+            DSSOrchestratorInfo dssOrchestratorInfo, OutputStream outputStream) throws IOException {
 
-    private void exportOrchestratorBaseInfo(DSSOrchestratorInfo dssOrchestratorInfo,OutputStream outputStream) throws IOException {
-
-        MetaWriter.of("dss_orchestrator", DSSOrchestratorInfo.class).data(dssOrchestratorInfo).write(outputStream);
-
+        MetaWriter.of("dss_orchestrator", DSSOrchestratorInfo.class)
+                .data(dssOrchestratorInfo)
+                .write(outputStream);
     }
-
 }

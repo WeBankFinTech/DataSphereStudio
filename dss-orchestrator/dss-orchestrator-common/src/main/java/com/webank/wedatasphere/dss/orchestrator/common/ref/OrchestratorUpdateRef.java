@@ -15,14 +15,14 @@
  */
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
 import java.util.List;
 
-
-public interface OrchestratorUpdateRef  extends RequestRef {
+public interface OrchestratorUpdateRef extends RequestRef {
 
     void setUserName(String userName);
 
@@ -60,8 +60,4 @@ public interface OrchestratorUpdateRef  extends RequestRef {
     List<DSSLabel> getDSSLabels();
 
     void setDSSLabels(List<DSSLabel> dssLabels);
-
-
-
-
 }

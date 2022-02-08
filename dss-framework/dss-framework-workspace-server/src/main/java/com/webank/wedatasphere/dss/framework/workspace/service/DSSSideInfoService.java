@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
-
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarVO;
 
 import java.util.List;
 
-
 public interface DSSSideInfoService {
 
-    List<SidebarVO> getSidebarVOList(String username, Integer workspaceId,boolean isEnglish);
+    List<SidebarVO> getSidebarVOList(String username, Integer workspaceId, boolean isEnglish);
 }

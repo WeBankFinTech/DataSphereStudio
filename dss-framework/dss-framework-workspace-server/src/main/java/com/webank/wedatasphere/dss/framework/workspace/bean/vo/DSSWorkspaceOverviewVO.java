@@ -19,37 +19,28 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 import java.util.List;
 import java.util.Map;
 
-
 public class DSSWorkspaceOverviewVO {
     private String title;
-
 
     private String description;
 
     private String dssDescription;
 
-
-
-
     private List<OverviewInfo> videos;
-
 
     Map<String, List<OverviewInfo>> demos;
 
-    public static class OverviewInfo{
+    public static class OverviewInfo {
         private int id;
         private String title;
         private String url;
 
-        public OverviewInfo(){
+        public OverviewInfo() {}
 
-        }
-
-        public OverviewInfo(String title, String url){
+        public OverviewInfo(String title, String url) {
             this.title = title;
             this.url = url;
         }
-
 
         public int getId() {
             return id;
@@ -99,7 +90,6 @@ public class DSSWorkspaceOverviewVO {
     public void setDescription(String description) {
         this.description = description;
     }
-
 
     public Map<String, List<OverviewInfo>> getDemos() {
         return demos;

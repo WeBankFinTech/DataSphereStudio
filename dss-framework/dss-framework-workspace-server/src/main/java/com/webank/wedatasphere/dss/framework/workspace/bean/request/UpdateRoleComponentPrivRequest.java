@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.request;
 
-import org.codehaus.jackson.JsonNode;
-
 import java.io.Serializable;
 import java.util.Map;
 
@@ -9,7 +7,7 @@ public class UpdateRoleComponentPrivRequest implements Serializable {
 
     public int componentId;
     public int workspaceId;
-    public Map<String,Boolean> componentPrivs;
+    public Map<String, Boolean> componentPrivs;
 
     public int getComponentId() {
         return componentId;

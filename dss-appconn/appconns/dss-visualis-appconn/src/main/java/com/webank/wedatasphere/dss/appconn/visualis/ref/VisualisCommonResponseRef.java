@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 
 public class VisualisCommonResponseRef extends DSSCommonResponseRef {
 
-
     public VisualisCommonResponseRef(String responseBody) throws Exception {
         super(responseBody);
     }

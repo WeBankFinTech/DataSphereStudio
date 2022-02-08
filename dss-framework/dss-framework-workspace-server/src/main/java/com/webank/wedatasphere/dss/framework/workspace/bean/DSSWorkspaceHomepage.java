@@ -20,26 +20,24 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-
 
 @TableName(value = "dss_workspace_homepage")
 public class DSSWorkspaceHomepage {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
     private Integer workspaceId;
     private Integer roleId;
     private String homepageUrl;
     private Date updateTime;
 
+    public DSSWorkspaceHomepage() {}
 
-    public DSSWorkspaceHomepage(){
-
-    }
-
-    public DSSWorkspaceHomepage(Integer workspaceId, Integer roleId, String homepageUrl, Date updateTime) {
+    public DSSWorkspaceHomepage(
+            Integer workspaceId, Integer roleId, String homepageUrl, Date updateTime) {
         this.workspaceId = workspaceId;
         this.roleId = roleId;
         this.homepageUrl = homepageUrl;

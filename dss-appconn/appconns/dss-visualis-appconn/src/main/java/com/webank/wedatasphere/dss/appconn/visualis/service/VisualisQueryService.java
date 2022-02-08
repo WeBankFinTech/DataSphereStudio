@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
 
 public class VisualisQueryService extends AbstractRefQueryService {
 
@@ -26,5 +26,4 @@ public class VisualisQueryService extends AbstractRefQueryService {
     public RefQueryOperation createRefQueryOperation() {
         return new VisualisRefQueryOperation();
     }
-
 }

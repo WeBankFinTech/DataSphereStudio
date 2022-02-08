@@ -19,8 +19,9 @@ package com.webank.wedatasphere.dss.workflow.entity;
 public enum NodeUiValidateTrigger {
     /**
      * blur 失去焦点事件
-     * <p>
-     * change 事件
+     *
+     * <p>change 事件
      */
-    blur, change
+    blur,
+    change
 }

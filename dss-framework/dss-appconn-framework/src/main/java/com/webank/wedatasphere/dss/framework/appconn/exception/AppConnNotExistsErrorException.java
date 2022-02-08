@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.appconn.exception;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public class AppConnNotExistsErrorException extends DSSErrorException {
 
     public AppConnNotExistsErrorException(int errCode, String desc) {

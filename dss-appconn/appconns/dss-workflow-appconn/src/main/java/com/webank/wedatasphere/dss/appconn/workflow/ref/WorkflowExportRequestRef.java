@@ -19,21 +19,20 @@ package com.webank.wedatasphere.dss.appconn.workflow.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-
-public class WorkflowExportRequestRef extends CommonRequestRefImpl implements OrchestratorExportRequestRef {
+public class WorkflowExportRequestRef extends CommonRequestRefImpl
+        implements OrchestratorExportRequestRef {
     private Long appId;
     private Long orchestratorVersionId;
 
     @Override
     public void setAppId(Long appId) {
-        this.appId =appId;
+        this.appId = appId;
     }
 
     @Override
     public Long getAppId() {
         return appId;
     }
-
 
     @Override
     public void setOrchestratorVersionId(Long orchestratorVersionId) {
@@ -42,7 +41,7 @@ public class WorkflowExportRequestRef extends CommonRequestRefImpl implements Or
 
     @Override
     public Long getOrchestratorVersionId() {
-        return  this.orchestratorVersionId;
+        return this.orchestratorVersionId;
     }
 
     @Override
@@ -51,8 +50,5 @@ public class WorkflowExportRequestRef extends CommonRequestRefImpl implements Or
     }
 
     @Override
-    public void setAddOrcVersionFlag(boolean addOrcVersion) {
-
-    }
-
+    public void setAddOrcVersionFlag(boolean addOrcVersion) {}
 }

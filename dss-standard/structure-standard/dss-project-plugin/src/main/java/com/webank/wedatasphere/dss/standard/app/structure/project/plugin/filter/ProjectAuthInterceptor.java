@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.Project
 
 import javax.servlet.http.HttpServletRequest;
 
-
 public interface ProjectAuthInterceptor {
 
     boolean isProjectRequest(HttpServletRequest request);
@@ -31,7 +30,8 @@ public interface ProjectAuthInterceptor {
 
     ProjectRequestType getProjectRequestType(HttpServletRequest request);
 
-    String getForbiddenMsg(ProjectAuth projectAuth, ProjectRequestType projectRequestType,
-                           HttpServletRequest request);
-
+    String getForbiddenMsg(
+            ProjectAuth projectAuth,
+            ProjectRequestType projectRequestType,
+            HttpServletRequest request);
 }

@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.orchestrator.converter.standard.service;
 
-
-public interface RelToOrchestratorConversionService extends ConversionService {
-
-}
+public interface RelToOrchestratorConversionService extends ConversionService {}

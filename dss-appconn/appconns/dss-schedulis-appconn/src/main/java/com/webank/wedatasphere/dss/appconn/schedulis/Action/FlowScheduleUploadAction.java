@@ -17,11 +17,10 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.Action;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.sso.UserInfo;
+
 import org.apache.linkis.httpclient.request.BinaryBody;
 import org.apache.linkis.httpclient.request.POSTAction;
 import org.apache.linkis.httpclient.request.UploadAction;
-import scala.Option;
-
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,17 +28,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import scala.Option;
+
 public class FlowScheduleUploadAction extends POSTAction implements UploadAction, UserInfo {
-    private Map<String,InputStream> inputStreams;
+    private Map<String, InputStream> inputStreams;
     private List<BinaryBody> binaryBodies;
-    private Map<String,String> streamNames=new HashMap<>();
+    private Map<String, String> streamNames = new HashMap<>();
 
     private String url;
     private String user;
     private ArrayList<String> filePaths;
 
-    public FlowScheduleUploadAction(List<BinaryBody> binaryBodies){
-        this.filePaths=null;
+    public FlowScheduleUploadAction(List<BinaryBody> binaryBodies) {
+        this.filePaths = null;
         this.binaryBodies = binaryBodies;
     }
 
@@ -48,23 +49,21 @@ public class FlowScheduleUploadAction extends POSTAction implements UploadAction
         return this.url;
     }
 
-    public void  setURl(String url){
+    public void setURl(String url) {
         this.url = url;
     }
 
     @Override
     public Map<String, String> files() {
-           Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
 
-            if (null == filePaths || filePaths.size() == 0) {
-               return map;
-            }
-            else {
-                filePaths.stream().forEach(
-                        filePath -> map.put("file", filePath));
-            }
-
+        if (null == filePaths || filePaths.size() == 0) {
             return map;
+        } else {
+            filePaths.stream().forEach(filePath -> map.put("file", filePath));
+        }
+
+        return map;
     }
 
     @Override
@@ -82,7 +81,6 @@ public class FlowScheduleUploadAction extends POSTAction implements UploadAction
         return null;
     }
 
-
     @Override
     public String getRequestPayload() {
         return null;
@@ -90,7 +88,7 @@ public class FlowScheduleUploadAction extends POSTAction implements UploadAction
 
     @Override
     public void setUser(String user) {
-          this.user = user;
+        this.user = user;
     }
 
     @Override

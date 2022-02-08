@@ -3,10 +3,11 @@ package com.webank.wedatasphere.dss.orange.tag;
 import com.webank.wedatasphere.dss.orange.node.IfSqlNode;
 import com.webank.wedatasphere.dss.orange.node.MixedSqlNode;
 import com.webank.wedatasphere.dss.orange.node.SqlNode;
-import org.dom4j.Element;
 
 import java.util.List;
 
+
+import org.dom4j.Element;
 
 public class IfHandler implements TagHandler {
 
@@ -21,6 +22,5 @@ public class IfHandler implements TagHandler {
 
         IfSqlNode ifSqlNode = new IfSqlNode(test, new MixedSqlNode(contents));
         targetContents.add(ifSqlNode);
-
     }
 }

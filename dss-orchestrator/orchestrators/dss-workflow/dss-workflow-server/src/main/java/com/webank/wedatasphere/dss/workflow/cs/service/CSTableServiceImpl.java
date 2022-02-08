@@ -16,13 +16,14 @@
 
 package com.webank.wedatasphere.dss.workflow.cs.service;
 
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.workflow.cs.DSSCSHelper;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.entity.metadata.CSColumn;
 import org.apache.linkis.cs.common.entity.metadata.CSTable;
 import org.apache.linkis.cs.common.entity.source.ContextKeyValue;
 import org.apache.linkis.cs.common.entity.source.ContextValue;
+
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.workflow.cs.DSSCSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,45 +33,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Service
 public class CSTableServiceImpl implements CSTableService {
 
-    private final static Logger logger = LoggerFactory.getLogger(CSTableServiceImpl.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(CSTableServiceImpl.class);
 
     @Override
-    public List<Map<String, Object>> queryTables(String dbName, String contextIDStr, String nodeName) throws DSSErrorException {
-        List<ContextKeyValue> contextKeyValueList = DSSCSHelper.getTableContextKeyValueList(contextIDStr, nodeName);
+    public List<Map<String, Object>> queryTables(
+            String dbName, String contextIDStr, String nodeName) throws DSSErrorException {
+        List<ContextKeyValue> contextKeyValueList =
+                DSSCSHelper.getTableContextKeyValueList(contextIDStr, nodeName);
         List<Map<String, Object>> tables = new ArrayList<>();
         if (null == contextKeyValueList || contextKeyValueList.isEmpty()) {
             return tables;
         }
-        for(ContextKeyValue contextKeyValue : contextKeyValueList){
+        for (ContextKeyValue contextKeyValue : contextKeyValueList) {
             Map<String, Object> tableNode = new HashMap<>();
             ContextValue contextValue = contextKeyValue.getContextValue();
             if (null != contextKeyValue && null != contextValue.getValue()) {
                 try {
-                    CSTable table = (CSTable) (contextValue.getValue()) ;
+                    CSTable table = (CSTable) (contextValue.getValue());
                     tableNode.put("tableName", table.getName());
                     tableNode.put("isView", table.isView());
                     tableNode.put("databaseName", dbName);
                     tableNode.put("createdBy", table.getCreator());
                     tableNode.put("createdAt", table.getCreateTime());
-                    //contextKey 需要序列化
-                    tableNode.put("contextKey", SerializeHelper.serializeContextKey(contextKeyValue.getContextKey()));
+                    // contextKey 需要序列化
+                    tableNode.put(
+                            "contextKey",
+                            SerializeHelper.serializeContextKey(contextKeyValue.getContextKey()));
                     tables.add(tableNode);
                 } catch (Exception e) {
                     logger.error("Failed to get table ", e);
                 }
             }
-
         }
         return tables;
     }
 
     @Override
-    public List<Map<String, Object>>  queryTableMeta(String dbName, String contextIDStr, String contextKeyStr) throws DSSErrorException {
+    public List<Map<String, Object>> queryTableMeta(
+            String dbName, String contextIDStr, String contextKeyStr) throws DSSErrorException {
         CSTable csTable = DSSCSHelper.getCSTable(contextIDStr, contextKeyStr);
         CSColumn[] columns = csTable.getColumns();
         List<Map<String, Object>> responseTables = new ArrayList<>();
@@ -84,5 +87,4 @@ public class CSTableServiceImpl implements CSTableService {
         }
         return responseTables;
     }
-
 }

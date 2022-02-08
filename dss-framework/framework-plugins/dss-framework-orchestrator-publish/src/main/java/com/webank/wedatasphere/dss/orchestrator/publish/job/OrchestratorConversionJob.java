@@ -16,6 +16,10 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.job;
 
+import org.apache.linkis.common.utils.ByteTimeUtils;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
@@ -24,13 +28,11 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugi
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import org.apache.linkis.common.utils.ByteTimeUtils;
-import java.util.List;
-import java.util.function.Consumer;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.function.Consumer;
 
 public final class OrchestratorConversionJob implements Runnable {
 
@@ -58,7 +60,8 @@ public final class OrchestratorConversionJob implements Runnable {
         return conversionJobEntity;
     }
 
-    public void setConversionDSSOrchestratorPlugins(List<DSSOrchestratorPlugin> conversionDSSOrchestratorPlugins) {
+    public void setConversionDSSOrchestratorPlugins(
+            List<DSSOrchestratorPlugin> conversionDSSOrchestratorPlugins) {
         this.conversionDSSOrchestratorPlugins = conversionDSSOrchestratorPlugins;
     }
 
@@ -68,40 +71,61 @@ public final class OrchestratorConversionJob implements Runnable {
 
     @Override
     public void run() {
-        //1.从编排中心导出一次工作流,进行一次版本升级
-        //2.进行发布到schedulis等调度系统
-        LOGGER.info("Begin to convert project {} for user {} to scheduler, the orcIdList is {}.",
-            conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrcIdList());
+        // 1.从编排中心导出一次工作流,进行一次版本升级
+        // 2.进行发布到schedulis等调度系统
+        LOGGER.info(
+                "Begin to convert project {} for user {} to scheduler, the orcIdList is {}.",
+                conversionJobEntity.getProject().getId(),
+                conversionJobEntity.getUserName(),
+                conversionJobEntity.getOrcIdList());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
-        for (DSSOrchestratorPlugin plugin: conversionDSSOrchestratorPlugins) {
-            if(plugin instanceof ConversionDSSOrchestratorPlugin) {
+        for (DSSOrchestratorPlugin plugin : conversionDSSOrchestratorPlugins) {
+            if (plugin instanceof ConversionDSSOrchestratorPlugin) {
                 conversionDSSOrchestratorPlugin = (ConversionDSSOrchestratorPlugin) plugin;
             }
         }
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(conversionJobEntity.getProject().getId());
-        try{
-            DSSProject project = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectInfoRequest);
+        try {
+            DSSProject project =
+                    (DSSProject)
+                            DSSSenderServiceFactory.getOrCreateServiceInstance()
+                                    .getProjectServerSender()
+                                    .ask(projectInfoRequest);
             conversionJobEntity.setProject(project);
             Workspace workspace = conversionJobEntity.getWorkspace();
-            ResponseOperateOrchestrator response = conversionDSSOrchestratorPlugin.convert(conversionJobEntity.getUserName(), project, workspace,
-                conversionJobEntity.getRefAppIdList(), conversionJobEntity.getLabels());
-            if(response.isFailed()) {
-                String msg = response.getMessage() == null ? "Unknown reason, please ask admin for help!" : response.getMessage();
+            ResponseOperateOrchestrator response =
+                    conversionDSSOrchestratorPlugin.convert(
+                            conversionJobEntity.getUserName(),
+                            project,
+                            workspace,
+                            conversionJobEntity.getRefAppIdList(),
+                            conversionJobEntity.getLabels());
+            if (response.isFailed()) {
+                String msg =
+                        response.getMessage() == null
+                                ? "Unknown reason, please ask admin for help!"
+                                : response.getMessage();
                 throw new DSSErrorException(50000, msg);
             }
-            //3.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
+            // 3.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             consumer.accept(response);
             conversionJobEntity.setResponse(response);
-        } catch (final Exception t){
+        } catch (final Exception t) {
             LOGGER.error("Convert for project {} failed.", conversionJobEntity.getProject(), t);
-            ResponseOperateOrchestrator response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
+            ResponseOperateOrchestrator response =
+                    ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
             conversionJobEntity.setResponse(response);
             consumer.accept(response);
         }
-        LOGGER.info("convert project {} for user {} to scheduler {}, costs {}.", conversionJobEntity.getResponse().getJobStatus(), conversionJobEntity.getProject().getId(),
-            conversionJobEntity.getUserName(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));
+        LOGGER.info(
+                "convert project {} for user {} to scheduler {}, costs {}.",
+                conversionJobEntity.getResponse().getJobStatus(),
+                conversionJobEntity.getProject().getId(),
+                conversionJobEntity.getUserName(),
+                ByteTimeUtils.msDurationToString(
+                        conversionJobEntity.getUpdateTime().getTime()
+                                - conversionJobEntity.getCreateTime().getTime()));
     }
 }

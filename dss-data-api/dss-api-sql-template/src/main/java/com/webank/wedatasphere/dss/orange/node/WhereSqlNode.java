@@ -5,8 +5,10 @@ import java.util.List;
 
 public class WhereSqlNode extends TrimSqlNode {
 
-    static List<String> prefixesToOverride = Arrays.asList("AND ", "AND\r", "AND\t", "AND\n", "OR ", "OR\r", "OR\t", "OR\n"
-            , "and ", "and\r", "and\t", "and\n", "or ", "or\r", "or\t", "or\n");
+    static List<String> prefixesToOverride =
+            Arrays.asList(
+                    "AND ", "AND\r", "AND\t", "AND\n", "OR ", "OR\r", "OR\t", "OR\n", "and ",
+                    "and\r", "and\t", "and\n", "or ", "or\r", "or\t", "or\n");
 
     public WhereSqlNode(SqlNode contents) {
 

@@ -10,7 +10,6 @@ public class CreateWorkspaceRequest implements Serializable {
     private String tags;
     private String productName;
 
-
     public String getWorkspaceName() {
         return workspaceName;
     }

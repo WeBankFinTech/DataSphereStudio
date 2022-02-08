@@ -1,20 +1,15 @@
 package com.webank.wedatasphere.dss.framework.admin.util;
 
-import com.squareup.okhttp.Call;
+import java.util.concurrent.TimeUnit;
+
+
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.webank.wedatasphere.dss.framework.admin.restful.DssExchangisController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/19-01-19-15:35
- */
+/** @Auther: Han Tang @Date: 2022/1/19-01-19-15:35 */
 public class OkHttpHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpHelper.class);
@@ -38,7 +33,6 @@ public class OkHttpHelper {
         private static OkHttpHelper instance = new OkHttpHelper();
     }
 
-
     public static Response syncGet(Request request) throws Exception {
         OkHttpClient okHttpClient = OkHttpHelper.getInstance().getOkHttpClient();
         Response response = okHttpClient.newCall(request).execute();
@@ -49,6 +43,4 @@ public class OkHttpHelper {
             throw new Exception(request.httpUrl().toString() + " http调用失败");
         }
     }
-
-
 }

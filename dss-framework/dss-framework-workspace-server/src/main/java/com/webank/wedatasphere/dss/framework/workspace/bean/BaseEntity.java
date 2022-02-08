@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import java.util.Date;
 
-
 public class BaseEntity {
 
     private String createBy;

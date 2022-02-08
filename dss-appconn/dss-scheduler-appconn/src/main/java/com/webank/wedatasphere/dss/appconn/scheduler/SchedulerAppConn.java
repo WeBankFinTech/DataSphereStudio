@@ -23,5 +23,4 @@ import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegra
 public interface SchedulerAppConn extends OnlySSOAppConn, OnlyStructureAppConn {
 
     WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard();
-
 }

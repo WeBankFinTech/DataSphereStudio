@@ -20,8 +20,8 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
+import java.util.List;
 
 @XmlRootElement
 public class OrchestratorModifyRequest {
@@ -38,26 +38,19 @@ public class OrchestratorModifyRequest {
     @NotNull(message = "编排名称不能为空")
     private String orchestratorName;
 
-    /**
-     * 编排模式，如工作流，组合编排等
-     */
+    /** 编排模式，如工作流，组合编排等 */
     @NotNull(message = "编排模式不能为空")
     private String orchestratorMode;
 
-    /**
-     * 编排方式
-     */
+    /** 编排方式 */
     @NotNull(message = "编排方式不能为空")
     private List<String> orchestratorWays;
 
-    /**
-     * 编排用途
-     */
+    /** 编排用途 */
     private String uses;
 
     @NotNull(message = "描述不能为空")
     private String description;
-
 
     public List<String> getDssLabels() {
         return dssLabels;
@@ -69,9 +62,7 @@ public class OrchestratorModifyRequest {
 
     private List<String> dssLabels;
 
-    /**
-     * labels是通过前端进行传入的，主要是用来进行当前的环境信息
-     */
+    /** labels是通过前端进行传入的，主要是用来进行当前的环境信息 */
     private LabelRouteVo labels;
 
     public Long getId() {
@@ -148,16 +139,29 @@ public class OrchestratorModifyRequest {
 
     @Override
     public String toString() {
-        return "OrchestratorModifyRequest{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", projectId=" + projectId +
-                ", orchestratorName='" + orchestratorName + '\'' +
-                ", orchestratorMode='" + orchestratorMode + '\'' +
-                ", orchestratorWays=" + orchestratorWays +
-                ", uses='" + uses + '\'' +
-                ", description='" + description + '\'' +
-                ", labels=" + labels +
-                '}';
+        return "OrchestratorModifyRequest{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", projectId="
+                + projectId
+                + ", orchestratorName='"
+                + orchestratorName
+                + '\''
+                + ", orchestratorMode='"
+                + orchestratorMode
+                + '\''
+                + ", orchestratorWays="
+                + orchestratorWays
+                + ", uses='"
+                + uses
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + ", labels="
+                + labels
+                + '}';
     }
 }

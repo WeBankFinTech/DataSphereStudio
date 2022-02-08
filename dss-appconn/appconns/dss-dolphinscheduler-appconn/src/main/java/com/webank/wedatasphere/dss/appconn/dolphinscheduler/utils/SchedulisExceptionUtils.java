@@ -1,4 +1,4 @@
- /*
+/*
  *
  *  * Copyright 2019 WeBank
  *  *
@@ -23,17 +23,17 @@ import org.apache.linkis.common.exception.ErrorException;
 import java.lang.reflect.Constructor;
 
 /**
- * created by cooperyang on 2020/11/16
- * Description: 因为所有的异常都是有errorcode和 errorDesc
+ * created by cooperyang on 2020/11/16 Description: 因为所有的异常都是有errorcode和 errorDesc
  * 所以需要拿到这个constructor就好
  */
 public class SchedulisExceptionUtils {
 
-    public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc,
-        Throwable throwable, Class<T> clazz) throws T {
+    public static <T extends ErrorException> void dealErrorException(
+            int errorCode, String errorDesc, Throwable throwable, Class<T> clazz) throws T {
         T errorException = null;
         try {
-            Constructor<T> constructor = clazz.getConstructor(int.class, String.class, Throwable.class);
+            Constructor<T> constructor =
+                    clazz.getConstructor(int.class, String.class, Throwable.class);
             errorException = constructor.newInstance(errorCode, errorDesc, throwable);
             errorException.setErrCode(errorCode);
             errorException.setDesc(errorDesc);
@@ -44,8 +44,8 @@ public class SchedulisExceptionUtils {
         throw errorException;
     }
 
-    public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc, Class<T> clazz)
-        throws T {
+    public static <T extends ErrorException> void dealErrorException(
+            int errorCode, String errorDesc, Class<T> clazz) throws T {
         T errorException = null;
         try {
             Constructor<T> constructor = clazz.getConstructor(int.class, String.class);
@@ -57,5 +57,4 @@ public class SchedulisExceptionUtils {
         }
         throw errorException;
     }
-
 }

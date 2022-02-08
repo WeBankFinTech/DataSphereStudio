@@ -20,29 +20,33 @@ import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 
 import java.util.Map;
 
-
 public class FunctionPool {
 
-    public static NodeServiceFunction deleteNode = (String userName, WorkflowNodeService nodeService, AbstractAppConnNode node, Map<String, Object> requestBody)->{
-        node.setJobContent(requestBody);
-        nodeService.deleteNode(userName,node);
-        return null;
-    };
+    public static NodeServiceFunction deleteNode =
+            (String userName,
+                    WorkflowNodeService nodeService,
+                    AbstractAppConnNode node,
+                    Map<String, Object> requestBody) -> {
+                node.setJobContent(requestBody);
+                nodeService.deleteNode(userName, node);
+                return null;
+            };
 
-    public static NodeServiceFunction createNode = (String userName, WorkflowNodeService nodeService, AbstractAppConnNode node, Map<String, Object> requestBody)->
+    public static NodeServiceFunction createNode =
+            (String userName,
+                    WorkflowNodeService nodeService,
+                    AbstractAppConnNode node,
+                    Map<String, Object> requestBody) -> {
+                node.setJobContent(requestBody);
+                return nodeService.createNode(userName, node);
+            };
 
-    {
-        node.setJobContent(requestBody);
-        return nodeService.createNode(userName, node);
-    };
-
-
-
-    public static NodeServiceFunction updateNode = (String userName, WorkflowNodeService nodeService, AbstractAppConnNode node, Map<String, Object> requestBody)->
-
-    {
-        node.setJobContent(requestBody);
-        return nodeService.updateNode(userName, node);
-    };
-
+    public static NodeServiceFunction updateNode =
+            (String userName,
+                    WorkflowNodeService nodeService,
+                    AbstractAppConnNode node,
+                    Map<String, Object> requestBody) -> {
+                node.setJobContent(requestBody);
+                return nodeService.updateNode(userName, node);
+            };
 }

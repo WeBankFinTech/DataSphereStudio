@@ -15,11 +15,11 @@
  */
 
 package com.webank.wedatasphere.dss.standard.common.desc;
+
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
 
 import java.util.List;
-
 
 public interface AppDesc {
 
@@ -28,14 +28,13 @@ public interface AppDesc {
     List<AppInstance> getAppInstances();
 
     /**
-     * 对于每个AppConn而言，会拥有多个AppInstance，如需要获取相应的AppInstance，
-     * 通过传入的labels来进行匹配。
+     * 对于每个AppConn而言，会拥有多个AppInstance，如需要获取相应的AppInstance， 通过传入的labels来进行匹配。
      * 返回的List实例，其中第0个是匹配程度最大的实例。
-     * */
-    List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels) throws NoSuchAppInstanceException;
+     */
+    List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels)
+            throws NoSuchAppInstanceException;
 
     void addAppInstance(AppInstance appInstance);
 
     void removeAppInstance(AppInstance appInstance);
-
 }

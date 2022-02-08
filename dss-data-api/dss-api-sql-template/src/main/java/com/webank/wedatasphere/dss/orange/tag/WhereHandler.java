@@ -3,10 +3,11 @@ package com.webank.wedatasphere.dss.orange.tag;
 import com.webank.wedatasphere.dss.orange.node.MixedSqlNode;
 import com.webank.wedatasphere.dss.orange.node.SqlNode;
 import com.webank.wedatasphere.dss.orange.node.WhereSqlNode;
-import org.dom4j.Element;
 
 import java.util.List;
 
+
+import org.dom4j.Element;
 
 public class WhereHandler implements TagHandler {
 

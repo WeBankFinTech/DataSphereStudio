@@ -16,15 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-
 
 public interface Procedure {
 
     public float progress(RefExecutionAction action);
 
     public String log(RefExecutionAction action);
-
-
 }

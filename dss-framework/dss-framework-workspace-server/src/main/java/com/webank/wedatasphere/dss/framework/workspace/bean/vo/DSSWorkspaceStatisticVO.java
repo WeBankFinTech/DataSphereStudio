@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
-public class DSSWorkspaceStatisticVO extends AbstractDSSVO{
-
-}
+public class DSSWorkspaceStatisticVO extends AbstractDSSVO {}

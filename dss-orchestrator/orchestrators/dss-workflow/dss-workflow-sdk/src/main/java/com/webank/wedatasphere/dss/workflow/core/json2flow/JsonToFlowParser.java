@@ -19,11 +19,9 @@ package com.webank.wedatasphere.dss.workflow.core.json2flow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 
-
 public interface JsonToFlowParser {
 
     void init();
 
     Workflow parse(DSSFlow dssFlow);
-
 }

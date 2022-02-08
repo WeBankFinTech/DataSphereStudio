@@ -20,15 +20,13 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorUpdateRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-
-public class WorkflowOrchestratorUpdateRequestRef extends CommonRequestRefImpl implements OrchestratorUpdateRef {
+public class WorkflowOrchestratorUpdateRequestRef extends CommonRequestRefImpl
+        implements OrchestratorUpdateRef {
 
     private DSSOrchestratorInfo dssOrchestratorInfo;
 
     @Override
-    public void setDescription(String description) {
-
-    }
+    public void setDescription(String description) {}
 
     @Override
     public String getDescription() {
@@ -36,9 +34,7 @@ public class WorkflowOrchestratorUpdateRequestRef extends CommonRequestRefImpl i
     }
 
     @Override
-    public void setUses(String uses) {
-
-    }
+    public void setUses(String uses) {}
 
     @Override
     public String getUses() {
@@ -52,7 +48,7 @@ public class WorkflowOrchestratorUpdateRequestRef extends CommonRequestRefImpl i
 
     @Override
     public void setOrchestratorInfo(DSSOrchestratorInfo dssOrchestratorInfo) {
-      this.dssOrchestratorInfo=dssOrchestratorInfo;
+        this.dssOrchestratorInfo = dssOrchestratorInfo;
     }
 
     public DSSOrchestratorInfo getDssOrchestratorInfo() {
@@ -65,11 +61,17 @@ public class WorkflowOrchestratorUpdateRequestRef extends CommonRequestRefImpl i
 
     @Override
     public String toString() {
-        return "WorkflowOrchestratorUpdateRequestRef{" +
-                "userName='" + userName + '\'' +
-                ", workspaceName='" + workspaceName + '\'' +
-                ", dssOrchestratorInfo=" + dssOrchestratorInfo +
-                ", dssLabels=" + dssLabelList +
-                '}';
+        return "WorkflowOrchestratorUpdateRequestRef{"
+                + "userName='"
+                + userName
+                + '\''
+                + ", workspaceName='"
+                + workspaceName
+                + '\''
+                + ", dssOrchestratorInfo="
+                + dssOrchestratorInfo
+                + ", dssLabels="
+                + dssLabelList
+                + '}';
     }
 }

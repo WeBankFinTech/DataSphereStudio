@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.utils;
 
-/**
- * A util helper class full of static methods that are commonly used.
- */
+/** A util helper class full of static methods that are commonly used. */
 public class Utils {
     /**
      * Equivalent to Object.equals except that it handles nulls. If a and b are both null, true is

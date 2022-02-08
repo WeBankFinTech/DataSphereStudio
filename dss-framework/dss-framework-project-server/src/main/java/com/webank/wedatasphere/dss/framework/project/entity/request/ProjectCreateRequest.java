@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
+import java.util.List;
 
 @XmlRootElement
 public class ProjectCreateRequest {
@@ -32,7 +32,7 @@ public class ProjectCreateRequest {
 
     private String business;
 
-    //产品
+    // 产品
     private String product;
 
     private List<String> releaseUsers;
@@ -44,23 +44,16 @@ public class ProjectCreateRequest {
     @NotNull(message = "工程描述不能为空")
     private String description;
 
-    /**
-     * 工作空间名,因为是全局唯一的
-     */
+    /** 工作空间名,因为是全局唯一的 */
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
 
     private String workspaceName;
-    /**
-     * 开发流程 list
-     */
+    /** 开发流程 list */
     private List<String> devProcessList;
 
-    /**
-     * 编码模式 list
-     */
+    /** 编码模式 list */
     private List<String> orchestratorModeList;
-
 
     public String getName() {
         return name;

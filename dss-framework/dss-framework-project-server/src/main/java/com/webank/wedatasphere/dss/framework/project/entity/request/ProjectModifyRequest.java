@@ -18,12 +18,11 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
+import java.util.List;
 
 @XmlRootElement
 public class ProjectModifyRequest {
-
 
     @NotNull(message = "工程名称不能为空")
     private String name;
@@ -44,38 +43,34 @@ public class ProjectModifyRequest {
 
     private String workspaceName;
 
-    //业务
+    // 业务
     private String business;
 
-    //编辑权限用户
+    // 编辑权限用户
     private List<String> editUsers;
 
-    //查看权限用户
+    // 查看权限用户
     private List<String> accessUsers;
 
-    //发布权限用户
+    // 发布权限用户
     private List<String> releaseUsers;
 
     @NotNull(message = "工程描述不能为空")
     private String description;
 
-    //产品
+    // 产品
     private String product;
 
-    /**
-     * 工作空间名,因为是全局唯一的
-     */
+    /** 工作空间名,因为是全局唯一的 */
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
 
     /*
-   开发流程 code list
-    */
+    开发流程 code list
+     */
     private List<String> devProcessList;
 
-    /**
-     * 编排模式 code list
-     */
+    /** 编排模式 code list */
     private List<String> orchestratorModeList;
 
     public String getName() {
@@ -176,19 +171,36 @@ public class ProjectModifyRequest {
 
     @Override
     public String toString() {
-        return "ProjectModifyRequest{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                ", applicationArea='" + applicationArea + '\'' +
-                ", business='" + business + '\'' +
-                ", editUsers=" + editUsers +
-                ", accessUsers=" + accessUsers +
-                ", releaseUsers=" + releaseUsers +
-                ", description='" + description + '\'' +
-                ", product='" + product + '\'' +
-                ", workspaceId=" + workspaceId +
-                ", devProcessList=" + devProcessList +
-                ", orchestratorModeList=" + orchestratorModeList +
-                '}';
+        return "ProjectModifyRequest{"
+                + "name='"
+                + name
+                + '\''
+                + ", id="
+                + id
+                + ", applicationArea='"
+                + applicationArea
+                + '\''
+                + ", business='"
+                + business
+                + '\''
+                + ", editUsers="
+                + editUsers
+                + ", accessUsers="
+                + accessUsers
+                + ", releaseUsers="
+                + releaseUsers
+                + ", description='"
+                + description
+                + '\''
+                + ", product='"
+                + product
+                + '\''
+                + ", workspaceId="
+                + workspaceId
+                + ", devProcessList="
+                + devProcessList
+                + ", orchestratorModeList="
+                + orchestratorModeList
+                + '}';
     }
 }

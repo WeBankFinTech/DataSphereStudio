@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
 import java.util.Date;
 
-
 public class OrchestratorUser {
 
     private Long id;
@@ -31,11 +30,10 @@ public class OrchestratorUser {
 
     private String username;
 
-    //权限等级：0:私密；1：公开
+    // 权限等级：0:私密；1：公开
     private Integer priv;
 
     private Date lastUpdateTime;
-
 
     public Long getId() {
         return id;

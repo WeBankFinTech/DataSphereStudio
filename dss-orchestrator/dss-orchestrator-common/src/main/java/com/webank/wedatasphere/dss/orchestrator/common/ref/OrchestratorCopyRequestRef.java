@@ -16,14 +16,12 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 
 public interface OrchestratorCopyRequestRef extends CopyRequestRef, CommonRequestRef {
 
     void setCopyOrcAppId(long appId);
 
     void setCopyOrcVersionId(long orcId);
-
 }

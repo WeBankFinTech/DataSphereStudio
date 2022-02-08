@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 public class RequestFrameworkConvertOrchestrationStatus {
 
     private String id;
 
-    public RequestFrameworkConvertOrchestrationStatus() {
-    }
+    public RequestFrameworkConvertOrchestrationStatus() {}
 
     public RequestFrameworkConvertOrchestrationStatus(String id) {
         this.id = id;

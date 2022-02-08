@@ -20,7 +20,8 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorUpdateRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
-public class DefaultOrchestratorUpdateRequestRef extends CommonRequestRefImpl implements OrchestratorUpdateRef {
+public class DefaultOrchestratorUpdateRequestRef extends CommonRequestRefImpl
+        implements OrchestratorUpdateRef {
 
     private String description;
     private String uses;
@@ -54,5 +55,6 @@ public class DefaultOrchestratorUpdateRequestRef extends CommonRequestRefImpl im
 
     @Override
     public void setOrchestratorInfo(DSSOrchestratorInfo dssOrchestratorInfo) {
-        this.dssOrchestratorInfo = dssOrchestratorInfo;   }
+        this.dssOrchestratorInfo = dssOrchestratorInfo;
+    }
 }

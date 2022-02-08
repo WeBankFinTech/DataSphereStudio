@@ -18,13 +18,9 @@ package com.webank.wedatasphere.dss.framework.project.exception;
 
 import org.apache.linkis.common.exception.ErrorException;
 
-
 public class DSSProjectErrorException extends ErrorException {
 
-    public DSSProjectErrorException(int errorCode, String errorDesc){
+    public DSSProjectErrorException(int errorCode, String errorDesc) {
         super(errorCode, errorDesc);
     }
-
-
-
 }

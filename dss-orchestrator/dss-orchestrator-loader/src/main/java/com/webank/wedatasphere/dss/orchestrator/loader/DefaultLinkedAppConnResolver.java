@@ -18,31 +18,30 @@ package com.webank.wedatasphere.dss.orchestrator.loader;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-class DefaultLinkedAppConnResolver implements LinkedAppConnResolver  {
+class DefaultLinkedAppConnResolver implements LinkedAppConnResolver {
 
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DefaultLinkedAppConnResolver.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedAppConnResolver.class);
-
-
-    static{
+    static {
         LOGGER.info("component resolver inited");
     }
 
     @Override
-    public List<AppConn> resolveAppConnByUser(String userName, String workspaceName, String typeName) {
-        //todo 后面可以使用数据库表来定义用户可以加载的AppConn.
-        List<AppConn> appConns =  new ArrayList<>();
-        for(AppConn appConn : AppConnManager.getAppConnManager().listAppConns()){
-            //可以在这里根据用户情况和工作空间情况，限制appConn的加载
+    public List<AppConn> resolveAppConnByUser(
+            String userName, String workspaceName, String typeName) {
+        // todo 后面可以使用数据库表来定义用户可以加载的AppConn.
+        List<AppConn> appConns = new ArrayList<>();
+        for (AppConn appConn : AppConnManager.getAppConnManager().listAppConns()) {
+            // 可以在这里根据用户情况和工作空间情况，限制appConn的加载
             appConns.add(appConn);
         }
 

@@ -22,11 +22,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 
-
 @TableName(value = "dss_application")
 public class DSSApplication implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -151,19 +150,38 @@ public class DSSApplication implements Serializable {
 
     @Override
     public String toString() {
-        return "DssApplication{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", isUserNeedInit=" + isUserNeedInit +
-                ", level=" + level +
-                ", userInitUrl='" + userInitUrl + '\'' +
-                ", existsProjectService=" + existsProjectService +
-                ", projectUrl='" + projectUrl + '\'' +
-                ", enhanceJson='" + enhanceJson + '\'' +
-                ", ifIframe=" + ifIframe +
-                ", homepageUrl='" + homepageUrl + '\'' +
-                ", redirectUrl='" + redirectUrl + '\'' +
-                '}';
+        return "DssApplication{"
+                + "id="
+                + id
+                + ", name='"
+                + name
+                + '\''
+                + ", url='"
+                + url
+                + '\''
+                + ", isUserNeedInit="
+                + isUserNeedInit
+                + ", level="
+                + level
+                + ", userInitUrl='"
+                + userInitUrl
+                + '\''
+                + ", existsProjectService="
+                + existsProjectService
+                + ", projectUrl='"
+                + projectUrl
+                + '\''
+                + ", enhanceJson='"
+                + enhanceJson
+                + '\''
+                + ", ifIframe="
+                + ifIframe
+                + ", homepageUrl='"
+                + homepageUrl
+                + '\''
+                + ", redirectUrl='"
+                + redirectUrl
+                + '\''
+                + '}';
     }
 }

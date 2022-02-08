@@ -16,10 +16,10 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.plugin;
 
-import com.webank.wedatasphere.dss.standard.common.service.Operation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg;
-import javax.servlet.http.HttpServletRequest;
+import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
+import javax.servlet.http.HttpServletRequest;
 
 public interface SSOMsgParseOperation extends Operation {
 
@@ -28,5 +28,4 @@ public interface SSOMsgParseOperation extends Operation {
     DSSMsg getDSSMsg(HttpServletRequest request);
 
     SSOMsg getSSOMsg(HttpServletRequest request);
-
 }

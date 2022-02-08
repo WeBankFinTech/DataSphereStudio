@@ -16,25 +16,20 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.Arrays;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/3/5
- * Description:
- */
-
-public class DSSPersonalWorkflowVO extends AbstractDSSVO{
+/** created by cooperyang on 2020/3/5 Description: */
+public class DSSPersonalWorkflowVO extends AbstractDSSVO {
     private int workflowId;
     private String name;
     private String json;
     private String description;
     private List<String> tags;
 
-    public DSSPersonalWorkflowVO() {
-    }
+    public DSSPersonalWorkflowVO() {}
 
-    public DSSPersonalWorkflowVO(int workflowId, String name, String json, String description, List<String> tags) {
+    public DSSPersonalWorkflowVO(
+            int workflowId, String name, String json, String description, List<String> tags) {
         this.workflowId = workflowId;
         this.name = name;
         this.json = json;
@@ -81,7 +76,4 @@ public class DSSPersonalWorkflowVO extends AbstractDSSVO{
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-
-
-
 }

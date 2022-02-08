@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
-
-public abstract class AppConnLinkisJob extends LinkisJob {
-}
+public abstract class AppConnLinkisJob extends LinkisJob {}

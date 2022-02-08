@@ -16,8 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.Sidebar;
 import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarContentVO;
@@ -26,8 +28,6 @@ import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMappe
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarContentMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -37,69 +37,72 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
 public class DSSSideInfoServiceImpl implements DSSSideInfoService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSSideInfoServiceImpl.class);
 
-    @Autowired
-    private SidebarMapper sidebarMapper;
-    @Autowired
-    private SidebarContentMapper sidebarContentMapper;
-    @Autowired
-    private DSSWorkspaceRoleMapper workspaceRoleMapper;
+    @Autowired private SidebarMapper sidebarMapper;
+    @Autowired private SidebarContentMapper sidebarContentMapper;
+    @Autowired private DSSWorkspaceRoleMapper workspaceRoleMapper;
 
     private static final String ADMIN = "admin";
 
     @Override
-    public List<SidebarVO> getSidebarVOList(String username, Integer workspaceId,boolean isEnglish) {
-        //查询所在工作空间以及默认空间的侧边栏
+    public List<SidebarVO> getSidebarVOList(
+            String username, Integer workspaceId, boolean isEnglish) {
+        // 查询所在工作空间以及默认空间的侧边栏
         List<SidebarVO> retList = new ArrayList<>();
         QueryWrapper<Sidebar> sidebarQueryWrapper = new QueryWrapper<>();
-        sidebarQueryWrapper.in("workspace_id", Arrays.asList(workspaceId,0));
+        sidebarQueryWrapper.in("workspace_id", Arrays.asList(workspaceId, 0));
         sidebarQueryWrapper.orderByAsc("order_num");
         List<Sidebar> sidebarList = sidebarMapper.selectList(sidebarQueryWrapper);
-        if(CollectionUtils.isEmpty(sidebarList)){
+        if (CollectionUtils.isEmpty(sidebarList)) {
             return retList;
         }
-        //查询所在工作空间以及默认空间的侧边栏对应的侧边栏-内容
-        List<Integer> sideBarIds = sidebarList.stream().map(Sidebar::getId).collect(Collectors.toList());
+        // 查询所在工作空间以及默认空间的侧边栏对应的侧边栏-内容
+        List<Integer> sideBarIds =
+                sidebarList.stream().map(Sidebar::getId).collect(Collectors.toList());
         QueryWrapper<SidebarContent> sidebarQueryContentWrapper = new QueryWrapper<>();
-        sidebarQueryContentWrapper.in("workspace_id", Arrays.asList(workspaceId,0));
+        sidebarQueryContentWrapper.in("workspace_id", Arrays.asList(workspaceId, 0));
         sidebarQueryContentWrapper.in("sidebar_id", sideBarIds);
         sidebarQueryContentWrapper.orderByAsc("order_num");
-        List<SidebarContent> sidebarContentList = sidebarContentMapper.selectList(sidebarQueryContentWrapper);
+        List<SidebarContent> sidebarContentList =
+                sidebarContentMapper.selectList(sidebarQueryContentWrapper);
         Boolean isAdmin = workspaceRoleMapper.getAllRoles(username, workspaceId).contains(ADMIN);
-        //封装返回数据
-        return getSidebarVOS(retList, sidebarList, sidebarContentList,isEnglish, isAdmin);
+        // 封装返回数据
+        return getSidebarVOS(retList, sidebarList, sidebarContentList, isEnglish, isAdmin);
     }
 
-    //封装返回数据
-    private List<SidebarVO> getSidebarVOS(List<SidebarVO> retList, List<Sidebar> sidebarList,
-                                          List<SidebarContent> sidebarContentList,boolean isEnglish, boolean isAdmin) {
-        Map<Integer,List<SidebarContent>> contentMap = new HashMap<>();
-        for(SidebarContent sidebarContent : sidebarContentList){
+    // 封装返回数据
+    private List<SidebarVO> getSidebarVOS(
+            List<SidebarVO> retList,
+            List<Sidebar> sidebarList,
+            List<SidebarContent> sidebarContentList,
+            boolean isEnglish,
+            boolean isAdmin) {
+        Map<Integer, List<SidebarContent>> contentMap = new HashMap<>();
+        for (SidebarContent sidebarContent : sidebarContentList) {
             if (!isAdmin && ADMIN.equals(sidebarContent.getRemark())) {
                 continue;
             }
             Integer sidebarId = sidebarContent.getSidebarId();
-            if(contentMap.get(sidebarId)==null){
-                contentMap.put(sidebarId,new ArrayList<>());
+            if (contentMap.get(sidebarId) == null) {
+                contentMap.put(sidebarId, new ArrayList<>());
             }
             contentMap.get(sidebarId).add(sidebarContent);
         }
-        for (Sidebar  sidebar : sidebarList){
+        for (Sidebar sidebar : sidebarList) {
             SidebarVO sidebarVO = new SidebarVO();
-            BeanUtils.copyProperties(sidebar,sidebarVO);
-            international(isEnglish,sidebar, sidebarVO);
+            BeanUtils.copyProperties(sidebar, sidebarVO);
+            international(isEnglish, sidebar, sidebarVO);
             List<SidebarContentVO> sidebarContentVOList = new ArrayList<>();
             List<SidebarContent> sidebarContents = contentMap.get(sidebar.getId());
-            if(!CollectionUtils.isEmpty(sidebarContents)){
-                for (SidebarContent  sidebarContent : sidebarContents){
+            if (!CollectionUtils.isEmpty(sidebarContents)) {
+                for (SidebarContent sidebarContent : sidebarContents) {
                     SidebarContentVO sidebarContentVO = new SidebarContentVO();
-                    BeanUtils.copyProperties(sidebarContent,sidebarContentVO);
-                    international(isEnglish,sidebarContent,sidebarContentVO);
+                    BeanUtils.copyProperties(sidebarContent, sidebarContentVO);
+                    international(isEnglish, sidebarContent, sidebarContentVO);
                     sidebarContentVOList.add(sidebarContentVO);
                 }
             }
@@ -109,28 +112,29 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
         return retList;
     }
 
-    //国际化
-    public void international(boolean isEnglish,Sidebar sidebar, SidebarVO sidebarVO){
-        if(sidebar==null||!isEnglish){
+    // 国际化
+    public void international(boolean isEnglish, Sidebar sidebar, SidebarVO sidebarVO) {
+        if (sidebar == null || !isEnglish) {
             return;
         }
-        if(StringUtils.isNotBlank(sidebar.getNameEn())){
+        if (StringUtils.isNotBlank(sidebar.getNameEn())) {
             sidebarVO.setName(sidebar.getNameEn());
         }
-        if(StringUtils.isNotBlank(sidebar.getTitleEn())){
+        if (StringUtils.isNotBlank(sidebar.getTitleEn())) {
             sidebarVO.setTitle(sidebar.getTitleEn());
         }
     }
 
-    //国际化
-    public void international(boolean isEnglish,SidebarContent sidebarContent, SidebarContentVO sidebarContentVO){
-        if(sidebarContent==null||!isEnglish){
+    // 国际化
+    public void international(
+            boolean isEnglish, SidebarContent sidebarContent, SidebarContentVO sidebarContentVO) {
+        if (sidebarContent == null || !isEnglish) {
             return;
         }
-        if(StringUtils.isNotBlank(sidebarContent.getNameEn())){
+        if (StringUtils.isNotBlank(sidebarContent.getNameEn())) {
             sidebarContentVO.setName(sidebarContent.getNameEn());
         }
-        if(StringUtils.isNotBlank(sidebarContent.getTitleEn())){
+        if (StringUtils.isNotBlank(sidebarContent.getTitleEn())) {
             sidebarContentVO.setTitle(sidebarContent.getTitleEn());
         }
     }

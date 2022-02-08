@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.structure.plugin.role;
 
 import java.util.List;
 
-
 public interface DSSUserRoles {
 
     List<String> getRoles();
@@ -26,5 +25,4 @@ public interface DSSUserRoles {
     String getWorkspaceName();
 
     String getUser();
-
 }

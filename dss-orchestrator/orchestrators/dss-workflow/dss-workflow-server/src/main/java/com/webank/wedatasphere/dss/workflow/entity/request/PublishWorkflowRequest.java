@@ -28,8 +28,6 @@ public class PublishWorkflowRequest {
         this.orchestratorVersionId = orchestratorVersionId;
     }
 
-
-
     public String getDssLabel() {
         return dssLabel;
     }
@@ -37,8 +35,6 @@ public class PublishWorkflowRequest {
     public void setDssLabel(String dssLabel) {
         this.dssLabel = dssLabel;
     }
-
-
 
     public Long getWorkflowId() {
         return workflowId;

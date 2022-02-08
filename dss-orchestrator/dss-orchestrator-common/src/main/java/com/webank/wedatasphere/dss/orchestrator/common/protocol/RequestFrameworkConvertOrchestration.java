@@ -17,9 +17,9 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
+
 import java.util.List;
 import java.util.Map;
-
 
 public class RequestFrameworkConvertOrchestration {
 
@@ -86,6 +86,4 @@ public class RequestFrameworkConvertOrchestration {
     public void setComment(String comment) {
         this.comment = comment;
     }
-
-
 }

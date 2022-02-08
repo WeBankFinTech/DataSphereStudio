@@ -16,30 +16,25 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
-
-import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceLoginFailException;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.security.SecurityFilter;
+
+import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceLoginFailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 @Component
 public class RestulHelper {
 
-    @Autowired
-    private WorkspaceDBHelper workspaceDBHelper;
+    @Autowired private WorkspaceDBHelper workspaceDBHelper;
 
-    public String getLoginUser(HttpServletRequest request)throws ErrorException {
-        try{
+    public String getLoginUser(HttpServletRequest request) throws ErrorException {
+        try {
             return SecurityFilter.getLoginUsername(request);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new DSSWorkspaceLoginFailException(80013, "You are not logged in");
         }
     }
-
-
-
 }

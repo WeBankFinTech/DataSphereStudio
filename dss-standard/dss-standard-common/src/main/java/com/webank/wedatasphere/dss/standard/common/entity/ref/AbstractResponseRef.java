@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import java.util.Map;
 
-
 public abstract class AbstractResponseRef implements ResponseRef {
 
     protected String responseBody;

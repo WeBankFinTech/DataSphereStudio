@@ -16,15 +16,14 @@
 
 package com.webank.wedatasphere.dss.workflow.dao;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
-
 
 public interface FlowMapper {
     DSSFlow selectFlowByID(Long id);
@@ -51,8 +50,9 @@ public interface FlowMapper {
 
     void updateFlowInputInfo(DSSFlow dssFlow);
 
-    DSSFlowRelation selectFlowRelation(@Param("flowID") Long flowID, @Param("parentFlowID") Long parentFlowID);
+    DSSFlowRelation selectFlowRelation(
+            @Param("flowID") Long flowID, @Param("parentFlowID") Long parentFlowID);
 
     @Select("select creator from dss_flow where id = #{flowId}")
-    String getCreatorById(@Param("flowId")Long flowId);
+    String getCreatorById(@Param("flowId") Long flowId);
 }

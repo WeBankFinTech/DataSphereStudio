@@ -16,28 +16,32 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
+import org.apache.linkis.server.BDPJettyServerHelper;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.Map;
 
 public class VisualisNodeUtils {
 
     public static String getId(NodeRequestRef nodeRequestRef) throws Exception {
-        String externalContent = BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeRequestRef.getJobContent());
+        String externalContent =
+                BDPJettyServerHelper.jacksonJson()
+                        .writeValueAsString(nodeRequestRef.getJobContent());
         if ("linkis.appconn.visualis.display".equalsIgnoreCase(nodeRequestRef.getNodeType())) {
             return NumberUtils.parseDoubleString(getDisplayId(externalContent));
-        } else if ("linkis.appconn.visualis.dashboard".equalsIgnoreCase(nodeRequestRef.getNodeType())) {
+        } else if ("linkis.appconn.visualis.dashboard"
+                .equalsIgnoreCase(nodeRequestRef.getNodeType())) {
             return NumberUtils.parseDoubleString(getDashboardPortalId(externalContent));
-        } else if ("linkis.appconn.visualis.widget".equalsIgnoreCase(nodeRequestRef.getNodeType())) {
+        } else if ("linkis.appconn.visualis.widget"
+                .equalsIgnoreCase(nodeRequestRef.getNodeType())) {
             return NumberUtils.parseDoubleString(getWidgetId(externalContent));
         }
         return null;
     }
-
 
     public static String getDisplayId(String responseBody) throws ExternalOperationFailedException {
         String displayId = null;
@@ -66,11 +70,13 @@ public class VisualisNodeUtils {
         return widgetId;
     }
 
-    public static String getDashboardPortalId(String responseBody) throws ExternalOperationFailedException {
+    public static String getDashboardPortalId(String responseBody)
+            throws ExternalOperationFailedException {
         String dashboardPortalId = null;
         try {
             Map responseMap = BDPJettyServerHelper.jacksonJson().readValue(responseBody, Map.class);
-            dashboardPortalId = ((Map<String, Object>) responseMap.get("payload")).get("id").toString();
+            dashboardPortalId =
+                    ((Map<String, Object>) responseMap.get("payload")).get("id").toString();
         } catch (JsonMappingException e) {
             throw new ExternalOperationFailedException(1000056, "Get dashboard Id failed!", e);
         } catch (JsonProcessingException e) {
@@ -79,6 +85,4 @@ public class VisualisNodeUtils {
 
         return Long.toString(Math.round(Double.parseDouble(dashboardPortalId)));
     }
-
-
 }

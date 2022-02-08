@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
-
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSDictionaryRequestVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
@@ -24,22 +23,22 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import java.util.List;
 import java.util.Map;
 
-
 public interface DSSDictionaryService {
 
-    public List<DSSDictionary> getListByParam(DSSDictionaryRequestVO dictionaryRequestVO) ;
+    public List<DSSDictionary> getListByParam(DSSDictionaryRequestVO dictionaryRequestVO);
 
     /**
      * 获取编排模式
+     *
      * @param dictionaryRequestVO
      * @return
      */
-    public Map<String,Object> getDicSecondList(DSSDictionaryRequestVO dictionaryRequestVO) ;
+    public Map<String, Object> getDicSecondList(DSSDictionaryRequestVO dictionaryRequestVO);
 
     /**
      * 获取空间默认部门
+     *
      * @return
      */
     public List<DepartmentVO> getDefaultDepartmentVOList();
-
 }

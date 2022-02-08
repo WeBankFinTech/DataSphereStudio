@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 
-
 public interface WorkflowToRelSynchronizer {
 
     void setAppInstance(AppInstance appInstance);
@@ -28,5 +27,4 @@ public interface WorkflowToRelSynchronizer {
     void syncToRel(ConvertedRel convertedRel);
 
     void setSSORequestService(SSORequestService ssoRequestService);
-
 }

@@ -16,14 +16,13 @@
 
 package com.webank.wedatasphere.dss.workflow.core.json2flow.parser;
 
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.order.Order;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 
 public interface WorkflowNodeParser extends Order {
 
     WorkflowNode parseNode(DSSNode dwsNode);
 
     Boolean ifNodeCanParse(DSSNode dwsNode);
-
 }

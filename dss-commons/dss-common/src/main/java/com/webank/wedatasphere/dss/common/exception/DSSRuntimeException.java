@@ -20,7 +20,7 @@ import org.apache.linkis.common.exception.WarnException;
 
 public class DSSRuntimeException extends WarnException {
 
-    public DSSRuntimeException(String msg){
+    public DSSRuntimeException(String msg) {
         super(100000, msg);
     }
 

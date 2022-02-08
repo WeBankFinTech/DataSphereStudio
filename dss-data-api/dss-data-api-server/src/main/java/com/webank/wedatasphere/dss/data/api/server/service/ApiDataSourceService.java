@@ -1,9 +1,11 @@
 package com.webank.wedatasphere.dss.data.api.server.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.data.api.server.entity.DataSource;
 
 import java.util.List;
+
+
+import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface ApiDataSourceService extends IService<DataSource> {
 
@@ -11,12 +13,9 @@ public interface ApiDataSourceService extends IService<DataSource> {
 
     List<DataSource> getAllConnections(Integer workspaceId, String type);
 
-
-
     List<DataSource> getAvailableConns(List<DataSource> allConnections);
 
     void addDatasource(DataSource dataSource);
-
 
     List<DataSource> listAllDatasources(DataSource dataSource);
 

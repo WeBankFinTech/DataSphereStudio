@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.io.Serializable;
-import java.util.List;
-
 public class DSSDictionaryRequestVO {
 
     private Integer workspaceId;

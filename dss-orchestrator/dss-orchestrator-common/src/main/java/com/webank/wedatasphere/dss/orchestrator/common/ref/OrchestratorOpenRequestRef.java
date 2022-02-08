@@ -21,17 +21,25 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
 
 import java.util.List;
 
-
 public interface OrchestratorOpenRequestRef extends OpenRequestRef {
     void setOrchestratorId(Long orchestratorId);
+
     Long getOrchestratorId();
+
     void setUserName(String userName);
+
     String getUserName();
+
     void setRefAppId(Long appId);
+
     Long getRefAppId();
+
     String getSecondaryType();
+
     void setSecondaryType(String secondaryType);
+
     @Override
     List<DSSLabel> getDSSLabels();
+
     void setDSSLabels(List<DSSLabel> dssLabels);
 }

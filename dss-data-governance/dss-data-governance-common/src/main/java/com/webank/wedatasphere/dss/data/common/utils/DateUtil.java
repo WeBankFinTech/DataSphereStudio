@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.data.common.utils;
 
-import org.apache.atlas.SortOrder;
-
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -16,44 +14,29 @@ import java.util.Date;
  */
 public class DateUtil {
 
-    /**
-     * 英文简写（默认）如：2010-12-01
-     */
+    /** 英文简写（默认）如：2010-12-01 */
     public static String FORMAT_MONTH = "yyyy-MM";
-    /**
-     * 英文简写（默认）如：2010-12-01
-     */
+    /** 英文简写（默认）如：2010-12-01 */
     public static String FORMAT_SHORT = "yyyy-MM-dd";
 
     public static String FORMAT_SHORT_REPORT = "yyyy/MM/dd";
-    /**
-     * 英文全称 如：2010-12-01 23:15:06
-     */
+    /** 英文全称 如：2010-12-01 23:15:06 */
     public static String FORMAT_LONG = "yyyy-MM-dd HH:mm:ss";
+
     public static String FORMAT_WITHOUT_SECOND = "yyyy-MM-dd HH:mm";
 
     public static String FORMAT_MINUTE_REPORT = "yyyy/MM/dd HH:mm";
     public static String FORMAT_MINUTE = "yyyy-MM-dd HH:mm";
-    /**
-     * 精确到毫秒的完整时间 如：yyyy-MM-dd HH:mm:ss.S
-     */
+    /** 精确到毫秒的完整时间 如：yyyy-MM-dd HH:mm:ss.S */
     public static String FORMAT_FULL = "yyyy-MM-dd HH:mm:ss.S";
-    /**
-     * 中文简写 如：2010年12月01日
-     */
+    /** 中文简写 如：2010年12月01日 */
     public static String FORMAT_SHORT_CN = "yyyy年MM月dd日";
-    /**
-     * 中文全称 如：2010年12月01日 23时15分06秒
-     */
+    /** 中文全称 如：2010年12月01日 23时15分06秒 */
     public static String FORMAT_LONG_CN = "yyyy年MM月dd日  HH时mm分ss秒";
-    /**
-     * 精确到毫秒的完整中文时间
-     */
+    /** 精确到毫秒的完整中文时间 */
     public static String FORMAT_FULL_CN = "yyyy年MM月dd日  HH时mm分ss秒SSS毫秒";
 
-    /**
-     * 获得默认的 date pattern
-     */
+    /** 获得默认的 date pattern */
     public static String getDatePattern() {
         return FORMAT_LONG;
     }
@@ -90,7 +73,7 @@ public class DateUtil {
     /**
      * 使用用户格式格式化日期
      *
-     * @param date    日期
+     * @param date 日期
      * @param pattern 日期格式
      * @return
      */
@@ -134,7 +117,7 @@ public class DateUtil {
      * 在日期上增加数个整月
      *
      * @param date 日期
-     * @param n    要增加的月数
+     * @param n 要增加的月数
      * @return
      */
     public static Date addMonth(Date date, int n) {
@@ -148,7 +131,7 @@ public class DateUtil {
      * 在日期上增加天数
      *
      * @param date 日期
-     * @param n    要增加的天数
+     * @param n 要增加的天数
      * @return
      */
     public static Date addDay(Date date, int n) {
@@ -158,9 +141,7 @@ public class DateUtil {
         return cal.getTime();
     }
 
-    /**
-     * 获取时间戳
-     */
+    /** 获取时间戳 */
     public static String getTimeString() {
         SimpleDateFormat df = new SimpleDateFormat(FORMAT_FULL);
         Calendar calendar = Calendar.getInstance();
@@ -194,7 +175,7 @@ public class DateUtil {
     /**
      * 按用户格式字符串距离今天的天数
      *
-     * @param date   日期字符串
+     * @param date 日期字符串
      * @param format 日期格式
      * @return
      */
@@ -209,7 +190,7 @@ public class DateUtil {
     /**
      * 按用户格式字符串距离今天的天数
      *
-     * @param date   日期字符串
+     * @param date 日期字符串
      * @param format 日期格式
      * @return
      */
@@ -232,9 +213,7 @@ public class DateUtil {
         String tempSplitStr = "1970-01-01 00:00:00";
         int index = tempStr.indexOf(str);
         if (0 == index) {
-            /**
-             * 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间
-             */
+            /** 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间 */
             String lastStr = tempSplitStr.substring(timeStr.length());
             return timeStr + lastStr;
         }
@@ -252,9 +231,7 @@ public class DateUtil {
         String tempSplitStr = "1970-01-01 00:00:00";
         int index = tempStr.indexOf(str);
         if (0 == index) {
-            /**
-             * 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间
-             */
+            /** 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间 */
             String lastStr = tempSplitStr.substring(timeStr.length());
             return Timestamp.valueOf(timeStr + lastStr);
         }
@@ -273,9 +250,7 @@ public class DateUtil {
         String tempSplitStr = "1970-01-01 23:59:59";
         int index = tempStr.indexOf(str);
         if (0 == index) {
-            /**
-             * 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间
-             */
+            /** 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间 */
             String lastStr = tempSplitStr.substring(timeStr.length());
             return Timestamp.valueOf(timeStr + lastStr);
         }
@@ -294,9 +269,7 @@ public class DateUtil {
         String tempSplitStr = "1970-01-01 00:00:00";
         int index = tempStr.indexOf(str);
         if (0 == index) {
-            /**
-             * 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间
-             */
+            /** 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间 */
             String lastStr = tempSplitStr.substring(timeStr.length());
             return parse(timeStr + lastStr);
         }
@@ -315,9 +288,7 @@ public class DateUtil {
         String tempSplitStr = "1970-01-01 23:59:59";
         int index = tempStr.indexOf(str);
         if (0 == index) {
-            /**
-             * 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间
-             */
+            /** 说明符合日期格式 截取tempStr后面的部分与timeStr拼接构成时间 */
             String lastStr = tempSplitStr.substring(timeStr.length());
             return parse(timeStr + lastStr);
         }
@@ -342,27 +313,27 @@ public class DateUtil {
         }
     }
 
-    public static String addHours(Date date,int hours) {
+    public static String addHours(Date date, int hours) {
         SimpleDateFormat df = new SimpleDateFormat(FORMAT_LONG);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.HOUR, hours);
-        return  df.format(cal.getTime());
+        return df.format(cal.getTime());
     }
 
-    public static Long strToTimeStamp(String date,String format) throws ParseException {
+    public static Long strToTimeStamp(String date, String format) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
-         return sdf.parse(date).getTime();
+        return sdf.parse(date).getTime();
     }
 
     public static String unixToTimeStr(Long unixtime) {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date (unixtime));
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(unixtime));
     }
 
-    public static String unixToTimeStr(Double unixtime){
-        String strTime ="";
-        if(unixtime !=null) {
+    public static String unixToTimeStr(Double unixtime) {
+        String strTime = "";
+        if (unixtime != null) {
             strTime = new DecimalFormat("#").format(unixtime);
             return unixToTimeStr(Long.valueOf(strTime));
         }

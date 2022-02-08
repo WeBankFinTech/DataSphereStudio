@@ -16,12 +16,10 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 
 import java.util.List;
-
 
 public class RequestUpdateOrchestrator {
     private String userName;
@@ -29,11 +27,11 @@ public class RequestUpdateOrchestrator {
     private DSSOrchestratorInfo dssOrchestratorInfo;
     private List<DSSLabel> dssLabels;
 
-
-    public RequestUpdateOrchestrator(String userName,
-                                     String workspaceName,
-                                     DSSOrchestratorInfo dssOrchestratorInfo,
-                                     List<DSSLabel> dssLabels) {
+    public RequestUpdateOrchestrator(
+            String userName,
+            String workspaceName,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.workspaceName = workspaceName;
         this.dssOrchestratorInfo = dssOrchestratorInfo;
@@ -71,6 +69,4 @@ public class RequestUpdateOrchestrator {
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
     }
-
-
 }

@@ -14,5 +14,4 @@ public class ProjectUtils {
     public static String generateDolphinProjectName(String workspaceName, String projectName) {
         return StringUtils.joinWith("-", workspaceName, projectName);
     }
-
 }

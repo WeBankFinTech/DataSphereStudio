@@ -20,15 +20,14 @@ import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
 import com.webank.wedatasphere.dss.workflow.core.order.Order;
 
-
 public interface WorkflowToRelConverter extends Order {
 
     /**
-     * Try to convert DSS workflow to external app ref.
-     * Warn: The implementation should resolve the loop of children workflow's by yourself.
+     * Try to convert DSS workflow to external app ref. Warn: The implementation should resolve the
+     * loop of children workflow's by yourself.
+     *
      * @param rel The DSS workflow wait to convert
      * @return Converted Rel
      */
     ConvertedRel convertToRel(PreConversionRel rel);
-
 }

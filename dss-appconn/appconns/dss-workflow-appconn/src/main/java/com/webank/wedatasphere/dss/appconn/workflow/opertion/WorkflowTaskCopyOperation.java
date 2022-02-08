@@ -23,13 +23,14 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOpe
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestCopyWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCopyWorkflow;
-import org.apache.linkis.rpc.Sender;
 
+import org.apache.linkis.rpc.Sender;
 
 public class WorkflowTaskCopyOperation implements RefCopyOperation<WorkflowCopyRequestRef> {
     private DevelopmentService service;
 
-    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
+    private final Sender sender =
+            DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
     @Override
     public void setDevelopmentService(DevelopmentService service) {
@@ -46,11 +47,18 @@ public class WorkflowTaskCopyOperation implements RefCopyOperation<WorkflowCopyR
         String projectName = workflowCopyRequestRef.getProjectName();
         String version = workflowCopyRequestRef.getVersion();
         String description = workflowCopyRequestRef.getDescription();
-        RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
-                workspaceName, appId, contextIdStr,
-                projectName, orcVersionId,
-                version, description);
-        ResponseCopyWorkflow responseCopyWorkflow = (ResponseCopyWorkflow) sender.ask(requestCopyWorkflow);
+        RequestCopyWorkflow requestCopyWorkflow =
+                new RequestCopyWorkflow(
+                        userName,
+                        workspaceName,
+                        appId,
+                        contextIdStr,
+                        projectName,
+                        orcVersionId,
+                        version,
+                        description);
+        ResponseCopyWorkflow responseCopyWorkflow =
+                (ResponseCopyWorkflow) sender.ask(requestCopyWorkflow);
         WorkflowCopyResponseRef workflowCopyResponseRef = new WorkflowCopyResponseRef();
         workflowCopyResponseRef.setDssFlow(responseCopyWorkflow.getDssFlow());
         workflowCopyResponseRef.setCopyTargetAppId(responseCopyWorkflow.getDssFlow().getId());

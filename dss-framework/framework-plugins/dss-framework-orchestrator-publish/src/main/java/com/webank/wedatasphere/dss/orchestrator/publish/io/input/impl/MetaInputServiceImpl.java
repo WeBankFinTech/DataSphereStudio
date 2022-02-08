@@ -16,12 +16,10 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.io.input.impl;
 
-
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaReader;
-
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -29,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
 
 @Service
 public class MetaInputServiceImpl implements MetaInputService {
@@ -45,7 +42,6 @@ public class MetaInputServiceImpl implements MetaInputService {
         }
     }
 
-
     /**
      * 获取inputStream
      *
@@ -56,6 +52,4 @@ public class MetaInputServiceImpl implements MetaInputService {
     private InputStream generateInputstream(String basePath) throws IOException {
         return IoUtils.generateInputInputStream(basePath + File.separator + fileName);
     }
-
-
 }

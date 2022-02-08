@@ -22,11 +22,12 @@ import java.lang.reflect.Constructor;
 
 public class SchedulisExceptionUtils {
 
-    public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc,Throwable throwable,
-                                          Class<T> clazz) throws T{
+    public static <T extends ErrorException> void dealErrorException(
+            int errorCode, String errorDesc, Throwable throwable, Class<T> clazz) throws T {
         T errorException = null;
         try {
-            Constructor<T> constructor = clazz.getConstructor(int.class, String.class, Throwable.class);
+            Constructor<T> constructor =
+                    clazz.getConstructor(int.class, String.class, Throwable.class);
             errorException = constructor.newInstance(errorCode, errorDesc, throwable);
             errorException.setErrCode(errorCode);
             errorException.setDesc(errorDesc);
@@ -37,9 +38,8 @@ public class SchedulisExceptionUtils {
         throw errorException;
     }
 
-
-    public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc,
-                                                                     Class<T> clazz) throws T{
+    public static <T extends ErrorException> void dealErrorException(
+            int errorCode, String errorDesc, Class<T> clazz) throws T {
         T errorException = null;
         try {
             Constructor<T> constructor = clazz.getConstructor(int.class, String.class);
@@ -51,9 +51,4 @@ public class SchedulisExceptionUtils {
         }
         throw errorException;
     }
-
-
-
-
-
 }

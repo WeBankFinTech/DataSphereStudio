@@ -16,10 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.Arrays;
-import java.util.List;
-
-
 public class DSSWorkflowVersionVO {
     private int workflowId;
     private String version;
@@ -28,10 +24,15 @@ public class DSSWorkflowVersionVO {
     private String createTime;
     private String workflowJson;
 
-    public DSSWorkflowVersionVO() {
-    }
+    public DSSWorkflowVersionVO() {}
 
-    public DSSWorkflowVersionVO(int workflowId, String version, String creator, String comment, String createTime, String workflowJson) {
+    public DSSWorkflowVersionVO(
+            int workflowId,
+            String version,
+            String creator,
+            String comment,
+            String createTime,
+            String workflowJson) {
         this.workflowId = workflowId;
         this.version = version;
         this.creator = creator;
@@ -87,7 +88,4 @@ public class DSSWorkflowVersionVO {
     public void setWorkflowJson(String workflowJson) {
         this.workflowJson = workflowJson;
     }
-
-
-
 }

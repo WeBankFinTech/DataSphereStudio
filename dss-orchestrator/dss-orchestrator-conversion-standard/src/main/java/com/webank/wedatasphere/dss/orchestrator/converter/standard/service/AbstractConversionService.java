@@ -21,13 +21,13 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.ConversionInt
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.ConversionOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppSingletonIntegrationServiceImpl;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
+
 import java.util.ArrayList;
 import java.util.List;
 
-
-public abstract class AbstractConversionService extends AppSingletonIntegrationServiceImpl<ConversionOperation, SSORequestService>
-    implements ConversionService {
+public abstract class AbstractConversionService
+        extends AppSingletonIntegrationServiceImpl<ConversionOperation, SSORequestService>
+        implements ConversionService {
 
     private List<DSSLabel> dssLabels = new ArrayList<>();
     private ConversionIntegrationStandard appStandard;

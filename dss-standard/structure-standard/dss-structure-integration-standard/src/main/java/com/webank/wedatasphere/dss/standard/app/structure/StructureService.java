@@ -16,15 +16,12 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure;
 
-
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
-
 
 public interface StructureService extends AppIntegrationService<SSORequestService> {
 
     void setAppStandard(StructureIntegrationStandard appStandard);
 
     StructureIntegrationStandard getAppStandard();
-
 }

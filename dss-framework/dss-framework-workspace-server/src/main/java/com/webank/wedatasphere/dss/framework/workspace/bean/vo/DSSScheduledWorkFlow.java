@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
-public class DSSScheduledWorkFlow {
-}
+public class DSSScheduledWorkFlow {}

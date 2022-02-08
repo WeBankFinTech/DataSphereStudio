@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.standard.app.development.standard;
 
 import com.webank.wedatasphere.dss.standard.app.development.service.*;
 
-
-public abstract class OnlyExecutionDevelopmentStandard extends AbstractDevelopmentIntegrationStandard {
+public abstract class OnlyExecutionDevelopmentStandard
+        extends AbstractDevelopmentIntegrationStandard {
 
     @Override
     protected RefCRUDService createRefCRUDService() {
         return null;
-}
+    }
 
     @Override
     protected RefExportService createRefExportService() {
@@ -40,5 +40,4 @@ public abstract class OnlyExecutionDevelopmentStandard extends AbstractDevelopme
     protected RefQueryService createRefQueryService() {
         return null;
     }
-
 }

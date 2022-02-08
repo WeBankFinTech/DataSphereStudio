@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-
 
 public interface Killable {
     public boolean kill(RefExecutionAction action);

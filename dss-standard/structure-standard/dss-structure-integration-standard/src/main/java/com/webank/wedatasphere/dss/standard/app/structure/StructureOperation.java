@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure;
 
-
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
-
 
 public interface StructureOperation extends Operation {
 
     void init();
 
     void setStructureService(StructureService service);
-
 }

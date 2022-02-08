@@ -23,12 +23,12 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
+import org.springframework.beans.BeanUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.BeanUtils;
-
 
 public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
 
@@ -39,25 +39,31 @@ public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
     }
 
     public synchronized void addWorkflowParsers(List<WorkflowParser> workflowParsers) {
-        if(workflowParsers == null || workflowParsers.isEmpty()) {
+        if (workflowParsers == null || workflowParsers.isEmpty()) {
             return;
         }
         workflowParsers.forEach(WorkflowParser::init);
-        if(this.workflowParsers == null) {
-            this.workflowParsers  = new ArrayList<>();
+        if (this.workflowParsers == null) {
+            this.workflowParsers = new ArrayList<>();
         }
         this.workflowParsers.addAll(workflowParsers);
-        this.workflowParsers = this.workflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder)).collect(Collectors.toList());
+        this.workflowParsers =
+                this.workflowParsers.stream()
+                        .sorted(Comparator.comparingInt(WorkflowParser::getOrder))
+                        .collect(Collectors.toList());
     }
 
     @Override
     public void init() {
-        if(workflowParsers == null) {
+        if (workflowParsers == null) {
             workflowParsers = ClassUtils.getInstances(WorkflowParser.class);
         } else {
             workflowParsers.addAll(ClassUtils.getInstances(WorkflowParser.class));
         }
-        workflowParsers = workflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder)).collect(Collectors.toList());
+        workflowParsers =
+                workflowParsers.stream()
+                        .sorted(Comparator.comparingInt(WorkflowParser::getOrder))
+                        .collect(Collectors.toList());
         workflowParsers.forEach(WorkflowParser::init);
     }
 
@@ -67,18 +73,24 @@ public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
         BeanUtils.copyProperties(dssFlow, workflow, "children");
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(dssFlow.getFlowJson()).getAsJsonObject();
-        for(WorkflowParser workflowParser : workflowParsers) {
+        for (WorkflowParser workflowParser : workflowParsers) {
             workflow = workflowParser.parse(jsonObject, workflow);
         }
-        if(dssFlow.getChildren() != null) {
+        if (dssFlow.getChildren() != null) {
             Workflow parentWorkflow = workflow;
-            List<Workflow> children = dssFlow.getChildren().stream().map(childFlow -> {
-                Workflow childWorkflow = parse(childFlow);
-                if(parentWorkflow instanceof WorkflowImpl) {
-                    ((WorkflowImpl) childWorkflow).setParentWorkflow((WorkflowImpl) parentWorkflow);
-                }
-                return childWorkflow;
-            }).collect(Collectors.toList());
+            List<Workflow> children =
+                    dssFlow.getChildren().stream()
+                            .map(
+                                    childFlow -> {
+                                        Workflow childWorkflow = parse(childFlow);
+                                        if (parentWorkflow instanceof WorkflowImpl) {
+                                            ((WorkflowImpl) childWorkflow)
+                                                    .setParentWorkflow(
+                                                            (WorkflowImpl) parentWorkflow);
+                                        }
+                                        return childWorkflow;
+                                    })
+                            .collect(Collectors.toList());
             workflow.setChildren(children);
         }
         return workflow;

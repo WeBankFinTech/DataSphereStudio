@@ -27,7 +27,6 @@ import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class WorkflowFactoryImpl implements WorkflowFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowFactoryImpl.class);
@@ -41,20 +40,21 @@ public class WorkflowFactoryImpl implements WorkflowFactory {
 
     @Override
     public JsonToFlowParser getJsonToFlowParser() {
-        if(jsonToFlowParser != null) {
+        if (jsonToFlowParser != null) {
             return jsonToFlowParser;
         }
         synchronized (this) {
-            if(jsonToFlowParser == null) {
+            if (jsonToFlowParser == null) {
                 try {
                     jsonToFlowParser = ClassUtils.getInstance(JsonToFlowParser.class);
                 } catch (DSSErrorException e) {
-                    jsonToFlowParser = new AbstractJsonToFlowParser() {
-                        @Override
-                        protected Workflow createWorkflow() {
-                            return new WorkflowImpl();
-                        }
-                    };
+                    jsonToFlowParser =
+                            new AbstractJsonToFlowParser() {
+                                @Override
+                                protected Workflow createWorkflow() {
+                                    return new WorkflowImpl();
+                                }
+                            };
                 }
                 jsonToFlowParser.init();
                 LOGGER.info("JsonToFlowParser is {}.", jsonToFlowParser.getClass().getSimpleName());
@@ -69,7 +69,8 @@ public class WorkflowFactoryImpl implements WorkflowFactory {
     }
 
     static WorkflowFactory createInstance() {
-        WorkflowFactory workflowFactory = ClassUtils.getInstanceOrDefault(WorkflowFactory.class, new WorkflowFactoryImpl());
+        WorkflowFactory workflowFactory =
+                ClassUtils.getInstanceOrDefault(WorkflowFactory.class, new WorkflowFactoryImpl());
         LOGGER.info("WorkflowFactory is {}.", workflowFactory.getClass().getSimpleName());
         return workflowFactory;
     }

@@ -19,18 +19,18 @@ package com.webank.wedatasphere.dss.orchestrator.core.impl;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
+
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class DefaultOrchestrator extends AbstractOrchestrator {
 
     private static volatile DSSOrchestratorContext orchestratorContext;
 
     private static void initDSSOrchestratorContext() {
-        if(orchestratorContext == null) {
+        if (orchestratorContext == null) {
             synchronized (DefaultOrchestrator.class) {
-                if(orchestratorContext == null) {
+                if (orchestratorContext == null) {
                     orchestratorContext = new DSSOrchestratorContextImpl();
                     orchestratorContext.initialize();
                 }
@@ -38,14 +38,14 @@ public class DefaultOrchestrator extends AbstractOrchestrator {
         }
     }
 
-    private  List<AppConn> linkedAppConn = new ArrayList<>();
+    private List<AppConn> linkedAppConn = new ArrayList<>();
 
     private List<DSSLabel> labels = new ArrayList<>();
 
     private AppConn appConn;
 
     @Override
-    public void setAppConn(AppConn appConn){
+    public void setAppConn(AppConn appConn) {
         this.appConn = appConn;
     }
 

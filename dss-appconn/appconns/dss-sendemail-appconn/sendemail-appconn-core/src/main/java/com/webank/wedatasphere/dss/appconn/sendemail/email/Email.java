@@ -21,24 +21,30 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.Attachment;
 public interface Email {
 
     String getContent();
+
     void setContent(String content);
 
     Attachment[] getAttachments();
+
     void setAttachments(Attachment[] attachments);
 
     String getSubject();
+
     void setSubject(String subject);
 
     String getFrom();
+
     void setFrom(String from);
 
     String getTo();
+
     void setTo(String to);
 
     String getCc();
+
     void setCc(String cc);
 
     String getBcc();
-    void setBcc(String bcc);
 
+    void setBcc(String bcc);
 }

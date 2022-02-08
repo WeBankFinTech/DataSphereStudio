@@ -16,17 +16,15 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.service;
 
-
-import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import org.apache.linkis.ujes.client.request.JobExecuteAction;
 import org.apache.linkis.ujes.client.request.JobSubmitAction;
 
+import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
+import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 
 public interface BuildJobAction {
 
     JobExecuteAction getJobAction(Job job) throws LinkisJobExecutionErrorException;
 
     JobSubmitAction getSubmitAction(Job job) throws LinkisJobExecutionErrorException;
-
 }

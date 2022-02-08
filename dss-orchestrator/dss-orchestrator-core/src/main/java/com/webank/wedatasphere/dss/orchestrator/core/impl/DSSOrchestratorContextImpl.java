@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.orchestrator.core.impl;
 
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
-import java.util.List;
 
+import java.util.List;
 
 public class DSSOrchestratorContextImpl extends AbstractDSSOrchestratorContext {
 
@@ -35,5 +35,4 @@ public class DSSOrchestratorContextImpl extends AbstractDSSOrchestratorContext {
     public List<DSSOrchestratorPlugin> getOrchestratorPlugins() {
         return plugins;
     }
-
 }

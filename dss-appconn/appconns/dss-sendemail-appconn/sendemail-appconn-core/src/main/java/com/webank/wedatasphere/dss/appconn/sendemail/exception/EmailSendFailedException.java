@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.exception;
 
-
 import org.apache.linkis.common.exception.ErrorException;
 
 public class EmailSendFailedException extends ErrorException {

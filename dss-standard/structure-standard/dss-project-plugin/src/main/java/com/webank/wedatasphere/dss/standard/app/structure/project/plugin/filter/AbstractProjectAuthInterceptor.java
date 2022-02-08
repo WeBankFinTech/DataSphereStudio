@@ -16,15 +16,17 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.filter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.ProjectAuth;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient;
+import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.ProjectAuth;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public abstract class AbstractProjectAuthInterceptor implements ProjectAuthInterceptor {
 
@@ -41,18 +43,24 @@ public abstract class AbstractProjectAuthInterceptor implements ProjectAuthInter
     }
 
     @Override
-    public String getForbiddenMsg(ProjectAuth projectAuth, ProjectRequestType projectRequestType,
-                                  HttpServletRequest request) {
-        String message = "You have no permission to " + projectRequestType.toString().toLowerCase() +
-            " the content of project " + projectAuth.getProjectName();
+    public String getForbiddenMsg(
+            ProjectAuth projectAuth,
+            ProjectRequestType projectRequestType,
+            HttpServletRequest request) {
+        String message =
+                "You have no permission to "
+                        + projectRequestType.toString().toLowerCase()
+                        + " the content of project "
+                        + projectAuth.getProjectName();
         Object returnObj = getForbiddenMsg(message);
-        if(returnObj instanceof String) {
+        if (returnObj instanceof String) {
             return (String) returnObj;
         } else {
             try {
                 return HttpClient.objectMapper().writeValueAsString(returnObj);
             } catch (JsonProcessingException e) {
-                throw new AppStandardWarnException(50002, "Serialize object to string failed! Object: " + returnObj, e);
+                throw new AppStandardWarnException(
+                        50002, "Serialize object to string failed! Object: " + returnObj, e);
             }
         }
     }

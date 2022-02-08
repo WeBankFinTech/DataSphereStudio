@@ -17,26 +17,25 @@
 package com.webank.wedatapshere.dss.appconn.datachecker.standard;
 
 import com.webank.wedatapshere.dss.appconn.datachecker.service.DataCheckerExecuteService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefExecutionService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataCheckerDevelopmentStandard extends OnlyExecutionDevelopmentStandard {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataCheckerDevelopmentStandard.class);
-
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DataCheckerDevelopmentStandard.class);
 
     @Override
     protected RefExecutionService createRefExecutionService() {
-        return  new DataCheckerExecuteService();
+        return new DataCheckerExecuteService();
     }
 
     @Override
     public void init() {
         LOGGER.info("class DataCheckerDevelopmentStandard init");
     }
-
-
 }

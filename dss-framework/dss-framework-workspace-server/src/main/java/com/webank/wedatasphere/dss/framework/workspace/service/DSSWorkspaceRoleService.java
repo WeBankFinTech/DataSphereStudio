@@ -18,9 +18,13 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import java.util.List;
 
-
 public interface DSSWorkspaceRoleService {
-    void addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username);
+    void addWorkspaceRole(
+            String roleName,
+            int workspaceId,
+            List<Integer> menuIds,
+            List<Integer> componentIds,
+            String username);
 
     List<String> getRoleInWorkspace(String username, int workspaceId);
 

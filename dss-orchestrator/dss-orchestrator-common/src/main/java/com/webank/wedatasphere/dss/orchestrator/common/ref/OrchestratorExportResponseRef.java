@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-
 public interface OrchestratorExportResponseRef extends ResponseRef {
     String getResourceId();
 

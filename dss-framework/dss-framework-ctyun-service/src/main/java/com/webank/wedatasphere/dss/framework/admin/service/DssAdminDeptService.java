@@ -1,16 +1,15 @@
 package com.webank.wedatasphere.dss.framework.admin.service;
 
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.TreeSelect;
 
 import java.util.List;
-import java.util.Map;
+
+
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
- * <p>
  * 部门表 服务类
- * </p>
  *
  * @author Lvjw
  * @since 2021-06-01
@@ -40,7 +39,6 @@ public interface DssAdminDeptService extends IService<DssAdminDept> {
      * @return 下拉树结构列表
      */
     public List<TreeSelect> buildDeptTreeSelect(List<DssAdminDept> depts);
-
 
     /**
      * 根据部门ID查询信息

@@ -18,9 +18,8 @@ package com.webank.wedatasphere.dss.orchestrator.loader;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 
-
 import java.util.List;
 
 public interface LinkedAppConnResolver {
-    List<AppConn>   resolveAppConnByUser(String userName, String workspaceName, String typeName);
+    List<AppConn> resolveAppConnByUser(String userName, String workspaceName, String typeName);
 }

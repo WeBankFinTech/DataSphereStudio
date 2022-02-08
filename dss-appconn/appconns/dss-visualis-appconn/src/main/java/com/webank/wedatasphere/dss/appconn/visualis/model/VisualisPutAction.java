@@ -16,10 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.linkis.httpclient.request.PutAction;
 import org.apache.linkis.httpclient.request.UserAction;
 import org.apache.linkis.server.BDPJettyServerHelper;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

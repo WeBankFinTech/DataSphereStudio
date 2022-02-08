@@ -16,19 +16,20 @@
 
 package com.webank.wedatasphere.dss.common.utils;
 
-
-
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZipHelper {
 
@@ -44,16 +45,17 @@ public class ZipHelper {
     }
 
     /**
-     *  ZipHelper可以将传入的path进行打包
+     * ZipHelper可以将传入的path进行打包
+     *
      * @param dirPath 需要打包的project路径,绝对路径
      * @return 打包之后的zip包全路径
      */
-    public static String zip(String dirPath, boolean deleteOriginDir)throws DSSErrorException {
-        if(!FileHelper.checkDirExists(dirPath)){
+    public static String zip(String dirPath, boolean deleteOriginDir) throws DSSErrorException {
+        if (!FileHelper.checkDirExists(dirPath)) {
             logger.error("{} 不存在, 不能创建zip文件", dirPath);
-            throw new DSSErrorException(90001,dirPath + " does not exist, can not zip");
+            throw new DSSErrorException(90001, dirPath + " does not exist, can not zip");
         }
-        //先用简单的方法，调用新进程进行压缩
+        // 先用简单的方法，调用新进程进行压缩
         String[] strArr = dirPath.split(File.separator);
         String shortPath = strArr[strArr.length - 1];
         String workPath = dirPath.substring(0, dirPath.length() - shortPath.length() - 1);
@@ -69,42 +71,43 @@ public class ZipHelper {
         processBuilder.directory(new File(workPath));
         BufferedReader infoReader = null;
         BufferedReader errorReader = null;
-        try{
+        try {
             Process process = processBuilder.start();
             infoReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String infoLine = null;
-            while((infoLine = infoReader.readLine()) != null){
+            while ((infoLine = infoReader.readLine()) != null) {
                 logger.info("process output: {} ", infoLine);
             }
             String errorLine = null;
             StringBuilder errMsg = new StringBuilder();
-            while((errorLine = errorReader.readLine()) != null){
-                if (StringUtils.isNotEmpty(errorLine)){
+            while ((errorLine = errorReader.readLine()) != null) {
+                if (StringUtils.isNotEmpty(errorLine)) {
                     errMsg.append(errorLine).append("\n");
                 }
                 logger.error("process error: {} ", errorLine);
             }
             int exitCode = process.waitFor();
-            if (exitCode != 0){
-                throw new DSSErrorException(90002,errMsg.toString());
+            if (exitCode != 0) {
+                throw new DSSErrorException(90002, errMsg.toString());
             }
-        }catch(final Exception e){
+        } catch (final Exception e) {
             logger.error("{} 压缩成 zip 文件失败, reason: ", e);
-            DSSErrorException exception = new DSSErrorException(90003,dirPath + " to zip file failed");
+            DSSErrorException exception =
+                    new DSSErrorException(90003, dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;
         } finally {
-            //删掉整个目录
+            // 删掉整个目录
             IOUtils.closeQuietly(infoReader);
             IOUtils.closeQuietly(errorReader);
-            if(deleteOriginDir) {
+            if (deleteOriginDir) {
                 File file = new File(dirPath);
-                logger.info("生成zip文件{}",longZipFilePath);
+                logger.info("生成zip文件{}", longZipFilePath);
                 logger.info("开始删除目录 {}", dirPath);
-                if (deleteDir(file)){
+                if (deleteDir(file)) {
                     logger.info("结束删除目录 {} 成功", dirPath);
-                }else{
+                } else {
                     logger.info("删除目录 {} 失败", dirPath);
                 }
             }
@@ -112,50 +115,49 @@ public class ZipHelper {
         return longZipFilePath;
     }
 
-
-
-    public static String unzip(String dirPath)throws DSSErrorException {
+    public static String unzip(String dirPath) throws DSSErrorException {
         File file = new File(dirPath);
-        if(!file.exists()){
+        if (!file.exists()) {
             logger.error("{} 不存在, 不能解压zip文件", dirPath);
-            throw new DSSErrorException(90001,dirPath + " does not exist, can not unzip");
+            throw new DSSErrorException(90001, dirPath + " does not exist, can not unzip");
         }
-        //先用简单的方法，调用新进程进行压缩
+        // 先用简单的方法，调用新进程进行压缩
         String[] strArr = dirPath.split(File.separator);
         String shortPath = strArr[strArr.length - 1];
         String workPath = dirPath.substring(0, dirPath.length() - shortPath.length() - 1);
         List<String> list = new ArrayList<>();
         list.add(UN_ZIP_CMD);
-        String longZipFilePath = dirPath.replace(ZIP_TYPE,"");
+        String longZipFilePath = dirPath.replace(ZIP_TYPE, "");
         list.add(shortPath);
         ProcessBuilder processBuilder = new ProcessBuilder(list);
         processBuilder.redirectErrorStream(true);
         processBuilder.directory(new File(workPath));
         BufferedReader infoReader = null;
         BufferedReader errorReader = null;
-        try{
+        try {
             Process process = processBuilder.start();
             infoReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String infoLine = null;
-            while((infoLine = infoReader.readLine()) != null){
+            while ((infoLine = infoReader.readLine()) != null) {
                 logger.info("process output: {} ", infoLine);
             }
             String errorLine = null;
             StringBuilder errMsg = new StringBuilder();
-            while((errorLine = errorReader.readLine()) != null){
-                if (StringUtils.isNotEmpty(errorLine)){
+            while ((errorLine = errorReader.readLine()) != null) {
+                if (StringUtils.isNotEmpty(errorLine)) {
                     errMsg.append(errorLine).append("\n");
                 }
                 logger.error("process error: {} ", errorLine);
             }
             int exitCode = process.waitFor();
-            if (exitCode != 0){
-                throw new DSSErrorException(90007,errMsg.toString());
+            if (exitCode != 0) {
+                throw new DSSErrorException(90007, errMsg.toString());
             }
-        }catch(final Exception e){
+        } catch (final Exception e) {
             logger.error("{} 解压缩 zip 文件失败, reason: ", e);
-            DSSErrorException exception = new DSSErrorException(90009,dirPath + " to zip file failed");
+            DSSErrorException exception =
+                    new DSSErrorException(90009, dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;
         } finally {
@@ -170,7 +172,7 @@ public class ZipHelper {
     private static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            if (children != null && children.length > 0){
+            if (children != null && children.length > 0) {
                 for (String s : children) {
                     boolean success = deleteDir(new File(dir, s));
                     if (!success) {
@@ -184,7 +186,7 @@ public class ZipHelper {
     }
 
     public static String zipExportProject(String projectPath) throws DSSErrorException {
-        if(projectPath.endsWith(File.separator)) {
+        if (projectPath.endsWith(File.separator)) {
             projectPath = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
         }
         return ZipHelper.zip(projectPath);

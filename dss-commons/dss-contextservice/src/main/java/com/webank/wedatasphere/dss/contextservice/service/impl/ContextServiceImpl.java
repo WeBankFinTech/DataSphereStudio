@@ -16,13 +16,14 @@
 
 package com.webank.wedatasphere.dss.contextservice.service.impl;
 
-import com.google.gson.*;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.ErrorCode;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -37,11 +38,13 @@ import org.apache.linkis.cs.common.entity.object.LinkisVariable;
 import org.apache.linkis.cs.common.entity.resource.LinkisBMLResource;
 import org.apache.linkis.cs.common.entity.source.*;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+
+import com.google.gson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContextServiceImpl implements ContextService {
 
@@ -63,7 +66,8 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public String createContextID(String workspace, String project, String flow, String version, String user) {
+    public String createContextID(
+            String workspace, String project, String flow, String version, String user) {
         LinkisHAWorkFlowContextID contextID = new LinkisHAWorkFlowContextID();
         contextID.setWorkSpace(workspace);
         contextID.setProject(project);
@@ -75,37 +79,55 @@ public class ContextServiceImpl implements ContextService {
             contextClient.createContext(contextID);
             return SerializeHelper.serializeContextID(contextID);
         } catch (Exception e) {
-            logger.error("createContextID error. workspace : {}, project : {}, flow : {}, version : {}, user : {}", workspace, project, flow, version, user, e);
+            logger.error(
+                    "createContextID error. workspace : {}, project : {}, flow : {}, version : {}, user : {}",
+                    workspace,
+                    project,
+                    flow,
+                    version,
+                    user,
+                    e);
         }
         return null;
     }
 
     @Override
-    public String checkAndCreateContextID(String jsonFlow, String flowVersion, String workspace, String project, String flow, String user, boolean fullCheck) {
+    public String checkAndCreateContextID(
+            String jsonFlow,
+            String flowVersion,
+            String workspace,
+            String project,
+            String flow,
+            String user,
+            boolean fullCheck) {
         JsonObject flowObject = null;
         try {
             flowObject = new Gson().fromJson(jsonFlow, JsonObject.class);
-            if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR) ||
-                    StringUtils.isBlank(flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString())||
-                    !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
-                String contextID = createContextID(workspace,
-                        project,
-                        flow, flowVersion, user);
+            if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR)
+                    || StringUtils.isBlank(
+                            flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString())
+                    || !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
+                String contextID = createContextID(workspace, project, flow, flowVersion, user);
                 flowObject.addProperty(CSCommonUtils.CONTEXT_ID_STR, contextID);
             } else {
                 boolean updateContextId = false;
                 LinkisHAWorkFlowContextID contextID = null;
                 try {
-                    Object contextIDObj = SerializeHelper.deserializeContextID(flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString());
-                    contextID = (LinkisHAWorkFlowContextID)contextIDObj;
+                    Object contextIDObj =
+                            SerializeHelper.deserializeContextID(
+                                    flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString());
+                    contextID = (LinkisHAWorkFlowContextID) contextIDObj;
                     if (fullCheck) {
-                        if (!DSSCommonConf.DSS_IO_ENV.getValue().equalsIgnoreCase(contextID.getEnv())) {
+                        if (!DSSCommonConf.DSS_IO_ENV
+                                .getValue()
+                                .equalsIgnoreCase(contextID.getEnv())) {
                             updateContextId = true;
                         } else if (StringUtils.isBlank(contextID.getProject())
                                 || StringUtils.isBlank(contextID.getFlow())
                                 || StringUtils.isBlank(contextID.getVersion())) {
                             updateContextId = false;
-                        } else if ((null != contextID.getWorkSpace() && !contextID.getWorkSpace().equalsIgnoreCase(workspace))
+                        } else if ((null != contextID.getWorkSpace()
+                                        && !contextID.getWorkSpace().equalsIgnoreCase(workspace))
                                 || !contextID.getProject().equalsIgnoreCase(project)
                                 || !contextID.getFlow().equalsIgnoreCase(flow)
                                 || !contextID.getVersion().equalsIgnoreCase(flowVersion)) {
@@ -115,14 +137,18 @@ public class ContextServiceImpl implements ContextService {
                         }
                     }
                 } catch (ErrorException e0) {
-                    logger.error("Invalid contextID : {}, please contact with administrator", flowObject.get(CSCommonUtils.CONTEXT_ID_STR));
+                    logger.error(
+                            "Invalid contextID : {}, please contact with administrator",
+                            flowObject.get(CSCommonUtils.CONTEXT_ID_STR));
                 }
                 if (updateContextId) {
-                    String newContextID = createContextID(workspace,
-                            project,
-                            flow, flowVersion, user);
+                    String newContextID =
+                            createContextID(workspace, project, flow, flowVersion, user);
                     flowObject.addProperty(CSCommonUtils.CONTEXT_ID_STR, newContextID);
-                    logger.info("UpdateContextId true, old contextID : {}, new contextID : {}", CSCommonUtils.gson.toJson(contextID), CSCommonUtils.gson.toJson(newContextID));
+                    logger.info(
+                            "UpdateContextId true, old contextID : {}, new contextID : {}",
+                            CSCommonUtils.gson.toJson(contextID),
+                            CSCommonUtils.gson.toJson(newContextID));
                 }
             }
         } catch (Exception e) {
@@ -136,11 +162,12 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void checkAndSaveContext(String jsonFlow,String parentFlowID) throws DSSErrorException{
+    public void checkAndSaveContext(String jsonFlow, String parentFlowID) throws DSSErrorException {
         logger.info("jsonFlow => \n" + jsonFlow);
         try {
             JsonObject flowObject = new Gson().fromJson(jsonFlow, JsonObject.class);
-            if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR) || !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
+            if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR)
+                    || !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
                 logger.error("Did not have invalid contextID, save context failed.");
                 return;
             } else {
@@ -155,29 +182,47 @@ public class ContextServiceImpl implements ContextService {
 
                 // 保存flow的资源
                 if (flowObject.has(DSSCommonUtils.FLOW_RESOURCE_NAME)) {
-                    JsonArray flowRes = flowObject.get(DSSCommonUtils.FLOW_RESOURCE_NAME).getAsJsonArray();
-                    saveContextResource(contextIDStr, flowRes, contextClient, CSCommonUtils.FLOW_RESOURCE_PREFIX, null);
+                    JsonArray flowRes =
+                            flowObject.get(DSSCommonUtils.FLOW_RESOURCE_NAME).getAsJsonArray();
+                    saveContextResource(
+                            contextIDStr,
+                            flowRes,
+                            contextClient,
+                            CSCommonUtils.FLOW_RESOURCE_PREFIX,
+                            null);
                 }
                 if (flowObject.has(DSSCommonUtils.FLOW_PROP_NAME)) {
                     JsonElement flowProp = flowObject.get(DSSCommonUtils.FLOW_PROP_NAME);
-                    saveContextVariable(contextIDStr, flowProp, contextClient, CSCommonUtils.FLOW_VARIABLE_PREFIX, null);
+                    saveContextVariable(
+                            contextIDStr,
+                            flowProp,
+                            contextClient,
+                            CSCommonUtils.FLOW_VARIABLE_PREFIX,
+                            null);
                 }
                 // todo udf
 
                 // 保存节点的资源
                 if (flowObject.has(DSSCommonUtils.FLOW_NODE_NAME)) {
-                    JsonArray nodes = flowObject.get(DSSCommonUtils.FLOW_NODE_NAME).getAsJsonArray();
+                    JsonArray nodes =
+                            flowObject.get(DSSCommonUtils.FLOW_NODE_NAME).getAsJsonArray();
                     for (JsonElement node : nodes) {
                         JsonObject json = node.getAsJsonObject();
-                        String nodeName =json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString();
-                        initContextNodeVarInfo(contextIDStr,nodeName,contextClient);
+                        String nodeName = json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString();
+                        initContextNodeVarInfo(contextIDStr, nodeName, contextClient);
                         if (json.has(DSSCommonUtils.NODE_RESOURCE_NAME)) {
-                            JsonArray nodeRes = json.get(DSSCommonUtils.NODE_RESOURCE_NAME).getAsJsonArray();
-                            saveContextResource(contextIDStr, nodeRes, contextClient,
-                                    CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
+                            JsonArray nodeRes =
+                                    json.get(DSSCommonUtils.NODE_RESOURCE_NAME).getAsJsonArray();
+                            saveContextResource(
+                                    contextIDStr,
+                                    nodeRes,
+                                    contextClient,
+                                    CSCommonUtils.NODE_PREFIX,
+                                    json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
                         }
                         if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
-                            JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
+                            JsonObject nodePropObj =
+                                    json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
                         }
                     }
                 }
@@ -185,50 +230,77 @@ public class ContextServiceImpl implements ContextService {
                 saveFlowInfo(contextIDStr, parentFlowID, jsonFlow);
             }
         } catch (Exception e) {
-            logger.error("CheckAndSaveContext error. jsonFlow : {}, parentFlowId : {}, e : ", jsonFlow, parentFlowID, e);
-            throw new DSSErrorException(ErrorCode.INVALID_PARAMS, "CheckAndSaveContext error : " + e.getMessage());
+            logger.error(
+                    "CheckAndSaveContext error. jsonFlow : {}, parentFlowId : {}, e : ",
+                    jsonFlow,
+                    parentFlowID,
+                    e);
+            throw new DSSErrorException(
+                    ErrorCode.INVALID_PARAMS, "CheckAndSaveContext error : " + e.getMessage());
         }
     }
 
-    private void initContextNodeVarInfo(String contextIDStr,String nodeName,ContextClient contextClient){
+    private void initContextNodeVarInfo(
+            String contextIDStr, String nodeName, ContextClient contextClient) {
         try {
-            ContextID contextID  = SerializeHelper.deserializeContextID(contextIDStr);
-            contextClient.removeAllValueByKeyPrefixAndContextType(contextID, ContextType.Variable, CSCommonUtils.NODE_PREFIX + nodeName);
+            ContextID contextID = SerializeHelper.deserializeContextID(contextIDStr);
+            contextClient.removeAllValueByKeyPrefixAndContextType(
+                    contextID, ContextType.Variable, CSCommonUtils.NODE_PREFIX + nodeName);
         } catch (ErrorException e) {
-            logger.error("CheckAndSaveContext error. ContextID : {}, nodeName : {}, e : ", contextIDStr,nodeName, e);
+            logger.error(
+                    "CheckAndSaveContext error. ContextID : {}, nodeName : {}, e : ",
+                    contextIDStr,
+                    nodeName,
+                    e);
         }
     }
 
     @Override
-    public String checkAndInitContext(String jsonFlow, String parentFlowId, String workspace, String  projectName, String flowName, String flowVersion, String user) throws DSSErrorException {
-        if (StringUtils.isBlank(jsonFlow) ) {
+    public String checkAndInitContext(
+            String jsonFlow,
+            String parentFlowId,
+            String workspace,
+            String projectName,
+            String flowName,
+            String flowVersion,
+            String user)
+            throws DSSErrorException {
+        if (StringUtils.isBlank(jsonFlow)) {
             logger.error("Invalid jsonFlow : {} or parentFlowId : {}.", jsonFlow, parentFlowId);
-            throw new DSSErrorException(ErrorCode.INVALID_PARAMS, "Invalid jsonFlow : " + jsonFlow + ", or parentFlowId : " + parentFlowId + ".");
+            throw new DSSErrorException(
+                    ErrorCode.INVALID_PARAMS,
+                    "Invalid jsonFlow : " + jsonFlow + ", or parentFlowId : " + parentFlowId + ".");
         }
-        jsonFlow = checkAndCreateContextID(jsonFlow, flowVersion, workspace, projectName, flowName, user, true);
-        checkAndSaveContext(jsonFlow,parentFlowId);
+        jsonFlow =
+                checkAndCreateContextID(
+                        jsonFlow, flowVersion, workspace, projectName, flowName, user, true);
+        checkAndSaveContext(jsonFlow, parentFlowId);
         JsonObject flowObject = new Gson().fromJson(jsonFlow, JsonObject.class);
         return flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString();
     }
 
-
-
-    private void saveContextVariable(String contextIDStr, JsonElement variables, ContextClient contextClient, String variablePrefix, String nodeName) {
+    private void saveContextVariable(
+            String contextIDStr,
+            JsonElement variables,
+            ContextClient contextClient,
+            String variablePrefix,
+            String nodeName) {
         try {
             if (variables.isJsonArray()) {
                 JsonArray flowProp = variables.getAsJsonArray();
                 for (JsonElement prop : flowProp) {
-                    Set<Map.Entry<String, JsonElement>> entrySet = prop.getAsJsonObject().entrySet();
+                    Set<Map.Entry<String, JsonElement>> entrySet =
+                            prop.getAsJsonObject().entrySet();
                     // assign entry num is 1
                     if (null != entrySet) {
                         for (Map.Entry<String, JsonElement> entry : entrySet) {
                             if (!entry.getValue().isJsonPrimitive()) {
                                 continue;
                             }
-                            saveContextVariableKeyValue(contextIDStr, contextClient, variablePrefix, entry, nodeName);
+                            saveContextVariableKeyValue(
+                                    contextIDStr, contextClient, variablePrefix, entry, nodeName);
                         }
                     }
-
                 }
             } else if (variables.isJsonObject()) {
                 JsonObject variableJson = variables.getAsJsonObject();
@@ -236,20 +308,30 @@ public class ContextServiceImpl implements ContextService {
                     if (!entry.getValue().isJsonPrimitive()) {
                         continue;
                     }
-                    saveContextVariableKeyValue(contextIDStr, contextClient, variablePrefix, entry, nodeName);
+                    saveContextVariableKeyValue(
+                            contextIDStr, contextClient, variablePrefix, entry, nodeName);
                 }
             } else {
                 logger.error("Invalid JsonElement variables : {}", variables.toString());
             }
 
         } catch (ErrorException e) {
-            logger.error("SaveContextVariable failed. contextIDStr : {}, variables : {}, variablePrefix : {}, e : ",
-                    contextIDStr, variables.toString(), variablePrefix, e);
+            logger.error(
+                    "SaveContextVariable failed. contextIDStr : {}, variables : {}, variablePrefix : {}, e : ",
+                    contextIDStr,
+                    variables.toString(),
+                    variablePrefix,
+                    e);
         }
-
     }
 
-    private void saveContextVariableKeyValue(String contextIDStr, ContextClient contextClient, String uniKeyPrefix, Map.Entry<String, JsonElement> entry, String nodeName) throws ErrorException {
+    private void saveContextVariableKeyValue(
+            String contextIDStr,
+            ContextClient contextClient,
+            String uniKeyPrefix,
+            Map.Entry<String, JsonElement> entry,
+            String nodeName)
+            throws ErrorException {
         String contextKeyPrefix = null;
         switch (uniKeyPrefix) {
             case CSCommonUtils.WORKSPACE_VARIABLE_PREFIX:
@@ -274,10 +356,17 @@ public class ContextServiceImpl implements ContextService {
         ContextValue contextValue = new CommonContextValue();
         contextValue.setValue(linkisVariable);
         ContextKeyValue contextKeyValue = new CommonContextKeyValue(contextKey, contextValue);
-        contextClient.setContextKeyValue(SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
+        contextClient.setContextKeyValue(
+                SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
     }
 
-    private void saveContextResource(String contextIDStr, JsonArray flowRes, ContextClient contextClient, String uniKeyPrefix, String nodeName) throws ErrorException {
+    private void saveContextResource(
+            String contextIDStr,
+            JsonArray flowRes,
+            ContextClient contextClient,
+            String uniKeyPrefix,
+            String nodeName)
+            throws ErrorException {
         String contextKeyPrefix = null;
         switch (uniKeyPrefix) {
             case CSCommonUtils.WORKSPACE_RESOURCE_PREFIX:
@@ -296,11 +385,21 @@ public class ContextServiceImpl implements ContextService {
             LinkisBMLResource bmlResource = new LinkisBMLResource();
             JsonObject json = res.getAsJsonObject();
             if (!json.has("fileName") || !json.has("resourceId") || !json.has("version")) {
-                logger.warn("Invalid resource: res : {}, contextidStr : {}, all res : {} ", CSCommonUtils.gson.toJson(json), contextIDStr, CSCommonUtils.gson.toJson(flowRes));
+                logger.warn(
+                        "Invalid resource: res : {}, contextidStr : {}, all res : {} ",
+                        CSCommonUtils.gson.toJson(json),
+                        contextIDStr,
+                        CSCommonUtils.gson.toJson(flowRes));
                 continue;
             }
-            if (json.get("fileName") instanceof JsonNull || json.get("resourceId") instanceof JsonNull || json.get("version") instanceof JsonNull) {
-                logger.warn("Invalid resource: res : {}, contextidStr : {}, all res : {} ", CSCommonUtils.gson.toJson(json), contextIDStr, CSCommonUtils.gson.toJson(flowRes));
+            if (json.get("fileName") instanceof JsonNull
+                    || json.get("resourceId") instanceof JsonNull
+                    || json.get("version") instanceof JsonNull) {
+                logger.warn(
+                        "Invalid resource: res : {}, contextidStr : {}, all res : {} ",
+                        CSCommonUtils.gson.toJson(json),
+                        contextIDStr,
+                        CSCommonUtils.gson.toJson(flowRes));
                 continue;
             }
             bmlResource.setDownloadedFileName(json.get("fileName").getAsString());
@@ -313,13 +412,21 @@ public class ContextServiceImpl implements ContextService {
             ContextValue contextValue = new CommonContextValue();
             contextValue.setValue(bmlResource);
             ContextKeyValue contextKeyValue = new CommonContextKeyValue(contextKey, contextValue);
-            contextClient.setContextKeyValue(SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
+            contextClient.setContextKeyValue(
+                    SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
             //// todo test
-            logger.info("Debug: saved contextKeyValue : {}", CSCommonUtils.gson.toJson(contextKeyValue));
+            logger.info(
+                    "Debug: saved contextKeyValue : {}",
+                    CSCommonUtils.gson.toJson(contextKeyValue));
         }
     }
 
-    private void saveContextResource(String contextIDStr, List<Resource> resourceList, ContextClient contextClient, String uniKeyPrefix) throws ErrorException {
+    private void saveContextResource(
+            String contextIDStr,
+            List<Resource> resourceList,
+            ContextClient contextClient,
+            String uniKeyPrefix)
+            throws ErrorException {
 
         String contextKeyPrefix = null;
         switch (uniKeyPrefix) {
@@ -344,15 +451,18 @@ public class ContextServiceImpl implements ContextService {
             ContextValue contextValue = new CommonContextValue();
             contextValue.setValue(bmlResource);
             ContextKeyValue contextKeyValue = new CommonContextKeyValue(contextKey, contextValue);
-            contextClient.setContextKeyValue(SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
+            contextClient.setContextKeyValue(
+                    SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
             //// todo test
-            logger.info("Debug: saved contextKeyValue : {}", CSCommonUtils.gson.toJson(contextKeyValue));
+            logger.info(
+                    "Debug: saved contextKeyValue : {}",
+                    CSCommonUtils.gson.toJson(contextKeyValue));
         }
     }
 
-
     /**
      * 保存节点间关系信息
+     *
      * @param contextIDStr
      * @param parentFlowID
      * @param parentFlowID
@@ -373,7 +483,7 @@ public class ContextServiceImpl implements ContextService {
         flowInfoMap.put(DSSCommonUtils.FLOW_EDGES_NAME, flowEdges);
         // 保存父节点 可以为空
         flowInfoMap.put(DSSCommonUtils.FLOW_PARENT_NAME, parentFlowID);
-        //保存节点名
+        // 保存节点名
         JsonObject idNodeNameJson = new JsonObject();
         if (flowJsonObject.has(DSSCommonUtils.FLOW_NODE_NAME)) {
             JsonArray nodes = flowJsonObject.getAsJsonArray(DSSCommonUtils.FLOW_NODE_NAME);
@@ -394,13 +504,17 @@ public class ContextServiceImpl implements ContextService {
         contextValue.setValue(flowInfos);
         ContextKeyValue contextKeyValue = new CommonContextKeyValue(contextKey, contextValue);
         try {
-            contextClient.setContextKeyValue(SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
+            contextClient.setContextKeyValue(
+                    SerializeHelper.deserializeContextID(contextIDStr), contextKeyValue);
             //// todo test
-            logger.info("ContextID : {}, \nContextKey : {}, \nContextValue : {}",
+            logger.info(
+                    "ContextID : {}, \nContextKey : {}, \nContextValue : {}",
                     CSCommonUtils.gson.toJson(SerializeHelper.deserializeContextID(contextIDStr)),
                     CSCommonUtils.gson.toJson(contextKey),
                     CSCommonUtils.gson.toJson(contextValue));
-            ContextValue contextValue1 = contextClient.getContextValue(SerializeHelper.deserializeContextID(contextIDStr), contextKey);
+            ContextValue contextValue1 =
+                    contextClient.getContextValue(
+                            SerializeHelper.deserializeContextID(contextIDStr), contextKey);
             logger.info(CSCommonUtils.gson.toJson(contextValue1));
         } catch (ErrorException e) {
             logger.error("Set ContextKeyValue error. contextIDStr ");

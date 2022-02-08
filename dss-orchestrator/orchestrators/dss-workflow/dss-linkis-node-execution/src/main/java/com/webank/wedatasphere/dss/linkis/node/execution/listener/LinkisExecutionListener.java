@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.linkis.node.execution.listener;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 
-
 public interface LinkisExecutionListener {
 
     void onStatusChanged(String fromState, String toState, Job job);

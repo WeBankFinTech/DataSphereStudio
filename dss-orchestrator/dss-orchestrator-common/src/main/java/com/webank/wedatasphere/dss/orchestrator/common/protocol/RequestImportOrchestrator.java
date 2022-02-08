@@ -20,9 +20,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
 import java.util.List;
 
-
 public class RequestImportOrchestrator {
-
 
     private String userName;
     private String workspaceName;
@@ -34,15 +32,16 @@ public class RequestImportOrchestrator {
     private List<DSSLabel> dssLabels;
     private String workspaceStr;
 
-    public RequestImportOrchestrator(String userName,
-                                     String workspaceName,
-                                     String projectName,
-                                     Long projectId,
-                                     String resourceId,
-                                     String bmlVersion,
-                                     String orchestratorName,
-                                     List<DSSLabel> dssLabels,
-                                     String workspaceStr) {
+    public RequestImportOrchestrator(
+            String userName,
+            String workspaceName,
+            String projectName,
+            Long projectId,
+            String resourceId,
+            String bmlVersion,
+            String orchestratorName,
+            List<DSSLabel> dssLabels,
+            String workspaceStr) {
         this.userName = userName;
         this.workspaceName = workspaceName;
         this.projectName = projectName;
@@ -53,7 +52,6 @@ public class RequestImportOrchestrator {
         this.orchestratorName = orchestratorName;
         this.workspaceStr = workspaceStr;
     }
-
 
     public String getUserName() {
         return userName;

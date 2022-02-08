@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 
-
-public abstract class AbstractRefQueryService extends AbstractDevelopmentService implements RefQueryService {
+public abstract class AbstractRefQueryService extends AbstractDevelopmentService
+        implements RefQueryService {
 
     protected abstract RefQueryOperation createRefQueryOperation();
 

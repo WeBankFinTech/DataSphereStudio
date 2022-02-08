@@ -16,13 +16,13 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-
-public class CommonResponseRef extends com.webank.wedatasphere.dss.standard.common.entity.ref.CommonResponseRef {
+public class CommonResponseRef
+        extends com.webank.wedatasphere.dss.standard.common.entity.ref.CommonResponseRef {
 
     protected Long orcId;
     protected String content;
     protected String name;
-    protected  boolean result;
+    protected boolean result;
 
     public boolean getResult() {
         return this.result;
@@ -36,8 +36,8 @@ public class CommonResponseRef extends com.webank.wedatasphere.dss.standard.comm
         super(responseBody, status);
     }
 
-    public CommonResponseRef(){
-        super("",0);
+    public CommonResponseRef() {
+        super("", 0);
     }
 
     public void setOrcId(Long orcId) {
@@ -55,5 +55,4 @@ public class CommonResponseRef extends com.webank.wedatasphere.dss.standard.comm
     public void setContent(String content) {
         this.content = content;
     }
-
 }

@@ -19,8 +19,8 @@ package com.webank.wedatasphere.dss.appconn.visualis.model;
 import java.util.List;
 import java.util.Map;
 
-public class WidgetResultData extends HttpResponseModel{
-    public static class Column{
+public class WidgetResultData extends HttpResponseModel {
+    public static class Column {
         private String name;
         private String type;
 
@@ -41,8 +41,7 @@ public class WidgetResultData extends HttpResponseModel{
         }
     }
 
-
-    public static class Data{
+    public static class Data {
         private List<Column> columns;
         private List<Map<String, Object>> resultList;
 
@@ -73,4 +72,3 @@ public class WidgetResultData extends HttpResponseModel{
         this.data = data;
     }
 }
-

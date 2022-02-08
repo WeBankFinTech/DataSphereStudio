@@ -20,13 +20,15 @@ import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecution
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 
-
-public class JobRuntimeParamsParser implements JobParser{
+public class JobRuntimeParamsParser implements JobParser {
 
     @Override
     public void parseJob(Job job) {
-        if(job instanceof LinkisJob) {
-            job.getRuntimeParams().put(LinkisJobExecutionConfiguration.LINKIS_SUBMIT_USER,((LinkisJob) job).getSubmitUser());
+        if (job instanceof LinkisJob) {
+            job.getRuntimeParams()
+                    .put(
+                            LinkisJobExecutionConfiguration.LINKIS_SUBMIT_USER,
+                            ((LinkisJob) job).getSubmitUser());
         }
     }
 }

@@ -16,20 +16,16 @@
 
 package com.webank.wedatapshere.dss.appconn.datachecker.connector;
 
-import com.alibaba.druid.pool.DruidDataSource;
-
 import com.webank.wedatapshere.dss.appconn.datachecker.DataChecker;
 import com.webank.wedatapshere.dss.appconn.datachecker.common.MaskCheckNotExistException;
 import com.webank.wedatapshere.dss.appconn.datachecker.utils.HttpUtils;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,6 +41,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
+import com.alibaba.druid.pool.DruidDataSource;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 public class DataCheckerDao {
 
     private static final String SQL_SOURCE_TYPE_JOB_TABLE =
@@ -57,8 +60,8 @@ public class DataCheckerDao {
             "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? AND status = '1';";
 
     private static final String SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION =
-            "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? " +
-                    "AND (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(STR_TO_DATE(modify_time, '%Y-%m-%d %H:%i:%s'))) <= ? AND status = '1';";
+            "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? "
+                    + "AND (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(STR_TO_DATE(modify_time, '%Y-%m-%d %H:%i:%s'))) <= ? AND status = '1';";
 
     private static DataSource jobDS;
     private static DataSource bdpDS;
@@ -75,7 +78,8 @@ public class DataCheckerDao {
         return instance;
     }
 
-    public boolean validateTableStatusFunction(Properties props, Logger log, RefExecutionAction action) {
+    public boolean validateTableStatusFunction(
+            Properties props, Logger log, RefExecutionAction action) {
         if (jobDS == null) {
             jobDS = DataDruidFactory.getJobInstance(props, log);
             if (jobDS == null) {
@@ -91,24 +95,31 @@ public class DataCheckerDao {
             }
         }
         removeBlankSpace(props);
-        log.info("=============================Data Check Start==========================================");
+        log.info(
+                "=============================Data Check Start==========================================");
         String dataCheckerInfo = props.getProperty(DataChecker.DATA_OBJECT);
-        if(null!=action.getExecutionRequestRefContext()) {
-            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
+        if (null != action.getExecutionRequestRefContext()) {
+            action.getExecutionRequestRefContext()
+                    .appendLog("Database table partition info : " + dataCheckerInfo);
         }
         log.info("(DataChecker info) database table partition info : " + dataCheckerInfo);
         long waitTime = Long.valueOf(props.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
-        int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+        int queryFrequency =
+                Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
         log.info("(DataChecker info) wait time : " + waitTime);
         log.info("(DataChecker info) query frequency : " + queryFrequency);
         List<Map<String, String>> dataObjectList = extractProperties(props);
         try (Connection jobConn = jobDS.getConnection();
-             Connection bdpConn = bdpDS.getConnection()) {
-            boolean flag = dataObjectList
-                    .stream()
-                    .allMatch(proObjectMap -> getDataCheckResult(proObjectMap, jobConn, bdpConn, props, log));
+                Connection bdpConn = bdpDS.getConnection()) {
+            boolean flag =
+                    dataObjectList.stream()
+                            .allMatch(
+                                    proObjectMap ->
+                                            getDataCheckResult(
+                                                    proObjectMap, jobConn, bdpConn, props, log));
             if (flag) {
-                log.info("=============================Data Check End==========================================");
+                log.info(
+                        "=============================Data Check End==========================================");
                 return true;
             }
 
@@ -116,36 +127,51 @@ public class DataCheckerDao {
             throw new RuntimeException("get DataChecker result failed", e);
         }
 
-        log.info("=============================Data Check End==========================================");
+        log.info(
+                "=============================Data Check End==========================================");
         return false;
     }
 
-    private boolean getDataCheckResult(Map<String, String> proObjectMap, Connection jobConn, Connection bdpConn, Properties props, Logger log) {
-        Predicate<Map<String, String>> hasDataSource = p -> {
-            if (StringUtils.isEmpty(proObjectMap.get(DataChecker.SOURCE_TYPE))) {
-                return false;
-            } else {
-                return true;
-            }
-        };
+    private boolean getDataCheckResult(
+            Map<String, String> proObjectMap,
+            Connection jobConn,
+            Connection bdpConn,
+            Properties props,
+            Logger log) {
+        Predicate<Map<String, String>> hasDataSource =
+                p -> {
+                    if (StringUtils.isEmpty(proObjectMap.get(DataChecker.SOURCE_TYPE))) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                };
         Predicate<Map<String, String>> hasNotDataSource = hasDataSource.negate();
         Supplier<String> sourceType = () -> proObjectMap.get(DataChecker.SOURCE_TYPE).toLowerCase();
-        Predicate<Map<String, String>> isJobDataSource = p -> sourceType.get().equals("hivedb") || sourceType.get().equals("job");
-        Predicate<Map<String, String>> isBdpDataSource = p -> sourceType.get().equals("maskdb") || sourceType.get().equals("bdp");
-        Predicate<Map<String, String>> isOdsDB = p -> {
-            String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT)
-                    .replace(" ", "").trim();
-            String dbName = dataObject.split("\\.")[0];
-            return dbName.contains("_ods");
-        };
+        Predicate<Map<String, String>> isJobDataSource =
+                p -> sourceType.get().equals("hivedb") || sourceType.get().equals("job");
+        Predicate<Map<String, String>> isBdpDataSource =
+                p -> sourceType.get().equals("maskdb") || sourceType.get().equals("bdp");
+        Predicate<Map<String, String>> isOdsDB =
+                p -> {
+                    String dataObject =
+                            proObjectMap.get(DataChecker.DATA_OBJECT).replace(" ", "").trim();
+                    String dbName = dataObject.split("\\.")[0];
+                    return dbName.contains("_ods");
+                };
         Predicate<Map<String, String>> isNotOdsDB = isOdsDB.negate();
-        Predicate<Map<String, String>> isCheckMetadata = (hasDataSource.and(isJobDataSource)).or(hasNotDataSource.and(isNotOdsDB));
-        Predicate<Map<String, String>> isCheckMask = (hasDataSource.and(isBdpDataSource)).or(hasNotDataSource.and(isOdsDB));
+        Predicate<Map<String, String>> isCheckMetadata =
+                (hasDataSource.and(isJobDataSource)).or(hasNotDataSource.and(isNotOdsDB));
+        Predicate<Map<String, String>> isCheckMask =
+                (hasDataSource.and(isBdpDataSource)).or(hasNotDataSource.and(isOdsDB));
         return isCheckMetadata.test(proObjectMap)
                 ? getJobTotalCount(proObjectMap, jobConn, log) > 0
-                : isCheckMask.test(proObjectMap) &&
-                (getBdpTotalCount(proObjectMap, bdpConn, log, props) > 0
-                        || "success".equals(fetchMaskCode(proObjectMap, log, props).get("maskStatus")));
+                : isCheckMask.test(proObjectMap)
+                        && (getBdpTotalCount(proObjectMap, bdpConn, log, props) > 0
+                                || "success"
+                                        .equals(
+                                                fetchMaskCode(proObjectMap, log, props)
+                                                        .get("maskStatus")));
     }
 
     private void sleep(long sleepTime) {
@@ -158,10 +184,13 @@ public class DataCheckerDao {
 
     private void removeBlankSpace(Properties props) {
         try {
-            props.entrySet().forEach(entry -> {
-                String value = entry.getValue().toString().replaceAll(" ", "").trim();
-                entry.setValue(value);
-            });
+            props.entrySet()
+                    .forEach(
+                            entry -> {
+                                String value =
+                                        entry.getValue().toString().replaceAll(" ", "").trim();
+                                entry.setValue(value);
+                            });
         } catch (Exception e) {
             throw new RuntimeException("remove job space char failed", e);
         }
@@ -169,7 +198,8 @@ public class DataCheckerDao {
 
     private List<Map<String, String>> extractProperties(Properties p) {
         return p.keySet().stream()
-                .map(key -> key2Map(key, p)).filter(x -> x.size() > 0)
+                .map(key -> key2Map(key, p))
+                .filter(x -> x.size() > 0)
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +229,8 @@ public class DataCheckerDao {
         return proMap;
     }
 
-    private PreparedStatement getJobStatement(Connection conn, String dataObject) throws SQLException {
+    private PreparedStatement getJobStatement(Connection conn, String dataObject)
+            throws SQLException {
         String dataScape = dataObject.contains("{") ? "Partition" : "Table";
         String[] dataObjectArray = dataObject.split("\\.");
         String dbName = dataObject.split("\\.")[0];
@@ -228,7 +259,8 @@ public class DataCheckerDao {
         }
     }
 
-    private PreparedStatement getBdpStatement(Connection conn, String dataObject, String timeScape) throws SQLException {
+    private PreparedStatement getBdpStatement(Connection conn, String dataObject, String timeScape)
+            throws SQLException {
         String dataScape = dataObject.contains("{") ? "Partition" : "Table";
         String dbName = dataObject.split("\\.")[0];
         String tableName = dataObject.split("\\.")[1];
@@ -271,7 +303,8 @@ public class DataCheckerDao {
         }
     }
 
-    private long getBdpTotalCount(Map<String, String> proObjectMap, Connection conn, Logger log, Properties props) {
+    private long getBdpTotalCount(
+            Map<String, String> proObjectMap, Connection conn, Logger log, Properties props) {
         String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT);
         if (dataObject != null) {
             dataObject = dataObject.replace(" ", "").trim();
@@ -288,8 +321,10 @@ public class DataCheckerDao {
         }
     }
 
-    private Map<String, String> fetchMaskCode(Map<String, String> proObjectMap, Logger log, Properties props) {
-        log.info("=============================调用BDP MASK接口查询数据状态==========================================");
+    private Map<String, String> fetchMaskCode(
+            Map<String, String> proObjectMap, Logger log, Properties props) {
+        log.info(
+                "=============================调用BDP MASK接口查询数据状态==========================================");
         Map<String, String> resultMap = new HashMap();
         String maskUrl = props.getProperty(DataChecker.MASK_URL);
         String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT);
@@ -310,21 +345,33 @@ public class DataCheckerDao {
             tableName = tableName.split("\\{")[0];
         }
         try {
-            RequestBody requestBody = new FormBody.Builder()
-                    .add("targetDb", dbName)
-                    .add("targetTable", tableName)
-                    .add("partition", partitionName)
-                    .build();
+            RequestBody requestBody =
+                    new FormBody.Builder()
+                            .add("targetDb", dbName)
+                            .add("targetTable", tableName)
+                            .add("partition", partitionName)
+                            .build();
             Map<String, String> dataMap = HttpUtils.initSelectParams(props);
-            log.info("request body:dbName--" + dbName + " tableName--" + tableName + " partitionName--" + partitionName);
+            log.info(
+                    "request body:dbName--"
+                            + dbName
+                            + " tableName--"
+                            + tableName
+                            + " partitionName--"
+                            + partitionName);
             Response response = HttpUtils.httpClientHandleBase(maskUrl, requestBody, dataMap);
             handleResponse(response, resultMap, log);
         } catch (IOException e) {
             log.error("fetch data from BDP MASK failed ");
             resultMap.put("maskStatus", "noPrepare");
         } catch (MaskCheckNotExistException e) {
-            String errorMessage = "fetch data from BDP MASK failed" +
-                    "please check database: " + dbName + ",table: " + tableName + "is exist";
+            String errorMessage =
+                    "fetch data from BDP MASK failed"
+                            + "please check database: "
+                            + dbName
+                            + ",table: "
+                            + tableName
+                            + "is exist";
             log.error(errorMessage);
             throw new RuntimeException(errorMessage, e);
         }
@@ -363,5 +410,4 @@ public class DataCheckerDao {
             jobDSObject.close();
         }
     }
-
 }

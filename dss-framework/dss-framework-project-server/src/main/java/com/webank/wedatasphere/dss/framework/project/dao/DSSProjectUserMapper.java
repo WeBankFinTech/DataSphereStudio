@@ -16,32 +16,37 @@
 
 package com.webank.wedatasphere.dss.framework.project.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 
+import java.util.List;
 
 @Mapper
 public interface DSSProjectUserMapper extends BaseMapper<DSSProjectUser> {
     @Insert({
-            "<script>",
-            "insert into dss_project_user",
-            "(project_id, username, workspace_id, priv, last_update_time)",
-            "values",
-            "<foreach collection='list' item='item' open='(' separator='),(' close=')'>",
-            " #{item.projectId}, #{item.username}, #{item.workspaceId}, #{item.priv}, now()",
-            "</foreach>",
-            "</script>"
+        "<script>",
+        "insert into dss_project_user",
+        "(project_id, username, workspace_id, priv, last_update_time)",
+        "values",
+        "<foreach collection='list' item='item' open='(' separator='),(' close=')'>",
+        " #{item.projectId}, #{item.username}, #{item.workspaceId}, #{item.priv}, now()",
+        "</foreach>",
+        "</script>"
     })
     void insertBatchProjectUser(@Param("list") List<DSSProjectUser> projectUserList);
 
     @Delete("delete from dss_project_user where project_id = #{projectID}")
     void deleteAllPriv(@Param("projectID") long projectID);
 
-    @Select("SELECT COUNT(0) FROM dss_workspace_user_role WHERE workspace_id = #{workspaceId} AND username = #{username} AND role_id = #{roleId} ")
-    Long isAdminByUsername(@Param("workspaceId")Long workspaceId,@Param("username")String username,@Param("roleId")int roleId);
-    List<Long> getUserWorkspaceAdminRole(@Param("workspaceId") Long workspaceId, @Param("username") String username);
+    @Select(
+            "SELECT COUNT(0) FROM dss_workspace_user_role WHERE workspace_id = #{workspaceId} AND username = #{username} AND role_id = #{roleId} ")
+    Long isAdminByUsername(
+            @Param("workspaceId") Long workspaceId,
+            @Param("username") String username,
+            @Param("roleId") int roleId);
 
+    List<Long> getUserWorkspaceAdminRole(
+            @Param("workspaceId") Long workspaceId, @Param("username") String username);
 }

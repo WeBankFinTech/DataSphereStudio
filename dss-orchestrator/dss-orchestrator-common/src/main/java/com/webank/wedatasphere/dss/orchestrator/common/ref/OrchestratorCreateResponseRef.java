@@ -18,31 +18,25 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-
 public interface OrchestratorCreateResponseRef extends ResponseRef {
 
     /**
      * 返回第三方应用和orchestrator关联的Id
+     *
      * @return
      */
-
-
     void setOrcId(Long orcId);
 
     Long getOrcId();
 
-
     /**
      * 返回第三方应用创建时返回的Content的内容
+     *
      * @return
      */
     String getContent();
 
     void setContent(String content);
-
-
-
-
 
     Long getOrchestratorVersionId();
 

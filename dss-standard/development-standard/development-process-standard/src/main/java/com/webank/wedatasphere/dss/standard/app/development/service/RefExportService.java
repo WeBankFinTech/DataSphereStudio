@@ -18,8 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-
 
 public interface RefExportService extends DevelopmentService {
     <K extends RequestRef> RefExportOperation<K> getRefExportOperation();

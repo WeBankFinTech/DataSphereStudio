@@ -18,7 +18,4 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 
-
-public interface OrchestratorFrameworkAppConn extends AppConn  {
-
-}
+public interface OrchestratorFrameworkAppConn extends AppConn {}

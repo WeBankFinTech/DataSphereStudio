@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.core.constant;
 
-
 public class WorkflowConstant {
-    public final static String PROXY_USER = "user.to.proxy";
+    public static final String PROXY_USER = "user.to.proxy";
 }

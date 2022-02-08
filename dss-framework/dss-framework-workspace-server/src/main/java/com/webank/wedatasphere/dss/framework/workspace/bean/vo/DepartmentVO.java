@@ -16,15 +16,12 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-
 public class DepartmentVO {
     private int id;
     private String name;
     private String frontName;
 
-    public DepartmentVO(){
-
-    }
+    public DepartmentVO() {}
 
     public DepartmentVO(int id, String name, String frontName) {
         this.id = id;

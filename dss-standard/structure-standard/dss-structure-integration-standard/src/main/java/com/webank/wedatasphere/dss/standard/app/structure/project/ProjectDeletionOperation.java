@@ -20,9 +20,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-
 public interface ProjectDeletionOperation extends StructureOperation {
 
     ResponseRef deleteProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException;
-
 }

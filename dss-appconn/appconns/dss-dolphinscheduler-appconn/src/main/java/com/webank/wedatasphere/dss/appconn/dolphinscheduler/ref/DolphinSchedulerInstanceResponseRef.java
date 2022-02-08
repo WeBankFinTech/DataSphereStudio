@@ -1,12 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DolphinSchedulerInstanceResponseRef extends AbstractResponseRef {
 

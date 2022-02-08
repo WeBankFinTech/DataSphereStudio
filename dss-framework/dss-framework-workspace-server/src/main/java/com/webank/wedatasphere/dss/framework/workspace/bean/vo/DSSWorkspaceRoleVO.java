@@ -18,14 +18,12 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.io.Serializable;
 
-
 public class DSSWorkspaceRoleVO implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     private int roleId;
     private String roleName;
     private String roleFrontName;
-
 
     public int getRoleId() {
         return roleId;
@@ -53,10 +51,15 @@ public class DSSWorkspaceRoleVO implements Serializable {
 
     @Override
     public String toString() {
-        return "DSSWorkspaceRoleVO{" +
-                "roleId=" + roleId +
-                ", roleName='" + roleName + '\'' +
-                ", roleFrontName='" + roleFrontName + '\'' +
-                '}';
+        return "DSSWorkspaceRoleVO{"
+                + "roleId="
+                + roleId
+                + ", roleName='"
+                + roleName
+                + '\''
+                + ", roleFrontName='"
+                + roleFrontName
+                + '\''
+                + '}';
     }
 }

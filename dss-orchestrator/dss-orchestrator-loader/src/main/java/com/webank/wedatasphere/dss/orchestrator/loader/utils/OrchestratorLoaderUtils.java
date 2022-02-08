@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.orchestrator.loader.utils;
 
+import org.apache.commons.math3.util.Pair;
+
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -31,41 +33,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.util.List;
-import org.apache.commons.math3.util.Pair;
 
 @Component
 public class OrchestratorLoaderUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorLoaderUtils.class);
-    @Autowired
-    private OrchestratorManager orchestratorManager;
+    @Autowired private OrchestratorManager orchestratorManager;
     private static OrchestratorLoaderUtils orchestratorLoaderUtils;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         orchestratorLoaderUtils = this;
-        orchestratorLoaderUtils.orchestratorManager=this.orchestratorManager;
+        orchestratorLoaderUtils.orchestratorManager = this.orchestratorManager;
     }
 
-
-    public static Pair<AppInstance,DevelopmentIntegrationStandard> getOrcDevelopStandard(String userName,
-                                                                                         String workspaceName,
-                                                                                         DSSOrchestratorInfo dssOrchestratorInfo,
-                                                                                         List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
-        DSSOrchestrator dssOrchestrator = orchestratorLoaderUtils.orchestratorManager.getOrCreateOrchestrator(userName,
-                workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
+    public static Pair<AppInstance, DevelopmentIntegrationStandard> getOrcDevelopStandard(
+            String userName,
+            String workspaceName,
+            DSSOrchestratorInfo dssOrchestratorInfo,
+            List<DSSLabel> dssLabels)
+            throws NoSuchAppInstanceException {
+        DSSOrchestrator dssOrchestrator =
+                orchestratorLoaderUtils.orchestratorManager.getOrCreateOrchestrator(
+                        userName,
+                        workspaceName,
+                        dssOrchestratorInfo.getType(),
+                        dssOrchestratorInfo.getAppConnName(),
+                        dssLabels);
         if (null != dssOrchestrator) {
             AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
 
-            if(orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
-                DevelopmentIntegrationStandard  developmentIntegrationStandard = ((OnlyDevelopmentAppConn) orchestratorAppConn).getOrCreateDevelopmentStandard();
+            if (orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
+                DevelopmentIntegrationStandard developmentIntegrationStandard =
+                        ((OnlyDevelopmentAppConn) orchestratorAppConn)
+                                .getOrCreateDevelopmentStandard();
 
-                //todo labels判别
-                List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
+                // todo labels判别
+                List<AppInstance> appInstance =
+                        orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
                 if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
-                   return new Pair(appInstance.get(0),developmentIntegrationStandard);
+                    return new Pair(appInstance.get(0), developmentIntegrationStandard);
 
-                }else{
+                } else {
                     return null;
                 }
             }

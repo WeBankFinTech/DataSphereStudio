@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.appconn.visualis.project.VisualisProjectServi
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 
-
 public class VisualisStructureIntegrationStandard extends AbstractStructureIntegrationStandard {
 
     @Override

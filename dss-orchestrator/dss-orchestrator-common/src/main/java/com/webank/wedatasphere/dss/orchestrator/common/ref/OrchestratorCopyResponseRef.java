@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-
 public interface OrchestratorCopyResponseRef extends ResponseRef {
 
     long getCopyOrcId();
@@ -26,5 +25,4 @@ public interface OrchestratorCopyResponseRef extends ResponseRef {
     long getCopyTargetAppId();
 
     String getCopyTargetContent();
-
 }

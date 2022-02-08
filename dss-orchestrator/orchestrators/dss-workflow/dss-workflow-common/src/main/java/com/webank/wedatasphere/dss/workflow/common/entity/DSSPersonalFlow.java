@@ -16,7 +16,4 @@
 
 package com.webank.wedatasphere.dss.workflow.common.entity;
 
-
-public class DSSPersonalFlow extends DSSJsonFlow {
-
-}
+public class DSSPersonalFlow extends DSSJsonFlow {}

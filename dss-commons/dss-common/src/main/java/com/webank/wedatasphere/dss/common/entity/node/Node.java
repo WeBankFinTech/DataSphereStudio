@@ -16,12 +16,11 @@
 
 package com.webank.wedatasphere.dss.common.entity.node;
 
-
 import java.util.List;
 
 /*
-    Node 接口
- */
+   Node 接口
+*/
 public interface Node {
     String getId();
 

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
+import org.apache.linkis.server.BDPJettyServerHelper;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -27,7 +28,6 @@ import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,54 +40,76 @@ import java.util.*;
 
 @Service
 public class NodeInputServiceImpl implements NodeInputService {
-    @Autowired
-    private BMLService bmlService;
+    @Autowired private BMLService bmlService;
 
-    @Autowired
-    private NodeParser nodeParser;
+    @Autowired private NodeParser nodeParser;
 
-    @Autowired
-    private WorkflowNodeService nodeService;
+    @Autowired private WorkflowNodeService nodeService;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     @Override
-    public String uploadResourceToBml(String userName, String nodeJson, String inputResourcePath, String projectName) throws IOException {
+    public String uploadResourceToBml(
+            String userName, String nodeJson, String inputResourcePath, String projectName)
+            throws IOException {
         List<Resource> resources = nodeParser.getNodeResource(nodeJson);
         if (resources != null && resources.size() > 0) {
-            resources.forEach(resource -> {
-                if (resource.getVersion() != null && resource.getFileName() != null && resource.getResourceId() != null) {
-                    InputStream resourceInputStream = readResource(userName, resource, inputResourcePath);
-                    Map<String, Object> bmlReturnMap = bmlService.upload(userName,
-                            resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-                    resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-                    resource.setVersion(bmlReturnMap.get("version").toString());
-                } else {
-                    logger.warn("Illegal resource information");
-                    logger.warn("username:{},fileName:{},version:{},resourceId:{}", userName, resource.getFileName(), resource.getVersion(), resource.getResourceId());
-                }
-            });
+            resources.forEach(
+                    resource -> {
+                        if (resource.getVersion() != null
+                                && resource.getFileName() != null
+                                && resource.getResourceId() != null) {
+                            InputStream resourceInputStream =
+                                    readResource(userName, resource, inputResourcePath);
+                            Map<String, Object> bmlReturnMap =
+                                    bmlService.upload(
+                                            userName,
+                                            resourceInputStream,
+                                            UUID.randomUUID().toString() + ".json",
+                                            projectName);
+                            resource.setResourceId(bmlReturnMap.get("resourceId").toString());
+                            resource.setVersion(bmlReturnMap.get("version").toString());
+                        } else {
+                            logger.warn("Illegal resource information");
+                            logger.warn(
+                                    "username:{},fileName:{},version:{},resourceId:{}",
+                                    userName,
+                                    resource.getFileName(),
+                                    resource.getVersion(),
+                                    resource.getResourceId());
+                        }
+                    });
         }
         return nodeParser.updateNodeResource(nodeJson, resources);
     }
 
     private InputStream readResource(String userName, Resource resource, String flowResourcePath) {
-        String readPath = flowResourcePath + resource.getResourceId() + "_" + resource.getVersion() + ".re";
+        String readPath =
+                flowResourcePath + resource.getResourceId() + "_" + resource.getVersion() + ".re";
         return bmlService.readLocalResourceFile(userName, readPath);
     }
 
     @Override
-    public String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow, String nodeJson, String flowContextId, String appConnResourcePath, Workspace workspace, String orcVersion) throws IOException {
-        Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
+    public String uploadAppConnResource(
+            String userName,
+            String projectName,
+            DSSFlow dssFlow,
+            String nodeJson,
+            String flowContextId,
+            String appConnResourcePath,
+            Workspace workspace,
+            String orcVersion)
+            throws IOException {
+        Map<String, Object> nodeJsonMap =
+                BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
         String nodeType = nodeJsonMap.get("jobType").toString();
-
 
         String nodeId = nodeJsonMap.get("id").toString();
 
-        Map<String, Object> nodeContent = (LinkedHashMap<String, Object>) nodeJsonMap.get("jobContent");
+        Map<String, Object> nodeContent =
+                (LinkedHashMap<String, Object>) nodeJsonMap.get("jobContent");
         CommonAppConnNode appConnNode = new CommonAppConnNode();
         appConnNode.setId(nodeId);
         appConnNode.setNodeType(nodeType);
@@ -102,29 +124,39 @@ public class NodeInputServiceImpl implements NodeInputService {
             String nodeResourcePath = appConnResourcePath + File.separator + nodeId + ".appconnre";
             File file = new File(nodeResourcePath);
             if (file.exists()) {
-                InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-                Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
-                        projectName);
+                InputStream resourceInputStream =
+                        bmlService.readLocalResourceFile(userName, nodeResourcePath);
+                Map<String, Object> bmlReturnMap =
+                        bmlService.upload(
+                                userName,
+                                resourceInputStream,
+                                UUID.randomUUID().toString() + ".json",
+                                projectName);
                 try {
-                    nodeExportContent = nodeService.importNode(userName, appConnNode, bmlReturnMap, workspace, orcVersion);
+                    nodeExportContent =
+                            nodeService.importNode(
+                                    userName, appConnNode, bmlReturnMap, workspace, orcVersion);
                 } catch (Exception e) {
                     logger.error("failed to import node ", e);
                 }
                 if (nodeExportContent != null) {
                     if (nodeExportContent.get("project_id") != null) {
-                        Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
-                        logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
+                        Long newProjectId =
+                                Long.parseLong(nodeExportContent.get("project_id").toString());
+                        logger.warn(
+                                String.format(
+                                        "new appConn node add into dss,dssProjectId: %s,newProjectId: %s",
+                                        appConnNode.getProjectId(), newProjectId));
                         nodeExportContent.remove("project_id");
                     }
                     nodeJsonMap.replace("jobContent", nodeExportContent);
                     appConnNode.setJobContent(nodeExportContent);
                     return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
                 }
-            }else{
-                logger.error("appConn node resource file does not exists."+nodeId);
+            } else {
+                logger.error("appConn node resource file does not exists." + nodeId);
             }
         }
-
 
         return nodeJson;
     }
@@ -134,5 +166,4 @@ public class NodeInputServiceImpl implements NodeInputService {
 
         return nodeParser.updateSubFlowID(nodeJson, subflowID);
     }
-
 }

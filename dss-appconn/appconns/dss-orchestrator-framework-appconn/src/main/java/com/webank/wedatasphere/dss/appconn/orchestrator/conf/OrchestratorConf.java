@@ -16,6 +16,4 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.conf;
 
-public class OrchestratorConf {
-
-}
+public class OrchestratorConf {}

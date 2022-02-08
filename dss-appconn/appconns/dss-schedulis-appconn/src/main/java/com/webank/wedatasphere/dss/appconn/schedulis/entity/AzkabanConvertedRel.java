@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.entity;
 
-import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
@@ -49,5 +48,4 @@ public class AzkabanConvertedRel extends PreConversionRelImpl implements Convert
     public void setStorePath(String storePath) {
         this.storePath = storePath;
     }
-
 }

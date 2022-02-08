@@ -23,21 +23,25 @@ import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import org.apache.linkis.rpc.Sender;
+
 import java.util.List;
 
-
-public class WorkflowTaskDeletionOperation implements RefDeletionOperation<WorkflowDeleteRequestRef> {
+public class WorkflowTaskDeletionOperation
+        implements RefDeletionOperation<WorkflowDeleteRequestRef> {
 
     private DevelopmentService developmentService;
 
     @Override
-    public void deleteRef(WorkflowDeleteRequestRef workflowDeleteRequestRef) throws ExternalOperationFailedException {
+    public void deleteRef(WorkflowDeleteRequestRef workflowDeleteRequestRef)
+            throws ExternalOperationFailedException {
         String userName = workflowDeleteRequestRef.getUserName();
         Long flowId = workflowDeleteRequestRef.getAppId();
         RequestDeleteWorkflow requestDeleteWorkflow = new RequestDeleteWorkflow(userName, flowId);
         List<DSSLabel> dssLabels = workflowDeleteRequestRef.getDSSLabels();
-        Sender tempSend = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
+        Sender tempSend =
+                DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
         if (null != tempSend) {
             tempSend.ask(requestDeleteWorkflow);
         } else {

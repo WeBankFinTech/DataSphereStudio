@@ -16,9 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
-
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-
 
 public class ResponseCopyWorkflow {
 
@@ -35,6 +33,4 @@ public class ResponseCopyWorkflow {
     public void setDssFlow(DSSFlow dssFlow) {
         this.dssFlow = dssFlow;
     }
-
-
 }

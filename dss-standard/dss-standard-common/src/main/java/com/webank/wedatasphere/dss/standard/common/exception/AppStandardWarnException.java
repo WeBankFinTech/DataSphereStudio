@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.standard.common.exception;
 
-
 public class AppStandardWarnException extends RuntimeException {
 
     public AppStandardWarnException(int errorCode, String message) {

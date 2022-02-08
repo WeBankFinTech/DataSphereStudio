@@ -29,14 +29,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-
 @Service
 public class MetaInputServiceImpl implements MetaInputService {
 
     // TODO: 2020/3/13 防止表结构发生改变的version 字段的添加
 
     private final String fileName = "meta.txt";
-
 
     @Override
     public List<DSSFlow> inputFlow(String basePath) throws IOException {
@@ -62,6 +60,4 @@ public class MetaInputServiceImpl implements MetaInputService {
     private InputStream generateInputstream(String basePath) throws IOException {
         return IoUtils.generateInputInputStream(basePath + File.separator + fileName);
     }
-
-
 }

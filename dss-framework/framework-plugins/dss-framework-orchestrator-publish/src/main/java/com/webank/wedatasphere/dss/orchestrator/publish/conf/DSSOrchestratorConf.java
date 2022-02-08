@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-
 public class DSSOrchestratorConf {
-    public static final CommonVars<String> DSS_EXPORT_ENV = CommonVars.apply("wds.dss.server.export.env", "dev");
+    public static final CommonVars<String> DSS_EXPORT_ENV =
+            CommonVars.apply("wds.dss.server.export.env", "dev");
 }

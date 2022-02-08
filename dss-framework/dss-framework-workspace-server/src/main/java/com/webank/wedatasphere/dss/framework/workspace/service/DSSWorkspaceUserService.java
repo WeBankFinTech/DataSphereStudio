@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
-
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
 
-
 public interface DSSWorkspaceUserService {
-
 
     void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator);
 

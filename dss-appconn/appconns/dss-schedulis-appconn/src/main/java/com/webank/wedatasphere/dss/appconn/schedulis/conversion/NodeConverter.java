@@ -21,5 +21,4 @@ import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 public interface NodeConverter {
 
     String conversion(WorkflowNode workflowNode);
-
 }

@@ -1,19 +1,7 @@
-
-
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
@@ -26,36 +14,45 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
-import org.apache.linkis.server.Message;
-import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 /**
  * @author allenlliu
  * @version 2.0.0
  * @date 2020/08/17 05:37 PM
  */
-
-@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RequestMapping(
+        path = "/dss/framework/project",
+        produces = {"application/json"})
 @RestController
 public class DSSFrameworkDSTokenRestfulApi {
-    private static final Logger logger = LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(DSSFrameworkDSTokenRestfulApi.class);
 
-
-    @RequestMapping(path ="/ds/token", method = RequestMethod.GET)
+    @RequestMapping(path = "/ds/token", method = RequestMethod.GET)
     public Message dsApiServiceTokenCreate(@Context HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
 
-        SchedulerAppConn schedulerAppConn = (SchedulerAppConn)AppConnManager.getAppConnManager()
-            .getAppConn(DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
+        SchedulerAppConn schedulerAppConn =
+                (SchedulerAppConn)
+                        AppConnManager.getAppConnManager()
+                                .getAppConn(
+                                        DSSProjectConstant.DSS_SCHEDULER_APPCONN_NAME.getValue());
         if (schedulerAppConn == null) {
-            logger.error("dolphinscheduler appconn is null, can not get scheduler api access token");
+            logger.error(
+                    "dolphinscheduler appconn is null, can not get scheduler api access token");
             return Message.error("dolphinscheduler appconn is null");
         }
 
-        WorkflowConversionIntegrationStandard standard = schedulerAppConn.getOrCreateWorkflowConversionStandard();
+        WorkflowConversionIntegrationStandard standard =
+                schedulerAppConn.getOrCreateWorkflowConversionStandard();
         AppInstance schedulerInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
         RefQueryService tokenQueryService = standard.getQueryService(schedulerInstance);
         RefQueryOperation tokenRefQueryOperation = tokenQueryService.getRefQueryOperation();
@@ -64,14 +61,17 @@ public class DSSFrameworkDSTokenRestfulApi {
         requestRef.setParameter("userName", userName);
         try {
             ResponseRef responseRef = tokenRefQueryOperation.query(requestRef);
-            return Message.ok().data("token", responseRef.getValue("token"))
-                .data("expire_time", Long.valueOf((String)responseRef.getValue("expire_time")));
+            return Message.ok()
+                    .data("token", responseRef.getValue("token"))
+                    .data(
+                            "expire_time",
+                            Long.valueOf((String) responseRef.getValue("expire_time")));
         } catch (ExternalOperationFailedException e) {
             return Message.error("获取token失败:" + e.getMessage());
         }
     }
 
-   /* @GET
+    /* @GET
     @Path("/ds/token1")
     public Response apiServiceTokenQuery(
                                          @Context HttpServletRequest req) {

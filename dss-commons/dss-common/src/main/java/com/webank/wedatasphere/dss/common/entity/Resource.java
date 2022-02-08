@@ -47,7 +47,7 @@ public class Resource implements Serializable {
         this.version = version;
     }
 
-/*    @Override
+    /*    @Override
     public String toString() {
         return "{" +
                 "fileName='" + fileName + '\'' +

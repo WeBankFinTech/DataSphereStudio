@@ -26,36 +26,41 @@ public class VisualisImportResponseRef extends DSSCommonResponseRef {
     Map<String, Object> importedMap = Maps.newHashMap();
     Map<String, Object> newJobContent = Maps.newHashMap();
 
-    public VisualisImportResponseRef(Map<String, Object> jobContent, String responseBody, String nodeType, Object projectId) throws Exception {
+    public VisualisImportResponseRef(
+            Map<String, Object> jobContent, String responseBody, String nodeType, Object projectId)
+            throws Exception {
         super(responseBody);
-        if("linkis.appconn.visualis.widget".equalsIgnoreCase(nodeType)){
+        if ("linkis.appconn.visualis.widget".equalsIgnoreCase(nodeType)) {
             Map<String, Object> payload = (Map<String, Object>) jobContent.get("data");
             Long id = ((Double) Double.parseDouble(payload.get("widgetId").toString())).longValue();
             Map<String, Object> tempDataMap = (Map<String, Object>) responseMap.get("data");
             Map<String, Object> tempValueMap = (Map<String, Object>) tempDataMap.get("widget");
             payload.put("widgetId", getIdByMap(tempValueMap, id));
-        } else if("linkis.appconn.visualis.display".equalsIgnoreCase(nodeType)){
+        } else if ("linkis.appconn.visualis.display".equalsIgnoreCase(nodeType)) {
             Map<String, Object> payload = (Map<String, Object>) jobContent.get("payload");
             Long id = ((Double) Double.parseDouble(payload.get("id").toString())).longValue();
             payload.put("projectId", projectId);
             Map<String, Object> tempDataMap = (Map<String, Object>) responseMap.get("data");
             Map<String, Object> tempValueMap = (Map<String, Object>) tempDataMap.get("display");
             payload.put("id", getIdByMap(tempValueMap, id));
-        } else if("linkis.appconn.visualis.dashboard".equalsIgnoreCase(nodeType)){
+        } else if ("linkis.appconn.visualis.dashboard".equalsIgnoreCase(nodeType)) {
             Map<String, Object> payload = (Map<String, Object>) jobContent.get("payload");
             Long id = ((Double) Double.parseDouble(payload.get("id").toString())).longValue();
             payload.put("projectId", projectId);
             Map<String, Object> tempDataMap = (Map<String, Object>) responseMap.get("data");
-            Map<String, Object> tempValueMap = (Map<String, Object>) tempDataMap.get("dashboardPortal");
+            Map<String, Object> tempValueMap =
+                    (Map<String, Object>) tempDataMap.get("dashboardPortal");
             payload.put("id", getIdByMap(tempValueMap, id));
         } else {
-            throw new ExternalOperationFailedException(90177, "Unknown task type " + nodeType, null);
+            throw new ExternalOperationFailedException(
+                    90177, "Unknown task type " + nodeType, null);
         }
         this.newJobContent = jobContent;
     }
 
     /**
      * 获取对应的Id
+     *
      * @param tempValueMap
      * @param id
      * @return

@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import java.util.Date;
 
-
 public class DSSRole {
     private int id;
     private int workspaceId;
@@ -77,13 +76,22 @@ public class DSSRole {
 
     @Override
     public String toString() {
-        return "DSSRole{" +
-                "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", name='" + name + '\'' +
-                ", frontName='" + frontName + '\'' +
-                ", createTime=" + createTime +
-                ", description='" + description + '\'' +
-                '}';
+        return "DSSRole{"
+                + "id="
+                + id
+                + ", workspaceId="
+                + workspaceId
+                + ", name='"
+                + name
+                + '\''
+                + ", frontName='"
+                + frontName
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", description='"
+                + description
+                + '\''
+                + '}';
     }
 }

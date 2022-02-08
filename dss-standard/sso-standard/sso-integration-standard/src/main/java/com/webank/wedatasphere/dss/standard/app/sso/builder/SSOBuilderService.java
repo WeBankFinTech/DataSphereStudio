@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.builder;
 
-
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
-
 
 public interface SSOBuilderService extends AppService {
 
     SSOUrlBuilderOperation createSSOUrlBuilderOperation();
 
     DssMsgBuilderOperation createDssMsgBuilderOperation();
-
 }

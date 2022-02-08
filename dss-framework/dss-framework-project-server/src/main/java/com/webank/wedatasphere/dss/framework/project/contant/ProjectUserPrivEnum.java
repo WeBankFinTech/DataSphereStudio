@@ -16,12 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.project.contant;
 
-
 public enum ProjectUserPrivEnum {
-
-    PRIV_ACCESS(1,"查看权限"),
-    PRIV_EDIT(2,"编辑权限"),
-    PRIV_RELEASE(3,"发布权限");
+    PRIV_ACCESS(1, "查看权限"),
+    PRIV_EDIT(2, "编辑权限"),
+    PRIV_RELEASE(3, "发布权限");
 
     ProjectUserPrivEnum(int rank, String name) {
         this.rank = rank;

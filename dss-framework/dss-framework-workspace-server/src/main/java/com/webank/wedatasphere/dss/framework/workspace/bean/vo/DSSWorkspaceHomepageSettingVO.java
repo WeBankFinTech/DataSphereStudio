@@ -17,18 +17,15 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
 import java.util.List;
-import java.util.Map;
-
 
 public class DSSWorkspaceHomepageSettingVO {
 
-    public static class RoleHomepage{
+    public static class RoleHomepage {
         private String roleName;
         private String homepageName;
         private String homepageUrl;
         private int roleId;
         private String roleFrontName;
-
 
         public String getRoleName() {
             return roleName;
@@ -53,7 +50,6 @@ public class DSSWorkspaceHomepageSettingVO {
         public void setHomepageUrl(String homepageUrl) {
             this.homepageUrl = homepageUrl;
         }
-
 
         public int getRoleId() {
             return roleId;
@@ -81,6 +77,4 @@ public class DSSWorkspaceHomepageSettingVO {
     public void setRoleHomepages(List<RoleHomepage> roleHomepages) {
         this.roleHomepages = roleHomepages;
     }
-
-
 }

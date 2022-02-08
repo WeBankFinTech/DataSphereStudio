@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.entity;
 
 import java.util.Date;
 
-
 public class WorkflowQueryTaskVO {
     private Long taskID;
     private String instance;
@@ -42,9 +41,7 @@ public class WorkflowQueryTaskVO {
     private Long costTime;
     private String strongerExecId;
     private String sourceJson;
-    /**
-     * source字段:用来将sourceJson的value取出来进行拼接返回给前台展示
-     */
+    /** source字段:用来将sourceJson的value取出来进行拼接返回给前台展示 */
     private String sourceTailor;
 
     private Date engineStartTime;

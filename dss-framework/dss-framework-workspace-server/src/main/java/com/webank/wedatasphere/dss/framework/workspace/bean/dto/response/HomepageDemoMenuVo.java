@@ -17,7 +17,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
 import java.util.List;
 
-
 public class HomepageDemoMenuVo {
 
     private Long id;

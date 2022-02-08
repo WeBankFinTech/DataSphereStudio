@@ -19,7 +19,9 @@ package com.webank.wedatasphere.dss.standard.app.structure;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppSingletonIntegrationServiceImpl;
 
-public class AbstractStructureService extends AppSingletonIntegrationServiceImpl<StructureOperation, SSORequestService> implements StructureService {
+public class AbstractStructureService
+        extends AppSingletonIntegrationServiceImpl<StructureOperation, SSORequestService>
+        implements StructureService {
 
     private StructureIntegrationStandard appStandard;
 
@@ -39,5 +41,4 @@ public class AbstractStructureService extends AppSingletonIntegrationServiceImpl
     public StructureIntegrationStandard getAppStandard() {
         return appStandard;
     }
-
 }

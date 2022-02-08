@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.standard.app.sso.plugin.filter;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 public interface HttpRequestUserInterceptor extends UserInterceptor {
 
     HttpServletRequest addUserToRequest(String user, HttpServletRequest req);
-
 }

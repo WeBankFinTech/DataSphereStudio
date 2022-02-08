@@ -20,11 +20,12 @@ import org.apache.commons.math3.util.Pair;
 
 import java.util.List;
 
-
 public interface DSSWorkspacePrivService {
-    void updateRoleMenuPriv(int workspaceId, int menuId, String updater, List<Pair<Integer, Boolean>> pairs);
+    void updateRoleMenuPriv(
+            int workspaceId, int menuId, String updater, List<Pair<Integer, Boolean>> pairs);
 
-    void updateRoleComponentPriv(int workspaceId, int menuId, String username, List<Pair<Integer, Boolean>> pairs);
+    void updateRoleComponentPriv(
+            int workspaceId, int menuId, String username, List<Pair<Integer, Boolean>> pairs);
 
     Integer getRoleId(int workspaceId, String key);
 }

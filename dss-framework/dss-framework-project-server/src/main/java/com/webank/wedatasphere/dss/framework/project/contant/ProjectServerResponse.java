@@ -16,12 +16,11 @@
 
 package com.webank.wedatasphere.dss.framework.project.contant;
 
-public enum  ProjectServerResponse {
-    PROJECT_NOT_EDIT_AUTH(6001,"没有修改权限"),
-    PROJECT_NOT_EDIT_NAME(6002,"不能修改工程名称"),
-    PROJECT_NOT_EXIST(6003,"工程不存在"),
-    PROJECT_IS_NOT_ADMIN(6004,"只有创建人或管理员才能编辑工程")
-    ;
+public enum ProjectServerResponse {
+    PROJECT_NOT_EDIT_AUTH(6001, "没有修改权限"),
+    PROJECT_NOT_EDIT_NAME(6002, "不能修改工程名称"),
+    PROJECT_NOT_EXIST(6003, "工程不存在"),
+    PROJECT_IS_NOT_ADMIN(6004, "只有创建人或管理员才能编辑工程");
 
     ProjectServerResponse(int code, String msg) {
         this.code = code;

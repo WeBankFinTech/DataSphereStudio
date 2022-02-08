@@ -33,21 +33,15 @@ public class DSSNodeDefault implements DSSNode {
     private String desc;
     private String createTime;
     private String userProxy;
-    /**
-     * dependencys 是该Node的依赖节点
-     */
+    /** dependencys 是该Node的依赖节点 */
     private List<String> dependencys = new ArrayList<String>();
-    /**
-     * jobContent 是node的内容
-     */
+    /** jobContent 是node的内容 */
     private Map<String, Object> jobContent;
-
 
     @Override
     public Layout getLayout() {
         return layout;
     }
-
 
     @Override
     public void setLayout(Layout layout) {
@@ -146,13 +140,21 @@ public class DSSNodeDefault implements DSSNode {
 
     @Override
     public String toString() {
-        return "dwsNode{" +
-                "layout=" + layout +
-                ", id='" + id + '\'' +
-                ", jobType='" + jobType + '\'' +
-                ", lastUpdateTime=" + lastUpdateTime +
-                ", params=" + params +
-                ", resources=" + resources +
-                '}';
+        return "dwsNode{"
+                + "layout="
+                + layout
+                + ", id='"
+                + id
+                + '\''
+                + ", jobType='"
+                + jobType
+                + '\''
+                + ", lastUpdateTime="
+                + lastUpdateTime
+                + ", params="
+                + params
+                + ", resources="
+                + resources
+                + '}';
     }
 }

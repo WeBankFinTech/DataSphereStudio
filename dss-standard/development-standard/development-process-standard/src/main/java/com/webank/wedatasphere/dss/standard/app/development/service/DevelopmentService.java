@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.service;
 
-
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
+
 import java.util.List;
 
 public interface DevelopmentService extends AppIntegrationService<SSORequestService> {
@@ -31,6 +31,7 @@ public interface DevelopmentService extends AppIntegrationService<SSORequestServ
 
     /**
      * Labels by default.
+     *
      * @return All default labels
      */
     List<DSSLabel> getLabels();

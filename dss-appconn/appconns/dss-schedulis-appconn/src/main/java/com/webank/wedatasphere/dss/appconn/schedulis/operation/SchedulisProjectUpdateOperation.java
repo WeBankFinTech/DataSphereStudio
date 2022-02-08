@@ -22,24 +22,22 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequest
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SchedulisProjectUpdateOperation implements ProjectUpdateOperation {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectUpdateOperation.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(SchedulisProjectUpdateOperation.class);
 
     private ProjectService schedulisProjectService;
 
-    public SchedulisProjectUpdateOperation(){
-
-    }
+    public SchedulisProjectUpdateOperation() {}
 
     @Override
-    public void init() {
-    }
+    public void init() {}
 
     @Override
     public void setStructureService(StructureService service) {

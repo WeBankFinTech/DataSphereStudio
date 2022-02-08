@@ -25,7 +25,8 @@ public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn {
 
     @Override
     public WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard() {
-        dolphinSchedulerWorkflowStandard.setSSORequestService(this.getOrCreateSSOStandard().getSSORequestService());
+        dolphinSchedulerWorkflowStandard.setSSORequestService(
+                this.getOrCreateSSOStandard().getSSORequestService());
         dolphinSchedulerWorkflowStandard.setAppConnName(getAppDesc().getAppName());
         return dolphinSchedulerWorkflowStandard;
     }
@@ -34,5 +35,4 @@ public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn {
     public StructureIntegrationStandard getOrCreateStructureStandard() {
         return DolphinSchedulerStructureStandard.getInstance();
     }
-
 }

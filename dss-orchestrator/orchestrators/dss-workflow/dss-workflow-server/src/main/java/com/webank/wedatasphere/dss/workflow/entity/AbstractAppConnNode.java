@@ -16,17 +16,13 @@
 
 package com.webank.wedatasphere.dss.workflow.entity;
 
-
-
 import java.util.Map;
-
 
 public abstract class AbstractAppConnNode {
 
     String projectName;
 
     long projectId;
-
 
     String flowName;
 
@@ -40,8 +36,14 @@ public abstract class AbstractAppConnNode {
 
     Map<String, Object> jobContent;
 
-    public AbstractAppConnNode(String projectName, long projectId, String flowName, long flowId,
-                               String nodeName, String nodeTye, Map<String, Object> jobContent){
+    public AbstractAppConnNode(
+            String projectName,
+            long projectId,
+            String flowName,
+            long flowId,
+            String nodeName,
+            String nodeTye,
+            Map<String, Object> jobContent) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.flowName = flowName;
@@ -51,10 +53,7 @@ public abstract class AbstractAppConnNode {
         this.jobContent = jobContent;
     }
 
-    public AbstractAppConnNode(){
-
-    }
-
+    public AbstractAppConnNode() {}
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
@@ -72,37 +71,29 @@ public abstract class AbstractAppConnNode {
         this.flowId = flowId;
     }
 
-
-
     public String getId() {
         return this.nodeId;
     }
-
 
     public void setId(String id) {
         this.nodeId = id;
     }
 
-
     public String getNodeType() {
         return this.nodeType;
     }
-
 
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
     }
 
-
     public String getName() {
         return this.nodeName;
     }
 
-
     public void setName(String name) {
         this.nodeName = name;
     }
-
 
     public long getProjectId() {
         return this.projectId;
@@ -112,24 +103,19 @@ public abstract class AbstractAppConnNode {
         return this.projectName;
     }
 
-
     public String getFlowName() {
         return this.flowName;
     }
-
 
     public long getFlowId() {
         return this.flowId;
     }
 
-
     public Map<String, Object> getJobContent() {
         return this.jobContent;
     }
 
-
     public void setJobContent(Map<String, Object> jobContent) {
         this.jobContent = jobContent;
     }
-
 }

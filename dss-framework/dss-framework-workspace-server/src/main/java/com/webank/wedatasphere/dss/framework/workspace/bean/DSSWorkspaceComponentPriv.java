@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import java.util.Date;
 
-
 public class DSSWorkspaceComponentPriv {
 
     private int id;
@@ -29,11 +28,15 @@ public class DSSWorkspaceComponentPriv {
     private Date updateTime;
     private String updateBy;
 
+    public DSSWorkspaceComponentPriv() {}
 
-    public DSSWorkspaceComponentPriv() {
-    }
-
-    public DSSWorkspaceComponentPriv(int workspaceId, int roleId, int componentId, int priv, Date updateTime, String updateBy) {
+    public DSSWorkspaceComponentPriv(
+            int workspaceId,
+            int roleId,
+            int componentId,
+            int priv,
+            Date updateTime,
+            String updateBy) {
         this.workspaceId = workspaceId;
         this.roleId = roleId;
         this.componentId = componentId;

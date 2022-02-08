@@ -20,15 +20,12 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.Abstr
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConversionOperation;
 
-
 public class WorkflowToRelConversionService extends AbstractConversionService
-    implements DSSToRelConversionService {
+        implements DSSToRelConversionService {
 
     @Override
     public WorkflowToRelConversionOperation getDSSToRelConversionOperation() {
-        return getOrCreate(WorkflowToRelConversionOperation::new, WorkflowToRelConversionOperation.class);
+        return getOrCreate(
+                WorkflowToRelConversionOperation::new, WorkflowToRelConversionOperation.class);
     }
-
-
-
 }

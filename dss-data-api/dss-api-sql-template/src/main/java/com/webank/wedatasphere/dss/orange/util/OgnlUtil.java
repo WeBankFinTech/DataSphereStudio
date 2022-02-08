@@ -1,14 +1,15 @@
 package com.webank.wedatasphere.dss.orange.util;
 
-import ognl.Ognl;
-import ognl.OgnlException;
-
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
+import ognl.Ognl;
+import ognl.OgnlException;
 
 public class OgnlUtil {
 
@@ -29,15 +30,16 @@ public class OgnlUtil {
         } else if (value instanceof Number)
             return !new BigDecimal(String.valueOf(value)).equals(BigDecimal.ZERO);
         else
-            throw new RuntimeException("expression value is not boolean or number type: " + expression);
+            throw new RuntimeException(
+                    "expression value is not boolean or number type: " + expression);
     }
 
     public static Iterable<?> getIterable(String expression, Map<String, Object> root) {
         Object value = getValue(expression, root);
         if (value == null)
-            throw new RuntimeException("The expression '" + expression + "' evaluated to a null value.");
-        if (value instanceof Iterable)
-            return (Iterable<?>) value;
+            throw new RuntimeException(
+                    "The expression '" + expression + "' evaluated to a null value.");
+        if (value instanceof Iterable) return (Iterable<?>) value;
         if (value.getClass().isArray()) {
             // the array may be primitive, so Arrays.asList() may throw
             // a ClassCastException (issue 209). Do the work manually
@@ -53,7 +55,12 @@ public class OgnlUtil {
         if (value instanceof Map) {
             return ((Map) value).entrySet();
         }
-        throw new RuntimeException("Error evaluating expression '" + expression + "'.  Return value (" + value + ") was not iterable.");
+        throw new RuntimeException(
+                "Error evaluating expression '"
+                        + expression
+                        + "'.  Return value ("
+                        + value
+                        + ") was not iterable.");
     }
 
     public static void main(String[] args) {
@@ -67,6 +74,5 @@ public class OgnlUtil {
 
         Object o = getValue("ids[3]", root);
         System.out.println(o);
-
     }
 }

@@ -15,8 +15,7 @@
  */
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-
-public class DSSFavorite extends BaseEntity{
+public class DSSFavorite extends BaseEntity {
 
     private Long id;
 
@@ -28,6 +27,7 @@ public class DSSFavorite extends BaseEntity{
 
     private Integer order;
     private String type;
+
     public Long getId() {
         return id;
     }
@@ -67,6 +67,7 @@ public class DSSFavorite extends BaseEntity{
     public void setOrder(Integer order) {
         this.order = order;
     }
+
     public String getType() {
         return type;
     }

@@ -19,11 +19,12 @@ package com.webank.wedatasphere.dss.standard.app.structure.project.plugin.filter
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.UserInterceptor;
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.ProjectCooperationPlugin;
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.origin.OriginProjectCooperationPlugin;
-import javax.servlet.FilterConfig;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.servlet.FilterConfig;
 
 @Component
 public class ProjectCooperationSpringFilter extends ProjectCooperationFilter {
@@ -31,14 +32,16 @@ public class ProjectCooperationSpringFilter extends ProjectCooperationFilter {
     @Override
     public ProjectAuthInterceptor getProjectAuthInterceptor(FilterConfig filterConfig) {
         WebApplicationContext webApplicationContext =
-            WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
+                WebApplicationContextUtils.getRequiredWebApplicationContext(
+                        filterConfig.getServletContext());
         return webApplicationContext.getBean(ProjectAuthInterceptor.class);
     }
 
     @Override
     public UserInterceptor getUserAuthInterceptor(FilterConfig filterConfig) {
         WebApplicationContext webApplicationContext =
-            WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
+                WebApplicationContextUtils.getRequiredWebApplicationContext(
+                        filterConfig.getServletContext());
         return webApplicationContext.getBean(UserInterceptor.class);
     }
 

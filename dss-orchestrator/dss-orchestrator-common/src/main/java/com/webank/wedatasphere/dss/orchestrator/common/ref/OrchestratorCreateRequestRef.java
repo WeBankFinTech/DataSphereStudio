@@ -17,10 +17,8 @@
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
 
 public interface OrchestratorCreateRequestRef extends CreateRequestRef, CommonRequestRef {
 
@@ -28,4 +26,3 @@ public interface OrchestratorCreateRequestRef extends CreateRequestRef, CommonRe
 
     DSSOrchestratorInfo getDSSOrchestratorInfo();
 }
-

@@ -17,15 +17,15 @@
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefImportOperation;
-import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefImportService;
 
 public class VisualisRefImportService extends AbstractRefImportService {
 
     @Override
     protected RefImportOperation createRefImportOperation() {
-        VisualisRefImportOperation visualisRefImportOperation = new VisualisRefImportOperation(this);
+        VisualisRefImportOperation visualisRefImportOperation =
+                new VisualisRefImportOperation(this);
         return visualisRefImportOperation;
     }
-
 }

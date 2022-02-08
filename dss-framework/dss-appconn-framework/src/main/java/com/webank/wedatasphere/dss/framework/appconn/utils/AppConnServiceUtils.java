@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.framework.appconn.utils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnResource;
 
-
 public class AppConnServiceUtils {
 
     public static String resourceToString(AppConnResource resource) {
@@ -29,5 +28,4 @@ public class AppConnServiceUtils {
     public static AppConnResource stringToResource(String resource) {
         return DSSCommonUtils.COMMON_GSON.fromJson(resource, AppConnResource.class);
     }
-
 }

@@ -16,19 +16,20 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
+
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.publish.VisualisImportResponseRef;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +37,17 @@ import java.util.Map;
 
 public class VisualisRefImportOperation implements RefImportOperation<ImportRequestRef> {
 
-    private final static Logger logger = LoggerFactory.getLogger(VisualisRefImportOperation.class);
+    private static final Logger logger = LoggerFactory.getLogger(VisualisRefImportOperation.class);
 
     DevelopmentService developmentService;
     private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
 
-    public VisualisRefImportOperation(DevelopmentService developmentService){
+    public VisualisRefImportOperation(DevelopmentService developmentService) {
         this.developmentService = developmentService;
-        this.ssoRequestOperation = this.developmentService.getSSORequestService().createSSORequestOperation(getAppName());
+        this.ssoRequestOperation =
+                this.developmentService
+                        .getSSORequestService()
+                        .createSSORequestOperation(getAppName());
     }
 
     private String getAppName() {
@@ -51,7 +55,8 @@ public class VisualisRefImportOperation implements RefImportOperation<ImportRequ
     }
 
     @Override
-    public ResponseRef importRef(ImportRequestRef requestRef) throws ExternalOperationFailedException {
+    public ResponseRef importRef(ImportRequestRef requestRef)
+            throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.projectUrl + "/import";
         VisualisPostAction visualisPostAction = new VisualisPostAction();
         visualisPostAction.setUser(requestRef.getParameter("user").toString());
@@ -60,16 +65,24 @@ public class VisualisRefImportOperation implements RefImportOperation<ImportRequ
         visualisPostAction.addRequestPayload("flowVersion", requestRef.getParameter("orcVersion"));
         visualisPostAction.addRequestPayload("resourceId", requestRef.getParameter("resourceId"));
         visualisPostAction.addRequestPayload("version", requestRef.getParameter("version"));
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = requestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
+        SSOUrlBuilderOperation ssoUrlBuilderOperation =
+                requestRef.getWorkspace().getSSOUrlBuilderOperation().copy();
         ssoUrlBuilderOperation.setAppName(getAppName());
         ssoUrlBuilderOperation.setReqUrl(url);
         ssoUrlBuilderOperation.setWorkspace(requestRef.getWorkspace().getWorkspaceName());
         ResponseRef responseRef;
-        try{
+        try {
             visualisPostAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
-            HttpResult httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, visualisPostAction);
-            responseRef = new VisualisImportResponseRef((Map<String, Object>) requestRef.getParameter("jobContent"), httpResult.getResponseBody(), requestRef.getParameter("nodeType").toString(), requestRef.getParameter("projectId"));
-        } catch (Exception e){
+            HttpResult httpResult =
+                    this.ssoRequestOperation.requestWithSSO(
+                            ssoUrlBuilderOperation, visualisPostAction);
+            responseRef =
+                    new VisualisImportResponseRef(
+                            (Map<String, Object>) requestRef.getParameter("jobContent"),
+                            httpResult.getResponseBody(),
+                            requestRef.getParameter("nodeType").toString(),
+                            requestRef.getParameter("projectId"));
+        } catch (Exception e) {
             throw new ExternalOperationFailedException(90176, "Export Visualis Exception", e);
         }
         return responseRef;
@@ -80,8 +93,7 @@ public class VisualisRefImportOperation implements RefImportOperation<ImportRequ
         this.developmentService = service;
     }
 
-    private String getBaseUrl(){
+    private String getBaseUrl() {
         return developmentService.getAppInstance().getBaseUrl();
     }
-
 }

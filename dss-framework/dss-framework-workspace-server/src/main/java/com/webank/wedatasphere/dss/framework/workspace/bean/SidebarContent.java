@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @TableName(value = "dss_sidebar_content")
 public class SidebarContent implements Serializable {
 
@@ -32,53 +31,49 @@ public class SidebarContent implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    //侧边栏ID
+    // 侧边栏ID
     private Integer sidebarId;
 
-    //名称
+    // 名称
     private String name;
 
-    //名称(英文)
+    // 名称(英文)
     private String nameEn;
 
-    //标题
+    // 标题
     private String title;
 
-    //标题(英文)
+    // 标题(英文)
     private String titleEn;
 
-    //url
+    // url
     private String url;
 
-    /**
-     * url类型: 0-内部系统，1-外部系统；默认是内部
-     */
+    /** url类型: 0-内部系统，1-外部系统；默认是内部 */
     private Integer urlType;
 
-    //icon
+    // icon
     private String icon;
 
-    //序号
+    // 序号
     private Integer orderNum;
 
-    //备注
+    // 备注
     private String remark;
 
-    //创建人
+    // 创建人
     private String createUser;
 
-    //创建时间
+    // 创建时间
     private Date createTime;
 
-    //更新人
+    // 更新人
     private String updateUser;
 
-    //更新时间
+    // 更新时间
     private Date updateTime;
 
-
-    public SidebarContent() {
-    }
+    public SidebarContent() {}
 
     public Integer getId() {
         return id;
@@ -202,22 +197,46 @@ public class SidebarContent implements Serializable {
 
     @Override
     public String toString() {
-        return "SidebarContent{" +
-                "id=" + id +
-                ", sidebarId=" + sidebarId +
-                ", name='" + name + '\'' +
-                ", nameEn='" + nameEn + '\'' +
-                ", title='" + title + '\'' +
-                ", titleEn='" + titleEn + '\'' +
-                ", url='" + url + '\'' +
-                ", urlType=" + urlType +
-                ", icon='" + icon + '\'' +
-                ", orderNum=" + orderNum +
-                ", remark='" + remark + '\'' +
-                ", createUser='" + createUser + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
-                '}';
+        return "SidebarContent{"
+                + "id="
+                + id
+                + ", sidebarId="
+                + sidebarId
+                + ", name='"
+                + name
+                + '\''
+                + ", nameEn='"
+                + nameEn
+                + '\''
+                + ", title='"
+                + title
+                + '\''
+                + ", titleEn='"
+                + titleEn
+                + '\''
+                + ", url='"
+                + url
+                + '\''
+                + ", urlType="
+                + urlType
+                + ", icon='"
+                + icon
+                + '\''
+                + ", orderNum="
+                + orderNum
+                + ", remark='"
+                + remark
+                + '\''
+                + ", createUser='"
+                + createUser
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateUser='"
+                + updateUser
+                + '\''
+                + ", updateTime="
+                + updateTime
+                + '}';
     }
 }

@@ -1,16 +1,14 @@
 package com.webank.wedatasphere.dss.data.asset.entity;
 
-import lombok.Data;
-
 import java.util.List;
 import java.util.Set;
 
+
+import lombok.Data;
+
 /**
- * @author suyc
- * @Classname HiveTblSimpleInfo
- * @Description TODO
- * @Date 2021/8/24 10:17
- * @Created by suyc
+ * @author suyc @Classname HiveTblSimpleInfo @Description TODO @Date 2021/8/24 10:17 @Created by
+ *     suyc
  */
 @Data
 public class HiveTblSimpleInfo {

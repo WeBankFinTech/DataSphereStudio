@@ -18,12 +18,10 @@ package com.webank.wedatasphere.dss.standard.common.exception;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public class AppStandardErrorException extends DSSErrorException {
 
-
-    public AppStandardErrorException(int errorCode, String errorMessage){
-        super(errorCode,errorMessage);
+    public AppStandardErrorException(int errorCode, String errorMessage) {
+        super(errorCode, errorMessage);
     }
 
     public AppStandardErrorException(int errorCode, String message, Throwable cause) {

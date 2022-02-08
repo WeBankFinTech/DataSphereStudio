@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.orchestrator.core.exception;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 
-
 public class DSSOrchestratorErrorException extends DSSErrorException {
     public DSSOrchestratorErrorException(int errCode, String desc) {
         super(errCode, desc);
     }
 
-    public DSSOrchestratorErrorException(int errCode, String desc, String ip, int port, String serviceKind) {
+    public DSSOrchestratorErrorException(
+            int errCode, String desc, String ip, int port, String serviceKind) {
         super(errCode, desc, ip, port, serviceKind);
     }
 }

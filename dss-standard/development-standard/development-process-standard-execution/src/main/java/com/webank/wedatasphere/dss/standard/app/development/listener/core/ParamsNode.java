@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
 import java.util.Map;
 
-
 public interface ParamsNode {
     public Map<String, Object> getParams();
 }

@@ -16,8 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.ref;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.CommonRequestRefImpl;
 
 import java.util.Map;
 
@@ -25,15 +25,15 @@ public class VisualisOpenRequestRef extends CommonRequestRefImpl implements Open
 
     @Override
     public String getName() {
-        return ((Map<String, Object>)this.getParameters().get("params")).get("title").toString();
+        return ((Map<String, Object>) this.getParameters().get("params")).get("title").toString();
     }
 
     @Override
     public String getType() {
-        return ((Map<String, Object>)this.getParameters().get("node")).get("nodeType").toString();
+        return ((Map<String, Object>) this.getParameters().get("node")).get("nodeType").toString();
     }
 
     public Object getJobContent() {
-        return ((Map<String, Object>)this.getParameters().get("params"));
+        return ((Map<String, Object>) this.getParameters().get("params"));
     }
 }

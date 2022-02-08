@@ -16,13 +16,13 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 
+import java.util.List;
 
 @Mapper
 public interface DSSWorkspaceMapper {
@@ -31,7 +31,9 @@ public interface DSSWorkspaceMapper {
 
     List<DSSWorkspace> getWorkspaces(String username);
 
-    List<Long> getUserMenuApplicationId(@Param("username")String username, @Param("workspaceId")Long workspaceId);
+    List<Long> getUserMenuApplicationId(
+            @Param("username") String username, @Param("workspaceId") Long workspaceId);
+
     List<Integer> getMenuId(int roleId, String workspaceId);
 
     DSSMenu getSpaceMenu(int menuId);
@@ -39,13 +41,14 @@ public interface DSSWorkspaceMapper {
     List<DSSWorkspaceMenuRolePriv> getDSSWorkspaceMenuPriv(String workspaceId);
 
     @Insert({
-            "<script>",
-            "insert into dss_component_role (workspace_id, component_id, role_id, priv, update_time, updateby)",
-            "values",
-            "<foreach collection='privs' item='priv' open='(' separator='),(' close=')'>",
-            "#{priv.workspaceId}, #{priv.componentId}, #{priv.roleId}, #{priv.priv}, #{priv.updateTime}, #{priv.updateBy}",
-            "</foreach>",
-            "</script>"
+        "<script>",
+        "insert into dss_component_role (workspace_id, component_id, role_id, priv, update_time, updateby)",
+        "values",
+        "<foreach collection='privs' item='priv' open='(' separator='),(' close=')'>",
+        "#{priv.workspaceId}, #{priv.componentId}, #{priv.roleId}, #{priv.priv}, #{priv.updateTime}, #{priv.updateBy}",
+        "</foreach>",
+        "</script>"
     })
-    void setDefaultComponentRoles(@Param("privs") List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivs);
+    void setDefaultComponentRoles(
+            @Param("privs") List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivs);
 }

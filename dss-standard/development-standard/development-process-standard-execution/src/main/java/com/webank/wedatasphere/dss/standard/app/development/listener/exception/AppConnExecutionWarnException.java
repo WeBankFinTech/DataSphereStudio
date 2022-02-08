@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.exception;
 
 import org.apache.linkis.common.exception.WarnException;
 
-
 public class AppConnExecutionWarnException extends WarnException {
 
     public AppConnExecutionWarnException(int errCode, String desc) {

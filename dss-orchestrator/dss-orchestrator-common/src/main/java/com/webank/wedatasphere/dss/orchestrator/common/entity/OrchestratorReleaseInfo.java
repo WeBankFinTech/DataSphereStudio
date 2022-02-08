@@ -28,15 +28,19 @@ public class OrchestratorReleaseInfo {
 
     private Date updateTime;
 
-    public static OrchestratorReleaseInfo newInstance(Long orchestratorId, String orchestratorVersion) {
+    public static OrchestratorReleaseInfo newInstance(
+            Long orchestratorId, String orchestratorVersion) {
         OrchestratorReleaseInfo orchestratorReleaseInfo = new OrchestratorReleaseInfo();
         orchestratorReleaseInfo.setOrchestratorId(orchestratorId);
         orchestratorReleaseInfo.setOrchestratorVersion(orchestratorVersion);
         return orchestratorReleaseInfo;
     }
 
-    public static OrchestratorReleaseInfo newInstance(Long orchestratorId, Long orchestratorVersionId,
-        String orchestratorVersion, Long orchestratorVersionAppId) {
+    public static OrchestratorReleaseInfo newInstance(
+            Long orchestratorId,
+            Long orchestratorVersionId,
+            String orchestratorVersion,
+            Long orchestratorVersionAppId) {
         OrchestratorReleaseInfo instance = new OrchestratorReleaseInfo();
         instance.setOrchestratorId(orchestratorId);
         instance.setOrchestratorVersionId(orchestratorVersionId);
@@ -119,5 +123,4 @@ public class OrchestratorReleaseInfo {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
 }

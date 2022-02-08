@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.workflow.receiver
 
-import java.util
-
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
@@ -27,7 +25,9 @@ import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
 import com.webank.wedatasphere.dss.workflow.common.protocol._
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam
+import org.apache.linkis.rpc.{Receiver, Sender}
 
+import java.util
 import scala.concurrent.duration.Duration
 
 /**

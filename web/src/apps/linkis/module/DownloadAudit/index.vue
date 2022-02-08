@@ -75,7 +75,7 @@ export default {
           minWidth: 200,
           align: "center",
           render: (h, params) => {
-            let texts = JSON.parse(params.row.sql)
+            let texts = params.row.sql
             if (texts != null) {
               if (texts.length > 80) {
                 texts = texts.substring(0, 80) + '...' // 进行数字截取或slice截取超过长度时以...表示
@@ -85,6 +85,7 @@ export default {
               props: {
                 placement: 'left',
                 transfer: true,
+                maxWidth: 800
               },
             }, [texts,
               h('span', {
@@ -93,7 +94,7 @@ export default {
                   whiteSpace: 'normal',
                   wordBreak: 'break-all'
                 }
-              }, JSON.parse(params.row.sql))
+              }, params.row.sql)
             ])
           }
         }

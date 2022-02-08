@@ -549,11 +549,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 // 如果该工作空间中用户拥有该组件权限，则该组件的accessable属性为true；否则为false
                 menuAppInstanceVo.setAccessable(userMenuApplicationId.contains(menuAppInstanceVo.getId()));
                 Map<String, String> nameAndUrl = new HashMap<>();
-<<<<<<< .mine
-                /*if ("visualis".equals(menuAppInstanceVo.getName())){
-                    nameAndUrl.put("进入开发中心", menuAppInstanceVo.getAccessButtonUrl());
-                    nameAndUrl.put("进入生产中心", menuAppInstanceVo.getAccessButtonUrl());
-                }*/
                 appConns.forEach(appConn -> {
                     if(appConn.getAppDesc().getAppName().equalsIgnoreCase(menuAppInstanceVo.getName())) {
                         if (appConn.getAppDesc().getAppInstances().size() == 2) {
@@ -564,22 +559,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     }
                 });
                 if(nameAndUrl.size()==0) {
-=======
-                appConns.forEach(appConn -> {
-                    if(appConn.getAppDesc().getAppName().equalsIgnoreCase(menuAppInstanceVo.getName())) {
-                        if (appConn.getAppDesc().getAppInstances().size() == 2) {
-                            appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
-                                nameAndUrl.put("进入开发中心", appInstance.getBaseUrl());
-                            });
-                        }
-                    }
-                });
-                if(nameAndUrl.size()==0) {
-
-
-
-
->>>>>>> .theirs
                     nameAndUrl.put(menuAppInstanceVo.getAccessButton(), menuAppInstanceVo.getAccessButtonUrl());
                 }
                 menuAppInstanceVo.setNameAndUrls(nameAndUrl);

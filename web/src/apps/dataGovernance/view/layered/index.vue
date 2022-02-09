@@ -62,22 +62,26 @@
     </div>
     <div>
       <div class="title-line">
-        <span class="title">
-          <span>自定义分层 </span>
-        </span>
-        <Input
-          search
-          enter-button
-          clearable
-          placeholder="输入名称搜索"
-          style="width: 300px; float: right"
-          v-model="searchVal"
-          @on-search="handleSearch"
-          @on-clear="handleSearch"
-        />
-        <Button type="primary" icon="md-add" @click="handleCreate">
-          创建自定义分层
-        </Button>
+        <div>
+          <span class="title">
+            <span>自定义分层 </span>
+          </span>
+        </div>
+        <div class="title-line-top">
+          <Input
+            search
+            enter-button
+            clearable
+            placeholder="输入名称搜索"
+            style="width: 300px;"
+            v-model="searchVal"
+            @on-search="handleSearch"
+            @on-clear="handleSearch"
+          />
+          <Button type="primary" icon="md-add" @click="handleCreate">
+            创建自定义分层
+          </Button>
+        </div>
       </div>
       <Table
         :columns="columns"
@@ -286,14 +290,16 @@ export default {
   margin: 0 24px;
 }
 .title-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  margin: 16px 0;
   .title {
     border-left: 6px solid #1890ff;
     @include border-color(#1890ff, $dark-border-color-base);
     padding-left: 6px;
+  }
+  &-top {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
   }
 }
 .page-line {

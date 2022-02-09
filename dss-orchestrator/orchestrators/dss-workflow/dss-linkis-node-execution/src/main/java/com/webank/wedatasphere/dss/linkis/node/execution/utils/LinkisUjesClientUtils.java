@@ -45,9 +45,10 @@ public class LinkisUjesClientUtils {
         return clientConfig;
     }
 
-
     public static DWSClientConfig getClientConfig1_X(String url, String user, String token, Map<String, String> jobProps) {
+        //TODO This place needs Linkis to create a class,DefaultRetryHandler.
         RetryHandler retryHandler = null;
+//        RetryHandler retryHandler = new DefaultRetryHandler();
         retryHandler.addRetryException(LinkisRetryException.class);
 
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()

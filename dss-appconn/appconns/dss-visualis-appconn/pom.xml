@@ -129,6 +129,14 @@
             <version>${dss.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-cs-client</artifactId>
+            <version>${linkis.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 

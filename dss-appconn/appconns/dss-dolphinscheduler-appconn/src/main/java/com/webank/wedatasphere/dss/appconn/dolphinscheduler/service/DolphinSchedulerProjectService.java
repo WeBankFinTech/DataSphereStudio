@@ -6,11 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectDeletionOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUrlOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
 /**
@@ -45,8 +41,15 @@ public class DolphinSchedulerProjectService extends ProjectService {
     }
 
     @Override
+    protected ProjectGetOperation createProjectGetOperation() {
+        return null;
+    }
+
+    @Override
     protected ProjectUrlOperation createProjectUrlOperation() {
         return null;
     }
+
+
 
 }

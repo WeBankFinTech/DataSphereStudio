@@ -429,7 +429,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public List<DepartmentVO> getDepartments() {
-        List<String> allDepartments = Arrays.asList("WeDataSphere","DataSP", "linkis");
+        List<String> allDepartments = staffInfoGetter.getAllDepartments();
         List<DepartmentVO> departmentVOs = new ArrayList<>();
         int count = 1;
         for (String department : allDepartments){

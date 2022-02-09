@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import org.apache.linkis.common.exception.LinkisRetryException;
-import org.apache.linkis.common.utils.DefaultRetryHandler;
 import org.apache.linkis.common.utils.RetryHandler;
 import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
@@ -48,7 +47,7 @@ public class LinkisUjesClientUtils {
 
 
     public static DWSClientConfig getClientConfig1_X(String url, String user, String token, Map<String, String> jobProps) {
-        RetryHandler retryHandler = new DefaultRetryHandler();
+        RetryHandler retryHandler = null;
         retryHandler.addRetryException(LinkisRetryException.class);
 
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()

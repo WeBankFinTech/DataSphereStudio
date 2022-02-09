@@ -51,7 +51,8 @@ export default {
     }
   },
   props: {
-    searchParams: Object
+    searchParams: Object,
+    workspaceName: String
   },
   methods: {
     _goProcess (name) {
@@ -93,17 +94,23 @@ export default {
       deep: true,
       immediate: true,
       handler (o) {
+        if (!this.workspaceName) return
         this.isSpin = true
         util.checkToken(() => {
-          if (o.projectId) {
-            api.fetch(`dolphinscheduler/projects/analysis/process-state-count`, o, 'get').then(res => {
-              this.processStateList = []
-              this._handleProcessState(res)
-              this.isSpin = false
-            }).catch(() => {
-              this.isSpin = false
-            })
+          let url, params = {}
+          if (o.projectId != 0) {
+            url = `dolphinscheduler/projects/analysis/process-state-count`
+            params = o
+          } else {
+            url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/process-state-count`
           }
+          api.fetch(url, params, 'get').then(res => {
+            this.processStateList = []
+            this._handleProcessState(res)
+            this.isSpin = false
+          }).catch(() => {
+            this.isSpin = false
+          })
         })
       }
     },

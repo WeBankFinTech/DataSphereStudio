@@ -471,14 +471,18 @@ export default {
         )
         .then((res) => {
           //运维中心路由且未选中任何项目
-          if (!this.$route.query.projectID && this.isScheduler) {
+          if ((!this.$route.query.projectID && this.isScheduler) && this.$route.query.projectID != 0) {
             this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
             return this.getAllProjects();
           }
-          const project = res.projects[0];
+          let project = res.projects[0];
+          //当为虚构的项目总览时候，取项目总览的数据
+          if (!project && this.isScheduler) {
+            project = this.projectsTree[0]
+          }
           setVirtualRoles(project, this.getUserName());
           this.currentProjectData = {
-            ...res.projects[0],
+            ...project,
             canWrite: project.canWrite(),
           };
           this.getSelectDevProcess();
@@ -516,8 +520,23 @@ export default {
                   name: n.name,
                   type: "scheduler",
                   canWrite: n.canWrite(),
+                  devProcessList: n.devProcessList,
+                  orchestratorModeList: n.orchestratorModeList,
+                  releaseUsers: n.releaseUsers,
+                  editUsers: n.editUsers,
+                  accessUsers: n.accessUsers,
+                  applicationArea: n.applicationArea,
+                  business: n.business,
+                  description: n.description,
+                  product: n.product,
                 };
               });
+            let wholeNode = JSON.parse(JSON.stringify(this.projectsTree[0]))
+            this.projectsTree.unshift({
+              ...wholeNode,
+              id: 0,
+              name: '项目总览'
+            })
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
           } else if (this.modeOfKey == "streamis_prod") {
@@ -540,7 +559,7 @@ export default {
               });
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
-          }else {
+          } else {
             this.projectsTree = res.projects.map((n) => {
               setVirtualRoles(n, this.getUserName());
               return {
@@ -551,7 +570,7 @@ export default {
               };
             });
           }
-          callback();
+          callback && callback();
         });
     },
     // 获取project下工作流

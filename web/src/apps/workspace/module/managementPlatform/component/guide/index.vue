@@ -2,10 +2,12 @@
   <div class="guide-editor">
     <mavon-editor
       v-if="showEditor"
-      style="height: 100%; z-index: 1"
+      style="height: 100%;"
+      :style="{zIndex: zIndex}"
       :externalLink="externalLink"
       v-model="source"
       ref="md"
+      @fullScreen="fullScreen"
       @save="saveContent"
       @imgAdd="onImgAdd"
     ></mavon-editor>
@@ -27,6 +29,7 @@ export default {
     return {
       externalLink: false, // 禁用自动加载highlight.js，github-markdown-css，katex
       source: "",
+      zIndex: 1, // 动态变更zIndex，权衡全屏按钮和header的冲突
     };
   },
   computed: {
@@ -59,6 +62,13 @@ export default {
       }).then((res) => {
         this.$Message.success("保存成功");
       });
+    },
+    fullScreen(status, value) {
+      if (status) {
+        this.zIndex = 1500;
+      } else {
+        this.zIndex = 1;
+      }
     },
     // 绑定@imgAdd event
     onImgAdd(pos, $file) {
@@ -106,5 +116,11 @@ export default {
 @import "@/common/style/variables.scss";
 .guide-editor {
   height: calc(100vh - 54px);
+  /deep/ol {
+    list-style: decimal;
+  }
+  /deep/ul {
+    list-style: disc;
+  }
 }
 </style>

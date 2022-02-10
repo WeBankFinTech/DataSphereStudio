@@ -52,6 +52,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RequestMapping(path = "/dss/apiservice", produces = {"application/json"})
 @RestController
@@ -133,6 +134,9 @@ public class ApiServiceExecuteRestfulApi {
         if (StringUtils.isEmpty(path)) {
             throw new  ApiServiceQueryException(80004, path);
         }
+        if (!isNumber(taskId)) {
+            throw new  ApiServiceQueryException(80005, "请求参数taskId非法");
+        }
         String dirFileTree="";
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
         if(null != apiServiceJob && userName.equals(apiServiceJob.getSubmitUser())) {
@@ -160,6 +164,9 @@ public class ApiServiceExecuteRestfulApi {
                              @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
                              @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
                              HttpServletResponse resp) throws IOException, ApiServiceQueryException {
+        if (!isNumber(taskId)) {
+            new ApiServiceQueryException(80003, "请求参数taskId非法");
+        }
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
             throw new  ApiServiceQueryException(80004, path);
@@ -192,7 +199,9 @@ public class ApiServiceExecuteRestfulApi {
             @DefaultValue("downloadResultset") @RequestParam(required = false, name = "outputFileName") String outputFileName,
             @DefaultValue("result") @RequestParam(required = false, name = "sheetName") String sheetName,
             @DefaultValue("NULL") @RequestParam(required = false, name = "nullValue") String nullValue) throws ApiServiceQueryException, IOException {
-
+        if (!isNumber(taskId)) {
+            new ApiServiceQueryException(80016, "请求参数taskId非法");
+        }
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
         resp.setCharacterEncoding(charset);
@@ -228,7 +237,7 @@ public class ApiServiceExecuteRestfulApi {
                                                            nullValue,
                                                            client);
         } else{
-            resp.getWriter().println("当前用户不存在运行的TaskId: "+taskId);
+            resp.getWriter().println("当前用户不存在运行的TaskId");
             resp.getWriter().flush();
             return;
         }
@@ -242,6 +251,9 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "/{id}/get",method = RequestMethod.GET)
     public Message getTaskByID(HttpServletRequest req, @PathVariable("id") Long taskId) {
+        if(taskId == null || !isNumber(taskId.toString())){
+            return Message.error("请求参数taskId非法");
+        }
         String username = SecurityFilter.getLoginUsername(req);
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId.toString());
         if (null != apiServiceJob && username.equals(apiServiceJob.getSubmitUser())) {
@@ -311,5 +323,15 @@ public class ApiServiceExecuteRestfulApi {
             }
         }
         return message;
+    }
+
+    Pattern numberPattern = Pattern.compile("^\\d+$");
+    //Judge if the taskId is number
+    public boolean isNumber(String taskId) {
+        if (taskId == null || taskId.trim().equals("")) {
+            return false;
+        }
+        boolean matches = numberPattern.matcher(taskId).matches();
+        return matches;
     }
 }

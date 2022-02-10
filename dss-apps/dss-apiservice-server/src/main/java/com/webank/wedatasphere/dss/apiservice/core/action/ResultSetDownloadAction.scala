@@ -37,7 +37,7 @@ class ResultSetDownloadAction extends GetAction with  DownloadAction with UJESJo
   override def suffixURLs: Array[String] = Array("filesystem", "resultsetToExcel")
 
 
-  override def getResponse: HttpResponse = response
+   def getResponse: HttpResponse = response
 
-  override def setResponse(response: HttpResponse): Unit = this.response = response
+   def setResponse(response: HttpResponse): Unit = this.response = response
 }

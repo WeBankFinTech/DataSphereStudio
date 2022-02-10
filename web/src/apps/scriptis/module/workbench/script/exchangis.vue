@@ -370,11 +370,12 @@ export default {
   .exchangisJob{
     height: 100%;
     position: relative;
-    min-width: 1300px;
+    min-width: 800px;
     .exchangisContent{
       height: 100%;
       .leftSide{
         height: 100%;
+        min-width: 152px;
         .ivu-menu-vertical{
           height: 100%;
           /deep/ .ivu-menu-item-group-title{

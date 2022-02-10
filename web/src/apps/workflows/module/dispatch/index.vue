@@ -5,9 +5,9 @@
         <div class="scheduler-menu">
           <ul>
             <li :class="activeDS == 4? 'active' : ''" @click="activeList(4)">{{$t('message.scheduler.dashboard')}}</li>
-            <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
-            <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
-            <li :class="activeDS == 5? 'active' : ''" @click="activeList(5)">{{$t('message.scheduler.taskInstance')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 5? 'active' : ''" @click="activeList(5)">{{$t('message.scheduler.taskInstance')}}</li>
           </ul>
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">

@@ -129,7 +129,7 @@ public class KnowledgeGuideAdminRestful {
 
         List<Map<String,Object>> totalResult=new ArrayList<Map<String,Object>>();
         // 要上传的目标文件存放的绝对路径
-        final String localPath= GuideConf.GUIDE_CHAPTER_IMAGES_PATH.getValue();
+        final String localPath= GuideConf.GUIDE_KNOWLEDGE_IMAGES_PATH.getValue();
         for (MultipartFile file : files) {
             Map<String,Object> result =new HashMap<String, Object>();
             String result_msg ="";
@@ -172,7 +172,7 @@ public class KnowledgeGuideAdminRestful {
             return Message.error("没有上传文件");
         }
 
-        final String imagesPath= GuideConf.GUIDE_CHAPTER_IMAGES_PATH.getValue();
+        final String imagesPath= GuideConf.GUIDE_KNOWLEDGE_IMAGES_PATH.getValue();
 
         if (file.getSize() > 5 * 1024 * 1024){
             return Message.error("图片大小不能超过5M");
@@ -186,7 +186,7 @@ public class KnowledgeGuideAdminRestful {
                 //获取文件后缀名
                 String suffixName = fileName.substring(fileName.lastIndexOf("."));
                 //重新生成文件名
-                fileName = UUID.randomUUID() + suffixName;
+                fileName = "knowledge-" + UUID.randomUUID() + suffixName;
                 if (FileUtils.upload(file, imagesPath, fileName)) {
                     return Message.ok().data("result",fileName);
                 }

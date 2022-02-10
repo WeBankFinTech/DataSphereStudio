@@ -1,21 +1,30 @@
-
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:20303/eureka/
-  #instance:
-    #prefer-ip-address: true
-    #instance-id: ${spring.cloud.client.ip-address}:${server.port}
-    #metadata-map:
+      defaultZone: http://xxxxxxxx:20303/eureka/
+      #instance:
+      #prefer-ip-address: true
+      #instance-id: ${spring.cloud.client.ip-address}:${server.port}
+      #metadata-map:
       #test: wedatasphere
 
 management:
   endpoints:
     web:
       exposure:
-        include: refresh,info
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    endpoints:
+      web:
+        exposure:
+          include: '*'
+        base-path: /metrics
 logging:
   config: classpath:log4j2.xml
+
 
 #mybatis:
 #  configuration:

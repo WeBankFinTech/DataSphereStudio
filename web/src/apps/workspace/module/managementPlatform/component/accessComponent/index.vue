@@ -10,7 +10,7 @@
               :key="component._id"
               :index="index"
               :isActive="currentTab._id == component._id"
-              :component="component"
+              :work="component"
               @on-choose="onChooseComponent"
               @on-remove="removeComponent"
             />
@@ -28,7 +28,7 @@
 <script>
 import tabItem from "./tab-item.vue"
 // import weTab from "./tabs.vue";
-import weTab from "@component/lubanTab/index.vue"
+import weTab from "./tabs.vue"
 export default {
   name: "accessComponent",
   components: {

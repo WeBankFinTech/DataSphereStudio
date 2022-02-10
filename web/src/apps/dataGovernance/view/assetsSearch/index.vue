@@ -4,6 +4,7 @@
     <div class="assets-index-t">
       <!-- bottom -->
       <div class="assets-index-t-b1">
+
         <Row>
           <Col :span="24" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
@@ -19,7 +20,7 @@
           </Col>
         </Row>
         <Row :style="{ 'margin-top': '16px' }">
-          <Col :span="8" :style="{ display: 'flex' }">
+          <Col :span="10" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label">
               <span>主题域/分层</span>
             </div>
@@ -49,7 +50,7 @@
               </Select>
             </div>
           </Col>
-          <Col :span="8" :style="{ display: 'flex' }">
+          <Col :span="10" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label"><span>负责人</span></div>
             <div class="assets-index-t-b1-content">
               <Select
@@ -71,7 +72,7 @@
               </Select>
             </div>
           </Col>
-          <Col :span="8">
+          <Col :span="4">
             <div :style="{ display: 'flex', 'margin-left': '32px' }">
               <Button @click="onReset">重置</Button>
               <Button
@@ -164,6 +165,7 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
+        <Divider v-if="isCompleted" orientation="center">到底了</Divider>
       </div>
       <div class="assets-index-b-r" v-else>
         <div style="text-align: center; margin-top: 50px; font-weight: bolder">
@@ -206,6 +208,7 @@ export default {
       isLoading: false,
       subjectList: [],
       layerList: [],
+      isCompleted: false,
     };
   },
   created() {
@@ -218,7 +221,16 @@ export default {
       getHiveTbls(JSON.parse(searchParams))
         .then((data) => {
           if (data.result) {
-            this.cardTabs = data.result;
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -228,7 +240,16 @@ export default {
       getHiveTbls({ query: "", limit: 10, offset: 0 })
         .then((data) => {
           if (data.result) {
-            this.cardTabs = data.result;
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -282,6 +303,11 @@ export default {
       getHiveTbls(params)
         .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             if( this.queryForTbls ) {
               this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
             } else {
@@ -327,7 +353,16 @@ export default {
         getHiveTbls(params)
           .then((data) => {
             if (data.result) {
-              that.cardTabs = res.concat(data.result);
+              if( data.result.length == this.searchOption.limit ) {
+                this.isCompleted = false
+              } else {
+                this.isCompleted = true
+              }
+              if( this.queryForTbls ) {
+                this.cardTabs = res.concat(this.foamtDataToHighLigth(data.result, this.queryForTbls))
+              } else {
+                this.cardTabs = res.concat(data.result);
+              }
             } else {
               that.$Message.success("所有数据已加载完成");
               that.isLoading = true;
@@ -432,22 +467,36 @@ export default {
       this.onSearch();
     },
 
-    // 处理高亮
+    // 处理高亮 并过滤没有 高亮 的结果
     foamtDataToHighLigth(result, query) {
       const _result = result.slice() || []
       const _query = `<span>${query}</span>`
       const reg = new RegExp(query, 'g')
-      _result.forEach(item => {
+      const filter_arr = []
+      _result.forEach((item, idx) => {
+        let flag = false
         Object.keys(item).forEach(key => {
-          if( typeof item[key] == 'string' ) {
-            item[key] = item[key].replace(reg, _query)
+          if( key == 'classifications' && item['classifications'] && item['classifications'].length > 0 ) {
+            item['classifications'].forEach(item => {
+              if( item['typeName'].indexOf(query) > -1 ) {
+                flag = true
+              }
+            })
           }
-          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' ) {
+          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 ) {
+            item[key] = item[key].replace(reg, _query)
+            flag = true
+          }
+          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' && item[key].join('@').indexOf(query) > -1 ) {
             item[key] = item[key].join('@').replace(reg, _query).split('@')
+            flag = true
           }
         })
+        if( !flag ){
+          filter_arr.push(idx)
+        }
       })
-      return _result
+      return  _result.filter((item, idx) => !filter_arr.includes(idx))
     }
   },
 };
@@ -459,6 +508,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   .assets-index-t-t1 {
     padding: 0px $padding-25;
     border-bottom: $border-width-base $border-style-base $border-color-base;

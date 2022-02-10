@@ -38,7 +38,7 @@
             <label for="store">存储量</label>
             <span>{{ basicData.store }}</span>
           </div>
-          <div class="assets-info-b-l-content-item">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="comment">描述</label>
             <span v-show="!isCommentEdit">{{ basicData.comment }}</span>
             <!-- <Input
@@ -61,7 +61,7 @@
               style="float:right;cursor: pointer;"
             ></Icon> -->
           </div>
-          <div class="assets-info-b-l-content-item" style="overflow: hidden">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="labels">标签</label>
             <div
               style="display: inline-block;width: calc(100% - 70px);float: right;line-height: 32px"
@@ -152,11 +152,11 @@
           </div>
 
           <div class="assets-info-b-l-content-item">
-            <label for="tableType">表类型</label>
-            <span>{{ basicData.tableType }}</span>
+            <label for="tableType">表类别</label>
+            <span>{{ basicData.tableType == 'EXTERNAL_TABLE' ? '外部表' : '内部表' }}</span>
           </div>
-          <div class="assets-info-b-l-content-item" v-if="basicData.location">
-            <label for="location">location</label>
+          <div class="assets-info-b-l-content-item" v-if=" basicData.tableType == 'EXTERNAL_TABLE' && basicData.location">
+            <label for="location">表路径</label>
             <span :style="{'word-break': 'break-all'}">{{ basicData.location }}</span>
           </div>
         </div>

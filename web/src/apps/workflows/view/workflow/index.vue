@@ -355,6 +355,16 @@ export default {
     currentWorkdapceData(val) {
       console.log(val, "工作空间数据");
     },
+    "$route.name"() {
+      let dicValue = '';
+      if( this.$route.name == 'Workflow' ) {
+        dicValue = 'dev'
+      }else if( this.$route.name == 'Scheduler' ) {
+        dicValue = 'scheduler'
+      }
+      const btn = this.selectDevprocess.find(item => item.dicValue === dicValue)
+      this.handleChangeButton(btn)
+    }
   },
   created() {
     this.getAreaMap();

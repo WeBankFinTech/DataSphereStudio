@@ -6,6 +6,7 @@
         <SvgIcon icon-class="biao" style="fontsize: 16px" />
         <span
           style="marginleft: 8px; fontsize: 16px"
+          class="content-html"
           v-html="model.name"
         ></span>
       </div>
@@ -32,16 +33,16 @@
     </div>
 
     <div class="tab-card-b">
-      <div v-if="!model.comment">
+      <div v-if="!model.comment" style="width: 100%">
         <span>描述：-</span>
       </div>
-      <div v-else>
+      <div v-else style="width: 100%">
         描述：<span v-html="model.comment" class="content-html"></span>
       </div>
     </div>
 
-    <div class="tab-card-b" style="width: 100%">
-      <div v-if="model.labels.length > 0">
+    <div class="tab-card-b">
+      <div v-if="model.labels.length > 0" style="width: 100%">
         <span>标签：</span>
         <span
           class="tab-card-b-tag content-html"
@@ -50,7 +51,7 @@
           v-html="label"
         ></span>
       </div>
-      <div v-else>
+      <div v-else style="width: 100%">
         <span>标签：-</span>
       </div>
     </div>
@@ -70,7 +71,6 @@
 </template>
 
 <script>
-import Tag from "../../../../../components/tag/index.vue";
 import { EventBus } from "../../../module/common/eventBus/event-bus";
 export default {
   name: "tabCard",
@@ -148,7 +148,6 @@ export default {
       return layer;
     },
   },
-  components: { Tag },
 };
 </script>
 
@@ -156,6 +155,7 @@ export default {
 @import "@/common/style/variables.scss";
 .tab-card-wrap {
   min-height: 10.5vh;
+  padding-top: 12px;
   padding-left: 24px;
   padding-right: 24px;
   border: 1px solid #dee4ec;
@@ -174,6 +174,8 @@ export default {
     display: flex;
     &-l {
       @include font-color(#3495f7, $dark-text-color);
+      height: 22px;
+      line-height: 22px;
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;
@@ -184,6 +186,9 @@ export default {
         height: 16px;
         margin: 0 12px;
       }
+    }
+    &-l > span {
+      display: inline-block;
     }
     &-r {
       font-family: PingFangSC-Regular;
@@ -235,7 +240,7 @@ export default {
 }
 .content-html {
   /deep/ span {
-    color: #3495f7;
+    color: #fa8c16;
   }
 }
 </style>

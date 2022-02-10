@@ -199,11 +199,22 @@ export default {
           this.sidebarFold = !this.sidebarFold;
         }
       } else {
+        this.header = title;
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
-        if (this.defaultMenu.title == "产品文档") {
+        if (this.defaultMenu.title == "部门和用户管理") {
+          let node = { name: "部门管理", type: "permissions", id: 1024, pathName: "departManagement"}
+          this.handleTreeClick(node)
+        } else if (this.defaultMenu.title == "控制台") {
+          let node = { name: "全局历史", type: "console", id: 1022, pathName: "globalHistory"}
+          this.handleTreeClick(node)
+        } else if (this.defaultMenu.title == "组件接入") {
+          this.$router.push("accessComponents");
+        } else if (this.defaultMenu.title == "产品文档") {
+          this.breadcrumbName = "";
           this.$router.push("guide");
         } else if (this.defaultMenu.title == "知识库") {
+          this.breadcrumbName = "";
           this.$router.push("library");
         }else if(this.defaultMenu.title == "下载审计"){
           this.sidebarFold = true
@@ -330,8 +341,9 @@ export default {
             delete updateData[key]
           }
         }
+        updateData.id = componentItem.applicationId
         console.log(updateData)
-        UpdateDataFromId(componentItem.id, updateData)
+        UpdateDataFromId(componentItem.applicationId, updateData)
           .then((data) => {
             _this.$Message.success("更新成功");
           })
@@ -342,12 +354,17 @@ export default {
       //新增
       if (componentItem.isAdded) {
         const postData = formatComponentDataForPost(componentItem);
+        postData['accessButtonEn'] = ''
+        postData['accessButtonCn'] = ''
+        postData['labelsEn'] = ''
+        postData['labelsCn'] = ''
         CreateData(postData)
           .then((data) => {
             _this.$Message.success("新增成功");
           })
           .catch((err) => {
-            _this.$Message.fail("新增失败");
+            console.log(err, 'err')
+            _this.$Message.error("新增失败");
           });
       }
     },
@@ -372,7 +389,7 @@ export default {
             _menuOptions.push(menu);
           });
           that.menuOptions = _menuOptions;
-          console.log("that.menuOptions", that.menuOptions);
+          console.log('that.menuOptions', that.menuOptions)
           sessionStorage.setItem(
             "menuOptions",
             JSON.stringify(that.menuOptions)

@@ -76,6 +76,15 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
 
     Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
+
     boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
+
+    /**
+     * 查询已删除工程list
+     * @param projectRequest
+     * @return
+     */
+    List<ProjectResponse> getDeletedProjects(ProjectQueryRequest projectRequest);
+
 
 }

@@ -84,4 +84,9 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
     void deleteProjectInfo(@Param("projectId") Long projectId);
 
 
+    /**
+     * 获取已删除的工程
+     *
+     */
+    List<QueryProjectVo> getDeletedProjects(ProjectQueryRequest projectRequest);
 }

@@ -25,9 +25,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.server.Message;
@@ -41,6 +39,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.ws.rs.core.Context;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -198,4 +198,19 @@ public class DSSFrameworkProjectRestfulApi {
             return  Message.error("获取工程能力失败");
         }
     }
+
+
+    /**
+     * 获取已删除的所有工程
+     */
+    @RequestMapping(path ="getDeletedProjects", method = RequestMethod.POST)
+    public Message getDeletedProjects(@Context HttpServletRequest request, @Valid ProjectQueryRequest projectRequest) {
+        String username = SecurityFilter.getLoginUsername(request);
+        projectRequest.setUsername(username);
+        List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
+        Message message = Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
+        return message;
+    }
+
+
 }

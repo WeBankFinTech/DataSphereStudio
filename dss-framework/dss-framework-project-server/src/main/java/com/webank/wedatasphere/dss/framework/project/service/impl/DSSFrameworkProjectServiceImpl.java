@@ -16,48 +16,37 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.webank.wedatasphere.dss.standard.app.structure.project.*;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
+import com.webank.wedatasphere.dss.appconn.schedulis.service.AzkabanUserService;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
-import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.exception.LambdaWarnException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectNoCreateSwitchService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.common.conf.CommonVars;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,6 +78,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace,boolean checkProjectName) throws Exception {
+        validReleaseUserExistWtss(projectCreateRequest.getReleaseUsers(),workspace);
         //1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程
         //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后进行数据库进行回滚
         boolean isWorkspaceUser = projectUserService.isWorkspaceUser(projectCreateRequest.getWorkspaceId(), username);
@@ -143,6 +133,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, String username, Workspace workspace) throws Exception {
+        validReleaseUserExistWtss(projectModifyRequest.getReleaseUsers(),workspace);
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
         //如果不是工程的创建人，则校验是否管理员
         if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
@@ -351,4 +342,42 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         return true;
     }
+
+    /**
+     * 校验运维用户是否存在WTSS
+     * @param releaseUsers
+     * @param workspace
+     */
+    public void validReleaseUserExistWtss(List<String> releaseUsers,Workspace workspace)throws DSSErrorException {
+        if (releaseUsers == null || releaseUsers.size() == 0) {
+            return;
+        }
+        SchedulisAppConn schedulisAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulisAppConn.class);
+        if (schedulisAppConn == null || schedulisAppConn.getAppDesc() == null) {
+            LOGGER.error("schedulisAppConn is null");
+            return;
+        }
+        List<AppInstance> appInstances = schedulisAppConn.getAppDesc().getAppInstances();
+        if (appInstances == null) {
+            LOGGER.error("validReleaseUserExistWtss-appInstances of schedulerAppConn is null");
+            return;
+        }
+        OnlyStructureAppConn onlyStructureAppConn = (OnlyStructureAppConn) schedulisAppConn;
+        StructureIntegrationStandard appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
+        ProjectService projectService = appStandard.getProjectService(appInstances.get(0));
+        String baseUrl = appInstances.get(0).getBaseUrl();
+        //如果发布权限，只有一个用户并且是创建用户，则不需要检查
+/*        if(releaseUsers.size() == 1 && releaseUsers.contains(createBy)){
+            return;
+        }
+        //创建人不需要检查是否存在WTSS系统
+        releaseUsers.remove(createBy);*/
+        for (String accessUser : releaseUsers) {
+            String userId = AzkabanUserService.getUserIdByName(accessUser, baseUrl, projectService.getSSORequestService(), workspace);
+            if (userId == null || userId.equals("")) {
+                throw new DSSErrorException(100323, "当前设置用户: " + accessUser + ", 在WTSS系统不存在，请联系WTSS管理员创建该用户！");
+            }
+        }
+    }
+
 }

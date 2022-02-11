@@ -50,7 +50,7 @@
               </Select>
             </div>
           </Col>
-          <Col :span="10" :style="{ display: 'flex' }">
+          <!-- <Col :span="10" :style="{ display: 'flex' }">
             <div class="assets-index-t-b1-label"><span>负责人</span></div>
             <div class="assets-index-t-b1-content">
               <Select
@@ -71,7 +71,7 @@
                 >
               </Select>
             </div>
-          </Col>
+          </Col> -->
           <Col :span="4">
             <div :style="{ display: 'flex', 'margin-left': '32px' }">
               <Button @click="onReset">重置</Button>
@@ -159,9 +159,10 @@
       <div class="assets-index-b-r" v-if="cardTabs.length">
         <Scroll :on-reach-bottom="handleReachBottom" height="100vh">
           <tab-card
-            v-for="model in cardTabs"
+            v-for="(model,idx) in cardTabs"
             :model="model"
-            :key="model.guid"
+            :key="idx"
+            :queryStr="queryForTbls || ''"
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
@@ -257,10 +258,14 @@ export default {
         });
     }
   },
+  watch: {
+    queryForTbls(newVal) {
+      this.onSearch()
+    }
+  },
   mounted() {
     let _this = this;
     this.throttleLoad = throttle(() => {
-      console.log("scroll");
       _this.scrollHander();
     }, 300);
     window.addEventListener("scroll", this.throttleLoad, false);
@@ -297,9 +302,6 @@ export default {
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
       this.isLoading = false;
-      if( this.queryForTbls || params.classification) {
-        EventBus.$emit("onQueryForHighLight", this.queryForTbls);
-      }
       getHiveTbls(params)
         .then((data) => {
           if (data.result) {
@@ -324,7 +326,8 @@ export default {
 
     onChooseCard(model) {
       let that = this;
-      EventBus.$emit("on-choose-card", model);
+      let _model = JSON.parse(JSON.stringify(model).replaceAll('<span>', '').replaceAll('</span>', ''))
+      EventBus.$emit("on-choose-card", _model);
       const workspaceId = that.$route.query.workspaceId;
       const { guid } = model;
       that.$router.push({
@@ -394,7 +397,6 @@ export default {
               });
               that.ownerList = _res;
               that.owerSerachLoading = false;
-              console.log("ownerList", that.ownerList);
             }
           })
           .catch((err) => {
@@ -444,7 +446,6 @@ export default {
       let st = getScrollTop();
       let ch = getClientHeight();
       let sh = getScrollHeight();
-      console.log(st, ch, sh);
       if (st + ch + 54 >= sh) {
         // 拉数据
         this.handleReachBottom();

@@ -72,6 +72,12 @@
       :mode="modalCfg.mode"
       @finish="handleModalFinish"
     />
+    <Modal
+      v-model="delete_modal"
+      title="友情提示"
+      @on-ok="deleteOk">
+      <p>确定要删除此条主题域记录吗？</p>
+    </Modal>
   </div>
 </template>
 
@@ -96,9 +102,13 @@ export default {
         mode: 'create',
       }
     },
-    async handleDelete(id) {
+    handleDelete(id) {
+      this.delete_modal = true;
+      this.delete_id = id
+    },
+    async deleteOk() {
       this.loading = true
-      await deleteThemedomains(id).then(res => {
+      await deleteThemedomains(this.delete_id).then(res => {
         this.loading = false
       }).catch(err => {
         this.loading = false
@@ -180,6 +190,7 @@ export default {
           title: '创建时间',
           key: 'createTime',
           slot: 'createTime',
+          sortable: true
         },
         {
           title: '更新时间',
@@ -207,6 +218,8 @@ export default {
         pageSize: 10,
         total: 10,
       },
+      delete_modal: false,
+      delete_id: ''
     }
   },
 }

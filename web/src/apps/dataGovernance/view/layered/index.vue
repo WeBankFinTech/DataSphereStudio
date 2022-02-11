@@ -145,6 +145,12 @@
       :mode="modalCfg.mode"
       @finish="handleModalFinish"
     />
+    <Modal
+      v-model="delete_modal"
+      title="友情提示"
+      @on-ok="deleteOk">
+      <p>确定要删除此条分层记录吗？</p>
+    </Modal>
   </div>
 </template>
 
@@ -176,11 +182,15 @@ export default {
         mode: "create"
       };
     },
-    async handleDelete(name) {
+    async deleteOk() {
       this.customloading = true;
-      await deleteLayers(name);
+      await deleteLayers(this.delete_name);
       this.customloading = false;
       this.handleGetLayersCustom();
+    },
+    handleDelete(name) {
+      this.delete_modal = true
+      this.delete_name = name
     },
     handleEdit(name) {
       this.modalCfg = {
@@ -254,7 +264,8 @@ export default {
         {
           title: "创建时间",
           key: "createTime",
-          slot: "createTime"
+          slot: "createTime",
+          sortable: true
         },
         {
           title: "更新时间",
@@ -278,7 +289,9 @@ export default {
         name: "",
         visible: false
       },
-      searchVal: ''
+      searchVal: '',
+      delete_modal: false,
+      delete_name: ''
     };
   }
 };

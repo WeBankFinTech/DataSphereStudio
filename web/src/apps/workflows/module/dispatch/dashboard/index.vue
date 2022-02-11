@@ -30,7 +30,7 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <m-process-state-count :search-params="searchParams" @goToList="goToList">
+              <m-process-state-count :search-params="searchParams" :workspaceName="workspaceName" @goToList="goToList">
               </m-process-state-count>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
@@ -56,7 +56,7 @@
               <span>{{$t('message.scheduler.processDefinitionStatistics')}}</span>
             </div>
             <div class="dashboard-module-content">
-              <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
+              <m-define-user-count :project-id="searchParams.projectId" :workspaceName="workspaceName" @goToList="goToList">
               </m-define-user-count>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
@@ -119,7 +119,7 @@ import mProcessStateCount from './source/processStateCount'
 //import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
-import {formatDate} from '../convertor'
+//import {formatDate} from '../convertor'
 import { tasksState } from '../config'
 
 import echarts from 'echarts'
@@ -198,7 +198,13 @@ export default {
   methods: {
     getConsumptionData() {
       if (!this.projectName) return
-      api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-order-by-duration`, {
+      let url
+      if (this.projectId != 0) {
+        url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-order-by-duration`
+      } else {
+        url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/list-order-by-duration`
+      }
+      api.fetch(url, {
         pageSize: 10,
         pageNo: 1,
         startDate: this.consumptionParams.startDate  || '',
@@ -264,7 +270,7 @@ export default {
       })
     },
     goToList() {
-      if (this.getFullName() === `${this.workspaceName}-${this.projectName}`) {
+      if (this.projectId != 0) {
         this.$emit('goToList', ...arguments)
       }
     },
@@ -276,22 +282,26 @@ export default {
       if (this.projectId) {
         return cb(this.projectId)
       } else {
+        if (this.$route.query.projectID == 0) {
+          this.projectId = 0
+          return cb(this.projectId)
+        }
+        if (!this.projectName) return
         this.loading = true
         let searchVal = `${this.workspaceName}-${this.projectName}`
-        api.fetch(`dolphinscheduler/projects/list-paging`, {
-          pageSize: 100,
-          pageNo: 1,
-          searchVal: ''
+        api.fetch(`dolphinscheduler/projects/query-project-id`, {
+          projectName: searchVal
         }, 'get').then(res => {
-          this.projectList = res.totalList
+          //this.projectList = res.totalList
           this.loading = false
-          for (let i = 0; i < res.totalList.length; i++) {
+          /*for (let i = 0; i < res.totalList.length; i++) {
             if (res.totalList[i].name === searchVal) {
               this.projectId = res.totalList[i].id
               return cb(this.projectId)
             }
-          }
-          this.projectId = res.totalList.length ? res.totalList[0].id : ''
+          }*/
+          //this.projectId = res.totalList.length ? res.totalList[0].id : ''
+          this.projectId = res
           return cb(this.projectId)
         })
       }
@@ -299,17 +309,21 @@ export default {
     getMixedBarLineData(currentDay, cb) {
       if (!this.projectName) return
       util.checkToken(() => {
-        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-paging`, {
-          pageSize: 1000,
-          pageNo: 1,
+        let url
+        if (this.projectId != 0) {
+          url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/success-rate`
+        } else {
+          url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/success-rate`
+        }
+        api.fetch(url , {
           startDate: `${currentDay} 00:00:00`,
           endDate: `${currentDay} 23:59:59`,
         }, 'get').then((res) => {
-          let objTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            successTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            failureTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+          let objTotal = res.total,
+            successTotal = res.successTotal,
+            failureTotal = res.failTotal,
             successPercent = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-          res.totalList.forEach(item => {
+          /*res.totalList.forEach(item => {
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
             let curHour = new Date(item.startTime).getHours()
@@ -321,7 +335,7 @@ export default {
             if (curState === 'FAILURE') {
               failureTotal[curHour] = failureTotal[curHour] + 1
             }
-          })
+          })*/
           successTotal.forEach((success, index) => {
             if (objTotal[index]) {
               successPercent[index] =  parseInt((success / objTotal[index]) * 100)
@@ -339,6 +353,7 @@ export default {
       })
     },
     getAreaData(cb, stateType) {
+      
       function getFormatDateString(dd) {
         let tYear = dd.getFullYear(),
           tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
@@ -353,7 +368,13 @@ export default {
       let dateString1 = getFormatDateString(dd),
         dateString2 = getFormatDateString(dd1)
       util.checkToken(() => {
-        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/statistics`, {
+        let url
+        if (this.projectId != 0) {
+          url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/statistics`
+        } else {
+          url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/statistics`
+        }
+        api.fetch(url , {
           dates: dateString1 + ',' + dateString2,
           step: 2,
           stateType: stateType || 'SUCCESS'

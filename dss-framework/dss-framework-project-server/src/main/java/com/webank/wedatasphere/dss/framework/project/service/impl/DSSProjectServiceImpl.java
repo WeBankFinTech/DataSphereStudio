@@ -380,4 +380,56 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return !projectUserMapper.getUserWorkspaceAdminRole(workspaceId, username).isEmpty();
     }
 
+    @Override
+    public List<ProjectResponse> getDeletedProjects(ProjectQueryRequest projectRequest) {
+        //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程,再删选出其中是已删除的项目
+        List<QueryProjectVo> list = projectMapper.getDeletedProjects(projectRequest);
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        List<ProjectResponse> projectResponseList = new ArrayList<>();
+        ProjectResponse projectResponse = null;
+        for (QueryProjectVo projectVo : list) {
+            projectResponse = new ProjectResponse();
+            projectResponse.setApplicationArea(projectVo.getApplicationArea());
+            projectResponse.setId(projectVo.getId());
+            projectResponse.setBusiness(projectVo.getBusiness());
+            projectResponse.setCreateBy(projectVo.getCreateBy());
+            projectResponse.setDescription(projectVo.getDescription());
+            projectResponse.setName(projectVo.getName());
+            projectResponse.setProduct(projectVo.getProduct());
+            projectResponse.setSource(projectVo.getSource());
+            projectResponse.setArchive(projectVo.getArchive());
+            projectResponse.setCreateTime(projectVo.getCreateTime());
+            projectResponse.setUpdateTime(projectVo.getUpdateTime());
+            projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
+            projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            projectResponseList.add(projectResponse);
+            /**
+             * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+             * 从而得到：查看权限用户、编辑权限用户、发布权限用户
+             */
+            String pusername = projectVo.getPusername();
+            if (StringUtils.isEmpty(pusername)) {
+                continue;
+            }
+            Map<String, List<String>> userPricMap = new HashMap<>();
+            String[] tempstrArr = pusername.split(MODE_SPLIT);
+
+            for (String s : tempstrArr) {
+                String[] strArr = s.split(KEY_SPLIT);
+                String key = strArr[0] + KEY_SPLIT + strArr[1];
+                userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                userPricMap.get(key).add(strArr[2]);
+            }
+            List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+            List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+            projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+        }
+        return projectResponseList;
+    }
+
 }

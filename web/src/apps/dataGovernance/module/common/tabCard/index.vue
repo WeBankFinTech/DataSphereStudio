@@ -146,9 +146,7 @@ export default {
 @import "@/common/style/variables.scss";
 .tab-card-wrap {
   min-height: 10.5vh;
-  padding-top: 12px;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 24px;
   border: 1px solid #dee4ec;
   @include border-color(#dee4ec, $dark-border-color-base);
   border-top: none;
@@ -167,6 +165,7 @@ export default {
       @include font-color(#3495f7, $dark-text-color);
       height: 22px;
       line-height: 22px;
+      font-size: 16px;
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;

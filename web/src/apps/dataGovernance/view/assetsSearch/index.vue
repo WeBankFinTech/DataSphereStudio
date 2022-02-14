@@ -4,23 +4,21 @@
     <div class="assets-index-t">
       <!-- bottom -->
       <div class="assets-index-t-b1">
+        <div style="display:flex">
+          <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
+          <div class="assets-index-t-b1-content">
+            <Input
+              :placeholder="
+                $t(`message.dataGovernance.pleaseEnterATableName`)
+              "
+              v-model="queryForTbls"
+            >
+            </Input>
+          </div>
+        </div>
 
-        <Row>
-          <Col :span="24" :style="{ display: 'flex' }">
-            <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
-            <div class="assets-index-t-b1-content">
-              <Input
-                :placeholder="
-                  $t(`message.dataGovernance.pleaseEnterATableName`)
-                "
-                v-model="queryForTbls"
-              >
-              </Input>
-            </div>
-          </Col>
-        </Row>
-        <Row :style="{ 'margin-top': '16px' }">
-          <Col :span="10" :style="{ display: 'flex' }">
+        <div style="display:flex; margin-top: 16px">
+          <div style="display:flex; flex: 1">
             <div class="assets-index-t-b1-label">
               <span>主题域/分层</span>
             </div>
@@ -49,8 +47,9 @@
                 </OptionGroup>
               </Select>
             </div>
-          </Col>
-          <!-- <Col :span="10" :style="{ display: 'flex' }">
+          </div>
+
+          <div style="display:flex; flex: 1">
             <div class="assets-index-t-b1-label"><span>负责人</span></div>
             <div class="assets-index-t-b1-content">
               <Select
@@ -71,19 +70,18 @@
                 >
               </Select>
             </div>
-          </Col> -->
-          <Col :span="4">
-            <div :style="{ display: 'flex', 'margin-left': '32px' }">
-              <Button @click="onReset">重置</Button>
-              <Button
-                type="primary"
-                :style="{ 'margin-left': '8px' }"
-                @click="onSearch"
-              >查询</Button
-              >
-            </div>
-          </Col>
-        </Row>
+          </div>
+
+          <div style="display:flex; flex: 1">
+            <Button @click="onReset">重置</Button>
+            <Button
+              type="primary"
+              :style="{ 'margin-left': '8px' }"
+              @click="onSearch"
+            >查询</Button
+            >
+          </div>
+        </div>
       </div>
     </div>
 
@@ -157,7 +155,7 @@
 
       <!-- right -->
       <div class="assets-index-b-r" v-if="cardTabs.length">
-        <Scroll :on-reach-bottom="handleReachBottom" height="100vh">
+        <Scroll :on-reach-bottom="handleReachBottom" height="100vh" style="margin: -10px 0">
           <tab-card
             v-for="(model,idx) in cardTabs"
             :model="model"
@@ -166,7 +164,9 @@
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
-        <Divider v-if="isCompleted" orientation="center">到底了</Divider>
+        <div style="height: 75px;  display: flex; align-items: center" class="assets-index-b-r-divider">
+          <Divider v-if="isCompleted" orientation="center">到底了</Divider>
+        </div>
       </div>
       <div class="assets-index-b-r" v-else>
         <div style="text-align: center; margin-top: 50px; font-weight: bolder">
@@ -484,7 +484,7 @@ export default {
               }
             })
           }
-          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 ) {
+          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 && key != 'guid' ) {
             item[key] = item[key].replace(reg, _query)
             flag = true
           }
@@ -511,7 +511,6 @@ export default {
   flex-direction: column;
   overflow-x: hidden;
   .assets-index-t-t1 {
-    padding: 0px $padding-25;
     border-bottom: $border-width-base $border-style-base $border-color-base;
     @include border-color(
       $background-color-base,
@@ -542,10 +541,6 @@ export default {
         margin: 0 15px;
       }
     }
-    .active {
-      border-bottom: 2px solid $primary-color;
-      @include border-color($primary-color, $dark-primary-color);
-    }
     .top-r-container {
       flex: 1;
       height: 40px;
@@ -553,9 +548,14 @@ export default {
   }
 
   .assets-index-t-b1 {
+    border-top: 1px solid #DEE4EC;
+    border-bottom: 1px solid #DEE4EC;
     min-height: 112px;
     @include bg-color(#f4f7fb, $dark-base-color);
-    padding: 16px 24px;
+    padding: 0px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     &-label {
       width: 100px;
       margin-right: 8px;
@@ -563,9 +563,9 @@ export default {
       line-height: 32px;
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
       text-align: right;
       font-weight: 400;
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     }
     &-content {
       flex: 1;
@@ -630,7 +630,9 @@ export default {
     }
     &-r {
       flex: 1;
-      padding-bottom: 10px;
+      &-divider {
+        @include bg-color(#f4f7fb, $dark-base-color);
+      }
     }
   }
   ::v-deep .ivu-input-group-prepend,
@@ -643,6 +645,9 @@ export default {
   ::v-deep .ivu-input-group .ivu-input,
   .ivu-input-group .ivu-input-inner-container {
     margin-left: 8px;
+  }
+  ::v-deep .ivu-divider-horizontal.ivu-divider-with-text-center, .ivu-divider-horizontal.ivu-divider-with-text-left, .ivu-divider-horizontal.ivu-divider-with-text-right {
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
   }
 }
 

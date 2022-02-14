@@ -45,4 +45,7 @@ public class DSSWorkFlowConstant {
     public static final String APPCONN_NAME_VISUALIS = CommonVars.apply("appconn.name.visualis", "visualis").getValue();
     public static final String APPCONN_NAME_QUALITIS = CommonVars.apply("appconn.name.qualitis", "qualitis").getValue();
 
+    public static final CommonVars<String> DSS_SCHEDULER_APPCONN_NAME = CommonVars.apply("wds.dss.scheduler.appconn.name", "dolphinscheduler");
+
+
 }

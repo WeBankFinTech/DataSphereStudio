@@ -32,6 +32,14 @@
   }
 }
 
+@mixin border-bottom-color($color, $darkColor) {
+  border-bottom-color: $color;
+
+  [data-theme="dark"] & {
+    border-bottom-color: $darkColor;
+  }
+}
+
 @mixin guide-box-shadow($color, $darkColor) {
   box-shadow: -2px 0 10px 0 $color;
 

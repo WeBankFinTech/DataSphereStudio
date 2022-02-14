@@ -25,6 +25,30 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
         return processDefinitionJson;
     }
 
+    public Integer tenantId;
+
+    private String tenantCode;
+
+
+    public String getTenantCode() {
+        return tenantCode;
+    }
+
+    public void setTenantCode(String tenantCode) {
+        this.tenantCode = tenantCode;
+    }
+
+
+
+    public Integer getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Integer tenantId) {
+        this.tenantId = tenantId;
+    }
+
+
     public void setProcessDefinitionJson(ProcessDefinitionJson processDefinitionJson) {
         this.processDefinitionJson = processDefinitionJson;
     }

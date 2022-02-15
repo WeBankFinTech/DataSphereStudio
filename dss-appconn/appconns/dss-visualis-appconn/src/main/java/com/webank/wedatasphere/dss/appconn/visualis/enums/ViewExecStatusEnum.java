@@ -1,16 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.visualis.enums;
 
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
-
 import java.util.Arrays;
-
-/**
- * Description visualis执行view语句任务状态枚举类
- *
- * @Author elishazhang
- * @Date 2021/11/2
- */
-
 public enum ViewExecStatusEnum {
     Scheduled(0, "Scheduled"),
     Running(1, "Running"),

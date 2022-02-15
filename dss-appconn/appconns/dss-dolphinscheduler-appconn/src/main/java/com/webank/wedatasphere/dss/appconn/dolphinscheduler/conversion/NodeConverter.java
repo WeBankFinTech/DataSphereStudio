@@ -142,7 +142,7 @@ task.setTenantId(8);
                 }else if("linkis.spark.py".equals(taskType)){
 
                     contentBuffer.append("source /etc/profile").append("\n");
-                    contentBuffer.append("pyspark --master yarn -- executor-memory 512m -- num-executors 1 <<EOF\n");
+                    contentBuffer.append("pyspark --master yarn --executor-memory 512m --num-executors 1 <<EOF\n");
                     contentBuffer.append("from pyspark.sql import SparkSession\n");
                     contentBuffer.append("spark = SparkSession.builder.appName('pyspark').getOrCreate()\n");
                     contentBuffer.append(scriptContent+"\n");

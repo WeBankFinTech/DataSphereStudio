@@ -32,7 +32,7 @@ function isLocal(){
     elif [ "$1" == $local_host ]; then
         return 0
     #elif [ "$1" == $ipaddr ]; then
-      #  return 0
+     #   return 0
     fi
         return 1
 }
@@ -174,14 +174,14 @@ function setServerName(){
 	elif [[ $PROJECT_NAME == *"execution"* ]]; then
 		SERVER_NAME=dss-flow-execution-server
 	elif [[ $PROJECT_NAME == *"data-api"* ]]; then
-    SERVER_NAME=dss-data-api-server
-  elif [[ $PROJECT_NAME == *"data-governance"* ]]; then
-    SERVER_NAME=dss-data-governance-server
-  elif [[ $PROJECT_NAME == *"guide"* ]]; then
-    SERVER_NAME=dss-guide-server
+		SERVER_NAME=dss-data-api-server
+	elif [[ $PROJECT_NAME == *"governance"* ]]; then
+		SERVER_NAME=dss-data-governance-server
+	elif [[ $PROJECT_NAME == *"guide"* ]]; then
+		SERVER_NAME=dss-guide-server
   else
 		echo "please input： sh dss-daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh restart project "
-		echo "server name :  project、orchestrator、apiservice、datapipe、workflow、execution、data-api、data-governance、guide"
+		echo "server name :  project、orchestrator、apiservice、datapipe、workflow、execution、data-api、governance、guide"
 		exit 1
 	fi
 }

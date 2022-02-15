@@ -1,5 +1,5 @@
 DELETE FROM dss_workspace;
-insert into `dss_workspace` (`name`, `label`, `description`, `create_by`, `create_time`, `department`, `product`, `source`, `last_update_time`, `last_update_user`) values('bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','企业直通银行部','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop');
+insert into `dss_workspace` (`name`, `label`, `description`, `create_by`, `create_time`, `department`, `product`, `source`, `last_update_time`, `last_update_user`) values('bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop');
 insert  into `dss_workspace`(`id`,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`) values(323,'hadoop001','','1','hadoop','2021-09-06 14:39:14','0','DSS',NULL,'2021-09-06 14:39:14','hadoop','project');
 
 DELETE FROM dss_workspace_user;

@@ -326,19 +326,19 @@ CREATE TABLE `dss_event_relation` (
 
 DROP TABLE IF EXISTS `dss_flow_edit_lock`;
 CREATE TABLE `dss_flow_edit_lock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `flow_id` bigint(11) NOT NULL,
-  `flow_version` varchar(16) NOT NULL,
-  `project_version_id` bigint(11) NOT NULL,
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `owner` varchar(128) NOT NULL,
-  `lock_stamp` int(8) NOT NULL DEFAULT '0',
-  `is_expire` tinyint(1) NOT NULL DEFAULT '0',
-  `lock_content` varchar(512) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `flow_lock` (`flow_id`,`flow_version`,`project_version_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `flow_id` bigint(11) NOT NULL,
+   `flow_version` varchar(16) NOT NULL,
+   `username` varchar(64) NOT NULL,
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `owner` varchar(128) NOT NULL,
+   `lock_stamp` int(8) NOT NULL DEFAULT '0',
+   `is_expire` tinyint(1) NOT NULL DEFAULT '0',
+   `lock_content` varchar(512) NOT NULL,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
+ ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `dss_flow_publish_history`;
 CREATE TABLE `dss_flow_publish_history` (
@@ -630,6 +630,7 @@ CREATE TABLE `dss_orchestrator_version_info` (
   `project_id` bigint(20) DEFAULT NULL,
   `content` varchar(255) DEFAULT NULL,
   `context_id` varchar(200) DEFAULT NULL COMMENT '上下文ID',
+   `valid_flag` INT(1) DEFAULT '1' COMMENT '版本有效标示，0:无效；1：有效',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 

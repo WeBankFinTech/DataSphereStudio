@@ -19,13 +19,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * @author suyc
- * @Classname ClassificationRestful
- * @Description TODO
- * @Date 2021/9/24 10:35
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/data/governance/classification", produces = {"application/json"})
 @Slf4j

@@ -11,14 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author lenovo
- * @Classname DSSDbApiManagerRestful
- * @Description 服务管理--API管理
- * @Date 2021/7/19 15:38
- * @Created by suyc
- */
-
 @RestController
 @RequestMapping(path = "/dss/data/api/apimanager", produces = {"application/json"})
 public class DSSDbApiManagerRestful {

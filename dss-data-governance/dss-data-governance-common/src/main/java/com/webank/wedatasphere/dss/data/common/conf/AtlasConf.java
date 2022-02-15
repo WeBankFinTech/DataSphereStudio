@@ -2,13 +2,6 @@ package com.webank.wedatasphere.dss.data.common.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-/**
- * @author suyc
- * @Classname AtlasConf
- * @Description TODO
- * @Date 2021/8/20 14:21
- * @Created by suyc
- */
 public interface AtlasConf {
     /**
      * atlas server info

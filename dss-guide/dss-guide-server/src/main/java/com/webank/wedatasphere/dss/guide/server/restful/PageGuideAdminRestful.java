@@ -27,13 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author suyc
- * @Classname PageGuideAdminRestful
- * @Description TODO
- * @Date 2021/12/17 14:53
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/guide/admin", produces = {"application/json"})
 @AllArgsConstructor

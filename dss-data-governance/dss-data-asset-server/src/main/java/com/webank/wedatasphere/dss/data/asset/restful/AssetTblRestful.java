@@ -26,12 +26,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * @Classname HiveTblRestful
- * @Description TODO
- * @Date 2021/8/19 13:53
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/data/governance/asset/hiveTbl", produces = {"application/json"})
 @AllArgsConstructor

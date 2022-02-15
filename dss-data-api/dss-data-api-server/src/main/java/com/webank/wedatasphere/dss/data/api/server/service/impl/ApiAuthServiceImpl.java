@@ -17,12 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @Classname DSSDataApiAuthServiceImpl
- * @Description TODO
- * @Date 2021/7/13 17:13
- * @Created by suyc
- */
 @Service
 @Slf4j
 public class ApiAuthServiceImpl extends ServiceImpl<ApiAuthMapper, ApiAuth> implements ApiAuthService {

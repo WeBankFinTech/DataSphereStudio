@@ -35,13 +35,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * @author suyc
- * @Classname AssetServiceImpl
- * @Description TODO
- * @Date 2021/8/20 9:54
- * @Created by suyc
- */
 @Service
 public class AssetServiceImpl implements AssetService {
     private static final Logger logger = LoggerFactory.getLogger(AssetServiceImpl.class);

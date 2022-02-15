@@ -39,8 +39,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
-
-
 @RestController
 @RequestMapping(path = "/dss/data/api", produces = {"application/json"})
 @Slf4j

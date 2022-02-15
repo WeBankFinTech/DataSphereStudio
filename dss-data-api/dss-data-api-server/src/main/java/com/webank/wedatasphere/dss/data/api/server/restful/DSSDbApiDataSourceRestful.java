@@ -6,6 +6,8 @@ import com.webank.wedatasphere.dss.data.api.server.service.ApiDataSourceService;
 import com.webank.wedatasphere.dss.data.api.server.util.CryptoUtils;
 import com.webank.wedatasphere.dss.data.api.server.util.JdbcUtil;
 import com.webank.wedatasphere.dss.data.api.server.util.PoolManager;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -32,17 +34,16 @@ public class DSSDbApiDataSourceRestful {
     private static final Logger logger = LoggerFactory.getLogger(DSSDbApiDataSourceRestful.class);
 
     @RequestMapping(path = "connections", method = RequestMethod.GET)
-
-    public Message connect(@RequestParam("workspaceId") Integer workspaceId, @RequestParam("type") String type) {
-
-        List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(workspaceId, type);
+    public Message connect(HttpServletRequest httpServletRequest, @RequestParam(value = "workspaceId", required = false) Integer workspaceId,
+                           @RequestParam("type") String type) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(Integer.valueOf(workspace.getWorkspaceName()), type);
         return Message.ok().data("availableConns", allConnections);
 
     }
 
 
     @RequestMapping(path = "tables", method = RequestMethod.GET)
-
     public Message getAllTables(@RequestParam("datasourceId") Integer datasourceId) throws SQLException {
 
         DataSource dataSource = dssDbApiDataSourceService.selectById(datasourceId);
@@ -53,7 +54,6 @@ public class DSSDbApiDataSourceRestful {
 
 
     @RequestMapping(path = "cols", method = RequestMethod.GET)
-
     public Message getAllCols(@RequestParam("datasourceId") Integer datasourceId, @RequestParam("tableName") String tableName) throws SQLException {
         DataSource dataSource = dssDbApiDataSourceService.selectById(datasourceId);
         DruidPooledConnection connection = PoolManager.getPooledConnection(dataSource);
@@ -62,8 +62,7 @@ public class DSSDbApiDataSourceRestful {
     }
 
 
-    @RequestMapping(path ="add", method = RequestMethod.POST)
-
+    @RequestMapping(path = "add", method = RequestMethod.POST)
     public Message addDatasource(@RequestBody DataSource dataSource, HttpServletRequest req) {
 
         dataSource.setPwd(CryptoUtils.object2String(dataSource.getPwd()));
@@ -74,11 +73,12 @@ public class DSSDbApiDataSourceRestful {
 
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
-
-    public Message getAllDs(@RequestParam("workspaceId") Integer workspaceId, @RequestParam("type") String type, @RequestParam("name") String name) {
-
+    public Message getAllDs(HttpServletRequest httpServletRequest,
+                            @RequestParam(value = "workspaceId", required = false) Integer workspaceId,
+                            @RequestParam("type") String type, @RequestParam("name") String name) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         DataSource dataSource = new DataSource();
-        dataSource.setWorkspaceId(workspaceId);
+        dataSource.setWorkspaceId(Integer.valueOf(workspace.getWorkspaceName()));
         dataSource.setType(type);
         dataSource.setName(name);
         List<DataSource> allDatasource = dssDbApiDataSourceService.listAllDatasources(dataSource);
@@ -86,8 +86,7 @@ public class DSSDbApiDataSourceRestful {
         return Message.ok().data("allDs", allDatasource);
     }
 
-    @RequestMapping(path ="edit", method = RequestMethod.POST)
-
+    @RequestMapping(path = "edit", method = RequestMethod.POST)
     public Message editDatasource(@RequestBody DataSource dataSource, HttpServletRequest req) {
         if (StringUtils.isNotEmpty(dataSource.getPwd())) {
             PoolManager.removeJdbcConnectionPool(dataSource.getDatasourceId());
@@ -100,10 +99,9 @@ public class DSSDbApiDataSourceRestful {
     }
 
 
-    @RequestMapping(path ="/delete/{id}", method = RequestMethod.POST)
-
+    @RequestMapping(path = "/delete/{id}", method = RequestMethod.POST)
     public Message deleteDatasource(@PathVariable("id") Integer id) {
-        if (dssDbApiDataSourceService.isDataSourceUsing(id)){
+        if (dssDbApiDataSourceService.isDataSourceUsing(id)) {
             return Message.error("该数据源正在被使用,请下线与此数据源相关的api后再删除");
         } else {
             dssDbApiDataSourceService.deleteById(id);
@@ -112,7 +110,7 @@ public class DSSDbApiDataSourceRestful {
     }
 
 
-    @RequestMapping(path ="test", method = RequestMethod.POST)
+    @RequestMapping(path = "test", method = RequestMethod.POST)
     public Message testDatasource(@RequestBody DataSource dataSource) {
         Connection connection = null;
         try {

@@ -130,6 +130,12 @@
             <artifactId>dss-api-sql-template</artifactId>
             <version>${dss.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-sso-integration-standard</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 

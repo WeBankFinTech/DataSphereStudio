@@ -9,13 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-/**
- * @author suyc
- * @Classname GuideChapter
- * @Description TODO
- * @Date 2022/1/13 20:10
- * @Created by suyc
- */
 @Data
 @TableName(value = "dss_guide_chapter")
 public class GuideChapter {

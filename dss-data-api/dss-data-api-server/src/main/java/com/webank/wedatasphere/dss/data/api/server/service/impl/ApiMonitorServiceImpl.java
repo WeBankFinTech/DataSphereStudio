@@ -17,12 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @Classname ApiMonitorServiceImpl
- * @Description TODO
- * @Date 2021/7/20 12:27
- * @Created by suyc
- */
 @Service
 public class ApiMonitorServiceImpl implements ApiMonitorService {
     @Autowired

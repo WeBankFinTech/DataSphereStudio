@@ -18,13 +18,6 @@ import javax.ws.rs.BeanParam;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @Classname DSSDbApiMonitorRestful
- * @Description 服务管理--API监控
- * @Date 2021/7/20 11:57
- * @Created by suyc
- */
-
 @RestController
 @RequestMapping(path = "/dss/data/api/apimonitor", produces = {"application/json"})
 public class DSSDbApiMonitorRestful {

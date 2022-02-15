@@ -20,9 +20,6 @@ package com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf
 import org.apache.linkis.common.conf.CommonVars
 
 
-/**
- * Created by peacewong on 2019/11/3.
- */
 object LinkisJobTypeConf {
 
   val JOB_TYPE = "type"

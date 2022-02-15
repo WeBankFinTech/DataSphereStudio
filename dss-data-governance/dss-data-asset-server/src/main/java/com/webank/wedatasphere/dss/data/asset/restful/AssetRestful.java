@@ -17,13 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author suyc
- * @Classname AssetRestful
- * @Description TODO
- * @Date 2021/8/19 13:53
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/data/governance/asset", produces = {"application/json"})
 @AllArgsConstructor

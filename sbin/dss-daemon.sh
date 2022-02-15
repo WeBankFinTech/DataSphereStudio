@@ -2,12 +2,6 @@
 #
 # description:  Starts and stops Server
 #
-# @name:        dss-demo
-# @author:      peacewong
-# @created:     01.16.2021
-#
-# Modified for dss 1.0.0
-
 
 cd `dirname $0`
 cd ..

@@ -14,12 +14,6 @@ import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConverter;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 
-/**
- * The type Project info workflow to rel converter.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 public class ProjectInfoWorkflowToRelConverter implements WorkflowToRelConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectInfoWorkflowToRelConverter.class);

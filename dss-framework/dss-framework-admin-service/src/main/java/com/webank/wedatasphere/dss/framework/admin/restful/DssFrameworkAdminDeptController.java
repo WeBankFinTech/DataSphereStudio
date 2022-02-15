@@ -15,19 +15,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-
-/**
- * <p>
- * 部门表 前端控制器
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
-//@RestController
-//@RequestMapping("/dss/framework/admin/dept")
-
-
 @RequestMapping(path = "/dss/framework/admin/dept", produces = {"application/json"})
 @RestController
 public class DssFrameworkAdminDeptController {

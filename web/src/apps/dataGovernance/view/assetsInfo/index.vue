@@ -80,7 +80,6 @@
                 style="width: 135px;"
                 size="small"
                 placeholder=""
-
                 @on-enter="editSingleLabel"
               />
               <Icon
@@ -466,6 +465,10 @@ export default {
     // 编辑标签
     editSingleLabel() {
       let that = this;
+      let regZh = /[\u4e00-\u9fa5]+/g
+      if( regZh.test(that.singleLabel) ) {
+        return this.$Message.warning("目前标签不支持中文字符");
+      }
       if (that.singleLabel) {
         that.labelOptions.push(that.singleLabel);
         let params = that.labelOptions.slice(0);

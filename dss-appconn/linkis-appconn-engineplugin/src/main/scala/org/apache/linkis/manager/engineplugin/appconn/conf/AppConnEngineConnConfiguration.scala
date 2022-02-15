@@ -23,4 +23,6 @@ object AppConnEngineConnConfiguration {
 
   val GATEWAY_SPRING_APPLICATION = CommonVars("wds.linkis.gateway.spring.name", "dataworkcloud-gateway")
 
+  val CONCURRENT_LIMIT = CommonVars("wds.linkis.engineconn.appconn.conncurrent.limit", 100)
+
 }

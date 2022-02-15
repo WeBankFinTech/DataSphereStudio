@@ -29,13 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author suyc
- * @Classname AtlasServiceImpl
- * @Description TODO
- * @Date 2021/8/20 9:21
- * @Created by suyc
- */
 @Service("atlasService")
 public class AtlasService {
     private AtlasClient atlasClient;

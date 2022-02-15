@@ -5,13 +5,6 @@ import com.webank.wedatasphere.dss.guide.server.entity.response.GuideCatalogDeta
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideCatalogService
- * @Description TODO
- * @Date 2022/1/14 11:07
- * @Created by suyc
- */
 public interface GuideCatalogService {
     public boolean saveGuideCatalog(GuideCatalog guideCatalog);
 

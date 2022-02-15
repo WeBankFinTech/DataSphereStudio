@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
+<!--        <relativePath>../../pom.xml</relativePath>-->
     </parent>
 
     <artifactId>dss-framework-admin-service</artifactId>
     <modelVersion>4.0.0</modelVersion>
 
-
-        <properties>
-            <swagger.version>2.9.2</swagger.version>
-            <swagger-bootstrap-ui.version>1.9.2</swagger-bootstrap-ui.version>
-            <commons-lang3.version>3.9</commons-lang3.version>
-        </properties>
+    <properties>
+        <swagger.version>2.9.2</swagger.version>
+        <swagger-bootstrap-ui.version>1.9.2</swagger-bootstrap-ui.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.linkis</groupId>
@@ -76,12 +73,12 @@
             <version>1.18.16</version>
             <scope>compile</scope>
         </dependency>
-  <!--      <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.2.2</version>
-            <scope>compile</scope>
-        </dependency>-->
+        <!--      <dependency>
+                  <groupId>com.squareup.okhttp3</groupId>
+                  <artifactId>okhttp</artifactId>
+                  <version>4.2.2</version>
+                  <scope>compile</scope>
+              </dependency>-->
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
             <artifactId>okhttp</artifactId>

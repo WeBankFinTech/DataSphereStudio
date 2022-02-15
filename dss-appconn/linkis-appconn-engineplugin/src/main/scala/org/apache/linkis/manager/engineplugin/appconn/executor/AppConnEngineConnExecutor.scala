@@ -18,7 +18,6 @@ package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
 import java.util.Map
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
@@ -30,7 +29,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import com.webank.wedatasphere.dss.standard.common.entity.ref.{AsyncResponseRef, DefaultRefFactory, ResponseRef}
 import org.apache.linkis.common.utils.{OverloadUtils, Utils}
-import org.apache.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
+import org.apache.linkis.engineconn.computation.executor.execute.{ComputationExecutor, ConcurrentComputationExecutor, EngineExecutionContext}
 import org.apache.linkis.engineconn.launch.EngineConnServer
 import org.apache.linkis.governance.common.utils.GovernanceConstant
 import org.apache.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
@@ -45,10 +44,11 @@ import org.apache.linkis.protocol.engine.JobProgressInfo
 import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
 import org.apache.linkis.server.BDPJettyServerHelper
 import org.apache.commons.lang.StringUtils
+import org.apache.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
 
 import scala.beans.BeanProperty
 
-class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
+class AppConnEngineConnExecutor(val id: Int) extends ConcurrentComputationExecutor {
 
   @BeanProperty
   var userWithCreator: UserWithCreator = _
@@ -171,6 +171,13 @@ class AppConnEngineConnExecutor(val id: Int) extends ComputationExecutor {
   }
 
   override def getId(): String = "AppConnEngineExecutor_" + id
+
+  override def getConcurrentLimit: Int = {
+    AppConnEngineConnConfiguration.CONCURRENT_LIMIT.getValue
+  }
+
+  override def killAll(): Unit = {
+  }
 
 }
 object AppConnEngineConnExecutor {

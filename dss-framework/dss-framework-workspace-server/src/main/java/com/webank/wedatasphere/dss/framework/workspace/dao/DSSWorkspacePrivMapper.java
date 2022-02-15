@@ -42,7 +42,8 @@ public interface DSSWorkspacePrivMapper {
     int queryCntOfRCP(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);
 
     @Select("insert into dss_component_role (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) " +
-            "values(#{workspaceId}, #{componentId}, #{roleId}, #{priv}, now(), 'cooperyang')")
+            "values(#{workspaceId}, #{componentId}, #{roleId}, #{priv}, now(), #{username})")
     void insertRolComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId,
-                                @Param("priv") int priv);
+                                @Param("priv") int priv,
+                                @Param("username") String username);
 }

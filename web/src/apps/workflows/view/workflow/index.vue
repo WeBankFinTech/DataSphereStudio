@@ -48,6 +48,19 @@
             </div>
           </div>
         </div>
+        <div class="list-container" v-else-if="modeOfKey === 'streamis_prod' ">
+          <div
+            class="list-item"
+            v-for="item in projectsTree"
+            :key="item.id"
+          >
+            <div class="list-content" :class="{ 'list-content-active': currentTreeId == item.id }">
+              <div class="list-name" @click="handleTreeClick(item)">
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
         <Tree
           v-else
           class="tree-container"
@@ -554,6 +567,7 @@ export default {
               .filter((n) => {
                 return (
                   n.devProcessList &&
+                  n.devProcessList.includes("streamis_prod") &&
                   n.releaseUsers &&
                   n.releaseUsers.indexOf(this.getUserName()) !== -1
                 );
@@ -677,8 +691,17 @@ export default {
         this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
       }
       if ( node.type == "streamis_prod" ) {
+        const query = {
+          workspaceId: this.$route.query.workspaceId,
+          projectID: node.id,
+          projectName: node.name,
+        }
         this.modeOfKey = "streamis_prod"
         this.pjNameForStreamis = node.name
+        this.$router.replace({
+          name: "Streamis",
+          query,
+        })
         return;
       }
       if (node.type == "flow") {

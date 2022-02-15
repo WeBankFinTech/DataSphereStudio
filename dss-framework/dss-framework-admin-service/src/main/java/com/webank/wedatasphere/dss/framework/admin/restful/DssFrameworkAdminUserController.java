@@ -26,17 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 
-/**
- * <p>
- * 用户信息表 前端控制器
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
-//@RestController
-//@RequestMapping("/dss/framework/admin/user")
-
 @RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
 @RestController
 public class DssFrameworkAdminUserController extends BaseController {

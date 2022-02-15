@@ -47,5 +47,8 @@ public class DSSWorkFlowConstant {
 
     public static final CommonVars<String> DSS_SCHEDULER_APPCONN_NAME = CommonVars.apply("wds.dss.scheduler.appconn.name", "dolphinscheduler");
 
-
+    /**
+     * 发布中的错误码
+     */
+    public static final String PUBLISHING_ERROR_CODE = "-999";
 }

@@ -6,13 +6,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideCatalogDetail
- * @Description TODO
- * @Date 2022/1/14 15:18
- * @Created by suyc
- */
 @Data
 public class GuideCatalogDetail {
     private Long id;

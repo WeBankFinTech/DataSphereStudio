@@ -20,9 +20,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * @author lvjw
- */
 @RestController
 @RequestMapping(path = "/dss/data/api/datasource", produces = {"application/json"})
 public class DSSDbApiDataSourceRestful {

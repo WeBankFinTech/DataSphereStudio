@@ -7,12 +7,6 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefQueryServ
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
-/**
- * The type Dolphin scheduler workflow standard.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 public class DolphinSchedulerWorkflowStandard extends WorkflowConversionIntegrationStandard {
 
     @Override

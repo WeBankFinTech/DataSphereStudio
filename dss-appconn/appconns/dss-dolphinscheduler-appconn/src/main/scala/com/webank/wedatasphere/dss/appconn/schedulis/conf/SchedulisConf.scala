@@ -23,10 +23,6 @@ import java.lang.reflect.Type
 
 import com.google.gson.{Gson, GsonBuilder, JsonElement, JsonPrimitive, JsonSerializationContext, JsonSerializer}
 
-/**
- * created by cooperyang on 2020/11/16
- * Description:
- */
 object SchedulisConf {
   implicit val gson:Gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").serializeNulls
     .registerTypeAdapter(classOf[java.lang.Double], new JsonSerializer[java.lang.Double] {

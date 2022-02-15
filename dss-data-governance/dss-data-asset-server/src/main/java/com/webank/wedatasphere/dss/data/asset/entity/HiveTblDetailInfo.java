@@ -6,12 +6,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @Classname HiveTblDetail
- * @Description TODO
- * @Date 2021/8/24 13:33
- * @Created by suyc
- */
 @Data
 public class HiveTblDetailInfo implements Serializable {
     private HiveTblBasicInfo basic;

@@ -23,13 +23,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/3/17
- * Description:
- */
-
 public interface DSSWorkspaceMenuService {
-
-
     List<DSSMenu> getRealComponents(List<DSSMenu> subMenus, String workspaceId, String username);
 }

@@ -28,12 +28,6 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
-/**
- * @Classname DSSDataApiAuthMapper
- * @Description
- * @Date 2021/7/14 10:44
- * @Created by suyc
- */
 @Mapper
 public interface ApiAuthMapper extends BaseMapper<ApiAuth> {
 

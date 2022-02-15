@@ -37,11 +37,6 @@ object VariableUtils extends Logging {
 
   var run_today: CustomDateType = null
   var run_mon: CustomMonType = null
-  /**
-    * date Format
-    */
-  //val dateFormat = new SimpleDateFormat("yyyyMMdd")
-  //val dateFormat_std = new SimpleDateFormat("yyyy-MM-dd")
 
   val dateFormatLocal = new ThreadLocal[SimpleDateFormat]() {
     override protected def initialValue = new SimpleDateFormat("yyyyMMdd")

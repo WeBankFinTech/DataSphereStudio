@@ -7,13 +7,6 @@ import org.apache.atlas.model.typedef.AtlasTypesDef;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname ClassificationService
- * @Description TODO
- * @Date 2021/9/24 10:25
- * @Created by suyc
- */
 public interface ClassificationService {
     public AtlasTypesDef getClassificationDef( ) throws DataGovernanceException;
 

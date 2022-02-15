@@ -4,9 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
-/**
- * Created by schumiyi on 2021/7/22
- */
 @TableName(value = "dss_onestop_menu")
 public class DSSOnestopMenu {
     private Integer id;

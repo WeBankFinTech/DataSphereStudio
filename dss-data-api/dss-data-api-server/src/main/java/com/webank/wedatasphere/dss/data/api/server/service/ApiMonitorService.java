@@ -10,12 +10,6 @@ import com.webank.wedatasphere.dss.data.api.server.entity.response.HourMonitorIn
 
 import java.util.List;
 
-/**
- * @Classname ApiMonitorService
- * @Description TODO
- * @Date 2021/7/20 11:59
- * @Created by suyc
- */
 public interface ApiMonitorService {
     /**
      * 已发布API数量

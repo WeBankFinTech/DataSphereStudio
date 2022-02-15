@@ -8,13 +8,6 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideChapterMapper
- * @Description TODO
- * @Date 2022/1/13 20:31
- * @Created by suyc
- */
 @Mapper
 public interface GuideChapterMapper extends BaseMapper<GuideChapter> {
     @Select("SELECT * FROM dss_guide_chapter WHERE is_delete =0 AND catalog_id =#{catalogId} ORDER BY id ASC")

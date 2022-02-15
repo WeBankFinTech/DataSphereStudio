@@ -1,15 +1,11 @@
 package com.webank.wedatasphere.dss.data.classification.service.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.webank.wedatasphere.dss.data.classification.service.ClassificationService;
 import com.webank.wedatasphere.dss.data.common.atlas.AtlasService;
 import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 import com.webank.wedatasphere.dss.data.common.exception.DataGovernanceException;
 import lombok.AllArgsConstructor;
-import org.apache.atlas.AtlasErrorCode;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.apache.atlas.model.typedef.AtlasTypesDef;
@@ -20,13 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname ClassificationServiceImpl
- * @Description TODO
- * @Date 2021/9/24 10:27
- * @Created by suyc
- */
 @Service
 @AllArgsConstructor
 public class ClassificationServiceImpl implements ClassificationService {

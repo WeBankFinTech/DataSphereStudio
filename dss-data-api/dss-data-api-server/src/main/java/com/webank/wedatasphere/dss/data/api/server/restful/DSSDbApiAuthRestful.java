@@ -37,12 +37,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @Classname DSSDataAPIAuthRestful
- * @Description 服务管理--API授权
- * @Date 2021/7/14 10:44
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/data/api/apiauth", produces = {"application/json"})
 @Slf4j

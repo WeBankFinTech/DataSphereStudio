@@ -2,11 +2,11 @@
   <div class="define-user-count-model">
     <div v-if="msg">
       <div class="data-area">
-        <div id="process-definition-bar" style="height:430px"></div>
+        <div id="process-definition-bar" style="height:330px"></div>
       </div>
     </div>
     <div v-else>
-      <m-no-data :height="430"></m-no-data>
+      <m-no-data :height="330"></m-no-data>
     </div>
   </div>
 </template>
@@ -40,7 +40,18 @@ export default {
         }
       })
       const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {barColor: '#89C2D9', yAxis: {
-        minInterval: 1
+        minInterval: 1,
+        axisLabel: {
+          color: 'rgb(150, 150, 150)'
+        },
+        nameTextStyle: {
+          color: 'rgb(150, 150, 150)'
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgb(237, 237, 237)'
+          }
+        }
       }})
       myChart.echart.setOption(bar)
       // Jump not allowed on home page

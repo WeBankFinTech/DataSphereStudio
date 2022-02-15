@@ -59,7 +59,7 @@ public class DSSDbApiMonitorRestful {
 
 
     @RequestMapping(path = "onlineApiCnt", method = RequestMethod.GET)
-    public Message getOnlineApiCnt(HttpServletRequest request, @RequestParam("workspaceId") Long workspaceId) {
+    public Message getOnlineApiCnt(HttpServletRequest request, @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
         return Message.ok().data("onlineApiCnt", apiMonitorService.getOnlineApiCnt(Long.valueOf(workspace.getWorkspaceName())));
@@ -67,7 +67,7 @@ public class DSSDbApiMonitorRestful {
 
 
     @RequestMapping(path = "offlineApiCnt", method = RequestMethod.GET)
-    public Message getOfflineApiCnt(HttpServletRequest request, @RequestParam("workspaceId") Long workspaceId) {
+    public Message getOfflineApiCnt(HttpServletRequest request, @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
         return Message.ok().data("offlineApiCnt", apiMonitorService.getOfflineApiCnt(Long.valueOf(workspace.getWorkspaceName())));
@@ -102,7 +102,7 @@ public class DSSDbApiMonitorRestful {
      */
 
     @RequestMapping(path = "callCntForPast24H", method = RequestMethod.GET)
-    public Message getCallCntForPast24H(HttpServletRequest request, @RequestParam("workspaceId") Long workspaceId)
+    public Message getCallCntForPast24H(HttpServletRequest request, @RequestParam(value = "workspaceId", required = false) Long workspaceId)
             throws Exception {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());

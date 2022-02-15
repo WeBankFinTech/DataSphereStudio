@@ -7,12 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-/**
- * @ClassName: workspaceInfoMapper
- * @Description: 工作空间下用户信息
- * @author: lijw
- * @date: 2021/9/3 10:43
- */
 @Mapper
 public interface WorkspaceInfoMapper {
 

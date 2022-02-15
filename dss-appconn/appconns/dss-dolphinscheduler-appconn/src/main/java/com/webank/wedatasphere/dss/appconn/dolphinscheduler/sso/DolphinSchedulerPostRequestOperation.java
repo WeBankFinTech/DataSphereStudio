@@ -14,12 +14,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperati
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 
-/**
- * The type Dolphin scheduler post request operation.
- *
- * @author yuxin.yuan
- * @date 2021/05/19
- */
 public class DolphinSchedulerPostRequestOperation
     implements SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> {
 

@@ -9,12 +9,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSch
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
-/**
- * The type Dolphin scheduler project service.
- *
- * @author yuxin.yuan
- * @date 2021/10/18
- */
 public class DolphinSchedulerProjectService extends ProjectService {
 
     private Map<Class<? extends Operation>, Operation<?, ?>> operationMap = new ConcurrentHashMap<>();

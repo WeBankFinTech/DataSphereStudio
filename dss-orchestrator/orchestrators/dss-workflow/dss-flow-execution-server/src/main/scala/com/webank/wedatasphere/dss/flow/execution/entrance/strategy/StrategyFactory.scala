@@ -3,13 +3,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.strategy
 import com.webank.wedatasphere.dss.flow.execution.entrance.enums.ExecuteStrategyEnum
 import com.webank.wedatasphere.dss.flow.execution.entrance.strategy.impl.{ExecuteNodeSkipStrategy, ReExecuteNodeSkipStrategy, SelectedExecuteNodeSkipStrategy}
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/24
- */
-
 object StrategyFactory {
 
   def getNodeSkipStrategy(executeStrategy: String): NodeSkipStrategy = {

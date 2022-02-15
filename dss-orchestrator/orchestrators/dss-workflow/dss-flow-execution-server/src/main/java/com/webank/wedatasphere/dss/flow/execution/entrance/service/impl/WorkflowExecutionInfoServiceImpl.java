@@ -10,12 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/10
- */
 @Service
 public class WorkflowExecutionInfoServiceImpl implements WorkflowExecutionInfoService {
 

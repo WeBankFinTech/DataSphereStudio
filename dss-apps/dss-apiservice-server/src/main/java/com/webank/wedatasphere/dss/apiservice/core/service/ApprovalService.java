@@ -18,9 +18,6 @@ package com.webank.wedatasphere.dss.apiservice.core.service;
 
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
 
-/**
- * @author: jinyangrao
- */
 public interface ApprovalService {
 
     /**

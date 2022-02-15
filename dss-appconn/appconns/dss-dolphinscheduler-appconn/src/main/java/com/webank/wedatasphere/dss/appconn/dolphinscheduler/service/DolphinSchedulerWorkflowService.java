@@ -12,12 +12,6 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConversionOperation;
 
-/**
- * The type Dolphin scheduler ref scheduler service.
- *
- * @author yuxin.yuan
- * @date 2021/05/21
- */
 public class DolphinSchedulerWorkflowService extends AbstractConversionService implements DSSToRelConversionService {
 
     private Map<Class<? extends Operation>, Operation<?, ?>> operationMap = new ConcurrentHashMap<>();

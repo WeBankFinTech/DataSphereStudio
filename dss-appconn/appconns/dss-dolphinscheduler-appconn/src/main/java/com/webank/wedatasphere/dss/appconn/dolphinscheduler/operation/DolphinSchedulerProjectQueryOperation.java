@@ -18,12 +18,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConn
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler project query operation.
- *
- * @author yuxin.yuan
- * @date 2021/06/23
- */
 public class DolphinSchedulerProjectQueryOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectQueryOperation.class);

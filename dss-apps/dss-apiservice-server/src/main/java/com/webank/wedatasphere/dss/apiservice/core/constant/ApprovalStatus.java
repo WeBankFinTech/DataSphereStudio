@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.constant;
 
-/**
- * @author: jinyangrao
- */
 public enum ApprovalStatus {
     INIT("init", 0),
     APPLYING("apply", 1),

@@ -16,15 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-/**
- * <p>
- * 部门表 服务实现类
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
 @Service
 public class DssAdminDeptServiceImpl extends ServiceImpl<DssAdminDeptMapper, DssAdminDept> implements DssAdminDeptService {
     @Resource

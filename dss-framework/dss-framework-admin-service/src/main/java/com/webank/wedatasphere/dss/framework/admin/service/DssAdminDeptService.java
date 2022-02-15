@@ -7,14 +7,6 @@ import com.webank.wedatasphere.dss.framework.admin.pojo.entity.TreeSelect;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <p>
- * 部门表 服务类
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
 public interface DssAdminDeptService extends IService<DssAdminDept> {
 
     /**

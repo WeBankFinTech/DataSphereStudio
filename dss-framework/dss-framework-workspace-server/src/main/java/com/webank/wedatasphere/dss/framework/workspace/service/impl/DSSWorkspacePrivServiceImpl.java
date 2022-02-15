@@ -53,7 +53,7 @@ public class DSSWorkspacePrivServiceImpl implements DSSWorkspacePrivService {
             if (count >= 1) {
                 dssWorkspacePrivMapper.updateRoleComponentPriv(workspaceId, componentId, roleId, priv);
             }else {
-                dssWorkspacePrivMapper.insertRolComponentPriv(workspaceId, componentId, roleId, priv);
+                dssWorkspacePrivMapper.insertRolComponentPriv(workspaceId, componentId, roleId, priv,username);
             }
         });
     }

@@ -9,11 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * 时间的工具类
- *
- * @author chongchuanbing
- */
 public class DateUtil {
 
     /**

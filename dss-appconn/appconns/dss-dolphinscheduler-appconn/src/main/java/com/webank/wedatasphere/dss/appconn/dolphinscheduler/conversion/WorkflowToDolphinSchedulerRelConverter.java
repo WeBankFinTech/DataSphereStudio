@@ -25,12 +25,6 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
 
-/**
- * The type Workflow to dolphin scheduler rel converter.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConverter {
 
     public static final Logger logger = LoggerFactory.getLogger(WorkflowToDolphinSchedulerRelConverter.class);

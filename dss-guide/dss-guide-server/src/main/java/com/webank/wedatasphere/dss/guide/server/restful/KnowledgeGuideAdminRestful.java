@@ -27,13 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author suyc
- * @Classname KnowledgeGuideAdminRestful
- * @Description TODO
- * @Date 2022/1/17 9:29
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/guide/admin", produces = {"application/json"})
 @AllArgsConstructor

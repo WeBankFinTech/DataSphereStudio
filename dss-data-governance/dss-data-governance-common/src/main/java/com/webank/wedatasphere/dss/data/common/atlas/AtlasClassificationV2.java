@@ -17,13 +17,6 @@ import java.util.List;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.PUBLIC_ONLY;
 
-/**
- * @author suyc
- * @Classname AtlasClassificationV2
- * @Description TODO
- * @Date 2021/9/26 19:36
- * @Created by suyc
- */
 public class AtlasClassificationV2 extends AtlasClassification {
     // org.codehaus.jackson.map.JsonMappingException: Conflicting getter definitions for property "propagate"
     // https://stackoverflow.com/questions/20624891/stuck-on-org-codehaus-jackson-map-jsonmappingexception-conflicting-getter-defi

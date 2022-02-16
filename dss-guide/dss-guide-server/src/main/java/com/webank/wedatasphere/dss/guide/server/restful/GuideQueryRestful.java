@@ -17,13 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideQueryRestful
- * @Description TODO
- * @Date 2021/12/24 10:04
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/guide/query", produces = {"application/json"})
 @AllArgsConstructor

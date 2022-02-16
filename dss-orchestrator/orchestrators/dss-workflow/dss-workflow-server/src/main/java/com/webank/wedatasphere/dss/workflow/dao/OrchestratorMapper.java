@@ -7,12 +7,6 @@ import org.apache.ibatis.annotations.Select;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseInfo;
 
-/**
- * The interface Orchestrator release info mapper.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 @Mapper
 public interface OrchestratorMapper {
 

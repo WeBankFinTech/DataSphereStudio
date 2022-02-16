@@ -24,10 +24,6 @@ import java.util
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf
 import org.apache.linkis.httpclient.request.{GetAction, HttpAction, POSTAction, UploadAction, UserAction}
 
-/**
- * created by cooperyang on 2020/11/16
- * Description:
- */
 trait SchedulisHttpAction extends UserAction{
 
   private var user:String = _

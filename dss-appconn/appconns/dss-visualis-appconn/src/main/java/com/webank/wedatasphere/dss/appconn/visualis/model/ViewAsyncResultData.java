@@ -19,10 +19,6 @@ package com.webank.wedatasphere.dss.appconn.visualis.model;
 import java.util.List;
 import java.util.Map;
 
-/**
- * created by cooperyang on 2019/1/26
- * Description:
- */
 public class ViewAsyncResultData {
     private String status;
     private String message;

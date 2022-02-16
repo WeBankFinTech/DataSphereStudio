@@ -8,12 +8,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 
-/**
- * The type Dolphin scheduler flow.
- *
- * @author yuxin.yuan
- * @date 2021/04/29
- */
 public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
     private ProcessDefinitionJson processDefinitionJson;
 

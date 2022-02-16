@@ -33,9 +33,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-/**
- * Created by schumiyi on 2020/6/19
- */
 @RestController
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 public class WorkspaceRestfulApi {

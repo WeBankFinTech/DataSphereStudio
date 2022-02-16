@@ -2,13 +2,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.entity;
 
 import java.util.Date;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/10
- */
-
 public class WorkflowExecuteInfo {
     private Long id;
     private Long taskId;

@@ -15,13 +15,6 @@ import org.apache.linkis.httpclient.response.HttpResult;
 
 import java.util.Map;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/11
- */
-
 public class VisualisProjectGetOperation implements ProjectGetOperation {
     private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
     private StructureService structureService;

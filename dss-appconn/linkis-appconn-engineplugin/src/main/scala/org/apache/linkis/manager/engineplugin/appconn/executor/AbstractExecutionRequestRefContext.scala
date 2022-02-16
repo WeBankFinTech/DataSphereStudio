@@ -44,9 +44,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
 
   override def updateProgress(progress: Float): Unit = engineExecutorContext.pushProgress(progress, Array.empty)
 
-  /**
-    * Get the operation user of this node.
-    */
+
   override def getUser: String = userWithCreator.user
 
   override def setStorePath(storePath: String): Unit = {
@@ -94,7 +92,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
   override def getGatewayUrl: String = {
     val instances = Utils.tryThrow {
       Sender.getInstances(AppConnEngineConnConfiguration.GATEWAY_SPRING_APPLICATION.getValue)
-    }{ t => new AppConnExecutionErrorException(75538, "获取gateway的url失败", t)}
+    } { t => new AppConnExecutionErrorException(75538, "获取gateway的url失败", t) }
     if (instances.length == 0) throw new AppConnExecutionErrorException(75538, "获取gateway的url失败")
     instances(0).getInstance
   }
@@ -107,7 +105,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
       case fileSystem: FileSystem =>
         fileSystem.init(new util.HashMap[String, String])
         Utils.tryFinally {
-          import  scala.collection.JavaConverters._
+          import scala.collection.JavaConverters._
           fileSystem.listPathWithError(new FsPath(resultSetLocation)).getFsPaths.asScala.toArray[FsPath]
         }(Utils.tryQuietly(fileSystem.close()))
     }

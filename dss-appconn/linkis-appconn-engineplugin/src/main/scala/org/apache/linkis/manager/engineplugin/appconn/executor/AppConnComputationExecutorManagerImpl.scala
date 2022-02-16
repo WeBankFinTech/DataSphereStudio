@@ -14,17 +14,14 @@
  *
  */
 
-package org.apache.linkis.manager.engineplugin.appconn.conf
+package org.apache.linkis.manager.engineplugin.appconn.executor
 
-import org.apache.linkis.common.conf.CommonVars
+import org.apache.linkis.engineconn.computation.executor.creation.ComputationExecutorManagerImpl
+import org.apache.linkis.manager.label.entity.Label
 
 
-object AppConnEngineConnConfiguration {
 
-  val GATEWAY_SPRING_APPLICATION = CommonVars("wds.linkis.gateway.spring.name", "dataworkcloud-gateway")
+class AppConnComputationExecutorManagerImpl extends ComputationExecutorManagerImpl {
 
-  val CONCURRENT_LIMIT = CommonVars("wds.linkis.engineconn.appconn.conncurrent.limit", 100)
-
-  val ENGINE_DEFAULT_LIMIT = CommonVars("wds.linkis.jdbc.default.limit", 5000)
-
+  override protected def getLabelKey(labels: Array[Label[_]]): String = "appconn"
 }

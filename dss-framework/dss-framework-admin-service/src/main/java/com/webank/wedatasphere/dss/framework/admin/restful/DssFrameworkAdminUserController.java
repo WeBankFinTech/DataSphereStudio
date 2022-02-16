@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +41,18 @@ import java.util.Map;
 public class DssFrameworkAdminUserController extends BaseController {
     @Resource
     private DssAdminUserService dssAdminUserService;
-//    @Autowired
+    //    @Autowired
 //    private LdapService ldapService;
     @Autowired
-
     DssUserMapper dssUserMapper;
 
-//    @GET
-//    @Path("/list")
-    @RequestMapping(path ="list", method = RequestMethod.GET)
+    @RequestMapping(path = "list", method = RequestMethod.GET)
 //    public TableDataInfo list(DssAdminUser user) {
-    public TableDataInfo list(@QueryParam("userName") String userName, @QueryParam("deptId") Long deptId, @QueryParam("phonenumber") String phonenumber, @QueryParam("beginTime") String beginTime, @QueryParam("endTime") String endTime) {
+    public TableDataInfo list(@RequestParam(value = "userName", required = false) String userName,
+                              @RequestParam(value = "deptId", required = false) Long deptId,
+                              @RequestParam(value = "phonenumber", required = false) String phonenumber,
+                              @RequestParam(value = "beginTime", required = false) String beginTime,
+                              @RequestParam(value = "endTime", required = false) String endTime) {
         DssAdminUser user = new DssAdminUser();
         user.setUserName(userName);
         user.setDeptId(deptId);
@@ -107,16 +107,13 @@ public class DssFrameworkAdminUserController extends BaseController {
     }*/
 
 
-    //    @GET
-//    @Path("/{id}")
-    @RequestMapping(path ="{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "{id}", method = RequestMethod.GET)
     public Message getInfo(@PathVariable("id") Long userId) {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
     }
 
-//    @POST
-//    @Path("/edit")
-    @RequestMapping(path ="edit", method = RequestMethod.POST)
+
+    @RequestMapping(path = "edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminUser user) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {

@@ -1294,6 +1294,9 @@ export default {
         clearInterval(this.timer)
       }
       this.activeDS = type
+      if (this.$route.query.projectID == 0) {
+        this.activeDS = 4
+      }
       if (this.activeDS === 1) {
         this.getListData(1, data)
       } else if (this.activeDS === 2) {

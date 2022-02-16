@@ -604,14 +604,15 @@ export default {
       this.workspaceName = data.workspace.name
       util.checkToken(() => {
         this.getProjectId((id) => {
+          console.log(this.projectId, id)
           this.searchParams.projectId = id
           this.searchParams.startDate = this.dataTime[0]
           this.searchParams.endDate = this.dataTime[1]
-        })
-        this.$nextTick(() => {
-          this.changeDay()
-          this.changeState()
-          this.getConsumptionData()
+          this.$nextTick(() => {
+            this.changeDay()
+            this.changeState()
+            this.getConsumptionData()
+          })
         })
       })
     })

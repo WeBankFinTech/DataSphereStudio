@@ -17,23 +17,6 @@
 
 /* eslint-disable */
 
-/**
- * Created by harrywan on 2016/5/11.
- */
-/**
- * jshashes - https://github.com/h2non/jshashes
- * Released under the "New BSD" license
- *
- * Algorithms specification:
- *
- * MD5 - http://www.ietf.org/rfc/rfc1321.txt
- * RIPEMD-160 - http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
- * SHA1   - http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf
- * SHA256 - http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf
- * SHA512 - http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf
- * HMAC - http://www.ietf.org/rfc/rfc2104.txt
- */
-
 (function() {
     let Hashes;
 

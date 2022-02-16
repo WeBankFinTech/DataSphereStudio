@@ -24,10 +24,6 @@ import org.apache.commons.math3.util.Pair;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 
-/**
- * created by cooperyang on 2020/10/19
- * Description:
- */
 public class RestfulUtils {
 
 //    public static Response dealError(String reason){

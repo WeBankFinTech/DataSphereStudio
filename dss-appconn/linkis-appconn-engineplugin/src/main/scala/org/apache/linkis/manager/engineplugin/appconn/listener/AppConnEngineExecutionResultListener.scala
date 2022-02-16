@@ -30,14 +30,14 @@ class AppConnEngineExecutionResultListener(val engineExecutionContext: EngineExe
   }
 
   override def onResultMetaData(metaData: MetaData): Unit = {
-    if(resultSetWriter == null){
+    if (resultSetWriter == null) {
       resultSetWriter = engineExecutionContext.createDefaultResultSetWriter()
     }
     resultSetWriter.addMetaData(metaData)
   }
 
   override def onResultSetRecord(record: Record): Unit = {
-    if(resultSetWriter == null){
+    if (resultSetWriter == null) {
       resultSetWriter = engineExecutionContext.createDefaultResultSetWriter()
     }
     resultSetWriter.addRecord(record)

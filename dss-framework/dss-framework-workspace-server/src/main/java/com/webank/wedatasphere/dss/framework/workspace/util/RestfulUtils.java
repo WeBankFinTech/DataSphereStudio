@@ -18,18 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
-import org.apache.linkis.server.Message;
-import org.apache.commons.math3.util.Pair;
-
-
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-
-/**
- * created by cooperyang on 2020/11/4
- * Description:
- */
-public class RestfulUtils {
+ public class RestfulUtils {
 
 //    public static Response dealError(String reason){
 //        Message message = Message.error(reason);

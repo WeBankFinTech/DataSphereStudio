@@ -9,12 +9,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * @Classname DateJsonDeserializer
- * @Description 自定义类型转换格式：时间字符串与java.util.Date
- * @Date 2021/7/14 9:45
- * @Created by suyc
- */
 public class DateJsonDeserializer extends JsonDeserializer<Date>
 {
     public static final SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

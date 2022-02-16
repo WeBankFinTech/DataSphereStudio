@@ -8,13 +8,6 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideCatalogMapper
- * @Description TODO
- * @Date 2022/1/13 20:30
- * @Created by suyc
- */
 @Mapper
 public interface GuideCatalogMapper extends BaseMapper<GuideCatalog> {
     /**

@@ -19,12 +19,6 @@ package com.webank.wedatasphere.dss.apiservice.core.action
 import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
 import org.apache.linkis.httpclient.dws.response.DWSResult
 
-/**
- * @author allenlliu
- * @date 2020/09/14 11:44 AM
- * @version 2.0.0
- */
-
 @DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/workspace/getWorkspaceIdByUserName")
 class ResultWorkspaceIds extends DWSResult{
   var userWorkspaceIds:String = _

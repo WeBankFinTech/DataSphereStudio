@@ -12,14 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 
-/**
- * <p>
- * 用户信息表 服务实现类
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
 @Service
 public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdminUser> implements DssAdminUserService {
 

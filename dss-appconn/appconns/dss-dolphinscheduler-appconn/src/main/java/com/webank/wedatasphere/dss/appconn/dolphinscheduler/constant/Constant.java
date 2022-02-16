@@ -1,11 +1,5 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant;
 
-/**
- * The type Constant.
- *
- * @author yuxin.yuan
- * @date 2021/10/22
- */
 public class Constant {
     public final static String JOB_TYPE = "type";
     public final static String LINKIS_TYPE = "linkistype";

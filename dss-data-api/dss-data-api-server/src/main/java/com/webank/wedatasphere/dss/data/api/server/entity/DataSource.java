@@ -8,11 +8,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * @program: dbApi
- * @description:
- * @create: 2021-01-20 09:52
- **/
 @Data
 @TableName(value = "datasource")
 public class DataSource {

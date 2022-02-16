@@ -27,9 +27,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation
 import org.apache.linkis.httpclient.request.HttpAction
 import org.apache.linkis.httpclient.response.HttpResult
 
-/**
- * Created by allenlliu on 2019/11/11.
- */
 class ViewAsyncRefExecutionOperation extends Killable with Procedure {
   protected def execute(requestRef: ExecutionRequestRef, baseUrl: String, ssoRequestOperation: SSORequestOperation[HttpAction, HttpResult]): RefExecutionAction = {
     val asyncExecutionRequestRef = requestRef.asInstanceOf[AsyncExecutionRequestRef]

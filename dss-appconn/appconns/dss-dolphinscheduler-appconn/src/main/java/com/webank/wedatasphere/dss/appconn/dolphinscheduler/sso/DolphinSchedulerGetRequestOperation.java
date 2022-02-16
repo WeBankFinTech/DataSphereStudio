@@ -14,12 +14,6 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The type Dolphin scheduler get request operation.
- *
- * @author yuxin.yuan
- * @date 2021/05/20
- */
 public class DolphinSchedulerGetRequestOperation
     implements SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> {
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerGetRequestOperation.class);

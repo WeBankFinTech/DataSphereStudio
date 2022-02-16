@@ -19,10 +19,6 @@ package com.webank.wedatasphere.dss.appconn.visualis
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, LongTermRefExecutionAction, RefExecutionState}
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
 
-/**
- * Created by allenlliu on 2019/11/12.
- */
-
 class ViewExecutionAction extends AbstractRefExecutionAction with LongTermRefExecutionAction {
   private[this] var _state: RefExecutionState = _
   private var schedulerId: Int = _

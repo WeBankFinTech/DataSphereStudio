@@ -18,13 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author suyc
- * @Classname AtlasClient
- * @Description TODO
- * @Date 2021/8/19 14:17
- * @Created by suyc
- */
 public class AtlasClient extends AtlasClientV2 {
     private static final String PREFIX_ATTR          = "attr:";
 

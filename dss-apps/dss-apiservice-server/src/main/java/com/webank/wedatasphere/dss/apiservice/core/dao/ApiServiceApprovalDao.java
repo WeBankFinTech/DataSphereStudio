@@ -20,10 +20,6 @@ package com.webank.wedatasphere.dss.apiservice.core.dao;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
 import org.apache.ibatis.annotations.Param;
 
-/**
- * @author: jinyangrao
- * @date: 2020-08-26 18:03:34
- */
 public interface ApiServiceApprovalDao {
 
     /**

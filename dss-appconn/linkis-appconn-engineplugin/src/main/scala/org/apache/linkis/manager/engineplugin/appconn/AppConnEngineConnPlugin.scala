@@ -25,11 +25,16 @@ import org.apache.linkis.manager.engineplugin.common.creation.EngineConnFactory
 import org.apache.linkis.manager.engineplugin.common.launch.EngineConnLaunchBuilder
 import org.apache.linkis.manager.engineplugin.common.resource.{EngineResourceFactory, GenericEngineResourceFactory}
 import org.apache.linkis.manager.label.entity.Label
-import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
+import org.apache.linkis.manager.label.entity.engine.{EngineType, EngineTypeLabel}
+import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator
 
 class AppConnEngineConnPlugin extends EngineConnPlugin {
 
-  private val EP_CONTEXT_CONSTRUCTOR_LOCK = new Object()
+  private val resourceLocker = new Object()
+
+  private val engineLaunchBuilderLocker = new Object()
+
+  private val engineFactoryLocker = new Object()
 
   private var engineResourceFactory: EngineResourceFactory = _
 
@@ -41,14 +46,12 @@ class AppConnEngineConnPlugin extends EngineConnPlugin {
 
 
   override def init(params: util.Map[String, Any]): Unit = {
-    val typeLabel =new EngineTypeLabel()
-    typeLabel.setEngineType("appconn")
-    typeLabel.setVersion("1.0.0")
-    this.defaultLabels.add(typeLabel)
+    val engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(EngineType.APPCONN.toString)
+    this.defaultLabels.add(engineTypeLabel)
   }
 
   override def getEngineResourceFactory: EngineResourceFactory = {
-    if (null == engineResourceFactory) EP_CONTEXT_CONSTRUCTOR_LOCK.synchronized {
+    if (null == engineResourceFactory) resourceLocker.synchronized {
       if (null == engineResourceFactory) {
         engineResourceFactory = new GenericEngineResourceFactory
       }
@@ -57,16 +60,11 @@ class AppConnEngineConnPlugin extends EngineConnPlugin {
   }
 
   override def getEngineConnLaunchBuilder: EngineConnLaunchBuilder = {
-    if (null == engineLaunchBuilder) EP_CONTEXT_CONSTRUCTOR_LOCK.synchronized {
-      if (null == engineLaunchBuilder) {
-        engineLaunchBuilder = new AppConnProcessEngineConnLaunchBuilder
-      }
-    }
-    engineLaunchBuilder
+    new AppConnProcessEngineConnLaunchBuilder
   }
 
   override def getEngineConnFactory: EngineConnFactory = {
-    if (null == engineFactory) EP_CONTEXT_CONSTRUCTOR_LOCK.synchronized {
+    if (null == engineFactory) engineFactoryLocker.synchronized {
       if (null == engineFactory) {
         engineFactory = new AppConnEngineConnFactory
       }

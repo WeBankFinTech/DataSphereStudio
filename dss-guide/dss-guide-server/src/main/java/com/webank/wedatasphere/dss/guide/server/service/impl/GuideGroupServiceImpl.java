@@ -9,13 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideGroupServiceImpl
- * @Description TODO
- * @Date 2021/12/21 14:04
- * @Created by suyc
- */
 @Service
 @AllArgsConstructor
 public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGroup> implements GuideGroupService {

@@ -9,12 +9,6 @@ import org.apache.linkis.common.exception.ErrorException;
 
 import java.util.List;
 
-/**
- * @Classname DSSDataApiAuthService
- * @Description TODO
- * @Date 2021/7/13 17:10
- * @Created by suyc
- */
 public interface ApiAuthService extends IService<ApiAuth> {
     public List<ApiGroupInfo> getApiGroupList(Long workspaceId);
     public boolean saveApiAuth(ApiAuth apiAuth) throws ErrorException;

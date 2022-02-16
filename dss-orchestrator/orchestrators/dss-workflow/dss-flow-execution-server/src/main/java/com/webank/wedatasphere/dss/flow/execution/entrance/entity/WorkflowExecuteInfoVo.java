@@ -1,15 +1,7 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.entity;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/10
- */
 
 public class WorkflowExecuteInfoVo extends WorkflowExecuteInfo {
     List<Map<String, Object>> runningJobsList;

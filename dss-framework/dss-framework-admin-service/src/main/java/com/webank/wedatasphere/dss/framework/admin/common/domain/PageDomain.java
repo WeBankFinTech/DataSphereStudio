@@ -2,11 +2,7 @@ package com.webank.wedatasphere.dss.framework.admin.common.domain;
 
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 
-/**
- * @author lvjw
- */
 public class PageDomain {
-
 
         /**
          * 当前记录起始索引

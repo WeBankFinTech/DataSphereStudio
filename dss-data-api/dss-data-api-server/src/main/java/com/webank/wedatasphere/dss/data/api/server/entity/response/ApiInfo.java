@@ -8,13 +8,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.Date;
 
-/**
- * @Classname ApiInfo
- * @Description TODO
- * @Date 2021/7/19 16:20
- * @Created by suyc
- */
-
 @Data
 public class ApiInfo {
     private Long id;

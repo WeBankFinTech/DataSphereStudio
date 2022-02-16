@@ -27,10 +27,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/9/22
- * Description:
- */
 public interface DSSFrameworkProjectService {
 
     DSSProjectDetailVo getProjectSettings(Long projectId);

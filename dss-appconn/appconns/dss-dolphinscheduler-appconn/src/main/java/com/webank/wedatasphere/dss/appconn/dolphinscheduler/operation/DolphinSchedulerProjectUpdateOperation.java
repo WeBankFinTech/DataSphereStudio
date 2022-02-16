@@ -32,12 +32,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRespons
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler project update operation.
- *
- * @author yuxin.yuan
- * @date 2021/06/23
- */
 public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOperation, DolphinSchedulerConf {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectUpdateOperation.class);

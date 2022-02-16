@@ -6,12 +6,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-/**
- * @Classname TimeUtil
- * @Description TODO
- * @Date 2021/8/10 14:35
- * @Created by suyc
- */
 public class TimeUtil {
     /**
      * 时间段的小时数

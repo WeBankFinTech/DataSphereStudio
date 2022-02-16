@@ -60,12 +60,6 @@ import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
 import org.apache.linkis.common.utils.JsonUtils;
 
-/**
- * The type Dolphin scheduler workflow upload operation.
- *
- * @author yuxin.yuan
- * @date 2021/05/24
- */
 public class DolphinSchedulerWorkflowUploadOperation extends WorkflowToRelConversionOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerWorkflowUploadOperation.class);

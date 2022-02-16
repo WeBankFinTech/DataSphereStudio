@@ -74,7 +74,7 @@ class WorkflowQueryServiceImpl extends WorkflowQueryService with Logging {
     val executionCode = requestUpdateTask.getExecutionCode
     requestUpdateTask.setExecutionCode(null)
     info("Update data to the database(往数据库中更新数据)：" + requestUpdateTask.toString)
-    /*//TODO cooperyang 去查数据内容
+    /*//TODO 去查数据内容
     if (StringUtils.isNotEmpty(requestUpdateTask.getEngineInstance)) {
       requestUpdateTask.setTaskResource(taskMapper.getResource(requestUpdateTask.getEngineInstance));
     }*/

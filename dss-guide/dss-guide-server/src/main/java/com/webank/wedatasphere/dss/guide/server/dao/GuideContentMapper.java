@@ -9,13 +9,6 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideContentMapper
- * @Description TODO
- * @Date 2021/12/21 17:02
- * @Created by suyc
- */
 @Mapper
 public interface GuideContentMapper extends BaseMapper<GuideContent> {
     @Select("SELECT * FROM dss_guide_content WHERE path=#{path} ORDER BY type,seq")

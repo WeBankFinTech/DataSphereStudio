@@ -7,13 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
-/**
- * @author suyc
- * @Classname FileUtils
- * @Description TODO
- * @Date 2021/12/23 15:53
- * @Created by suyc
- */
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 

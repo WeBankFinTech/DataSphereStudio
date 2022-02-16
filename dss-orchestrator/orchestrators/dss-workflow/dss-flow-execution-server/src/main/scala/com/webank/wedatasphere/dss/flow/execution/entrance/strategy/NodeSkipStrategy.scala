@@ -3,13 +3,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.strategy
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
 
-/**
- * Description 执节点跳过策略类
- *
- * @Author elishazhang
- * @Date 2021/11/24
- */
-
 trait NodeSkipStrategy {
   /**
    * 判断节点是否需要跳过

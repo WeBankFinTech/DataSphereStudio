@@ -27,12 +27,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.common.utils.JsonUtils;
 
-/**
- * The type Dolphin scheduler user operation.
- *
- * @author yuxin.yuan
- * @date 2021/06/23
- */
 public class DolphinSchedulerUserOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerUserOperation.class);

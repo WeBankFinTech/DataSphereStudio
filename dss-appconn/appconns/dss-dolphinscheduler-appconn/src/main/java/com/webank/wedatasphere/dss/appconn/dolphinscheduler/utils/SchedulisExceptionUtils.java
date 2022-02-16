@@ -22,11 +22,6 @@ import org.apache.linkis.common.exception.ErrorException;
 
 import java.lang.reflect.Constructor;
 
-/**
- * created by cooperyang on 2020/11/16
- * Description: 因为所有的异常都是有errorcode和 errorDesc
- * 所以需要拿到这个constructor就好
- */
 public class SchedulisExceptionUtils {
 
     public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc,

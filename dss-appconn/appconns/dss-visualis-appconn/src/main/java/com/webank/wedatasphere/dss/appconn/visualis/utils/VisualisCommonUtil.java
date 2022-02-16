@@ -27,13 +27,6 @@ import org.apache.linkis.server.BDPJettyServerHelper;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/10/16
- */
-
 public class VisualisCommonUtil {
 
     public static SSOUrlBuilderOperation getSSOUrlBuilderOperation(NodeRequestRef requestRef, String url) {

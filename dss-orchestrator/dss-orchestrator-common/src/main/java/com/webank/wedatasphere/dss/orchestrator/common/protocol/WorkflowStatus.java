@@ -1,11 +1,5 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-/**
- * The type Published process definition status.
- *
- * @author yuxin.yuan
- * @date 2021/10/20
- */
 public class WorkflowStatus {
 
     private Boolean published;

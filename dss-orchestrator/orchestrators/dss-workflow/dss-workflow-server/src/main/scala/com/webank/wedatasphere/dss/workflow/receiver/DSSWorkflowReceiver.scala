@@ -30,9 +30,6 @@ import org.apache.linkis.rpc.{Receiver, Sender}
 import java.util
 import scala.concurrent.duration.Duration
 
-/**
- * Created by allenlliu on 2020/10/21.
- */
 class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
   override def receive(message: Any, sender: Sender): Unit = {}
 

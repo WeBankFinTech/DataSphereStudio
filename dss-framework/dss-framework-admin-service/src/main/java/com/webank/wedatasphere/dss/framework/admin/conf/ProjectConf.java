@@ -20,10 +20,6 @@ package com.webank.wedatasphere.dss.framework.admin.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-/**
- * created by cooperyang on 2021/2/26
- * Description:
- */
 public interface ProjectConf {
 
     CommonVars<String> SUPPORT_ABILITY = CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");

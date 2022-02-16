@@ -7,10 +7,6 @@ import org.apache.ibatis.annotations.*;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * @Author:李嘉玮
- */
-//
 @Mapper
 public interface MetaInfoMapper {
     Long getTableStorage() throws SQLException;

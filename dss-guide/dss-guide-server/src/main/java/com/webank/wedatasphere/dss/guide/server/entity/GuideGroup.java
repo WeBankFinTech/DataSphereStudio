@@ -11,13 +11,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideGroup
- * @Description TODO
- * @Date 2021/12/21 10:54
- * @Created by suyc
- */
 @Data
 @TableName(value = "dss_guide_group")
 public class GuideGroup implements Serializable {

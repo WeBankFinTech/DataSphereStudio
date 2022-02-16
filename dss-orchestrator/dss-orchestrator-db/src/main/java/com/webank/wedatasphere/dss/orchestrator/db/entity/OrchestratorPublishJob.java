@@ -2,11 +2,6 @@ package com.webank.wedatasphere.dss.orchestrator.db.entity;
 
 import java.util.Date;
 
-/**
- * @author alexyang
- * @date 2021/12/2
- * @description
- */
 public class OrchestratorPublishJob {
 
     private Long id;

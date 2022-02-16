@@ -38,12 +38,6 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler token operation.
- *
- * @author yuxin.yuan
- * @date 2021/06/07
- */
 public class DolphinSchedulerTokenOperation implements RefQueryOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerTokenOperation.class);

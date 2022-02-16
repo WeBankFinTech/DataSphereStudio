@@ -7,13 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideGroupMapper
- * @Description TODO
- * @Date 2021/12/21 13:53
- * @Created by suyc
- */
 @Mapper
 public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
     GuideGroup getGuideGroupByPath(@Param("path") String path);

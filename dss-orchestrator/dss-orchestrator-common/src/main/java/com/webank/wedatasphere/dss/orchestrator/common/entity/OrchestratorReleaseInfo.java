@@ -2,12 +2,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
 import java.util.Date;
 
-/**
- * The type Orchestrator release info.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 public class OrchestratorReleaseInfo {
 
     private Long id;

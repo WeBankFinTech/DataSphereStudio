@@ -3,12 +3,6 @@ package com.webank.wedatasphere.dss.data.common.utils;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 
-/**
- * @Classname DataSourceUtil
- * @Description TODO
- * @Date 2021/8/23 15:36
- * @Created by suyc
- */
 public class DataSourceUtil {
     private static DruidDataSource druidDataSource =null;
 

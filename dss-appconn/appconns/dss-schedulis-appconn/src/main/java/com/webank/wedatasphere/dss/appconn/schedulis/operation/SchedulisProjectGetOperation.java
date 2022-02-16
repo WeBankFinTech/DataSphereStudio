@@ -15,13 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/11/11
- */
-
 public class SchedulisProjectGetOperation implements ProjectGetOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectGetOperation.class);
 

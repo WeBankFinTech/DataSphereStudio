@@ -17,13 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author suyc
- * @Classname GuideQueryRestful
- * @Description TODO
- * @Date 2021/12/24 10:04
- * @Created by suyc
- */
 @RestController
 @RequestMapping(path = "/dss/guide/query", produces = {"application/json"})
 @AllArgsConstructor
@@ -38,7 +31,6 @@ public class GuideQueryRestful {
     public Message queryGudieContent(@RequestParam String path){
         return Message.ok().data("result",guideGroupService.queryGuideGroupByPath(path));
     }
-
 
     @RequestMapping(path ="/guidecatalog/top", method = RequestMethod.GET)
     public Message queryGuideCatalogListForTop( ){

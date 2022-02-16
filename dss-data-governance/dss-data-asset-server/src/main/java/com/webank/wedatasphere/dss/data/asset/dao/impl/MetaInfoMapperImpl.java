@@ -17,9 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * @Author:李嘉玮
- */
 public class MetaInfoMapperImpl implements MetaInfoMapper {
     @Override
     public Long getTableStorage() throws SQLException {

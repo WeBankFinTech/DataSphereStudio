@@ -18,4 +18,4 @@ package org.apache.linkis.manager.engineplugin.appconn.exception
 
 import org.apache.linkis.common.exception.ErrorException
 
-case class AppConnExecuteFailedException (errCode:Int, desc:String) extends ErrorException(errCode, desc)
+case class AppConnExecuteFailedException(errCode: Int, desc: String) extends ErrorException(errCode, desc)

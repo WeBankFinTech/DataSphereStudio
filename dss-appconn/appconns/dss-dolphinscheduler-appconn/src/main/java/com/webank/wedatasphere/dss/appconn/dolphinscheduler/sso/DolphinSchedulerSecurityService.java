@@ -11,12 +11,6 @@ import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQ
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler security service.
- *
- * @author yuxin.yuan
- * @date 2021/10/19
- */
 public final class DolphinSchedulerSecurityService extends AbstractRefQueryService {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerSecurityService.class);

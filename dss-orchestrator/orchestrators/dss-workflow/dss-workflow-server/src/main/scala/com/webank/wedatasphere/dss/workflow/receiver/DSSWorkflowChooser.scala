@@ -26,10 +26,6 @@ import javax.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-
-/**
- * Created by allenlliu on 2020/10/21.
- */
 @Component
 class DSSWorkflowChooser extends ReceiverChooser {
 

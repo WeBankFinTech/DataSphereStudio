@@ -10,11 +10,11 @@ public class UpdateWorkspaceUserRequest implements Serializable {
     private List<Integer> roles;
     private String userId;
 
-    public String getUserName() {
+    public String getUsername() {
         return username;
     }
 
-    public void setUserName(String userName) {
+    public void setUsername(String userName) {
         this.username = userName;
     }
 
@@ -35,8 +35,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
     public void setWorkspaceId(int workspaceId) {
         this.workspaceId = workspaceId;
     }
-
-
 
     public List<Integer> getRoles() {
         return roles;

@@ -113,6 +113,27 @@ function replaceCommonIp() {
     DSS_DATAPIPE_SERVER_PORT=9008
   fi
 
+  if [ -z "$DSS_DATA_API_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_API_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_DATA_API_SERVER_PORT" ]; then
+    DSS_DATA_API_SERVER_PORT=9208
+  fi
+
+  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_PORT" ]; then
+    DSS_DATA_GOVERNANCE_SERVER_PORT=9209
+  fi
+
+  if [ -z "$DSS_GUIDE_SERVER_INSTALL_IP" ]; then
+    DSS_GUIDE_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_GUIDE_SERVER_PORT" ]; then
+    DSS_GUIDE_SERVER_PORT=9210
+  fi
+
  if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
    #echo "GATEWAY_INSTALL_IP is equals $GATEWAY_INSTALL_IP ,we will change it to ip address"
    GATEWAY_INSTALL_IP=$LOCAL_IP
@@ -306,6 +327,43 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install dss-workflow-server
   installPackage
+
+  ###install dss-data-api-server
+  SERVER_NAME=dss-data-api-server
+  SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_API_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-api/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-api
+  LOG_PATH=$SERVER_HOME/logs/dss-data-api/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-data-governance-server
+  SERVER_NAME=dss-data-governance-server
+  SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_GOVERNANCE_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-governance/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-governance
+  LOG_PATH=$SERVER_HOME/logs/dss-data-governance/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-guide-server
+  SERVER_NAME=dss-guide-server
+  SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_GUIDE_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-guide/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-guide
+  LOG_PATH=$SERVER_HOME/logs/dss-guide/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
   #echo "-----------------DSS install end--------------------"
   #echo ""
 

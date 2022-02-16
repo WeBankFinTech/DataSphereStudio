@@ -1,7 +1,7 @@
 ### deploy user
 deployUser=root
 
-##微服务的�?大内存使用量
+##微服务的�?大内存使用量
 SERVER_HEAP_SIZE="512M"
 
 
@@ -18,7 +18,7 @@ EUREKA_PORT=20303
 #### Path to store job ResultSet：file or hdfs path
 #RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
-### Path to store job ResultSet�file or hdfs path
+### Path to store job ResultSet�file or hdfs path
 #RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 ### Linkis Gateway  information
@@ -58,6 +58,16 @@ DSS_FLOW_EXECUTION_SERVER_PORT=9006
 ###dss-datapipe-server
 DSS_DATAPIPE_SERVER_INSTALL_IP=127.0.0.1
 DSS_DATAPIPE_SERVER_PORT=9008
+
+###dss-data-api-server
+DSS_DATA_API_SERVER_INSTALL_IP=127.0.0.1
+DSS_DATA_API_SERVER_PORT=9208
+###dss-data-governance-server
+DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP=127.0.0.1
+DSS_DATA_GOVERNANCE_SERVER_PORT=9209
+###dss-guide-server
+DSS_GUIDE_SERVER_INSTALL_IP=127.0.0.1
+DSS_GUIDE_SERVER_PORT=9210
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
 EVENTCHECKER_JDBC_URL="jdbc:mysql://127.0.0.1:3306/dss_linkis?characterEncoding=UTF-8"

@@ -7,14 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * <p>
- * 部门表 Mapper 接口
- * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
- */
 @Mapper
 public interface DssAdminDeptMapper extends BaseMapper<DssAdminDept> {
     /**

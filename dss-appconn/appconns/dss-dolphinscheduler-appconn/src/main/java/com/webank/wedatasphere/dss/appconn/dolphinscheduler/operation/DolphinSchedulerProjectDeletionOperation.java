@@ -28,12 +28,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequest
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler project deletion operation.
- *
- * @author yuxin.yuan
- * @date 2021/06/04
- */
 public class DolphinSchedulerProjectDeletionOperation implements ProjectDeletionOperation {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectDeletionOperation.class);

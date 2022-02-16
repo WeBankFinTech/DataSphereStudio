@@ -1,11 +1,11 @@
 <template>
   <div class="process-state-count-model">
     <div v-show="!msg">
-      <div class="data-area" style="height: 330px;">
-        <div class="col-md-7">
-          <div id="process-state-pie" style="width:100%;height:260px;"></div>
+      <div class="data-area" style="height: 230px;">
+        <div class="col-md-8">
+          <div id="process-state-pie" style="width:100%;height:250px;"></div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-4">
           <div class="table-small-model">
             <table>
               <!--<tr>-->
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div v-show="msg">
-      <m-no-data :msg="msg" v-if="msg" :height="330"></m-no-data>
+      <m-no-data :msg="msg" v-if="msg" :height="230"></m-no-data>
     </div>
   </div>
 </template>
@@ -145,6 +145,6 @@ export default {
     border-bottom: none !important;
   }
   .table-small-model {
-    margin-top: 50px;
+    margin-top: 30px;
   }
 </style>

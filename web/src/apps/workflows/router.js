@@ -33,6 +33,17 @@ export default [
       import('./view/workflow/index.vue'),
   },
   {
+    path: 'streamis',
+    name: 'Streamis',
+    meta: {
+      title: 'My Streamis',
+      publicPage: true,
+      parent: 'Project',
+    },
+    component: () =>
+      import('./view/workflow/index.vue'),
+  },
+  {
     path: 'process',
     name: 'Process',
     meta: {

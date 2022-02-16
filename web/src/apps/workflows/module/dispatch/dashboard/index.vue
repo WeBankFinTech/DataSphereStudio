@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <div id="areaChart" style="height: 330px"></div>
+              <div id="areaChart" style="height: 250px"></div>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
@@ -84,7 +84,7 @@
               <!--</div>-->
             </div>
             <div class="row dashboard-module-content">
-              <Table :columns="columns" :data="consumptionList" style="height: 430px;" class="consumption-table">
+              <Table :columns="columns" :data="consumptionList" style="height: 330px;" class="consumption-table">
                 <!--<template slot-scope="{ row }" slot="operation">-->
                 <!--</template>-->
               </Table>
@@ -102,7 +102,7 @@
               </div>
             </div>
             <div class="dashboard-module-content">
-              <div id="mixedBarLine" style="height: 500px"></div>
+              <div id="mixedBarLine" style="height: 400px"></div>
             </div>
           </div>
         </div>
@@ -353,7 +353,7 @@ export default {
       })
     },
     getAreaData(cb, stateType) {
-      
+
       function getFormatDateString(dd) {
         let tYear = dd.getFullYear(),
           tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
@@ -396,7 +396,10 @@ export default {
           }
         },
         legend: {
-          data: ['昨日', '今日']
+          data: ['昨日', '今日'],
+          textStyle: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         xAxis: {
           type: 'category',
@@ -478,7 +481,10 @@ export default {
           }
         },*/
         legend: {
-          data: ['实例数', '成功率']
+          data: ['实例数', '成功率'],
+          textStyle: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         xAxis: [
           {
@@ -628,7 +634,7 @@ export default {
         {
           title: '实例名',
           key: 'name',
-          //width: 240,
+          width: 240,
           align: 'center',
         },
         {
@@ -677,6 +683,7 @@ export default {
       height: 60px;
       line-height: 60px;
       border-bottom: 1px solid #DEE4EC;
+      @include border-bottom-color(#DEE4EC, $dark-workspace-title-color);
       span {
         font-size: 16px;
         @include font-color($workspace-title-color, $dark-workspace-title-color);
@@ -718,15 +725,18 @@ export default {
     &.col-md-6 {
       width: calc(50% - 10px);
     }
-    background: #FFFFFF;
-    border: 1px solid #DEE4EC;
+    @include bg-color(#fff, $dark-workflow-bg-color);
+    @include font-color($light-text-color, $dark-text-color);
+    @include border-color($border-color-base, $dark-workspace-background);
+    /*background: #FFFFFF;
+    border: 1px solid #DEE4EC;*/
     border-radius: 2px;
     padding: 0;
     position: relative;
     margin-bottom: 24px;
-    min-width: 570px;
+    min-width: 470px;
     .dashboard-module-content {
-      padding: 30px;
+      padding: 30px 30px 0;
       position: relative;
       margin:0 0 24px;
     }

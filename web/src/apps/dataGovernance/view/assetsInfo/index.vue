@@ -120,19 +120,21 @@
             </Select>
             <span v-else>{{ classification.subject }}</span>
           </div>
-          <div class="assets-info-b-l-content-item" style="position: relative">
+          <div style="position: relative; margin-top: 16px; text-align: right; padding-right: 16px">
             <Icon
               type="md-create"
               v-if="!editable"
               @click="editable = true"
-              style="position: absolute; right:16px; top: -15px;cursor: pointer;"
+              style="cursor: pointer;"
             ></Icon>
             <Icon
               type="md-checkmark"
               v-else
               @click.once="changeClassifications"
-              style="position: absolute; right:0; top: -15px;cursor: pointer;"
+              style="cursor: pointer;"
             ></Icon>
+          </div>
+          <div class="assets-info-b-l-content-item">
             <label>分层</label>
             <Select
               v-model="classification.layer"
@@ -463,6 +465,10 @@ export default {
     // 编辑标签
     editSingleLabel() {
       let that = this;
+      let regZh = /[\u4e00-\u9fa5]+/g
+      if( regZh.test(that.singleLabel) ) {
+        return this.$Message.warning("目前标签不支持中文字符");
+      }
       if (that.singleLabel) {
         that.labelOptions.push(that.singleLabel);
         let params = that.labelOptions.slice(0);
@@ -549,6 +555,9 @@ export default {
           font-size: 14px;
           margin-top: 16px;
           padding-right: 8px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
           label {
             font-weight: normal;
             @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);

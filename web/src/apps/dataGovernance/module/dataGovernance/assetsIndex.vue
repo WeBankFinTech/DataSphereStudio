@@ -16,7 +16,7 @@
           <div class="top-r-container">
             <template v-for="(work, index) in topTapList">
               <we-tab
-                :key="work.id"
+                :key="index"
                 :index="index"
                 :work="work"
                 :isActive="currentTab.guid === work.guid && !textColor"
@@ -159,7 +159,6 @@ export default {
   flex-direction: column;
   .assets-index-t {
     .assets-index-t-t1 {
-      padding: 0px $padding-25;
       border-bottom: $border-width-base $border-style-base $border-color-base;
       @include border-color(
         $background-color-base,
@@ -178,6 +177,7 @@ export default {
         margin-bottom: -1px;
         line-height: 40px;
         position: relative;
+        font-weight: 500;
         &::after {
           content: "";
           border-left: 1px solid #dee4ec;
@@ -190,6 +190,9 @@ export default {
           margin: 0 15px;
         }
       }
+    .top-l-text.active {
+      @include font-color(#2E92F7, $dark-workspace-title-color);
+    }
       .top-r-container {
         flex: 1;
         height: 40px;

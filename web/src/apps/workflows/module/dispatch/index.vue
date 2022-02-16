@@ -1587,6 +1587,7 @@ export default {
   overflow: hidden;
   margin: 20px 30px 0;
   border: 1px solid rgb(237,237,237);
+  @include border-color($border-color-base, $dark-workspace-background);
   border-left: none;
   .scheduler-wrapper{
     padding-top: 0;
@@ -1607,7 +1608,7 @@ export default {
 
   .scheduler-menu{
     float: left;
-    width: 200px;
+    width: 150px;
     padding-top: 16px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
@@ -1619,7 +1620,7 @@ export default {
     @include bg-color($light-base-color, $dark-base-color);
     @include font-color($light-text-color, $dark-text-color);
     li {
-    padding: 0 40px;
+    padding: 0 24px;
     cursor: pointer;
     line-height: 40px;
     &:hover{
@@ -1637,7 +1638,7 @@ export default {
     float: left;
     padding: 10px 25px;
     min-height: calc(80vh - 16px);
-    width: calc(100% - 250px);
+    width: calc(100% - 150px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;

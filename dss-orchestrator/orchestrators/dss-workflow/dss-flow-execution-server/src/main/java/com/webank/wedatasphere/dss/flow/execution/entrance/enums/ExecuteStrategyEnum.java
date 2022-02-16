@@ -2,13 +2,6 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.enums;
 
 import java.util.Arrays;
 
-/**
- * Description 执行策略
- *
- * @Author elishazhang
- * @Date 2021/11/25
- */
-
 public enum ExecuteStrategyEnum {
 
 

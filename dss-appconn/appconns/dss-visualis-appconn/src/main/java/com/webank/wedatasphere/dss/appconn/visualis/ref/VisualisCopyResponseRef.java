@@ -4,10 +4,6 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.DSSCommonRespons
 
 import java.util.Map;
 
-/**
- * created by cooperyang on 2021/8/2
- * Description:
- */
 public class VisualisCopyResponseRef extends DSSCommonResponseRef {
 
 

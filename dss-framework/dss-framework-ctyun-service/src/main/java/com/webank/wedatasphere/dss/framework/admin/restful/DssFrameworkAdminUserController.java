@@ -91,7 +91,7 @@ public class DssFrameworkAdminUserController extends BaseController {
             } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
                 return Message.error().data("弱密码请关注:",passwordResult.getMessage());
             }
-            boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName());
+            boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName(),"user");
             if(ldapExist){
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号在ldap已存在");
             }
@@ -101,7 +101,8 @@ public class DssFrameworkAdminUserController extends BaseController {
             user.setCreateBy(SecurityFilter.getLoginUsername(req));
             int rows = dssAdminUserService.insertUser(user);
             String userName = user.getUserName();
-            ldapService.addUser(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), userName, pwd);
+            //默认每个用户所属的组是用户自身
+            ldapService.addUserWithPwd(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), userName, pwd,userName);
             return Message.ok().data("rows", rows).message("新增成功");
         } catch (Exception exception) {
             return Message.error().data("rows", 0).message(exception.getMessage());

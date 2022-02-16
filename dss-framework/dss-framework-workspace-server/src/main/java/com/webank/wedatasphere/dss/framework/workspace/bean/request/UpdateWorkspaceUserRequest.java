@@ -6,16 +6,16 @@ import java.util.List;
 public class UpdateWorkspaceUserRequest implements Serializable {
 
     private int workspaceId;
-    private String userName ;
+    private String username ;
     private List<Integer> roles;
     private String userId;
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.username = userName;
     }
 
 

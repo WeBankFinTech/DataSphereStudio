@@ -14,12 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @Classname DSSDataApiAuth
- * @Description TODO
- * @Date 2021/7/13 14:03
- * @Created by suyc
- */
 @TableName(value = "dss_dataapi_auth")
 @Data
 public class ApiAuth implements Serializable {

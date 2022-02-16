@@ -119,7 +119,7 @@ public class FlowRestfulApi {
     }
 
     @RequestMapping(value = "getSchedulerWorkflowStatus",method = RequestMethod.GET)
-    public Message getSchedulerWorkflowStatus(@Context HttpServletRequest request,
+    public Message getSchedulerWorkflowStatus(HttpServletRequest request,
                                               @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
                                               @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
         String username = SecurityFilter.getLoginUsername(request);

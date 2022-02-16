@@ -11,12 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @Classname AssetService
- * @Description TODO
- * @Date 2021/8/20 9:52
- * @Created by suyc
- */
 public interface AssetService {
     public Map<String, Long> getHiveSummary() throws DataGovernanceException;
 

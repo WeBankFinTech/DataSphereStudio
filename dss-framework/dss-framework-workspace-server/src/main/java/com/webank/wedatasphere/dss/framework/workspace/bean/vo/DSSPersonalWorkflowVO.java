@@ -16,13 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import java.util.Arrays;
 import java.util.List;
-
-/**
- * created by cooperyang on 2020/3/5
- * Description:
- */
 
 public class DSSPersonalWorkflowVO extends AbstractDSSVO{
     private int workflowId;

@@ -17,10 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * created by cooperyang on 2021/8/2
- * Description:
- */
 public class VisualisRefCopyOperation implements RefCopyOperation<VisualisCopyRequestRef> {
 
     private static final Logger LOG = LoggerFactory.getLogger(VisualisRefCopyOperation.class);

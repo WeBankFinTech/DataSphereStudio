@@ -19,11 +19,6 @@ package com.webank.wedatasphere.dss.apiservice.core.action
 import org.apache.linkis.httpclient.request.GetAction
 import org.apache.linkis.ujes.client.request.UJESJobAction
 
-/**
- * @author allenlliu
- * @date 2020/09/14 10:32 AM
- * @version 2.0.0
- */
 class ApiServiceGetAction extends GetAction with  UJESJobAction {
   override def suffixURLs: Array[String] =  Array("dss","framework","workspace", "getWorkspaceIdByUserName")
 }

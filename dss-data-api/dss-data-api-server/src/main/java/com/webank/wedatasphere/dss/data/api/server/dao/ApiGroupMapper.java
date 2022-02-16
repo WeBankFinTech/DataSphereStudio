@@ -7,12 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-/**
- * @Classname ApiGroupMapper
- * @Description TODO
- * @Date 2021/7/23 15:44
- * @Created by suyc
- */
 @Mapper
 public interface ApiGroupMapper extends BaseMapper<ApiGroup> {
 

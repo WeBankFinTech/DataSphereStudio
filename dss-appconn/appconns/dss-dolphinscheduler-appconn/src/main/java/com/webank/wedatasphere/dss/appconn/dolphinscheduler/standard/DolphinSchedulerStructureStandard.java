@@ -4,13 +4,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSched
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 
-
-/**
- * The type Dolphin scheduler structure standard.
- *
- * @author yuxin.yuan
- * @date 2021/10/18
- */
 public class DolphinSchedulerStructureStandard extends AbstractStructureIntegrationStandard {
 
     private static volatile DolphinSchedulerStructureStandard instance;

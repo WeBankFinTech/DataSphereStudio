@@ -32,12 +32,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequest
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * The type Dolphin scheduler project creation operation.
- *
- * @author yuxin.yuan
- * @date 2021/10/18
- */
+
 public class DolphinSchedulerProjectCreationOperation implements ProjectCreationOperation, DolphinSchedulerConf {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectCreationOperation.class);

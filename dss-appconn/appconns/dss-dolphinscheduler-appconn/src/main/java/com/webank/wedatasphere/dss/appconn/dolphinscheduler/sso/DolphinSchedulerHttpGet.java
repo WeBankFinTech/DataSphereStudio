@@ -4,12 +4,6 @@ import org.apache.http.client.methods.HttpGet;
 
 import java.net.URI;
 
-/**
- * The type Dolphin scheduler http get.
- *
- * @author yuxin.yuan
- * @date 2021/05/20
- */
 public class DolphinSchedulerHttpGet extends HttpGet implements UserInfo {
 
     private String user;

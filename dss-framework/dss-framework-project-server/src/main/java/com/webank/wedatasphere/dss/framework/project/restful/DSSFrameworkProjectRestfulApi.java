@@ -204,7 +204,7 @@ public class DSSFrameworkProjectRestfulApi {
      * 获取已删除的所有工程
      */
     @RequestMapping(path ="getDeletedProjects", method = RequestMethod.POST)
-    public Message getDeletedProjects(@Context HttpServletRequest request, @Valid ProjectQueryRequest projectRequest) {
+    public Message getDeletedProjects(HttpServletRequest request, @Valid ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);

@@ -22,17 +22,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * <p>
  * 用户信息表
  * </p>
- *
- * @author Lvjw
- * @since 2021-06-01
  */
-//@Data
-//@EqualsAndHashCode(callSuper = false)
-//@ApiModel(value = "DssAdminUser对象" , description = "用户信息表")
-
 @TableName(value = "dss_user")
-
-
 public class DssAdminUser extends BaseEntity {
     private static final long serialVersionUID = 1L;
     /**

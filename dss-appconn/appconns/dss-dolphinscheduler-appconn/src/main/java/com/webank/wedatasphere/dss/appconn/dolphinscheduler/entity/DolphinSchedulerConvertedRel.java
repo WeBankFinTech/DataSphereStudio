@@ -5,12 +5,6 @@ import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRelImpl;
 
-/**
- * The type Dolphin scheduler converted rel.
- *
- * @author yuxin.yuan
- * @date 2021/10/27
- */
 public class DolphinSchedulerConvertedRel extends PreConversionRelImpl implements ConvertedRel {
 
     public DolphinSchedulerConvertedRel(PreConversionRel rel) {

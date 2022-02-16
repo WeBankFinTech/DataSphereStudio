@@ -39,10 +39,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/**
- * created by cooperyang on 2020/3/17
- * Description:一个数据库的helper类，这个类可以将一些数据load到内存，比如menu信息，role的信息等
- */
 @Component
 public class WorkspaceDBHelper {
 

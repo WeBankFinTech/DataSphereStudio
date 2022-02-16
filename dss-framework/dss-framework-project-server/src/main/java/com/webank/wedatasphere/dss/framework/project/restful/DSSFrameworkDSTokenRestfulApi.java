@@ -25,12 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author allenlliu
- * @version 2.0.0
- * @date 2020/08/17 05:37 PM
- */
-
 @RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
 @RestController
 public class DSSFrameworkDSTokenRestfulApi {

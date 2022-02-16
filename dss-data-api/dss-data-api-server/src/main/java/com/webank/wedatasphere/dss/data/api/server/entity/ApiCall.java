@@ -11,12 +11,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.Date;
 
-/**
- * @Classname ApiCall
- * @Description TODO
- * @Date 2021/7/20 13:36
- * @Created by suyc
- */
 @Data
 @TableName(value = "dss_dataapi_call")
 public class ApiCall {

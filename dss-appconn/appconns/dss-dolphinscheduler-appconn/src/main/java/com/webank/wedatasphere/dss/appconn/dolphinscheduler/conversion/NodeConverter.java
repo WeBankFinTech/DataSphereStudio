@@ -12,12 +12,6 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedu
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 
-/**
- * The type Node converter.
- *
- * @author yuxin.yuan
- * @date 2021/04/29
- */
 public class NodeConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeConverter.class);

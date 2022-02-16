@@ -74,16 +74,7 @@ public final class HttpClientUtil {
 		httpclient = HttpClients.createDefault();
 	}
 	
-	
-    /**
-     * 
-     * @param url
-     * @param timeout
-     * @param headerMap
-     * @param paramsList
-     * @param encoding
-     * @return
-     */
+
     public static String postForm(String url, int timeout, Map<String, Object> headerMap, List<NameValuePair> paramsList, String encoding){
         HttpPost post = new HttpPost(url);
         try {
@@ -127,11 +118,6 @@ public final class HttpClientUtil {
         return "";
     }
 
-	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
-	 */
 	public static String postJsonBody(String url, int timeout, Map<String, Object> headerMap,
 			String paraData, String encoding) {
 
@@ -179,7 +165,6 @@ public final class HttpClientUtil {
 		return "";
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String invokeGet(String url, Map<String, String> params, String encode, int connectTimeout,
 			int soTimeout) {
 		String responseString = null;
@@ -343,11 +328,6 @@ public final class HttpClientUtil {
 		return sdf.format(date);
 	}
 
-	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
-	 */
 	public static String postJsonBody2(String url, int timeout, Map<String, Object> headerMap,
                                        List<NameValuePair> paramsList, String encoding) {
 		logger.info("successfully  start post Json Body  url{} ", url);
@@ -396,11 +376,6 @@ public final class HttpClientUtil {
 		return "";
 	}
 
-	/**
-	 * 调用saltapi时
-	 *
-	 * @author: XIEJIAN948@pingan.com.cn
-	 */
 	public static String postJsonBody3(String url, int timeout, Map<String, Object> headerMap,
 			Map<String, Object> paramsList, String encoding) {
 		HttpPost post = new HttpPost(url);

@@ -10,12 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @Classname ApiManagerServiceImpl
- * @Description TODO
- * @Date 2021/7/22 20:52
- * @Created by suyc
- */
 @Service
 public class ApiManagerServiceImpl implements ApiManagerService {
     @Autowired

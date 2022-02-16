@@ -2,13 +2,6 @@ package com.webank.wedatasphere.dss.appconn.visualis.enums;
 
 import java.util.Arrays;
 
-/**
- * Description
- *
- * @Author elishazhang
- * @Date 2021/10/20
- */
-
 public enum NodeNameEnum {
 
     DASHBOARD_NAME("dashboardPortal", "DASHBOARD节点名称"),

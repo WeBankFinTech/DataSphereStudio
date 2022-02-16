@@ -309,10 +309,6 @@ INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (15,45
 INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (17,45);
 INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (20,45);
 
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,1);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,3);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,5);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,6);
 
 DELETE FROM dss_workflow_node_ui;
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (1,'title','请填写节点名称','Please enter node name','节点名','Node name','Input',1,NULL,NULL,0,NULL,0,1,1,1,'node');
@@ -549,7 +545,10 @@ INSERT INTO `dss_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `orde
 
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (50,'title','请填写节点名称','Please enter node name','节点名','Node name','Input',1,NULL,NULL,0,NULL,0,1,1,1,'node');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('60','Regex','^exchangis_[a-zA-Z0-9_]*$','必须以exchangis_开头','必须以exchangis_开头','blur');
-
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,50);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,3);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,5);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (21,6);
 INSERT  INTO `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) VALUES (50,47);
 INSERT  INTO `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) VALUES (50,55);
 INSERT  INTO `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) VALUES (50,56);

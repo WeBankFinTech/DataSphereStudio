@@ -32,7 +32,6 @@ public class GuideQueryRestful {
         return Message.ok().data("result",guideGroupService.queryGuideGroupByPath(path));
     }
 
-
     @RequestMapping(path ="/guidecatalog/top", method = RequestMethod.GET)
     public Message queryGuideCatalogListForTop( ){
         return Message.ok().data("result", guideCatalogService.queryGuideCatalogListForTop());

@@ -323,7 +323,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     }
 
                 });
-
                 vo.setMenuPrivs(menuPrivs);
                 dssWorkspaceMenuPrivVOList.add(vo);
             }
@@ -342,7 +341,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         Map<Integer, List<DSSWorkspaceComponentRolePriv>> map1 = new HashMap<>();
         for (DSSWorkspaceComponentRolePriv dssWorkspaceComponentRolePriv : dssWorkspaceComponentRolePrivList){
-            int componentId = dssWorkspaceComponentRolePriv.getComponentId();
+            Integer componentId = dssWorkspaceComponentRolePriv.getComponentId();
+            if (componentId == null) {
+                continue;
+            }
             if(!map1.containsKey(componentId)){
                 List<DSSWorkspaceComponentRolePriv> tempList = new ArrayList<>();
                 tempList.add(dssWorkspaceComponentRolePriv);

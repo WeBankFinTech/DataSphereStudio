@@ -112,7 +112,8 @@ public class FlowExecutionRestfulApi {
                 message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
             }
         } catch (Exception e) {
-            message = Message.error("Failed to get job execution info");
+            logger.error("Failed to get job execution info:", e);
+            message = Message.error("Failed to get job execution info:" + e.getMessage());
         }
         return message;
     }

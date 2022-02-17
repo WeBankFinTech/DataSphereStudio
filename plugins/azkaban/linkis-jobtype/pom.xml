@@ -32,7 +32,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.webank.wedatasphere.linkis</groupId>
+            <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-common</artifactId>
             <version>${linkis.version}</version>
         </dependency>
@@ -44,7 +44,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>
-                    <groupId>com.webank.wedatasphere.linkis</groupId>
+                    <groupId>org.apache.linkis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

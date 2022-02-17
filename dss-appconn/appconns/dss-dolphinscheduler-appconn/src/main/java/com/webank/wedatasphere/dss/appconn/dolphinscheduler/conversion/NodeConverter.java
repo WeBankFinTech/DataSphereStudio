@@ -121,10 +121,10 @@ public class NodeConverter {
                 } else if ("linkis.hive.hql".equals(taskType)) {
 //                    contentBuffer.append("source /etc/profile").append("\n");
 //                    beeline -u "jdbc:hive2://10.30.33.24:10000/default;principal=hive/nm-bigdata-030033024.ctc.local@EWS.BIGDATA.CHINATELECOM.CN.UAT;hive.server2.proxy.user=luban_test" -e
-                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS + "\n");
+                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB.getValue() + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS.getValue() + "\n");
                     contentBuffer.append("beeline -u\n");
                     contentBuffer.append(" \"");
-                    contentBuffer.append(DolphinSchedulerConf.DS_HIVE_SERVER2_URL+";");
+                    contentBuffer.append(DolphinSchedulerConf.DS_HIVE_SERVER2_URL.getValue()+";");
                     contentBuffer.append("hive.server2.proxy.user="+proxyUser+"\"");
                     contentBuffer.append(" -e \"\n");
                     contentBuffer.append(scriptContent);
@@ -132,7 +132,7 @@ public class NodeConverter {
                     taskParams.setRawScript(contentBuffer.toString());
                 } else if ("linkis.spark.sql".equals(taskType)) {
 //                    contentBuffer.append("source /etc/profile").append("\n");
-                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS + "\n");
+                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB.getValue() + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS.getValue() + "\n");
                     contentBuffer.append("spark-sql --master yarn --deploy-mode client");
                     contentBuffer.append(" --executor-memory " + executorMemory);
                     contentBuffer.append(" --num-executors " + executorInstances);
@@ -148,7 +148,7 @@ public class NodeConverter {
                     taskParams.setRawScript(contentBuffer.toString());
                 } else if ("linkis.spark.scala".equals(taskType)) {
 //                    contentBuffer.append("source /etc/profile").append("\n");
-                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS + "\n");
+                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB.getValue() + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS.getValue() + "\n");
                     contentBuffer.append("spark-shell --master yarn");
                     contentBuffer.append(" --executor-memory " + executorMemory);
                     contentBuffer.append(" --num-executors " + executorInstances);
@@ -174,7 +174,7 @@ public class NodeConverter {
 
                 } else if ("linkis.spark.py".equals(taskType)) {
 //                    contentBuffer.append("source /etc/profile").append("\n");
-                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS + "\n");
+                    contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB.getValue() + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS.getValue() + "\n");
                     contentBuffer.append("pyspark --master yarn");
                     contentBuffer.append(" --executor-memory " + executorMemory);
                     contentBuffer.append(" --num-executors " + executorInstances);

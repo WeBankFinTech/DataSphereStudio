@@ -15,7 +15,7 @@ public interface DolphinSchedulerConf {
     CommonVars<String> NGINX_URL = CommonVars.apply("wds.dss.nginx.url", "http://172.24.2.230:8088");
 
     CommonVars<String> DS_DOLPHIN_KERBEROS_PRINCIPALS= CommonVars.apply("wds.dss.dolphin.kerberos.principals", "hive");
-    CommonVars<String> DS_DOLPHIN_KERBEROS_KEYTAB= CommonVars.apply("wds.dss.dolphin.kerberos.keytab", " /opt/soft/hadoop/hive.keytab");
+    CommonVars<String> DS_DOLPHIN_KERBEROS_KEYTAB= CommonVars.apply("wds.dss.dolphin.kerberos.keytab", "/opt/soft/hadoop/hive.keytab");
     CommonVars<String> DS_HIVE_SERVER2_URL= CommonVars.apply("wds.dss.hive.server2.url", "jdbc:hive2://10.30.33.24:10000/default;principal=hive/nm-bigdata-030033024.ctc.local@EWS.BIGDATA.CHINATELECOM.CN.UAT");
 
 

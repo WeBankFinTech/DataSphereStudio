@@ -33,10 +33,10 @@
     </div>
 
     <div class="tab-card-b">
-      <div v-if="!model.comment" style="width: 80%">
+      <div v-if="!model.comment" >
         <span>描述：-</span>
       </div>
-      <div v-else style="width: 80%">
+      <div v-else :title="model.comment">
         描述：<span v-html="model.comment" class="content-html"></span>
       </div>
     </div>
@@ -49,6 +49,7 @@
           v-for="(label, idx) in model.labels"
           :key="idx"
           v-html="label"
+          :title="label"
         ></span>
       </div>
       <div v-else style="width: 80%">

@@ -184,9 +184,14 @@ export default {
     },
     async deleteOk() {
       this.customloading = true;
-      await deleteLayers(this.delete_name);
-      this.customloading = false;
-      this.handleGetLayersCustom();
+      try {
+        await deleteLayers(this.delete_name);
+        this.customloading = false;
+        this.handleGetLayersCustom();
+      } catch (error) {
+        this.customloading = false;
+        this.handleGetLayersCustom();
+      }
     },
     handleDelete(name) {
       this.delete_modal = true

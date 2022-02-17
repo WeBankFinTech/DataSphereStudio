@@ -80,6 +80,7 @@
                 style="width: 135px;"
                 size="small"
                 placeholder=""
+                maxlength="20"
                 @on-enter="editSingleLabel"
               />
               <Icon
@@ -264,7 +265,6 @@ export default {
       let { result } = res;
       this.layerList = result;
     });
-
     util.Hub.$on("register_click_hive_table", data => {
       this.$nextTick(() => {
         $(`#${data.guid}`).on("click", () => {

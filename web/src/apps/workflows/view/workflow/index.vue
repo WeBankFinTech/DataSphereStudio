@@ -375,7 +375,7 @@ export default {
       }else if( this.$route.name == 'Scheduler' ) {
         dicValue = 'scheduler'
       }
-      const btn = this.selectDevprocess.find(item => item.dicValue === dicValue)
+      const btn = this.devProcessBase.find(item => item.dicValue === dicValue)
       this.handleChangeButton(btn)
     }
   },
@@ -752,6 +752,7 @@ export default {
           });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
+        debugger
         this.currentTreeId = node.id;
         let schedulerTabList = JSON.parse(sessionStorage.getItem('scheduler_tab_list')) || []
         if( schedulerTabList.findIndex(i => i.id == node.id) < 0 ) {

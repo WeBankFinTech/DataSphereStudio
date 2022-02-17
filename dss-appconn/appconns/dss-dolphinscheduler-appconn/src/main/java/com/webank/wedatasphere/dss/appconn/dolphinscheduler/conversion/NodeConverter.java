@@ -122,7 +122,7 @@ public class NodeConverter {
 //                    contentBuffer.append("source /etc/profile").append("\n");
 //                    beeline -u "jdbc:hive2://10.30.33.24:10000/default;principal=hive/nm-bigdata-030033024.ctc.local@EWS.BIGDATA.CHINATELECOM.CN.UAT;hive.server2.proxy.user=luban_test" -e
                     contentBuffer.append("kinit -kt " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_KEYTAB.getValue() + " " + DolphinSchedulerConf.DS_DOLPHIN_KERBEROS_PRINCIPALS.getValue() + "\n");
-                    contentBuffer.append("beeline -u\n");
+                    contentBuffer.append("beeline -u");
                     contentBuffer.append(" \"");
                     contentBuffer.append(DolphinSchedulerConf.DS_HIVE_SERVER2_URL.getValue()+";");
                     contentBuffer.append("hive.server2.proxy.user="+proxyUser+"\"");

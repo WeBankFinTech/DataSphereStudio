@@ -635,7 +635,7 @@ export default {
         {
           title: '实例名',
           key: 'name',
-          width: 240,
+          //width: 180,
           align: 'center',
         },
         {
@@ -650,7 +650,7 @@ export default {
         {
           title: '耗时',
           key: 'duration',
-          width: 210,
+          width: 150,
           align: 'center',
           render: (h, scope) => {
             return h('span', {}, this.showDuration(scope.row.duration))

@@ -1126,14 +1126,21 @@ CREATE TABLE `linkis_user` (
 
 
 
-
-
-
-
-
-
-
-
+CREATE TABLE `dss_workflow_execute_info` (
+   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+   `task_id` bigint(20) NOT NULL COMMENT '任务id',
+   `status` int(1) DEFAULT NULL COMMENT '状态，0：失败 1：成功，',
+   `flow_id` bigint(20) NOT NULL COMMENT 'flowId',
+   `version` varchar(200) DEFAULT NULL COMMENT '工作流bml版本号',
+   `failed_jobs` text COMMENT '执行失败节点',
+   `Pending_jobs` text COMMENT '未执行节点',
+   `skipped_jobs` text COMMENT '执行跳过节点',
+   `succeed_jobs` text COMMENT '执行成功节点',
+   `createtime` datetime NOT NULL COMMENT '创建时间',
+   `running_jobs` text COMMENT '正在执行节点',
+   `updatetime` datetime DEFAULT NULL COMMENT '更新时间',
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
 
 
 ALTER TABLE dss_workspace  ADD COLUMN `workspace_type`  varchar(20) comment '工作空间类型';
@@ -1369,3 +1376,4 @@ CREATE TABLE IF NOT EXISTS `dss_guide_chapter` (
   `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导知识库文章';
+

@@ -39,6 +39,7 @@ import java.util.Map;
 public class AzkabanDssJobType extends AbstractJob {
 
 
+
     private static final String SENSITIVE_JOB_PROP_NAME_SUFFIX = "_X";
     private static final String SENSITIVE_JOB_PROP_VALUE_PLACEHOLDER = "[MASKED]";
     private static final String JOB_DUMP_PROPERTIES_IN_LOG = "job.dump.properties";

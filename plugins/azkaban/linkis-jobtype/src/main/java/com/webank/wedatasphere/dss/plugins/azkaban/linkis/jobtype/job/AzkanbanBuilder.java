@@ -19,18 +19,32 @@ package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
+import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Builder;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.action.WorkspaceInfoGetAction;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.utils.AzkabanHttpResultUtils;
+import org.apache.linkis.common.exception.LinkisRetryException;
+
+import org.apache.linkis.common.utils.DefaultRetryHandler;
+import org.apache.linkis.httpclient.config.ClientConfig;
+import org.apache.linkis.httpclient.dws.DWSHttpClient;
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import org.apache.linkis.httpclient.response.impl.DefaultHttpResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -51,6 +65,7 @@ public class AzkanbanBuilder extends Builder{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
+    private static final String RUN_DATE_KEY ="run_date";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
@@ -99,9 +114,12 @@ public class AzkanbanBuilder extends Builder{
 
         runtimeMap.put(LinkisJobTypeConf.DSS_LABELS_KEY, jobProps.get(LinkisJobTypeConf.DSS_LABELS_KEY));
         //to put a workspace for linkis job
+        //todo 0.X不需要这个参数
         String workspace = "";
         try {
-            workspace = getWorkspace(job.getUser(), job);
+//            workspace = getWorkspace(job.getUser(), job);
+            workspace = getWorkspaceByHttpClient(job);
+            LOGGER.info("Get workspace str: "+workspace);
         } catch (Exception e) {
            LOGGER.error("Failed to get workspace", e);
         }
@@ -149,13 +167,62 @@ public class AzkanbanBuilder extends Builder{
     }
 
 
+    private String getWorkspaceByHttpClient(Job job) throws Exception {
+        String workspaceStr="";
+        String user=job.getUser();
+        String linkisUrl = LinkisURLService.Factory.getLinkisURLService().getDefaultLinkisURL(job);
+        String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
+        DWSHttpClient client=null;
+        try {
+            client= getDWSHttpClient(token,user,linkisUrl);
+            WorkspaceInfoGetAction  workspaceInfoGetAction =new WorkspaceInfoGetAction();
+            workspaceInfoGetAction.setURL("/api/rest_j/v1/dss/framework/project/getWorkSpaceStr");
+            workspaceInfoGetAction.setUser(user);
+            DefaultHttpResult result = (DefaultHttpResult)client.execute(workspaceInfoGetAction);
+            if (result.getStatusCode() == 200 || result.getStatusCode() == 0) {
+                String response = result.getResponseBody();
+                workspaceStr = AzkabanHttpResultUtils.getValueFromEntity(response,"workspaceStr");
+                return workspaceStr;
+            }else{
+                throw new LinkisJobExecutionErrorException(50063,"Failed to get workspace str:"+workspaceInfoGetAction.getURL());
+            }
+
+        }
+        finally {
+            IOUtils.closeQuietly(client);
+        }
+
+    }
+
+    public DWSHttpClient getDWSHttpClient(String token,String user,String gatewayUrl) {
+        DefaultRetryHandler retryHandler = new DefaultRetryHandler();
+        retryHandler.addRetryException(LinkisRetryException.class);
+        ClientConfig clientConfig = DWSClientConfigBuilder.newBuilder().setDWSVersion("v1").addServerUrl(gatewayUrl)
+                .connectionTimeout(300000).discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES).loadbalancerEnabled(false).setAuthenticationStrategy(new TokenAuthenticationStrategy()).setAuthTokenKey(user)
+                .setAuthTokenValue(token).maxConnectionSize(5).retryEnabled(true).setRetryHandler(retryHandler).readTimeout(300000).build();
+       DWSHttpClient client = new DWSHttpClient((DWSClientConfig) clientConfig, "Job-Type-Client-");
+
+
+       return client;
+    }
+
+
+
+
+
     @Override
     protected void fillLinkisJobInfo(LinkisJob linkisJob) {
         linkisJob.setConfiguration(findConfiguration(LinkisJobExecutionConfiguration.NODE_CONF_PREFIX));
         Map<String, Object> variables = findVariables(LinkisJobExecutionConfiguration.FLOW_VARIABLE_PREFIX);
         //只有工作流参数中没有设置,我们才会去进行替换
-        if(jobProps.containsKey("run_date") && !variables.containsKey("run_date")){
-            variables.put("run_date", jobProps.get("run_date"));
+        //改为不管工作流是否设置，在wtss这边都需要统一使用wtss设置的run_date,防止出现批量调度的误导作用
+        if(jobProps.containsKey(RUN_DATE_KEY)){
+            if(variables.containsKey(RUN_DATE_KEY)){
+                //去掉工作流设置的变量
+                variables.remove(RUN_DATE_KEY);
+            }
+            variables.put(RUN_DATE_KEY, jobProps.get(RUN_DATE_KEY));
+            LOGGER.info("Put run_date to variables"+jobProps.get(RUN_DATE_KEY));
         }
         linkisJob.setVariables(variables);
         linkisJob.setSource(getSource());

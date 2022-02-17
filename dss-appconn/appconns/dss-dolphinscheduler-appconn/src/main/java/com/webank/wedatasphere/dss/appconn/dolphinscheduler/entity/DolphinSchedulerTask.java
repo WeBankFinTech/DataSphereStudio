@@ -14,28 +14,6 @@ public class DolphinSchedulerTask {
 
     private String description;
 
-    private String tenantCode;
-
-    public int getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(int tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    private int tenantId;
-
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-
     private List<String> preTasks;
 
     public void setType(String type) {

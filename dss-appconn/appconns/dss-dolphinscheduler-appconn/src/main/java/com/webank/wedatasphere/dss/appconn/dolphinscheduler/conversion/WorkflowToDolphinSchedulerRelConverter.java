@@ -96,7 +96,6 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         dolphinSchedulerWorkflow.setLocations(locations);
         dolphinSchedulerWorkflow.setConnects(connects);
         dolphinSchedulerWorkflow.setTenantId(8);
-        dolphinSchedulerWorkflow.setTenantCode("hadoop");
 
 
         return dolphinSchedulerWorkflow;

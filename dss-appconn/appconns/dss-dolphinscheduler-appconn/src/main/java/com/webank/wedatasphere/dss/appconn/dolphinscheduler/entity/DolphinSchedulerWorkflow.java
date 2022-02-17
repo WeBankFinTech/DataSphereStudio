@@ -27,18 +27,6 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
 
     public Integer tenantId;
 
-    private String tenantCode;
-
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-
 
     public Integer getTenantId() {
         return tenantId;

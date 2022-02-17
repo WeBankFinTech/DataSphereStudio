@@ -23,7 +23,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
     </parent>
     <artifactId>linkis-jobtype</artifactId>
     <properties>

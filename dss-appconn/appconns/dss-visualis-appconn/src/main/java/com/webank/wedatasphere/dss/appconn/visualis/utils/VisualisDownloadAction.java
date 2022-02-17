@@ -57,7 +57,7 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
         return url;
     }
 
-/*
+
     @Override
     public HttpResponse getResponse() {
         return this.response;
@@ -67,14 +67,14 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
     public void setResponse(HttpResponse response) {
         this.response = response;
     }
-*/
+
 
     @Override
     public void write(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-/*
+
     @Override
     public void write( InputStream inputStream, HttpResponse response) {
 
@@ -116,7 +116,7 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
     public Logger logger() {
         return LoggerFactory.getLogger(getClass());
     }
-*/
+
 
 
 }

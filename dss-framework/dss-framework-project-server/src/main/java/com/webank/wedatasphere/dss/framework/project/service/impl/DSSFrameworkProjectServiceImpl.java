@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
 public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectServiceImpl.class);
     public static final int MaxProjectNameSize = 64;

@@ -767,7 +767,7 @@ export default {
         delete destination.fieldDelimiter;
       }
       const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
-      const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\ncom.webank.wedatasphere.linkis.engine.imexport.ExportData.exportData(spark,dataInfo,destination)`;
+      const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\norg.apache.linkis.engine.imexport.ExportData.exportData(spark,dataInfo,destination)`;
       const md5Path = util.md5(tabName);
       this.dispatch('Workbench:add', {
         id: md5Path,

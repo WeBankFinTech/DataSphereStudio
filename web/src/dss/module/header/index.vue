@@ -620,10 +620,11 @@ export default {
       const url =
         location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
       this.$router.push({
-        name: "commonIframe",
+        path: `/commonIframe/Console`,
         query: {
           workspaceId: this.$route.query.workspaceId,
-          url
+          url,
+          type: 'Console'
         }
       });
       // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});

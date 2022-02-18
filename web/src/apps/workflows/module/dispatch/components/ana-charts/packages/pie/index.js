@@ -111,7 +111,7 @@ export default class Pie extends Base {
         y: 'center',
         textStyle: {
           fontSize: 14,
-          color: 'rgba(0,0,0,0.45)'
+          color: 'rgb(150, 150, 150)'
         }
       },
       tooltip: {
@@ -121,7 +121,10 @@ export default class Pie extends Base {
       legend: {
         orient: 'vertical',
         left: 'left',
-        data: legendData
+        data: legendData,
+        textStyle: {
+          color: 'rgb(150, 150, 150)'
+        }
       },
       series: _series
     }

@@ -398,10 +398,12 @@ export default {
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  @import '@/common/style/variables.scss';
   .start-process-model {
     width: 100%;
     min-height: 300px;
-    background: #fff;
+    @include bg-color(#fff, $dark-workflow-bg-color);
+    @include font-color($light-text-color, $dark-text-color);
     border-radius: 3px;
   .title-box {
     margin-bottom: 18px;

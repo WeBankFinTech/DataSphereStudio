@@ -30,6 +30,7 @@
           <Input
             type="text"
             v-model="catalogForm.title"
+            :maxlength=21
             placeholder="请输入目录名称"
             style="width: 300px"
           ></Input>
@@ -52,6 +53,7 @@
           <Input
             type="text"
             v-model="contentForm.title"
+            :maxlength=21
             placeholder="请输入标题"
             style="width: 300px"
           >
@@ -105,7 +107,11 @@ export default {
         description: "",
       },
       groupRule: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [
+          { required: true, message: "请输入标题", trigger: 'blur' },
+          { message: "标题长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '标题必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
       },
       contentForm: {
         catalogId: -1,
@@ -116,7 +122,11 @@ export default {
         type: [
           { required: true, message: "请选择节点类型", trigger: "change" },
         ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [
+          { required: true, message: "请输入标题", trigger: 'blur' },
+          { message: "标题长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '标题必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
       },
     };
   },

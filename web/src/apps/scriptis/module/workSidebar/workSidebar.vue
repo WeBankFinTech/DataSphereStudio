@@ -67,11 +67,11 @@
         @select="openImportToHiveDialog">
         <span>{{ $t('message.scripts.contextMenu.importToHive') }}</span>
       </we-menu-item> -->
-      <we-menu-item
+      <!-- <we-menu-item
         v-if="currentNode.isLeaf"
         @select="openImportDialog">
         <span>{{ $t('message.scripts.contextMenu.importToHdfs') }}</span>
-      </we-menu-item>
+      </we-menu-item> -->
       <we-menu-item
         v-if="currentNode.isLeaf"
         @select="copyName">

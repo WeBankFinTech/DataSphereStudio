@@ -5,9 +5,9 @@
         <div class="scheduler-menu">
           <ul>
             <li :class="activeDS == 4? 'active' : ''" @click="activeList(4)">{{$t('message.scheduler.dashboard')}}</li>
-            <li :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
-            <li :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
-            <li :class="activeDS == 5? 'active' : ''" @click="activeList(5)">{{$t('message.scheduler.taskInstance')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 1 || activeDS == 3? 'active' : ''" @click="activeList(1)">{{$t('message.scheduler.processDefinition')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 2? 'active' : ''" @click="activeList(2)">{{$t('message.scheduler.processInstance')}}</li>
+            <li v-if="$route.query.projectID" :class="activeDS == 5? 'active' : ''" @click="activeList(5)">{{$t('message.scheduler.taskInstance')}}</li>
           </ul>
         </div>
         <div class="scheduler-list" v-if="activeDS == 4">
@@ -1294,6 +1294,9 @@ export default {
         clearInterval(this.timer)
       }
       this.activeDS = type
+      if (this.$route.query.projectID == 0) {
+        this.activeDS = 4
+      }
       if (this.activeDS === 1) {
         this.getListData(1, data)
       } else if (this.activeDS === 2) {
@@ -1587,6 +1590,7 @@ export default {
   overflow: hidden;
   margin: 20px 30px 0;
   border: 1px solid rgb(237,237,237);
+  @include border-color($border-color-base, $dark-workspace-background);
   border-left: none;
   .scheduler-wrapper{
     padding-top: 0;
@@ -1607,7 +1611,7 @@ export default {
 
   .scheduler-menu{
     float: left;
-    width: 200px;
+    width: 150px;
     padding-top: 16px;
     font-size: 14px;
     min-height: calc(80vh - 16px);
@@ -1619,7 +1623,7 @@ export default {
     @include bg-color($light-base-color, $dark-base-color);
     @include font-color($light-text-color, $dark-text-color);
     li {
-    padding: 0 40px;
+    padding: 0 24px;
     cursor: pointer;
     line-height: 40px;
     &:hover{
@@ -1637,7 +1641,7 @@ export default {
     float: left;
     padding: 10px 25px;
     min-height: calc(80vh - 16px);
-    width: calc(100% - 250px);
+    width: calc(100% - 150px);
     .scheduler-list-title {
       padding-bottom: 17px;
       font-size: 16px;

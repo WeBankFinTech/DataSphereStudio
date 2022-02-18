@@ -96,7 +96,6 @@
         <div class="addWrap">
           <p>{{ tableTitle }}</p>
           <Button
-            v-if="false"
             type="primary"
             @click="handleAdd()"
             icon="md-add"

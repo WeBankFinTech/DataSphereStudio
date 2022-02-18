@@ -28,14 +28,14 @@ public class JobParamsParser implements JobParser {
 
         if (job instanceof LinkisJob) {
             LinkisJob linkisJob = (LinkisJob) job;
-            linkisJob.getLogObj().info("Start to  put variable and configuration");
+            linkisJob.getLogObj().info("************************************PARAMS FROM BML, Start to  put variable and configuration");
             //put variable
             Map<String, Object> flowVariables = linkisJob.getVariables();
             putParamsMap(job.getParams(), "variable", flowVariables);
             // put configuration
             Map<String, Object> configuration = linkisJob.getConfiguration();
             putParamsMap(job.getParams(), "configuration", configuration);
-            linkisJob.getLogObj().info("Finished to  put variable and configuration");
+            linkisJob.getLogObj().info("************************************PARAMS FROM BML, Finished to  put variable and configuration");
         }
     }
 

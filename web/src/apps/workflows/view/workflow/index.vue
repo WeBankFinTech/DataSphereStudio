@@ -752,7 +752,6 @@ export default {
           });
         }
       } else if (node.type === "project" || node.type === "scheduler") {
-        debugger
         this.currentTreeId = node.id;
         let schedulerTabList = JSON.parse(sessionStorage.getItem('scheduler_tab_list')) || []
         if( schedulerTabList.findIndex(i => i.id == node.id) < 0 ) {

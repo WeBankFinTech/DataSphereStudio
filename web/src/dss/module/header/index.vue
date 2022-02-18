@@ -258,6 +258,8 @@ export default {
     },
     // 将以前的'$route.query.workspaceId'监听换成'$route'，之前的无法监听组件之间的切换触发
     $route(v) {
+      let that = this
+      console.log(v)
       // 设定条件只有切换在工作空间首页时才触发
       if (v.name === "workspaceHome") {
         // this.currentId = -1;
@@ -276,6 +278,20 @@ export default {
             console.error(err);
           });
       }
+      let name = (v.params.appName || v.name || '').toLowerCase()
+      if( name == 'console' ) {
+        that.isConsolePage = true
+        return that.currentId = -1
+      }
+      this.collections.forEach( item => {
+        if( new RegExp(name).test(item.name.toLowerCase()) ) {
+          that.currentId = item.menuApplicationId
+          that.isHomePage = false
+          that.isConsolePage = false
+          return
+        }
+      })
+
     },
   },
   methods: {
@@ -405,7 +421,6 @@ export default {
             (i) => i.menuApplicationId !== app.menuApplicationId
           );
         });
-
         if ( this.collections.find(item => item.menuApplicationId == app.menuApplicationId ) ) {
           this.removeCollection(app)
         }

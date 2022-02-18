@@ -135,7 +135,7 @@ public class DssFrameworkAdminUserController extends BaseController {
 
 //    @POST
 //    @Path("/resetPsw")
-/*    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
+   @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
     public Message resetPwd(@RequestBody DssAdminUser user) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
@@ -143,13 +143,13 @@ public class DssFrameworkAdminUserController extends BaseController {
                 return Message.error().data("弱密码请关注:",passwordResult.getMessage());
             }
             DssAdminUser dssAdminUser = dssUserMapper.selectUserById(user.getId());
-            ldapService.update(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), dssAdminUser.getUserName(), user.getPassword());
+            ldapService.updatePwd(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), dssAdminUser.getUserName(), user.getPassword());
             user.setPassword(DigestUtils.md5Hex(user.getPassword()));
             return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
 
         } catch (Exception exception) {
             return  Message.error().message(exception.getMessage());
         }
-    }*/
+    }
 }
 

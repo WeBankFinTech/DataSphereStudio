@@ -95,6 +95,8 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         dolphinSchedulerWorkflow.setProcessDefinitionJson(processDefinitionJson);
         dolphinSchedulerWorkflow.setLocations(locations);
         dolphinSchedulerWorkflow.setConnects(connects);
+        dolphinSchedulerWorkflow.setTenantId(8);
+
 
         return dolphinSchedulerWorkflow;
     }

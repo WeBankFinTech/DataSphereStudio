@@ -27,12 +27,11 @@ import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobRuntimeParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.BuildJobActionImpl;
-import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.CodeParser;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParser;
+import com.webank.wedatasphere.dss.linkis.node.execution.utils.JsonUtil;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisUjesClientUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.LinkisException;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.ujes.client.UJESClient;
@@ -43,18 +42,13 @@ import org.apache.linkis.ujes.client.request.ResultSetAction;
 import org.apache.linkis.ujes.client.response.JobInfoResult;
 import org.apache.linkis.ujes.client.response.JobLogResult;
 import org.apache.linkis.ujes.client.response.OpenLogResult;
-import org.apache.commons.lang.StringUtils;
-import scala.tools.nsc.settings.Final;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
 
 public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExecutionListener {
 
@@ -105,10 +99,20 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         for(JobParser parser : jobParsers){
             parser.parseJob(job);
         }
-
         Map<String, String> props =job.getJobProps();
+        //用户传入的参数优先级最高 by suyc
+        String userParams =props.get("params");
+        if(userParams != null){
+            job.getLogObj().info("************************************PARAMS FROM USER, Higher Priority************************************");
+            job.getLogObj().info(userParams);
+            job.getLogObj().info("************************************PARAMS FROM USER, Higher Priority************************************");
+            job.getLogObj().info("************************************PARAMS FROM USER, Start to  put variable and configuration");
+            job.setParams(JsonUtil.toMap(userParams));
+            job.getLogObj().info("************************************PARAMS FROM USER, Finished to  put variable and configuration");
+        }
         if(LinkisJobExecutionConfiguration.isLinkis1_X(props)) {
             JobSubmitAction submitAction = BuildJobActionImpl.getbuildJobAction().getSubmitAction(job);
+
             job.setJobExecuteResult(getClient(job).submit(submitAction));
         }else{
             //兼容0.X版本的任务提交方式
@@ -116,9 +120,9 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             job.setJobExecuteResult(getClient(job).execute(jobAction));
         }
 
-        job.getLogObj().info("<---------------Start to execute job--------------->");
-        job.getLogObj().info("Task id is:"+ job.getJobExecuteResult().getTaskID());
-        job.getLogObj().info("Exec id is:"+ job.getJobExecuteResult().getExecID());
+        job.getLogObj().info("************************************Start to execute job************************************");
+        job.getLogObj().info("************************************Task id is:"+ job.getJobExecuteResult().getTaskID());
+        job.getLogObj().info("************************************Exec id is:"+ job.getJobExecuteResult().getExecID());
     }
 
     @Override
@@ -132,14 +136,17 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         JobInfoResult jobInfo =getClient(job).getJobInfo(job.getJobExecuteResult());
 
         List<String> logArray = null;
-        //只有job执行失败了，才打印全部日志，否则只打印linkis运行时缓存日志
-        if(jobInfo.isCompleted() && jobInfo.isFailed()){
+        //只有job是终态(成功完成or失败完成)，才打印全部日志，否则只打印linkis运行时缓存日志
+        //if(jobInfo.isCompleted() && jobInfo.isFailed()){
+        if(jobInfo.isCompleted()){
+            job.getLogObj().info("************************************任务为已完成/已失败状态");
             try {
                 logArray = Arrays.asList(queryPersistedLogAll(job).getLog());
             } catch (LinkisJobExecutionErrorException e) {
-                job.getLogObj().error("Get full log failed:"+e.getMessage());
+                job.getLogObj().error("************************************任务完整日志获取失败，具体异常为: " + e.getMessage());
             }
         }else if(jobInfo.isRunning()){
+            job.getLogObj().info("************************************任务为运行中状态");
             JobLogResult jobLogResult = getClient(job)
                     .log(job.getJobExecuteResult(),
                             job.getLogFromLine(),
@@ -148,7 +155,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             job.setLogFromLine(jobLogResult.fromLine());
             logArray = jobLogResult.getLog();
         }else {
-            job.getLogObj().info("Job run is completed and the cache log can not be printed ");
+            job.getLogObj().info("************************************任务为等待/调度中等其它状态，暂无日志输出");
         }
 
         if (logArray != null && logArray.size()
@@ -232,7 +239,11 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
     @Override
     public void waitForComplete(Job job) throws Exception {
         JobInfoResult jobInfo = getClient(job).getJobInfo(job.getJobExecuteResult());
-        int count = 0;
+        int fetchLogFailCnt = 0;
+        //如果第一次请求时，任务已经是成功完成状态了
+        if(jobInfo.isSucceed()) {
+            printJobLog(job);
+        }
         while (!jobInfo.isCompleted()) {
             double progress = -1;
             try{
@@ -241,26 +252,28 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
                 //ignore
             }
             if (progress >= 0){
-                job.getLogObj().info("Update Progress info:" + progress);
+                job.getLogObj().info("************************************任务运行进度更新: " + progress);
             }
             JobInfoResult oldJobInfo = jobInfo;
             try{
                 jobInfo = getClient(job).getJobInfo(job.getJobExecuteResult());
             }catch(Throwable e){
                 jobInfo = oldJobInfo;
-                count += 1;
-                job.getLogObj().error("不能获取到正确的状态，计数 count = " + count);
+                fetchLogFailCnt += 1;
+                job.getLogObj().error("************************************任务信息获取失败，失败次数合计为: " + fetchLogFailCnt);
                 //两分钟内获取不到,就认为不行，因为这个时候我应该是重启完成了
-                if (count == 40) {
-                    job.getLogObj().info("超过40次不能获取状态，应该是linkis不能获取到正常信息，判断任务失败");
+                if (fetchLogFailCnt == 40) {
+                    job.getLogObj().info("***********************************任务信息获取失败次数已达40次，应该是linkis不能获取到正常信息，认为任务失败，抛出异常");
                     throw new LinkisJobExecutionErrorException(90101, "Failed to execute Job: " + e.getMessage());
                 }
             }
+            //UJESClient获取任务log间隔时间，默认3秒钟
             Utils.sleepQuietly(LinkisJobExecutionConfiguration.LINKIS_JOB_REQUEST_STATUS_TIME.getValue(job.getJobProps()));
             printJobLog(job);
         }
+        //任务不是成功完成，打印log，并抛出异常
         if (!jobInfo.isSucceed()) {
-            //printJobLog(job);
+            printJobLog(job);
             throw new LinkisJobExecutionErrorException(90101, "Failed to execute Job: " + jobInfo.getMessage());
         }
     }
@@ -270,7 +283,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         try{
             log = this.getLog(job);
         }catch(Exception e){
-            job.getLogObj().warn("failed to get log info", e);
+            job.getLogObj().warn("************************************failed to get log info", e);
         }
         if (StringUtils.isEmpty(log)){
             return;
@@ -278,9 +291,9 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         Arrays.stream(log.split("\n")).forEach(l -> {
             if (l != null) {
                 if(l.contains("ERROR")) {
-                    job.getLogObj().error(l);
+                    job.getLogObj().error("************************************" + l);
                 }else{
-                    job.getLogObj().info(l);
+                    job.getLogObj().info("************************************" + l);
                 }
             }
         });

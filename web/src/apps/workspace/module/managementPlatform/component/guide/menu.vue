@@ -58,6 +58,7 @@
           <Input
             type="text"
             v-model="groupForm.title"
+            :maxlength=21
             placeholder="请输入文档名称"
             style="width: 300px"
           ></Input>
@@ -66,6 +67,7 @@
           <Input
             type="textarea"
             v-model="groupForm.description"
+            :maxlength=201
             placeholder="请输入描述"
             style="width: 300px"
           >
@@ -98,6 +100,7 @@
           <Input
             type="text"
             v-model="contentForm.title"
+            :maxlength=21
             placeholder="请输入标题"
             style="width: 300px"
           >
@@ -107,6 +110,7 @@
           <Input
             type="text"
             v-model="contentForm.titleAlias"
+            :maxlength=21
             placeholder="请输入titleAlias"
             style="width: 300px"
             :disabled="modalType === 'updateApi'"
@@ -117,6 +121,7 @@
           <Input
             type="text"
             v-model="contentForm.seq"
+            :maxlength=21
             placeholder="请输入seq"
             style="width: 300px"
             :disabled="modalType === 'updateApi'"
@@ -196,7 +201,15 @@ export default {
       groupRule: {
         path: [
           { required: true, validator: validateGroupPath, trigger: "blur" },
-        ]
+        ],
+        title: [
+          { message: "文档名称长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '文档名称必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
+        description: [
+          { message: "文档描述长度不能超过200个字符", max: 200 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '文档描述必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
       },
       contentForm: {
         type: "", // 类型: 1-步骤step，2-问题question
@@ -208,7 +221,19 @@ export default {
         type: [
           { required: true, message: "请选择节点类型", trigger: "change" },
         ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [
+          { required: true, message: "请输入标题", trigger: 'blur' },
+          { message: "标题长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '标题必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
+        titleAlias: [
+          { message: "别名长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '别名必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
+        seq: [
+          { message: "前缀长度不能超过20个字符", max: 20 },
+          { type: 'string', pattern: /^[a-zA-Z0-9\u4e00-\u9fa5][^]*$/, message: '前缀必须以汉字、字母、数字开头', trigger: 'blur' },
+        ],
       },
     };
   },

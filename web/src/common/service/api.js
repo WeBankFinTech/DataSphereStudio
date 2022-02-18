@@ -26,6 +26,12 @@ import cache from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
 
+// 接口报错防抖，某一时间段内，合并相同错误只提示一次
+// const errorTrigger = {
+//   [message]: lastTriggerTime 
+// }
+const errorTrigger = {};
+
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
 let cancelConfig = null;
@@ -312,12 +318,23 @@ const action = function(url, data, option) {
     .then(function(response) {
       return response;
     })
-    .catch(function(error) {
-      error.message && Message.error(error.message);
-      error.msg && Message.error(error.msg);
+    .catch(function (error) {
+      // error.message && Message.error(error.message);
+      // error.msg && Message.error(error.msg);
+      showError(error)
       throw error;
     });
 };
+
+// 2000ms内合并相同错误message
+const showError = function (error) {
+  const message = error.message || error.msg;
+  const lastTriggerTime = errorTrigger[message] || 0;
+  if (Date.now() - lastTriggerTime > 2000) {
+    errorTrigger[message] = Date.now();
+    Message.error(message)
+  }
+}
 
 api.fetch = action;
 

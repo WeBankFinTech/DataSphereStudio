@@ -34,6 +34,7 @@
       <!--  <module>dss-apps/dss-apiservice-server</module>
         <module>dss-apps/dss-datapipe-server</module>-->
 <!--        <module>plugins/azkaban/linkis-jobtype</module>-->
+        <module>plugins/dolphinscheduler/linkis-dolphinscheduler-client</module>
         <module>plugins/linkis/dss-gateway-support</module>
         <module>dss-data-api</module>
         <module>dss-data-governance</module>
@@ -229,8 +230,8 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <recompileMode>incremental</recompileMode>
-                        <useZincServer>true</useZincServer>
+                        <recompileMode>all</recompileMode>
+<!--                        <useZincServer>true</useZincServer>-->
                     </configuration>
                 </plugin>
                 <plugin>

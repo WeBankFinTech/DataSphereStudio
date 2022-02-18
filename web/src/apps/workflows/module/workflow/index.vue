@@ -626,6 +626,12 @@ export default {
           this.$route.query.projectID,
         orchestratorMode: this.currentMode
       };
+      const replace_query = {
+        workspaceId: this.$route.query.workspaceId,
+        projectID: params.projectId,
+        projectName: workflow.query.projectName,
+        flowId: workflow.query.flowId
+      }
       if (!params.projectId) return;
       this.loading = true;
       api
@@ -643,6 +649,10 @@ export default {
               subItem = item
             }
           })
+          this.$router.replace({
+            name: "Workflow",
+            query: replace_query,
+          });
           // 这里的一定是最新版本
           that.$emit("open-workflow", {
             workspaceId: params.workspaceId,

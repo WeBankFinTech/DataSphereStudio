@@ -50,7 +50,7 @@
           highlight-row
           outer-sort
           :tableHeight="resultHeight"
-          :loadNum="25"
+          :loadNum="page.size"
           :columns="data.headRows"
           :tableList="data.bodyRows"
           @on-current-change="onRowClick"

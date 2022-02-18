@@ -147,8 +147,7 @@ const configWrap = config => {
 module.exports = {
   publicPath: "./",
   outputDir: "dist/dist",
-  // lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
-  lintOnSave: false,
+  lintOnSave: process.env.NODE_ENV !== "production", // build无需eslint
   productionSourceMap: process.env.NODE_ENV === "dev", // 生产环境无需source map加速构建
   css: {
     loaderOptions: {
@@ -245,7 +244,7 @@ module.exports = {
         //target: 'http://172.24.2.29:9202', //yichao
         // target: "http://172.24.2.83:9202", //jiawei
         target: "http://luban.ctyun.cn:8088",
-        //target: "http://devluban.ctyun.cn:8088",
+        // target: "http://devluban.ctyun.cn:8088",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api"

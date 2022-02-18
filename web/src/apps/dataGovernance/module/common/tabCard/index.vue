@@ -6,6 +6,7 @@
         <SvgIcon icon-class="biao" style="fontsize: 16px" />
         <span
           style="marginleft: 8px; fontsize: 16px"
+          class="content-html"
           v-html="model.name"
         ></span>
       </div>
@@ -32,31 +33,32 @@
     </div>
 
     <div class="tab-card-b">
-      <div v-if="!model.comment">
+      <div v-if="!model.comment" >
         <span>描述：-</span>
       </div>
-      <div v-else>
+      <div v-else :title="model.comment">
         描述：<span v-html="model.comment" class="content-html"></span>
       </div>
     </div>
 
-    <div class="tab-card-b" style="width: 100%">
-      <div v-if="model.labels.length > 0">
+    <div class="tab-card-b">
+      <div v-if="model.labels.length > 0" style="width: 80%">
         <span>标签：</span>
         <span
           class="tab-card-b-tag content-html"
           v-for="(label, idx) in model.labels"
           :key="idx"
           v-html="label"
+          :title="label"
         ></span>
       </div>
-      <div v-else>
+      <div v-else style="width: 80%">
         <span>标签：-</span>
       </div>
     </div>
 
     <div class="tab-card-b" v-if="model.columns && model.columns.length > 0">
-      <div class="tab-card-b-field" style="width: 100%">
+      <div class="tab-card-b-field" style="width: 80%">
         <span>相关字段：</span>
         <span
           v-for="(item, idx) in model.columns"
@@ -70,8 +72,6 @@
 </template>
 
 <script>
-import Tag from "../../../../../components/tag/index.vue";
-import { EventBus } from "../../../module/common/eventBus/event-bus";
 export default {
   name: "tabCard",
   props: {
@@ -79,20 +79,12 @@ export default {
       type: Object,
       default: null,
     },
+    queryStr: {
+      type: String
+    }
   },
   data() {
-    return {
-      modal: [],
-      query: "",
-    };
-  },
-  mounted() {
-    EventBus.$on("onQueryForHighLight", (query) => {
-      this.query = query;
-    });
-  },
-  destroyed() {
-    EventBus.$off("onQueryForHighLight");
+    return {};
   },
   methods: {
     onChoose() {
@@ -115,9 +107,9 @@ export default {
           }
         });
       }
-      if (this.query) {
-        let reg = new RegExp(this.query, "g");
-        let _query = `<span>${this.query}</span>`;
+      if (this.queryStr) {
+        let reg = new RegExp(this.queryStr, "g");
+        let _query = `<span>${this.queryStr}</span>`;
         subject = subject.replace(reg, _query);
       }
       return subject;
@@ -140,15 +132,14 @@ export default {
           }
         });
       }
-      if (this.query) {
-        let reg = new RegExp(this.query, "g");
-        let _query = `<span>${this.query}</span>`;
+      if (this.queryStr) {
+        let reg = new RegExp(this.queryStr, "g");
+        let _query = `<span>${this.queryStr}</span>`;
         layer = layer.replace(reg, _query);
       }
       return layer;
     },
   },
-  components: { Tag },
 };
 </script>
 
@@ -156,8 +147,7 @@ export default {
 @import "@/common/style/variables.scss";
 .tab-card-wrap {
   min-height: 10.5vh;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 24px;
   border: 1px solid #dee4ec;
   @include border-color(#dee4ec, $dark-border-color-base);
   border-top: none;
@@ -174,6 +164,9 @@ export default {
     display: flex;
     &-l {
       @include font-color(#3495f7, $dark-text-color);
+      height: 22px;
+      line-height: 22px;
+      font-size: 16px;
       &::after {
         content: "";
         border-left: 1px solid #dee4ec;
@@ -184,6 +177,9 @@ export default {
         height: 16px;
         margin: 0 12px;
       }
+    }
+    &-l > span {
+      display: inline-block;
     }
     &-r {
       font-family: PingFangSC-Regular;
@@ -230,12 +226,13 @@ export default {
       border: 1px solid #dee4ec;
       border-radius: 2px;
       padding: 4px 8px;
+      margin-left: 8px;
     }
   }
 }
 .content-html {
   /deep/ span {
-    color: #3495f7;
+    color: #fa8c16;
   }
 }
 </style>

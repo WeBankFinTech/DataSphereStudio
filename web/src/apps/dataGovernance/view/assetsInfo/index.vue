@@ -38,7 +38,7 @@
             <label for="store">存储量</label>
             <span>{{ basicData.store }}</span>
           </div>
-          <div class="assets-info-b-l-content-item">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="comment">描述</label>
             <span v-show="!isCommentEdit">{{ basicData.comment }}</span>
             <!-- <Input
@@ -61,7 +61,7 @@
               style="float:right;cursor: pointer;"
             ></Icon> -->
           </div>
-          <div class="assets-info-b-l-content-item" style="overflow: hidden">
+          <div class="assets-info-b-l-content-item" style="overflow: hidden; width: 100%">
             <label for="labels">标签</label>
             <div
               style="display: inline-block;width: calc(100% - 70px);float: right;line-height: 32px"
@@ -80,6 +80,7 @@
                 style="width: 135px;"
                 size="small"
                 placeholder=""
+                maxlength="20"
                 @on-enter="editSingleLabel"
               />
               <Icon
@@ -120,19 +121,21 @@
             </Select>
             <span v-else>{{ classification.subject }}</span>
           </div>
-          <div class="assets-info-b-l-content-item" style="position: relative">
+          <div style="position: relative; margin-top: 16px; text-align: right; padding-right: 16px">
             <Icon
               type="md-create"
               v-if="!editable"
               @click="editable = true"
-              style="position: absolute; right:16px; top: -15px;cursor: pointer;"
+              style="cursor: pointer;"
             ></Icon>
             <Icon
               type="md-checkmark"
               v-else
               @click.once="changeClassifications"
-              style="position: absolute; right:0; top: -15px;cursor: pointer;"
+              style="cursor: pointer;"
             ></Icon>
+          </div>
+          <div class="assets-info-b-l-content-item">
             <label>分层</label>
             <Select
               v-model="classification.layer"
@@ -152,11 +155,11 @@
           </div>
 
           <div class="assets-info-b-l-content-item">
-            <label for="tableType">表类型</label>
-            <span>{{ basicData.tableType }}</span>
+            <label for="tableType">表类别</label>
+            <span>{{ basicData.tableType == 'EXTERNAL_TABLE' ? '外部表' : '内部表' }}</span>
           </div>
-          <div class="assets-info-b-l-content-item" v-if="basicData.location">
-            <label for="location">location</label>
+          <div class="assets-info-b-l-content-item" v-if=" basicData.tableType == 'EXTERNAL_TABLE' && basicData.location">
+            <label for="location">表路径</label>
             <span :style="{'word-break': 'break-all'}">{{ basicData.location }}</span>
           </div>
         </div>
@@ -262,7 +265,6 @@ export default {
       let { result } = res;
       this.layerList = result;
     });
-
     util.Hub.$on("register_click_hive_table", data => {
       this.$nextTick(() => {
         $(`#${data.guid}`).on("click", () => {
@@ -463,6 +465,10 @@ export default {
     // 编辑标签
     editSingleLabel() {
       let that = this;
+      let regZh = /[\u4e00-\u9fa5]+/g
+      if( regZh.test(that.singleLabel) ) {
+        return this.$Message.warning("目前标签不支持中文字符");
+      }
       if (that.singleLabel) {
         that.labelOptions.push(that.singleLabel);
         let params = that.labelOptions.slice(0);
@@ -549,6 +555,9 @@ export default {
           font-size: 14px;
           margin-top: 16px;
           padding-right: 8px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
           label {
             font-weight: normal;
             @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);

@@ -110,10 +110,18 @@
         <li
           class="menu-item"
           @click="goSpaceHome"
+          :class="isHomePage ? 'header-actived' : '' "
         >
           {{ $t("message.common.home") }}
         </li>
-        <li class="menu-item" v-if="$route.query.workspaceId"  @click="goConsole">{{$t("message.common.management")}}</li>
+        <li
+        class="menu-item"
+        v-if="$route.query.workspaceId"
+        @click="goConsole"
+        :class="isConsolePage ? 'header-actived' : '' "
+        >
+          {{$t("message.common.management")}}
+        </li>
         <li
           v-for="app in collections"
           :key="app.id"
@@ -190,6 +198,8 @@ export default {
       favorites: [],
       collections: [],
       currentId: -1,
+      isHomePage: true,
+      isConsolePage: false,
     };
   },
   mixins: [mixin],
@@ -396,9 +406,9 @@ export default {
           );
         });
 
-        this.collections = this.collections.filter(
-          (i) => i.menuApplicationId !== app.menuApplicationId
-        );
+        if ( this.collections.find(item => item.menuApplicationId == app.menuApplicationId ) ) {
+          this.removeCollection(app)
+        }
       }
     },
     addCollection(app) {
@@ -567,6 +577,8 @@ export default {
       }
     },
     goHome() {
+      this.isHomePage = true;
+      this.isConsolePage = false;
       if (this.isAdmin) {
         this.$router.push("/newhome");
       } else {
@@ -588,25 +600,38 @@ export default {
       util.windowOpen(url);
     },
     goSpaceHome() {
+      this.isHomePage = true;
+      this.isConsolePage = false;
       let workspaceId = this.$route.query.workspaceId;
-      if (!workspaceId) return this.goHome();
-      this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
-      this.currentProject = {};
       this.currentId = -1;
+      if (!workspaceId) {
+        // workspaceId为空，说明一定是admin，进入了admin的页面，因为workspaceId是一直伴随的
+        // 就无须在调goHome，防止在控制台页面因为isAdmin失效而导致goHome和goSpaceHome来回调用而报错RangeError: Maximum call stack size exceeded
+        this.$router.push("/newhome");
+      } else {
+        this.$router.push({ path: "/workspaceHome", query: { workspaceId } });
+        this.currentProject = {};
+      }
     },
     goConsole() {
+      this.isHomePage = false;
+      this.isConsolePage = true;
+      this.currentId = -1;
       const url =
         location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
       this.$router.push({
-        name: "commonIframe",
+        path: `/commonIframe/Console`,
         query: {
           workspaceId: this.$route.query.workspaceId,
-          url
+          url,
+          type: 'Console'
         }
       });
       // this.$router.push({path: '/console',query: Object.assign({}, this.$route.query)});
     },
     goCollectedUrl(app) {
+      this.isHomePage = false;
+      this.isConsolePage = false;
       this.currentId = app.menuApplicationId || -1;
       this.gotoCommonIframe(app.name, {
         workspaceId: this.$route.query.workspaceId,

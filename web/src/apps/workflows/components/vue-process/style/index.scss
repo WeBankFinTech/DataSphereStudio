@@ -645,7 +645,7 @@ $mask-color: rgba(55, 55, 55, .6);
 }
 .executor-pending {
   position: absolute;
-  background: #fff;
+  @include bg-color(#fff, $dark-workflow-bg-color);
   border: 2px solid #666;
   right: -30px;
   top: -37px;
@@ -664,7 +664,7 @@ $mask-color: rgba(55, 55, 55, .6);
 }
 
 .executor-pending:after {
-  border-top-color: #fff;
+  @include border-top-color(#fff, $dark-workflow-bg-color);
   border-width: 7px;
   margin-left: -23px;
 }

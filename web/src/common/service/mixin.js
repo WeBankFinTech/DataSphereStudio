@@ -117,7 +117,7 @@ export default {
       }
     },
     getUserName() {
-      return  storage.get("baseInfo") ? storage.get("baseInfo").username : null;
+      return storage.get('baseInfo', 'local') ? storage.get('baseInfo', 'local').username : null;
     },
     getCurrentWorkspaceName() {
       const workspaceData = storage.get("currentWorkspace");

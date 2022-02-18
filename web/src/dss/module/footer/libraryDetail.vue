@@ -74,6 +74,31 @@ export default {
       max-width: 100%;
       cursor: pointer;
     }
+    /deep/h1, /deep/h2, /deep/h3, /deep/h4, /deep/h5, /deep/h6 {
+      margin-top: 24px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    /deep/blockquote, /deep/dl, /deep/ol, /deep/p, /deep/pre, /deep/table, /deep/ul {
+      margin-bottom: 16px;
+    }
+    /deep/ol {
+      padding-left: 2em;
+      list-style: decimal;
+    }
+    /deep/ul {
+      padding-left: 2em;
+      list-style: disc;
+    }
+    /deep/table tr {
+      background-color: #fff;
+      border-top: 1px solid #c6cbd1;
+    }
+    /deep/table td, /deep/table th {
+      padding: 6px 13px;
+      border: 1px solid #dfe2e5;
+    }
   }
 }
 </style>

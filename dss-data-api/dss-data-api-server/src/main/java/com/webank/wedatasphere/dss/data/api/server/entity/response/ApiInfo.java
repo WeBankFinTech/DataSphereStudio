@@ -1,10 +1,8 @@
 package com.webank.wedatasphere.dss.data.api.server.entity.response;
 
-import com.webank.wedatasphere.dss.data.api.server.util.DateJsonDeserializer;
-import com.webank.wedatasphere.dss.data.api.server.util.DateJsonSerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -24,12 +22,12 @@ public class ApiInfo {
     private Integer status;
     private String label;
     private String createBy;
-    @JsonSerialize(using= DateJsonSerializer.class)
-    @JsonDeserialize(using= DateJsonDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
     private String updateBy;
-    @JsonSerialize(using= DateJsonSerializer.class)
-    @JsonDeserialize(using= DateJsonDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
     private String groupName;
     private String datasourceName;

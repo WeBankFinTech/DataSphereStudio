@@ -4,22 +4,21 @@
     <div class="assets-index-t">
       <!-- bottom -->
       <div class="assets-index-t-b1">
-        <Row>
-          <Col :span="24" :style="{ display: 'flex' }">
-            <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
-            <div class="assets-index-t-b1-content">
-              <Input
-                :placeholder="
-                  $t(`message.dataGovernance.pleaseEnterATableName`)
-                "
-                v-model="queryForTbls"
-              >
-              </Input>
-            </div>
-          </Col>
-        </Row>
-        <Row :style="{ 'margin-top': '16px' }">
-          <Col :span="8" :style="{ display: 'flex' }">
+        <div style="display:flex">
+          <div class="assets-index-t-b1-label"><span>全局搜索</span></div>
+          <div class="assets-index-t-b1-content">
+            <Input
+              :placeholder="
+                $t(`message.dataGovernance.pleaseEnterATableName`)
+              "
+              v-model="queryForTbls"
+            >
+            </Input>
+          </div>
+        </div>
+
+        <div style="display:flex; margin-top: 16px">
+          <div style="display:flex; flex: 1">
             <div class="assets-index-t-b1-label">
               <span>主题域/分层</span>
             </div>
@@ -48,8 +47,9 @@
                 </OptionGroup>
               </Select>
             </div>
-          </Col>
-          <Col :span="8" :style="{ display: 'flex' }">
+          </div>
+
+          <div style="display:flex; flex: 1">
             <div class="assets-index-t-b1-label"><span>负责人</span></div>
             <div class="assets-index-t-b1-content">
               <Select
@@ -70,19 +70,18 @@
                 >
               </Select>
             </div>
-          </Col>
-          <Col :span="8">
-            <div :style="{ display: 'flex', 'margin-left': '32px' }">
-              <Button @click="onReset">重置</Button>
-              <Button
-                type="primary"
-                :style="{ 'margin-left': '8px' }"
-                @click="onSearch"
-              >查询</Button
-              >
-            </div>
-          </Col>
-        </Row>
+          </div>
+
+          <div style="display:flex; flex: 1">
+            <Button @click="onReset">重置</Button>
+            <Button
+              type="primary"
+              :style="{ 'margin-left': '8px' }"
+              @click="onSearch"
+            >查询</Button
+            >
+          </div>
+        </div>
       </div>
     </div>
 
@@ -156,14 +155,18 @@
 
       <!-- right -->
       <div class="assets-index-b-r" v-if="cardTabs.length">
-        <Scroll :on-reach-bottom="handleReachBottom" height="100vh">
+        <Scroll :on-reach-bottom="handleReachBottom" height="100vh" style="margin: -10px 0">
           <tab-card
-            v-for="model in cardTabs"
+            v-for="(model,idx) in cardTabs"
             :model="model"
-            :key="model.guid"
+            :key="idx"
+            :queryStr="queryForTbls || ''"
             @on-choose="onChooseCard"
           ></tab-card>
         </Scroll>
+        <div style="height: 75px;  display: flex; align-items: center" class="assets-index-b-r-divider">
+          <Divider v-if="isCompleted" orientation="center">到底了</Divider>
+        </div>
       </div>
       <div class="assets-index-b-r" v-else>
         <div style="text-align: center; margin-top: 50px; font-weight: bolder">
@@ -206,6 +209,7 @@ export default {
       isLoading: false,
       subjectList: [],
       layerList: [],
+      isCompleted: false,
     };
   },
   created() {
@@ -218,7 +222,16 @@ export default {
       getHiveTbls(JSON.parse(searchParams))
         .then((data) => {
           if (data.result) {
-            this.cardTabs = data.result;
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -228,7 +241,16 @@ export default {
       getHiveTbls({ query: "", limit: 10, offset: 0 })
         .then((data) => {
           if (data.result) {
-            this.cardTabs = data.result;
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
+            if( this.queryForTbls ) {
+              this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
+            } else {
+              this.cardTabs = data.result;
+            }
           }
         })
         .catch((err) => {
@@ -236,10 +258,14 @@ export default {
         });
     }
   },
+  watch: {
+    queryForTbls(newVal) {
+      this.onSearch()
+    }
+  },
   mounted() {
     let _this = this;
     this.throttleLoad = throttle(() => {
-      console.log("scroll");
       _this.scrollHander();
     }, 300);
     window.addEventListener("scroll", this.throttleLoad, false);
@@ -276,12 +302,14 @@ export default {
       this.searchOption["offset"] = 0;
       storage.setItem("searchTbls", JSON.stringify(params));
       this.isLoading = false;
-      if( this.queryForTbls || params.classification) {
-        EventBus.$emit("onQueryForHighLight", this.queryForTbls);
-      }
       getHiveTbls(params)
         .then((data) => {
           if (data.result) {
+            if( data.result.length == this.searchOption.limit ) {
+              this.isCompleted = false
+            } else {
+              this.isCompleted = true
+            }
             if( this.queryForTbls ) {
               this.cardTabs = this.foamtDataToHighLigth(data.result, this.queryForTbls)
             } else {
@@ -298,7 +326,8 @@ export default {
 
     onChooseCard(model) {
       let that = this;
-      EventBus.$emit("on-choose-card", model);
+      let _model = JSON.parse(JSON.stringify(model).replaceAll('<span>', '').replaceAll('</span>', ''))
+      EventBus.$emit("on-choose-card", _model);
       const workspaceId = that.$route.query.workspaceId;
       const { guid } = model;
       that.$router.push({
@@ -327,7 +356,16 @@ export default {
         getHiveTbls(params)
           .then((data) => {
             if (data.result) {
-              that.cardTabs = res.concat(data.result);
+              if( data.result.length == this.searchOption.limit ) {
+                this.isCompleted = false
+              } else {
+                this.isCompleted = true
+              }
+              if( this.queryForTbls ) {
+                this.cardTabs = res.concat(this.foamtDataToHighLigth(data.result, this.queryForTbls))
+              } else {
+                this.cardTabs = res.concat(data.result);
+              }
             } else {
               that.$Message.success("所有数据已加载完成");
               that.isLoading = true;
@@ -359,7 +397,6 @@ export default {
               });
               that.ownerList = _res;
               that.owerSerachLoading = false;
-              console.log("ownerList", that.ownerList);
             }
           })
           .catch((err) => {
@@ -409,7 +446,6 @@ export default {
       let st = getScrollTop();
       let ch = getClientHeight();
       let sh = getScrollHeight();
-      console.log(st, ch, sh);
       if (st + ch + 54 >= sh) {
         // 拉数据
         this.handleReachBottom();
@@ -432,22 +468,36 @@ export default {
       this.onSearch();
     },
 
-    // 处理高亮
+    // 处理高亮 并过滤没有 高亮 的结果
     foamtDataToHighLigth(result, query) {
       const _result = result.slice() || []
       const _query = `<span>${query}</span>`
       const reg = new RegExp(query, 'g')
-      _result.forEach(item => {
+      const filter_arr = []
+      _result.forEach((item, idx) => {
+        let flag = false
         Object.keys(item).forEach(key => {
-          if( typeof item[key] == 'string' ) {
-            item[key] = item[key].replace(reg, _query)
+          if( key == 'classifications' && item['classifications'] && item['classifications'].length > 0 ) {
+            item['classifications'].forEach(item => {
+              if( item['typeName'].indexOf(query) > -1 ) {
+                flag = true
+              }
+            })
           }
-          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' ) {
+          if( typeof item[key] == 'string' && item[key].indexOf(query) > -1 && key != 'guid' ) {
+            item[key] = item[key].replace(reg, _query)
+            flag = true
+          }
+          if( item[key] instanceof Array && item[key].length > 0 && typeof item[key][0] == 'string' && item[key].join('@').indexOf(query) > -1 ) {
             item[key] = item[key].join('@').replace(reg, _query).split('@')
+            flag = true
           }
         })
+        if( !flag ){
+          filter_arr.push(idx)
+        }
       })
-      return _result
+      return  _result.filter((item, idx) => !filter_arr.includes(idx))
     }
   },
 };
@@ -459,8 +509,8 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   .assets-index-t-t1 {
-    padding: 0px $padding-25;
     border-bottom: $border-width-base $border-style-base $border-color-base;
     @include border-color(
       $background-color-base,
@@ -491,10 +541,6 @@ export default {
         margin: 0 15px;
       }
     }
-    .active {
-      border-bottom: 2px solid $primary-color;
-      @include border-color($primary-color, $dark-primary-color);
-    }
     .top-r-container {
       flex: 1;
       height: 40px;
@@ -502,9 +548,14 @@ export default {
   }
 
   .assets-index-t-b1 {
+    border-top: 1px solid #DEE4EC;
+    border-bottom: 1px solid #DEE4EC;
     min-height: 112px;
     @include bg-color(#f4f7fb, $dark-base-color);
-    padding: 16px 24px;
+    padding: 0px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     &-label {
       width: 100px;
       margin-right: 8px;
@@ -512,9 +563,9 @@ export default {
       line-height: 32px;
       font-family: PingFangSC-Regular;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.85);
       text-align: right;
       font-weight: 400;
+      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
     }
     &-content {
       flex: 1;
@@ -579,7 +630,9 @@ export default {
     }
     &-r {
       flex: 1;
-      padding-bottom: 10px;
+      &-divider {
+        @include bg-color(#f4f7fb, $dark-base-color);
+      }
     }
   }
   ::v-deep .ivu-input-group-prepend,
@@ -592,6 +645,9 @@ export default {
   ::v-deep .ivu-input-group .ivu-input,
   .ivu-input-group .ivu-input-inner-container {
     margin-left: 8px;
+  }
+  ::v-deep .ivu-divider-horizontal.ivu-divider-with-text-center, .ivu-divider-horizontal.ivu-divider-with-text-left, .ivu-divider-horizontal.ivu-divider-with-text-right {
+    @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
   }
 }
 

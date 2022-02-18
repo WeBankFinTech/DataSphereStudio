@@ -415,6 +415,30 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@mixin bg-color1($initial-color, $replace-color) {
+  background-color: $initial-color;
+  [data-theme="dark"] & {
+    background-color: $replace-color;
+  }
+}
+@mixin bg-color2($initial-color, $replace-color) {
+  background: $initial-color;
+  [data-theme="dark"] & {
+    background: $replace-color;
+  }
+}
+@mixin border {
+  border: 1px solid #dcdee2;
+  [data-theme="dark"] & {
+    border: none;
+  }
+}
+@mixin color1 {
+  color: #17233d;
+  [data-theme="dark"] & {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
 .create-table-step-first {
     .basic-card {
         .basic-card-form {
@@ -436,7 +460,7 @@ export default {
     position: relative;
     .data-source {
         display: block;
-        background: #fff;
+        @include bg-color2(#fff, #2A303C);
         border-radius: 4px;
         font-size: 14px;
         position: relative;
@@ -456,7 +480,7 @@ export default {
                 height: 20px;
                 line-height: 20px;
                 font-size: 14px;
-                color: #17233d;
+                @include color1;
                 font-weight: 700;
             }
             .data-source-type {
@@ -464,6 +488,23 @@ export default {
                 width: 200px;
             }
         }
+    }
+    /deep/ .create-table{
+      .ivu-card-bordered{
+        // @include border;
+        .ivu-card-body{
+          .field-table .field-table-header{
+            @include bg-color1(#5e9de0, #8899992b !important);
+          }
+          .field-table .field-table-body{
+            @include bg-color2(#fff, none);
+            @include border;
+            &:hover{
+              @include bg-color2(#ebf7ff, #39414b !important);
+            }
+          }
+        }
+      }
     }
 }
 </style>

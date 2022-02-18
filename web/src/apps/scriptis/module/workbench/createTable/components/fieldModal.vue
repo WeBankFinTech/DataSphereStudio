@@ -78,6 +78,9 @@ export default {
         align-items: center;
     }
     .field-modal-li-label {
+        [data-theme="dark"] & {
+          color: white;
+        }
         margin-left: 10px;
         display: inline-block;
         width: 100%;

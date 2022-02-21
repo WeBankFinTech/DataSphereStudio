@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.ref.SchedulisProjectResponseRef;
-import com.webank.wedatasphere.dss.appconn.schedulis.service.SchedulisProjectService;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.AzkabanUtils;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisExceptionUtils;
@@ -96,7 +95,7 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
 
     @Override
     public void setStructureService(StructureService service) {
-        this.schedulisProjectService = (SchedulisProjectService) service;
+        this.schedulisProjectService = (ProjectService) service;
     }
 
     /**

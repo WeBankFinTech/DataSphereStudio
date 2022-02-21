@@ -127,7 +127,7 @@ export default {
       if (!item) return this.$Message.warning(this.$t('message.common.resourceSimple.QXZYTJL'));
       if (!item.strongerExecId) return this.$Message.warning(this.$t('message.common.resourceSimple.WHQD'));
       this.loading = true;
-      api.fetch(`/entrance/${item.strongerExecId}/kill`, {taskID: item.taskID},'get').then(() => {
+      api.fetch(`/dss/flow/entrance/${item.strongerExecId}/kill`, {taskID: item.taskID},'get').then(() => {
         this.loading = false;
         this.$emit('close-modal');
         // 停止执行
@@ -148,7 +148,7 @@ export default {
       if (!item.strongerExecId) return this.$Message.warning(this.$t('message.common.resourceSimple.WHQD'));
       if (!item.engineInstance) return this.$Message.warning(this.$t('message.common.resourceSimple.WHQD'));
       this.loading = true;
-      await api.fetch(`/entrance/${item.strongerExecId}/kill`, {taskID: item.taskID}, 'get');
+      await api.fetch(`/dss/flow/entrance/${item.strongerExecId}/kill`, {taskID: item.taskID}, 'get');
       api.fetch('/resourcemanager/engines').then((res) => {
         const engines = res.engines;
         const engine = engines.find((e) => e.engineInstance === item.engineInstance);

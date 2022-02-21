@@ -109,7 +109,7 @@
       </template>
 
       <template v-if="myReadonly">
-        <div class="devider"></div> 
+        <div class="devider"></div>
         <template v-if="product && isLatest">
           <div
             v-if="!workflowIsExecutor"
@@ -1996,7 +1996,7 @@ export default {
       this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
         item.flowId !== this.newFlowId;
       });
-      api.fetch(`/entrance/${this.workflowExeteId}/kill`, {taskID: this.workflowTaskId, labels: this.getCurrentDsslabels()}, 'get').then(() => {
+      api.fetch(`/dss/flow/entrance/${this.workflowExeteId}/kill`, {taskID: this.workflowTaskId, labels: this.getCurrentDsslabels()}, 'get').then(() => {
         this.workflowIsExecutor = false;
         this.flowExecutorNode(this.workflowExeteId, true);
       }).catch(() => {

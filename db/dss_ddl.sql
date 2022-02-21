@@ -1126,6 +1126,19 @@ CREATE TABLE `linkis_user` (
 
 
 
+
+alter table `dss_release_task`
+   add column `error_msg` varchar(500) NULL COMMENT '发布错误信息' after `status`,
+   add column `comment` varchar(500) NULL COMMENT '发布描述' after `error_msg`,
+   add column `log_msg` varchar(255) DEFAULT NULL COMMENT '日志信息或日志路径',
+   add column `bak` varchar(255) NULL COMMENT '备用字段' after `log_msg`;
+
+CREATE TABLE `dss_project_no_create_switch` (
+   `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+   `appconn_instance_id` INT(11) DEFAULT NULL COMMENT 'dss_appconn_instance 关联id',
+   PRIMARY KEY (`id`)
+ ) ENGINE=INNODB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='不需要创建工程appconnInstance的开关表';
+
 CREATE TABLE `dss_workflow_execute_info` (
    `id` bigint(20) NOT NULL AUTO_INCREMENT,
    `task_id` bigint(20) NOT NULL COMMENT '任务id',

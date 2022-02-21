@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.service.SchedulisProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +41,7 @@ public class SchedulisProjectUpdateOperation implements ProjectUpdateOperation {
 
     @Override
     public void setStructureService(StructureService service) {
-        this.schedulisProjectService = (SchedulisProjectService) service;
+        this.schedulisProjectService = (ProjectService) service;
     }
 
     @Override

@@ -27,38 +27,38 @@ public class GuideQueryRestful {
     private GuideCatalogService guideCatalogService;
     private GuideChapterService guideChapterService;
 
-    @RequestMapping(path ="/groupdetail", method = RequestMethod.GET)
-    public Message queryGudieContent(@RequestParam String path){
-        return Message.ok().data("result",guideGroupService.queryGuideGroupByPath(path));
+    @RequestMapping(path = "/groupdetail", method = RequestMethod.GET)
+    public Message queryGudieContent(@RequestParam String path) {
+        return Message.ok().data("result", guideGroupService.queryGuideGroupByPath(path));
     }
 
-    @RequestMapping(path ="/guidecatalog/top", method = RequestMethod.GET)
-    public Message queryGuideCatalogListForTop( ){
+    @RequestMapping(path = "/guidecatalog/top", method = RequestMethod.GET)
+    public Message queryGuideCatalogListForTop() {
         return Message.ok().data("result", guideCatalogService.queryGuideCatalogListForTop());
     }
 
-    @RequestMapping(path ="/guidecatalog/{id}/detail", method = RequestMethod.GET)
-    public Message queryGuideCatalogDetailById(@PathVariable Long id){
+    @RequestMapping(path = "/guidecatalog/{id}/detail", method = RequestMethod.GET)
+    public Message queryGuideCatalogDetailById(@PathVariable Long id) {
         return Message.ok().data("result", guideCatalogService.queryGuideCatalogDetailById(id));
     }
 
-    @RequestMapping(path ="/guidechapter", method = RequestMethod.GET)
+    @RequestMapping(path = "/guidechapter", method = RequestMethod.GET)
     public Message queryGuideChapter(@RequestParam("keyword") String keyword,
-                                     @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize){
-        if(pageNow == null){
+                                     @RequestParam("pageNow") Integer pageNow, @RequestParam("pageSize") Integer pageSize) {
+        if (pageNow == null) {
             pageNow = 1;
         }
-        if(pageSize == null){
+        if (pageSize == null) {
             pageSize = 20;
         }
 
         List<Long> totals = new ArrayList<>();
-        List<GuideChapter> guideChapterList = guideChapterService.searchGuideChapterList(keyword,totals,pageNow,pageSize);
-        return Message.ok().data("result",guideChapterList).data("total", totals.get(0));
+        List<GuideChapter> guideChapterList = guideChapterService.searchGuideChapterList(keyword, totals, pageNow, pageSize);
+        return Message.ok().data("result", guideChapterList).data("total", totals.get(0));
     }
 
-    @RequestMapping(path ="/guidechapter/{id}", method = RequestMethod.GET)
-    public Message queryGuideChapter(@PathVariable Long id){
+    @RequestMapping(path = "/guidechapter/{id}", method = RequestMethod.GET)
+    public Message queryGuideChapter(@PathVariable Long id) {
         return Message.ok().data("result", guideChapterService.queryGuideChapterById(id));
     }
 

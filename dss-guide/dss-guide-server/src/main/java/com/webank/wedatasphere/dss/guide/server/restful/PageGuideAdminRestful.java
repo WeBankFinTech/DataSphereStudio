@@ -36,104 +36,100 @@ public class PageGuideAdminRestful {
     private GuideGroupService guideGroupService;
     private GuideContentService guideContentService;
 
-    @RequestMapping(path ="/guidegroup", method = RequestMethod.POST)
-    public Message saveGuideGroup(HttpServletRequest request, @RequestBody GuideGroup guideGroup){
+    @RequestMapping(path = "/guidegroup", method = RequestMethod.POST)
+    public Message saveGuideGroup(HttpServletRequest request, @RequestBody GuideGroup guideGroup) {
         String userName = SecurityFilter.getLoginUsername(request);
-        if(null == guideGroup.getId()) {
+        if (null == guideGroup.getId()) {
             guideGroup.setCreateBy(userName);
             guideGroup.setCreateTime(new Date(System.currentTimeMillis()));
-        }
-        else{
+        } else {
             guideGroup.setUpdateBy(userName);
             guideGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         }
 
         boolean flag = guideGroupService.saveGuideGroup(guideGroup);
-        if(flag) {
+        if (flag) {
             return Message.ok("保存成功");
-        }else{
+        } else {
             return Message.error("保存失败");
         }
     }
 
-    @RequestMapping(path ="/guidegroup", method = RequestMethod.GET)
-    public Message queryGuideGroup( ){
+    @RequestMapping(path = "/guidegroup", method = RequestMethod.GET)
+    public Message queryGuideGroup() {
         return Message.ok().data("result", guideGroupService.getAllGuideGroupDetails());
     }
 
-    @RequestMapping(path ="/guidegroup/{id}/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/guidegroup/{id}/delete", method = RequestMethod.POST)
     public Message deleteGuideGroup(@PathVariable Long id) {
         guideGroupService.deleteGuideGroup(id);
         Message message = Message.ok("删除成功");
         return message;
     }
 
-    @RequestMapping(path ="/guidecontent", method = RequestMethod.POST)
-    public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent){
+    @RequestMapping(path = "/guidecontent", method = RequestMethod.POST)
+    public Message saveGuideContent(HttpServletRequest request, @RequestBody GuideContent guideConent) {
         String userName = SecurityFilter.getLoginUsername(request);
-        if(null == guideConent.getId()) {
+        if (null == guideConent.getId()) {
             guideConent.setCreateBy(userName);
             guideConent.setCreateTime(new Date(System.currentTimeMillis()));
-        }
-        else{
+        } else {
             guideConent.setUpdateBy(userName);
             guideConent.setUpdateTime(new Date(System.currentTimeMillis()));
         }
 
         boolean flag = guideContentService.saveGuideContent(guideConent);
-        if(flag) {
+        if (flag) {
             return Message.ok("保存成功");
-        }else{
+        } else {
             return Message.error("保存失败");
         }
     }
 
-    @RequestMapping(path ="/guidecontent", method = RequestMethod.GET)
-    public Message queryGuideContent(@RequestParam String path){
+    @RequestMapping(path = "/guidecontent", method = RequestMethod.GET)
+    public Message queryGuideContent(@RequestParam String path) {
         return Message.ok().data("result", guideContentService.queryGuideContentByPath(path));
     }
 
-    @RequestMapping(path ="/guidecontent/{id}", method = RequestMethod.GET)
-    public Message queryGuideContent(@PathVariable Long id){
+    @RequestMapping(path = "/guidecontent/{id}", method = RequestMethod.GET)
+    public Message queryGuideContent(@PathVariable Long id) {
         return Message.ok().data("result", guideContentService.getGuideContent(id));
     }
 
-    @RequestMapping(path ="/guidecontent/{id}/content", method = RequestMethod.POST)
+    @RequestMapping(path = "/guidecontent/{id}/content", method = RequestMethod.POST)
     public Message updateGuideContent(@PathVariable Long id, @RequestBody Map<String, Object> map) {
-        try{
-            guideContentService.updateGuideContentById(id,map);
+        try {
+            guideContentService.updateGuideContentById(id, map);
             return Message.ok("更新成功");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("ERROR", "Error found: ", ex);
             return Message.error(ex.getMessage());
         }
     }
 
-    @RequestMapping(path ="/guidecontent/{id}/delete", method = RequestMethod.POST)
+    @RequestMapping(path = "/guidecontent/{id}/delete", method = RequestMethod.POST)
     public Message deleteContent(@PathVariable Long id) {
         guideContentService.deleteGuideContent(id);
         Message message = Message.ok("删除成功");
         return message;
     }
 
-    @RequestMapping(path ="/guidecontent/uploadImages", method = RequestMethod.POST)
+    @RequestMapping(path = "/guidecontent/uploadImages", method = RequestMethod.POST)
     public Message multFileUpload(@RequestParam(required = true) List<MultipartFile> files) {
         if (null == files || files.size() == 0) {
             return Message.error("没有上传文件");
         }
 
-        List<Map<String,Object>> totalResult=new ArrayList<Map<String,Object>>();
+        List<Map<String, Object>> totalResult = new ArrayList<Map<String, Object>>();
         // 要上传的目标文件存放的绝对路径
-        final String localPath= GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
+        final String localPath = GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
         for (MultipartFile file : files) {
-            Map<String,Object> result =new HashMap<String, Object>();
-            String result_msg ="";
+            Map<String, Object> result = new HashMap<String, Object>();
+            String result_msg = "";
 
-            if (file.getSize() > 5 * 1024 * 1024){
-                result_msg="图片大小不能超过5M";
-            }
-            else{
+            if (file.getSize() > 5 * 1024 * 1024) {
+                result_msg = "图片大小不能超过5M";
+            } else {
                 //判断上传文件格式
                 String fileType = file.getContentType();
                 if (fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/jpg")) {
@@ -144,36 +140,33 @@ public class PageGuideAdminRestful {
                     //重新生成文件名
                     fileName = "page-" + UUID.randomUUID() + suffixName;
                     if (FileUtils.upload(file, localPath, fileName)) {
-                        String relativePath =fileName;
-                        result.put("relativePath",relativePath);
-                        result_msg="图片上传成功";
+                        String relativePath = fileName;
+                        result.put("relativePath", relativePath);
+                        result_msg = "图片上传成功";
+                    } else {
+                        result_msg = "图片上传失败";
                     }
-                    else{
-                        result_msg="图片上传失败";
-                    }
-                }
-                else{
-                    result_msg="图片格式不正确";
+                } else {
+                    result_msg = "图片格式不正确";
                 }
             }
-            result.put("result_msg",result_msg);
+            result.put("result_msg", result_msg);
             totalResult.add(result);
         }
         return Message.ok().data("result", totalResult);
     }
 
-    @RequestMapping(path ="/guidecontent/uploadImage", method = RequestMethod.POST)
+    @RequestMapping(path = "/guidecontent/uploadImage", method = RequestMethod.POST)
     public Message fileUpload(@RequestParam(required = true) MultipartFile file) {
         if (null == file) {
             return Message.error("没有上传文件");
         }
 
-        final String imagesPath= GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
+        final String imagesPath = GuideConf.GUIDE_CONTENT_IMAGES_PATH.getValue();
 
-        if (file.getSize() > 5 * 1024 * 1024){
+        if (file.getSize() > 5 * 1024 * 1024) {
             return Message.error("图片大小不能超过5M");
-        }
-        else{
+        } else {
             //判断上传文件格式
             String fileType = file.getContentType();
             if (fileType.equals("image/jpeg") || fileType.equals("image/png") || fileType.equals("image/jpg")) {
@@ -184,13 +177,11 @@ public class PageGuideAdminRestful {
                 //重新生成文件名
                 fileName = UUID.randomUUID() + suffixName;
                 if (FileUtils.upload(file, imagesPath, fileName)) {
-                    return Message.ok().data("result",fileName);
-                }
-                else{
+                    return Message.ok().data("result", fileName);
+                } else {
                     return Message.error("图片上传失败");
                 }
-            }
-            else{
+            } else {
                 return Message.error("图片格式不正确");
             }
         }

@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,8 +82,23 @@ public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
             }).collect(Collectors.toList());
             workflow.setChildren(children);
         }
+        syncJsonField(workflow,jsonObject);
         return workflow;
     }
 
+    public void syncJsonField(Workflow workflow,JsonObject jsonObject){
+        try{
+            if(!jsonObject.has("updateTime")){
+                return;
+            }
+            if(workflow instanceof WorkflowImpl) {
+                ((WorkflowImpl) workflow).setUpdateTime(jsonObject.get("updateTime").getAsLong());
+            }else if(workflow instanceof WorkflowWithContextImpl) {
+                ((WorkflowWithContextImpl) workflow).setUpdateTime(jsonObject.get("updateTime").getAsLong());
+            }
+        }catch (Exception e){
+            e.fillInStackTrace();
+        }
+    }
     protected abstract Workflow createWorkflow();
 }

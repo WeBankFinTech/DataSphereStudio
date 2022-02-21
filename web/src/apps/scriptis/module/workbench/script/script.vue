@@ -477,7 +477,7 @@ export default {
       // fix http://172.0.0.1/#/product/100199/bug/detail/199545
       if (this.node) {
         setTimeout(()=>{
-          this.resizePanel() 
+          this.resizePanel()
         })
       }
     },
@@ -977,7 +977,7 @@ export default {
     },
     stop(cb) {
       if (this.execute && this.execute.id) {
-        api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
+        api.fetch(`/dss/flow/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
           this.execute.trigger('stop');
           this.execute.trigger('error');
           this.execute.trigger('kill');

@@ -131,7 +131,6 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         return message;
     }
 
-    @Override
     @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
     public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
         String realId = ZuulEntranceUtils.parseExecID(id)[3];

@@ -47,6 +47,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
@@ -138,7 +139,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
     public DSSFlow addFlow(DSSFlow dssFlow,
-                               String contextID) throws DSSErrorException {
+                           String contextID) throws DSSErrorException {
         try {
             flowMapper.insertFlow(dssFlow);
         } catch (DuplicateKeyException e) {
@@ -237,11 +238,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (StringUtils.isNotEmpty(creator)) {
             userName = creator;
         }
-        String flowJsonOld = getFlowJson(userName,projectName, dssFlow);
-        if(isEqualTwoJson(flowJsonOld,jsonFlow)){
+        String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
+        if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
             return dssFlow.getBmlVersion();
-        }else{
+        } else {
             logger.info("saveFlow is change");
         }
         String resourceId = dssFlow.getResourceId();
@@ -261,8 +262,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         flowMapper.updateFlowInputInfo(dssFlow);
 
         try {
-            contextService.checkAndSaveContext(jsonFlow,  String.valueOf(parentFlowID));
-        }  catch (DSSErrorException e) {
+            contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
+        } catch (DSSErrorException e) {
             logger.error("Failed to saveContext: ", e);
         }
 
@@ -270,7 +271,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return version;
     }
 
-    public boolean isEqualTwoJson(String oldJsonNode,String newJsonNode){
+    public boolean isEqualTwoJson(String oldJsonNode, String newJsonNode) {
         Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(oldJsonNode).getAsJsonObject();
@@ -278,14 +279,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         jsonObject.remove("comment");
         String tempOldJson = gson.toJson(jsonObject);
 
-        JsonObject jsonObject2  = parser.parse(newJsonNode).getAsJsonObject();
+        JsonObject jsonObject2 = parser.parse(newJsonNode).getAsJsonObject();
         jsonObject2.remove("updateTime");
         jsonObject2.remove("comment");
         String tempNewJson = gson.toJson(jsonObject2);
         return tempOldJson.equals(tempNewJson);
     }
 
-    public String getFlowJson(String userName,String projectName, DSSFlow dssFlow){
+    public String getFlowJson(String userName, String projectName, DSSFlow dssFlow) {
         String flowExportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
         String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";
         String flowJson = bmlService.downloadAndGetFlowJson(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
@@ -300,6 +301,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public Long getParentFlowID(Long flowID) {
         return flowMapper.getParentFlowID(flowID);
+    }
+
+    @Override
+    public List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId) {
+        List<ExtraToolBarsVO> retList = new ArrayList<>();
+        retList.add(new ExtraToolBarsVO("前往调度中心", "/schedulerCenter?workspaceId=" + workspaceId));
+        return retList;
     }
 
     @Deprecated
@@ -335,10 +343,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version,String contextIdStr) throws DSSErrorException, IOException {
+    public DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version, String contextIdStr) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName);
-        updateFlowJson(userName, workspaceName, projectName, rootFlowWithSubFlows, version, null,contextIdStr);
+        updateFlowJson(userName, workspaceName, projectName, rootFlowWithSubFlows, version, null, contextIdStr);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         return copyFlow;
     }
@@ -365,19 +373,19 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return cyFlow;
     }
 
-    private void updateFlowJson(String userName, String workspaceName, String projectName, DSSFlow rootFlow, String version, Long parentFlowId,String contextIdStr) throws DSSErrorException, IOException {
+    private void updateFlowJson(String userName, String workspaceName, String projectName, DSSFlow rootFlow, String version, Long parentFlowId, String contextIdStr) throws DSSErrorException, IOException {
         String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextId(flowJson,contextIdStr);
+        String updateFlowJson = updateFlowContextId(flowJson, contextIdStr);
         //重新上传工作流资源
-        updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson,projectName,rootFlow);
+        updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
         //上传节点的资源或调用appconn的copyRef
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow, version);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
-                updateFlowJson(userName, workspaceName, projectName, subflow, version, rootFlow.getId(),contextIdStr);
+                updateFlowJson(userName, workspaceName, projectName, subflow, version, rootFlow.getId(), contextIdStr);
             }
         }
 
@@ -427,7 +435,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return dssFlow;
     }
 
-    private String updateFlowContextId(String flowJson,String contextIdStr) throws  IOException {
+    private String updateFlowContextId(String flowJson, String contextIdStr) throws IOException {
 //        String parentFlowIdStr = null;
 //        if (parentFlowId != null) {
 //            parentFlowIdStr = parentFlowId.toString();
@@ -569,14 +577,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             context = HttpClientContext.create();
             response = httpClient.execute(httpGet, context);
             HttpEntity entity = response.getEntity();
-            responseContent = EntityUtils.toString(entity,"utf-8");
+            responseContent = EntityUtils.toString(entity, "utf-8");
             Gson gson = new Gson();
             Map resultMap = gson.fromJson(responseContent, Map.class);
             Object obj = resultMap.get("data");
-            if (obj instanceof Map){
-                if (null != ((Map) obj).get("workspaceStr")){
+            if (obj instanceof Map) {
+                if (null != ((Map) obj).get("workspaceStr")) {
                     return ((Map) obj).get("workspaceStr").toString();
-                }else {
+                } else {
                     return "";
                 }
             }

@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.exception.DSSWorkflowErrorException;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
@@ -47,7 +48,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.util.*;
 
@@ -118,7 +118,7 @@ public class FlowRestfulApi {
         return message;
     }
 
-    @RequestMapping(value = "getSchedulerWorkflowStatus",method = RequestMethod.GET)
+    @RequestMapping(value = "getSchedulerWorkflowStatus", method = RequestMethod.GET)
     public Message getSchedulerWorkflowStatus(HttpServletRequest request,
                                               @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
                                               @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
@@ -304,5 +304,14 @@ public class FlowRestfulApi {
             throw new DSSErrorException(60067, "update flowEditLock failed,because flowEditLock is empty");
         }
         return Message.ok().data("flowEditLock", DSSFlowEditLockManager.updateLock(flowEditLock));
+    }
+
+
+    @RequestMapping(value = "/getExtraToolBars", method = RequestMethod.GET)
+    public Message getExtraToolBars(HttpServletRequest req, @RequestParam("projectId") Long projectId) throws DSSErrorException {
+        String userName = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        List<ExtraToolBarsVO> barsVOList = flowService.getExtraToolBars(Long.parseLong(workspace.getWorkspaceName()), projectId);
+        return Message.ok().data("extraBars", barsVOList);
     }
 }

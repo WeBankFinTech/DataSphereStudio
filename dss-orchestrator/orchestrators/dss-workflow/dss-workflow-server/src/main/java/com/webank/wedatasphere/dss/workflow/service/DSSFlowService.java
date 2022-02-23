@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +34,7 @@ public interface DSSFlowService {
 
     /**
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion
+     *
      * @param flowID
      * @return
      */
@@ -40,6 +42,7 @@ public interface DSSFlowService {
 
     /**
      * 通过flowID和某个版本号，获取一个dwsFlow，版本信息在versions数组中的第一个元素
+     *
      * @param flowID
      * @return
      */
@@ -47,6 +50,7 @@ public interface DSSFlowService {
 
     /**
      * 通过dwsFlow对象拿到最新的json，其实这里只要个flowID应该就可以了
+     *
      * @param DSSFlow
      * @return
      */
@@ -65,11 +69,11 @@ public interface DSSFlowService {
                     String userName,
                     String workspaceName,
                     String projectName
-                   ) throws DSSErrorException;
+    ) throws DSSErrorException;
 
     Integer getParentRank(Long flowID);
 
-    DSSFlow copyRootFlow(Long rootFlowId,String userName,String workspaceName,String projectName,String version,String contextIdStr) throws DSSErrorException, IOException;
+    DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version, String contextIdStr) throws DSSErrorException, IOException;
 
 //    DWSFlowVersion getLatestVersionByFlowIDAndProjectVersionID(Long flowID, Long projectVersionID);
 
@@ -81,4 +85,6 @@ public interface DSSFlowService {
 //
 //    void flowVersionIncr(Long flowID, String userName, String comment, Long newProjectVersionID, Long oldProjectVersionID,
 //                         DWSProject dwsProject,String workspace);
+
+    List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId);
 }

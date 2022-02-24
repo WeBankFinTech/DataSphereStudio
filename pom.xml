@@ -37,13 +37,14 @@
         <module>plugins/linkis/dss-gateway-support</module>
         <module>dss-data-api</module>
         <module>dss-data-governance</module>
-        <module>dss-guide</module>
+        <module>dss-apps/dss-user-guide</module>
         <module>assembly</module>
+<!--        <module>plugins/dolphinscheduler/dolphinscheduler-prod-metrics</module>-->
     </modules>
 
     <properties>
         <dss.version>1.1.0</dss.version>
-        <linkis.version>1.1.2</linkis.version>
+        <linkis.version>1.0.3</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>

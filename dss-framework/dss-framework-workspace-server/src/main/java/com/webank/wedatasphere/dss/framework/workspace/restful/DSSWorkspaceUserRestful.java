@@ -101,7 +101,7 @@ public class DSSWorkspaceUserRestful {
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
-        String userName = updateWorkspaceUserRequest.getUsername();
+        String userName = updateWorkspaceUserRequest.getUserName();
         String userId = updateWorkspaceUserRequest.getUserId();
         Long count = dssWorkspaceUserService.getCountByUsername(userName, workspaceId);
         if (count != null && count.longValue() > 0) {
@@ -122,7 +122,7 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
             return Message.error("无权限进行该操作");
         }
-        String userName = updateWorkspaceUserRequest.getUsername();
+        String userName = updateWorkspaceUserRequest.getUserName();
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
     }

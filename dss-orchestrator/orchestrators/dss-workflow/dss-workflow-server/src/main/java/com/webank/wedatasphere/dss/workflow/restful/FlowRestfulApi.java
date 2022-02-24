@@ -307,11 +307,11 @@ public class FlowRestfulApi {
     }
 
 
-    @RequestMapping(value = "/getExtraToolBars", method = RequestMethod.GET)
-    public Message getExtraToolBars(HttpServletRequest req, @RequestParam("projectId") Long projectId) throws DSSErrorException {
+    @RequestMapping(value = "/getExtraToolBars", method = RequestMethod.POST)
+    public Message getExtraToolBars(HttpServletRequest req, @RequestBody GetExtraToolBarsRequest getExtraToolBarsRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
-        List<ExtraToolBarsVO> barsVOList = flowService.getExtraToolBars(Long.parseLong(workspace.getWorkspaceName()), projectId);
+        List<ExtraToolBarsVO> barsVOList = flowService.getExtraToolBars(Long.parseLong(workspace.getWorkspaceName()), getExtraToolBarsRequest.getProjectId());
         return Message.ok().data("extraBars", barsVOList);
     }
 }

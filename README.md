@@ -77,7 +77,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;**If desired, new data application systems can also be easily integrated to replace or enrich DSS's data application development process.** [Click me to learn how to quickly integrate new application systems](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/Third-party_System_Access_Development_Guide.md)
 
-| Component | Description | DSS0.X Version Compatibility(recommend DSS0.9.1) | DSS1.0 Version Compatibility(recommend DSS1.0.1) |
+| Component | Description | DSS0.X Compatibility(recommend DSS0.9.1) | DSS1.0 Compatibility(recommend DSS1.0.1) |
 | --------------- | -------------------------------------------------------------------- | --------- | ---------- |
 | [**Linkis**](https://github.com/apache/incubator-linkis) | Apache Linkis, builds a layer of computation middleware, by using standard interfaces such as REST/WS/JDBC provided by Linkis, the upper applications can easily access the underlying engines such as MySQL/Spark/Hive/Presto/Flink, etc.  | >= Linkis0.5.0 (**Released**) | >= Linkis1.0.0 (**Released**)|
 | [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Using_Document/DataApiService_Usage_Documentation.md) | (Third-party applications built into DSS) Data API service. The SQL script can be quickly published as a Restful interface, providing Rest access capability to the outside world. | Not supported | >= DSS1.0.0 (**Released**) |

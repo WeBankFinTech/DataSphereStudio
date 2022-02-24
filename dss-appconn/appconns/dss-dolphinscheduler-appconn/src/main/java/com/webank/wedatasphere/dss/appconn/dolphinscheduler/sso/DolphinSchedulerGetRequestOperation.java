@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DolphinSchedulerGetRequestOperation
-    implements SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> {
+        implements SSORequestOperation<DolphinSchedulerHttpGet, CloseableHttpResponse> {
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerGetRequestOperation.class);
 
     private DolphinSchedulerSecurityService dolphinSchedulerSecurityService;
@@ -28,11 +28,11 @@ public class DolphinSchedulerGetRequestOperation
 
     @Override
     public CloseableHttpResponse requestWithSSO(SSOUrlBuilderOperation urlBuilder, DolphinSchedulerHttpGet req)
-        throws AppStandardErrorException {
+            throws AppStandardErrorException {
         try {
             ArrayList<Header> headers = new ArrayList<>();
             Header header = new BasicHeader("token", dolphinSchedulerSecurityService.getUserToken(req.getUser()));
-            logger.info("dolphin请求url"+req.getURI()+"token "+dolphinSchedulerSecurityService.getUserToken(req.getUser()));
+            logger.info("dolphin请求url: " + req.getURI() + " 请求用户:" + req.getUser() + " token: " + dolphinSchedulerSecurityService.getUserToken(req.getUser()));
 
             headers.add(header);
             httpClient = HttpClients.custom().setDefaultHeaders(headers).build();

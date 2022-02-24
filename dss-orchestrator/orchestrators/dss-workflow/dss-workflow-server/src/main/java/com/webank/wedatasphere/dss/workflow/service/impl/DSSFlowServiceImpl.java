@@ -306,7 +306,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId) {
         List<ExtraToolBarsVO> retList = new ArrayList<>();
-        retList.add(new ExtraToolBarsVO("前往调度中心", "/schedulerCenter?workspaceId=" + workspaceId));
+        retList.add(new ExtraToolBarsVO("前往调度中心", "/schedulerCenter?workspaceId=" + workspaceId, "icon:null"));
         return retList;
     }
 

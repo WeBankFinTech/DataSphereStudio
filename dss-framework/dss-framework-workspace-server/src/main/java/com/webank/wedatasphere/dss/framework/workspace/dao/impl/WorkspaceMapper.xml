@@ -263,7 +263,7 @@
     </select>
 
 
-    <select id="getWorkspaceUsers" resultMap="dss_workspace_user01_map">
+    <select id="getWorkspaceUsers01" resultMap="dss_workspace_user01_map">
         SELECT
         t1.id,
         t2.username,
@@ -273,9 +273,7 @@
         t4.dept_name office,
         t5.role_id
         FROM
-        ( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id}
-        <if test="username != null and username != ''"> and username like CONCAT('%',#{username,jdbcType=VARCHAR},'%')</if>
-        ) t1
+        ( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
         JOIN dss_user t2 ON t2.username = t1.username
         JOIN dss_admin_dept t3 ON t3.id = t2.dept_id
         left JOIN dss_admin_dept t4 ON t4.id = t3.parent_id

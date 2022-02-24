@@ -79,7 +79,7 @@ public class DSSWorkspaceUserRestful {
             return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
         }else{
             List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUser01> workspaceUsers =
+            List<DSSWorkspaceUserVO> workspaceUsers =
                     dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
             List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
             return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));

@@ -47,7 +47,10 @@ public interface DSSWorkspaceService {
 
     DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception;
 
-    List<DSSWorkspaceUser01> getWorkspaceUsers(String workspaceId, String department, String username,
+    List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
+                                               String roleName, int pageNow, int pageSize, List<Long> total);
+
+    List<DSSWorkspaceUser01> getWorkspaceUsers01(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);

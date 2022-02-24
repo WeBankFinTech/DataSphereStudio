@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
-import static com.webank.wedatasphere.dss.orchestrator.publish.impl.ExportDSSOrchestratorPluginImpl.DEFAULT_ORC_NAME;
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -29,9 +27,9 @@ import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorImportRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorImportRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
@@ -46,17 +44,20 @@ import com.webank.wedatasphere.dss.standard.app.development.standard.Development
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.RefFactory;
+import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.protocol.util.ImmutablePair;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javafx.util.Pair;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import static com.webank.wedatasphere.dss.orchestrator.publish.impl.ExportDSSOrchestratorPluginImpl.DEFAULT_ORC_NAME;
 
 
 @Component
@@ -148,14 +149,14 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
             workspaceName, importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
         AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
-        Pair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
+        ImmutablePair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
             .getOrcDevelopStandard(userName, workspaceName, importDssOrchestratorInfo, dssLabels);
         if (null != standardPair) {
             RefImportService refImportService = standardPair.getValue().getRefImportService(standardPair.getKey());
             OrchestratorImportRequestRef orchestratorImportRequestRef = null;
             try {
                 orchestratorImportRequestRef =
-                    (OrchestratorImportRequestRef) RefFactory.INSTANCE.newRef(OrchestratorImportRequestRef.class,
+                    RefFactory.INSTANCE.newRef(OrchestratorImportRequestRef.class,
                         orchestratorAppConn.getClass().getClassLoader(), "com.webank.wedatasphere.dss.appconn.workflow.ref");
             } catch (final Exception e) {
                 DSSExceptionUtils

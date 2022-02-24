@@ -20,25 +20,23 @@ public class DssFrameworkAdminDeptController {
     private DssAdminDeptService dssAdminDeptService;
 
 
-    @RequestMapping(path ="list", method = RequestMethod.GET)
-    public Message listAll(@RequestParam(value = "parentId",required = false) Long parentId, @RequestParam(value = "deptName",required = false) String deptName) {
+    @RequestMapping(path = "list", method = RequestMethod.GET)
+    public Message listAll(@RequestParam(value = "parentId", required = false) Long parentId, @RequestParam(value = "deptName", required = false) String deptName) {
 
-        DssAdminDept dept=new DssAdminDept();
+        DssAdminDept dept = new DssAdminDept();
         dept.setParentId(parentId);
         dept.setDeptName(deptName);
         List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
         return Message.ok().data("deptList", list).message("成功");
     }
 
-    @RequestMapping( method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public Message add(@RequestBody DssAdminDept dssAdminDept) {
-
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dssAdminDept))) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，部门名称已存在");
-        }else if (dssAdminDept.getDeptName().contains(UserConstants.SINGLE_SPACE)) {
+        } else if (dssAdminDept.getDeptName().contains(UserConstants.SINGLE_SPACE)) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'部门名称中不能含有空格");
-        }
-        else if (dssAdminDeptService.checkDeptFinalStage(dssAdminDept.getParentId())) {
+        } else if (dssAdminDeptService.checkDeptFinalStage(dssAdminDept.getParentId())) {
             return Message.error().message("新增部门'" + dssAdminDept.getDeptName() + "'失败，该部门是末级部门,不能新增下级部门");
         }
 
@@ -54,27 +52,26 @@ public class DssFrameworkAdminDeptController {
     /**
      * 获取部门下拉树列表
      */
-    @RequestMapping(path ="treeselect", method = RequestMethod.GET)
+    @RequestMapping(path = "treeselect", method = RequestMethod.GET)
     public Message treeselect(DssAdminDept dept) {
         List<DssAdminDept> depts = dssAdminDeptService.selectDeptList(dept);
         return Message.ok().data("deptTree", dssAdminDeptService.buildDeptTreeSelect(depts)).message("树形部门获取成功");
     }
 
-    
 
-    @RequestMapping(path ="{deptId}", method = RequestMethod.GET)
+    @RequestMapping(path = "{deptId}", method = RequestMethod.GET)
     public Message getInfo(@PathVariable("deptId") Long deptId) {
         return Message.ok().data("deptInfo", dssAdminDeptService.selectDeptById(deptId));
     }
 
 
-    @RequestMapping(path ="edit", method = RequestMethod.POST)
+    @RequestMapping(path = "edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminDept dept) {
         if (UserConstants.NOT_UNIQUE.equals(dssAdminDeptService.checkDeptNameUnique(dept))) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         } else if (dept.getDeptName().contains(UserConstants.SINGLE_SPACE)) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'部门名称中不能含有空格");
-        }else if (dept.getParentId().equals(dept.getId())) {
+        } else if (dept.getParentId().equals(dept.getId())) {
             return Message.error().message("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus())
                 && dssAdminDeptService.selectNormalChildrenDeptById(dept.getId()) > 0) {
@@ -88,7 +85,7 @@ public class DssFrameworkAdminDeptController {
      * 删除部门
      */
 
-    @RequestMapping(path ="{deptId}", method = RequestMethod.POST)
+    @RequestMapping(path = "{deptId}", method = RequestMethod.POST)
     public Message remove(@PathVariable("deptId") Long deptId) {
         if (dssAdminDeptService.hasChildById(deptId)) {
             return Message.error().message("存在下级部门,不允许删除");

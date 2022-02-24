@@ -25,7 +25,8 @@ import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
-import javafx.util.Pair;
+
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +46,13 @@ public class OrchestratorLoaderUtils {
     @PostConstruct
     public void init(){
         orchestratorLoaderUtils = this;
-        orchestratorLoaderUtils.orchestratorManager=this.orchestratorManager;
     }
 
 
-    public static Pair<AppInstance,DevelopmentIntegrationStandard> getOrcDevelopStandard(String userName,
-                                                                                         String workspaceName,
-                                                                                         DSSOrchestratorInfo dssOrchestratorInfo,
-                                                                                         List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
+    public static ImmutablePair<AppInstance,DevelopmentIntegrationStandard> getOrcDevelopStandard(String userName,
+                                                                                                  String workspaceName,
+                                                                                                  DSSOrchestratorInfo dssOrchestratorInfo,
+                                                                                                  List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
         DSSOrchestrator dssOrchestrator = orchestratorLoaderUtils.orchestratorManager.getOrCreateOrchestrator(userName,
                 workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
         if (null != dssOrchestrator) {
@@ -64,7 +64,7 @@ public class OrchestratorLoaderUtils {
                 //todo labels判别
                 List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
                 if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
-                   return new Pair(appInstance.get(0),developmentIntegrationStandard);
+                   return new ImmutablePair<>(appInstance.get(0),developmentIntegrationStandard);
 
                 }else{
                     return null;

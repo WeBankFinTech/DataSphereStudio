@@ -63,6 +63,8 @@
         <aspectj.version>1.9.5</aspectj.version>
         <xstream.version>1.4.15</xstream.version>
         <jersey.version>2.16</jersey.version>
+        <junit.version>4.13.1</junit.version>
+        <mysql.version>5.1.49</mysql.version>
     </properties>
 
     <dependencyManagement>

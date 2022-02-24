@@ -10,6 +10,7 @@ import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
 import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -29,8 +30,8 @@ import java.util.Map;
 public class DssFrameworkAdminUserController extends BaseController {
     @Resource
     private DssAdminUserService dssAdminUserService;
-    //    @Autowired
-//    private LdapService ldapService;
+    @Autowired
+    private LdapService ldapService;
     @Autowired
     DssUserMapper dssUserMapper;
 
@@ -54,30 +55,25 @@ public class DssFrameworkAdminUserController extends BaseController {
         return getDataTable(userList);
     }
 
-    //    @PostMapping("/add")
-//    @POST
-//    @Path("/add")
-/*    @RequestMapping(path ="add", method = RequestMethod.POST)
-
-    public Message add(@Validated @RequestBody DssAdminUser user, HttpServletRequest req
-    ) {
+    @RequestMapping(path = "add", method = RequestMethod.POST)
+    public Message add(@Validated @RequestBody DssAdminUser user, HttpServletRequest req) {
         try {
             PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
             if (UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkUserNameUnique(user.getUserName()))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
             } else if (user.getUserName().contains(UserConstants.SINGLE_SPACE)) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'用户名中不能含有空格");
-            }    else if (StringUtils.isNotEmpty(user.getPhonenumber())
+            } else if (StringUtils.isNotEmpty(user.getPhonenumber())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
             } else if (StringUtils.isNotEmpty(user.getEmail())
                     && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
             } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
-                return Message.error().data("弱密码请关注:",passwordResult.getMessage());
+                return Message.error().data("弱密码请关注:", passwordResult.getMessage());
             }
             boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName());
-            if(ldapExist){
+            if (ldapExist) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号在ldap已存在");
             }
 
@@ -92,7 +88,7 @@ public class DssFrameworkAdminUserController extends BaseController {
             return Message.error().data("rows", 0).message(exception.getMessage());
         }
 
-    }*/
+    }
 
 
     @RequestMapping(path = "{id}", method = RequestMethod.GET)

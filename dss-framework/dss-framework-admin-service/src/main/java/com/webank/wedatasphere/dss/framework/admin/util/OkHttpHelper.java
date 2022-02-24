@@ -1,14 +1,11 @@
 package com.webank.wedatasphere.dss.framework.admin.util;
 
-import com.squareup.okhttp.Call;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.webank.wedatasphere.dss.framework.admin.restful.DssExchangisController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**

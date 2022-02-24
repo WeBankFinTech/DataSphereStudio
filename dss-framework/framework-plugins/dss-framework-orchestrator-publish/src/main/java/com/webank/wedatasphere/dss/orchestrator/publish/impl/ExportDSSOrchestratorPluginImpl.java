@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
-import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
-
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -26,11 +24,11 @@ import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
-import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyResponseRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
+import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
+import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
@@ -44,18 +42,20 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
+import org.apache.linkis.protocol.util.ImmutablePair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javafx.util.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
 
 
 @Component
@@ -100,7 +100,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {} ", userName, dssOrchestratorInfo.getName(), orcVersionId);
 
             //2、导出第三方应用信息，如工作流、Visualis、Qualities
-            Pair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
+            ImmutablePair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
                 .getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
             if (null != standardPair) {
                 RefExportService refExportService = standardPair.getValue().getRefExportService(standardPair.getKey());
@@ -182,7 +182,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         //要求AppConn对应第三方应用拷贝一个新的app出来关联，如工作流，需要新建一个新的工作流进行关联。
 
-        Pair<AppInstance,DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
+        ImmutablePair<AppInstance,DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
         if(standardPair == null){
             LOGGER.error("dev Process Service is null");
             throw new DSSOrchestratorErrorException(61105, "dev Process Service is null");

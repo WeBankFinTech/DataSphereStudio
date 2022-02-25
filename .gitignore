@@ -91,8 +91,8 @@ dss-data-governance/dss-data-warehouse-service/target
 dss-data-governance/dss-data-warehouse-server/target
 
 #dss-guide
-dss-guide/dss-guide-server/src/main/resources/
-dss-guide/dss-guide-server/target
+dss-apps/dss-user-guide/dss-user-guide-server/src/main/resources/
+dss-apps/dss-user-guide/dss-user-guide-server/target
 
 
 # plugins

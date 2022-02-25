@@ -250,33 +250,33 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
                     + KEY_SPLIT + projectRequest.getUsername();
 
+            Map<String, List<String>> userPricMap = new HashMap<>();
+            String[] tempstrArr = pusername.split(MODE_SPLIT);
+            /**
+             * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+             * 从而得到：查看权限用户、编辑权限用户、发布权限用户
+             */
+            for (String s : tempstrArr) {
+                String[] strArr = s.split(KEY_SPLIT);
+                if(strArr.length >= 3) {
+                    String key = strArr[0] + KEY_SPLIT + strArr[1];
+                    userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                    userPricMap.get(key).add(strArr[2]);
+                }
+            }
+            List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+            List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+            projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
+            projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+
             // 用户是否具有编辑权限  编辑权限和创建者都有
             if (!StringUtils.isEmpty(pusername) &&
                     (pusername.contains(editPriv) ||
                             projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
                             isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()))) {
                 projectResponse.setEditable(true);
-                Map<String, List<String>> userPricMap = new HashMap<>();
-                String[] tempstrArr = pusername.split(MODE_SPLIT);
-
-                /**
-                 * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-                 * 从而得到：查看权限用户、编辑权限用户、发布权限用户
-                 */
-                for (String s : tempstrArr) {
-                    String[] strArr = s.split(KEY_SPLIT);
-                    if(strArr.length >= 3) {
-                        String key = strArr[0] + KEY_SPLIT + strArr[1];
-                        userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
-                        userPricMap.get(key).add(strArr[2]);
-                    }
-                }
-                List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());
-                List<String> editUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank());
-                List<String> releaseUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_RELEASE.getRank());
-                projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
-                projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
-                projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
             } else if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) ||
                     projectVo.getCreateBy().equals(projectRequest.getUsername())) {
                 projectResponse.setEditable(true);

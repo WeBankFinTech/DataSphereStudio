@@ -98,7 +98,7 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
     public CommonOrchestratorVo createOrchestrator(String username, OrchestratorCreateRequest orchestratorCreateRequest,
                                                    Workspace workspace) throws Exception {
         //是否存在相同的编排名称
-        orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getProjectId(),orchestratorCreateRequest.getWorkspaceId(),orchestratorCreateRequest.getOrchestratorName());
+        orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(),orchestratorCreateRequest.getProjectId(),orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
         ProjectInfoVo projectInfoVo = projectService.getProjectInfoById(orchestratorCreateRequest.getProjectId());
         if (projectInfoVo == null) {

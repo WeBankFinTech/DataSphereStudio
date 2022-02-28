@@ -17,12 +17,15 @@
 package com.webank.wedatasphere.dss.framework.project.restful;
 
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
+import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
@@ -52,6 +55,8 @@ public class DSSFrameworkProjectRestfulApi {
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
     private DSSProjectService projectService;
+    @Autowired
+    private DSSProjectService dssProjectService;
 
     /**
      * 获取所有工程或者单个工程
@@ -126,19 +131,27 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         try {
+            DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
+            //工程不存在
+            if (dbProject == null) {
+                LOGGER.error("{} project id is null, can not modify", projectModifyRequest.getName());
+                DSSExceptionUtils.dealErrorException(60021,
+                        String.format("%s project id is null, can not modify", projectModifyRequest.getName()), DSSProjectErrorException.class);
+            }
+            String createUsername = dbProject.getUsername();
             //將创建人默认为发布权限和編輯权限
-            if (!projectModifyRequest.getEditUsers().contains(username)) {
-                projectModifyRequest.getEditUsers().add(username);
+            if (!projectModifyRequest.getEditUsers().contains(createUsername)) {
+                projectModifyRequest.getEditUsers().add(createUsername);
             }
             List<String> releaseUsers = projectModifyRequest.getReleaseUsers();
             if (releaseUsers == null) {
                 releaseUsers = new ArrayList<>();
                 projectModifyRequest.setReleaseUsers(releaseUsers);
             }
-            if (!releaseUsers.contains(username)) {
-                releaseUsers.add(username);
+            if (!releaseUsers.contains(createUsername)) {
+                releaseUsers.add(createUsername);
             }
-            dssFrameworkProjectService.modifyProject(projectModifyRequest, username, workspace);
+            dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace);
             return Message.ok("修改工程成功");
         } catch (Exception e) {
             LOGGER.error("Failed to modify project {} for user {}", projectModifyRequest.getName(), username, e);

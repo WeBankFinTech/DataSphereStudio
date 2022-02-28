@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class DeleteWorkspaceUserRequest implements Serializable {
 
     private int workspaceId;
-    private String username ;
+    private String userName;
 
     public int getWorkspaceId() {
         return workspaceId;
@@ -15,11 +15,11 @@ public class DeleteWorkspaceUserRequest implements Serializable {
         this.workspaceId = workspaceId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String username) {
+        this.userName = username;
     }
 }

@@ -131,9 +131,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
 
     @Override
-    public void modifyProject(ProjectModifyRequest projectModifyRequest, String username, Workspace workspace) throws Exception {
-        validReleaseUserExistWtss(projectModifyRequest.getReleaseUsers(),workspace);
-        DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
+    public void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
+        validReleaseUserExistWtss(projectModifyRequest.getReleaseUsers(), workspace);
         //如果不是工程的创建人，则校验是否管理员
         if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
             boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
@@ -142,22 +141,15 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getMsg(), DSSProjectErrorException.class);
             }
         }
-        //工程不存在
-        if (dbProject == null) {
-            LOGGER.error("{} project id is null, can not modify", projectModifyRequest.getName());
-            DSSExceptionUtils.dealErrorException(60021,
-                    String.format("%s project id is null, can not modify", projectModifyRequest.getName()), DSSProjectErrorException.class);
-        }
         //不允许修改工程名称
         if (!dbProject.getName().equalsIgnoreCase(projectModifyRequest.getName())) {
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
-
         //1.统一修改各个接入的第三方的系统的工程状态信息
         //2.修改dss_project_user 工程与用户关系
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
         //调用第三方的工程修改接口
-        modifyThirdProject(projectModifyRequest, username,dbProject);
+        modifyThirdProject(projectModifyRequest, username, dbProject);
         //3.修改dss_project DSS基本工程信息
         dssProjectService.modifyProject(username, projectModifyRequest);
     }

@@ -90,8 +90,10 @@ public class DSSWorkspaceUserRestful {
     public Message getAllWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId) {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
         dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
-        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
-        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+//        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
+//        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
         return Message.ok().data("users", dssWorkspaceUsersVo);
     }
 

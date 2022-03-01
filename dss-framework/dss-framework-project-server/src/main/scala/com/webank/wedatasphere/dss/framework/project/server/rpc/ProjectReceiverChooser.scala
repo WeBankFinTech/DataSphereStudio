@@ -16,9 +16,13 @@
 
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
+import com.webank.wedatasphere.dss.framework.project.service.{DSSOrchestratorService, DSSProjectService}
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
+import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace}
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
+
 import javax.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -30,14 +34,23 @@ class ProjectReceiverChooser extends ReceiverChooser {
 
   @Autowired
   var projectService: DSSProjectService = _
+  @Autowired
+  var orchestratorService: DSSOrchestratorService = _
+  @Autowired
+  var dssWorkspaceUserService: DSSWorkspaceUserService = _
 
   private var receiver: Option[ProjectReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new ProjectReceiver(projectService))
+  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, orchestratorService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: ProjectRelationRequest => receiver
+    case _: RequestUserWorkspace => receiver
+    case _: RequestUserListFromWorkspace => receiver
+    case _: ProjectInfoRequest => receiver
+    case _: RequestProjectImportOrchestrator => receiver
+    case _: RequestProjectUpdateOrcVersion => receiver
     case _ => None
   }
 }

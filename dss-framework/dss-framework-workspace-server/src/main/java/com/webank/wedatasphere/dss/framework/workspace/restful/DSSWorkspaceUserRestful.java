@@ -60,7 +60,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "getWorkspaceUsers", method = RequestMethod.GET)
     public Message getWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId,
                                      @RequestParam(required = false, name = "pageNow") Integer pageNow, @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                                     @RequestParam(required = false, name = "department") String department, @RequestParam(required = false, name = "username") String username,
+                                     @RequestParam(required = false, name = "department") String department, @RequestParam(required = false, name = "userName") String username,
                                      @RequestParam(required = false, name = "roleName") String roleName) {
         //todo 获取工作空间中所有的用户以及他们的角色信息
         if (pageNow == null) {

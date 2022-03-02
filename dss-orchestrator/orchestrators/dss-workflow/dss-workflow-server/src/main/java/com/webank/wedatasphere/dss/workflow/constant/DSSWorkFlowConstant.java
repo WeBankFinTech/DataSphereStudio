@@ -51,4 +51,6 @@ public class DSSWorkFlowConstant {
      * 发布中的错误码
      */
     public static final String PUBLISHING_ERROR_CODE = "-999";
+
+    public static final CommonVars<String> GOTO_SCHEDULER_CENTER_URL = CommonVars.apply("wds.dss.workflow.schedulerCenter.url", "/scheduleCenter");
 }

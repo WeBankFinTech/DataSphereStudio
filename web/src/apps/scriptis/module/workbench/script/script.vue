@@ -474,7 +474,6 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix http://172.0.0.1/#/product/100199/bug/detail/199545
       if (this.node) {
         setTimeout(()=>{
           this.resizePanel()

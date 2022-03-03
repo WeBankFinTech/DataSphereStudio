@@ -3,9 +3,9 @@
     <Input
       v-model="searchText"
       :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
-    <Icon
-      slot="prefix"
-      type="ios-search"/>
+      <Icon
+        slot="prefix"
+        type="ios-search"/>
     </Input>
     <div class="field-list-header">
       <div class="field-list-item field-list-index">序号</div>

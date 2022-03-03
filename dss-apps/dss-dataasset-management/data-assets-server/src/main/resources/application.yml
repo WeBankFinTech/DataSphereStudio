@@ -1,0 +1,19 @@
+server:
+  port: 20082
+spring:
+  application:
+    name: data-assets-server
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:20303/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,info
+logging:
+  config: classpath:log4j2.xml
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

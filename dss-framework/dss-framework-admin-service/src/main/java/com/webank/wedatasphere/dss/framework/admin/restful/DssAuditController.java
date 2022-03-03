@@ -24,7 +24,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(path = "/dss/framework/audit", produces = {"application/json"})
+@RequestMapping(path = "/dss/framework/admin/audit", produces = {"application/json"})
 @Slf4j
 public class DssAuditController {
 

@@ -275,7 +275,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             if (!StringUtils.isEmpty(pusername) &&
                     (pusername.contains(editPriv) ||
                             projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
-                            isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()))) {
+                            isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())) {
                 projectResponse.setEditable(true);
             } else if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) ||
                     projectVo.getCreateBy().equals(projectRequest.getUsername())) {

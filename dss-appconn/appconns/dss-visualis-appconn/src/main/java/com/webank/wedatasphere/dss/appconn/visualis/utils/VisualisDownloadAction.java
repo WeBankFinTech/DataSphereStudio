@@ -68,16 +68,15 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
         this.response = response;
     }
 
-
     @Override
     public void write(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-
     @Override
-    public void write( InputStream inputStream, HttpResponse response) {
-
+    public void write(InputStream inputStream, HttpResponse response) {
+        write(inputStream);
+        setResponse(response);
     }
 
     @Override
@@ -116,7 +115,6 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
     public Logger logger() {
         return LoggerFactory.getLogger(getClass());
     }
-
 
 
 }

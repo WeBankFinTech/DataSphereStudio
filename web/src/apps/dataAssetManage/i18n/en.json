@@ -1,0 +1,14 @@
+{
+  "message": {
+    "dataAssetManage": {
+      "dataAssetManage": "Data Governance",
+      "dataAssets": "Data Assets",
+      "dataOverview": "Data Overview",
+      "dataAssetsIndex": "Data Assets Index",
+      "overallMeasurement": "Overall measurement",
+      "menu": "Menu",
+      "pleaseEnterATableName": "Please enter a table name / description to search the database table",
+      "search": "Search"
+    }
+  }
+}

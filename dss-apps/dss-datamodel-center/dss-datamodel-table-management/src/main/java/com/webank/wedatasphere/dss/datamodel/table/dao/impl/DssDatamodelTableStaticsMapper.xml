@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableStaticsMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableStatics">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_table_statics-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="origin_tables" jdbcType="VARCHAR" property="originTables" />
+    <result column="table_id" jdbcType="BIGINT" property="tableId" />
+    <result column="access_count" jdbcType="INTEGER" property="accessCount" />
+    <result column="last_access_time" jdbcType="INTEGER" property="lastAccessTime" />
+    <result column="sample_data_path" jdbcType="VARCHAR" property="sampleDataPath" />
+    <result column="sample_update_time" jdbcType="INTEGER" property="sampleUpdateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, origin_tables, table_id, access_count, last_access_time, sample_data_path, sample_update_time
+  </sql>
+</mapper>

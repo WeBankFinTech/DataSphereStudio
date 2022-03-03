@@ -25,26 +25,26 @@
               <Row>
                 <RadioGroup v-model="resultsShowType">
                   <Col span="10">
-                  <Radio label="1">{{$t('message.common.toolbar.graphAnalysis')}}</Radio>
+                    <Radio label="1">{{$t('message.common.toolbar.graphAnalysis')}}</Radio>
                   </Col>
                   <Col
                     span="10"
                     offset="4">
-                  <Radio label="2">{{$t('message.common.toolbar.excelAnalysis')}}</Radio>
+                    <Radio label="2">{{$t('message.common.toolbar.excelAnalysis')}}</Radio>
                   </Col>
                 </RadioGroup>
               </Row>
             </div>
             <Row class="confirm">
               <Col span="10">
-              <Button @click="cancelPopup('visualis')">{{$t('message.common.cancel')}}</Button>
+                <Button @click="cancelPopup('visualis')">{{$t('message.common.cancel')}}</Button>
               </Col>
               <Col
                 span="10"
                 offset="4">
-              <Button
-                type="primary"
-                @click="confirm('visualis')">{{ $t('message.common.submit') }}</Button>
+                <Button
+                  type="primary"
+                  @click="confirm('visualis')">{{ $t('message.common.submit') }}</Button>
               </Col>
             </Row>
           </div>
@@ -74,12 +74,12 @@
               <Row>
                 <RadioGroup v-model="download.format">
                   <Col span="10">
-                  <Radio label="1">CSV</Radio>
+                    <Radio label="1">CSV</Radio>
                   </Col>
                   <Col
                     span="10"
                     offset="4">
-                  <Radio label="2">Excel</Radio>
+                    <Radio label="2">Excel</Radio>
                   </Col>
                 </RadioGroup>
               </Row>
@@ -91,12 +91,12 @@
               <Row>
                 <RadioGroup v-model="download.coding">
                   <Col span="10">
-                  <Radio label="1">UTF-8</Radio>
+                    <Radio label="1">UTF-8</Radio>
                   </Col>
                   <Col
                     span="10"
                     offset="4">
-                  <Radio label="2">GBK</Radio>
+                    <Radio label="2">GBK</Radio>
                   </Col>
                 </RadioGroup>
               </Row>
@@ -108,12 +108,12 @@
               <Row>
                 <RadioGroup v-model="download.nullValue">
                   <Col span="10">
-                  <Radio label="1">NULL</Radio>
+                    <Radio label="1">NULL</Radio>
                   </Col>
                   <Col
                     span="10"
                     offset="4">
-                  <Radio label="2">{{$t('message.common.toolbar.emptyString')}}</Radio>
+                    <Radio label="2">{{$t('message.common.toolbar.emptyString')}}</Radio>
                   </Col>
                 </RadioGroup>
               </Row>
@@ -128,14 +128,14 @@
             </div>
             <Row class="confirm">
               <Col span="10">
-              <Button @click="cancelPopup('download')">{{$t('message.common.cancel')}}</Button>
+                <Button @click="cancelPopup('download')">{{$t('message.common.cancel')}}</Button>
               </Col>
               <Col
                 span="10"
                 offset="4">
-              <Button
-                type="primary"
-                @click="confirm('download')">{{ $t('message.common.submit') }}</Button>
+                <Button
+                  type="primary"
+                  @click="confirm('download')">{{ $t('message.common.submit') }}</Button>
               </Col>
             </Row>
           </div>

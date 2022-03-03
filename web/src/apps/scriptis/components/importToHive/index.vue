@@ -151,60 +151,60 @@
           </FormItem>
           <Row>
             <Col span="12">
-            <FormItem
-              v-if="isShowPartition"
-              :label="$t('message.scripts.importToHive.FQ')"
-              prop="partitionValue"
-            >
-              <div style="white-space: nowrap;">
-                <span>{{ secondStep.partition }}</span>
+              <FormItem
+                v-if="isShowPartition"
+                :label="$t('message.scripts.importToHive.FQ')"
+                prop="partitionValue"
+              >
+                <div style="white-space: nowrap;">
+                  <span>{{ secondStep.partition }}</span>
+                  <span> = </span>
+                  <Input
+                    ref="partition"
+                    v-model="secondStep.partitionValue"
+                    style="width: calc(100% - 30px);"></Input>
+                </div>
+              </FormItem>
+            </Col>
+            <Col span="6">
+              <FormItem
+                v-if="isShowOverwrite"
+                :label="$t('message.scripts.importToHive.FX')">
+                <Checkbox
+                  v-model="secondStep.isOverwrite"/>
+              </FormItem>
+            </Col>
+            <Col span="6">
+              <FormItem
+                v-if="isNewPartition && !validator.isView"
+                :label="$t('message.scripts.importToHive.XZFQ')"
+              >
+                <Checkbox
+                  v-model="secondStep.isNewPartition"/>
+              </FormItem>
+            </Col>
+            <Col
+              v-if="isNewPartition && secondStep.isNewPartition"
+              span="9">
+              <FormItem
+                :label="$t('message.scripts.importToHive.FQ')"
+                prop="partition"
+              >
+                <Input
+                  v-model="secondStep.partition"></Input>
+              </FormItem>
+            </Col>
+            <Col
+              v-if="isNewPartition && secondStep.isNewPartition"
+              span="9">
+              <FormItem
+                :label-width="0"
+                prop="partitionValue">
                 <span> = </span>
                 <Input
-                  ref="partition"
                   v-model="secondStep.partitionValue"
                   style="width: calc(100% - 30px);"></Input>
-              </div>
-            </FormItem>
-            </Col>
-            <Col span="6">
-            <FormItem
-              v-if="isShowOverwrite"
-              :label="$t('message.scripts.importToHive.FX')">
-              <Checkbox
-                v-model="secondStep.isOverwrite"/>
-            </FormItem>
-            </Col>
-            <Col span="6">
-            <FormItem
-              v-if="isNewPartition && !validator.isView"
-              :label="$t('message.scripts.importToHive.XZFQ')"
-            >
-              <Checkbox
-                v-model="secondStep.isNewPartition"/>
-            </FormItem>
-            </Col>
-            <Col
-              v-if="isNewPartition && secondStep.isNewPartition"
-              span="9">
-            <FormItem
-              :label="$t('message.scripts.importToHive.FQ')"
-              prop="partition"
-            >
-              <Input
-                v-model="secondStep.partition"></Input>
-            </FormItem>
-            </Col>
-            <Col
-              v-if="isNewPartition && secondStep.isNewPartition"
-              span="9">
-            <FormItem
-              :label-width="0"
-              prop="partitionValue">
-              <span> = </span>
-              <Input
-                v-model="secondStep.partitionValue"
-                style="width: calc(100% - 30px);"></Input>
-            </FormItem>
+              </FormItem>
             </Col>
           </Row>
           <FormItem

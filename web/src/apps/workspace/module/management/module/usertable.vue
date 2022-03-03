@@ -60,14 +60,14 @@
         <FormItem :label="$t('message.workspaceManagemnet.user')" prop="name">
           <Row>
             <Col span="12" style="width: 196px" size="small">
-            <Select
-              v-model="useradd.name"
-              filterable
-              remote
-              :remote-method="remoteMethod1"
-              :loading="loading1">
-              <Option v-for="(option, index) in options" :value="option.value" :key="index">{{option.label}}</Option>
-            </Select>
+              <Select
+                v-model="useradd.name"
+                filterable
+                remote
+                :remote-method="remoteMethod1"
+                :loading="loading1">
+                <Option v-for="(option, index) in options" :value="option.value" :key="index">{{option.label}}</Option>
+              </Select>
             </Col>
           </Row>
         </FormItem>

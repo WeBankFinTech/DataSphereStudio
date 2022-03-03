@@ -2,10 +2,10 @@
   <div>
     <Row>
       <Col span="24" v-for="(item, index) in dataList" :key="index">
-      <div class="contetn" :title="item.value">
-        <span class="label">{{ item.label }}</span>
-        <span class="content-item">{{ item.value }}</span>
-      </div>
+        <div class="contetn" :title="item.value">
+          <span class="label">{{ item.label }}</span>
+          <span class="content-item">{{ item.value }}</span>
+        </div>
       </Col>
     </Row>
     <slot></slot>

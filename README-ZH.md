@@ -98,7 +98,7 @@
 | [**DolphinScheduler**](https://github.com/apache/dolphinscheduler) | Apache DolphinScheduler，分布式易扩展的可视化工作流任务调度平台，支持一键将DSS工作流发布到 DolphinScheduler。    | 不支持 | >= DolphinScheduler1.3.6，规划在 DSS1.1.0（**开发中**） |
 | **UserGuide**     | （DSS 将内置的第三方应用工具）包含帮助文档、新手指引、Dark模式换肤等。      | 不支持 | 规划在 DSS1.1.0（**开发中**） |
 | **DataModelCenter**     | （DSS 将内置的第三方应用工具）主要提供数仓规划、数据模型开发和数据资产管理的能力。数仓规划包含主题域、数仓分层、修饰词等；数据模型开发包含指标、维度、度量、向导式建表等；数据资产打通 **Apache Atlas**，提供**数据血缘**能力。      | 不支持 | 规划在 DSS1.2.0（**开发中**） |
-| [**Airflow**](https://github.com/apache/airflow)     | 支持将 DSS 工作流发布到 Apache Airflow 进行定时调度。      | 推荐 DSS0.9.1，尚未合并 | 不支持 |
+| [**Airflow**](https://github.com/apache/airflow)     | 支持将 DSS 工作流发布到 Apache Airflow 进行定时调度。      | PR 尚未合并 | 不支持 |
 
 
 ## Demo试用环境

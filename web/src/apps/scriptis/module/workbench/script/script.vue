@@ -474,7 +474,6 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix ***REMOVED***
       if (this.node) {
         setTimeout(()=>{
           this.resizePanel()

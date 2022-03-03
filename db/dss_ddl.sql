@@ -603,3 +603,15 @@ CREATE TABLE `dss_workspace_user_role` (
 --  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
 --) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';
 
+DROP TABLE IF EXISTS `dss_user`;
+CREATE TABLE `dss_proxy_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) DEFAULT NULL,
+  `proxy_user_name` varchar(64) DEFAULT NULL,
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
+

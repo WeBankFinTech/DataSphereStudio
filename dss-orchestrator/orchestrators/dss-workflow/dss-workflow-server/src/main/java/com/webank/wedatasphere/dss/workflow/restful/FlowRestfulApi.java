@@ -101,7 +101,7 @@ public class FlowRestfulApi {
         try {
             String taskId = publishService.submitPublish(publishUser, workflowId, labels, workspace, comment);
             LOGGER.info("submit publish task ok ,taskId is {}.", taskId);
-            if ("-999".equals(taskId)) {
+            if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
                 message = Message.error("发布工程已经含有工作流，正在发布中，请稍后再试");
             } else if (StringUtils.isNotEmpty(taskId)) {
                 message = Message.ok("生成工作流发布任务成功").data("releaseTaskId", taskId);

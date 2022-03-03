@@ -231,7 +231,7 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
                 orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(orchestrator, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(ProjectStringUtils.convertList(orchestrator.getOrchestratorWay()));
-                orchestratorBaseInfo.setEditable(!editPriv.isEmpty());
+                orchestratorBaseInfo.setEditable(!editPriv.isEmpty() || !releasePriv.isEmpty());
                 orchestratorBaseInfo.setReleasable(!releasePriv.isEmpty());
                 retList.add(orchestratorBaseInfo);
             }

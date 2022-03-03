@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>dss</artifactId>
+        <groupId>com.webank.wedatasphere.dss</groupId>
+        <version>1.0.1</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dss-datawarehouse-design</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jersey.version>2.16</jersey.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+    </properties>
+
+    <modules>
+        <module>data-warehouse-server</module>
+        <module>data-warehouse-service</module>
+        <module>data-warehouse-mybatis</module>
+        <module>data-warehouse-client</module>
+        <module>governance-dao</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 数据治理模块依赖		START -->
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>governance-dao</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.webank.wedatasphere.dss</groupId>
+                <artifactId>data-warehouse-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 数据治理模块依赖		END -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scalap</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-mybatis</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-httpclient</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-gateway-httpclient-support</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-module</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-tomcat</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>hibernate-validator</artifactId>
+                        <groupId>org.hibernate.validator</groupId>
+                    </exclusion>
+                </exclusions>
+                <version>${linkis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-common</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-protocol</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${commons.math.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>xstream</artifactId>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <version>${xstream.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.linkis</groupId>
+                <artifactId>linkis-datasource-client</artifactId>
+                <version>${linkis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.20</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

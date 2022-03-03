@@ -95,19 +95,8 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     public void saveProjectUser(Long projectID,String username, ProjectCreateRequest request, Workspace workspace)throws Exception{
         //將创建人默认为发布权限
         List<String> releaseUsers = request.getReleaseUsers();
-        if(!request.getEditUsers().contains(username)){
-            request.getEditUsers().add(username);
-        }
-        if(releaseUsers == null){
-            releaseUsers = new ArrayList<>();
-        }
-        if(!releaseUsers.contains(username)){
-            releaseUsers.add(username);
-        }
-
         //批量保存
         saveBatch(request.getWorkspaceId(),projectID,releaseUsers,request.getEditUsers(),request.getAccessUsers());
-
         //获取所有编辑权限的用户
         List<String> sumEditUsers = ProjectUserUtils.getEditUserList(releaseUsers, request.getEditUsers());
         //去bml建一个工程
@@ -124,17 +113,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         projectUserMapper.deleteAllPriv(dbProject.getId());
         //將创建人默认为发布权限
         List<String> releaseUsers = modifyRequest.getReleaseUsers();
-        String username = dbProject.getCreateBy();
-        if(!modifyRequest.getEditUsers().contains(username)){
-            modifyRequest.getEditUsers().add(username);
-        }
-        if(releaseUsers == null){
-            releaseUsers = new ArrayList<>();
-        }
-        if(!releaseUsers.contains(username)){
-            releaseUsers.add(username);
-        }
-
+        String username = dbProject.getUsername();
         //批量保存
         saveBatch(modifyRequest.getWorkspaceId(),dbProject.getId(),releaseUsers,modifyRequest.getEditUsers(),modifyRequest.getAccessUsers());
 

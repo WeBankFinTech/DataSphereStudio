@@ -570,6 +570,7 @@ CREATE TABLE `dss_onestop_user_favorites` (
   `create_time` datetime DEFAULT NULL,
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL,
+  `type` varchar(20) NOT NULL DEFAULT "" COMMENT "dingyiding or 收藏",
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
@@ -1310,11 +1311,8 @@ CREATE TABLE `dss_orchestrator_release_info`  (
 
 alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT NULL COMMENT '上下文ID'
 
-ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';
+ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) DEFAULT "" comment '类型,区分收藏和盯一盯';
 
-/**
- * 鲁班产品及文档 dss-guide
- */
 DROP TABLE IF EXISTS `dss_guide_group`;
 CREATE TABLE IF NOT EXISTS `dss_guide_group` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,

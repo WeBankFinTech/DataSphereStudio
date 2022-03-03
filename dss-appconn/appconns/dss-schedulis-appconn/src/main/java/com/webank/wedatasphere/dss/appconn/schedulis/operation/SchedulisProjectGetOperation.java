@@ -34,6 +34,7 @@ public class SchedulisProjectGetOperation implements ProjectGetOperation {
         params.put("ajax", "fetchprojectflows");
         try {
             String responseBody = SSORequestWTSS.requestWTSSWithSSOGet(queryUrl, params, this.schedulisProjectService.getSSORequestService(), requestRef.getWorkspace());
+            LOGGER.info("responseBody from schedulis is:{}", responseBody);
             JsonNode jsonNode = new ObjectMapper().readValue(responseBody, JsonNode.class);
             DSSProject project = new DSSProject();
             JsonNode errorInfo = jsonNode.get("error");

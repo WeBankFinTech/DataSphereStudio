@@ -1,7 +1,9 @@
 package com.webank.wedatasphere.dss.data.governance.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 import com.webank.wedatasphere.dss.data.governance.atlas.AtlasService;
 import com.webank.wedatasphere.dss.data.governance.dao.*;
@@ -11,11 +13,9 @@ import com.webank.wedatasphere.dss.data.governance.dto.SearchLabelDTO;
 import com.webank.wedatasphere.dss.data.governance.entity.*;
 import com.webank.wedatasphere.dss.data.governance.exception.DAOException;
 import com.webank.wedatasphere.dss.data.governance.exception.DataGovernanceException;
-import com.webank.wedatasphere.dss.data.governance.restful.DSSDataGovernanceAssetRestful;
 import com.webank.wedatasphere.dss.data.governance.service.AssetService;
 import com.webank.wedatasphere.dss.data.governance.utils.DateUtil;
 import com.webank.wedatasphere.dss.data.governance.vo.*;
-import jersey.repackaged.com.google.common.collect.Lists;
 import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.glossary.AtlasGlossaryTerm;
 import org.apache.atlas.model.glossary.relations.AtlasTermAssignmentHeader;
@@ -73,7 +73,10 @@ public class AssetServiceImpl implements AssetService {
         }
     }
 
-
+    @Override
+    public String getHiveDbsName(Integer limit, Integer offset) throws AtlasServiceException {
+            return atlasService.getHiveDbsName(limit,offset);
+    }
     @Override
     public CreateModelTypeInfo createModelType(CreateModelTypeVO vo) throws DataGovernanceException {
         if (!ClassificationConstant.isTypeScope(vo.getType())) {
@@ -540,6 +543,7 @@ public class AssetServiceImpl implements AssetService {
                 }
                 sql.append(")");
             }
+            sql.append(")");
             return sql.toString();
         } catch (AtlasServiceException ex) {
             throw new DataGovernanceException(23000, ex.getMessage());
@@ -744,6 +748,7 @@ public class AssetServiceImpl implements AssetService {
 
         if (StringUtils.isNotBlank(vo.getLabelGuid()) && StringUtils.isNotBlank(vo.getTableGuid())) {
             try {
+
                 atlasService.assignTermToEntities(vo.getLabelGuid(), Lists.newArrayList(vo.getTableGuid()));
             } catch (AtlasServiceException exception1) {
                 throw new DataGovernanceException(23000, exception1.getMessage());
@@ -754,6 +759,7 @@ public class AssetServiceImpl implements AssetService {
         List<AtlasEntityHeader> entityHeaders = getAtlasEntityHeaders(vo.getTableName());
 
         try {
+
             atlasService.assignTermToEntities(termGuidOptional.get(), Lists.newArrayList(entityHeaders.get(0).getGuid()));
         } catch (AtlasServiceException exception1) {
             throw new DataGovernanceException(23000, exception1.getMessage());

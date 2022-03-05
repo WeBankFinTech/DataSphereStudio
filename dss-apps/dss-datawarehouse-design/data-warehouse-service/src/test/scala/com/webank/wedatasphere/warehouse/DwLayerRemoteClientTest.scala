@@ -1,12 +1,9 @@
 package com.webank.wedatasphere.warehouse
 
-import org.apache.linkis.datasource.client.impl.{LinkisMetaDataRemoteClient, LinkisMetadataSourceRemoteClient}
-import org.apache.linkis.datasource.client.request.{GetMetadataSourceAllDatabasesAction, MetadataGetDatabasesAction}
+import org.apache.linkis.datasource.client.impl.{LinkisMetaDataRemoteClient}
+import org.apache.linkis.datasource.client.request.{MetadataGetDatabasesAction}
 import org.apache.linkis.httpclient.dws.authentication.StaticAuthenticationStrategy
 import org.apache.linkis.httpclient.dws.config.{DWSClientConfig, DWSClientConfigBuilder}
-
-import java.util.concurrent.TimeUnit
-
 object DwLayerRemoteClientTest {
 
 
@@ -25,10 +22,10 @@ object DwLayerRemoteClientTest {
       .setDWSVersion("v1")
       .build();
 
-    val client = new LinkisMetadataSourceRemoteClient(clientCfg)
+    val client = new LinkisMetaDataRemoteClient(clientCfg)
 
-    val action = GetMetadataSourceAllDatabasesAction.builder().setUser("hdfs").build()
-    val result = client.getAllDBMetaDataSource(action)
+    val action = MetadataGetDatabasesAction.builder().setUser("hdfs").build()
+    val result = client.getDatabases(action)
     println(result.dbs)
 
 //    val client = new LinkisMetaDataRemoteClient(clientCfg)

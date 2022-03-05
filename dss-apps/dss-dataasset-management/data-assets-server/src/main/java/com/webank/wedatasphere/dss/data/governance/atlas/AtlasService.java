@@ -73,6 +73,13 @@ public class AtlasService {
     }
 
     /**
+     * hive db
+     */
+    public String getHiveDbsName(Integer limit, Integer offset) throws AtlasServiceException {
+        return atlasClient.getHiveDbsName(limit,offset);
+    }
+
+    /**
      * hive table数量
      */
     public long getHiveTableCnt() throws AtlasServiceException {

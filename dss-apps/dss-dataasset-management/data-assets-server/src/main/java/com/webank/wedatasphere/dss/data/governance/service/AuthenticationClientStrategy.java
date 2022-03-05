@@ -17,6 +17,6 @@ public interface AuthenticationClientStrategy {
         if (StringUtils.equals(ClientStrategy.TOKEN.getCode(),CLIENT_STRATEGY.getValue())){
             return SecurityFilter.getLoginUsername(req);
         }
-        return "hdfs";
+        return "hadoop";
     }
 }

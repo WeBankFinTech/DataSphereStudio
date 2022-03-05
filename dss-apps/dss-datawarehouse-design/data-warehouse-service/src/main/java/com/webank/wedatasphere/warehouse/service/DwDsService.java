@@ -5,7 +5,7 @@ import org.apache.linkis.server.Message;
 import javax.servlet.http.HttpServletRequest;
 
 public interface DwDsService {
-    Message getAllHiveDbs(HttpServletRequest request) throws Exception;
+    Message getAllHiveDbs(HttpServletRequest request,Integer limit, Integer offset) throws Exception;
 
     Message getPrincipalUsers(HttpServletRequest request, String id) throws Exception;
 

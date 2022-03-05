@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.datamodel.table.service.*;
 import com.webank.wedatasphere.dss.datamodel.table.vo.*;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.linkis.ujes.client.exception.UJESJobException;
 import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -44,8 +45,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -628,10 +631,10 @@ public class TableServiceImpl extends ServiceImpl<DssDatamodelTableMapper, DssDa
     @Override
     public Message listDataBases(TableDatabasesQueryVO vo) {
         SearchHiveDbResult result = linkisDataAssetsRemoteClient.searchHiveDb(
-                SearchHiveDbAction.builder().setQuery(vo.getName()).setUser(vo.getUser()).setOffset(vo.getPageNum() - 1).setLimit(vo.getPageSize() * (vo.getPageNum() - 1)).build());
-        return Message.ok().data("list", result.getResult());
+                SearchHiveDbAction.builder().setQuery("hive_db").setUser(vo.getUser()).setOffset(vo.getPageNum() - 1).setLimit(vo.getPageSize() * (vo.getPageNum() - 1)).build());
+        List<Map<String,Object>> results=result.getResult();
+        return Message.ok().data("list",results);
     }
-
 
     @Override
     public Message previewData(TableDataPreviewVO vo) throws ErrorException {

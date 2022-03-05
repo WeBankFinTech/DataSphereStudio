@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.data.governance.atlas;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.webank.wedatasphere.dss.data.governance.entity.GlossaryConstant;
 import org.apache.atlas.AtlasClientV2;
@@ -44,6 +45,16 @@ public class AtlasClient extends AtlasClientV2 {
         queryParams.add("type", "hive_db");
         return callAPI(API_V3.GET_ENTITIES, String.class, queryParams);
     }
+
+
+    public String getHiveDbsName(Integer limit, Integer offset) throws AtlasServiceException {
+        MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
+        queryParams.add(QUERY, "hive_db");
+        queryParams.add(LIMIT, limit+"");
+        queryParams.add(OFFSET, offset+"");
+        return callAPI(API_V2.DSL_SEARCH, String.class, queryParams);
+    }
+
 
     /**
      * 获取所有的hive table实体

@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.data.governance.service;
 
 
+import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.data.governance.dto.HiveTblStatsDTO;
 import com.webank.wedatasphere.dss.data.governance.dto.SearchLabelDTO;
 import com.webank.wedatasphere.dss.data.governance.entity.*;
@@ -18,6 +19,8 @@ import java.util.Set;
 
 public interface AssetService {
     public Map<String,Long> getHiveSummary() throws DataGovernanceException;
+
+    public String getHiveDbsName(Integer limit, Integer offset) throws AtlasServiceException;
 
     public List<HiveTblSimpleInfo> searchHiveTable(String classification, String query,String termName,
                                                    int limit, int offset) throws DataGovernanceException;

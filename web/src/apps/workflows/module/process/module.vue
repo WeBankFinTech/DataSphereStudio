@@ -1996,7 +1996,7 @@ export default {
       this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
         item.flowId !== this.newFlowId;
       });
-      api.fetch(`/dss/flow/entrance/${this.workflowExeteId}/kill`, {taskID: this.workflowTaskId, labels: this.getCurrentDsslabels()}, 'get').then(() => {
+      api.fetch(`/dss/flow/entrance/${this.workflowExeteId}/killWorkflow`, {taskID: this.workflowTaskId, labels: this.getCurrentDsslabels()}, 'get').then(() => {
         this.workflowIsExecutor = false;
         this.flowExecutorNode(this.workflowExeteId, true);
       }).catch(() => {

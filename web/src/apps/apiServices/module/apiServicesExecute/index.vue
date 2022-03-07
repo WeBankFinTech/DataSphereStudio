@@ -163,7 +163,7 @@ export default {
       // 后续的执行逻辑
       if (this.excuteLoading) { // 停止执行
         if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: '任务暂时未生成返回，请稍后再试或联系管理员！' });
-        api.fetch(`/dss/flow/entrance/${this.apiData.execID}/kill`, {taskID: this.apiData.taskID}, 'get').then(() => {
+        api.fetch(`/entrance/${this.apiData.execID}/kill`, {taskID: this.apiData.taskID}, 'get').then(() => {
           // kill成功后，去查kill后的状态
           this.$refs.currentConsole.killExecute(true);
           const name = this.apiData.name;

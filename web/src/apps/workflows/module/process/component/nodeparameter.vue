@@ -1,7 +1,7 @@
 <template>
   <div>
     <Form label-position="top" ref="baseInfoForm" :model="currentNode" class="node-parameter-bar">
-      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeName')" prop="title" :rules="titleRules">
+      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeName')" prop="title" :rules="nodeNameValidate">
         <Input v-model="currentNode.title" :placeholder="$t('message.workflow.process.nodeParameter.inputeNodeName')" />
       </FormItem>
       <FormItem
@@ -116,12 +116,13 @@ export default {
     let validatorName = (rule, value, callback) => {
       if (value === `${this.name}_`) {
         callback(new Error(this.$t('message.workflow.process.nodeParameter.JDMCBNYGZL')));
-      } else {
+      }else {
         callback();
       }
     };
     return {
       test: [],
+      isExchangisName: false,
       currentNode: {
       },
       titleRules: [
@@ -194,6 +195,9 @@ export default {
     // 获取当前节点参数的基本信息
     currentNodeParamsBaseinfoList() {
       return this.currentNode.nodeUiVOS ? this.currentNode.nodeUiVOS.filter((item) => !item.baseInfo && item.nodeMenuType) : [];
+    },
+    nodeNameValidate() {
+      return this.currentNode.nodeUiVOS ? this.paramsValid(this.currentNode.nodeUiVOS[0]) : []
     }
   },
   methods: {
@@ -434,7 +438,7 @@ export default {
           return 'text';
       }
     },
-  },
+  }
 };
 
 </script>

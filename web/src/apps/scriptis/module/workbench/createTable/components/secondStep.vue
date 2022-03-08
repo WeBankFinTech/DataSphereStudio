@@ -6,7 +6,7 @@
       fix/>
     <div class="data-source">
       <div class="data-source-item-wrap">
-        <span class="data-source-title">{{$t('message.scripts.createTable.SJSXLY')}}</span>
+        <span class="data-source-title">{{$t('message.scripts.createTable.SJSXLY')}}</span> <!-- 数据属性来源 -->
         <Select
           v-model="attrInfo.source.source"
           class="data-source-type">
@@ -20,7 +20,7 @@
         style="margin-left:20px;"
         class="data-source-item-wrap"
         v-show="attrInfo.source.source === 'import'">
-        <span class="data-source-title">{{$t('message.scripts.createTable.DRFS')}}</span>
+        <span class="data-source-title">{{$t('message.scripts.createTable.DRFS')}}</span>   <!-- 导入方式 -->
         <Select
           v-model="attrInfo.source.importType"
           class="data-source-type"

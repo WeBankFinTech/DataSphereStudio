@@ -79,7 +79,18 @@ export default class Bar extends Base {
     }]
     const xAxis = {
       type: 'category',
-      data: []
+      data: [],
+      nameTextStyle: {
+        color: 'rgb(150, 150, 150)'
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'rgb(237, 237, 237)'
+        }
+      },
+      axisLabel: {
+        color: 'rgb(150, 150, 150)'
+      }
     }
 
     for (let i = 0; i < data.length; i++) {
@@ -282,7 +293,10 @@ export default class Bar extends Base {
           },
           legend: {
             x: 'right',
-            data: legendData
+            data: legendData,
+            textStyle: {
+              color: 'rgb(150, 150, 150)'
+            }
           },
           xAxis: xAxisModel,
           yAxis: yAxisModel,
@@ -313,7 +327,10 @@ export default class Bar extends Base {
           containLabel: true
         },
         legend: {
-          data: legendData
+          data: legendData,
+          textStyle: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         xAxis: xAxisModel,
         yAxis: yAxisModel,

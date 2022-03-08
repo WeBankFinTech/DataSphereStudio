@@ -2,11 +2,11 @@
   <div class="define-user-count-model">
     <div v-if="msg">
       <div class="data-area">
-        <div id="process-definition-bar" style="height:430px"></div>
+        <div id="process-definition-bar" style="height:330px"></div>
       </div>
     </div>
     <div v-else>
-      <m-no-data :height="430"></m-no-data>
+      <m-no-data :height="330"></m-no-data>
     </div>
   </div>
 </template>
@@ -23,11 +23,12 @@ export default {
     return {
       isSpin: true,
       msg: true,
-      parameter: { projectId: 0 }
+      parameter: {}
     }
   },
   props: {
-    projectId: Number
+    projectId: Number,
+    workspaceName: String
   },
   methods: {
     _handleDefineUser (res) {
@@ -39,7 +40,18 @@ export default {
         }
       })
       const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {barColor: '#89C2D9', yAxis: {
-        minInterval: 1
+        minInterval: 1,
+        axisLabel: {
+          color: 'rgb(150, 150, 150)'
+        },
+        nameTextStyle: {
+          color: 'rgb(150, 150, 150)'
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgb(237, 237, 237)'
+          }
+        }
       }})
       myChart.echart.setOption(bar)
       // Jump not allowed on home page
@@ -57,11 +69,18 @@ export default {
       deep: true,
       immediate: true,
       handler () {
+        if (!this.workspaceName) return
         this.isSpin = true
         this.parameter.projectId = this.projectId
-        if (!this.projectId) return
+        let url, params = {}
+        if (this.projectId != 0) {
+          url = `dolphinscheduler/projects/analysis/define-user-count`
+          params = this.parameter
+        } else {
+          url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/define-user-count`
+        }
         util.checkToken(() => {
-          api.fetch(`dolphinscheduler/projects/analysis/define-user-count`, this.parameter, 'get').then(res => {
+          api.fetch(url, params, 'get').then(res => {
             this.msg = res.count > 0
             this.processStateList = []
             this.defineUserList = []

@@ -657,7 +657,7 @@
                 "Name": "名称",
                 "Number": "数量",
                 "State": "状态",
-                "RunType": "运行类型",
+                "RunType": "操作类型",
                 "SchedulingTime": "调度时间",
                 "SubmitTime": "提交时间",
                 "StartTime": "开始时间",

@@ -30,7 +30,7 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <m-process-state-count :search-params="searchParams" @goToList="goToList">
+              <m-process-state-count :search-params="searchParams" :workspaceName="workspaceName" @goToList="goToList">
               </m-process-state-count>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="row dashboard-module-content">
-              <div id="areaChart" style="height: 330px"></div>
+              <div id="areaChart" style="height: 250px"></div>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
           </div>
@@ -56,7 +56,7 @@
               <span>{{$t('message.scheduler.processDefinitionStatistics')}}</span>
             </div>
             <div class="dashboard-module-content">
-              <m-define-user-count :project-id="searchParams.projectId" @goToList="goToList">
+              <m-define-user-count :project-id="searchParams.projectId" :workspaceName="workspaceName" @goToList="goToList">
               </m-define-user-count>
               <Spin size="large" fix v-if="loading"></Spin>
             </div>
@@ -84,7 +84,7 @@
               <!--</div>-->
             </div>
             <div class="row dashboard-module-content">
-              <Table :columns="columns" :data="consumptionList" style="height: 430px;" class="consumption-table">
+              <Table :columns="columns" :data="consumptionList" style="height: 330px;" class="consumption-table">
                 <!--<template slot-scope="{ row }" slot="operation">-->
                 <!--</template>-->
               </Table>
@@ -102,7 +102,7 @@
               </div>
             </div>
             <div class="dashboard-module-content">
-              <div id="mixedBarLine" style="height: 500px"></div>
+              <div id="mixedBarLine" style="height: 400px"></div>
             </div>
           </div>
         </div>
@@ -119,7 +119,7 @@ import mProcessStateCount from './source/processStateCount'
 //import mTaskStatusCount from './source/taskStatusCount'
 import mListConstruction from '../components/listConstruction/listConstruction'
 import { GetWorkspaceData } from '@/common/service/apiCommonMethod.js'
-import {formatDate} from '../convertor'
+//import {formatDate} from '../convertor'
 import { tasksState } from '../config'
 
 import echarts from 'echarts'
@@ -198,7 +198,13 @@ export default {
   methods: {
     getConsumptionData() {
       if (!this.projectName) return
-      api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-order-by-duration`, {
+      let url
+      if (this.projectId != 0) {
+        url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-order-by-duration`
+      } else {
+        url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/list-order-by-duration`
+      }
+      api.fetch(url, {
         pageSize: 10,
         pageNo: 1,
         startDate: this.consumptionParams.startDate  || '',
@@ -264,7 +270,7 @@ export default {
       })
     },
     goToList() {
-      if (this.getFullName() === `${this.workspaceName}-${this.projectName}`) {
+      if (this.projectId != 0) {
         this.$emit('goToList', ...arguments)
       }
     },
@@ -276,22 +282,26 @@ export default {
       if (this.projectId) {
         return cb(this.projectId)
       } else {
+        if (this.$route.query.projectID == 0) {
+          this.projectId = 0
+          return cb(this.projectId)
+        }
+        if (!this.projectName) return
         this.loading = true
         let searchVal = `${this.workspaceName}-${this.projectName}`
-        api.fetch(`dolphinscheduler/projects/list-paging`, {
-          pageSize: 100,
-          pageNo: 1,
-          searchVal: ''
+        api.fetch(`dolphinscheduler/projects/query-project-id`, {
+          projectName: searchVal
         }, 'get').then(res => {
-          this.projectList = res.totalList
+          //this.projectList = res.totalList
           this.loading = false
-          for (let i = 0; i < res.totalList.length; i++) {
+          /*for (let i = 0; i < res.totalList.length; i++) {
             if (res.totalList[i].name === searchVal) {
               this.projectId = res.totalList[i].id
               return cb(this.projectId)
             }
-          }
-          this.projectId = res.totalList.length ? res.totalList[0].id : ''
+          }*/
+          //this.projectId = res.totalList.length ? res.totalList[0].id : ''
+          this.projectId = res
           return cb(this.projectId)
         })
       }
@@ -299,17 +309,21 @@ export default {
     getMixedBarLineData(currentDay, cb) {
       if (!this.projectName) return
       util.checkToken(() => {
-        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/list-paging`, {
-          pageSize: 1000,
-          pageNo: 1,
+        let url
+        if (this.projectId != 0) {
+          url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/success-rate`
+        } else {
+          url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/success-rate`
+        }
+        api.fetch(url , {
           startDate: `${currentDay} 00:00:00`,
           endDate: `${currentDay} 23:59:59`,
         }, 'get').then((res) => {
-          let objTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            successTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            failureTotal = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+          let objTotal = res.total,
+            successTotal = res.successTotal,
+            failureTotal = res.failTotal,
             successPercent = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-          res.totalList.forEach(item => {
+          /*res.totalList.forEach(item => {
             item.startTime = formatDate(item.startTime)
             item.endTime = formatDate(item.endTime)
             let curHour = new Date(item.startTime).getHours()
@@ -321,7 +335,7 @@ export default {
             if (curState === 'FAILURE') {
               failureTotal[curHour] = failureTotal[curHour] + 1
             }
-          })
+          })*/
           successTotal.forEach((success, index) => {
             if (objTotal[index]) {
               successPercent[index] =  parseInt((success / objTotal[index]) * 100)
@@ -339,6 +353,7 @@ export default {
       })
     },
     getAreaData(cb, stateType) {
+
       function getFormatDateString(dd) {
         let tYear = dd.getFullYear(),
           tMonth = dd.getMonth() + 1 > 9 ? dd.getMonth() + 1 : '0' + (dd.getMonth() + 1),
@@ -353,7 +368,13 @@ export default {
       let dateString1 = getFormatDateString(dd),
         dateString2 = getFormatDateString(dd1)
       util.checkToken(() => {
-        api.fetch(`dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/statistics`, {
+        let url
+        if (this.projectId != 0) {
+          url = `dolphinscheduler/projects/${this.workspaceName}-${this.projectName}/instance/statistics`
+        } else {
+          url = `dolphinscheduler/workspaces/${this.workspaceName}/instance/statistics`
+        }
+        api.fetch(url , {
           dates: dateString1 + ',' + dateString2,
           step: 2,
           stateType: stateType || 'SUCCESS'
@@ -375,7 +396,10 @@ export default {
           }
         },
         legend: {
-          data: ['昨日', '今日']
+          data: ['昨日', '今日'],
+          textStyle: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         xAxis: {
           type: 'category',
@@ -439,6 +463,13 @@ export default {
             crossStyle: {
               color: '#999'
             }
+          },
+          formatter: function (params) {
+            let str = ''
+            params.forEach((item, index) => {
+              str += index === 1 ? `${item.seriesName}: ${item.value}%<br/>` : `${item.seriesName}: ${item.value}<br/>`
+            })
+            return str
           }
         },
         /*toolbox: {
@@ -450,7 +481,10 @@ export default {
           }
         },*/
         legend: {
-          data: ['实例数', '成功率']
+          data: ['实例数', '成功率'],
+          textStyle: {
+            color: 'rgb(150, 150, 150)'
+          }
         },
         xAxis: [
           {
@@ -570,14 +604,15 @@ export default {
       this.workspaceName = data.workspace.name
       util.checkToken(() => {
         this.getProjectId((id) => {
+          console.log(this.projectId, id)
           this.searchParams.projectId = id
           this.searchParams.startDate = this.dataTime[0]
           this.searchParams.endDate = this.dataTime[1]
-        })
-        this.$nextTick(() => {
-          this.changeDay()
-          this.changeState()
-          this.getConsumptionData()
+          this.$nextTick(() => {
+            this.changeDay()
+            this.changeState()
+            this.getConsumptionData()
+          })
         })
       })
     })
@@ -600,7 +635,7 @@ export default {
         {
           title: '实例名',
           key: 'name',
-          //width: 240,
+          //width: 180,
           align: 'center',
         },
         {
@@ -615,7 +650,7 @@ export default {
         {
           title: '耗时',
           key: 'duration',
-          width: 210,
+          width: 150,
           align: 'center',
           render: (h, scope) => {
             return h('span', {}, this.showDuration(scope.row.duration))
@@ -649,6 +684,7 @@ export default {
       height: 60px;
       line-height: 60px;
       border-bottom: 1px solid #DEE4EC;
+      @include border-bottom-color(#DEE4EC, $dark-workspace-title-color);
       span {
         font-size: 16px;
         @include font-color($workspace-title-color, $dark-workspace-title-color);
@@ -690,15 +726,18 @@ export default {
     &.col-md-6 {
       width: calc(50% - 10px);
     }
-    background: #FFFFFF;
-    border: 1px solid #DEE4EC;
+    @include bg-color(#fff, $dark-workflow-bg-color);
+    @include font-color($light-text-color, $dark-text-color);
+    @include border-color($border-color-base, $dark-workspace-background);
+    /*background: #FFFFFF;
+    border: 1px solid #DEE4EC;*/
     border-radius: 2px;
     padding: 0;
     position: relative;
     margin-bottom: 24px;
-    min-width: 570px;
+    min-width: 470px;
     .dashboard-module-content {
-      padding: 30px;
+      padding: 30px 30px 0;
       position: relative;
       margin:0 0 24px;
     }

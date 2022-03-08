@@ -1,27 +1,16 @@
 <template>
   <div class="create-table-view">
-    <first-step
-      ref="firstStep"
-      :db-list="personalDbList"
-      :attr-info="attrInfo"
-      @close-tab="closeTab"
-      @next-step="nextStep"
-      @get-tables="getTables"
-      :loading="loading"
-      v-if="current === 1"/>
-    <second-step
-      ref="secondStep"
+    <create-table-process 
+      ref="createTableProcess"
+      :personal-db-list="personalDbList"
       :db-list="dbList"
-      :loading="loading"
       :attr-info="attrInfo"
-      v-if="current === 2"
+      @get-tables="getTables"
       @get-fields="getFields"
-      @get-tables="getTables"/>
-    <div
-      class="create-table-view-button-group"
-      v-if="current===2">
+      :loading="loading"/>
+    <div class="create-table-view-button-group">
       <Button
-        @click="prev">{{$t('message.scripts.createTable.FHSYB')}}</Button>
+        @click="closeTab">{{$t('message.scripts.cancel')}}</Button>
       <Button
         type="success"
         @click="generatingStatements"
@@ -46,12 +35,10 @@ import { pick } from 'lodash';
 import moment from 'moment';
 import api from '@/common/service/api';
 import util from '@/common/util';
-import firstStep from './components/firstStep.vue';
-import secondStep from './components/secondStep.vue';
+import createTableProcess from './components/createTableProcess.vue';
 export default {
   components: {
-    firstStep,
-    secondStep,
+    createTableProcess
   },
   props: {
     work: {
@@ -66,7 +53,6 @@ export default {
       personalDbList: [],
       loading: false,
       hiveComponent: null,
-      current: 1,
       attrInfo: {
         basic: {
           database: '',
@@ -166,7 +152,7 @@ export default {
   methods: {
     getIndDbList() {
       this.dbList = this.work && this.work.data;
-      this.dispatch('HiveSidebar:getAllowMap', (map) => {
+      this.dispatch('HiveSidebar:getAllowMap', (map) => {   // ALLOW_MAP: ['_ind', '_share', '_work', '_qml', '_default'],
         this.personalDbList = [];
         if (!map.length) {
           this.personalDbList = this.work.data;
@@ -237,11 +223,17 @@ export default {
     closeTab() {
       this.dispatch('Workbench:removeWork', this.work);
     },
-    prev() {
-      this.current = 1;
-    },
-    nextStep() {
-      this.current = 2;
+    partOneValidate() {   // 第一部分校验
+      return new Promise(resolve=>{
+        this.$refs.createTableProcess.$refs.basicAttr[0].validate((valid1) => {
+          if (!valid1) return this.$Message.warning(this.$t('message.scripts.failedNotice'));
+          this.$refs.createTableProcess.$refs.modelAttr[0].validate((valid2) => {
+            if (!valid2) return this.$Message.warning(this.$t('message.scripts.failedNotice'));
+            resolve()
+          });
+        })
+      })
+
     },
     getParams() {
       const basic = this.attrInfo.basic;
@@ -374,11 +366,13 @@ export default {
       return params;
     },
     generatingStatements() {
-      const params = this.getParams();
-      api.fetch('/datasource/displaysql', { table: params }).then((rst) => {
-        this.statements = rst.sql;
-        this.modalShow = true;
-      });
+      this.partOneValidate().then(()=>{
+        const params = this.getParams();
+        api.fetch('/datasource/displaysql', { table: params }).then((rst) => {
+          this.statements = rst.sql;
+          this.modalShow = true;
+        });
+      }) 
     },
     executeCopy() {
       util.executeCopy(this.statements);
@@ -390,7 +384,7 @@ export default {
     getValidate() {
       return new Promise((resolve) => {
         if (this.attrInfo.source.source === 'new') {
-          this.$refs.secondStep.$refs.createTable.$refs.fieldsForm.validate((valid) => {
+          this.$refs.createTableProcess.$refs.createTable.$refs.fieldsForm.validate((valid) => {
             if (valid) {
               resolve();
             } else {
@@ -403,36 +397,38 @@ export default {
       });
     },
     createTable() {
-      this.getValidate().then(() => {
-        const tabName = `create_table_${this.attrInfo.basic.name}`;
-        const md5Path = util.md5(tabName);
-        const code = JSON.stringify(this.getParams());
-        this.dispatch('Workbench:add', {
-          id: md5Path,
-          filename: tabName + '.scala',
-          filepath: '',
-          saveAs: true,
-          noLoadCache: true,
-          specialSetting: {
-            runType: 'function.mdq',
-          },
-          code,
-        }, () => {
-          this.$nextTick(() => {
-            this.dispatch('Workbench:run', {
-              id: md5Path,
-            }, () => {
-
+      this.partOneValidate().then(()=>{
+        this.getValidate().then(() => {
+          const tabName = `create_table_${this.attrInfo.basic.name}`;
+          const md5Path = util.md5(tabName);
+          const code = JSON.stringify(this.getParams());
+          this.dispatch('Workbench:add', {
+            id: md5Path,
+            filename: tabName + '.scala',
+            filepath: '',
+            saveAs: true,
+            noLoadCache: true,
+            specialSetting: {
+              runType: 'function.mdq',
+            },
+            code,
+          }, () => {
+            this.$nextTick(() => {
+              this.dispatch('Workbench:run', {
+                id: md5Path,
+              }, () => {
+              });
             });
           });
         });
-      });
+
+      })
+        
     },
     getCurrentDate() {
       return moment.unix(moment().unix()).format('YYYYMMDD');
     },
     reset() {
-      this.current = 1;
       this.attrInfo = {
         basic: {
           database: '',

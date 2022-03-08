@@ -32,15 +32,23 @@ object LinkisDolphinSchedulerClient extends Logging {
     val source: BufferedSource = Source.fromURL(url)
     val gatewayUrl = source.getLines().toList.filter(_.startsWith("wds.linkis.gateway.url")).map(_.stripPrefix("wds.linkis.gateway.url=")).head
     source.close()
-    println("gateway url is " + gatewayUrl)
-
+    println("************************************Gateway URL is: " + gatewayUrl)
+    println("************************************Args.head is: " + args.head)
     val jobProps: JMap[String, String] = new Gson().fromJson(args.head, classOf[JMap[String, String]])
-    jobProps.put("wds.linkis.gateway.url", gatewayUrl)
+    /** 本地断点调试代码
+    //val gatewayUrl ="http://172.24.2.63:9001"
+    //val json =
+      """
+        |{"proxy.user":"hadoop","resources":"[{\"fileName\":\"62482983-8c5a-4e26-b659-1fe8690350f0.sh\",\"resourceId\":\"8544d640-bf06-44de-b934-71f1acc3b251\",\"version\":\"v000003\"}]","type":"linkis","params":"{\"variable\":{\"run_date\":\"20220210\"},\"configuration\":{\"special\":{},\"runtime\":{},\"startup\":{}}}","command":"{\"script\":\"62482983-8c5a-4e26-b659-1fe8690350f0.sh\"}","linkistype":"linkis.shell.sh"}
+        |""".stripMargin
+    //val jobProps: JMap[String, String] = new Gson().fromJson(json, classOf[JMap[String, String]])
+    */
+    jobProps.put("linkis.version","1.0.3")
+    jobProps.put("wds.linkis.gateway.url.v1", gatewayUrl)
     jobProps.put("wds.linkis.client.flow.adminuser", "hadoop")
     jobProps.put("wds.linkis.client.flow.author.user.token", "WS-AUTH")
     val job: Job = new DolphinSchedulerJobBuilder(jobProps).build()
     job.setLogObj(logObj)
-
     val execution = LinkisNodeExecutionImpl.getLinkisNodeExecution
 
     execution.runJob(job)
@@ -50,7 +58,7 @@ object LinkisDolphinSchedulerClient extends Logging {
     //    val resultSize = execution.getResultSize(job)
     //    val result = LinkisNodeExecutionImpl.getLinkisNodeExecution.getResult(job, 0, resultSize)
     //    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++\n执行结果：\n\n$result\n\n**************************************************")
-    info(s"\n\n+++++++++++++++++++++执行成功+++++++++++++++++++++++")
+    job.getLogObj().info(s"\n\n************************************ 执行成功 ************************************")
   }
 
   def parseKVMapFromArgs(args: Array[String]): JMap[String, String] = {

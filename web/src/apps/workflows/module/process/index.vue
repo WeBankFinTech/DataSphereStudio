@@ -94,6 +94,12 @@
         </template>
       </div>
     </div>
+    <Modal
+      title="提示"
+      v-model="isExchangisShow"
+      class-name="vertical-center-modal">
+      <p>暂无内容，可前往<span @click="handleClick" class="exchangis">数据交换</span>创建项目</p>
+    </Modal>
   </div>
 </template>
 <script>
@@ -105,7 +111,8 @@ import Ide from "@/apps/workflows/module/ide";
 import commonModule from "@/apps/workflows/module/common";
 import { NODETYPE, NODEICON } from "@/apps/workflows/service/nodeType";
 import eventbus from '@/common/helper/eventbus';
-import DS from '@/apps/workflows/module/dispatch'
+import DS from '@/apps/workflows/module/dispatch';
+import mixin from '@/common/service/mixin.js';
 export default {
   components: {
     Process,
@@ -119,6 +126,7 @@ export default {
       default: () => {}
     }
   },
+  mixins: [mixin],
   computed: {},
   data() {
     return {
@@ -141,7 +149,8 @@ export default {
       setTime: 40,
       showTip: true,
       openFiles: {},
-      nodeImg: NODEICON
+      nodeImg: NODEICON,
+      isExchangisShow: false,
     }
   },
   mounted() {
@@ -282,6 +291,14 @@ export default {
         return true;
       }
     },
+    getShellName(node){
+      return node.title.split("_")[0];
+    },
+    handleClick(){
+      this.gotoCommonIframe("Exchangis", {
+        workspaceId: this.$route.query.workspaceId
+      });
+    },
     dblclickNode(index, args) {
       if (!this.check(args[0][0])) {
         return;
@@ -333,7 +350,8 @@ export default {
               node,
               data: {
                 content,
-                params
+                params,
+                projects: []
               }
             });
           });
@@ -358,7 +376,8 @@ export default {
             node,
             data: {
               content,
-              params
+              params,
+              projects: []
             }
           });
         }
@@ -392,21 +411,49 @@ export default {
       }
     },
     getTabsAndChoose({ type, node, data }) {
-      this.$set(node, "isChange", false);
-      this.tabs.push({
-        type,
-        key: node.key,
-        title: node.title,
-        close: true,
-        // 把节点的引用放到这里
-        node,
-        data,
-        isHover: false
-      });
-      // 记录打开的tab的依赖关系
-      this.openFileAction(node);
-      this.choose(this.tabs.length - 1);
-      this.updateProjectCacheByTab();
+      let shellName = this.getShellName(node)
+      if(shellName === "exchangis"){
+        api.fetch("/dss/framework/exchangis/project/tree", {}, 'get').then((res)=>{
+          let len = res.response.length
+          if(!len){
+            this.isExchangisShow = true
+            return;
+          }else{
+            this.$set(data, "projects", res.response)
+            this.$set(node, "isChange", false);
+            this.tabs.push({
+              type,
+              key: node.key,
+              title: node.title,
+              close: true,
+              // 把节点的引用放到这里
+              node,
+              data,
+              isHover: false
+            });
+            // 记录打开的tab的依赖关系
+            this.openFileAction(node);
+            this.choose(this.tabs.length - 1);
+            this.updateProjectCacheByTab();
+          }
+        })
+      }else {
+        this.$set(node, "isChange", false);
+        this.tabs.push({
+          type,
+          key: node.key,
+          title: node.title,
+          close: true,
+          // 把节点的引用放到这里
+          node,
+          data,
+          isHover: false
+        });
+        // 记录打开的tab的依赖关系
+        this.openFileAction(node);
+        this.choose(this.tabs.length - 1);
+        this.updateProjectCacheByTab();
+      }
     },
     openFileAction(node) {
       // 判断当前打开的节点的父工作过流是否已经有打开的节点s

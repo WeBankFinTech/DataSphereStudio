@@ -48,6 +48,19 @@
             </div>
           </div>
         </div>
+        <div class="list-container" v-else-if="modeOfKey === 'streamis_prod' ">
+          <div
+            class="list-item"
+            v-for="item in projectsTree"
+            :key="item.id"
+          >
+            <div class="list-content" :class="{ 'list-content-active': currentTreeId == item.id }">
+              <div class="list-name" @click="handleTreeClick(item)">
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
         <Tree
           v-else
           class="tree-container"
@@ -355,6 +368,16 @@ export default {
     currentWorkdapceData(val) {
       console.log(val, "工作空间数据");
     },
+    "$route.name"() {
+      let dicValue = '';
+      if( this.$route.name == 'Workflow' ) {
+        dicValue = 'dev'
+      }else if( this.$route.name == 'Scheduler' ) {
+        dicValue = 'scheduler'
+      }
+      const btn = this.devProcessBase.find(item => item.dicValue === dicValue)
+      this.handleChangeButton(btn)
+    }
   },
   created() {
     this.getAreaMap();
@@ -471,14 +494,18 @@ export default {
         )
         .then((res) => {
           //运维中心路由且未选中任何项目
-          if (!this.$route.query.projectID && this.isScheduler) {
+          if ((!this.$route.query.projectID && this.isScheduler) && this.$route.query.projectID != 0) {
             this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
             return this.getAllProjects();
           }
-          const project = res.projects[0];
+          let project = res.projects[0];
+          //当为虚构的项目总览时候，取项目总览的数据
+          if (!project && this.isScheduler) {
+            project = this.projectsTree[0]
+          }
           setVirtualRoles(project, this.getUserName());
           this.currentProjectData = {
-            ...res.projects[0],
+            ...project,
             canWrite: project.canWrite(),
           };
           this.getSelectDevProcess();
@@ -516,8 +543,23 @@ export default {
                   name: n.name,
                   type: "scheduler",
                   canWrite: n.canWrite(),
+                  devProcessList: n.devProcessList,
+                  orchestratorModeList: n.orchestratorModeList,
+                  releaseUsers: n.releaseUsers,
+                  editUsers: n.editUsers,
+                  accessUsers: n.accessUsers,
+                  applicationArea: n.applicationArea,
+                  business: n.business,
+                  description: n.description,
+                  product: n.product,
                 };
               });
+            let wholeNode = JSON.parse(JSON.stringify(this.projectsTree[0]))
+            this.projectsTree.unshift({
+              ...wholeNode,
+              id: 0,
+              name: '项目总览'
+            })
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
           } else if (this.modeOfKey == "streamis_prod") {
@@ -525,6 +567,7 @@ export default {
               .filter((n) => {
                 return (
                   n.devProcessList &&
+                  n.devProcessList.includes("streamis_prod") &&
                   n.releaseUsers &&
                   n.releaseUsers.indexOf(this.getUserName()) !== -1
                 );
@@ -540,7 +583,7 @@ export default {
               });
             if (!this.$route.query.projectID)
               this.handleTreeClick(this.projectsTree[0]);
-          }else {
+          } else {
             this.projectsTree = res.projects.map((n) => {
               setVirtualRoles(n, this.getUserName());
               return {
@@ -551,7 +594,7 @@ export default {
               };
             });
           }
-          callback();
+          callback && callback();
         });
     },
     // 获取project下工作流
@@ -648,8 +691,17 @@ export default {
         this.modeOfKey = DEVPROCESS.OPERATIONCENTER;
       }
       if ( node.type == "streamis_prod" ) {
+        const query = {
+          workspaceId: this.$route.query.workspaceId,
+          projectID: node.id,
+          projectName: node.name,
+        }
         this.modeOfKey = "streamis_prod"
         this.pjNameForStreamis = node.name
+        this.$router.replace({
+          name: "Streamis",
+          query,
+        })
         return;
       }
       if (node.type == "flow") {

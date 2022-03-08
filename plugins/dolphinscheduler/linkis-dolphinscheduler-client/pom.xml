@@ -35,13 +35,13 @@
             <version>${dss.version}</version>
         </dependency>
 
-
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.30</version>
         </dependency>
-
+        -->
     </dependencies>
 
     <build>
@@ -80,7 +80,7 @@
                 </executions>
                 <configuration>
                     <skipAssembly>false</skipAssembly>
-                    <finalName>linkis-airflow-client</finalName>
+                    <finalName>linkis-dolphinscheduler-client</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <descriptorRefs>
@@ -105,6 +105,14 @@
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.yml</include>
                 </includes>
             </resource>
         </resources>

@@ -81,6 +81,11 @@ export default {
     hiveSidebar: hiveSidebarModule.component,
     hdfsSidebar: hdfsSidebarModule.component,
   },
+  provide(){
+    return {
+      IdeInstance: this
+    }
+  },
   props: {
     parameters: {
       type: Object,
@@ -88,6 +93,7 @@ export default {
         return {
           content: '',
           params: {},
+          projects: [],
         };
       },
     },
@@ -95,7 +101,7 @@ export default {
     readonly: {
       type: Boolean,
       default: false,
-    },
+    }
   },
   data() {
     return {

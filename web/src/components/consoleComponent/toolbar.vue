@@ -332,7 +332,39 @@ export default {
       const flag = link.dispatchEvent(evObj);
       this.$nextTick(() => {
         if (flag) {
-          this.$Message.success(this.$t('message.common.toolbar.success.download'));
+          // 下载结果集审计
+          let sql = ''
+          if(this.script.data == '' || this.script.data){
+            sql = this.script.data
+            let params2 = {
+              sql: sql,
+              path: temPath
+            }
+            api.fetch("/dss/framework/audit/script/download/save", params2, "post").then((res)=>{
+              console.log("下载审计")
+            })
+            this.$Message.success(this.$t('message.common.toolbar.success.download'));
+          }else {
+            let { fileName, resourceId, version } = this.$parent.$parent.node.resources[0]
+            let projectName = this.$route.query.projectName
+            let params1 = {
+              fileName,
+              resourceId,
+              version,
+              projectName,
+              creator: ''
+            }
+            api.fetch('filesystem/openScriptFromBML', params1, "get").then(res => {
+              sql = res.scriptContent
+              let params2 = {
+                sql: sql,
+                path: temPath
+              }
+              api.fetch("/dss/framework/audit/script/download/save", params2, "post").then((res)=>{
+                console.log("下载审计")
+              })
+            })
+          }
         }
       });
     },

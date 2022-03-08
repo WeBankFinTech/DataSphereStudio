@@ -2,8 +2,7 @@
   <div class="import-table-hive">
     <p class="import-table-hive-item">
       <span class="import-table-hive-item-title">{{$t('message.scripts.createTable.XZK')}}</span>
-      <Select
-        transfer
+      <Select        
         v-model="hive.dbName"
         class="import-table-hive-item-select"
         @on-change="handleHiveChange">
@@ -16,7 +15,6 @@
     <p class="import-table-hive-item">
       <span class="import-table-hive-item-title">{{$t('message.scripts.createTable.XZB')}}</span>
       <Select
-        transfer
         v-model="hive.tbName"
         class="import-table-hive-item-select"
         @on-change="handleTbChange"
@@ -53,9 +51,12 @@ export default {
   },
   methods: {
     init() {
-      const personalDbName = `${this.getUserName()}_ind`;
-      this.handleHiveChange(personalDbName);
-      this.currentDbIndex = this.dbList.findIndex((item) => item.name === personalDbName);
+      // const personalDbName = `${this.getUserName()}_ind`;
+      // this.handleHiveChange(personalDbName); // luban_test_ind
+      // this.currentDbIndex = this.dbList.findIndex((item) => item.name === personalDbName);
+      // this.currentAcitvedDb = this.dbList[this.currentDbIndex];
+      // this.hive.dbName = this.currentAcitvedDb.name;
+      this.currentDbIndex = 0;
       this.currentAcitvedDb = this.dbList[this.currentDbIndex];
       this.hive.dbName = this.currentAcitvedDb.name;
     },

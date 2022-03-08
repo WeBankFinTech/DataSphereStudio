@@ -10,7 +10,12 @@ import org.apache.linkis.common.conf.CommonVars;
  * @Created by suyc
  */
 public interface GuideConf {
-    CommonVars<String> GUIDE_CONTENT_IMAGES_PATH = CommonVars.apply("guide.content.images.path", "/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2/images");
-
-    CommonVars<String> GUIDE_CHAPTER_IMAGES_PATH = CommonVars.apply("guide.chapter.images.path", "/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2/images");
+    /**
+     * 页面向导图片-存储位置
+      */
+    CommonVars<String> GUIDE_PAGE_IMAGES_PATH = CommonVars.apply("guide.page.images.path", "/opt/dss/dss-guide-server/guide_images");
+    /**
+     * 知识库向导图片-存储位置
+      */
+    CommonVars<String> GUIDE_KNOWLEDGE_IMAGES_PATH = CommonVars.apply("guide.knowledge.images.path", "/opt/dss/dss-guide-server/guide_images");
 }

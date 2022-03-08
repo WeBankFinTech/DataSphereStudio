@@ -215,6 +215,8 @@ public class ContextServiceImpl implements ContextService {
 
     private void saveContextVariable(String contextIDStr, JsonElement variables, ContextClient contextClient, String variablePrefix, String nodeName) {
         try {
+            String contextKeyPrefix = variablePrefix + nodeName + "." + CSCommonUtils.RESOURCE_PREFIX;
+            contextClient.removeAllValueByKeyPrefixAndContextType(SerializeHelper.deserializeContextID(contextIDStr), ContextType.OBJECT, contextKeyPrefix);
             if (variables.isJsonArray()) {
                 JsonArray flowProp = variables.getAsJsonArray();
                 for (JsonElement prop : flowProp) {

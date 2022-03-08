@@ -18,7 +18,6 @@ import org.apache.atlas.AtlasServiceException;
 import org.apache.atlas.model.instance.AtlasClassification;
 import org.apache.atlas.model.instance.AtlasEntity;
 import org.apache.atlas.model.instance.AtlasEntityHeader;
-import org.apache.atlas.model.instance.AtlasRelatedObjectId;
 import org.apache.atlas.model.lineage.AtlasLineageInfo;
 import org.apache.atlas.model.typedef.AtlasClassificationDef;
 import org.slf4j.Logger;
@@ -171,7 +170,7 @@ public class AssetServiceImpl implements AssetService {
     private HiveTblDetailInfo.HiveTblBasicInfo getBasicInfo(String guid, AtlasEntity atlasEntity) throws AtlasServiceException {
         Map<String, Object> hiveTblAttributesMap = atlasService.getHiveTblAttributesByGuid(guid);
         Boolean isPartTable = (Boolean) hiveTblAttributesMap.get("isPartition");
-        int storage = 0;
+        long storage = 0;
         String db_name = String.valueOf(atlasEntity.getAttributes().get("qualifiedName")).split("@")[0];
         String tableName = db_name.split("\\.")[1];
         String dbName = db_name.split("\\.")[0];
@@ -183,16 +182,16 @@ public class AssetServiceImpl implements AssetService {
 
         HiveTblDetailInfo.HiveTblBasicInfo basic = new HiveTblDetailInfo.HiveTblBasicInfo();
         basic.setName(tableName);
-        basic.setOwner(String.valueOf(atlasEntity.getAttributes().getOrDefault("owner","NULL")));
+        basic.setOwner(String.valueOf(atlasEntity.getAttributes().get("owner")));
         basic.setCreateTime(new java.text.SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(atlasEntity.getCreateTime()));
         basic.setStore(String.valueOf(storage));
-        basic.setComment(String.valueOf(atlasEntity.getAttributes().getOrDefault("comment","NULL")));
+        basic.setComment(String.valueOf(atlasEntity.getAttributes().get("comment")));
         Set<String> labels = atlasEntity.getLabels();
         basic.setLabels(labels);
         basic.setIsParTbl(isPartTable);
         basic.setGuid(guid);
-        basic.setTableType(hiveTblAttributesMap.getOrDefault("tableType","NULL").toString());
-        basic.setLocation(hiveTblAttributesMap.getOrDefault("location","NULL").toString());
+        basic.setTableType(String.valueOf(hiveTblAttributesMap.get("tableType")));
+        basic.setLocation(String.valueOf(hiveTblAttributesMap.get("location")));
 
         return basic;
     }

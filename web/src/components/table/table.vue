@@ -56,7 +56,7 @@
         >
           <tr
             v-for="(items,indexs) in showTableList"
-            @click="rowClick(items,indexs+dataTop/tdHeight+1)"
+            @click="rowClick(items,indexs)"
             @dblclick="rowDblclick(items,indexs+dataTop/tdHeight+1)"
             :key="indexs"
             :style="{'line-height':`${tdHeight}px`}"

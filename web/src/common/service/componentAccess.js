@@ -13,7 +13,7 @@ const QueryDataFromId = (id) => api.fetch(`dss/framework/admin/component/query/$
 const UpdateDataFromId = (id, params) => api.fetch(`dss/framework/admin/component/createApplication`, {id, ...params}, 'post');
 
 // 创建新的数据
-const CreateData = (params) => api.fetch('dss/framework/admin/component/createApplication', params, 'post');
+const CreateData = (params) => api.fetch('dss/framework/admin/component/createApplication', {...params}, 'post');
 export {
   GetMenu,
   QueryAllData,

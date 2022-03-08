@@ -3,7 +3,7 @@
     "common": {
       "log": "日志",
       "diagnosis": "智能诊断",
-      "watermaskText": "由DataWorkShop生成，仅供内部参考，严禁对外分享",
+      "watermaskText": "鲁班",
       "filter": "过滤",
       "saveToWidget": "保存widget到解决方案",
       "script": "脚本",
@@ -26,7 +26,7 @@
       "logoName": "鲁班",
       "project": "工程",
       "home": "首页",
-      "management": "管理台",
+      "management": "控制台",
       "bbs": "论坛",
       "feedback": "反馈",
       "tabs": {

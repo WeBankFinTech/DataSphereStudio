@@ -12,7 +12,6 @@
 </template>
 <script>
 import util from '@/common/util/index';
-import api from "@/common/service/api";
 export default {
   data() {
     return {
@@ -22,13 +21,7 @@ export default {
     };
   },
   watch: {
-    async '$route.query.projectID'() {
-      await this.getCommonProjectId(this.$route.query.type, this.$route.query);
-      this.getUrl();
-      this.reload()
-    },
     async '$route.query.type'() {
-      await this.getCommonProjectId(this.$route.query.type, this.$route.query);
       this.getUrl();
       this.reload()
     }
@@ -44,24 +37,12 @@ export default {
     window.removeEventListener('resize', this.resize(window.innerHeight));
   },
   methods: {
-    getCommonProjectId(type, query) {
-      return api.fetch(`/dss/getAppjointProjectIDByApplicationName`, {
-        projectID: query.projectID,
-        applicationName: type
-      }, 'get').then((res) => {
-        localStorage.setItem('appJointProjectId', res.appJointProjectID);
-      })
-    },
     resize(height) {
       this.height = height;
     },
     getUrl() {
       const url = this.$route.query.url;
-      const appJointProjectId = localStorage.getItem('appJointProjectId');
-      this.visualSrc = util.replaceHolder(url, {
-        projectId: appJointProjectId,
-        projectName: this.$route.query.projectName,
-      });
+      this.visualSrc = util.replaceHolder(url);
     },
     reload() {
       this.isRefresh = false;

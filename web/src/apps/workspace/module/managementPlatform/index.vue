@@ -92,29 +92,29 @@ const menu = [
       },
     ],
   },
-  // {
-  //   title: "控制台",
-  //   icon: "kongzhitai",
-  //   nodes: [
-  //     {
-  //       name: "全局历史",
-  //       type: "console",
-  //       id: 1022,
-  //       pathName: "globalHistory",
-  //     },
-  //     { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
-  //     { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
-  //     {
-  //       name: "全局变量",
-  //       type: "console",
-  //       id: 1019,
-  //       pathName: "globalValiable",
-  //     },
-  //     { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
-  //     // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
-  //     { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" },
-  //   ],
-  // },
+  {
+    title: "控制台",
+    icon: "kongzhitai",
+    nodes: [
+      {
+        name: "全局历史",
+        type: "console",
+        id: 1022,
+        pathName: "globalHistory",
+      },
+      { name: "资源管理", type: "console", id: 1021, pathName: "resource" },
+      { name: "参数配置", type: "console", id: 1020, pathName: "setting" },
+      {
+        name: "全局变量",
+        type: "console",
+        id: 1019,
+        pathName: "globalValiable",
+      },
+      { name: "ECM管理", type: "console", id: 1018, pathName: "ECM" },
+      // {name: '微服务管理', type: 'console', id: 1017, pathName: 'microService'},
+      { name: "常见问题", type: "console", id: 1016, pathName: "FAQ" }
+    ],
+  },
   {
     title: "组件接入",
     icon: "componentImport",
@@ -128,6 +128,11 @@ const menu = [
   {
     title: "知识库",
     icon: "question",
+    nodes: [],
+  },
+  {
+    title: "下载审计",
+    icon: "audit",
     nodes: [],
   }
 ];
@@ -190,14 +195,31 @@ export default {
     handleSidebarToggle(title) {
       this.currentHeader = title;
       if (title === this.defaultMenu.title) {
-        this.sidebarFold = !this.sidebarFold;
+        if(this.defaultMenu.title !== "下载审计"){
+          this.sidebarFold = !this.sidebarFold;
+        }
       } else {
+        this.header = title;
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
-        if (this.defaultMenu.title == "产品文档") {
+        if (this.defaultMenu.title == "部门和用户管理") {
+          let node = { name: "部门管理", type: "permissions", id: 1024, pathName: "departManagement"}
+          this.handleTreeClick(node)
+        } else if (this.defaultMenu.title == "控制台") {
+          let node = { name: "全局历史", type: "console", id: 1022, pathName: "globalHistory"}
+          this.handleTreeClick(node)
+        } else if (this.defaultMenu.title == "组件接入") {
+          this.$router.push("accessComponents");
+        } else if (this.defaultMenu.title == "产品文档") {
+          this.breadcrumbName = "";
           this.$router.push("guide");
         } else if (this.defaultMenu.title == "知识库") {
+          this.breadcrumbName = "";
           this.$router.push("library");
+        }else if(this.defaultMenu.title == "下载审计"){
+          this.sidebarFold = true
+          let node = { name: "下载审计", type: "console", id: 1017, pathName: "DownloadAudit"}
+          this.handleTreeClick(node)
         }
       }
     },
@@ -319,8 +341,9 @@ export default {
             delete updateData[key]
           }
         }
+        updateData.id = componentItem.applicationId
         console.log(updateData)
-        UpdateDataFromId(componentItem.id, updateData)
+        UpdateDataFromId(componentItem.applicationId, updateData)
           .then((data) => {
             _this.$Message.success("更新成功");
           })
@@ -331,12 +354,17 @@ export default {
       //新增
       if (componentItem.isAdded) {
         const postData = formatComponentDataForPost(componentItem);
+        postData['accessButtonEn'] = ''
+        postData['accessButtonCn'] = ''
+        postData['labelsEn'] = ''
+        postData['labelsCn'] = ''
         CreateData(postData)
           .then((data) => {
             _this.$Message.success("新增成功");
           })
           .catch((err) => {
-            _this.$Message.fail("新增失败");
+            console.log(err, 'err')
+            _this.$Message.error("新增失败");
           });
       }
     },
@@ -361,7 +389,7 @@ export default {
             _menuOptions.push(menu);
           });
           that.menuOptions = _menuOptions;
-          console.log("that.menuOptions", that.menuOptions);
+          console.log('that.menuOptions', that.menuOptions)
           sessionStorage.setItem(
             "menuOptions",
             JSON.stringify(that.menuOptions)
@@ -414,7 +442,7 @@ export default {
     },
   },
   mounted() {
-    //this.getMenuForcomponentAccess();
+    this.getMenuForcomponentAccess();
     if (this.$route.name !== this.lastPathName) {
       this.$router.push("departManagement");
     }

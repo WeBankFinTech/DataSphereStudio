@@ -943,8 +943,8 @@ export default {
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}listNodeType`, {
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
-        // 暂时隐藏数据开发及信号节点以外的节点
-        this.shapes = res.nodeTypes.filter(i => i.title == '数据开发' || i.title == "信号节点").map((item) => {
+        // 暂时隐藏exchangis接入、数据开发及信号节点以外的节点
+        this.shapes = res.nodeTypes.filter(i => i.title == '数据开发' || i.title == "信号节点" || i.title == "数据交换").map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
               // svg绘制的点太多，导致动画卡顿，使用图片代替
@@ -983,7 +983,7 @@ export default {
         if (this.workflowIsExecutor) return;
         this.initNode(arg);
         this.nodebaseinfoShow = true;
-        this.$emit('node-click', arg);
+        this.$emit('node-click', arg);   // 父组件里没找到node-click点击事件？
       }, 200);
     },
     dblclick(...arg) {
@@ -1978,15 +1978,28 @@ export default {
     // 根据节点类型将后台节点基础信息加入
     bindNodeBasicInfo(node) {
       const shapes = JSON.parse(JSON.stringify(this.shapes));
-      shapes.map((item) => {
-        if (item.children.length > 0) {
-          item.children.map((subItem) => {
-            if (subItem.type === node.type) {
-              node = Object.assign(subItem, node);
+      // shapes.map((item) => {
+      //   if (item.children.length > 0) {
+      //     item.children.map((subItem) => {
+      //       if (subItem.type === node.type) {
+      //           node = Object.assign(subItem, node);
+      //       }
+      //     })
+      //   }
+      // })
+      for(let item of shapes){
+        if(item.children.length > 0){
+          for(let subItem of item.children){
+            if(subItem.type === node.type){
+              if(subItem.title.split("_")[0] == "exchangis" && node.title.split("_")[0] !== "exchangis"){
+                continue
+              }
+              node = Object.assign(subItem, node)
+              break
             }
-          })
+          }
         }
-      })
+      }
       return node;
     },
     // 点击节流

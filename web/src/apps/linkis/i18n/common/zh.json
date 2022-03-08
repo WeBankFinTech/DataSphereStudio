@@ -25,6 +25,7 @@
             "noDataText": "暂无数据",
             "userName": "用户名",
             "searchName": "请输入用户名搜索",
+            "searchUserName": "请输入用户名",
             "generalView": "切换普通视图",
             "manageView": "切换管理员视图",
             "back": "返回",
@@ -46,6 +47,9 @@
                 "day": "天"
             },
             "tableColumns": {
+                "date": "日期",
+                "scriptFilePath": "文件路径",
+                "sqlContent": "执行语句",
                 "engineInstance": "引擎实例",
                 "engineType": "引擎类型",
                 "taskID": "任务ID",
@@ -88,6 +92,15 @@
                         "dateReport": "全局变量",
                         "globalValiable": "常见问题"
                     }
+                }
+            },
+            "downloadAudit": {
+                "userName": {
+                    "label": "用户名称"
+                },
+                "time": {
+                    "label": "时间",
+                    "datetimerange": "请选择日期和时间"
                 }
             },
             "formItems": {

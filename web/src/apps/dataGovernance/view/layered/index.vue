@@ -62,22 +62,26 @@
     </div>
     <div>
       <div class="title-line">
-        <span class="title">
-          <span>自定义分层 </span>
-        </span>
-        <Input
-          search
-          enter-button
-          clearable
-          placeholder="输入名称搜索"
-          style="width: 300px; float: right"
-          v-model="searchVal"
-          @on-search="handleSearch"
-          @on-clear="handleSearch"
-        />
-        <Button type="primary" icon="md-add" @click="handleCreate">
-          创建自定义分层
-        </Button>
+        <div>
+          <span class="title">
+            <span>自定义分层 </span>
+          </span>
+        </div>
+        <div class="title-line-top">
+          <Input
+            search
+            enter-button
+            clearable
+            placeholder="输入名称搜索"
+            style="width: 300px;"
+            v-model="searchVal"
+            @on-search="handleSearch"
+            @on-clear="handleSearch"
+          />
+          <Button type="primary" icon="md-add" @click="handleCreate">
+            创建自定义分层
+          </Button>
+        </div>
       </div>
       <Table
         :columns="columns"
@@ -141,6 +145,12 @@
       :mode="modalCfg.mode"
       @finish="handleModalFinish"
     />
+    <Modal
+      v-model="delete_modal"
+      title="友情提示"
+      @on-ok="deleteOk">
+      <p>确定要删除此条分层记录吗？</p>
+    </Modal>
   </div>
 </template>
 
@@ -172,11 +182,20 @@ export default {
         mode: "create"
       };
     },
-    async handleDelete(name) {
+    async deleteOk() {
       this.customloading = true;
-      await deleteLayers(name);
-      this.customloading = false;
-      this.handleGetLayersCustom();
+      try {
+        await deleteLayers(this.delete_name);
+        this.customloading = false;
+        this.handleGetLayersCustom();
+      } catch (error) {
+        this.customloading = false;
+        this.handleGetLayersCustom();
+      }
+    },
+    handleDelete(name) {
+      this.delete_modal = true
+      this.delete_name = name
     },
     handleEdit(name) {
       this.modalCfg = {
@@ -250,7 +269,8 @@ export default {
         {
           title: "创建时间",
           key: "createTime",
-          slot: "createTime"
+          slot: "createTime",
+          sortable: true
         },
         {
           title: "更新时间",
@@ -274,7 +294,9 @@ export default {
         name: "",
         visible: false
       },
-      searchVal: ''
+      searchVal: '',
+      delete_modal: false,
+      delete_name: ''
     };
   }
 };
@@ -286,14 +308,16 @@ export default {
   margin: 0 24px;
 }
 .title-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  margin: 16px 0;
   .title {
     border-left: 6px solid #1890ff;
     @include border-color(#1890ff, $dark-border-color-base);
     padding-left: 6px;
+  }
+  &-top {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
   }
 }
 .page-line {

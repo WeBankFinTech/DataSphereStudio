@@ -659,7 +659,7 @@
         "nodeType": "Node Type",
         "Number": "Number",
         "State": "State",
-        "RunType": "Run Type",
+        "RunType": "Operation Type",
         "SchedulingTime": "Scheduling Time",
         "SubmitTime": "Submit Time",
         "StartTime": "Start Time",

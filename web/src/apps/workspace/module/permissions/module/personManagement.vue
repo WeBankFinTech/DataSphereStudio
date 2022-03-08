@@ -96,7 +96,6 @@
         <div class="addWrap">
           <p>{{ tableTitle }}</p>
           <Button
-            v-if="false"
             type="primary"
             @click="handleAdd()"
             icon="md-add"
@@ -109,10 +108,9 @@
               <div class="operation" @click="edit(row, index)">
                 {{ $t("message.permissions.edit") }}
               </div>
-              <Divider v-if="false" type="vertical" />
+              <Divider type="vertical" />
               <div
                 class="operation"
-                v-if="false"
                 @click="modifyPassword(row, index)"
               >
                 {{ $t("message.permissions.modifyPassword") }}

@@ -976,7 +976,7 @@ export default {
     },
     stop(cb) {
       if (this.execute && this.execute.id) {
-        api.fetch(`/dss/flow/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
+        api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
           this.execute.trigger('stop');
           this.execute.trigger('error');
           this.execute.trigger('kill');

@@ -995,6 +995,7 @@ CREATE TABLE `dss_workspace` (
   `source` varchar(255) DEFAULT NULL,
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL COMMENT '最新修改用户',
+  `workspace_type`  varchar(20) DEFAULT NULL comment '工作空间类型',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8;
@@ -1124,10 +1125,6 @@ CREATE TABLE `linkis_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
-
-
-
 alter table `dss_release_task`
    add column `error_msg` varchar(500) NULL COMMENT '发布错误信息' after `status`,
    add column `comment` varchar(500) NULL COMMENT '发布描述' after `error_msg`,
@@ -1156,8 +1153,6 @@ CREATE TABLE `dss_workflow_execute_info` (
    PRIMARY KEY (`id`)
  ) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
 
-
-ALTER TABLE dss_workspace  ADD COLUMN `workspace_type`  varchar(20) comment '工作空间类型';
 ALTER TABLE dss_menu ADD COLUMN `menu_application_id` bigint(20);
 
 
@@ -1307,11 +1302,6 @@ CREATE TABLE `dss_orchestrator_release_info`  (
   `update_time` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
-
-
-alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT NULL COMMENT '上下文ID'
-
-ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) DEFAULT "" comment '类型,区分收藏和盯一盯';
 
 DROP TABLE IF EXISTS `dss_guide_group`;
 CREATE TABLE IF NOT EXISTS `dss_guide_group` (

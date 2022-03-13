@@ -533,4 +533,4 @@ INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `pr
 INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'5','0',now(),'system');
 INSERT INTO `dss_component_role` (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'6','0',now(),'system');
 
-INSERT INTO `dss_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','天翼云科技','0','ctyunuser','1888888888','ctyun@ctyun.com','0','0','admin',now(),'admin',now());
+INSERT INTO `dss_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','基础科技','0','leader01','1888888888','123@qq.com','0','0','admin',now(),'admin',now());

@@ -1,7 +1,7 @@
 ### deploy user
 deployUser=root
 
-##微服务的�?大内存使用量
+## max memory for services
 SERVER_HEAP_SIZE="512M"
 
 
@@ -14,12 +14,8 @@ EUREKA_PORT=20303
 
 ### Specifies the user workspace, which is used to store the user's script files and log files.
 ### Generally local directory
-#WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
-#### Path to store job ResultSet：file or hdfs path
-#RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
-### Path to store job ResultSet�file or hdfs path
-#RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
+### Path to store job ResultSet file or hdfs path
 RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 ### Linkis Gateway  information
 GATEWAY_INSTALL_IP=127.0.0.1

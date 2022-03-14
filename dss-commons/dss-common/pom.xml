@@ -26,6 +26,11 @@
     </parent>
     <artifactId>dss-common</artifactId>
 
+    <properties>
+        <mysql.connector.version>5.1.49</mysql.connector.version>
+        <jersey.version>2.16</jersey.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.linkis</groupId>
@@ -121,6 +126,12 @@
             <artifactId>linkis-module</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.connector.version}</version>
+            <!--                <scope>test</scope>-->
         </dependency>
     </dependencies>
 

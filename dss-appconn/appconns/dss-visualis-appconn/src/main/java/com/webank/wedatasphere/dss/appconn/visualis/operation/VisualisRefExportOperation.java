@@ -16,64 +16,27 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class VisualisRefExportOperation implements RefExportOperation<ExportRequestRef> {
-
-    private final static Logger logger = LoggerFactory.getLogger(VisualisRefExportOperation.class);
-
-    private DevelopmentService developmentService;
-    private SSORequestOperation ssoRequestOperation;
-
-    public VisualisRefExportOperation(DevelopmentService developmentService) {
-        this.developmentService = developmentService;
-        this.ssoRequestOperation = this.developmentService.getSSORequestService().createSSORequestOperation(getAppName());
-    }
-
-    private String getAppName() {
-        return VisualisAppConn.VISUALIS_APPCONN_NAME;
-    }
+public class VisualisRefExportOperation extends VisualisDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, ExportResponseRef>
+        implements RefExportOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl> {
 
     @Override
-    public ResponseRef exportRef(ExportRequestRef requestRef) throws ExternalOperationFailedException {
+    public ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.projectUrl + "/export";
-        logger.info("url:{}", url);
+        String nodeType = requestRef.getType().toLowerCase();
+        logger.info("The {} of Visualis try to export ref RefJobContent: {} in url {}.", nodeType, requestRef.getRefJobContent(), url);
         VisualisPostAction visualisPostAction = new VisualisPostAction();
-        visualisPostAction.setUser(requestRef.getParameter("user").toString());
-        visualisPostAction.addRequestPayload("projectId", requestRef.getParameter("projectId"));
+        visualisPostAction.setUser(requestRef.getUserName());
+        visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         visualisPostAction.addRequestPayload("partial", true);
-        String nodeType = requestRef.getParameter("nodeType").toString().toLowerCase();
-        String externalContent = null;
-        try {
-            externalContent = BDPJettyServerHelper.jacksonJson().writeValueAsString(requestRef.getParameter("jobContent"));
-        } catch (Exception e) {
-            logger.error("Failed to  export request", e);
-        }
-        try {
-            return ModuleFactory.getInstance().crateModule(nodeType).exportRef(requestRef, url, visualisPostAction, externalContent, ssoRequestOperation);
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90176, "Export Visualis Exception", e);
-        }
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        developmentService = service;
-    }
-
-    private String getBaseUrl() {
-        return developmentService.getAppInstance().getBaseUrl();
+        return OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
+                .exportRef(requestRef, url, visualisPostAction);
     }
 
 }

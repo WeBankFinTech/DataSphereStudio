@@ -16,15 +16,14 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
-public interface RefQueryOperation<K extends RequestRef>
-        extends DevelopmentOperation<K, ResponseRef> {
+public interface RefQueryOperation<K extends RefJobContentRequestRef<K>, V extends ResponseRef>
+        extends DevelopmentOperation<K, V> {
 
-    ResponseRef query(K requestRef) throws ExternalOperationFailedException;
-    
+    V query(K requestRef) throws ExternalOperationFailedException;
 
 }

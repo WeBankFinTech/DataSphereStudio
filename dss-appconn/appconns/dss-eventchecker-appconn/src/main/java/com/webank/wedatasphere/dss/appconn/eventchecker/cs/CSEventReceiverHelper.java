@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.cs;
 
-import com.google.gson.Gson;
 import org.apache.linkis.cs.client.service.CSVariableService;
 import org.apache.linkis.cs.client.utils.ContextServiceUtils;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
@@ -34,8 +33,6 @@ import java.util.Properties;
 public class CSEventReceiverHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSEventReceiverHelper.class);
-
-    private static Gson gson = new Gson();
 
     public static void putVariable(Properties properties, String msgBody, String saveKey) {
         String contextIDStr = ContextServiceUtils.getContextIDStrByProperties(properties);

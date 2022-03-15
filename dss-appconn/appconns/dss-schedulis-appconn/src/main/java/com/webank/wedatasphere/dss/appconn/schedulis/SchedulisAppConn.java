@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.appconn.schedulis;
 
 import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerAppConn;
+import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.appconn.schedulis.standard.SchedulisStructureStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class SchedulisAppConn extends AbstractSchedulerAppConn {
     public static final String SCHEDULIS_APPCONN_NAME = "Schedulis";
 
     @Override
-    public StructureIntegrationStandard getOrCreateStructureStandard() {
+    public SchedulerStructureIntegrationStandard getOrCreateStructureStandard() {
         return SchedulisStructureStandard.getInstance();
     }
 }

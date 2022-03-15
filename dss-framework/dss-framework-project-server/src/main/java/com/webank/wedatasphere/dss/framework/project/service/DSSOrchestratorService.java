@@ -26,13 +26,13 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.OrchestratorBaseI
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 
 
 public interface DSSOrchestratorService extends IService<DSSOrchestrator> {
 
 
-    void saveOrchestrator(OrchestratorCreateRequest orchestratorCreateRequest, OrchestratorCreateResponseRef responseRef, String username) throws DSSFrameworkErrorException, DSSProjectErrorException;
+    void saveOrchestrator(OrchestratorCreateRequest orchestratorCreateRequest, long orchestratorId,
+                          long orchestratorVersionId, Long orchestrationRefId, String username) throws DSSFrameworkErrorException, DSSProjectErrorException;
 
 
     void updateOrchestrator(OrchestratorModifyRequest orchestratorModifyRequest, String username) throws DSSFrameworkErrorException, DSSProjectErrorException;

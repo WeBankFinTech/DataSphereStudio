@@ -16,56 +16,52 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowImportResponseRef;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.protocol.JobStatus;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowImportRequestRef;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestImportWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseImportWorkflow;
 import org.apache.linkis.rpc.Sender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class WorkflowRefImportOperation implements
-        RefImportOperation<WorkflowImportRequestRef> {
+import java.util.HashMap;
+import java.util.Map;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowRefImportOperation.class);
-
-    private DevelopmentService developmentService;
+public class WorkflowRefImportOperation
+    extends AbstractDevelopmentOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl, RefJobContentResponseRef>
+        implements RefImportOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl> {
 
     @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
-    }
-
-    @Override
-    public WorkflowImportResponseRef importRef(WorkflowImportRequestRef requestRef) throws ExternalOperationFailedException {
-
-        WorkflowImportResponseRef workflowImportResponseRef = null;
+    public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
         RequestImportWorkflow requestImportWorkflow = new RequestImportWorkflow(requestRef.getUserName(),
-                requestRef.getResourceId(), requestRef.getBmlVersion(),
-                requestRef.getProjectId(), requestRef.getProjectName(),
-                requestRef.getSourceEnv(), requestRef.getOrcVersion(),
-                requestRef.getWorkspaceName(),
-                DSSCommonUtils.COMMON_GSON.toJson(requestRef.getWorkspace()),
-                requestRef.getContextID());
+                (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY),
+                (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
+                requestRef.getProjectRefId(), requestRef.getProjectName(),
+                requestRef.getNewVersion(),
+                toJson(requestRef.getWorkspace()),
+                requestRef.getContextId(), requestRef.getDSSLabels());
 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
-        if (null != sender) {
-            ResponseImportWorkflow responseImportWorkflow = (ResponseImportWorkflow) sender.ask(requestImportWorkflow);
-            workflowImportResponseRef = new WorkflowImportResponseRef();
-            if (responseImportWorkflow.getWorkflowIds() != null && responseImportWorkflow.getWorkflowIds().size() > 0){
-                workflowImportResponseRef.setOrcId(responseImportWorkflow.getWorkflowIds().get(0));
-            }else{
-                LOGGER.error("failed to get ref orc id, workflow Ids are {}", responseImportWorkflow.getWorkflowIds());
+        ResponseImportWorkflow responseImportWorkflow = (ResponseImportWorkflow) sender.ask(requestImportWorkflow);
+        if(responseImportWorkflow.getStatus() == JobStatus.Success) {
+            if(MapUtils.isEmpty(responseImportWorkflow.getWorkflows())) {
+                return RefJobContentResponseRef.newBuilder()
+                        .error("Empty workflow returned from workflow server, please ask admin for help!");
             }
-            workflowImportResponseRef.setStatus(responseImportWorkflow.getStatus());
+            Map<String, Object> refMap = new HashMap<>(2);
+            responseImportWorkflow.getWorkflows().forEach((key, value) -> {
+                refMap.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, key);
+                refMap.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, value);
+            });
+            return RefJobContentResponseRef.newBuilder().setRefJobContent(refMap).success();
         } else {
-            throw new ExternalOperationFailedException(100039, "Rpc sender is null", null);
+            return RefJobContentResponseRef.newBuilder().error("Unknown reason, please ask admin for help.");
         }
-        return workflowImportResponseRef;
     }
 }

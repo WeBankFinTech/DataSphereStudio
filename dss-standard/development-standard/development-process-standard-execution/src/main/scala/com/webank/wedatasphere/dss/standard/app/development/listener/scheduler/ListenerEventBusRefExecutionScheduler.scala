@@ -16,16 +16,17 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.scheduler
 
-import java.util
 import java.util.concurrent.ArrayBlockingQueue
 
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, AsyncExecutionResponseRef, AsyncResponseRefImpl, CompletedExecutionResponseRef, LongTermRefExecutionAction}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.conf.RefExecutionConfiguration._
 import com.webank.wedatasphere.dss.standard.app.development.listener.exception.AppConnExecutionErrorException
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef}
+import org.apache.commons.lang.time.DateFormatUtils
 import org.apache.linkis.common.listener.ListenerEventBus
 import org.apache.linkis.common.utils.{ByteTimeUtils, Utils}
-import org.apache.commons.lang.exception.ExceptionUtils
-import org.apache.commons.lang.time.DateFormatUtils
+
+import scala.collection.JavaConverters._
 
 
 class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: String)(listenerConsumerThreadSize: Int)
@@ -63,7 +64,7 @@ class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: Strin
         val response = event.getResponse
         val action = response.getAction.asInstanceOf[AbstractRefExecutionAction]
         if(action.isKilledFlag){
-          val resultResponse = response.getRefExecution.result(response.getAction)
+          val resultResponse = response.getRefExecutionOperation.result(response.getAction)
           onEventCompleted(event, resultResponse)
         }
         if(response.getMaxLoopTime > 0 && System.currentTimeMillis - response.getStartTime >= response.getMaxLoopTime) {
@@ -77,9 +78,9 @@ class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: Strin
           if(!response.isCompleted) addEvent(event)
           return
         }
-        val state = response.getRefExecution.state(response.getAction)
+        val state = response.getRefExecutionOperation.state(response.getAction)
         if(state.isCompleted) {
-          val resultResponse = response.getRefExecution.result(response.getAction)
+          val resultResponse = response.getRefExecutionOperation.result(response.getAction)
           onEventCompleted(event, resultResponse)
         } else if(!response.isCompleted) {
           event.setLastAskTime()
@@ -87,17 +88,13 @@ class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: Strin
         }
       }
 
-      private def onEventCompleted(event: AsyncResponseRefEvent, response: CompletedExecutionResponseRef): Unit = {
+      private def onEventCompleted(event: AsyncResponseRefEvent, response: ExecutionResponseRef): Unit = {
         event.getResponse.setCompleted(response)
       }
 
       override def onEventError(event: AsyncResponseRefEvent, t: Throwable): Unit = t match {
         case e: Exception =>
-          val response = new CompletedExecutionResponseRef(400) {
-            override def toMap: util.Map[String, AnyRef] = new util.HashMap[String, AnyRef]
-            override def getErrorMsg: String = ExceptionUtils.getRootCauseMessage(e)
-          }
-          onEventCompleted(event, response)
+          onEventCompleted(event, ExecutionResponseRef.newBuilder().setException(e).error())
       }
     })
   }
@@ -107,18 +104,14 @@ class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: Strin
 
   protected def addEvent(event: AsyncResponseRefEvent): Unit = synchronized {
     listenerEventBus.post(event)
-//    event.getResponse.getAction match {
-//      case longTermAction: LongTermRefExecutionAction =>
-//        longTermAction.setSchedulerId(eventQueue.max)
-//      case _ =>
-//    }
   }
 
   override def removeAsyncResponse(action: LongTermRefExecutionAction): Unit = {
 
   }
 
-  override def getAsyncResponse(action: LongTermRefExecutionAction): AsyncResponseRefImpl = null
+  override def getAsyncResponse(action: LongTermRefExecutionAction): AsyncExecutionResponseRef =
+    eventQueue.iterator().asScala.find(_.getResponse.getAction == action).map(_.getResponse).orNull
 
   override def start(): Unit = listenerEventBus.start()
 

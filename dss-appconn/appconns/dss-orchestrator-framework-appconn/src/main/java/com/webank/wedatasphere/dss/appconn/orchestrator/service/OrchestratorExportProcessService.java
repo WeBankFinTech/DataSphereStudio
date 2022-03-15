@@ -17,15 +17,13 @@
 package com.webank.wedatasphere.dss.appconn.orchestrator.service;
 
 import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFrameworkExportOperation;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExportService;
 
 public class OrchestratorExportProcessService extends AbstractRefExportService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public RefExportOperation<OrchestratorExportRequestRef> createRefExportOperation() {
+    public OrchestratorFrameworkExportOperation createRefExportOperation() {
         return new OrchestratorFrameworkExportOperation();
     }
 

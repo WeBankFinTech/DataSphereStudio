@@ -31,7 +31,7 @@ public abstract class AbstractAppIntegrationStandard<Service extends AppIntegrat
     implements AppIntegrationStandard<SSORequestService> {
 
     private final Map<AppInstance, List<Service>> appServices = new HashMap<>();
-    private SSORequestService ssoRequestService;
+    protected SSORequestService ssoRequestService;
 
     protected <T extends Service> T getOrCreate(AppInstance appInstance, Supplier<T> create, Class<T> clazz) {
         Supplier<T> createAndPut = () -> {

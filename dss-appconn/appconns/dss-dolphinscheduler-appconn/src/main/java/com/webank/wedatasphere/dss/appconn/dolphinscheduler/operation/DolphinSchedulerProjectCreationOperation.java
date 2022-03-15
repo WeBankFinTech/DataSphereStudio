@@ -1,10 +1,18 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.linkis.common.utils.JsonUtils;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
+import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -17,27 +25,14 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DolphinSchedulerProjectCreationOperation implements ProjectCreationOperation, DolphinSchedulerConf {
 
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectCreationOperation.class);
-
-    private static final Long DEFAULT_PROJECT_ID = 0L;
 
     private DolphinSchedulerProjectService dolphinSchedulerProjectService;
 
@@ -82,7 +77,6 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
         DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(projectUrl, Constant.DS_ADMIN_USERNAME);
         httpPost.setEntity(entity);
 
-        DolphinSchedulerProjectResponseRef responseRef = new DolphinSchedulerProjectResponseRef();
         try (CloseableHttpResponse httpResponse =
             this.postOperation.requestWithSSO(null, httpPost);) {
             HttpEntity ent = httpResponse.getEntity();
@@ -102,8 +96,7 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
                     logger.info("DolphinScheduler项目 {} 已经存在, 返回的信息是 {}", dsProjectName,
                         DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
                     // 不返回project id
-                    responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
-                    return responseRef;
+                    return ProjectResponseRef.newExternalBuilder().error(entString);
                 } else {
                     throw new ExternalOperationFailedException(90021, "新建工程失败, 原因:" + entString);
                 }
@@ -120,8 +113,9 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
         DolphinSchedulerProjectQueryOperation projectQueryOperation =
             new DolphinSchedulerProjectQueryOperation(this.baseUrl);
         DolphinSchedulerUserOperation userOperation = new DolphinSchedulerUserOperation(this.baseUrl);
+        Long projectId = null;
         try {
-            Long projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
+            projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
             for (String userName : releaseUsers) {
                 userOperation.grantProject(userName, projectId, false);
             }
@@ -130,8 +124,7 @@ public class DolphinSchedulerProjectCreationOperation implements ProjectCreation
         }
 
         // 不返回project id
-        responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
-        return responseRef;
+        return ProjectResponseRef.newExternalBuilder().setRefProjectId(projectId).success();
     }
 
 }

@@ -17,11 +17,23 @@
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
-public interface ProjectCreationOperation extends StructureOperation {
+public interface ProjectCreationOperation<R extends DSSProjectContentRequestRef<R>>
+        extends StructureOperation<R, ProjectResponseRef> {
 
-    ProjectResponseRef createProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException;
+    /**
+     * Try to create the one-to-one related refProject in third-party AppConn.
+     * If created successfully, please return a ProjectResponseRef contained refProjectId,
+     * so DSS can use the refProjectId to operate the related refProject in third-party AppConn.
+     * The returned refProjectId is the other ProjectOperations which used.
+     * @param projectRef contains the DSS project info.
+     * @return a ProjectResponseRef contained refProjectId
+     * @throws ExternalOperationFailedException
+     */
+    ProjectResponseRef createProject(R projectRef) throws ExternalOperationFailedException;
 
 }

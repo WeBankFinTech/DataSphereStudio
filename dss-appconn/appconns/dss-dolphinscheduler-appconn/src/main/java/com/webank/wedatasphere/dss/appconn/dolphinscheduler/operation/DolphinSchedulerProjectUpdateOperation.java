@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
@@ -28,7 +27,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperati
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
@@ -85,7 +84,6 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
         DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(projectUpdateUrl, Constant.DS_ADMIN_USERNAME);
         httpPost.setEntity(entity);
 
-        DolphinSchedulerProjectResponseRef responseRef = new DolphinSchedulerProjectResponseRef();
         try (CloseableHttpResponse httpResponse =
             this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);) {
             HttpEntity ent = httpResponse.getEntity();
@@ -119,7 +117,7 @@ public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOper
             throw new ExternalOperationFailedException(90025, "调度中心授权出错", e);
         }
 
-        return responseRef;
+        return ProjectResponseRef.newExternalBuilder().success();
     }
 
 }

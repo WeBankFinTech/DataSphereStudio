@@ -33,16 +33,12 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDescImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractAppConnManager implements AppConnManager {
 
@@ -105,14 +101,16 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         Map<String, AppConn> appConns = new HashMap<>();
         appConnInfos.forEach(DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
-            appConns.put(appConnInfo.getAppConnName(), appConn);
+            if(appConn != null) {
+                appConns.put(appConnInfo.getAppConnName(), appConn);
+            }
         }));
         synchronized (this.appConns) {
             this.appConns.clear();
             this.appConns.putAll(appConns);
             appConnList = Collections.unmodifiableList(new ArrayList<>(appConns.values()));
         }
-        LOGGER.info("Inited all AppConns, the AppConn list are {}.", this.appConnList);
+        LOGGER.info("Inited all AppConns, the AppConn list are {}.", this.appConns.keySet());
     }
 
     protected AppConn loadAppConn(AppConnInfo appConnInfo) throws Exception {
@@ -129,6 +127,10 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             AppInstanceImpl appInstance = new AppInstanceImpl();
             copyProperties(appConnInfo.getAppConnName(), instanceBean, appInstance);
             appDesc.addAppInstance(appInstance);
+        }
+        if(appDesc.getAppInstances().isEmpty()) {
+            LOGGER.error("The AppConn {} has no appInstance, we cannot load this AppConn successfully, please check the database info.", appConnInfo.getAppConnName());
+            return null;
         }
         appDesc.setAppName(appConnInfo.getAppConnName());
         appConn.setAppDesc(appDesc);
@@ -201,6 +203,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         } catch (Exception e) {
             LOGGER.error("Reload AppConn failed.", e);
             throw new DSSRuntimeException("Load AppConn " + appConnInfo.getAppConnName() + " failed!");
+        }
+        if(appConn == null) {
+            return;
         }
         synchronized (this.appConns) {
             this.appConns.put(appConnInfo.getAppConnName(), appConn);

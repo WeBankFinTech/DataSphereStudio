@@ -17,14 +17,13 @@
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefExportOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExportService;
 
 public class VisualisRefExportService extends AbstractRefExportService {
 
     @Override
-    public RefExportOperation createRefExportOperation() {
-        return new VisualisRefExportOperation(this);
+    public VisualisRefExportOperation createRefExportOperation() {
+        return new VisualisRefExportOperation();
     }
 
 }

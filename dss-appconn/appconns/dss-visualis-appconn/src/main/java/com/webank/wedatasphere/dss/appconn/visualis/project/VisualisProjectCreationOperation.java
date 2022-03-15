@@ -18,93 +18,38 @@ package com.webank.wedatasphere.dss.appconn.visualis.project;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
+import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.conf.ServerConfiguration;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class VisualisProjectCreationOperation implements ProjectCreationOperation {
+public class VisualisProjectCreationOperation extends AbstractStructureOperation<DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl, ProjectResponseRef>
+        implements ProjectCreationOperation<DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl> {
 
-    private static Logger logger = LoggerFactory.getLogger(VisualisProjectCreationOperation.class);
     private final static String projectUrl = "/api/rest_s/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/projects";
-    private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
-    private StructureService structureService;
-
-    public VisualisProjectCreationOperation(StructureService service, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) {
-        this.structureService = service;
-        this.ssoRequestOperation = ssoRequestOperation;
-    }
-    private String getAppName() {
-        return VisualisAppConn.VISUALIS_APPCONN_NAME;
-    }
 
     @Override
-    public void init() {
-    }
-
-    @Override
-    public ProjectResponseRef createProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         String url = getBaseUrl() + projectUrl;
         VisualisPostAction visualisPostAction = new VisualisPostAction();
-        visualisPostAction.setUser(projectRef.getCreateBy());
+        visualisPostAction.setUser(projectRef.getDSSProject().getCreateBy());
         visualisPostAction.addRequestPayload("name", projectRef.getName());
-        visualisPostAction.addRequestPayload("description", projectRef.getDescription());
+        visualisPostAction.addRequestPayload("description", projectRef.getDSSProject().getDescription());
         visualisPostAction.addRequestPayload("pic", "6");
         visualisPostAction.addRequestPayload("visibility", true);
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = projectRef.getWorkspace().getSSOUrlBuilderOperation().copy();
-        ssoUrlBuilderOperation.setAppName(getAppName());
-        ssoUrlBuilderOperation.setReqUrl(url);
-        ssoUrlBuilderOperation.setWorkspace(projectRef.getWorkspace().getWorkspaceName());
-        String response;
-        Map resMap;
-        HttpResult httpResult;
-        try {
-            visualisPostAction.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
-            httpResult = this.ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, visualisPostAction);
-            response = httpResult.getResponseBody();
-            resMap = BDPJettyServerHelper.jacksonJson().readValue(response, Map.class);
-        } catch (Exception e) {
-            logger.error("Create Visualis Project Exception", e);
-            throw new ExternalOperationFailedException(90176, "Create Visualis Project Exception", e);
-        }
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, visualisPostAction);
         @SuppressWarnings("unchecked")
-        Map<String, Object> header = (Map<String, Object>) resMap.get("header");
-        int code = (int) header.get("code");
-        String errorMsg = "";
-        if (code != 200) {
-            errorMsg = header.toString();
-            throw new ExternalOperationFailedException(90176, errorMsg, null);
-        }
-        @SuppressWarnings("unchecked")
-        Integer projectId = (Integer) ((Map<String, Object>) resMap.get("payload")).get("id");
-        VisualisProjectResponseRef visualisProjectResponseRef;
-        try {
-            visualisProjectResponseRef = new VisualisProjectResponseRef(response, code);
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90176, "failed to parse response json", e);
-        }
-        visualisProjectResponseRef.setAppInstance(structureService.getAppInstance());
-        visualisProjectResponseRef.setProjectRefId(projectId.longValue());
-        visualisProjectResponseRef.setErrorMsg(errorMsg);
-        return visualisProjectResponseRef;
+        Integer projectId = (Integer) responseRef.getValue("id");
+        return ProjectResponseRef.newExternalBuilder()
+                .setRefProjectId(projectId.longValue()).success();
     }
 
     @Override
-    public void setStructureService(StructureService service) {
-        this.structureService = service;
-    }
-
-    private String getBaseUrl(){
-        return structureService.getAppInstance().getBaseUrl();
+    protected String getAppConnName() {
+        return VisualisAppConn.VISUALIS_APPCONN_NAME;
     }
 }

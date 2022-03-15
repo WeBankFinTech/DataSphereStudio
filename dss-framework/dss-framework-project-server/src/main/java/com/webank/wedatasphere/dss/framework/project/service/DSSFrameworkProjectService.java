@@ -28,14 +28,14 @@ public interface DSSFrameworkProjectService {
     DSSProjectDetailVo getProjectSettings(Long projectId);
 
     /**
-     * 1. 首先要去所有满足工程结构的规范的去建工程，首先必须要满足建工程的appconn进行进工程
+     * 1. 首先要去所有满足工程结构的规范的去建工程，首先必须要满足建工程的 AppConn 进行进工程
      * 2. 自己创建工程
      * 3. 如果第三方系统创建失败，最多重试一次
      * 4. 如果本身失败了，则进行回滚
      * @param projectCreateRequest
      * @return
      */
-    DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace,boolean checkProjectName) throws Exception;
+    DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception;
 
     void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 }

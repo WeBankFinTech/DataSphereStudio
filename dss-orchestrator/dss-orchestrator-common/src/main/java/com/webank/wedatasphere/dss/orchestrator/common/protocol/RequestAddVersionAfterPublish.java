@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 public class RequestAddVersionAfterPublish implements Serializable {
 
     private String userName;
-    private String workspaceName;
+    private Workspace workspace;
     private Long orchestratorId;
     private Long orcVersionId;
     private String projectName;
@@ -33,13 +34,13 @@ public class RequestAddVersionAfterPublish implements Serializable {
     private String comment;
 
     public RequestAddVersionAfterPublish(String userName,
-                                         String workspaceName,
+                                         Workspace workspace,
                                          Long orchestratorId,
                                          Long orcVersionId,
                                          String projectName,
                                          List<DSSLabel> dssLabels, String comment) {
         this.userName = userName;
-        this.workspaceName = workspaceName;
+        this.workspace = workspace;
         this.orcVersionId = orcVersionId;
         this.orchestratorId = orchestratorId;
         this.projectName = projectName;
@@ -55,12 +56,12 @@ public class RequestAddVersionAfterPublish implements Serializable {
         this.userName = userName;
     }
 
-    public String getWorkspaceName() {
-        return workspaceName;
+    public Workspace getWorkspace() {
+        return workspace;
     }
 
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
     public Long getOrcVersionId() {

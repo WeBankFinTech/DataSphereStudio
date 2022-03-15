@@ -16,17 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-
-public interface WorkspaceRequestRef extends RequestRef {
-
-    default void setWorkspace(Workspace workspace){
-
-    }
-
-    default Workspace getWorkspace(){
-        return null;
-    }
-
+/**
+ * This class is only used to keep compatibility. since lots of AppConn have used this class.
+ */
+@Deprecated
+public interface WorkspaceRequestRef extends com.webank.wedatasphere.dss.standard.app.sso.ref.WorkspaceRequestRef {
 }

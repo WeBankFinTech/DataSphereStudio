@@ -41,12 +41,12 @@ public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
     Long orchestratorVersionIncrease(Long orcId,
                                      String userName,
                                      String comment,
-                                     String workspaceName,
+                                     Workspace workspace,
                                      DSSOrchestratorInfo dssOrchestratorInfo,
                                      String projectName,
                                      List<DSSLabel> dssLabels) throws DSSErrorException;
 
-    Long addVersionAfterPublish(String userName, String workspaceName,
+    Long addVersionAfterPublish(String userName, Workspace workspace,
                                 Long orchestratorId, Long orcVersionId, String projectName,
                                 List<DSSLabel> dssLabels,String comment) throws DSSErrorException;
 

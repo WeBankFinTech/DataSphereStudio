@@ -17,12 +17,22 @@
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
-public interface ProjectDeletionOperation extends StructureOperation {
+public interface ProjectDeletionOperation<R extends RefProjectContentRequestRef<R>>
+        extends StructureOperation<R, ResponseRef> {
 
-    ResponseRef deleteProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException;
+    /**
+     * delete the related refProject in third-party AppConn by refProjectId
+     * which returned by ProjectCreationOperation.
+     * refProjectId must not be null, please use it to delete the refProject.
+     * @param projectRef refProject info, refProjectId must not be null
+     * @return the result of deletion, just success or failure.
+     * @throws ExternalOperationFailedException
+     */
+    ResponseRef deleteProject(R projectRef) throws ExternalOperationFailedException;
 
 }

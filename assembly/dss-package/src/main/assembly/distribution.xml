@@ -287,7 +287,7 @@
     <!--dss-guide-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-guide/dss-guide-server/target/out/dss-guide-server/lib/
+        ${basedir}/../../dss-apps/dss-user-guide/dss-user-guide-server/target/out/dss-user-guide-server/lib/
       </directory>
       <outputDirectory>lib/dss-guide/dss-guide-server</outputDirectory>
       <includes>

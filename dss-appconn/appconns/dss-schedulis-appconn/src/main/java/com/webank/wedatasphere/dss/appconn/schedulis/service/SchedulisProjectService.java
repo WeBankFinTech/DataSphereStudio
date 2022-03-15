@@ -43,12 +43,8 @@ public class SchedulisProjectService extends ProjectService {
     }
 
     @Override
-    protected ProjectGetOperation createProjectGetOperation() {
+    protected ProjectSearchOperation createProjectSearchOperation() {
         return new SchedulisProjectGetOperation();
     }
 
-    @Override
-    protected ProjectUrlOperation createProjectUrlOperation() {
-        return null;
-    }
 }

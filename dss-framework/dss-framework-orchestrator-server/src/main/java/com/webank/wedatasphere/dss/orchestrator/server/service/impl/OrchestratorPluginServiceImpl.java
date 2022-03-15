@@ -37,17 +37,14 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPlugi
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class OrchestratorPluginServiceImpl implements OrchestratorPluginService {
@@ -64,11 +61,6 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     private DSSOrchestratorContext dssOrchestratorContext;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
-    //    private Map<String, OrchestratorConversionJob> orchestratorConversionJobMap = new ConcurrentHashMap<>();
-    /*private Cache<String, OrchestratorConversionJob> orchestratorConversionJobMap = CacheBuilder.newBuilder()
-            .maximumSize(OrchestratorConf.MAX_ID_INSTANCE_CACHE_SUM)
-            .expireAfterWrite(OrchestratorConf.ORCHESTRATION_ID_EXPIRE_TIMEMILLS.getValue(), TimeUnit.MILLISECONDS)
-            .build();*/
     private AtomicInteger idGenerator = new AtomicInteger();
 
     @Override
@@ -84,8 +76,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         }
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(toPublishOrcId);
         long projectId = dssOrchestratorInfo.getProjectId();
-        //把orcId装车第三方的AppId
-        List<Long> refAppIdList = new ArrayList<>();
+        //这里的key为DSS编排ID，例如DSS工作流；这里的value为DSS编排所对应的第三方调度系统的工作流ID
+        //请注意：由于对接的SchedulerAppConn调度系统有可能没有实现OrchestrationOperation，
+        // 所以可能存在DSS在创建DSS编排时，无法同步去SchedulerAppConn创建工作流的情况，从而导致这个Map的所有value都为null。
+        Map<Long, Long> orchestrationIdMap = new HashMap<>();
         List<Long> publishedOrcIds;
         List<DSSLabel> labels = LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(requestConversionOrchestration.getLabels());
         if(requestConversionOrchestration.isConvertAllOrcs()) {
@@ -99,11 +93,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 if (orcId.longValue() == toPublishOrcId.longValue() && !DSSLabelUtil.isDevEnv(labels)) {
                     validFlag = 0;
                 }
-                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,validFlag);
+                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId, validFlag);
                 if (dssOrchestratorVersion == null) {
                     continue;
                 }
-                refAppIdList.add(dssOrchestratorVersion.getAppId());
+                orchestratorMapper
+                orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
             }
         } else {
             publishedOrcIds = new ArrayList<>();
@@ -111,7 +106,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 publishedOrcIds.add(toPublishOrcId);
                 DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(toPublishOrcId,1);
                 if (dssOrchestratorVersion != null) {
-                    refAppIdList.add(dssOrchestratorVersion.getAppId());
+                    orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
                 }
             }
             if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
@@ -121,7 +116,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                         continue;
                     }
                     publishedOrcIds.add(orcId);
-                    refAppIdList.add(dssOrchestratorVersion.getAppId());
+                    orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
                 }
             }
         }
@@ -132,7 +127,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         entity.setCreateTime(new Date());
         entity.setUserName(requestConversionOrchestration.getUserName());
         entity.setOrcIdList(publishedOrcIds);
-        entity.setRefAppIdList(refAppIdList);
+        entity.setRefAppIdList(orchestrationIdMap);
         entity.setLabels(labels);
         entity.setWorkspace((Workspace) requestConversionOrchestration.getWorkspace());
         DSSProject dssProject = new DSSProject();
@@ -140,7 +135,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         entity.setProject(dssProject);
         job.setConversionJobEntity(entity);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
-        job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId,response, job, requestConversionOrchestration));
+        job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId, response, job, requestConversionOrchestration));
         //submit it
         releaseThreadPool.submit(job);
         DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
@@ -150,21 +145,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Override
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
-        //OrchestratorConversionJob job = orchestratorConversionJobMap.getIfPresent(id);
         OrchestratorConversionJob job = DSSOrchestratorConstant.orchestratorConversionJobMap.get(id);
-        /*if (null == job) {
-            OrchestratorPublishJob orchestratorPublishJob = orchestratorJobMapper.getPublishJobByJobId(id);
-            if (null != orchestratorPublishJob && StringUtils.isNotBlank(orchestratorPublishJob.getConversionJobJson())) {
-                // tod check
-                job = BDPJettyServerHelper.gson().fromJson(orchestratorPublishJob.getConversionJobJson(), OrchestratorConversionJob.class);
-                orchestratorConversionJobMap.put(job.getId(), job);
-            } else {
-                return new ResponseConvertOrchestrator(id, new ResponseOperateOrchestrator().setJobStatus(JobStatus.Failed).setMessage("Cannot find jobstatus."));
-            }
-        }*/
         // todo 找不到从db加载
         if(job.getConversionJobEntity().getResponse().isCompleted()) {
-//            orchestratorConversionJobMap.invalidate(id);
             DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
         }
         return new ResponseConvertOrchestrator(job.getId(), job.getConversionJobEntity().getResponse());
@@ -188,7 +171,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orcId);
                     dssOrchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class)
                             .orchestratorVersionIncrease(orcId, job.getConversionJobEntity().getUserName(), requestConversionOrchestration.getComment(),
-                                    requestConversionOrchestration.getWorkspace().getWorkspaceName(), dssOrchestratorInfo,
+                                    (Workspace) requestConversionOrchestration.getWorkspace(), dssOrchestratorInfo,
                                     job.getConversionJobEntity().getProject().getName(), job.getConversionJobEntity().getLabels());
                 }));
             }

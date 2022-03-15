@@ -24,8 +24,8 @@ public class SchedulerManager {
 
     private static LongTermRefExecutionScheduler scheduler = new ListenerEventBusRefExecutionScheduler();
 
-    static{
-        ((ListenerEventBusRefExecutionScheduler)scheduler).start();
+    static {
+        scheduler.start();
     }
 
     public static LongTermRefExecutionScheduler getScheduler(){

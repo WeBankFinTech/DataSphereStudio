@@ -18,12 +18,19 @@ package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
 import java.util.function.Consumer;
 
-
+/**
+ * This is the topper interface of async responseRef, if one operation want to provide async capability,
+ * please provides a child interface which extends this super interface to use.
+ * Notice: all detail classes should never directly implement this topper interface, since every operation will
+ * provide a child interface for async operation.
+ */
 public interface AsyncResponseRef extends ResponseRef {
 
     long getStartTime();
 
-    boolean isCompleted();
+    default boolean isCompleted() {
+        return isFailed() || isSucceed();
+    }
 
     ResponseRef getResponse();
 

@@ -18,11 +18,44 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefBuilder;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 
 import java.util.List;
 
 
-public interface OrchestratorQueryResponseRef  extends ResponseRef {
+public interface OrchestratorQueryResponseRef extends ResponseRef {
+
     List<OrchestratorVo> getOrchestratorVos();
-    void setOrchestratorVoList(List<OrchestratorVo> orchestratorVoList);
+
+    static OrchestratorQueryResponseRefBuilder newBuilder() {
+        return new OrchestratorQueryResponseRefBuilder();
+    }
+
+    class OrchestratorQueryResponseRefBuilder
+            extends ResponseRefBuilder.ExternalResponseRefBuilder<OrchestratorQueryResponseRefBuilder, OrchestratorQueryResponseRef> {
+
+        private List<OrchestratorVo> orchestratorVoList;
+
+        public OrchestratorQueryResponseRefBuilder setOrchestratorVoList(List<OrchestratorVo> orchestratorVoList) {
+            this.orchestratorVoList = orchestratorVoList;
+            return this;
+        }
+
+        class OrchestratorQueryResponseRefImpl extends ResponseRefImpl implements OrchestratorQueryResponseRef {
+            public OrchestratorQueryResponseRefImpl() {
+                super(OrchestratorQueryResponseRefBuilder.this.responseBody, OrchestratorQueryResponseRefBuilder.this.status,
+                        OrchestratorQueryResponseRefBuilder.this.errorMsg, OrchestratorQueryResponseRefBuilder.this.responseMap);
+            }
+            @Override
+            public List<OrchestratorVo> getOrchestratorVos() {
+                return orchestratorVoList;
+            }
+        }
+
+        @Override
+        protected OrchestratorQueryResponseRefImpl createResponseRef() {
+            return new OrchestratorQueryResponseRefImpl();
+        }
+    }
 }

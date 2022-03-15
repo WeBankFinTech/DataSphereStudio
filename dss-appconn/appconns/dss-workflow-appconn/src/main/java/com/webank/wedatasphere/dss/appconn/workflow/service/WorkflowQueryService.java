@@ -18,12 +18,11 @@ package com.webank.wedatasphere.dss.appconn.workflow.service;
 
 import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefQueryOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefQueryService;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 
 public class WorkflowQueryService  extends AbstractRefQueryService {
 
     @Override
-    protected RefQueryOperation createRefQueryOperation() {
+    protected WorkflowRefQueryOperation createRefQueryOperation() {
         return new WorkflowRefQueryOperation();
     }
 

@@ -16,12 +16,20 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefImportOperation<K extends RequestRef> extends DevelopmentOperation<K, ResponseRef> {
+public interface RefImportOperation<K extends ImportRequestRef<K>>
+        extends DevelopmentOperation<K, RefJobContentResponseRef> {
 
-    ResponseRef importRef(K requestRef) throws ExternalOperationFailedException;
+    /**
+     * The resourceMap in ImportRequestRef is the content of ExportRequestRef exported.
+     * <br>
+     * Now, DSS only supports to import Linkis BML resources, so the resourceMap is consisted of `resourceId`
+     * and `version`.
+     * @return a refJobContent related to a only third appConn refJob which created by the resourceMap.
+     */
+    RefJobContentResponseRef importRef(K requestRef) throws ExternalOperationFailedException;
 
 }

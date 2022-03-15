@@ -16,53 +16,32 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
-import com.webank.wedatasphere.dss.appconn.orchestrator.ref.DefaultOrchestratorQueryResponseRef;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseQueryOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorQueryResponseRef;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.rpc.Sender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkQueryOperation implements RefQueryOperation<OrchestratorQueryRequestRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkQueryOperation.class);
+import java.util.List;
+
+public class OrchestratorFrameworkQueryOperation
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, OrchestratorQueryResponseRef>
+        implements RefQueryOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, OrchestratorQueryResponseRef> {
 
     private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
-    private DevelopmentService developmentService;
 
     @Override
-    public OrchestratorQueryResponseRef query(OrchestratorQueryRequestRef requestRef) throws ExternalOperationFailedException {
-        if (null == requestRef) {
-            LOGGER.error("request of query is null");
-            return null;
-        }
-        LOGGER.info("Begin to ask to create orchestrator, requestRef is {}", requestRef);
-        RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(requestRef.getOrchestratorIdList());
-        ResponseQueryOrchestrator queryResponse = null;
-        try {
-            queryResponse = (ResponseQueryOrchestrator) sender.ask(queryRequest);
-        } catch (Exception e) {
-            DSSExceptionUtils.dealErrorException(60015, "create orchestrator ref failed",
-                    ExternalOperationFailedException.class);
-        }
-        if (queryResponse == null) {
-            LOGGER.error("query response is null, it is a fatal error");
-            return null;
-        }
-        LOGGER.info("End to ask to query orchestrator, responseRef is {}", queryResponse);
-        OrchestratorQueryResponseRef queryResponseRef = new DefaultOrchestratorQueryResponseRef();
-        queryResponseRef.setOrchestratorVoList(queryResponse.getOrchestratorVoes());
-        return queryResponseRef;
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
+    public OrchestratorQueryResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        logger.info("Begin to ask to create orchestrator, requestRef is {}.", toJson(requestRef));
+        List<Long> orchestratorIds = (List<Long>) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_ID_LIST_KEY);
+        RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(orchestratorIds);
+        ResponseQueryOrchestrator queryResponse = (ResponseQueryOrchestrator) sender.ask(queryRequest);
+        logger.info("End to ask to query orchestrator, responseRef is {}.", toJson(queryResponse.getOrchestratorVoes()));
+        return OrchestratorQueryResponseRef.newBuilder().setOrchestratorVoList(queryResponse.getOrchestratorVoes()).success();
     }
 }

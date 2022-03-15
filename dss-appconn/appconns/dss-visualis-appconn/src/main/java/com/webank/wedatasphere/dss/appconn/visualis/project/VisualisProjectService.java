@@ -16,30 +16,26 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
-import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.*;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectSearchOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 
 public class VisualisProjectService extends ProjectService {
 
     @Override
     public boolean isCooperationSupported() {
-        return true;
-    }
-
-    @Override
-    public boolean isProjectNameUnique() {
         return false;
     }
 
     @Override
+    public boolean isProjectNameUnique() {
+        return true;
+    }
+
+    @Override
     protected VisualisProjectCreationOperation createProjectCreationOperation() {
-        SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation = getSSORequestService().createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME);
-        VisualisProjectCreationOperation visualisProjectCreationOperation = new VisualisProjectCreationOperation(this, ssoRequestOperation);
-        visualisProjectCreationOperation.setStructureService(this);
-        return visualisProjectCreationOperation;
+        return new VisualisProjectCreationOperation();
     }
 
     @Override
@@ -53,16 +49,8 @@ public class VisualisProjectService extends ProjectService {
     }
 
     @Override
-    protected ProjectGetOperation createProjectGetOperation() {
-        SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation = getSSORequestService().createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME);
-        VisualisProjectGetOperation visualisProjectQueryOperation = new VisualisProjectGetOperation(this, ssoRequestOperation);
-        visualisProjectQueryOperation.setStructureService(this);
-        return visualisProjectQueryOperation;
-    }
-
-    @Override
-    protected ProjectUrlOperation createProjectUrlOperation() {
-        return null;
+    protected ProjectSearchOperation createProjectSearchOperation() {
+        return new VisualisProjectSearchOperation();
     }
 
 }

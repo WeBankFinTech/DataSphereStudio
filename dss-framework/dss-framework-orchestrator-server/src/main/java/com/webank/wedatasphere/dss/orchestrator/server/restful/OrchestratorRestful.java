@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -58,7 +59,7 @@ public class OrchestratorRestful {
         String typeStr = addOrchestratorRequest.getType();
         String desc = addOrchestratorRequest.getDesc();
         Long projectID = addOrchestratorRequest.getProjectID();
-        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(addOrchestratorRequest.getLabels().getRoute()));
+        List<DSSLabel> dssLabelList = Collections.singletonList(new EnvDSSLabel(addOrchestratorRequest.getLabels().getRoute()));
         DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
         dssOrchestratorInfo.setName(name);
         dssOrchestratorInfo.setCreator(userName);

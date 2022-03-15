@@ -31,8 +31,6 @@ import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.fs.FileSystem
 import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
 
-import scala.collection.JavaConversions._
-
 abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext, userWithCreator: UserWithCreator)
   extends ExecutionRequestRefContext with Logging {
 

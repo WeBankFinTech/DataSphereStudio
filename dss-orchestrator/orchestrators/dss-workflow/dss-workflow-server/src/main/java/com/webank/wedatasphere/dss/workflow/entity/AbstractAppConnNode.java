@@ -17,30 +17,28 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 
-
 import java.util.Map;
 
 
 public abstract class AbstractAppConnNode {
 
-    String projectName;
+    private String projectName;
 
-    long projectId;
+    private long projectId;
 
+    private String flowName;
 
-    String flowName;
+    private long flowId;
 
-    long flowId;
+    private String nodeName;
 
-    String nodeName;
+    private String nodeId;
 
-    String nodeId;
+    private String nodeType;
 
-    String nodeType;
+    private String contextId;
 
-    String contextId;
-
-    Map<String, Object> jobContent;
+    private Map<String, Object> jobContent;
 
     public AbstractAppConnNode(String projectName, long projectId, String flowName, long flowId,
                                String nodeName, String nodeTye, Map<String, Object> jobContent){

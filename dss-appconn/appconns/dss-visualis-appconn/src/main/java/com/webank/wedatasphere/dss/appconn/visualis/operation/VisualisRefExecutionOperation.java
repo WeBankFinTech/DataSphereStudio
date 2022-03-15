@@ -16,85 +16,90 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.ViewAsyncRefExecutionOperation;
-import com.webank.wedatasphere.dss.appconn.visualis.ViewExecutionAction;
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
-import com.webank.wedatasphere.dss.appconn.visualis.enums.ModuleEnum;
-import com.webank.wedatasphere.dss.appconn.visualis.utils.HttpUtils;
+import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisGetAction;
+import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.ViewOptStrategy;
+import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.VisualisRefExecutionAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
-import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisDownloadAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.*;
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.LongTermRefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.listener.core.SchedulerManager;
-import com.webank.wedatasphere.dss.standard.app.development.listener.scheduler.LongTermRefExecutionScheduler;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Optional;
-
-public class VisualisRefExecutionOperation extends LongTermRefExecutionOperation implements RefExecutionOperation {
-
-    private final static Logger logger = LoggerFactory.getLogger(VisualisRefExecutionOperation.class);
-    private DevelopmentService developmentService;
-    private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
-    private LongTermRefExecutionScheduler scheduler = SchedulerManager.getScheduler();
-
-    public VisualisRefExecutionOperation(DevelopmentService service) {
-        this.developmentService = service;
-        this.ssoRequestOperation = this.developmentService.getSSORequestService().createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME);
-    }
+public class VisualisRefExecutionOperation
+        extends LongTermRefExecutionOperation<RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef> {
 
     @Override
-    protected RefExecutionAction submit(ExecutionRequestRef requestRef) {
-        return new ViewAsyncRefExecutionOperation().execute(requestRef, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation);
-    }
-
-    @Override
-    public RefExecutionState state(RefExecutionAction action) {
-        return new ViewAsyncRefExecutionOperation().state(action, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation);
-    }
-
-
-    @Override
-    public CompletedExecutionResponseRef result(RefExecutionAction action) {
-        return new ViewAsyncRefExecutionOperation().result(action, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation);
-    }
-
-
-    @Override
-    public ResponseRef execute(ExecutionRequestRef ref) {
-        AsyncExecutionRequestRef asyncExecutionRequestRef = (AsyncExecutionRequestRef) ref;
-        String nodeType = asyncExecutionRequestRef.getExecutionRequestRefContext().getRuntimeMap().get("nodeType").toString().toLowerCase().trim();
+    protected RefExecutionAction submit(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef requestRef) throws ExternalOperationFailedException {
+        String nodeType = requestRef.getType().toLowerCase();
         String nodeName = VisualisConstant.NODE_NAME_PREFIX + nodeType;
-        logger.info("nodeName:{}", nodeName);
-        if (ModuleEnum.VIEW.getName().equals(nodeName)) {
-            try {
-                return executeAsyncOpt(asyncExecutionRequestRef);
-            } catch (ExternalOperationFailedException e) {
-                asyncExecutionRequestRef.getExecutionRequestRefContext().appendLog(e.getMessage());
-                logger.error("Async execute view node failed", e);
-            }
+        OperationStrategy strategy = OperationStrategyFactory.getInstance().getOperationStrategy(service.getAppInstance(), nodeName);
+        if (isSupportAsyncExecution(requestRef, strategy)) {
+            return executeAsync(requestRef, strategy);
         } else {
-            return executeSyncOpt(ref, nodeName);
+            return executeSync(requestRef, strategy);
         }
-        return null;
     }
 
+    @Override
+    public RefExecutionState state(RefExecutionAction action) throws ExternalOperationFailedException {
+        VisualisRefExecutionAction visualisRefExecutionAction = ((VisualisRefExecutionAction)action);
+        if(isAsyncExecution(visualisRefExecutionAction)) {
+            AsyncExecutionOperationStrategy strategy = (AsyncExecutionOperationStrategy) visualisRefExecutionAction.getStrategy();
+            return strategy.state(visualisRefExecutionAction.getRequestRef(), visualisRefExecutionAction.getId());
+        } else {
+            logger.warn("{} do not support async execution, turn async state to success to execute it.", visualisRefExecutionAction.getRequestRef().getType());
+            visualisRefExecutionAction.getExecutionRequestRefContext().appendLog("do not support async execution, turn async state to success to execute it.");
+            return RefExecutionState.Success;
+        }
+    }
+
+    @Override
+    public ExecutionResponseRef result(RefExecutionAction action) throws ExternalOperationFailedException {
+        VisualisRefExecutionAction visualisRefExecutionAction = ((VisualisRefExecutionAction)action);
+        if(isAsyncExecution(visualisRefExecutionAction)) {
+            AsyncExecutionOperationStrategy strategy = (AsyncExecutionOperationStrategy) visualisRefExecutionAction.getStrategy();
+            return strategy.getAsyncResult(visualisRefExecutionAction.getRequestRef(), visualisRefExecutionAction.getId());
+        } else {
+            ResponseRef responseRef = visualisRefExecutionAction.getStrategy()
+                    .executeRef(visualisRefExecutionAction.getRequestRef());
+            return ExecutionResponseRef.newBuilder().setResponseRef(responseRef).build();
+        }
+    }
+
+    /**
+     * I override this method, since I want to use SSORequestOperation to request Visualis server.
+     * @return visualis appConn name
+     */
+    @Override
+    protected String getAppConnName() {
+        return VisualisAppConn.VISUALIS_APPCONN_NAME;
+    }
+
+    private RefExecutionAction executeSync(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef requestRef,
+                                           OperationStrategy strategy) {
+        return createRefExecutionAction(requestRef, "-1", strategy);
+    }
+
+    private boolean isAsyncExecution(VisualisRefExecutionAction action) {
+        return !action.getId().equals("-1");
+    }
+
+    private RefExecutionAction createRefExecutionAction(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef requestRef,
+                                                        String id, OperationStrategy strategy) {
+        VisualisRefExecutionAction action = new VisualisRefExecutionAction();
+        action.setRequestRef(requestRef);
+        action.setExecutionRequestRefContext(requestRef.getExecutionRequestRefContext());
+        action.setId(id);
+        action.setStrategy(strategy);
+        return action;
+    }
 
     /**
      * 执行异步操作
@@ -102,91 +107,27 @@ public class VisualisRefExecutionOperation extends LongTermRefExecutionOperation
      * @param requestRef
      * @return
      */
-    private ResponseRef executeAsyncOpt(ExecutionRequestRef requestRef) throws ExternalOperationFailedException {
+    private RefExecutionAction executeAsync(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef requestRef,
+                                            OperationStrategy strategy) throws ExternalOperationFailedException {
+        AsyncExecutionOperationStrategy asyncStrategy = (AsyncExecutionOperationStrategy) strategy;
+        //任务发布
+        String execId = asyncStrategy.submit(requestRef);
+        return createRefExecutionAction(requestRef, execId, asyncStrategy);
+    }
+
+    private boolean isSupportAsyncExecution(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref,
+                                     OperationStrategy strategy) throws ExternalOperationFailedException {
+
+        if(!(strategy instanceof ViewOptStrategy)) {
+            return false;
+        }
+        ViewOptStrategy viewStrategy = (ViewOptStrategy) strategy;
         //判断数据源是不是hiveDatesouce，异步只支持hiveDatesouce，不支持jdbc
-        OperationStrategy viewStrategy = ModuleFactory.getInstance().crateModule((ModuleEnum.VIEW.getName()));
-        AsyncExecutionRequestRef asyncExecutionRequestRef = (AsyncExecutionRequestRef) requestRef;
-        boolean hiveDataSource = isHiveDataSource(asyncExecutionRequestRef, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation, viewStrategy);
-        if (hiveDataSource) {
-            //任务发布
-            RefExecutionAction action = submit(requestRef);
-            ViewExecutionAction viewAction = null;
-            if (action instanceof ViewExecutionAction) {
-                viewAction = (ViewExecutionAction) action;
-            }
-            if (action instanceof AbstractRefExecutionAction) {
-                ((AbstractRefExecutionAction) action).setExecutionRequestRefContext(createExecutionRequestRefContext(requestRef));
-            }
-            //获取任务状态
-            RefExecutionState state = state(viewAction);
-            if (state != null && state.isCompleted()) {
-                //获取结果集
-                CompletedExecutionResponseRef response = result(viewAction);
-                return response;
-            } else {
-                AsyncExecutionResponseRef response = createAsyncResponseRef(requestRef, action);
-                response.setRefExecution(this);
-                if (scheduler != null) {
-                    scheduler.addAsyncResponse(response);
-                }
-                return response;
-            }
-        } else {
-            return viewStrategy.executeRef(asyncExecutionRequestRef, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation);
-        }
+        String url = URLUtils.getUrl(getBaseUrl(), URLUtils.VIEW_DATA_URL_IS__HIVE_DATA_SOURCE, viewStrategy.getId(ref.getRefJobContent()));
+        ref.getExecutionRequestRefContext().appendLog("dss execute view node, judge dataSource type from  " + url);
+        VisualisGetAction visualisGetAction = new VisualisGetAction();
+        visualisGetAction.setUser(ref.getUserName());
+        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
+        return (boolean) responseRef.getData().get("isLinkisDataSource");
     }
-
-    private boolean isHiveDataSource(AsyncExecutionRequestRef ref,
-                                     String baseUrl,
-                                     SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
-                                     OperationStrategy viewStrategy) throws ExternalOperationFailedException {
-
-        String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_IS__HIVE_DATA_SOURCE, viewStrategy.getId(ref));
-        ref.getExecutionRequestRefContext().appendLog("dss execute view node,judge datasource type from  " + url);
-        VisualisDownloadAction visualisDownloadAction = new VisualisDownloadAction();
-        visualisDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
-        InputStream inputStream = null;
-        try {
-            VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, url, visualisDownloadAction);
-            inputStream = Optional.of(visualisDownloadAction.getInputStream()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,inputStream is empty", null));
-            Map map = BDPJettyServerHelper.gson().fromJson(IOUtils.toString(inputStream), Map.class);
-            ref.getExecutionRequestRefContext().appendLog(map.toString());
-            @SuppressWarnings("unchecked")
-            Map dataMap = Optional.of((Map<String, Object>) map.get("data")).orElseThrow(() -> new ExternalOperationFailedException(90176, "judge datasource type failed"));
-            return Optional.of(Boolean.parseBoolean(dataMap.get("isLinkisDataSource").toString())).orElseThrow(() -> new ExternalOperationFailedException(90176, "judge datasource type failed"));
-        } catch (AppStandardErrorException e) {
-            ref.getExecutionRequestRefContext().appendLog("dss execute view node,judge datasource type error");
-            throw new ExternalOperationFailedException(90176, "dss execute view node,judge datasource failed", e);
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90176, "dss execute view node,exec http request failed", e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
-    }
-
-
-    /**
-     * 执行同步操作
-     *
-     * @param ref
-     * @param nodeName
-     * @return
-     */
-    private ResponseRef executeSyncOpt(ExecutionRequestRef ref, String nodeName) {
-        AsyncExecutionRequestRef asyncExecutionRequestRef = (AsyncExecutionRequestRef) ref;
-        try {
-            return ModuleFactory.getInstance().crateModule(nodeName).executeRef(asyncExecutionRequestRef, HttpUtils.getBaseUrl(developmentService), ssoRequestOperation);
-        } catch (ExternalOperationFailedException e) {
-            logger.error("execute " + nodeName + " failed", e);
-        }
-        return null;
-
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
-    }
-
-
 }

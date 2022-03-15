@@ -16,14 +16,9 @@
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.WorkflowStatus;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
@@ -39,7 +34,6 @@ import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +43,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
@@ -58,36 +55,12 @@ public class FlowRestfulApi {
 
     @Autowired
     private DSSFlowService flowService;
-    private ContextService contextService = ContextServiceImpl.getInstance();
     @Autowired
     private PublishService publishService;
     @Autowired
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowManager workFlowManager;
-    ObjectMapper mapper = new ObjectMapper();
-
-    @RequestMapping(value = "addFlow", method = RequestMethod.POST)
-    public Message addFlow(HttpServletRequest req, @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
-        //如果是子工作流，那么分类应该是和父类一起的？
-        String userName = SecurityFilter.getLoginUsername(req);
-        // TODO: 2019/5/23 flowName工程名下唯一校验
-        String name = addFlowRequest.getName();
-        String workspaceName = addFlowRequest.getWorkspaceName();
-        String projectName = addFlowRequest.getProjectName();
-        String version = addFlowRequest.getVersion();
-        String description = addFlowRequest.getDescription();
-        Long parentFlowID = addFlowRequest.getParentFlowID();
-        String uses = addFlowRequest.getUses();
-        List<DSSLabel> dssLabelList = new ArrayList<>();
-        dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
-        String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
-        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, name, contextId, description, parentFlowID, uses, null, dssLabelList);
-
-        // TODO: 2019/5/16 空值校验，重复名校验
-        return Message.ok().data("flow", dssFlow);
-    }
-
 
     @RequestMapping(value = "publishWorkflow", method = RequestMethod.POST)
     public Message publishWorkflow(HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) throws Exception {
@@ -116,24 +89,6 @@ public class FlowRestfulApi {
             message = Message.error("发布工作流失败");
         }
         return message;
-    }
-
-    @RequestMapping(value = "getSchedulerWorkflowStatus", method = RequestMethod.GET)
-    public Message getSchedulerWorkflowStatus(HttpServletRequest request,
-                                              @NotNull(message = "查询的空间id不能为空") @RequestParam("workspaceId") Long workspaceId,
-                                              @NotNull(message = "查询的编排id不能为空") @RequestParam("orchestratorId") Long orchestratorId) {
-        String username = SecurityFilter.getLoginUsername(request);
-        try {
-            WorkflowStatus status = publishService.getSchedulerWorkflowStatus(username, orchestratorId);
-            Message result = Message.ok("获取调度工作流状态").data("published", status.getPublished()).data("releaseStatus",
-                    status.getReleaseState());
-            // Message result = Message.ok("获取调度工作流状态").data("published", false).data("releaseStatus", null);
-            return result;
-        } catch (final Throwable t) {
-            LOGGER.error("Failed to get scheduler workflow status for user {} , OrchestratorId {}", username,
-                    orchestratorId, t);
-            return Message.error("获取工作流调度状态失败");
-        }
     }
 
     /**
@@ -190,7 +145,6 @@ public class FlowRestfulApi {
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
         String uses = updateFlowBaseInfoRequest.getUses();
-//        ioManager.checkeIsExecuting(projectVersionID);
         // TODO: 2019/6/13  projectVersionID的更新校验
         //这里可以不做事务
         DSSFlow dssFlow = new DSSFlow();
@@ -216,7 +170,7 @@ public class FlowRestfulApi {
                        @RequestParam(required = false, name = "flowId") Long flowID,
                        @RequestParam(required = false, name = "isNotHaveLock") Boolean isNotHaveLock) throws DSSErrorException {
         String username = SecurityFilter.getLoginUsername(req);
-        DSSFlow dssFlow = flowService.getLatestVersionFlow(flowID);
+        DSSFlow dssFlow = flowService.getFlow(flowID);
         if (isNotHaveLock != null && isNotHaveLock) {
             return Message.ok().data("flow", dssFlow);
         }
@@ -247,7 +201,6 @@ public class FlowRestfulApi {
         if (flowService.getFlowByID(flowID).getState() && !sure) {
             return Message.ok().data("warmMsg", "该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？");
         }
-//        ioManager.checkeIsExecuting(projectVersionID);
         flowService.batchDeleteFlow(Arrays.asList(flowID));
         return Message.ok();
     }

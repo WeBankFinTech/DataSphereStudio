@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.standard.common.entity.ref;
 
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefBuilder.*;
+
 import java.util.Map;
 
 
@@ -31,10 +33,24 @@ public interface ResponseRef extends Ref {
 
     String getErrorMsg();
 
-    boolean isSucceed();
+    default boolean isSucceed() {
+        return getStatus() == 0 || getStatus() == 200;
+    }
 
     default boolean isFailed() {
         return !isSucceed();
+    }
+
+    static InternalResponseRefBuilder newInternalBuilder() {
+        return new InternalResponseRefBuilder();
+    }
+
+    static ExternalResponseRefBuilder newExternalBuilder() {
+        return new ExternalResponseRefBuilder();
+    }
+
+    static MutableExternalResponseRefBuilder newMutableExternalBuilder() {
+        return new MutableExternalResponseRefBuilder();
     }
 
 }

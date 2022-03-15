@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
@@ -23,6 +24,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Onestop
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -30,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @RestController
@@ -40,15 +43,23 @@ public class WorkspaceRestfulApi {
 
     @RequestMapping(path = "workspaces", method = RequestMethod.GET)
     public Message getAllWorkspaces(HttpServletRequest req) {
-        // TODO: Order By time
         String username = SecurityFilter.getLoginUsername(req);
         List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(username);
         return Message.ok().data("workspaces", workspaces);
     }
 
     @RequestMapping(path = "/workspaces/{id}", method = RequestMethod.GET)
-    public Message getWorkspacesById(HttpServletRequest req, @PathVariable("id") Long id) {
-        DSSWorkspace workspace = dssWorkspaceService.getWorkspacesById(id);
+    public Message getWorkspacesById(HttpServletRequest req,
+                                     HttpServletResponse resp,
+                                     @PathVariable("id") Long id) {
+        String username = SecurityFilter.getLoginUsername(req);
+        DSSWorkspace workspace = null;
+        try {
+            workspace = dssWorkspaceService.getWorkspacesById(id, username);
+        } catch (DSSErrorException e) {
+            return Message.error(e);
+        }
+        SSOHelper.setAndGetWorkspace(req, resp, workspace.getId(), workspace.getName());
         return Message.ok().data("workspace", workspace);
     }
 

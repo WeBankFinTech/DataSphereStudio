@@ -34,6 +34,7 @@ public class SchedulisProjectGetOperation implements ProjectSearchOperation {
         params.put("ajax", "fetchprojectflows");
         try {
             String responseBody = SSORequestWTSS.requestWTSSWithSSOGet(queryUrl, params, this.schedulisProjectService.getSSORequestService(), requestRef.getWorkspace());
+            LOGGER.info("responseBody from schedulis is:{}", responseBody);
             JsonNode jsonNode = new ObjectMapper().readValue(responseBody, JsonNode.class);
             JsonNode errorInfo = jsonNode.get("error");
             if (errorInfo != null && errorInfo.toString().contains("Project " + requestRef.getName() + " doesn't exist")) {

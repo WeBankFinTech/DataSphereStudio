@@ -17,9 +17,12 @@
 package com.webank.wedatasphere.dss.standard.app.structure.status;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
 
-public interface AppStatusOperation extends StructureOperation {
+public interface AppStatusOperation<K extends RequestRef, V extends ResponseRef>
+        extends StructureOperation<K, V> {
 
     AppStatusResponseRef heartbeat();
 

@@ -16,10 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
-import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefCopyOperation;
-import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefCreationOperation;
-import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefDeletionOperation;
-import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefUpdateOperation;
+import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
+import com.webank.wedatasphere.dss.appconn.visualis.operation.*;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
@@ -29,23 +27,23 @@ import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefC
 public class VisualisCRUDService extends AbstractRefCRUDService {
 
     @Override
-    protected RefCreationOperation createRefCreationOperation() {
-        return new VisualisRefCreationOperation(this);
+    protected VisualisRefCreationOperation createRefCreationOperation() {
+        return new VisualisRefCreationOperation();
     }
 
     @Override
-    protected RefCopyOperation createRefCopyOperation() {
-        return new VisualisRefCopyOperation(null,this);
+    protected VisualisRefCopyOperation createRefCopyOperation() {
+        return new VisualisRefCopyOperation();
     }
 
     @Override
-    protected RefUpdateOperation createRefUpdateOperation() {
-        return new VisualisRefUpdateOperation(this);
+    protected VisualisRefUpdateOperation createRefUpdateOperation() {
+        return new VisualisRefUpdateOperation();
     }
 
     @Override
-    protected RefDeletionOperation createRefDeletionOperation() {
-        return new VisualisRefDeletionOperation(this);
+    protected VisualisRefDeletionOperation createRefDeletionOperation() {
+        return new VisualisRefDeletionOperation();
     }
 
 }

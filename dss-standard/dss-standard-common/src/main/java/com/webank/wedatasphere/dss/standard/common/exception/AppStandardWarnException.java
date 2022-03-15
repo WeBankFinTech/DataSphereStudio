@@ -17,13 +17,16 @@
 package com.webank.wedatasphere.dss.standard.common.exception;
 
 
-public class AppStandardWarnException extends RuntimeException {
+import org.apache.linkis.common.exception.WarnException;
+
+public class AppStandardWarnException extends WarnException {
 
     public AppStandardWarnException(int errorCode, String message) {
-        super(message);
+        super(errorCode, message);
     }
 
     public AppStandardWarnException(int errorCode, String message, Throwable cause) {
-        super(message, cause);
+        super(errorCode, message);
+        initCause(cause);
     }
 }

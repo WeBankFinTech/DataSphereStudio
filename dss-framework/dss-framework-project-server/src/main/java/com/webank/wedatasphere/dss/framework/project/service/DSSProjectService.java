@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -29,7 +26,6 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQuery
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
@@ -51,7 +47,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
      * @param dbProject      数据库工程（246）
      * @throws Exception
      */
-    public void modifyOldProject(DSSProjectDO updateProject, DSSProjectDO dbProject) throws DSSProjectErrorException;
+    void modifyOldProject(DSSProjectDO updateProject, DSSProjectDO dbProject);
 
     DSSProjectDO getProjectByName(String name);
 
@@ -68,7 +64,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception;
 
-    Long getAppConnProjectId(Long dssProjectId, Long appInstanceId) throws Exception;
+    Long getAppConnProjectId(Long appInstanceId, Long dssProjectId);
 
     void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)  throws Exception;
 

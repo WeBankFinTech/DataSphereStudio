@@ -16,8 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
-import static com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
-
 import com.webank.wedatasphere.dss.appconn.schedulis.Action.FlowScheduleAction;
 import com.webank.wedatasphere.dss.appconn.schedulis.Action.FlowScheduleGetAction;
 import com.webank.wedatasphere.dss.appconn.schedulis.Action.FlowScheduleUploadAction;
@@ -28,10 +26,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationService;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-import java.util.List;
-import java.util.Map;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -45,9 +40,15 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HTTP;
+import org.apache.linkis.httpclient.request.HttpAction;
+import org.apache.linkis.httpclient.response.HttpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
 
 
 public class SSORequestWTSS {
@@ -91,10 +92,9 @@ public class SSORequestWTSS {
 
             FlowScheduleAction flowScheduleAction = new FlowScheduleAction();
             flowScheduleAction.getFormParams().putAll(params);
-            SSOUrlBuilderOperation ssoUrlBuilderOperation = workspace.getSSOUrlBuilderOperation().copy();
+            SSOUrlBuilderOperation ssoUrlBuilderOperation = SSOHelper.createSSOUrlBuilderOperation(workspace);
             ssoUrlBuilderOperation.setAppName(SCHEDULIS_APPCONN_NAME);
             ssoUrlBuilderOperation.setReqUrl(url);
-            ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
             flowScheduleAction.setURL(ssoUrlBuilderOperation.getBuiltUrl());
             SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation = service.getSSORequestService().createSSORequestOperation(SCHEDULIS_APPCONN_NAME);
             HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, flowScheduleAction);
@@ -114,17 +114,16 @@ public class SSORequestWTSS {
     public static String requestWTSSWithSSOGet( String url,
                                                  Map<String,Object> params,
                                                  SSORequestService service,
-                                                 Workspace Workspace
+                                                 Workspace workspace
     ) throws Exception {
 
         try {
 
             FlowScheduleGetAction flowScheduleGetAction = new FlowScheduleGetAction();
             flowScheduleGetAction.getParameters().putAll(params);
-            SSOUrlBuilderOperation ssoUrlBuilderOperation =Workspace.getSSOUrlBuilderOperation().copy();
+            SSOUrlBuilderOperation ssoUrlBuilderOperation = SSOHelper.createSSOUrlBuilderOperation(workspace);
             ssoUrlBuilderOperation.setAppName(SCHEDULIS_APPCONN_NAME);
             ssoUrlBuilderOperation.setReqUrl(url);
-            ssoUrlBuilderOperation.setWorkspace(Workspace.getWorkspaceName());
             flowScheduleGetAction.setURL(ssoUrlBuilderOperation.getBuiltUrl());
             SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation=service.createSSORequestOperation(SCHEDULIS_APPCONN_NAME);
             HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, flowScheduleGetAction);
@@ -141,14 +140,13 @@ public class SSORequestWTSS {
     public static HttpResult requestWTSSWithSSOUpload(String url,
                                                   FlowScheduleUploadAction uploadAction,
                                                   SSORequestService service,
-                                                  Workspace Workspace) throws AppStandardErrorException {
+                                                  Workspace workspace) throws AppStandardErrorException {
         HttpResult previewResult= null;
         try {
 
-            SSOUrlBuilderOperation ssoUrlBuilderOperation = Workspace.getSSOUrlBuilderOperation().copy();
+            SSOUrlBuilderOperation ssoUrlBuilderOperation = SSOHelper.createSSOUrlBuilderOperation(workspace);
             ssoUrlBuilderOperation.setAppName(SCHEDULIS_APPCONN_NAME);
             ssoUrlBuilderOperation.setReqUrl(url);
-            ssoUrlBuilderOperation.setWorkspace(Workspace.getWorkspaceName());
             uploadAction.setURl(ssoUrlBuilderOperation.getBuiltUrl());
             SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation = service.createSSORequestOperation(SCHEDULIS_APPCONN_NAME);
             previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, uploadAction);

@@ -39,21 +39,20 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserServi
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCreateResponseRef;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import org.apache.linkis.rpc.Sender;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -73,22 +72,22 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
      * 保存编排模式
      *
      * @param orchestratorCreateRequest
-     * @param responseRef
+     * @param orchestratorId
      * @param username
-     * @throws DSSFrameworkErrorException
      * @throws DSSProjectErrorException
      */
     @Override
-    public void saveOrchestrator(OrchestratorCreateRequest orchestratorCreateRequest, OrchestratorCreateResponseRef responseRef, String username) throws DSSFrameworkErrorException, DSSProjectErrorException {
-        //todo 使用工程的权限关系来限定 校验当前登录用户是否含有修改权限
+    public void saveOrchestrator(OrchestratorCreateRequest orchestratorCreateRequest, long orchestratorId,
+                                 long orchestratorVersionId, Long orchestrationRefId, String username) throws DSSProjectErrorException {
         projectUserService.isEditProjectAuth(orchestratorCreateRequest.getProjectId(), username);
         DSSOrchestrator orchestrator = new DSSOrchestrator();
         orchestrator.setWorkspaceId(orchestratorCreateRequest.getWorkspaceId());
         orchestrator.setProjectId(orchestratorCreateRequest.getProjectId());
         //编排模式id（工作流,调用orchestrator服务返回的orchestratorId）
-        orchestrator.setOrchestratorId(responseRef.getOrcId());
+        orchestrator.setOrchestratorId(orchestratorId);
         //编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId）
-        orchestrator.setOrchestratorVersionId(responseRef.getOrchestratorVersionId());
+        orchestrator.setOrchestratorVersionId(orchestratorVersionId);
+        orchestrator.setOrchestrationRefId(orchestrationRefId);
         //编排模式-名称
         orchestrator.setOrchestratorName(orchestratorCreateRequest.getOrchestratorName());
         //编排模式-类型
@@ -179,30 +178,6 @@ public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMappe
      */
     @Override
     public List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username) {
-      /*  QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
-        queryWrapper.eq("project_id", orchestratorRequest.getProjectId());
-        if (StringUtils.isNotBlank(orchestratorRequest.getOrchestratorMode())) {
-            queryWrapper.eq("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
-        }
-        List<DSSOrchestrator> list = this.list(queryWrapper);
-        List<OrchestratorBaseInfo> retList = new ArrayList<OrchestratorBaseInfo>(list.size());
-        if (!CollectionUtils.isEmpty(list)) {
-            //获取工程的权限等级
-            List<DSSProjectUser> projectUserList = projectUserService.getEditProjectList(orchestratorRequest.getProjectId(), username);
-            //获取最大权限
-
-            Integer priv = CollectionUtils.isEmpty(projectUserList) ? null : projectUserList.stream().mapToInt(DSSProjectUser::getPriv).max().getAsInt();
-            OrchestratorBaseInfo orchestratorBaseInfo = null;
-            for (DSSOrchestrator orchestrator : list) {
-                orchestratorBaseInfo = new OrchestratorBaseInfo();
-                BeanUtils.copyProperties(orchestrator, orchestratorBaseInfo);
-                orchestratorBaseInfo.setOrchestratorWays(ProjectStringUtils.convertList(orchestrator.getOrchestratorWay()));
-                orchestratorBaseInfo.setPriv(priv);
-                retList.add(orchestratorBaseInfo);
-            }
-        }
-        return retList;*/
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("workspace_id", orchestratorRequest.getWorkspaceId());
         queryWrapper.eq("project_id", orchestratorRequest.getProjectId());

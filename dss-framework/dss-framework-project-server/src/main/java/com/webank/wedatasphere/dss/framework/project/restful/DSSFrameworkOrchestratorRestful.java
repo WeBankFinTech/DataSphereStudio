@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
@@ -26,6 +25,7 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchest
 import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -50,8 +50,6 @@ public class DSSFrameworkOrchestratorRestful {
     @Autowired
     private DSSOrchestratorService orchestratorService;
 
-    @Autowired
-    private DSSProjectMapper projectMapper;
 
     /**
      * 创建编排模式
@@ -129,13 +127,12 @@ public class DSSFrameworkOrchestratorRestful {
     public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        LOGGER.info("workspace is {}", workspace.getWorkspaceName());
         try {
-            dssFrameworkOrchestratorService.deleteOrchestrator(username, deleteRequest,workspace);
+            dssFrameworkOrchestratorService.deleteOrchestrator(username, deleteRequest, workspace);
             return Message.ok("删除工作流编排模式成功");
         } catch (Exception e) {
-            LOGGER.error("Failed to delete orchestrator {} for user {}", deleteRequest, username, e);
-            return Message.error("删除工作流编排模式失败:" + e.getMessage());
+            LOGGER.error("Failed to delete orchestrator {} for user {}.", deleteRequest.getId(), username, e);
+            return Message.error("删除工作流编排模式失败:" + ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

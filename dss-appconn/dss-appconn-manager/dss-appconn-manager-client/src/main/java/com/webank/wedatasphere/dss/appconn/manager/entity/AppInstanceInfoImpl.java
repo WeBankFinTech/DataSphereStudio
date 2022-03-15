@@ -78,4 +78,16 @@ public class AppInstanceInfoImpl implements AppInstanceInfo {
     public void setEnhanceJson(String enhanceJson) {
         this.enhanceJson = enhanceJson;
     }
+
+    @Override
+    public String toString() {
+        return "AppInstanceInfoImpl{" +
+                "id=" + id +
+                ", url='" + url + '\'' +
+                ", homepageUrl='" + homepageUrl + '\'' +
+                ", redirectUrl='" + redirectUrl + '\'' +
+                ", labels='" + labels + '\'' +
+                ", enhanceJson='" + enhanceJson + '\'' +
+                '}';
+    }
 }

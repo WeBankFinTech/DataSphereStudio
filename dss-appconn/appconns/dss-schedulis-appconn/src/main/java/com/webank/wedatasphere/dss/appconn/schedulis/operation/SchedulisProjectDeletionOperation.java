@@ -16,19 +16,19 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.ref.SchedulisProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisExceptionUtils;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SchedulisProjectDeletionOperation implements ProjectDeletionOperation {
 
@@ -64,7 +64,7 @@ public class SchedulisProjectDeletionOperation implements ProjectDeletionOperati
             SchedulisExceptionUtils.dealErrorException(60052, "failed to delete project in schedulis", e,
                     ExternalOperationFailedException.class);
         }
-        return new SchedulisProjectResponseRef();
+        return ProjectResponseRef.newExternalBuilder().success();
     }
 
 }

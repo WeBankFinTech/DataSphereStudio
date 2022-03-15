@@ -1,67 +1,39 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisCopyRequestRef;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisOpenRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
-import com.webank.wedatasphere.dss.standard.app.development.ref.*;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
-
-import java.util.Map;
 
 
 public interface OperationStrategy {
 
-    ResponseRef createRef(NodeRequestRef requestRef,
-                          String baseUrl,
-                          DevelopmentService developmentService,
-                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
+    String getStrategyName();
 
-    void deleteRef(String baseUrl,
-                   NodeRequestRef visualisDeleteRequestRef,
-                   SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
+    RefJobContentResponseRef createRef(ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException;
 
-    ResponseRef exportRef(ExportRequestRef requestRef,
-                          String url,
-                          VisualisPostAction visualisPostAction,
-                          String externalContent,
-                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws Exception;
+    void deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl visualisDeleteRequestRef) throws ExternalOperationFailedException;
 
-    ResponseRef query(VisualisOpenRequestRef visualisOpenRequestRef, String externalContent, Long projectId, String baseUrl) throws Exception;
+    ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef,
+                                String url,
+                                VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
 
-    ResponseRef updateRef(UpdateRequestRef requestRef,
-                          NodeRequestRef visualisUpdateRequestRef,
-                          String baseUrl,
-                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
+    QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef);
 
-    ResponseRef copyRef(VisualisCopyRequestRef requestRef,
-                        Map<String, Object> jobContent,
+    ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException;
+
+    RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl requestRef,
                         String url,
-                        String nodeType,
-                        VisualisPostAction visualisPostAction,
-                        SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
+                        VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
 
-    ResponseRef importRef(VisualisPostAction visualisPostAction,
-                          String url,
-                          ImportRequestRef requestRef,
-                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
-                          DevelopmentService developmentService) throws ExternalOperationFailedException;
+    RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
+                                       String url,
+                                       VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
 
-    ResponseRef executeRef(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
-
-    String getId(AsyncExecutionRequestRef requestRef);
-
-    String submit(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException;
-
-    RefExecutionState state(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation, String execId) throws ExternalOperationFailedException;
-
-    ResponseRef getAsyncResult(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation, String execId) throws ExternalOperationFailedException;
+    ResponseRef executeRef(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException;
 
 }

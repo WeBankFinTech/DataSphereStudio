@@ -1,10 +1,28 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerAccessToken;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpGet;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DateUtil;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -13,30 +31,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Interner;
-import com.google.common.collect.Interners;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerAccessToken;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpGet;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DateUtil;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
-import com.webank.wedatasphere.dss.appconn.schedulis.conf.SchedulisConf;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DolphinSchedulerTokenOperation implements RefQueryOperation {
 
@@ -116,7 +114,7 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         CommonRequestRef requestRef = (CommonRequestRef)ref;
         String userName = (String)requestRef.getParameter("userName");
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         if (Constant.DS_ADMIN_USERNAME.equals(userName)) {
             result.put("token", DolphinSchedulerConf.DS_ADMIN_TOKEN.getValue());
         } else {
@@ -129,7 +127,7 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
             result = getToken(userName, userId);
         }
 
-        return new DolphinSchedulerProjectResponseRef(SchedulisConf.gson().toJson(result));
+        return ProjectResponseRef.newExternalBuilder().setResponseMap(result).success();
     }
 
     @Override
@@ -245,14 +243,14 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private Map<String, String> getToken(String userName, String userId) throws ExternalOperationFailedException {
+    private Map<String, Object> getToken(String userName, String userId) throws ExternalOperationFailedException {
         DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
         // 该用户有token
         if (accessToken != null) {
             long expireTimeStamp = accessToken.getExpireTime().getTime() - expireTimeGap;
             // 已有token未过期，返回该token
-            if (new Date().getTime() < expireTimeStamp) {
-                Map<String, String> result = new HashMap<>();
+            if (System.currentTimeMillis() < expireTimeStamp) {
+                Map<String, Object> result = new HashMap<>();
                 result.put("token", accessToken.getToken());
                 result.put("expire_time", String.valueOf(expireTimeStamp));
                 return result;
@@ -316,9 +314,9 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private Map<String, String> createToken(String userName, String userId, String expireTime)
+    private Map<String, Object> createToken(String userName, String userId, String expireTime)
         throws ExternalOperationFailedException {
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         synchronized (pool.intern(userId)) {
             DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
             // 已有token未过期，返回该token
@@ -362,14 +360,14 @@ public class DolphinSchedulerTokenOperation implements RefQueryOperation {
         }
     }
 
-    private Map<String, String> updateToken(int tokenId, String userName, String userId, String expireTime)
+    private Map<String, Object> updateToken(int tokenId, String userName, String userId, String expireTime)
         throws ExternalOperationFailedException {
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         synchronized (pool.intern(userId)) {
             DolphinSchedulerAccessToken accessToken = getTokenByUserName(userName, userId);
             long expireTimeStamp = accessToken.getExpireTime().getTime() - expireTimeGap;
             // 已有token未过期，返回该token
-            if (new Date().getTime() < expireTimeStamp) {
+            if (System.currentTimeMillis() < expireTimeStamp) {
                 result.put("token", accessToken.getToken());
                 result.put("expire_time", String.valueOf(expireTimeStamp));
                 return result;

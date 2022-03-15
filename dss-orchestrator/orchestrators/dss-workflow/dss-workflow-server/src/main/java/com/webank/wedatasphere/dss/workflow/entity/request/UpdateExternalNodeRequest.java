@@ -7,6 +7,7 @@ import java.util.Map;
 public class UpdateExternalNodeRequest {
     private Long projectID;
     private String nodeType;
+    private Long flowID;
     private LabelRouteVO labels;
     private Map<String, Object> params;
 
@@ -40,5 +41,13 @@ public class UpdateExternalNodeRequest {
 
     public void setLabels(LabelRouteVO labels) {
         this.labels = labels;
+    }
+
+    public Long getFlowID() {
+        return flowID;
+    }
+
+    public void setFlowID(Long flowID) {
+        this.flowID = flowID;
     }
 }

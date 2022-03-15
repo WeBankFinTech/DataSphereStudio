@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,24 @@ public class OrchestratorLoaderUtils {
     @PostConstruct
     public void init(){
         orchestratorLoaderUtils = this;
-        orchestratorLoaderUtils.orchestratorManager=this.orchestratorManager;
+    }
+
+    public static ImmutablePair<AppInstance, DevelopmentIntegrationStandard> getOrchestratorDevelopmentStandard(
+            DSSOrchestrator dssOrchestrator, List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
+        AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
+        if(orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
+            DevelopmentIntegrationStandard  developmentIntegrationStandard = ((OnlyDevelopmentAppConn) orchestratorAppConn).getOrCreateDevelopmentStandard();
+            List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
+            if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
+                return new ImmutablePair<>(appInstance.get(0), developmentIntegrationStandard);
+            } else {
+                throw new NoSuchAppInstanceException(50635, "The binding AppConn of Orchestrator " + dssOrchestrator.getName() +
+                        " has no appInstance.");
+            }
+        } else {
+            throw new NoSuchAppInstanceException(50635, "The binding AppConn of Orchestrator " + dssOrchestrator.getName() +
+                    " has not implements OnlyDevelopmentAppConn.");
+        }
     }
 
 

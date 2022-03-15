@@ -21,13 +21,11 @@ import org.apache.linkis.common.conf.CommonVars;
 public class DSSCommonConf {
 
     public static final CommonVars<String> DSS_IO_ENV = CommonVars.apply("wds.dss.server.io.env", "BDAP_DEV");
-    public static final CommonVars<String> DSS_EXPORT_ENV = CommonVars.apply("wds.dss.server.export.env", "生产中心");
 
     public static final CommonVars<String> DSS_EXPORT_URL = CommonVars.apply("wds.dss.server.export.url", "/appcom/tmp/dss");
-    public static final CommonVars<String> DSS_INPUT_TOKEN = CommonVars.apply("wds.dss.server.input.token", "QML-AUTH");
 
-    public static final CommonVars<String> DSS_UPLOAD_PATH = CommonVars.apply("wds.dss.file.upload.dir", "/appcom/tmp/uploads");
-    public static final CommonVars<String> DSS_INPUT_RESTFUL_URL = CommonVars.apply("wds.dss.server.input.url", "http://localhost:9004/api/rest_j/v1/dss/input");
+    public static final CommonVars<String> DSS_ORCHESTRATOR_FRAMEWORK_APP_CONN_NAME = CommonVars.apply("wds.dss.orchestrator.framework.appconn", "orchestrator-framework");
 
+    public static final CommonVars<Integer> DSS_DOMAIN_LEVEL = CommonVars.apply("wds.linkis.gateway.domain.level", 3);
 
 }

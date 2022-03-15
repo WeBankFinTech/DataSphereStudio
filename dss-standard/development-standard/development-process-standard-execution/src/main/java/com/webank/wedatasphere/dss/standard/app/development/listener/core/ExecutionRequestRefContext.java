@@ -22,6 +22,7 @@ import org.apache.linkis.common.io.Record;
 import org.apache.linkis.common.io.resultset.ResultSet;
 import org.apache.linkis.common.io.resultset.ResultSetReader;
 import org.apache.linkis.common.io.resultset.ResultSetWriter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,16 +30,16 @@ import java.util.Map;
 public interface ExecutionRequestRefContext {
 
 
-    static final String TOKEN_USER_STR = "Token-User";
+    String TOKEN_USER_STR = "Token-User";
 
-    static final String TOKEN_CODE_STR = "Token-Code";
+    String TOKEN_CODE_STR = "Token-Code";
 
 
-    public Map<String, Object> getRuntimeMap();
+    Map<String, Object> getRuntimeMap();
 
-    public void appendLog(String log);
+    void appendLog(String log);
 
-    public void updateProgress(float progress);
+    void updateProgress(float progress);
 
     LinkisJob fetchLinkisJob(long jobId);
 
@@ -49,7 +50,7 @@ public interface ExecutionRequestRefContext {
      * 获取本节点的操作用户
      * @return
      */
-    public String getUser();
+    String getUser();
 
     void setStorePath(String storePath);
 

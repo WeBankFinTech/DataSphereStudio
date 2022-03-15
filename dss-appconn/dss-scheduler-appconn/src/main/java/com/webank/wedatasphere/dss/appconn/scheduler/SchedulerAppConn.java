@@ -18,10 +18,13 @@ package com.webank.wedatasphere.dss.appconn.scheduler;
 
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
+import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
 public interface SchedulerAppConn extends OnlySSOAppConn, OnlyStructureAppConn {
 
     WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard();
 
+    @Override
+    SchedulerStructureIntegrationStandard getOrCreateStructureStandard();
 }

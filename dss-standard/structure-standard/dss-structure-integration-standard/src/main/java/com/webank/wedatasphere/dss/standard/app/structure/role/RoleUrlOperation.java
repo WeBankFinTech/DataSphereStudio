@@ -17,9 +17,10 @@
 package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
 
-public interface RoleUrlOperation extends StructureOperation {
+public interface RoleUrlOperation extends StructureOperation<RequestRef, RoleResponseRef> {
 
     RoleResponseRef getRoleUrl(String workspaceName, Role role);
 

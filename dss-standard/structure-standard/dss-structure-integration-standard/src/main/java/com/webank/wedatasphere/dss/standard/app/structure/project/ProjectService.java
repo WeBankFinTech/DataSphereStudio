@@ -22,45 +22,61 @@ import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureServi
 public abstract class ProjectService extends AbstractStructureService {
 
     /**
-     * 是否支持DSS与各集成接入系统的协同开发能力
-     * @return 默认为false
+     * This method is used to ensure if the third-part AppConn has the same permission
+     * management with DSS project or not.
+     * <br>
+     * If permission management is exists and similar, please return true; otherwise
+     * please return false.
+     * @return return false by default.
      */
     public boolean isCooperationSupported() {
         return false;
     }
 
+    /**
+     * This is a pretty important method, please be aware of the instruction of this method.
+     * This method is used to ensure Whether the third-part AppConn allows duplicate project names.
+     * If this method returns false, which means duplicate project names is allowed, no exception will
+     * be throwed by DSS project framework when
+     * a new DSS project is creating and a duplicate project name check was not passed; otherwise, the
+     * project creation will be failed if a duplicate project name check was not passed.
+     * <br>
+     * 这是一个非常重要的方法，请注意此方法的说明。
+     * 此方法用于确保第三方 AppConn 是否允许重复的项目名称。
+     * 如果该方法返回 false，即允许项目名重复，则在创建新的 DSS 项目并进行项目名重复性检查时，
+     * 即使第三方应用存在同名项目，DSS 框架也不会抛出异常；
+     * 否则，如果项目名重复性检查未通过，则 DSS 项目将创建失败。
+     * @return return true by default, means if the third-part AppConn has exist a project with the same
+     * name, the DSS project creation will be failed(默认返回 true，表示如果第三方 AppConn 已经存在同名项目，
+     * 则 DSS 项目将创建失败).
+     */
     public boolean isProjectNameUnique() {
         return true;
     }
 
-    public ProjectCreationOperation getProjectCreationOperation() {
+    public final ProjectCreationOperation getProjectCreationOperation() {
         return getOrCreate(this::createProjectCreationOperation, ProjectCreationOperation.class);
     }
 
     protected abstract ProjectCreationOperation createProjectCreationOperation();
 
-    public ProjectUpdateOperation getProjectUpdateOperation() {
+    public final ProjectUpdateOperation getProjectUpdateOperation() {
         return getOrCreate(this::createProjectUpdateOperation, ProjectUpdateOperation.class);
     }
 
     protected abstract ProjectUpdateOperation createProjectUpdateOperation();
 
-    public ProjectDeletionOperation getProjectDeletionOperation() {
+    public final ProjectDeletionOperation getProjectDeletionOperation() {
         return getOrCreate(this::createProjectDeletionOperation, ProjectDeletionOperation.class);
     }
 
     protected abstract ProjectDeletionOperation createProjectDeletionOperation();
 
-    public ProjectUrlOperation getProjectUrlOperation() {
-        return getOrCreate(this::createProjectUrlOperation, ProjectUrlOperation.class);
+
+    public final ProjectSearchOperation getProjectSearchOperation() {
+        return getOrCreate(this::createProjectSearchOperation, ProjectSearchOperation.class);
     }
 
-    public ProjectGetOperation getProjectGetOperation() {
-        return getOrCreate(this::createProjectGetOperation, ProjectGetOperation.class);
-    }
-
-    protected abstract ProjectGetOperation createProjectGetOperation();
-
-    protected abstract ProjectUrlOperation createProjectUrlOperation();
+    protected abstract ProjectSearchOperation createProjectSearchOperation();
 
 }

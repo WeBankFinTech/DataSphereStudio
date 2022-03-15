@@ -22,19 +22,17 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreatio
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 
 public interface RefCRUDService extends DevelopmentService {
 
-     <K extends CreateRequestRef> RefCreationOperation<K> getRefCreationOperation();
+     <K extends DSSJobContentRequestRef<K>> RefCreationOperation<K> getRefCreationOperation();
 
-     <K extends CopyRequestRef> RefCopyOperation<K> getRefCopyOperation();
+     <K extends CopyRequestRef<K>> RefCopyOperation<K> getRefCopyOperation();
 
-     <K extends RequestRef> RefUpdateOperation<K> getRefUpdateOperation();
+     <K extends RefJobContentRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation();
 
-     <K extends DeleteRequestRef> RefDeletionOperation<K> getRefDeletionOperation();
+     <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> getRefDeletionOperation();
 
 }

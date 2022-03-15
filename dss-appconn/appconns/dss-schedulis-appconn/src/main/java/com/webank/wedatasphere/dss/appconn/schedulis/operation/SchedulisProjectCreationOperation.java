@@ -16,14 +16,13 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.ref.SchedulisProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.AzkabanUtils;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisExceptionUtils;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.codehaus.jackson.JsonNode;
@@ -44,8 +43,6 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
 
     private String managerUrl;
 
-    private static  Long DEFAULT_PROJECT_ID = 0L;
-
 
     public SchedulisProjectCreationOperation() {
     }
@@ -63,7 +60,7 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
     @Override
     public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
         LOGGER.info("begin to create project in schedulis project is {}", requestRef.getName());
-        SchedulisProjectResponseRef responseRef = new SchedulisProjectResponseRef();
+//        SchedulisProjectResponseRef responseRef = new SchedulisProjectResponseRef();
         Map<String, String> params = new HashMap<>();
         params.put("action", "create");
         params.put("name", requestRef.getName());
@@ -78,19 +75,20 @@ public class SchedulisProjectCreationOperation implements ProjectCreationOperati
             }
 
         } catch (final Exception t) {
-            LOGGER.error("Failed to create project!",t);
+            LOGGER.error("Failed to create project!", t);
+            return ProjectResponseRef.newExternalBuilder().error(t);
         }
+        Long projectId = null;
         try {
-            DEFAULT_PROJECT_ID = getSchedulisProjectId(requestRef.getName(),requestRef);
+            projectId = getSchedulisProjectId(requestRef.getName(),requestRef);
         } catch (Exception e) {
             SchedulisExceptionUtils.dealErrorException(60051, "failed to get project id", e,
                     ExternalOperationFailedException.class);
         }
 
-        responseRef.setProjectRefId(DEFAULT_PROJECT_ID);
         // There is no project ID returned in schedulis, so there is no need to set.
         // Other exceptions are thrown out, so the correct code returned as 0 is OK.
-        return responseRef;
+        return ProjectResponseRef.newExternalBuilder().setRefProjectId(projectId).success();
     }
 
     @Override

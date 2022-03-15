@@ -17,5 +17,32 @@
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
 
-public interface ImportRequestRef extends WorkspaceRequestRef {
+import java.util.Map;
+
+public interface ImportRequestRef<R extends RefJobContentRequestRef<R>>
+        extends CopyRequestRef<R> {
+
+    default R setResourceMap(Map<String, Object> resourceMap) {
+        setParameter("resourceMap", resourceMap);
+        return (R) this;
+    }
+
+    /**
+     * ResourceMap is the content of ExportRequestRef exported.
+     * <br>
+     * Now, DSS only supports to import BML resources, so the resourceMap is consisted of `resourceId`
+     * and `version`.
+     * @return the content of ExportRequestRef exported.
+     */
+    default Map<String, Object> getResourceMap() {
+        return (Map<String, Object>) getParameter("resourceMap");
+    }
+
+    static boolean isLinkisBMLResources(Map<String, Object> resourceMap) {
+        return resourceMap.containsKey("resourceId") && resourceMap.containsKey("version");
+    }
+
+    String RESOURCE_ID_KEY = "resourceId";
+    String RESOURCE_VERSION_KEY = "version";
+
 }

@@ -17,14 +17,12 @@
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefCopyOperation<K extends CopyRequestRef>
-        extends DevelopmentOperation<CopyRequestRef, ResponseRef> {
+public interface RefCopyOperation<K extends CopyRequestRef<K>>
+        extends DevelopmentOperation<K, RefJobContentResponseRef> {
 
-
-    ResponseRef copyRef(K requestRef) throws ExternalOperationFailedException;
+    RefJobContentResponseRef copyRef(K requestRef) throws ExternalOperationFailedException;
 
 }

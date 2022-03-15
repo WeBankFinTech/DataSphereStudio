@@ -1,13 +1,13 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectCreationOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectDeletionOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.DolphinSchedulerProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DolphinSchedulerProjectService extends ProjectService {
 
@@ -35,15 +35,8 @@ public class DolphinSchedulerProjectService extends ProjectService {
     }
 
     @Override
-    protected ProjectGetOperation createProjectGetOperation() {
+    protected ProjectSearchOperation createProjectSearchOperation() {
         return null;
     }
-
-    @Override
-    protected ProjectUrlOperation createProjectUrlOperation() {
-        return null;
-    }
-
-
 
 }

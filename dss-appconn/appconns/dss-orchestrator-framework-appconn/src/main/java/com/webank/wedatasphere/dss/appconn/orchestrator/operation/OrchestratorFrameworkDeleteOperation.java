@@ -16,45 +16,38 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestDeleteOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorDeleteRequestRef;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.rpc.Sender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkDeleteOperation implements
-        RefDeletionOperation<OrchestratorDeleteRequestRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkDeleteOperation.class);
+public class OrchestratorFrameworkDeleteOperation
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, ResponseRef>
+        implements RefDeletionOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl> {
 
     @Override
-    public void setDevelopmentService(DevelopmentService service) {
-    }
-
-    @Override
-    public void deleteRef(OrchestratorDeleteRequestRef requestRef) throws ExternalOperationFailedException {
-        LOGGER.info("Begin to ask to delete orchestrator, requestRef is {}", requestRef);
+    public ResponseRef deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        logger.info("Begin to ask to delete orchestrator, requestRef is {}.", requestRef);
+        Long orchestratorId = (Long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_ID_KEY);
         RequestDeleteOrchestrator deleteRequest = new RequestDeleteOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspaceName(), requestRef.getProjectName(),
-                requestRef.getOrcId(), requestRef.getDSSLabels());
-        ResponseOperateOrchestrator deleteResponse = null;
-        try {
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
-            deleteResponse = (ResponseOperateOrchestrator) sender.ask(deleteRequest);
-            LOGGER.info("End to ask to delete orchestrator , responseRef is {}", deleteResponse);
-            if (deleteResponse == null || !deleteResponse.getJobStatus().equals(JobStatus.Success)){
-                LOGGER.error("delete response is null or delete response status is not success");
-                DSSExceptionUtils.dealErrorException(60075, "failed to delete ref", ExternalOperationFailedException.class);
-            }
-        } catch (Exception e) {
-            DSSExceptionUtils.dealErrorException(60015, e.getMessage(), ExternalOperationFailedException.class);
+                requestRef.getWorkspace().getWorkspaceName(), requestRef.getProjectName(),
+                orchestratorId, requestRef.getDSSLabels());
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
+        ResponseOperateOrchestrator deleteResponse = (ResponseOperateOrchestrator) sender.ask(deleteRequest);
+        logger.info("End to ask to delete orchestrator , responseRef is {}.", deleteResponse);
+        if (! deleteResponse.isSucceed()){
+            logger.error("delete response status is failed, errorMsg: {}.", deleteResponse.getMessage());
+            DSSExceptionUtils.dealWarnException(60075, "failed to delete ref, errorMsg: " + deleteResponse.getMessage(),
+                    ExternalOperationFailedException.class);
         }
+        return ResponseRef.newInternalBuilder().success();
     }
 
 }

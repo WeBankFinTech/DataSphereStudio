@@ -19,12 +19,12 @@ package com.webank.wedatasphere.dss.standard.app.development.ref.impl;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRefImpl;
 
 import java.util.List;
 
 
-public  class CommonRequestRefImpl extends AbstractRequestRef implements CommonRequestRef {
+public  class CommonRequestRefImpl extends RequestRefImpl implements CommonRequestRef {
 
     protected String userName;
     protected Long projectId;

@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.loader;
 
-import com.webank.wedatasphere.dss.appconn.core.exception.AppConnErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class OrchestratorManager {
 
     private final static Logger logger = LoggerFactory.getLogger(OrchestratorManager.class);
 
-    private Map<String, DSSOrchestrator> cacheDssOrchestrator = new ConcurrentHashMap<>();
+    private final Map<String, DSSOrchestrator> cacheDssOrchestrator = new ConcurrentHashMap<>();
 
     @Autowired
     private DefaultOrchestratorLoader defaultOrchestratorLoader;
@@ -47,13 +46,12 @@ public class OrchestratorManager {
         String findKey = getCacheKey(userName, workspaceName, typeName, appConnName);
         DSSOrchestrator dssOrchestrator = cacheDssOrchestrator.get(findKey);
         if (null == dssOrchestrator) {
-            try {
-
-                dssOrchestrator = defaultOrchestratorLoader.loadOrchestrator(userName, workspaceName, typeName, appConnName, dssLabels);
-
-                cacheDssOrchestrator.put(findKey, dssOrchestrator);
-            } catch (AppConnErrorException e) {
-                logger.error("OrchestratorManager get DSSOrchestrator exception!", e);
+            synchronized (cacheDssOrchestrator)  {
+                dssOrchestrator = cacheDssOrchestrator.get(findKey);
+                if(null == dssOrchestrator) {
+                    dssOrchestrator = defaultOrchestratorLoader.loadOrchestrator(userName, workspaceName, typeName, appConnName, dssLabels);
+                    cacheDssOrchestrator.put(findKey, dssOrchestrator);
+                }
             }
         }
         return dssOrchestrator;

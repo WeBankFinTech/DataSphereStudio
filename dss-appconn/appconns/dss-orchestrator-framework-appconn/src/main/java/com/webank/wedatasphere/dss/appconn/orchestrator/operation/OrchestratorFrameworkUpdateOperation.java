@@ -16,52 +16,35 @@
 
 package com.webank.wedatasphere.dss.appconn.orchestrator.operation;
 
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestUpdateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorUpdateRef;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CommonResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.OnlyDevelopmentRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.rpc.Sender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class OrchestratorFrameworkUpdateOperation implements
-        RefUpdateOperation<OrchestratorUpdateRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorFrameworkUpdateOperation.class);
+public class OrchestratorFrameworkUpdateOperation
+        extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.UpdateRequestRefImpl, ResponseRef>
+        implements RefUpdateOperation<OnlyDevelopmentRequestRef.UpdateRequestRefImpl> {
 
     @Override
-    public CommonResponseRef updateRef(OrchestratorUpdateRef requestRef) throws ExternalOperationFailedException {
-        if (null == requestRef){
-            LOGGER.error("request ref is null, can not deal with null ref");
-            return null;
-        }
-        LOGGER.info("Begin to ask to update orchestrator, requestRef is {}", requestRef);
+    public ResponseRef updateRef(OnlyDevelopmentRequestRef.UpdateRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        logger.info("Begin to ask to update orchestrator, requestRef is {}.", toJson(requestRef));
+        DSSOrchestratorInfo dssOrchestratorInfo = (DSSOrchestratorInfo) requestRef.getRefJobContent().get(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY);
         RequestUpdateOrchestrator updateRequest = new RequestUpdateOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspaceName(), requestRef.getOrchestratorInfo(), requestRef.getDSSLabels());
-        ResponseOperateOrchestrator updateResponse = null;
+                requestRef.getWorkspace().getWorkspaceName(), dssOrchestratorInfo, requestRef.getDSSLabels());
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
-        try{
-            updateResponse = (ResponseOperateOrchestrator) sender.ask(updateRequest);
-        }catch(final Exception e){
-            DSSExceptionUtils.dealErrorException(60015, "update orchestrator ref failed", e,
-                    ExternalOperationFailedException.class);
+        ResponseOperateOrchestrator updateResponse = (ResponseOperateOrchestrator) sender.ask(updateRequest);
+        logger.info("End to ask to update orchestrator, responseRef is {} with message {}.", updateResponse.getJobStatus(), updateResponse.getMessage());
+        if(updateResponse.isSucceed()) {
+            return ResponseRef.newInternalBuilder().success();
+        } else {
+            return ResponseRef.newInternalBuilder().error(updateResponse.getMessage());
         }
-        LOGGER.info("End to ask to update orchestrator, responseRef is {}", updateResponse);
-        if (updateResponse == null) {
-            LOGGER.error("to get updateResponse from orchestrator is null");
-            return null;
-        }
-        CommonResponseRef updateResponseRef = new CommonResponseRef();
-        updateResponseRef.setResult(JobStatus.Success.equals(updateResponse.getJobStatus()));
-        return updateResponseRef;
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
     }
 }

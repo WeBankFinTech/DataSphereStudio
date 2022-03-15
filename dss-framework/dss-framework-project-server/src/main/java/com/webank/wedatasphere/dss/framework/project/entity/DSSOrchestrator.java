@@ -47,14 +47,20 @@ public class DSSOrchestrator implements Serializable {
     private Long projectId;
 
     /**
-     * 编排模式id（工作流,调用orchestrator服务返回的orchestratorId）
+     * 编排模式id（如：DSS工作流编排模式。调用 orchestrator-framework 服务返回的 orchestratorId）
      */
     private Long orchestratorId;
 
     /**
-     * 编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId）
+     * 编排模式版本id（如：DSS工作流编排模式。调用 orchestrator-framework 服务返回的 orchestratorVersionId）
      */
     private Long orchestratorVersionId;
+
+    /**
+     * 对应调度系统的编排Id（如：Schedulis的工作流。调用 SchedulerAppConn 返回的 调度系统的工作流 id）
+     * 如果对接的调度系统不支持直接创建工作流，则该值为 null。
+     */
+    private Long orchestrationRefId;
 
     /**
      * 编排名称
@@ -140,6 +146,14 @@ public class DSSOrchestrator implements Serializable {
 
     public void setOrchestratorVersionId(Long orchestratorVersionId) {
         this.orchestratorVersionId = orchestratorVersionId;
+    }
+
+    public Long getOrchestrationRefId() {
+        return orchestrationRefId;
+    }
+
+    public void setOrchestrationRefId(Long orchestrationRefId) {
+        this.orchestrationRefId = orchestrationRefId;
     }
 
     public String getOrchestratorName() {

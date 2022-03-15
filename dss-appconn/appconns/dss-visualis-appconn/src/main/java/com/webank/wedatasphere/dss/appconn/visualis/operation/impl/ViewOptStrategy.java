@@ -1,22 +1,26 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation.impl;
 
 import com.google.common.collect.Lists;
-import com.webank.wedatasphere.dss.appconn.visualis.enums.NodeIdEnum;
-import com.webank.wedatasphere.dss.appconn.visualis.enums.ViewExecStatusEnum;
+import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
 import com.webank.wedatasphere.dss.appconn.visualis.model.*;
-import com.webank.wedatasphere.dss.appconn.visualis.model.publish.VisualisCommonResponseRef;
-import com.webank.wedatasphere.dss.appconn.visualis.operation.OperationStrategy;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisExportResponseRef;
-import com.webank.wedatasphere.dss.appconn.visualis.ref.*;
-import com.webank.wedatasphere.dss.appconn.visualis.utils.*;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef;
+import com.webank.wedatasphere.dss.appconn.visualis.operation.AsyncExecutionOperationStrategy;
+import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
+import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
+import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
-import com.webank.wedatasphere.dss.standard.app.development.ref.*;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.common.io.resultset.ResultSetWriter;
 import org.apache.linkis.cs.client.ContextClient;
@@ -25,36 +29,36 @@ import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.entity.enumeration.ContextType;
 import org.apache.linkis.cs.common.entity.source.ContextID;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.storage.domain.Column;
 import org.apache.linkis.storage.domain.DataType;
 import org.apache.linkis.storage.resultset.table.TableMetaData;
 import org.apache.linkis.storage.resultset.table.TableRecord;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public class ViewOptStrategy implements OperationStrategy {
+public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncExecutionOperationStrategy {
     private final static Logger logger = LoggerFactory.getLogger(ViewOptStrategy.class);
 
+    @Override
+    public String getStrategyName() {
+        return VisualisConstant.VIEW_OPERATION_STRATEGY;
+    }
 
     @Override
-    public ResponseRef createRef(NodeRequestRef requestRef, String baseUrl, DevelopmentService developmentService, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
+    public RefJobContentResponseRef createRef(ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException {
 
         String url = baseUrl + URLUtils.VIEW_URL;
-        logger.info("requestUrl:{}", url);
-
         VisualisPostAction visualisPostAction = new VisualisPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("name", requestRef.getName());
-        visualisPostAction.addRequestPayload("projectId", requestRef.getParameter("projectId"));
-        visualisPostAction.addRequestPayload("description", requestRef.getJobContent().get("desc"));
+        visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         visualisPostAction.addRequestPayload("sourceId", 0);
         visualisPostAction.addRequestPayload("config", "");
         visualisPostAction.addRequestPayload("sql", "");
@@ -62,229 +66,130 @@ public class ViewOptStrategy implements OperationStrategy {
         visualisPostAction.addRequestPayload("roles", Lists.newArrayList());
 
         // 执行http请求，获取响应结果
-        VisualisCommonResponseRef responseRef = VisualisCommonUtil.getResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
-        if (responseRef.isFailed()) {
-            logger.error(responseRef.getResponseBody());
-            throw new ExternalOperationFailedException(90178, responseRef.getErrorMsg());
-        }
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> jobContent = (Map<String, Object>) responseRef.toMap().get("payload");
-            responseRef.updateResponseBody(jobContent);
-            return responseRef;
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90177, "Create View Exception", e);
-        }
+        return VisualisCommonUtil.getRefJobContentResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }
 
 
     @Override
-    public void deleteRef(String baseUrl, NodeRequestRef visualisDeleteRequestRef, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
-        String url;
-        try {
-            url = baseUrl + URLUtils.VIEW_URL + "/" + VisualisNodeUtils.getId(visualisDeleteRequestRef);
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90177, "Delete View Exception", e);
-        }
+    public void deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        String url = baseUrl + URLUtils.VIEW_URL + "/" + getId(requestRef.getRefJobContent());
 
         VisualisDeleteAction deleteAction = new VisualisDeleteAction();
-        deleteAction.setUser(visualisDeleteRequestRef.getUserName());
+        deleteAction.setUser(requestRef.getUserName());
 
-        VisualisCommonUtil.checkResponseMap(VisualisCommonUtil.getResponseMap(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction));
+        VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, deleteAction);
     }
 
 
     @Override
-    public ResponseRef exportRef(ExportRequestRef requestRef, String url, VisualisPostAction visualisPostAction, String externalContent, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws Exception {
-        VisualisCommonResponseRef responseRef = new VisualisCommonResponseRef(externalContent);
-
-        visualisPostAction.addRequestPayload("viewIds", ((Double) Double.parseDouble(responseRef.getViewId())).longValue());
-        HttpResult httpResult = VisualisCommonUtil.getHttpResult(requestRef, url, visualisPostAction, ssoRequestOperation);
-        return new VisualisExportResponseRef(httpResult.getResponseBody());
+    public ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef, String url,
+                                 VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+        visualisPostAction.addRequestPayload("viewIds", Double.parseDouble(getId(requestRef.getRefJobContent())));
+        return VisualisCommonUtil.getExportResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }
 
 
     @Override
-    public ResponseRef query(VisualisOpenRequestRef visualisOpenRequestRef, String externalContent, Long projectId, String baseUrl) throws Exception {
-        VisualisCommonResponseRef responseRef = new VisualisCommonResponseRef(externalContent);
-        return VisualisCommonUtil.getResponseRef(visualisOpenRequestRef, projectId, baseUrl, URLUtils.VIEW_JUMP_URL_FORMAT, responseRef.getViewId());
+    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) {
+        String id = getId(requestRef.getRefJobContent());
+        return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.VIEW_JUMP_URL_FORMAT, id);
     }
 
 
     @Override
-    public ResponseRef updateRef(UpdateRequestRef requestRef, NodeRequestRef visualisUpdateRequestRef, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
-        String url;
-        String id;
-        try {
-            id = VisualisNodeUtils.getId(visualisUpdateRequestRef);
-            url = baseUrl + URLUtils.VIEW_URL + "/" + id;
-            logger.info("requestUrl:{}", url);
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90177, "Update View Exception", e);
-        }
+    public ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        String id = getId(requestRef.getRefJobContent());
+        String url = baseUrl + URLUtils.VIEW_URL + "/" + id;
+        logger.info("requestUrl: {}.", url);
         VisualisPutAction putAction = new VisualisPutAction();
-
-        putAction.addRequestPayload("projectId", visualisUpdateRequestRef.getProjectId());
-        putAction.addRequestPayload("name", visualisUpdateRequestRef.getName());
+        putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", Long.parseLong(id));
-        putAction.addRequestPayload("description", visualisUpdateRequestRef.getJobContent().get("desc"));
-        putAction.setUser(visualisUpdateRequestRef.getUserName());
+        putAction.addRequestPayload("description", requestRef.getRefJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
+        putAction.setUser(requestRef.getUserName());
 
-        Map resMap = VisualisCommonUtil.getResponseMap(visualisUpdateRequestRef, ssoRequestOperation, url, putAction);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> header = (Map<String, Object>) resMap.get("header");
-        int code = Integer.parseInt(NumberUtils.parseDoubleString(header.get("code").toString()));
-        if (code != 200) {
-            String errorMsg = header.toString();
-            if (errorMsg.contains("the view name is already taken")) {
-                return new CommonResponseRef();
-            } else {
-                throw new ExternalOperationFailedException(90177, errorMsg, null);
-            }
-        }
-        return new CommonResponseRef();
+        return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, putAction);
     }
 
 
     @Override
-    public ResponseRef copyRef(VisualisCopyRequestRef requestRef,
-                               Map<String, Object> jobContent,
+    public RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl requestRef,
                                String url,
-                               String nodeType,
-                               VisualisPostAction visualisPostAction,
-                               SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
+                               VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
 
-        visualisPostAction.addRequestPayload(NodeIdEnum.VIEW_IDS.getName(), VisualisCommonUtil.getNodeId(jobContent, "id"));
-
-        return VisualisCommonUtil.getResponseRef(requestRef, jobContent, url, visualisPostAction, ssoRequestOperation, "view");
+        visualisPostAction.addRequestPayload(VisualisConstant.VIEW_IDS, getId(requestRef.getRefJobContent()));
+        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        String id = getId(requestRef.getRefJobContent());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> viewData = (Map<String, Object>) responseRef.getData().get("view");
+        Map<String, Object> jobContent = new HashMap<>(2);
+        jobContent.put("id", Double.parseDouble(viewData.get(id).toString()));
+        return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
     }
 
 
     @Override
-    public ResponseRef importRef(VisualisPostAction visualisPostAction,
-                                 String url,
-                                 ImportRequestRef requestRef,
-                                 SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
-                                 DevelopmentService developmentService) throws ExternalOperationFailedException {
+    public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
+                                              String url,
+                                              VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
 
-        return VisualisCommonUtil.getResponseRef(visualisPostAction, url, requestRef, ssoRequestOperation);
+        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        Map<String, Object> jobContent = new HashMap<>(2);
+        String id = getId(requestRef.getRefJobContent());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> viewData = (Map<String, Object>) responseRef.getData().get("view");
+        jobContent.put("projectId", requestRef.getParameter("projectId"));
+        jobContent.put("id", Double.parseDouble(viewData.get(id).toString()));
+        return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
     }
 
-
     @Override
-    public ResponseRef executeRef(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
-
-        String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_FORMAT, getId(ref));
-        ref.getExecutionRequestRefContext().appendLog("dss execute view node,ready to get result set from " + url);
-
-        VisualisDownloadAction visualisDownloadAction = new VisualisDownloadAction();
-        visualisDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
-
+    public ResponseRef executeRef(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException {
+        String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_FORMAT, getId(ref.getRefJobContent()));
+        ResponseRef responseRef = executeRef(ref, url);
         try {
-            VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, url, visualisDownloadAction);
-
-        } catch (AppStandardErrorException e) {
-            ref.getExecutionRequestRefContext().appendLog("dss execute view node failed, ssoRequestOperation error");
-            throw new ExternalOperationFailedException(90176, "dss execute view node failed, ssoRequestOperation error", e);
-        }
-        InputStream inputStream = null;
-        try {
-            inputStream = Optional.of(visualisDownloadAction.getInputStream()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,inputStream is empty", null));
-            ViewResultData responseData = BDPJettyServerHelper.gson().fromJson(IOUtils.toString(inputStream), ViewResultData.class);
-            List<ViewResultData.Column> oldColumns = Optional.of(responseData.getData().getColumns()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,responseData is empty", null));
-            if (oldColumns.isEmpty()) {
-                ref.getExecutionRequestRefContext().appendLog("dss execute view node failed,columns is empty");
-                throw new ExternalOperationFailedException(90176, "dss execute view node failed,columns is empty", null);
-            }
-
-            List<Column> columns = Lists.newArrayList();
-            for (ViewResultData.Column columnData : oldColumns) {
-                columns.add(new Column(columnData.getName(), DataType.toDataType(columnData.getType().toLowerCase()), ""));
-            }
-            ResultSetWriter resultSetWriter = ref.getExecutionRequestRefContext().createTableResultSetWriter();
-            resultSetWriter.addMetaData(new TableMetaData(columns.toArray(new Column[0])));
-
-            List<Map<String, Object>> oldResultList = Optional.of(responseData.getData().getResultList()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,resultList is empty", null));
-            for (Map<String, Object> recordMap : oldResultList) {
-                resultSetWriter.addRecord(new TableRecord(recordMap.values().toArray()));
-            }
-            resultSetWriter.flush();
-            IOUtils.closeQuietly(resultSetWriter);
-            ref.getExecutionRequestRefContext().sendResultSet(resultSetWriter);
             cleanCSTabel(ref);
-        } catch (Throwable e) {
-            ref.getExecutionRequestRefContext().appendLog("dss execute view node failed，url：" + url);
-            ref.getExecutionRequestRefContext().appendLog(e.getMessage());
-            throw new ExternalOperationFailedException(90176, "dss execute view node failed", e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
+        } catch (ErrorException e) {
+            ref.getExecutionRequestRefContext().appendLog("ERROR: Failed to clean cs tables. Caused by: " + ExceptionUtils.getRootCauseMessage(e));
+            throw new ExternalOperationFailedException(90176, "Failed to clean cs tables.", e);
         }
-        return new VisualisCompletedExecutionResponseRef(200);
+        return responseRef;
     }
 
     @Override
-    public String submit(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation) throws ExternalOperationFailedException {
-        String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_SUBMIT, getId(ref));
-        ref.getExecutionRequestRefContext().appendLog("dss execute view node,ready to submit from " + url);
-        VisualisDownloadAction visualisDownloadAction = new VisualisDownloadAction();
-        visualisDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
-        InputStream inputStream = null;
-        try {
-            VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, url, visualisDownloadAction);
-            inputStream = Optional.of(visualisDownloadAction.getInputStream()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,inputStream is empty", null));
-            Map map = BDPJettyServerHelper.gson().fromJson(IOUtils.toString(inputStream), Map.class);
-            ref.getExecutionRequestRefContext().appendLog(map.toString());
-            @SuppressWarnings("unchecked")
-            Map dataMap = Optional.of((Map<String, Object>) map.get("data")).orElseThrow(() -> new ExternalOperationFailedException(90176, "judge datasource type failed"));
-            @SuppressWarnings("unchecked")
-            Map paginateWithExecStatusMap = (Map<String, Object>) dataMap.get("paginateWithExecStatus");
-            return Optional.of(paginateWithExecStatusMap.get("execId").toString()).orElseThrow(() -> new ExternalOperationFailedException(90176, "judge datasource type failed"));
-        } catch (Exception e) {
-            ref.getExecutionRequestRefContext().appendLog("dss execute view error for submit failed，url：" + url);
-            ref.getExecutionRequestRefContext().appendLog(e.getMessage());
-            throw new ExternalOperationFailedException(90176, "dss execute view error for submit failed,", e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
+    public String submit(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException {
+        String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_SUBMIT, getId(ref.getRefJobContent()));
+        logger.info("The {} of Visualis try to submit ref RefJobContent: {} in url {}.", ref.getType(), ref.getRefJobContent(), url);
+        ref.getExecutionRequestRefContext().appendLog("dss execute view node, ready to submit to " + url);
+        VisualisGetAction visualisGetAction = new VisualisGetAction();
+        visualisGetAction.setUser(ref.getUserName());
+        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
+        Map<String, Object> paginateWithExecStatusMap = (Map<String, Object>) responseRef.getData().get("paginateWithExecStatus");
+        return paginateWithExecStatusMap.get("execId").toString();
     }
 
     @Override
-    public RefExecutionState state(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation, String execId) throws ExternalOperationFailedException {
+    public RefExecutionState state(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref, String execId) throws ExternalOperationFailedException {
         if (StringUtils.isEmpty(execId)) {
             ref.getExecutionRequestRefContext().appendLog("dss execute view error for execId is null when get state!");
             throw new ExternalOperationFailedException(90176, "dss execute view error when get state");
         }
         String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_STATE, execId);
-        ref.getExecutionRequestRefContext().appendLog("dss execute view node,ready to get state from " + url);
+        ref.getExecutionRequestRefContext().appendLog("dss execute view node, ready to get state from " + url);
 
         VisualisPostAction visualisPostAction = new VisualisPostAction();
         visualisPostAction.setUser(VisualisCommonUtil.getUser(ref));
 
-        try {
-            HttpResult httpResult = VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, url, visualisPostAction);
-            ref.getExecutionRequestRefContext().appendLog(httpResult.getResponseBody());
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisPostAction);
+        ref.getExecutionRequestRefContext().appendLog(responseRef.getResponseBody());
 
-            Map responseMap = Optional.of(BDPJettyServerHelper.jacksonJson().readValue(httpResult.getResponseBody(), Map.class)).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,responseMap is empty", null));
-            String status = Optional.of(((Map<String, Object>) responseMap.get("payload")).get("status").toString()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,payload is empty", null));
-            switch (ViewExecStatusEnum.getEnum(status)) {
-                case Failed:
-                    return RefExecutionState.Failed;
-                case Succeed:
-                    return RefExecutionState.Success;
-                case Cancelled:
-                    return RefExecutionState.Killed;
-                default:
-                    return RefExecutionState.Running;
-            }
-        } catch (Exception e) {
-            ref.getExecutionRequestRefContext().appendLog("dss execute view error for get state failed，url：" + url);
-            ref.getExecutionRequestRefContext().appendLog(e.getMessage());
-            throw new ExternalOperationFailedException(90176, "dss execute view error for get state failed", e);
-        }
+        String status = responseRef.toMap().get("status").toString();
+        return toRefExecutionState(status);
     }
 
     @Override
-    public ResponseRef getAsyncResult(AsyncExecutionRequestRef ref, String baseUrl, SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation, String execId) throws ExternalOperationFailedException {
+    public ExecutionResponseRef getAsyncResult(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref, String execId) throws ExternalOperationFailedException {
         if (StringUtils.isEmpty(execId)) {
             ref.getExecutionRequestRefContext().appendLog("dss execute view error for execId is null when get result!");
             throw new ExternalOperationFailedException(90176, "dss execute view error when get result");
@@ -295,12 +200,9 @@ public class ViewOptStrategy implements OperationStrategy {
 
         visualisPostAction.setUser(VisualisCommonUtil.getUser(ref));
         try {
-            HttpResult httpResult = VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, url, visualisPostAction);
-            String responseBody = httpResult.getResponseBody();
-            Map responseMap = Optional.of(BDPJettyServerHelper.jacksonJson().readValue(responseBody, Map.class)).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,responseMap is empty", null));
-            Map<String, Object> payloadMap = Optional.of((Map<String, Object>) responseMap.get("payload")).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,payloadMap is empty", null));
-            ViewAsyncResultData responseData = BDPJettyServerHelper.gson().fromJson(BDPJettyServerHelper.gson().toJson(payloadMap), ViewAsyncResultData.class);
-            ref.getExecutionRequestRefContext().appendLog("get responseData success ");
+            ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisPostAction);
+            ViewAsyncResultData responseData = BDPJettyServerHelper.gson().fromJson(BDPJettyServerHelper.gson().toJson(responseRef.toMap()), ViewAsyncResultData.class);
+            ref.getExecutionRequestRefContext().appendLog("get responseData success.");
             List<ViewAsyncResultData.Column> oldColumns = Optional.of(responseData.getColumns()).orElseThrow(() -> new ExternalOperationFailedException(90176, "DSS execute view node failed,responseData is empty", null));
             if (oldColumns.isEmpty()) {
                 ref.getExecutionRequestRefContext().appendLog("dss execute view node failed,columns is empty");
@@ -325,27 +227,18 @@ public class ViewOptStrategy implements OperationStrategy {
             ref.getExecutionRequestRefContext().appendLog(e.getMessage());
             throw new ExternalOperationFailedException(90176, "dss execute view node failed", e);
         }
-        return new VisualisCompletedExecutionResponseRef(200);
+        return ExecutionResponseRef.newBuilder().success();
     }
 
 
-    @Override
-    public String getId(AsyncExecutionRequestRef requestRef) {
-        try {
-            String executionContent = BDPJettyServerHelper.jacksonJson().writeValueAsString(requestRef.getJobContent());
-            VisualisCommonResponseRef viewCreateResponseRef = new VisualisCommonResponseRef(executionContent);
-            return NumberUtils.parseDoubleString(viewCreateResponseRef.getViewId());
-        } catch (Exception e) {
-            logger.error("failed to parse jobContent when execute view node", e);
-        }
-        return null;
+    public String getId(Map<String, Object> requestRef) {
+        return NumberUtils.parseDoubleString(requestRef.get("id").toString());
     }
 
     // 为了实现View节点不产生CS表，对View执行产生的CS表进行清理
-    private void cleanCSTabel(AsyncExecutionRequestRef ref) throws ErrorException {
-        Map<String, Object> runMap = ref.getExecutionRequestRefContext().getRuntimeMap();
-        String contextIdStr = (String) runMap.get("contextID");
-        String nodeName = (String) runMap.get("nodeName");
+    private void cleanCSTabel(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ErrorException {
+        String contextIdStr = ref.getContextId();
+        String nodeName = ref.getName();
         ContextID contextID  = SerializeHelper.deserializeContextID(contextIdStr);
         ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
         contextClient.removeAllValueByKeyPrefixAndContextType(contextID, ContextType.METADATA, CSCommonUtils.NODE_PREFIX + nodeName);

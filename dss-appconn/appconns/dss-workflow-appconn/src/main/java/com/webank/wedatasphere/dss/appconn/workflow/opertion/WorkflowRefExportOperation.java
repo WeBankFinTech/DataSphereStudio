@@ -16,65 +16,44 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowExportRequestRef;
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowExportResponseRef;
 import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import org.apache.linkis.rpc.Sender;
-import org.apache.linkis.server.BDPJettyServerHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
-public class WorkflowRefExportOperation implements RefExportOperation<WorkflowExportRequestRef> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowRefExportOperation.class);
-
-    private DevelopmentService developmentService;
-
+public class WorkflowRefExportOperation
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, ExportResponseRef>
+        implements RefExportOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl> {
 
     @Override
-    public WorkflowExportResponseRef exportRef(WorkflowExportRequestRef workflowExportRequestRef) throws ExternalOperationFailedException {
+    public ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) {
 
-        String userName = workflowExportRequestRef.getUserName();
-        //todo
-        long flowId = workflowExportRequestRef.getAppId();
-        Long projectId = workflowExportRequestRef.getProjectId();
-        String projectName = workflowExportRequestRef.getProjectName();
+        String userName = requestRef.getUserName();
+        long flowId = (long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
+        Long projectId = requestRef.getProjectRefId();
+        String projectName = requestRef.getProjectName();
         RequestExportWorkflow requestExportWorkflow = new RequestExportWorkflow(userName,
                 flowId,
                 projectId,
                 projectName,
-                BDPJettyServerHelper.gson().toJson(workflowExportRequestRef.getWorkspace()),
-                workflowExportRequestRef.getDSSLabels());
-        ResponseExportWorkflow responseExportWorkflow = null;
-        try{
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(workflowExportRequestRef.getDSSLabels());
-            responseExportWorkflow = (ResponseExportWorkflow) sender.ask(requestExportWorkflow);
-        }catch(final Exception t){
-            DSSExceptionUtils.dealErrorException(60025, "failed to get rpc message", t, ExternalOperationFailedException.class);
-        }
-        if (null != responseExportWorkflow) {
-            WorkflowExportResponseRef workflowExportResponseRef = new WorkflowExportResponseRef();
-            workflowExportResponseRef.setFlowID(responseExportWorkflow.flowID());
-            workflowExportResponseRef.setResourceId(responseExportWorkflow.resourceId());
-            workflowExportResponseRef.setVersion(responseExportWorkflow.version());
-            workflowExportResponseRef.addResponse("resourceId", responseExportWorkflow.resourceId());
-            workflowExportResponseRef.addResponse("version", responseExportWorkflow.version());
-            workflowExportResponseRef.addResponse("flowID", responseExportWorkflow.flowID());
-            return workflowExportResponseRef;
-        } else {
-            throw new ExternalOperationFailedException(100085, "Error ask workflow to export!", null);
-        }
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
+                toJson(requestRef.getWorkspace()),
+                requestRef.getDSSLabels());
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
+        ResponseExportWorkflow responseExportWorkflow = (ResponseExportWorkflow) sender.ask(requestExportWorkflow);
+        Map<String, Object> resourceMap = new HashMap<>(2);
+        resourceMap.put(ImportRequestRef.RESOURCE_ID_KEY, responseExportWorkflow.resourceId());
+        resourceMap.put(ImportRequestRef.RESOURCE_VERSION_KEY, responseExportWorkflow.version());
+        return ExportResponseRef.newBuilder().setResourceMap(resourceMap).success();
     }
 
 }

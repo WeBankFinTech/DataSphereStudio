@@ -16,48 +16,46 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
-import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
-
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyRequestRef;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorCopyResponseRef;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorExportRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
-import com.webank.wedatasphere.dss.orchestrator.loader.utils.OrchestratorLoaderUtils;
+import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
+import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.*;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefExportService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractResponseRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javafx.util.Pair;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
 
 
 @Component
@@ -73,6 +71,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private MetaExportService metaExportService;
     @Autowired
     private ContextService contextService;
+    @Autowired
+    private OrchestratorManager orchestratorManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -80,7 +80,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                                                   List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
         if (orcVersionId == null || orcVersionId < 0){
-            LOGGER.info("orchestratorVersionId is {}", orcVersionId);
+            LOGGER.info("orchestratorVersionId is {}.", orcVersionId);
             //最简单的就是通过orcId来找到最新的versionId
             orcVersionId = orchestratorMapper.findLatestOrcVersionId(orchestratorId);
         }
@@ -99,36 +99,23 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 LOGGER.error("Failed to export metaInfo in orchestrator server for orc({}) in version {}.", orchestratorId, orcVersionId, e);
                 DSSExceptionUtils.dealErrorException(60099, "Failed to export metaInfo in orchestrator server.", e, DSSOrchestratorErrorException.class);
             }
-            LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {} ", userName, dssOrchestratorInfo.getName(), orcVersionId);
+            LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {}.", userName, dssOrchestratorInfo.getName(), orcVersionId);
 
             //2、导出第三方应用信息，如工作流、Visualis、Qualities
-            Pair<AppInstance, DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils
-                    .getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
-            if (null != standardPair) {
-                RefExportService refExportService = standardPair.getValue().getRefExportService(standardPair.getKey());
-
-                if (refExportService == null) {
-                    LOGGER.error("for {} to export orchestrator {} refExportService is null", userName, dssOrchestratorInfo.getName());
-                    DSSExceptionUtils.dealErrorException(60089, "refExportService is null", DSSErrorException.class);
-                }
-                OrchestratorExportRequestRef orchestratorExportRequestRef =
-                        AppConnRefFactoryUtils.newAppConnRef(OrchestratorExportRequestRef.class,
-                                refExportService.getClass().getClassLoader(), dssOrchestratorInfo.getType());
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("orchestrator Export Request Ref class is {}", orchestratorExportRequestRef.getClass());
-                }
-                orchestratorExportRequestRef.setAppId(dssOrchestratorVersion.getAppId());
-                orchestratorExportRequestRef.setProjectId(dssOrchestratorVersion.getProjectId());
-                orchestratorExportRequestRef.setProjectName(projectName);
-                orchestratorExportRequestRef.setUserName(userName);
-                orchestratorExportRequestRef.setWorkspace(workspace);
-                orchestratorExportRequestRef.setDSSLabels(dssLabels);
-                AbstractResponseRef responseRef = (AbstractResponseRef) refExportService.getRefExportOperation().
-                        exportRef(orchestratorExportRequestRef);
-                String resourceId = responseRef.getValue("resourceId").toString();
-                String version = responseRef.getValue("version").toString();
-                bmlService.downloadToLocalPath(userName, resourceId, version, orcExportSaveBasePath + "orc_flow.zip");
-            }
+            DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspaceName, dssOrchestratorInfo.getType(),
+                    dssOrchestratorInfo.getAppConnName(), dssLabels);
+            ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
+                    workspace, dssLabels, developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
+                    null,
+                    projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
+                    (developmentOperation, developmentRequestRef) -> {
+                        RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
+                        requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
+                        return ((RefExportOperation) developmentOperation).exportRef(requestRef);
+                    }, "export");
+            String resourceId = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY);
+            String version = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY);
+            bmlService.downloadToLocalPath(userName, resourceId, version, orcExportSaveBasePath + "orc_flow.zip");
 
             //打包导出工程
             String exportPath = zipExportProject(orcExportSaveBasePath);
@@ -142,7 +129,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             if (addOrcVersion) {
                 Long orcIncreaseVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
                         userName, dssOrchestratorInfo.getComment(),
-                        workspaceName, dssOrchestratorInfo, projectName, dssLabels);
+                        workspace, dssOrchestratorInfo, projectName, dssLabels);
                 resultMap.put("orcVersionId", orcIncreaseVersionId);
             } else {
                 resultMap.put("orcVersionId", orcVersionId);
@@ -150,7 +137,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             return resultMap;
             //4、返回BML存储信息
         } else {
-            throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确");
+            throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确.");
         }
     }
 
@@ -158,7 +145,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     public Long orchestratorVersionIncrease(Long orcId,
                                             String userName,
                                             String comment,
-                                            String workspaceName,
+                                            Workspace workspace,
                                             DSSOrchestratorInfo dssOrchestratorInfo,
                                             String projectName,
                                             List<DSSLabel> dssLabels) throws DSSErrorException {
@@ -187,48 +174,33 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
 
         //要求AppConn对应第三方应用拷贝一个新的app出来关联，如工作流，需要新建一个新的工作流进行关联。
-        Pair<AppInstance,DevelopmentIntegrationStandard> standardPair = OrchestratorLoaderUtils.getOrcDevelopStandard(userName, workspaceName, dssOrchestratorInfo, dssLabels);
-        if(standardPair == null){
-            LOGGER.error("dev Process Service is null");
-            throw new DSSOrchestratorErrorException(61105, "dev Process Service is null");
-        }
-        RefCRUDService refcrudservice =standardPair.getValue().getRefCRUDService (standardPair.getKey());
-        if (null != refcrudservice) {
-            try {
-                OrchestratorCopyRequestRef orchestratorCopyRequestRef =
-                        AppConnRefFactoryUtils.newAppConnRef(OrchestratorCopyRequestRef.class,
-                                refcrudservice.getClass().getClassLoader(), dssOrchestratorInfo.getAppConnName());
-                orchestratorCopyRequestRef.setCopyOrcAppId(dssOrchestratorVersion.getAppId());
-                orchestratorCopyRequestRef.setCopyOrcVersionId(dssOrchestratorVersion.getOrchestratorId());
-                orchestratorCopyRequestRef.setUserName(userName);
-                orchestratorCopyRequestRef.setProjectName(projectName);
-                //插入版本号
-                orchestratorCopyRequestRef.setParameter("version",dssOrchestratorVersion.getVersion());
-
-                //5、生成上下文ContextId
-                String contextId = contextService.createContextID(workspaceName, projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
-                dssOrchestratorVersion.setContextId(contextId);
-                LOGGER.info("Create a new ContextId for increase: {} ", contextId);
-                orchestratorCopyRequestRef.setContextID(contextId);
-                OrchestratorCopyResponseRef orchestratorCopyResponseRef =
-                        (OrchestratorCopyResponseRef) refcrudservice.getRefCopyOperation().copyRef(orchestratorCopyRequestRef);
-                dssOrchestratorVersion.setAppId(orchestratorCopyResponseRef.getCopyTargetAppId());
-                dssOrchestratorVersion.setContent(orchestratorCopyResponseRef.getCopyTargetContent());
-                //update appconn node contextId
-                dssOrchestratorVersion.setFormatContextId(contextId);
-                orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-            } catch (final Exception t) {
-                LOGGER.error("Failed to copy new orcVersion in orchestrator server for orc({}).", orcId, t);
-                DSSExceptionUtils.dealErrorException(60099, "Failed to copy app in orchestrator server", t, DSSOrchestratorErrorException.class);
-            }
-            return dssOrchestratorVersion.getId();
-        } else {
-            throw new DSSOrchestratorErrorException(10023, "获取第三方应用的Ref为空，不能完成拷贝操作！");
-        }
+        //1、生成上下文ContextId
+        String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
+        dssOrchestratorVersion.setContextId(contextId);
+        LOGGER.info("Create a new ContextId {} for orchestration {} to increase version to {}.", contextId, orcId, dssOrchestratorVersion.getVersion());
+        DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
+                dssOrchestratorInfo.getAppConnName(), dssLabels);
+        RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
+                workspace, dssLabels, developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
+                dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
+                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
+                (developmentOperation, developmentRequestRef) -> {
+                    CopyRequestRef requestRef = (CopyRequestRef) developmentRequestRef;
+                    Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId(),
+                            OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION, dssOrchestratorVersion.getComment());
+                    requestRef.setNewVersion(dssOrchestratorVersion.getVersion()).setRefJobContent(refJobContent);
+                    return ((RefCopyOperation) developmentOperation).copyRef(requestRef);
+                }, "increase");
+        dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
+        dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
+        //update appConn node contextId
+        dssOrchestratorVersion.setFormatContextId(contextId);
+        orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        return dssOrchestratorVersion.getId();
     }
 
     @Override
-    public Long addVersionAfterPublish(String userName, String workspaceName, Long orchestratorId,
+    public Long addVersionAfterPublish(String userName, Workspace workspace, Long orchestratorId,
                                        Long orcVersionId, String projectName,
                                        List<DSSLabel> dssLabels,String comment) throws DSSErrorException {
         //发布之后添加一个版本号
@@ -241,7 +213,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(dssOrchestratorVersion.getOrchestratorId());
         Long orcIncreaseVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
                 userName, comment,
-                workspaceName, dssOrchestratorInfo, projectName, dssLabels);
+                workspace, dssOrchestratorInfo, projectName, dssLabels);
         orcIncreaseVersionId = orcIncreaseVersionId == null ? 0L : orcIncreaseVersionId;
         return orcIncreaseVersionId;
     }

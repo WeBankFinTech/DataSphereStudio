@@ -142,17 +142,6 @@ public class MetaWriter<T> {
     }
 
     /**
-     * 驼峰转_
-     *
-     * @param str
-     * @return
-     */
-    private String unCamel(String str) {
-        // TODO: 2020/3/9
-        return null;
-    }
-
-    /**
      * 写comment,包括表名,class名,和外部自定义的comment
      */
     private void writeComment() {

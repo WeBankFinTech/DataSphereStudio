@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.visualis.model;
 import org.apache.linkis.httpclient.request.DeleteAction;
 import org.apache.linkis.httpclient.request.UserAction;
 
-public class VisualisDeleteAction extends DeleteAction implements UserAction {
+public class VisualisDeleteAction extends DeleteAction implements UserAction, VisualisHttpAction {
 
     String url;
     String user;
@@ -29,6 +29,7 @@ public class VisualisDeleteAction extends DeleteAction implements UserAction {
         return url;
     }
 
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }

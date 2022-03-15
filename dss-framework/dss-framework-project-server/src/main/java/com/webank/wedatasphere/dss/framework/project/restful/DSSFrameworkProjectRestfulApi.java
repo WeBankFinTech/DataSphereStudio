@@ -107,7 +107,7 @@ public class DSSFrameworkProjectRestfulApi {
             if (!releaseUsers.contains(username)) {
                 releaseUsers.add(username);
             }
-            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace, true);
+            DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
             if (dssProjectVo != null) {
                 return Message.ok("创建工程成功").data("project", dssProjectVo);
             } else {

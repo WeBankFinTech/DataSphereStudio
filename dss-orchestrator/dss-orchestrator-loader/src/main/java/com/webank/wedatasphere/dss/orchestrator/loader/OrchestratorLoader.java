@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.orchestrator.loader;
 
 
-import com.webank.wedatasphere.dss.appconn.core.exception.AppConnErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 
@@ -37,5 +36,5 @@ public interface OrchestratorLoader {
                                      String workspaceName,
                                      String typeName,
                                      String appConnName,
-                                     List<DSSLabel> dssLabels) throws AppConnErrorException;
+                                     List<DSSLabel> dssLabels);
 }

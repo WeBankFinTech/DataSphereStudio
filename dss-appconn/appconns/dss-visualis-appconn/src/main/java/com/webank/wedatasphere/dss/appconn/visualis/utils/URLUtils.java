@@ -16,11 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
-import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisOpenRequestRef;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import org.apache.linkis.server.conf.ServerConfiguration;
-
-import java.util.Map;
 
 public class URLUtils {
     public final static String widgetUrl = "/api/rest_j/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/widget" + "/smartcreate";
@@ -62,9 +58,8 @@ public class URLUtils {
         return baseUrl + String.format(format, ids);
     }
 
-    public static String getEnvUrl(String url, VisualisOpenRequestRef visualisOpenRequestRef) {
-        String env = ((Map<String, Object>) visualisOpenRequestRef.getParameter("params")).get(DSSCommonUtils.DSS_LABELS_KEY).toString();
-        return url + "?env=" + env.toLowerCase();
+    public static String getEnvUrl(String url, String labels) {
+        return url + "?env=" + labels.toLowerCase();
     }
 
 }

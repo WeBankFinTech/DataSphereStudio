@@ -16,12 +16,20 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis;
 
+import com.webank.wedatasphere.dss.appconn.visualis.operation.OperationStrategyFactory;
 import com.webank.wedatasphere.dss.appconn.visualis.service.VisualisExecutionService;
 import com.webank.wedatasphere.dss.appconn.visualis.service.*;
 import com.webank.wedatasphere.dss.standard.app.development.service.*;
 import com.webank.wedatasphere.dss.standard.app.development.standard.AbstractDevelopmentIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 
 public class VisualisDevelopmentIntegrationStandard extends AbstractDevelopmentIntegrationStandard {
+
+    @Override
+    public void init() throws AppStandardErrorException {
+        OperationStrategyFactory.setSsoRequestOperation(ssoRequestService.createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME));
+        super.init();
+    }
 
     @Override
     protected RefCRUDService createRefCRUDService() {

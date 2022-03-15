@@ -20,6 +20,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
@@ -44,6 +45,7 @@ import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -164,9 +166,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }else{
             //踢掉那个演示demo工作空间
             List<DSSWorkspace> retWorkspaces = new ArrayList<>();
-            String defaultDemoWorkspaceName = DEFAULT_DEMO_WORKSPACE_NAME.getValue();
+            String[] defaultDemoWorkspaceNames = DEFAULT_DEMO_WORKSPACE_NAME.getValue().split(",");
             for (DSSWorkspace workspace : workspaces) {
-                if (!workspace.getName().equals(defaultDemoWorkspaceName)){
+                if (!ArrayUtils.contains(defaultDemoWorkspaceNames, workspace.getName())){
                     retWorkspaces.add(workspace);
                 }
             }
@@ -175,13 +177,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws Exception {
+    public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws DSSErrorException {
         //根据用户名 拿到用户ID
         //根据用户id 和工作空间id 拿到 角色id
         //根据role id 和工作空间id 拿到 重定向的 url
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
         if(tempWorkspaceIds == null || tempWorkspaceIds.isEmpty()){
-            throw new Exception("该账号尚未加入工作空间，请联系管理员分配工作空间及用户角色");
+            throw new DSSErrorException(30020, "该账号尚未加入工作空间，请联系管理员分配工作空间及用户角色");
         }
         List<Integer> workspaceIds = new ArrayList<>();
         tempWorkspaceIds.stream().
@@ -491,14 +493,15 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
 
     @Override
-    public List<DSSWorkspace> getWorkspaces() {
-
-        return workspaceMapper.getWorkspaces();
-    }
-
-    @Override
-    public DSSWorkspace getWorkspacesById(Long id) {
+    public DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException {
+        List<String> users = dssWorkspaceUserMapper.getAllWorkspaceUsers(id.intValue());
+        if(!users.contains(username)) {
+            throw new DSSErrorException(30021, "You have no permission to access this workspace " + id);
+        }
         DSSWorkspace dssWorkSpace = workspaceMapper.getWorkspaceById(id);
+        if(dssWorkSpace == null) {
+            throw new DSSErrorException(30022, "workspace " + id + " is not exists.");
+        }
         String originDepart = dssWorkSpace.getDepartment();
         if(StringUtils.isNotBlank(originDepart)){
             String departName = workspaceMapper.getDepartName(Long.valueOf(originDepart));

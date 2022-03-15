@@ -17,15 +17,33 @@
 package com.webank.wedatasphere.dss.orchestrator.common.ref;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CommonRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.DSSContextRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ProjectRefRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.DevelopmentRequestRefImpl;
 
 
+public interface OrchestratorCreateRequestRef<K extends DSSJobContentRequestRef<K>>
+        extends DSSJobContentRequestRef<K> {
 
-public interface OrchestratorCreateRequestRef extends CreateRequestRef, CommonRequestRef {
+    default K setDssOrchestratorInfo(DSSOrchestratorInfo dssOrchestratorInfo) {
+        setParameter("dssOrchestratorInfo", dssOrchestratorInfo);
+        return (K) this;
+    }
 
-    void setDssOrchestratorInfo(DSSOrchestratorInfo dssOrchestratorInfo);
+    default DSSOrchestratorInfo getDSSOrchestratorInfo() {
+        return (DSSOrchestratorInfo) getParameter("dssOrchestratorInfo");
+    }
 
-    DSSOrchestratorInfo getDSSOrchestratorInfo();
+    class OrchestratorCreateRequestRefImpl extends DevelopmentRequestRefImpl<OrchestratorCreateRequestRefImpl>
+            implements OrchestratorCreateRequestRef<OrchestratorCreateRequestRefImpl> {}
+
+    class OrchestratorCreateRequestRefWithProject extends DevelopmentRequestRefImpl<OrchestratorCreateRequestRefWithProject>
+            implements OrchestratorCreateRequestRef<OrchestratorCreateRequestRefWithProject>,
+            ProjectRefRequestRef<OrchestratorCreateRequestRefWithProject> {}
+
+    class OrchestratorCreateRequestRefWithContext extends DevelopmentRequestRefImpl<OrchestratorCreateRequestRefWithContext>
+            implements OrchestratorCreateRequestRef<OrchestratorCreateRequestRefWithContext>,
+            DSSContextRequestRef<OrchestratorCreateRequestRefWithContext> {}
 }
 

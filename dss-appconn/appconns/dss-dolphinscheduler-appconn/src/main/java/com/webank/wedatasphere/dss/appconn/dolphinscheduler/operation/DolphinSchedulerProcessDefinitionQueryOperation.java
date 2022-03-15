@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerProjectResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerGetRequestOperation;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpGet;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
@@ -59,7 +59,7 @@ public class DolphinSchedulerProcessDefinitionQueryOperation implements RefQuery
             ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getProjectName());
         String releaseState = queryProcessDefinitionReleaseStateById(dolphinProjectName,
             (Long)requestRef.getParameter("processId"), (String)requestRef.getParameter("username"));
-        return new DolphinSchedulerProjectResponseRef(releaseState);
+        return ProjectResponseRef.newExternalBuilder().setResponseBody(releaseState).success();
     }
 
     private String queryProcessDefinitionReleaseStateById(String projectName, Long processId, String userName)

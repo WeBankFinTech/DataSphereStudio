@@ -17,18 +17,19 @@
 package com.webank.wedatapshere.dss.appconn.datachecker
 
 
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, LongTermRefExecutionAction, RefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.AbstractRefExecutionAction
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef
 
-class DataCheckerExecutionAction extends AbstractRefExecutionAction with LongTermRefExecutionAction{
-  private[this] var _state: RefExecutionState = null
-  private var schedulerId: Int = _
-  def state: RefExecutionState = _state
+class DataCheckerExecutionAction extends AbstractRefExecutionAction {
 
-  def setState(value: RefExecutionState): Unit = {
-    _state = value
-  }
-  val response = new DataCheckerCompletedExecutionResponseRef(200)
-  private[this] var _dc: DataChecker = null
+  private var response: ExecutionResponseRef = _
+
+  def setExecutionResponseRef(response: ExecutionResponseRef): Unit =
+    this.response = response
+
+  def getExecutionResponseRef: ExecutionResponseRef = response
+
+  private[this] var _dc: DataChecker = _
 
   def dc: DataChecker = _dc
 
@@ -36,7 +37,4 @@ class DataCheckerExecutionAction extends AbstractRefExecutionAction with LongTer
     _dc = value
   }
 
-  override def setSchedulerId(schedulerId: Int): Unit = this.schedulerId = schedulerId
-
-  override def getSchedulerId: Int = schedulerId
 }

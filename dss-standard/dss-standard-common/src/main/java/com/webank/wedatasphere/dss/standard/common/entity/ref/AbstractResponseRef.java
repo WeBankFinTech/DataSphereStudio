@@ -32,8 +32,17 @@ public abstract class AbstractResponseRef implements ResponseRef {
     }
 
     @Override
+    public Map<String, Object> toMap() {
+        return responseMap;
+    }
+
+    @Override
     public Object getValue(String key) {
-        return toMap().get(key);
+        if(responseMap == null) {
+            return null;
+        } else {
+            return responseMap.get(key);
+        }
     }
 
     @Override
@@ -47,7 +56,7 @@ public abstract class AbstractResponseRef implements ResponseRef {
     }
 
     @Override
-    public boolean isSucceed() {
-        return status == 0 || status == 200;
+    public String getErrorMsg() {
+        return errorMsg;
     }
 }

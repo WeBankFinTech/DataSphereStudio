@@ -16,46 +16,21 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.apache.linkis.httpclient.request.HttpAction;
-import org.apache.linkis.httpclient.response.HttpResult;
 
 
-public class VisualisRefUpdateOperation implements RefUpdateOperation<UpdateRequestRef> {
-
-    private DevelopmentService developmentService;
-    private SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation;
-
-    public VisualisRefUpdateOperation(DevelopmentService developmentService) {
-        this.developmentService = developmentService;
-        this.ssoRequestOperation = developmentService.getSSORequestService().createSSORequestOperation(getAppName());
-    }
-
-    private String getAppName() {
-        return VisualisAppConn.VISUALIS_APPCONN_NAME;
-    }
+public class VisualisRefUpdateOperation
+        extends VisualisDevelopmentOperation<ThirdlyRequestRef.UpdateWitContextRequestRefImpl, ResponseRef>
+        implements RefUpdateOperation<ThirdlyRequestRef.UpdateWitContextRequestRefImpl> {
 
     @Override
-    public ResponseRef updateRef(UpdateRequestRef requestRef) throws ExternalOperationFailedException {
-        NodeRequestRef visualisUpdateRequestRef = (NodeRequestRef) requestRef;
-        String nodeType = visualisUpdateRequestRef.getNodeType().toLowerCase();
-        return ModuleFactory.getInstance().crateModule(nodeType).updateRef(requestRef, visualisUpdateRequestRef, getBaseUrl(), ssoRequestOperation);
-
-    }
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
-    }
-
-    private String getBaseUrl() {
-        return developmentService.getAppInstance().getBaseUrl();
+    public ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        String nodeType = requestRef.getType().toLowerCase();
+        logger.info("The {} of Visualis try to update ref RefJobContent: {}.", nodeType, requestRef.getParameters());
+        return OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
+                .updateRef(requestRef);
     }
 }

@@ -18,12 +18,11 @@ package com.webank.wedatasphere.dss.appconn.orchestrator.service;
 
 import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFrameworkImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefImportService;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 
 public class OrchestratorImportProcessService extends AbstractRefImportService {
 
     @Override
-    protected RefImportOperation createRefImportOperation() {
+    protected OrchestratorFrameworkImportOperation createRefImportOperation() {
         return new OrchestratorFrameworkImportOperation();
     }
 

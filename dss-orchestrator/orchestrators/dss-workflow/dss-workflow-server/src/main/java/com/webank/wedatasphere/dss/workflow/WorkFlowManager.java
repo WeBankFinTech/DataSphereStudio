@@ -49,26 +49,27 @@ public interface WorkFlowManager {
                           Long parentFlowID,
                           String uses,
                           List<String> linkedAppConnNames,
-                          List<DSSLabel> dssLabels
-                           ) throws DSSErrorException, JsonProcessingException;
+                          List<DSSLabel> dssLabels,
+                          String orcVersion) throws DSSErrorException, JsonProcessingException;
 
 
     /**
      * 根据已有的flow内容，拷贝一份新的flow,区分BML文件，用于绑定不同的版本
      * @param userName
      * @param rootFlowId
-     * @param contextIDStr
+     * @param contextIdStr
      * @param description
      * @return
      * @throws DSSErrorException
      */
-    DSSFlow copyRootflowWithSubflows(String userName,
-                                              long rootFlowId,
-                                              String workspaceName,
-                                              String projectName,
-                                              String contextIDStr,
-                                              String version,
-                                              String description) throws DSSErrorException, IOException;
+    DSSFlow copyRootFlowWithSubFlows(String userName,
+                                     long rootFlowId,
+                                     Workspace workspace,
+                                     String projectName,
+                                     String contextIdStr,
+                                     String orcVersion,
+                                     String description,
+                                     List<DSSLabel> dssLabels) throws DSSErrorException, IOException;
 
     DSSFlow queryWorkflow(String userName, Long rootFlowId) throws DSSErrorException;
 
@@ -91,11 +92,12 @@ public interface WorkFlowManager {
                                      Workspace workspace,
                                      List<DSSLabel> dssLabels) throws Exception;
 
-   List<DSSFlow>  importWorkflow(String userName,
+   List<DSSFlow> importWorkflow(String userName,
                                   String resourceId,
                                   String bmlVersion,
-                                  DSSFlowImportParam dssFlowImportParam) throws Exception;
+                                  DSSFlowImportParam dssFlowImportParam,
+                                  List<DSSLabel> dssLabels) throws Exception;
 
-    public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
+    ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
 
 }

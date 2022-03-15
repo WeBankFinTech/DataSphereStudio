@@ -16,27 +16,17 @@
 
 package com.webank.wedatasphere.dss.workflow.io.export.impl;
 
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExportRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.RefExportService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
-import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +47,8 @@ public class NodeExportServiceImpl implements NodeExportService {
     private BMLService bmlService;
     @Autowired
     private NodeInfoMapper nodeInfoMapper;
+    @Autowired
+    private WorkflowNodeService workflowNodeService;
 
     private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
 
@@ -78,51 +70,20 @@ public class NodeExportServiceImpl implements NodeExportService {
     }
 
     @Override
-    public void downloadAppConnResourceToLocal(String userName, Long projectId, DSSNode dwsNode, String savePath, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
-        //qualitis默认创建是为空
-        if (dwsNode.getJobContent() == null) {
-            return ;
-        }
-        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(dwsNode.getNodeType());
-        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
-        if (appConn != null) {
-            DevelopmentIntegrationStandard devStand = ((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
-
-            if (null != devStand) {
-                if (appConn.getAppDesc().getAppInstancesByLabels(dssLabels).size() > 0) {
-                    AppInstance appInstance = appConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
-                    RefExportService refExportService = devStand.getRefExportService(appInstance);
-                    ExportRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRefByPackageName(ExportRequestRef.class,
-                            appConn.getClass().getClassLoader(), appConn.getClass().getPackage().getName());
-                    //todo request param def
-                    requestRef.setParameter("jobContent", dwsNode.getJobContent());
-                    requestRef.setParameter("projectId", parseProjectId(projectId, appConn.getAppDesc().getAppName(), dssLabels));
-                    requestRef.setParameter("nodeType", dwsNode.getNodeType());
-                    requestRef.setParameter("user", userName);
-                    requestRef.setWorkspace(workspace);
-                    if (null != refExportService) {
-                        Map<String, Object> nodeExportContent = refExportService.getRefExportOperation().exportRef(requestRef).toMap();
-                        if (nodeExportContent != null) {
-                            String resourceId = nodeExportContent.get("resourceId").toString();
-                            String version = nodeExportContent.get("version").toString();
-                            String nodeResourcePath = savePath + File.separator + dwsNode.getId() + ".appconnre";
-                            bmlService.downloadToLocalPath(userName, resourceId, version, nodeResourcePath);
-                        } else {
-                            LOGGER.error("nodeExportContent is null for projectId {}, dwsNode {}", projectId, dwsNode.getName());
-                            DSSExceptionUtils.dealErrorException(61023, "nodeExportContent is null", DSSErrorException.class);
-                        }
-                    }
-                }
-            }else{
-                DSSExceptionUtils.dealErrorException(61024, "Failed to get AppInstance", DSSErrorException.class);
-            }
-        }
+    public void downloadAppConnResourceToLocal(String userName, Long projectId, DSSNode dwsNode, String savePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
+        CommonAppConnNode node = new CommonAppConnNode();
+        node.setJobContent(dwsNode.getJobContent());
+        node.setProjectId(projectId);
+        node.setWorkspace(workspace);
+        node.setDssLabels(dssLabels);
+        node.setNodeType(dwsNode.getNodeType());
+        node.setName(dwsNode.getName());
+        node.setId(dwsNode.getId());
+        Map<String, Object> resourceMap = workflowNodeService.exportNode(userName, node);
+        String resourceId = resourceMap.get(ImportRequestRef.RESOURCE_ID_KEY).toString();
+        String version = resourceMap.get(ImportRequestRef.RESOURCE_VERSION_KEY).toString();
+        String nodeResourcePath = savePath + File.separator + dwsNode.getId() + ".appconnre";
+        bmlService.downloadToLocalPath(userName, resourceId, version, nodeResourcePath);
     }
 
-
-    private Long parseProjectId(Long dssProjectId, String appconnName, List<DSSLabel> dssLabels){
-        ProjectRelationRequest projectRelationRequest = new ProjectRelationRequest(dssProjectId, appconnName, dssLabels);
-        ProjectRelationResponse projectRelationResponse = (ProjectRelationResponse) projectSender.ask(projectRelationRequest);
-        return projectRelationResponse.getAppInstanceProjectId();
-    }
 }

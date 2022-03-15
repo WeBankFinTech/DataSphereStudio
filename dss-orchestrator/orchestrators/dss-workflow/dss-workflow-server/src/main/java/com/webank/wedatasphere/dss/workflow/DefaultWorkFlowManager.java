@@ -45,20 +45,16 @@ import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.linkis.server.BDPJettyServerHelper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class DefaultWorkFlowManager implements WorkFlowManager {
@@ -79,8 +75,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     @Autowired
     private MetaInputService metaInputService;
 
-    private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
     @Override
     public DSSFlow createWorkflow(String userName,
                                   String flowName,
@@ -89,7 +83,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                   Long parentFlowId,
                                   String uses,
                                   List<String> linkedAppConnNames,
-                                  List<DSSLabel> dssLabels) throws DSSErrorException, JsonProcessingException {
+                                  List<DSSLabel> dssLabels,
+                                  String orcVersion) throws DSSErrorException, JsonProcessingException {
         DSSFlow dssFlow = new DSSFlow();
         dssFlow.setName(flowName);
         dssFlow.setDescription(description);
@@ -101,10 +96,10 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
         String appConnJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(linkedAppConnNames);
         dssFlow.setLinkedAppConnNames(appConnJson);
-        Map<String, String> dssLabelList = new HashMap<>();
+        Map<String, String> dssLabelList = new HashMap<>(1);
         if (null != dssLabels) {
-            dssLabels.stream().map(a->a.getValue()).forEach(a->{
-                dssLabelList.put(EnvDSSLabel.DSS_ENV_LABEL_KEY,a.get(EnvDSSLabel.DSS_ENV_LABEL_KEY));
+            dssLabels.stream().map(DSSLabel::getValue).forEach(a->{
+                dssLabelList.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, a.get(EnvDSSLabel.DSS_ENV_LABEL_KEY));
             });
         } else {
             dssLabelList.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, DSSCommonUtils.ENV_LABEL_VALUE_DEV);
@@ -115,32 +110,29 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             dssFlow.setRootFlow(true);
             dssFlow.setRank(0);
             dssFlow.setHasSaved(true);
-            dssFlow = flowService.addFlow(dssFlow, contextIdStr);
+            dssFlow = flowService.addFlow(dssFlow, contextIdStr, orcVersion);
         } else {
             dssFlow.setRootFlow(false);
             Integer rank = flowService.getParentRank(parentFlowId);
             // TODO: 2019/6/3 并发问题考虑for update
             dssFlow.setRank(rank + 1);
             dssFlow.setHasSaved(true);
-            dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr);
+            dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion);
         }
         return dssFlow;
     }
 
     @Override
-    public DSSFlow copyRootflowWithSubflows(String userName, long rootFlowId, String workspaceName, String projectName, String contextIdStr, String version, String description) throws DSSErrorException, IOException {
-
-        return flowService.copyRootFlow(rootFlowId, userName, workspaceName, projectName, version,contextIdStr);
-
+    public DSSFlow copyRootFlowWithSubFlows(String userName, long rootFlowId, Workspace workspace,
+                                            String projectName, String contextIdStr, String orcVersion,
+                                            String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+        return flowService.copyRootFlow(rootFlowId, userName, workspace, projectName,
+                orcVersion, contextIdStr, description, dssLabels);
     }
 
     @Override
-    public DSSFlow queryWorkflow(String userName, Long rootFlowId) throws DSSErrorException {
-        DSSFlow dssFlow = flowService.getFlowWithJsonAndSubFlowsByID(rootFlowId);
-       /* if (!dssFlow.getCreator().equals(userName)) {
-            throw new DSSErrorException(100089, "Workflow can not be query by others");
-        }*/
-        return dssFlow;
+    public DSSFlow queryWorkflow(String userName, Long rootFlowId) {
+        return flowService.getFlowWithJsonAndSubFlowsByID(rootFlowId);
     }
 
     @Override
@@ -164,19 +156,21 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public Map<String, Object> exportWorkflow(String userName, Long flowId, Long dssProjectId, String projectName, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+    public Map<String, Object> exportWorkflow(String userName, Long flowId, Long dssProjectId,
+                                              String projectName, Workspace workspace,
+                                              List<DSSLabel> dssLabels) throws Exception {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
         String exportPath = workFlowExportService.exportFlowInfo(dssProjectId, projectName, flowId, userName, workspace,dssLabels);
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
-        Map<String, Object> resultMap = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
-        return resultMap;
+        return bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
     }
 
     @Override
     public List<DSSFlow> importWorkflow(String userName,
-                               String resourceId,
-                               String bmlVersion,
-                               DSSFlowImportParam dssFlowImportParam) throws DSSErrorException, IOException {
+                                        String resourceId,
+                                        String bmlVersion,
+                                        DSSFlowImportParam dssFlowImportParam,
+                                        List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
 
         //todo download workflow bml file contains flowInfo and flowRelationInfo
         String inputZipPath = IoUtils.generateIOPath(userName, dssFlowImportParam.getProjectName(), dssFlowImportParam.getProjectName() + ".zip");
@@ -190,17 +184,14 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         List<DSSFlow> dwsFlowRelationList = workFlowInputService.persistenceFlow(dssFlowImportParam.getProjectID(),
                 dssFlowImportParam.getUserName(),
                 dssFlows,
-                dwsFlowRelations,
-                dssFlowImportParam.getSourceEnv());
+                dwsFlowRelations);
         List<DSSFlow> rootFlows = dwsFlowRelationList.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
         for (DSSFlow rootFlow : rootFlows) {
             workFlowInputService.inputWorkFlow(dssFlowImportParam.getUserName(),
-                    dssFlowImportParam.getWorkspaceName(),
                     rootFlow,
-                    dssFlowImportParam.getVersion(),
                     dssFlowImportParam.getProjectName(),
                     inputPath, null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
-                    dssFlowImportParam.getContextId());
+                    dssFlowImportParam.getContextId(), dssLabels);
         }
         return rootFlows;
     }

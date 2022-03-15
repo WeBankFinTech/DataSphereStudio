@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.parser;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -24,6 +25,7 @@ import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.stereotype.Component;
@@ -77,11 +79,19 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
             return workFlowJson;
         }
         Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
-
-
         flowJsonObject.replace(key,value);
         String updatedJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
         return updatedJson;
+    }
+
+    @Override
+    public String updateFlowJsonWithMap(String workFlowJson, Map<String, Object> props) throws JsonProcessingException {
+        if(MapUtils.isEmpty(props)){
+            return workFlowJson;
+        }
+        Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
+        props.forEach(flowJsonObject::replace);
+        return BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
     }
 
     @Override

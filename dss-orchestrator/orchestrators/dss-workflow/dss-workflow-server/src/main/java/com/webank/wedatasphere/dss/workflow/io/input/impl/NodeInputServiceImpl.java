@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -38,7 +39,10 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class NodeInputServiceImpl implements NodeInputService {
@@ -82,7 +86,9 @@ public class NodeInputServiceImpl implements NodeInputService {
     }
 
     @Override
-    public String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow, String nodeJson, String flowContextId, String appConnResourcePath, Workspace workspace, String orcVersion) throws DSSErrorException, IOException {
+    public String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow,
+                                        String nodeJson, String flowContextId, String appConnResourcePath,
+                                        Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
         String nodeType = nodeJsonMap.get("jobType").toString();
         String nodeId = nodeJsonMap.get("id").toString();
@@ -96,43 +102,42 @@ public class NodeInputServiceImpl implements NodeInputService {
         Map<String, Object> nodeContent = (LinkedHashMap<String, Object>) nodeJsonMap.get("jobContent");
         CommonAppConnNode appConnNode = new CommonAppConnNode();
         appConnNode.setId(nodeId);
+        appConnNode.setName((String) nodeJsonMap.get("title"));
+        appConnNode.setDssLabels(dssLabels);
         appConnNode.setNodeType(nodeType);
         appConnNode.setJobContent(nodeContent);
         appConnNode.setFlowId(dssFlow.getId());
         appConnNode.setProjectId(dssFlow.getProjectID());
+        appConnNode.setWorkspace(workspace);
+        appConnNode.setContextId(flowContextId);
 
         Map<String, Object> nodeExportContent = null;
-
-        if (nodeService != null) {
-            logger.info("appConn NodeService is exist");
-
-            File file = new File(nodeResourcePath);
-            if (file.exists()) {
-                InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-                Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
-                        projectName);
-                try {
-                    nodeExportContent = nodeService.importNode(userName, appConnNode, bmlReturnMap, workspace, orcVersion, flowContextId);
-                } catch (ExternalOperationFailedException e) {
-                    logger.error("failed to import node ", e);
-                    throw new DSSErrorException(e.getErrCode(), e.getMessage());
-                } catch (Exception e) {
-                    logger.error("failed to import node ", e);
-                    throw new DSSErrorException(90011, e.getMessage());
-                }
-                if (nodeExportContent != null) {
-                    if (nodeExportContent.get("project_id") != null) {
-                        Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
-                        logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
-                        nodeExportContent.remove("project_id");
-                    }
-                    nodeJsonMap.replace("jobContent", nodeExportContent);
-                    appConnNode.setJobContent(nodeExportContent);
-                    return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
-                }
-            } else {
-                logger.error("appConn node resource file does not exists." + nodeId);
+        File file = new File(nodeResourcePath);
+        if (file.exists()) {
+            InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
+            Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
+                    projectName);
+            try {
+                nodeExportContent = nodeService.importNode(userName, appConnNode, bmlReturnMap, orcVersion);
+            } catch (ExternalOperationFailedException e) {
+                logger.error("failed to import node ", e);
+                throw new DSSErrorException(e.getErrCode(), e.getMessage());
+            } catch (Exception e) {
+                logger.error("failed to import node ", e);
+                throw new DSSErrorException(90011, e.getMessage());
             }
+            if (nodeExportContent != null) {
+                if (nodeExportContent.get("project_id") != null) {
+                    Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
+                    logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
+                    nodeExportContent.remove("project_id");
+                }
+                nodeJsonMap.replace("jobContent", nodeExportContent);
+                appConnNode.setJobContent(nodeExportContent);
+                return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
+            }
+        } else {
+            logger.error("appConn node resource file does not exists." + nodeId);
         }
 
 
@@ -141,7 +146,6 @@ public class NodeInputServiceImpl implements NodeInputService {
 
     @Override
     public String updateNodeSubflowID(String nodeJson, long subflowID) throws IOException {
-
         return nodeParser.updateSubFlowID(nodeJson, subflowID);
     }
 

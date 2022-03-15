@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+
 import java.util.List;
 
 
@@ -107,6 +108,16 @@ public class RequestCreateOrchestrator {
         this.dssLabels = dssLabels;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "RequestCreateOrchestrator{" +
+                "userName='" + userName + '\'' +
+                ", workspaceName='" + workspaceName + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", projectId=" + projectId +
+                ", description='" + description + '\'' +
+                ", dssOrchestratorInfo=" + dssOrchestratorInfo +
+                ", dssLabels=" + dssLabels +
+                '}';
+    }
 }

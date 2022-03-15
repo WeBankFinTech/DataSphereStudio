@@ -17,17 +17,13 @@
 package com.webank.wedatapshere.dss.appconn.datachecker.service;
 
 import com.webank.wedatapshere.dss.appconn.datachecker.DataCheckerRefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
 
 public class DataCheckerExecuteService extends AbstractRefExecutionService {
 
-
     @Override
-    public RefExecutionOperation createRefExecutionOperation() {
-        DataCheckerRefExecutionOperation dataCheckerRefExecutionOperation = new DataCheckerRefExecutionOperation();
-        dataCheckerRefExecutionOperation.setDevelopmentService(this);
-        return dataCheckerRefExecutionOperation;
+    protected DataCheckerRefExecutionOperation createRefExecutionOperation() {
+        return new DataCheckerRefExecutionOperation();
     }
 
 }

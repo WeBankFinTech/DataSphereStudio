@@ -22,15 +22,17 @@ import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import com.webank.wedatasphere.dss.appconn.core.AppConn
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
-import com.webank.wedatasphere.dss.common.label.{EnvDSSLabel, LabelKeyConvertor}
+import com.webank.wedatasphere.dss.common.label.{DSSLabel, EnvDSSLabel, LabelKeyConvertor}
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.AbstractRefExecutionAction
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.Killable
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
+import com.webank.wedatasphere.dss.standard.app.development.ref.{DSSContextRequestRef, ProjectRefRequestRef}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
-import com.webank.wedatasphere.dss.standard.common.entity.ref.{AsyncResponseRef, DefaultRefFactory, ResponseRef}
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef
+import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils
+import org.apache.commons.lang.StringUtils
 import org.apache.linkis.common.utils.{OverloadUtils, Utils}
 import org.apache.linkis.engineconn.computation.executor.async.AsyncConcurrentComputationExecutor
 import org.apache.linkis.engineconn.computation.executor.execute.EngineExecutionContext
@@ -39,110 +41,96 @@ import org.apache.linkis.governance.common.utils.GovernanceConstant
 import org.apache.linkis.manager.common.entity.resource.{CommonNodeResource, LoadResource, NodeResource}
 import org.apache.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
 import org.apache.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFailedException
+import org.apache.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
 import org.apache.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
 import org.apache.linkis.manager.label.entity.Label
-import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
 import org.apache.linkis.protocol.UserWithCreator
 import org.apache.linkis.protocol.engine.JobProgressInfo
 import org.apache.linkis.scheduler.executer.{AsynReturnExecuteResponse, ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
 import org.apache.linkis.server.BDPJettyServerHelper
-import org.apache.commons.lang.StringUtils
-import org.apache.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
 
 import scala.beans.BeanProperty
+import scala.collection.JavaConverters._
 
-class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int) extends AsyncConcurrentComputationExecutor(outputPrintLimit) {
+class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
+  extends AsyncConcurrentComputationExecutor {
 
   @BeanProperty
   var userWithCreator: UserWithCreator = _
 
   private val executorLabels: util.List[Label[_]] = new util.ArrayList[Label[_]](2)
 
-  private val refFactory = new DefaultRefFactory
-
-  //  private var engineExecutionContext: EngineExecutionContext = _
-
-  private val taskHashMap: ConcurrentHashMap[String, (AsyncResponseRef, RefExecutionOperation)] = new ConcurrentHashMap[String, (AsyncResponseRef, RefExecutionOperation)](8)
+  private val taskHashMap: ConcurrentHashMap[String, AsyncExecutionResponseRef] = new ConcurrentHashMap[String, AsyncExecutionResponseRef](8)
 
   //定时清除map元素
   Utils.defaultScheduler.scheduleAtFixedRate(new Runnable {
-    override def run(): Unit = Utils.tryAndError({
-      val iterator = taskHashMap.entrySet().iterator()
-      while (iterator.hasNext) {
-        val current = iterator.next()
-        if (current.getValue._1.isCompleted) {
-          info("Begin to remove task map " + current.getKey)
-          iterator.remove()
-        }
-      }
-    })
-
+    override def run(): Unit = Utils.tryAndError {
+      val iterator = taskHashMap.entrySet().asScala.filter(_.getValue.isCompleted).map(_.getKey).clone()
+      iterator.foreach(taskHashMap.remove(_))
+      info(s"Cleaned ${iterator.size} history jobs, now only ${taskHashMap.size()} remained.")
+    }
   }, 0, 5, TimeUnit.MINUTES)
 
   override def executeLine(engineExecutorContext: EngineExecutionContext, code: String): ExecuteResponse = {
-    info("got code:[" + code + "]")
-    info("got params:[" + BDPJettyServerHelper.gson.toJson(engineExecutorContext.getProperties) + "]")
+    info(s"The execution code is: $code, runtime properties is: ${BDPJettyServerHelper.gson.toJson(engineExecutorContext.getProperties)}.")
 
-    //    if (engineExecutorContext != this.engineExecutionContext) {
-    //      this.engineExecutionContext = engineExecutorContext
-    //      info("Appconn executor reset new engineExecutorContext!")
-    //    }
     val source = engineExecutorContext.getProperties.get(GovernanceConstant.TASK_SOURCE_MAP_KEY) match {
       case map: util.Map[String, Object] => map
       case _ => return ErrorExecuteResponse("Cannot find source.", null)
     }
-
     def getValue(map: util.Map[String, AnyRef], key: String): String = map.get(key) match {
       case string: String => string
       case anyRef: AnyRef => BDPJettyServerHelper.gson.toJson(anyRef)
       case _ => null
     }
 
-    val requestRef = refFactory.newRef(classOf[ExecutionRequestRef], getClass.getClassLoader, "com.webank.wedatasphere") match {
-      case ref: AsyncExecutionRequestRef =>
-        ref.setProjectName(getValue(source, PROJECT_NAME_STR))
-        ref.setOrchestratorName(getValue(source, FLOW_NAME_STR))
-        ref.setJobContent(BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
-        ref.setName(getValue(source, NODE_NAME_STR))
-        engineExecutorContext.getLabels.find(_.isInstanceOf[EngineTypeLabel]).foreach {
-          case engineTypeLabel: EngineTypeLabel =>
-            ref.setType(engineTypeLabel.getEngineType)
-        }
-        ref.setExecutionRequestRefContext(new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator))
-        ref
-      case ref: ExecutionRequestRef => ref
-    }
     val workspace = BDPJettyServerHelper.gson.fromJson(getValue(engineExecutorContext.getProperties, WORKSPACE_NAME_STR), classOf[Workspace])
-    requestRef.setWorkspace(workspace)
     val appConnName = getAppConnName(getValue(engineExecutorContext.getProperties, NODE_TYPE))
     val appConn = AppConnManager.getAppConnManager.getAppConn(appConnName)
     if (appConn == null) {
-      error("appconn is null")
+      error(s"Cannot find AppConn $appConnName.")
       throw AppConnExecuteFailedException(510001, "Cannot Find appConnName: " + appConnName)
     }
-    //val labels = getDSSLabels(engineExecutorContext.getLabels)
-    var labels = engineExecutorContext.getProperties.get("labels").toString
+    val labels = engineExecutorContext.getProperties.get("labels").toString
     getAppInstanceByLabels(labels, appConn) match {
       case Some(appInstance) =>
         val developmentIntegrationStandard = appConn.asInstanceOf[OnlyDevelopmentAppConn].getOrCreateDevelopmentStandard
         val refExecutionService = developmentIntegrationStandard.getRefExecutionService(appInstance)
-        val refExecutionOperation = refExecutionService.getRefExecutionOperation
-        Utils.tryCatch({
-          val res = refExecutionOperation.execute(requestRef)
-          res match {
-            case asyncResponseRef: AsyncResponseRef =>
-              if (refExecutionOperation.isInstanceOf[Killable]) {
-                if (null != engineExecutorContext.getJobId.get) {
-                  info("add async response to task map " + engineExecutorContext.getJobId.get)
-                  taskHashMap.put(engineExecutorContext.getJobId.get, (asyncResponseRef, refExecutionOperation))
-                }
+        val refExecutionOperation = refExecutionService.getRefExecutionOperation[RefExecutionRequestRef[_]]
+        val requestRef = RequestRefUtils.getRequestRef(refExecutionOperation, classOf[RefExecutionRequestRef[_]])
+        requestRef.setExecutionRequestRefContext(new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator))
+        requestRef.setDSSLabels(getLabels(labels))
+        requestRef.setName(getValue(source, NODE_NAME_STR))
+        requestRef.setType(getValue(engineExecutorContext.getProperties, NODE_TYPE))
+        requestRef.setUserName(userWithCreator.user)
+        requestRef.setWorkspace(workspace)
+        requestRef.setRefJobContent(BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
+        requestRef match {
+          case contextRequestRef: DSSContextRequestRef[_] =>
+            contextRequestRef.setContextId(getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY))
+          case _ =>
+        }
+        requestRef match {
+          case projectRequestRef: ProjectRefRequestRef[_] =>
+            projectRequestRef.setProjectName(getValue(source, PROJECT_NAME_STR))
+        }
+        Utils.tryCatch {
+          refExecutionOperation.execute(requestRef) match {
+            case asyncResponseRef: AsyncExecutionResponseRef =>
+              engineExecutorContext.getJobId match {
+                case Some(id) =>
+                  info(s"add async responseRef to task map, the taskId is $id.")
+                  taskHashMap.put(id, asyncResponseRef)
+                case _ =>
               }
               new AsynReturnExecuteResponse {
-                private var er: ExecuteResponse => Unit = null
+                private var er: ExecuteResponse => Unit = _
 
                 def tryToNotifyAll(responseRef: ResponseRef): Unit = {
                   val executeResponse = createExecuteResponse(responseRef, appConnName)
-                  if (er == null) this synchronized (while (er == null) this.wait(1000))
+                  if (er == null) this synchronized {
+                    while (er == null) this.wait(1000)
+                  }
                   er(executeResponse)
                 }
 
@@ -157,12 +145,10 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
               }
             case responseRef: ResponseRef =>
               createExecuteResponse(responseRef, appConnName)
-            case _ =>
-              throw AppConnExecuteFailedException(510009, "appconn execute return error for: " + res)
           }
-        })(ErrorExecuteResponse("Failed to execute appconn", _))
+        } (ErrorExecuteResponse("Failed to execute appConn.", _))
       case None =>
-        throw AppConnExecuteFailedException(510000, "Cannot Find AppInstance by labels " + labels)
+        throw AppConnExecuteFailedException(510000, "Cannot Find AppInstance by labels." + labels)
     }
   }
 
@@ -171,7 +157,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
     if (responseRef.isSucceed) SuccessExecuteResponse()
     else {
       val exception = responseRef match {
-        case response: CompletedExecutionResponseRef => response.getException
+        case response: ExecutionResponseRef => response.getException
         case _ => null
       }
       error(s"$appConnName execute failed, failed reason is ${
@@ -184,13 +170,16 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
     StringUtils.split(nodeType, ".")(0)
   }
 
-  private def getAppInstanceByLabels(labels: String, appConn: AppConn): Option[AppInstance] = {
-    var labelStr = labels
-    if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+  private def getLabels(labels: String): util.List[DSSLabel] = {
+    val envLabelValue = if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
       val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
-      labelStr = labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
-    }
-    val appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(util.Arrays.asList(new EnvDSSLabel(labelStr)));
+      labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
+    } else labels
+    util.Arrays.asList(new EnvDSSLabel(envLabelValue))
+  }
+
+  private def getAppInstanceByLabels(labels: String, appConn: AppConn): Option[AppInstance] = {
+    val appInstanceList = appConn.getAppDesc.getAppInstancesByLabels(getLabels(labels))
     if (appInstanceList != null && appInstanceList.size() > 0) {
       return Some(appInstanceList.get(0))
     }
@@ -232,32 +221,29 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
 
   override def getId(): String = "AppConnEngineExecutor_" + id
 
-  override def getConcurrentLimit: Int = {
-    AppConnEngineConnConfiguration.CONCURRENT_LIMIT.getValue
-  }
+  override def getConcurrentLimit: Int = AppConnEngineConnConfiguration.CONCURRENT_LIMIT.getValue
 
   override def killAll(): Unit = {
   }
 
   override def killTask(taskID: String): Unit = {
-    warn(s"Appconn Kill job : ${taskID},size is " + taskHashMap.size())
+    warn(s"AppConn want to kill job: $taskID.")
     if (taskHashMap.containsKey(taskID)) {
-      val response = taskHashMap.get(taskID).asInstanceOf[(AsyncExecutionResponseRef, RefExecutionOperation)]
-      if (response._1.getAction.isInstanceOf[AbstractRefExecutionAction]) {
-
-        Utils.tryCatch {
-          response._1.getAction.asInstanceOf[AbstractRefExecutionAction].setKilledFlag(true)
-          taskHashMap.remove(taskID)
-          response._2.asInstanceOf[Killable].kill(response._1.getAction)
-          info(s"Appconn Kill job : ${taskID} success " + taskHashMap.size())
-        } {
-          case e: Exception =>
-            warn("kill error. " + e.getMessage)
-        }
+      val response = taskHashMap.get(taskID)
+      response.getAction match {
+        case action: AbstractRefExecutionAction =>
+          action.setKilledFlag(true)
+        case _ =>
       }
-
+      taskHashMap.remove(taskID)
+      response.getRefExecutionOperation match {
+        case killable: Killable =>
+          killable.kill(response.getAction)
+        case _ =>
+      }
+      info(s"AppConn Kill job: $taskID succeed.")
     } else {
-      warn(s"Appconn Kill job : ${taskID} failed for taskID is not exsit")
+      warn(s"AppConn Kill job: $taskID failed for task is not exist.")
     }
     super.killTask(taskID)
   }
@@ -275,5 +261,7 @@ object AppConnEngineConnExecutor {
   private val NODE_NAME_STR = "nodeName"
 
   private val NODE_TYPE = "nodeType"
+
+  private val CONTEXT_ID_KEY = "contextID"
 
 }

@@ -23,7 +23,7 @@ import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VisualisPutAction extends PutAction implements UserAction {
+public class VisualisPutAction extends PutAction implements UserAction, VisualisHttpAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VisualisPutAction.class);
     String url;
@@ -44,6 +44,7 @@ public class VisualisPutAction extends PutAction implements UserAction {
         return url;
     }
 
+    @Override
     public void setUrl(String url) {
         this.url = url;
     }

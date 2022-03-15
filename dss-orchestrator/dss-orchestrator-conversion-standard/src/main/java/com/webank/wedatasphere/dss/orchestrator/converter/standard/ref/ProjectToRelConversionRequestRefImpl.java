@@ -19,11 +19,11 @@ package com.webank.wedatasphere.dss.orchestrator.converter.standard.ref;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AbstractRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRefImpl;
 import java.util.List;
 
 
-public class ProjectToRelConversionRequestRefImpl extends AbstractRequestRef implements ProjectToRelConversionRequestRef {
+public class ProjectToRelConversionRequestRefImpl extends RequestRefImpl implements ProjectToRelConversionRequestRef {
 
     private DSSProject dssProject;
     private List<DSSOrchestration> dssOrcList;

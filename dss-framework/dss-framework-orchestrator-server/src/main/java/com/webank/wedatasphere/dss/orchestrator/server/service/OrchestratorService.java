@@ -89,8 +89,6 @@ public interface OrchestratorService {
      */
     List<DSSOrchestratorVersion> getVersionByOrchestratorId(Long orchestratorId);
 
-//    OrchestratorInfo getOrchestratorInfo(String username, Long workflowId);
-
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
 
     String rollbackOrchestrator(String username, Long projectId, String projectName,

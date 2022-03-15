@@ -16,8 +16,9 @@
 
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 
+import java.util.List;
 
 public class RequestImportWorkflow {
     private String userName;
@@ -25,12 +26,10 @@ public class RequestImportWorkflow {
     private String bmlVersion;
     private Long projectId;
     private String projectName;
-    private IOEnv sourceEnv;
     private String orcVersion;
-    private String workspaceName;
     private String workspaceStr;
     private String contextId;
-
+    private List<DSSLabel> dssLabels;
 
     public String getContextId() {
         return contextId;
@@ -82,28 +81,12 @@ public class RequestImportWorkflow {
         this.projectName = projectName;
     }
 
-    public IOEnv getSourceEnv() {
-        return sourceEnv;
-    }
-
-    public void setSourceEnv(IOEnv sourceEnv) {
-        this.sourceEnv = sourceEnv;
-    }
-
     public String getOrcVersion() {
         return orcVersion;
     }
 
     public void setOrcVersion(String orcVersion) {
         this.orcVersion = orcVersion;
-    }
-
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
     }
 
     public String getWorkspaceStr() {
@@ -114,26 +97,32 @@ public class RequestImportWorkflow {
         this.workspaceStr = workspaceStr;
     }
 
+    public List<DSSLabel> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<DSSLabel> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
+
     public RequestImportWorkflow(String userName,
                                  String resourceId,
                                  String bmlVersion,
                                  Long projectId,
                                  String projectName,
-                                 IOEnv sourceEnv,
                                  String orcVersion,
-                                 String workspaceName,
                                  String workspaceStr,
-                                 String contextId) {
+                                 String contextId,
+                                 List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.resourceId = resourceId;
         this.bmlVersion = bmlVersion;
         this.projectId = projectId;
         this.projectName = projectName;
-        this.sourceEnv = sourceEnv;
         this.orcVersion = orcVersion;
-        this.workspaceName = workspaceName;
         this.workspaceStr = workspaceStr;
         this.contextId = contextId;
+        this.dssLabels = dssLabels;
     }
 
 

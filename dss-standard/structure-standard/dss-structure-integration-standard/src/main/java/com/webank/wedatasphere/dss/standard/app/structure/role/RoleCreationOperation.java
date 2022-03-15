@@ -17,11 +17,12 @@
 package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
 import java.util.Map;
 
 
-public interface RoleCreationOperation extends StructureOperation {
+public interface RoleCreationOperation extends StructureOperation<RequestRef, RoleResponseRef> {
 
     RoleResponseRef createRole(String workspaceName, Role role);
 

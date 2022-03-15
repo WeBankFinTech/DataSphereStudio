@@ -16,50 +16,144 @@
 
 package com.webank.wedatasphere.dss.standard.sso.utils;
 
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
-import org.apache.linkis.common.conf.Configuration;
-import java.util.Arrays;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class SSOHelper {
 
-    public static Workspace getWorkspace(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        Cookie workspaceCookie = Arrays.stream(cookies).
-                filter(cookie -> "workspaceId".equals(cookie.getName())).findAny().orElse(null);
-        Workspace workspace = new Workspace();
-        if (workspaceCookie != null) {
-            workspace.setWorkspaceName(workspaceCookie.getValue());
+    private static final String WORKSPACE_ID_COOKIE_KEY = "workspaceId";
+    private static final String WORKSPACE_NAME_COOKIE_KEY = "workspaceName";
+    private static SSOBuilderService ssoBuilderService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SSOHelper.class);
+
+    public static void setSSOBuilderService(SSOBuilderService ssoBuilderService) {
+        if(ssoBuilderService == null) {
+            return;
         }
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
-        Arrays.stream(cookies).forEach(cookie -> ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue()));
-        ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
-        ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
-        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
+        SSOHelper.ssoBuilderService = ssoBuilderService;
+    }
+
+    public static Workspace getWorkspace(String workspaceName) {
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceName(workspaceName);
         return workspace;
     }
 
-    public static Workspace setWorkspaceId(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
-        response.addCookie(new Cookie("workspaceId", String.valueOf(workspaceId)));
-        SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
+    public static Workspace getWorkspace(Map<String, String> cookies) {
+        Workspace workspace = new Workspace();
+        workspace.setCookies(cookies);
+        if(cookies.isEmpty() || !cookies.containsKey(WORKSPACE_NAME_COOKIE_KEY)) {
+            throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies map, please ensure cookies have transferred correctly.");
+        }
+        String workspaceName = cookies.get(WORKSPACE_NAME_COOKIE_KEY);
+        workspace.setWorkspaceName(workspaceName);
+        if(cookies.containsKey(WORKSPACE_ID_COOKIE_KEY)) {
+            long workspaceId = Long.parseLong(cookies.get(WORKSPACE_ID_COOKIE_KEY));
+            workspace.setWorkspaceId(workspaceId);
+        }
+        return workspace;
+    }
+
+    public static Workspace getWorkspace(HttpServletRequest request){
+        Workspace workspace = new Workspace();
+        workspace.setDssUrl(request.getRemoteAddr());  //TODO
         Cookie[] cookies = request.getCookies();
         Arrays.stream(cookies).forEach(cookie -> {
-            if (cookie.getName().equals("workspaceId")) {
-                ssoUrlBuilderOperation.addCookie(cookie.getName(), String.valueOf(workspaceId));
-            } else {
-                ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue());
+            if(WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName())) {
+                workspace.setWorkspaceName(cookie.getValue());
+            } else if(WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName())) {
+                workspace.setWorkspaceId(Long.parseLong(cookie.getValue()));
             }
         });
-        Workspace workspace = new Workspace();
-        ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
-        ssoUrlBuilderOperation.setWorkspace(workspaceName);
-        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
+        if(StringUtils.isBlank(workspace.getWorkspaceName())) {
+            throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceId'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceId']).");
+        }
+        Arrays.stream(cookies).forEach(cookie -> workspace.addCookie(cookie.getName(), cookie.getValue()));
         return workspace;
+    }
+
+    public static Workspace setAndGetWorkspace(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
+        String workspaceIdStr = String.valueOf(workspaceId);
+        String domain = getCookieDomain(request.getHeader("Host"));
+        Cookie workspaceIdCookie = new Cookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
+        workspaceIdCookie.setDomain(domain);
+        Cookie workspaceNameCookie = new Cookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
+        workspaceNameCookie.setDomain(domain);
+        response.addCookie(workspaceIdCookie);
+        response.addCookie(workspaceNameCookie);
+        Workspace workspace = getWorkspace(request);
+        LOGGER.info("Try to change the workspace from [{}] to [{}] in DSS cookies of domain({}).",
+                workspace.getWorkspaceName(), workspaceName, domain);
+        workspace.setWorkspaceId(workspaceId);
+        workspace.setWorkspaceName(workspaceName);
+        workspace.addCookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
+        workspace.addCookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
+        return workspace;
+    }
+
+    public static SSOUrlBuilderOperation createSSOUrlBuilderOperation(Workspace workspace) {
+        SSOUrlBuilderOperation operation = ssoBuilderService.createSSOUrlBuilderOperation();
+        workspace.getCookies().forEach(operation::addCookie);
+        operation.setDSSUrl(workspace.getDssUrl());
+        operation.setWorkspace(workspace.getWorkspaceName());
+        return operation;
+    }
+
+    private static final Pattern DOMAIN_REGEX = Pattern.compile("[a-zA-Z][a-zA-Z0-9\\.]+");
+    private static final Pattern IP_REGEX = Pattern.compile("([^:]+):.+");
+
+    /**
+     * "dss.com" -> ".dss.com"
+     * "127.0.0.1" -> "127.0.0.1"
+     * "127.0.0.1:8080" -> "127.0.0.1"
+     * @param host the Host in HttpRequest Headers
+     * @return
+     */
+    public static String getCookieDomain(String host) {
+        int level = DSSCommonConf.DSS_DOMAIN_LEVEL.getValue();
+        if(DOMAIN_REGEX.matcher(host).find()) {
+            String[] domains = host.split("\\.");
+            int index = level;
+            if (domains.length == level) {
+                index = level - 1;
+            } else if (domains.length < level) {
+                index = domains.length;
+            }
+            if (index < 0) {
+                return host;
+            }
+            String[] parsedDomains = Arrays.copyOfRange(domains, index, domains.length);
+            if (parsedDomains.length < level) {
+                return host;
+            }
+            String domain = String.join(".", parsedDomains);
+            if(domains.length >= level) {
+                return "." + domain;
+            }
+            return domain;
+        }
+        Matcher matcher = IP_REGEX.matcher(host);
+        if(matcher.find()) {
+            return matcher.group();
+        } else {
+            return host;
+        }
     }
 
 }

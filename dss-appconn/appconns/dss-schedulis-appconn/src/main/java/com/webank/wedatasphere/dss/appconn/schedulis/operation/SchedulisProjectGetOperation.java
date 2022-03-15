@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
-import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectGetOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectSearchOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.codehaus.jackson.JsonNode;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchedulisProjectGetOperation implements ProjectGetOperation {
+public class SchedulisProjectGetOperation implements ProjectSearchOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectGetOperation.class);
 
     private ProjectService schedulisProjectService;
@@ -26,7 +26,7 @@ public class SchedulisProjectGetOperation implements ProjectGetOperation {
     }
 
     @Override
-    public DSSProject getProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef searchProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
         LOGGER.info("begin to get schedulis project , projectName is {}", requestRef.getName());
 
         Map<String, Object> params = new HashMap<>();
@@ -35,14 +35,11 @@ public class SchedulisProjectGetOperation implements ProjectGetOperation {
         try {
             String responseBody = SSORequestWTSS.requestWTSSWithSSOGet(queryUrl, params, this.schedulisProjectService.getSSORequestService(), requestRef.getWorkspace());
             JsonNode jsonNode = new ObjectMapper().readValue(responseBody, JsonNode.class);
-            DSSProject project = new DSSProject();
             JsonNode errorInfo = jsonNode.get("error");
             if (errorInfo != null && errorInfo.toString().contains("Project " + requestRef.getName() + " doesn't exist")) {
-                project.setId(-1L);
-                return project;
+                return ProjectResponseRef.newExternalBuilder().error(errorInfo.toString());
             }
-            project.setId(jsonNode.get("projectId").getLongValue());
-            return project;
+            return ProjectResponseRef.newExternalBuilder().setRefProjectId(jsonNode.get("projectId").getLongValue()).success();
         } catch (Exception e) {
             throw new ExternalOperationFailedException(90117, "Failed to query project!", e);
         }

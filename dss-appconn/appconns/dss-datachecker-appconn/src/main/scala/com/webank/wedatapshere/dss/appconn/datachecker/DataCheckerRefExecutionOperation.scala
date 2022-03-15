@@ -20,45 +20,31 @@ import java.util
 import java.util.{Properties, UUID}
 
 import com.webank.wedatasphere.dss.common.utils.VariableUtils
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
-import com.webank.wedatasphere.dss.common.utils.VariableUtils
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.linkis.common.log.LogUtils
 import org.apache.linkis.common.utils.Utils
-import org.slf4j.LoggerFactory;
 
-class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation with Killable with Procedure{
+import scala.collection.mutable
 
-  private var service:DevelopmentService = _
+class DataCheckerRefExecutionOperation
+  extends LongTermRefExecutionOperation[RefExecutionRequestRef.RefExecutionRequestRefImpl] with Killable with Procedure{
 
-  private val logger = LoggerFactory.getLogger(classOf[DataCheckerRefExecutionOperation])
-
-
-
-
-
-
-  protected def putErrorMsg(errorMsg: String, t: Throwable, action: DataCheckerExecutionAction): DataCheckerExecutionAction = t match {
-
-    case t: Exception =>
-      val response = action.response
-      response.setErrorMsg(errorMsg)
-      response.setException(t)
-      response.setIsSucceed(false)
-      action
+  protected def putErrorMsg(errorMsg: String, t: Throwable, action: DataCheckerExecutionAction): DataCheckerExecutionAction = {
+    action.setExecutionResponseRef(ExecutionResponseRef.newBuilder().setErrorMsg(errorMsg).setException(t).error())
+    action
   }
 
-  override def submit(requestRef: ExecutionRequestRef): RefExecutionAction = {
-    val asyncExecutionRequestRef = requestRef.asInstanceOf[AsyncExecutionRequestRef]
+  override def submit(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): RefExecutionAction = {
+    val asyncExecutionRequestRef = requestRef.asInstanceOf[RefExecutionRequestRef]
     val nodeAction = new DataCheckerExecutionAction()
-    nodeAction.setId(UUID.randomUUID().toString())
+    nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
     val InstanceConfig = this.service.getAppInstance.getConfig
-    val runTimeParams: scala.collection.mutable.Map[String, Object] = asyncExecutionRequestRef.getExecutionRequestRefContext().getRuntimeMap()
-    val variableParams: scala.collection.mutable.Map[String, Object]= asyncExecutionRequestRef.getJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
-    val inputParams =runTimeParams++variableParams
+    val runTimeParams = asyncExecutionRequestRef.getExecutionRequestRefContext.getRuntimeMap
+    val variableParams: mutable.Map[String, Object]= asyncExecutionRequestRef.getRefJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
+    val inputParams = runTimeParams ++ variableParams
     val properties = new Properties()
     InstanceConfig.foreach {
       case (key: String, value: Object) =>
@@ -74,7 +60,7 @@ class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation wit
           if (record._1.equalsIgnoreCase("job.desc")) {
             val rows = record._2.asInstanceOf[String].split("\n")
             rows.foreach(row => if (row.contains("=")) {
-              val endLocation = row.indexOf("=");
+              val endLocation = row.indexOf("=")
               val rowKey = row.substring(0, endLocation)
               val rowEnd = row.substring(endLocation + 1)
               tmpProperties.put(rowKey, rowEnd)
@@ -92,8 +78,8 @@ class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation wit
       else {
         if(inputParams.exists(x=>x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
           val tmp:util.HashMap[String, Any]  = new util.HashMap[String,Any]()
-          tmp.put(VariableUtils.RUN_DATE,inputParams.get(VariableUtils.RUN_DATE).getOrElse(null))
-          properties.put(record._1,VariableUtils.replace(record._2.toString,tmp))
+          tmp.put(VariableUtils.RUN_DATE,inputParams.getOrElse(VariableUtils.RUN_DATE, null))
+          properties.put(record._1, VariableUtils.replace(record._2.toString,tmp))
         }else {
           properties.put(record._1, VariableUtils.replace(record._2.toString))
         }
@@ -113,38 +99,28 @@ class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation wit
 
   override def state(action: RefExecutionAction): RefExecutionState = {
     action match {
-      case action: DataCheckerExecutionAction => {
+      case action: DataCheckerExecutionAction =>
         action.getExecutionRequestRefContext.appendLog("DataCheck is running!")
-        if (action.state.isCompleted) return action.state
+        if (action.getState.isCompleted) return action.getState
         Utils.tryCatch(action.dc.begineCheck(action))(t => {
           action.setState(RefExecutionState.Failed)
           logger.error("DataChecker run failed for " + t.getMessage, t)
           putErrorMsg("DataChecker run failed! " + t.getMessage, t, action)
         })
-        action.state
-      }
+        action.getState
       case _ => RefExecutionState.Failed
     }
   }
 
-  override def result(action: RefExecutionAction): CompletedExecutionResponseRef = {
-    val response:DataCheckerCompletedExecutionResponseRef = new DataCheckerCompletedExecutionResponseRef(200)
+  override def result(action: RefExecutionAction): ExecutionResponseRef = {
     action match {
-      case action: DataCheckerExecutionAction => {
-        if (action.state.equals(RefExecutionState.Success)) {
-          response.setIsSucceed(true)
-        } else {
-          response.setErrorMsg(action.response.getErrorMsg)
-          response.setIsSucceed(false)
-        }
-        response
-      }
-      case _ => {
-        response.setIsSucceed(false)
-        response
-      }
-
-
+      case action: DataCheckerExecutionAction =>
+        if (action.getState.equals(RefExecutionState.Success)) {
+          ExecutionResponseRef.newBuilder().success()
+        } else if(action.getExecutionResponseRef != null) action.getExecutionResponseRef
+        else ExecutionResponseRef.newBuilder().error()
+      case _ =>
+        ExecutionResponseRef.newBuilder().error()
     }
   }
 
@@ -162,31 +138,24 @@ class DataCheckerRefExecutionOperation extends LongTermRefExecutionOperation wit
 
   override def log(action: RefExecutionAction): String = {
     action match {
-      case action: DataCheckerExecutionAction => {
-        if (!action.state.isCompleted) {
+      case action: DataCheckerExecutionAction =>
+        if (!action.getState.isCompleted) {
           LogUtils.generateInfo("DataChecker is waiting for tables")
         } else {
           LogUtils.generateInfo("DataChecker successfully received info of tables")
         }
-      }
       case _ => LogUtils.generateERROR("Error for NodeExecutionAction ")
     }
 
   }
 
-  override def createAsyncResponseRef(requestRef: ExecutionRequestRef, action: RefExecutionAction): AsyncExecutionResponseRef = {
+  override def createAsyncResponseRef(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, action: RefExecutionAction): AsyncExecutionResponseRef = {
     action match {
-      case action: DataCheckerExecutionAction => {
-        val response = super.createAsyncResponseRef(requestRef,action)
-        response.setMaxLoopTime(action.dc.maxWaitTime)
-        response.setAskStatePeriod(action.dc.queryFrequency)
-        response
-      }
+      case action: DataCheckerExecutionAction =>
+        val response = super.createAsyncResponseRef(requestRef, action)
+        AsyncExecutionResponseRef.newBuilder().setMaxLoopTime(action.dc.maxWaitTime)
+        .setAskStatePeriod(action.dc.queryFrequency).setAsyncExecutionResponseRef(response).build()
     }
   }
 
-
-  override def setDevelopmentService(service: DevelopmentService): Unit = {
-    this.service = service
-  }
 }

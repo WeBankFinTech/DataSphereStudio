@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 
 @XmlRootElement
@@ -35,15 +34,7 @@ public class OrchestratorDeleteRequest {
     @NotNull(message = "工程id不能为空")
     private Long projectId;
 
-    public List<String> getDssLabels() {
-        return dssLabels;
-    }
-
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
-    }
-
-    private List<String> dssLabels;
+    private Boolean deleteSchedulerWorkflow = false;
 
     /**
      * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
@@ -80,5 +71,13 @@ public class OrchestratorDeleteRequest {
 
     public void setLabels(LabelRouteVo labels) {
         this.labels = labels;
+    }
+
+    public Boolean getDeleteSchedulerWorkflow() {
+        return deleteSchedulerWorkflow;
+    }
+
+    public void setDeleteSchedulerWorkflow(Boolean deleteSchedulerWorkflow) {
+        this.deleteSchedulerWorkflow = deleteSchedulerWorkflow;
     }
 }

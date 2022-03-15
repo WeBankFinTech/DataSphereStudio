@@ -570,6 +570,7 @@ CREATE TABLE `dss_onestop_user_favorites` (
   `create_time` datetime DEFAULT NULL,
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL,
+  `type` varchar(20) NOT NULL DEFAULT "" COMMENT "dingyiding or 收藏",
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
@@ -994,6 +995,7 @@ CREATE TABLE `dss_workspace` (
   `source` varchar(255) DEFAULT NULL,
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL COMMENT '最新修改用户',
+  `workspace_type`  varchar(20) DEFAULT NULL comment '工作空间类型',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8;
@@ -1123,10 +1125,6 @@ CREATE TABLE `linkis_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
-
-
-
 alter table `dss_release_task`
    add column `error_msg` varchar(500) NULL COMMENT '发布错误信息' after `status`,
    add column `comment` varchar(500) NULL COMMENT '发布描述' after `error_msg`,
@@ -1149,8 +1147,6 @@ CREATE TABLE `dss_workflow_execute_info` (
    PRIMARY KEY (`id`)
  ) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
 
-
-ALTER TABLE dss_workspace  ADD COLUMN `workspace_type`  varchar(20) comment '工作空间类型';
 ALTER TABLE dss_menu ADD COLUMN `menu_application_id` bigint(20);
 
 
@@ -1301,19 +1297,11 @@ CREATE TABLE `dss_orchestrator_release_info`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
-
-alter table dss_orchestrator_version_info  add  context_id varchar(200) DEFAULT NULL COMMENT '上下文ID'
-
-ALTER TABLE dss_onestop_user_favorites  ADD COLUMN `type`  varchar(20) comment '类型,区分收藏和盯一盯';
-
-/**
- * 鲁班产品及文档 dss-guide
- */
 DROP TABLE IF EXISTS `dss_guide_group`;
 CREATE TABLE IF NOT EXISTS `dss_guide_group` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
   `path` VARCHAR(100) NOT NULL COMMENT '页面URL路径',
-  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
   `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
   `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -1328,12 +1316,12 @@ CREATE TABLE IF NOT EXISTS `dss_guide_content` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
   `group_id` BIGINT(50) NOT NULL COMMENT '所属页面ID',
   `path` VARCHAR(100) NOT NULL COMMENT '所属页面URL路径',
-  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
   `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
   `seq` VARCHAR(20) DEFAULT NULL COMMENT '序号',
   `type` INT(1) DEFAULT '1' COMMENT '类型: 1-步骤step，2-问题question',
   `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
-  `content_html` TEXT DEFAULT NULL COMMENT 'Markdown内容转化为HTML格式',
+  `content_html` MEDIUMTEXT DEFAULT NULL COMMENT 'Markdown内容转化为HTML格式',
   `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
@@ -1358,7 +1346,7 @@ DROP TABLE IF EXISTS `dss_guide_catalog`;
 CREATE TABLE IF NOT EXISTS `dss_guide_catalog` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
   `parent_id` BIGINT(13) NOT NULL COMMENT '父级目录ID，-1代表最顶级目录',
-  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
   `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
   `create_by` VARCHAR(255) DEFAULT NULL COMMENT '创建者',
   `create_time` DATETIME DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -1372,10 +1360,10 @@ DROP TABLE IF EXISTS `dss_guide_chapter`;
 CREATE TABLE IF NOT EXISTS `dss_guide_chapter` (
   `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
   `catalog_id` BIGINT(13) NOT NULL COMMENT '目录ID',
-  `title` VARCHAR(50) DEFAULT NULL COMMENT '标题',
+  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
   `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
   `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
-  `content_html` TEXT DEFAULT NULL COMMENT 'Markdown转换为html内容',
+  `content_html` MEDIUMTEXT DEFAULT NULL COMMENT 'Markdown转换为html内容',
   `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',

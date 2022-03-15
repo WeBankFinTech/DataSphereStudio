@@ -31,6 +31,7 @@ public class RequestCreateWorkflow {
     private  String  uses;
     private List<String > linkedAppConnNames;
     private List<DSSLabel> dssLabels;
+    private String orcVersion;
 
     public RequestCreateWorkflow(String userName,
                                  String workflowName,
@@ -39,7 +40,8 @@ public class RequestCreateWorkflow {
                                  Long parentFlowID,
                                  String uses,
                                  List<String> linkedAppConnNames,
-                                 List<DSSLabel> dssLabels) {
+                                 List<DSSLabel> dssLabels,
+                                 String orcVersion) {
         this.userName = userName;
         this.workflowName = workflowName;
         this.contextIDStr = contextIDStr;
@@ -48,6 +50,7 @@ public class RequestCreateWorkflow {
         this.uses = uses;
         this.linkedAppConnNames = linkedAppConnNames;
         this.dssLabels =dssLabels;
+        this.orcVersion = orcVersion;
     }
 
     public String getUserName() {
@@ -111,5 +114,13 @@ public class RequestCreateWorkflow {
 
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public String getOrcVersion() {
+        return orcVersion;
+    }
+
+    public void setOrcVersion(String orcVersion) {
+        this.orcVersion = orcVersion;
     }
 }

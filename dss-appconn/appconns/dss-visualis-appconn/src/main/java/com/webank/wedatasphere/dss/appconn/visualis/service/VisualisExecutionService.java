@@ -17,15 +17,13 @@
 package com.webank.wedatasphere.dss.appconn.visualis.service;
 
 import com.webank.wedatasphere.dss.appconn.visualis.operation.VisualisRefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
 
 public class VisualisExecutionService extends AbstractRefExecutionService {
 
     @Override
-    public RefExecutionOperation createRefExecutionOperation() {
-        VisualisRefExecutionOperation visualisRefExecutionOperation = new VisualisRefExecutionOperation(this);
-        return visualisRefExecutionOperation;
+    protected VisualisRefExecutionOperation createRefExecutionOperation() {
+        return new VisualisRefExecutionOperation();
     }
 
 }

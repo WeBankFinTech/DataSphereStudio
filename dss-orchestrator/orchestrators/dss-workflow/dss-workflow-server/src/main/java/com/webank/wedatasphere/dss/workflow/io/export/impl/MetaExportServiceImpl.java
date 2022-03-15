@@ -40,7 +40,7 @@ public class MetaExportServiceImpl implements MetaExportService {
     public void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
 
         try (
-                OutputStream outputStream = generateOutputStream(savePath)
+            OutputStream outputStream = generateOutputStream(savePath)
         ) {
             exportFlowBaseInfo(allDSSFlows, outputStream);
             exportFlowRelation(allFlowRelations, outputStream);

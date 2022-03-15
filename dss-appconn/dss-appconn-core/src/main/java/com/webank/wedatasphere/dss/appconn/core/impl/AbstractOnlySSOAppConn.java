@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandardFactory;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 
 public abstract class AbstractOnlySSOAppConn extends AbstractAppConn implements OnlySSOAppConn {
 
@@ -29,6 +30,8 @@ public abstract class AbstractOnlySSOAppConn extends AbstractAppConn implements 
         SSOIntegrationStandardFactory ssoIntegrationStandardFactory = ClassUtils.getInstanceOrWarn(SSOIntegrationStandardFactory.class);
         ssoIntegrationStandardFactory.init();
         SSO_INTEGRATION_STANDARD = ssoIntegrationStandardFactory.getSSOIntegrationStandard();
+        // considering the plugin design model in different classloader, We must set it when each AppConn is instanced.
+        SSOHelper.setSSOBuilderService(SSO_INTEGRATION_STANDARD.getSSOBuilderService());
     }
 
     @Override

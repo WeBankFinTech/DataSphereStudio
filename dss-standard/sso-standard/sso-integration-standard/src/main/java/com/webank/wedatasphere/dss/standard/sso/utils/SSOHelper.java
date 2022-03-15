@@ -72,7 +72,7 @@ public class SSOHelper {
 
     public static Workspace getWorkspace(HttpServletRequest request){
         Workspace workspace = new Workspace();
-        workspace.setDssUrl(request.getRemoteAddr());  //TODO
+        workspace.setDssUrl("http://" + request.getRemoteHost() + ":" + request.getRemotePort());
         Cookie[] cookies = request.getCookies();
         Arrays.stream(cookies).forEach(cookie -> {
             if(WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName())) {

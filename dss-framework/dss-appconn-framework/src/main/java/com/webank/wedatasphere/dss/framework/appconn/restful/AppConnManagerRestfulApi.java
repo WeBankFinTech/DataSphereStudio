@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.framework.appconn.conf.AppconnConf;
+import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.core.Response;
 import java.util.List;
 
 @RequestMapping(path = "/dss/framework/project/appconn", produces = {"application/json"})
@@ -48,7 +47,7 @@ public class AppConnManagerRestfulApi {
 
     @PostConstruct
     public void init() {
-        if (AppconnConf.IS_APPCONN_MANAGER.getValue()) {
+        if (AppConnConf.IS_APPCONN_MANAGER.getValue()) {
             LOGGER.info("Try to scan AppConn plugins...");
             appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
                 LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());

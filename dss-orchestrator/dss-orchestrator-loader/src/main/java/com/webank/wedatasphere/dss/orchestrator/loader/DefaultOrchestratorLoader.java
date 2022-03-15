@@ -46,7 +46,7 @@ public class DefaultOrchestratorLoader implements OrchestratorLoader {
                                             String workspaceName,
                                             String typeName,
                                             String appConnName,
-                                            List<DSSLabel> dssLabels) throws AppConnErrorException {
+                                            List<DSSLabel> dssLabels) {
 
         //todo load DSSOrchestatror by type name
         DSSOrchestrator dssOrchestrator = new DefaultOrchestrator() {
@@ -55,16 +55,14 @@ public class DefaultOrchestratorLoader implements OrchestratorLoader {
                 return dssOrchestratorContext;
             }
         };
-
-        //向工作流添加实现了第三级规范的AppConn
+        // 添加实现了第三级规范的AppConn
         List<AppConn> appConnList = linkedAppConnResolver.resolveAppConnByUser(userName, workspaceName, typeName);
-        for (AppConn appConn : appConnList) {
+        appConnList.forEach(appConn -> {
             if(appConn instanceof OnlyDevelopmentAppConn){
                 dssOrchestrator.addLinkedAppConn(appConn);
             }
-
-        }
-        LOGGER.info("Load dss orchestrator:"+appConnName+",typeName:"+typeName);
+        });
+        LOGGER.info("Load dss orchestrator: " + typeName + ", with the binding AppConn: " + typeName);
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(appConnName);
         dssLabels.forEach(dssOrchestrator::addLinkedDssLabels);
         dssOrchestrator.setAppConn(appConn);

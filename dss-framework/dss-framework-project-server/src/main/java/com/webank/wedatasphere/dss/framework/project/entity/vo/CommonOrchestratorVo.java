@@ -17,10 +17,39 @@
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
 
-public class CommonOrchestratorVo extends AbstractOrchestratorVo{
+public class CommonOrchestratorVo{
 
-    @Override
-    String getType() {
+    final static String WORK_FLOW = "workflow";
+
+    final static String ORDINARY = "ordinary";
+
+    private Long orchestratorId;
+
+    private String orchestratorVersion;
+
+    private String type = WORK_FLOW;
+
+    public Long getOrchestratorId() {
+        return orchestratorId;
+    }
+
+    public void setOrchestratorId(Long orchestratorId) {
+        this.orchestratorId = orchestratorId;
+    }
+
+    public String getOrchestratorVersion() {
+        return orchestratorVersion;
+    }
+
+    public void setOrchestratorVersion(String orchestratorVersion) {
+        this.orchestratorVersion = orchestratorVersion;
+    }
+
+    public String getType() {
         return WORK_FLOW;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

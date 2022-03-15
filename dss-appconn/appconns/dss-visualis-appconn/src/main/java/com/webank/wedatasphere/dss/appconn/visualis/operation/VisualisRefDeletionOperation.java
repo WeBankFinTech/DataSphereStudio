@@ -16,39 +16,22 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.app.development.ref.NodeRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
-public class VisualisRefDeletionOperation implements RefDeletionOperation {
-
-    private DevelopmentService developmentService;
-    private SSORequestOperation ssoRequestOperation;
-
-    public VisualisRefDeletionOperation(DevelopmentService service) {
-        this.developmentService = service;
-        this.ssoRequestOperation = this.developmentService.getSSORequestService().createSSORequestOperation(VisualisAppConn.VISUALIS_APPCONN_NAME);
-    }
+public class VisualisRefDeletionOperation
+        extends VisualisDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, ResponseRef>
+        implements RefDeletionOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl> {
 
     @Override
-    public void deleteRef(RequestRef requestRef) throws ExternalOperationFailedException {
-        NodeRequestRef visualisDeleteRequestRef = (NodeRequestRef) requestRef;
-        String nodeType = visualisDeleteRequestRef.getNodeType().toLowerCase();
-        ModuleFactory.getInstance().crateModule(nodeType).deleteRef(getBaseUrl(), visualisDeleteRequestRef, ssoRequestOperation);
-    }
-
-
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService = service;
-    }
-
-    private String getBaseUrl() {
-        return developmentService.getAppInstance().getBaseUrl();
+    public ResponseRef deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        String nodeType = requestRef.getType().toLowerCase();
+        logger.info("The {} of Visualis try to delete ref RefJobContent: {}.", nodeType, requestRef.getRefJobContent());
+        OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
+                .deleteRef(requestRef);
+        return ResponseRef.newExternalBuilder().success();
     }
 }

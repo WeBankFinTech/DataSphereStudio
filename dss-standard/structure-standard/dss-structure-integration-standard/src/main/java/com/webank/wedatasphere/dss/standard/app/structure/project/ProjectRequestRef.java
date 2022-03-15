@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.ref.WorkspaceRequestRef;
 
 import java.util.List;
 
-public interface ProjectRequestRef extends RequestRef {
-
-    String getWorkspaceName();
+public interface ProjectRequestRef extends WorkspaceRequestRef {
 
     Long getId();
 
@@ -34,35 +31,5 @@ public interface ProjectRequestRef extends RequestRef {
 
     void setName(String name);
 
-    String getDescription();
 
-    void setDescription(String description);
-
-    String getCreateBy();
-
-    void setCreateBy(String createBy);
-
-    String getUpdateBy();
-
-    void setUpdateBy(String updateBy);
-
-    default void setWorkspace(Workspace workspace){
-
-    }
-
-    default Workspace getWorkspace(){
-        return null;
-    }
-
-    public List<String> getAccessUsers();
-
-    public void setAccessUsers(List<String> accessUsers);
-
-    public List<String> getEditUsers();
-
-    public void setEditUsers(List<String> editUsers);
-
-    public List<String> getReleaseUsers();
-
-    public void setReleaseUsers(List<String> releaseUsers);
 }

@@ -20,15 +20,12 @@ import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFr
 import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFrameworkDeleteOperation;
 import com.webank.wedatasphere.dss.appconn.orchestrator.operation.OrchestratorFrameworkUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefCRUDService;
 
 public class OrchestratorCRUDService  extends AbstractRefCRUDService {
 
     @Override
-    protected RefCreationOperation createRefCreationOperation() {
+    protected OrchestratorFrameworkCreationOperation createRefCreationOperation() {
         return new OrchestratorFrameworkCreationOperation();
     }
 
@@ -38,12 +35,12 @@ public class OrchestratorCRUDService  extends AbstractRefCRUDService {
     }
 
     @Override
-    protected RefUpdateOperation createRefUpdateOperation() {
+    protected OrchestratorFrameworkUpdateOperation createRefUpdateOperation() {
         return new OrchestratorFrameworkUpdateOperation();
     }
 
     @Override
-    protected RefDeletionOperation createRefDeletionOperation() {
+    protected OrchestratorFrameworkDeleteOperation createRefDeletionOperation() {
         return new OrchestratorFrameworkDeleteOperation();
     }
 

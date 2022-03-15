@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 
@@ -28,42 +30,22 @@ public interface DSSFlowService {
 
     DSSFlow getFlowWithJsonAndSubFlowsByID(Long rootFlowId);
 
-    DSSFlow addFlow(DSSFlow DSSFlow, String contextIDStr) throws DSSErrorException;
+    DSSFlow addFlow(DSSFlow dssFlow, String contextIdStr, String orcVersion) throws DSSErrorException;
 
-    DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr) throws DSSErrorException;
+    DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowId, String contextIdStr, String orcVersion) throws DSSErrorException;
 
     /**
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion
-     *
-     * @param flowID
      * @return
      */
-    DSSFlow getLatestVersionFlow(Long flowID) throws DSSErrorException;
+    DSSFlow getFlow(Long flowId) throws DSSErrorException;
 
-    /**
-     * 通过flowID和某个版本号，获取一个dwsFlow，版本信息在versions数组中的第一个元素
-     *
-     * @param flowID
-     * @return
-     */
-    DSSFlow getOneVersionFlow(Long flowID);
-
-    /**
-     * 通过dwsFlow对象拿到最新的json，其实这里只要个flowID应该就可以了
-     *
-     * @param DSSFlow
-     * @return
-     */
-/*    String getLatestJsonByFlow(DWSFlow dwsFlow);
-
-    DWSFlow getLatestVersionFlow(Long ProjectID,String flowName);*/
-
-    void updateFlowBaseInfo(DSSFlow DSSFlow) throws DSSErrorException;
+    void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
 
 
-    void batchDeleteFlow(List<Long> flowIDlist);
+    void batchDeleteFlow(List<Long> flowIdlist);
 
-    String saveFlow(Long flowID,
+    String saveFlow(Long flowId,
                     String jsonFlow,
                     String comment,
                     String userName,
@@ -71,20 +53,13 @@ public interface DSSFlowService {
                     String projectName
     ) throws DSSErrorException;
 
-    Integer getParentRank(Long flowID);
+    Integer getParentRank(Long flowId);
 
-    DSSFlow copyRootFlow(Long rootFlowId, String userName, String workspaceName, String projectName, String version, String contextIdStr) throws DSSErrorException, IOException;
-
-//    DWSFlowVersion getLatestVersionByFlowIDAndProjectVersionID(Long flowID, Long projectVersionID);
+    DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
+                         String projectName, String version, String contextIdStr,
+                         String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
-
-//    AppMap getFlowAppMap(long projectID);
-//
-//    DWSFlow genBusinessTagForNode(DWSFlow dwsFlow) throws DSSErrorException;
-//
-//    void flowVersionIncr(Long flowID, String userName, String comment, Long newProjectVersionID, Long oldProjectVersionID,
-//                         DWSProject dwsProject,String workspace);
 
     List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId);
 }

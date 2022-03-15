@@ -16,38 +16,35 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.listener.async.RefExecutionStatusListener;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.AbstractRefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncResponseRefImpl;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.CompletedExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
-import com.webank.wedatasphere.dss.standard.app.development.listener.exception.AppConnExecutionWarnException;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.AsyncExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.scheduler.LongTermRefExecutionScheduler;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Description: LongTermRefExecutionOperation is used to execute long-term tasks in external application systems.
  * Long-term task usually supports to execute asyncly and can fetch status and logs when it is submitted.
  *
  */
-public abstract class LongTermRefExecutionOperation implements RefExecutionOperation {
+public abstract class LongTermRefExecutionOperation<K extends RefExecutionRequestRef<K>>
+    extends AbstractDevelopmentOperation<K, ResponseRef> implements RefExecutionOperation<K> {
 
-    private static final Logger logger = LoggerFactory.getLogger(LongTermRefExecutionOperation.class);
-
-    private List<RefExecutionStatusListener> refExecutionListener = new ArrayList<RefExecutionStatusListener>();
+    private List<RefExecutionStatusListener<K>> refExecutionListener = new ArrayList<>();
     private LongTermRefExecutionScheduler scheduler = SchedulerManager.getScheduler();
 
-    public void addRefExecutionStatusListener(RefExecutionStatusListener refExecutionListener) {
-        for(RefExecutionStatusListener listener : this.refExecutionListener){
+    public void addRefExecutionStatusListener(RefExecutionStatusListener<K> refExecutionListener) {
+        for(RefExecutionStatusListener<K> listener : this.refExecutionListener){
             if (listener.getClass().equals(refExecutionListener.getClass())){
                 return;
             }
@@ -55,31 +52,18 @@ public abstract class LongTermRefExecutionOperation implements RefExecutionOpera
         this.refExecutionListener.add(refExecutionListener);
     }
 
-    public LongTermRefExecutionScheduler getScheduler() {
-        return scheduler;
-    }
+    protected abstract RefExecutionAction submit(K requestRef) throws ExternalOperationFailedException;
 
-    public void setScheduler(LongTermRefExecutionScheduler scheduler) {
-        this.scheduler = scheduler;
-    }
+    public abstract RefExecutionState state(RefExecutionAction action) throws ExternalOperationFailedException;
 
-    protected abstract RefExecutionAction submit(ExecutionRequestRef requestRef);
+    public abstract ExecutionResponseRef result(RefExecutionAction action) throws ExternalOperationFailedException;
 
-    public abstract RefExecutionState state(RefExecutionAction action);
-
-    public abstract CompletedExecutionResponseRef result(RefExecutionAction action);
-
-
-    protected ExecutionRequestRefContext createExecutionRequestRefContext(ExecutionRequestRef requestRef) {
-        if(requestRef instanceof AsyncExecutionRequestRef) {
-            return ((AsyncExecutionRequestRef) requestRef).getExecutionRequestRefContext();
-        } else {
-            throw new AppConnExecutionWarnException(75536, "Cannot find a available ExecutionRequestRefContext.");
-        }
+    protected ExecutionRequestRefContext createExecutionRequestRefContext(K requestRef) {
+        return requestRef.getExecutionRequestRefContext();
     }
 
     @Override
-    public ResponseRef execute(ExecutionRequestRef requestRef) {
+    public final ResponseRef execute(K requestRef) throws ExternalOperationFailedException {
         refExecutionListener.forEach(l -> l.beforeSubmit(requestRef));
         RefExecutionAction action = submit(requestRef);
         if(action instanceof AbstractRefExecutionAction) {
@@ -88,26 +72,23 @@ public abstract class LongTermRefExecutionOperation implements RefExecutionOpera
         refExecutionListener.forEach(l -> l.afterSubmit(requestRef, action));
         RefExecutionState state = state(action);
         if(state != null && state.isCompleted()) {
-            CompletedExecutionResponseRef response = result(action);
+            ExecutionResponseRef response = result(action);
             refExecutionListener.forEach(l -> l.afterCompletedExecutionResponseRef(requestRef, action, response));
             return response;
         } else {
-            AsyncExecutionResponseRef response = createAsyncResponseRef(requestRef, action);
-            response.setRefExecution(this);
+            AsyncExecutionResponseRef oldResponse = createAsyncResponseRef(requestRef, action);
+            AsyncExecutionResponseRef response = AsyncExecutionResponseRef.newBuilder().setAsyncExecutionResponseRef(oldResponse)
+                    .setRefExecutionOperation(this)
+                    .addListener(r -> refExecutionListener.forEach(l -> l.afterCompletedExecutionResponseRef(requestRef, action, r))).build();
             refExecutionListener.forEach(l -> l.afterAsyncResponseRef(response));
-            response.addListener(r -> refExecutionListener.forEach(l -> l.afterCompletedExecutionResponseRef(requestRef, action, (CompletedExecutionResponseRef) r)));
-            if(scheduler != null) {
-                scheduler.addAsyncResponse(response);
-            }
+            scheduler.addAsyncResponse(response);
             return response;
         }
     }
 
-    protected AsyncExecutionResponseRef createAsyncResponseRef(ExecutionRequestRef requestRef, RefExecutionAction action) {
-        AsyncResponseRefImpl response =  new AsyncResponseRefImpl();
-        response.setAction(action);
-        response.setExecutionRequestRef(requestRef);
-        return response;
+    protected AsyncExecutionResponseRef createAsyncResponseRef(K requestRef, RefExecutionAction action) {
+        return AsyncExecutionResponseRef.newBuilder().setAction(action)
+            .setExecutionRequestRef(requestRef).build();
     }
 
 }

@@ -15,27 +15,19 @@
  */
 
 package com.webank.wedatasphere.dss.framework.project.service;
-import com.webank.wedatasphere.dss.framework.project.entity.DSSOrchestrator;
+
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import org.apache.linkis.common.exception.ErrorException;
 
 
 public interface DSSFrameworkOrchestratorService {
 
-
-
     CommonOrchestratorVo createOrchestrator(String username, OrchestratorCreateRequest orchestratorCreateRequest, Workspace workspace) throws Exception;
 
-
-
     CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception;
-
-    void deleteOrchestrator(String username, DSSOrchestrator dssOrchestrator, Boolean deleteSchedulerWorkflow)
-            throws ErrorException;
 
     CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception;
 

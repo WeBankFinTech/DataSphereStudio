@@ -16,18 +16,16 @@
 
 package com.webank.wedatasphere.dss.standard.common.exception;
 
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 
 
-public class AppStandardErrorException extends DSSErrorException {
-
+public class AppStandardErrorException extends DSSRuntimeException {
 
     public AppStandardErrorException(int errorCode, String errorMessage){
-        super(errorCode,errorMessage);
+        super(errorCode, errorMessage);
     }
 
     public AppStandardErrorException(int errorCode, String message, Throwable cause) {
-        super(errorCode, message);
-        this.initCause(cause);
+        super(errorCode, message, cause);
     }
 }

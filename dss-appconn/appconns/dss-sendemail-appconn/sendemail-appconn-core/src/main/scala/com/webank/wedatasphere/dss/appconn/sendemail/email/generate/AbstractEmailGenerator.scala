@@ -16,38 +16,30 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 
-import com.webank.wedatasphere.dss.appconn.sendemail.email.{Email, EmailGenerator}
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.AbstractEmail
-import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef
+import com.webank.wedatasphere.dss.appconn.sendemail.email.{Email, EmailGenerator}
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 import org.apache.linkis.common.utils.Logging
 
 trait AbstractEmailGenerator extends EmailGenerator with Logging{
 
   protected def createEmail(): AbstractEmail
 
-  override def generateEmail(requestRef: ExecutionRequestRef): Email = {
+  override def generateEmail(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): Email = {
     val email = createEmail()
     generateEmailInfo(requestRef, email)
     generateEmailContent(requestRef, email)
     email
   }
 
-  protected def getRuntimeMap(requestRef: ExecutionRequestRef): java.util.Map[String, AnyRef] =
-    requestRef match {
-      case r: AsyncExecutionRequestRef => r.getExecutionRequestRefContext.getRuntimeMap
-      case _ => requestRef.getParameters
-    }
+  protected def getRuntimeMap(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): java.util.Map[String, AnyRef] =
+    requestRef.getExecutionRequestRefContext.getRuntimeMap
 
-  protected def getExecutionRequestRefContext(requestRef: ExecutionRequestRef): ExecutionRequestRefContext =
-    requestRef match {
-      case r: AsyncExecutionRequestRef => r.getExecutionRequestRefContext
-      case _ => throw new EmailSendFailedException(80002, "ExecutionRequestRefContext is empty!")
-    }
+  protected def getExecutionRequestRefContext(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): ExecutionRequestRefContext =
+    requestRef.getExecutionRequestRefContext
 
-  protected def generateEmailInfo(requestRef: ExecutionRequestRef, email: AbstractEmail): Unit = {
+  protected def generateEmailInfo(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, email: AbstractEmail): Unit = {
     import scala.collection.JavaConversions._
     val runtimeMap = getRuntimeMap(requestRef)
     runtimeMap foreach {
@@ -68,6 +60,6 @@ trait AbstractEmailGenerator extends EmailGenerator with Logging{
     email.setTo(to)
   }
 
-  protected def generateEmailContent(requestRef: ExecutionRequestRef, email: AbstractEmail): Unit
+  protected def generateEmailContent(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, email: AbstractEmail): Unit
 
 }

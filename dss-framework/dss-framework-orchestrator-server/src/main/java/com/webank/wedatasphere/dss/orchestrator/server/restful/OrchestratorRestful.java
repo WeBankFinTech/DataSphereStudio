@@ -50,7 +50,8 @@ public class OrchestratorRestful {
     @Autowired
     OrchestratorService orchestratorService;
 
-    @RequestMapping(path ="addOrchestrator", method = RequestMethod.POST)
+    @RequestMapping(path = "addOrchestrator", method = RequestMethod.POST)
+    @Deprecated
     public Message addOrchestrator(HttpServletRequest req, @RequestBody AddOrchestratorRequest addOrchestratorRequest) throws Exception {
         String userName = SecurityFilter.getLoginUsername(req);
         String name = addOrchestratorRequest.getName();
@@ -75,8 +76,8 @@ public class OrchestratorRestful {
         return Message.ok().data("OrchestratorVo", orchestratorVo);
     }
 
-    @RequestMapping(path ="rollbackOrchestrator", method = RequestMethod.POST)
-    public Message rollbackOrchestrator(HttpServletRequest request,@RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
+    @RequestMapping(path = "rollbackOrchestrator", method = RequestMethod.POST)
+    public Message rollbackOrchestrator(HttpServletRequest request, @RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Long orchestratorId = rollbackOrchestratorRequest.getOrchestratorId();
         String version = rollbackOrchestratorRequest.getVersion();
@@ -95,8 +96,8 @@ public class OrchestratorRestful {
         }
     }
 
-    @RequestMapping(path ="openOrchestrator", method = RequestMethod.POST)
-    public Message openOrchestrator(HttpServletRequest req,@RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
+    @RequestMapping(path = "openOrchestrator", method = RequestMethod.POST)
+    public Message openOrchestrator(HttpServletRequest req, @RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
         String openUrl = "";
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
@@ -116,7 +117,7 @@ public class OrchestratorRestful {
      * @return
      * @throws Exception
      */
-    @RequestMapping(path ="getVersionByOrchestratorId", method = RequestMethod.POST)
+    @RequestMapping(path = "getVersionByOrchestratorId", method = RequestMethod.POST)
     public Message getVersionByOrchestratorId(@RequestBody QueryOrchestratorVersion queryOrchestratorVersion) throws Exception {
         List list = orchestratorService.getVersionByOrchestratorId(queryOrchestratorVersion.getOrchestratorId());
         return Message.ok().data("list", list);

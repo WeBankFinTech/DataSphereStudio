@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import java.util
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
-import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest, ProjectRelationResponse}
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse}
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.{DSSOrchestratorService, DSSProjectService}
@@ -49,6 +49,9 @@ class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService
         val appConnName = projectRelationRequest.getAppconnName
         val appConnProjectId = projectService.getAppConnProjectId(dssProjectId, appConnName, dssLabels)
         new ProjectRelationResponse(dssProjectId, appConnName, dssLabels, appConnProjectId)
+      case projectRefIdRequest: ProjectRefIdRequest =>
+        val refProjectId = projectService.getAppConnProjectId(projectRefIdRequest.getAppInstanceId, projectRefIdRequest.getDssProjectId);
+        new ProjectRefIdResponse(projectRefIdRequest.getAppInstanceId, projectRefIdRequest.getDssProjectId, refProjectId);
       case requestUserWorkspace: RequestUserWorkspace =>
         val userWorkspaceIds: util.List[Integer] = dssWorkspaceUserService.getUserWorkspaceIds(requestUserWorkspace.getUserName)
         new ResponseUserWorkspace(userWorkspaceIds)

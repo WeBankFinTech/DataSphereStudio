@@ -85,8 +85,8 @@ public class DSSFrameworkOrchestratorServiceImpl implements DSSFrameworkOrchestr
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private DSSOrchestratorMapper orchestratorMapper;
+//    @Autowired
+//    private DSSOrchestratorMapper orchestratorMapper;
     @Autowired
     private DSSOrchestratorService orchestratorService;
     @Autowired

@@ -20,22 +20,26 @@
 
 <mapper namespace="com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper">
 
-
-
-
     <sql id="orchestrator_main">
-        id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type`
+        id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type` ,
+        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`update_user`,`update_time`
     </sql>
 
     <sql id="orchestrator_version">
         id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`
     </sql>
 
-    <select id="getOrchestrator" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+    <sql id="orchestrator_ref_orchestration">
+        id,`orchestrator_id`,`ref_project_id`,`ref_orchestration_id`
+    </sql>
+
+    <select id="getOrchestrator"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         SELECT * FROM `dss_orchestrator_info` WHERE id = #{id}
     </select>
 
-    <select id="getOrchestratorByUUID" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+    <select id="getOrchestratorByUUID"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         SELECT * FROM `dss_orchestrator_info` WHERE uuid = #{uuid}
     </select>
 
@@ -43,10 +47,13 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         INSERT INTO dss_orchestrator_info (<include refid="orchestrator_main"/>)
         VALUES
-        (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},#{uuid},#{secondaryType})
+        (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},
+        #{uuid},#{secondaryType},
+        #{workspaceId},#{orchestratoMode},#{orchestratorWay},#{updateUser},#{updateTime})
     </insert>
 
-    <update id="updateOrchestrator" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+    <update id="updateOrchestrator"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         UPDATE dss_orchestrator_info
         <trim prefix="set" suffixOverrides=",">
             <if test="name != null">`name`=#{name},</if>
@@ -115,7 +122,8 @@
     </select>
 
 
-    <select id="getOrchestratorVersion" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+    <select id="getOrchestratorVersion"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
         *
         FROM
@@ -138,8 +146,6 @@
         ORDER BY id DESC
     </select>
 
-
-
     <resultMap id="orcInfo" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo">
         <result column="id" property="orchestratorVersionId" jdbcType="BIGINT"/>
         <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
@@ -150,7 +156,8 @@
         select `id`, `orchestrator_id` from dss_orchestrator_version_info where app_id = #{appId} and valid_flag = 1
     </select>
 
-    <resultMap id="orchestrator_version_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+    <resultMap id="orchestrator_version_info_result_map"
+               type="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         <result column="id" property="id" jdbcType="BIGINT"/>
         <result column="orchestrator_id" property="orchestratorId" jdbcType="BIGINT"/>
         <result column="app_id" property="appId" jdbcType="BIGINT"/>
@@ -164,12 +171,12 @@
     </resultMap>
 
     <select id="getOrchestratorVersions" resultMap="orchestrator_version_info_result_map">
-        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` = #{orchestratorId} and valid_flag = 1
+        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` =
+        #{orchestratorId} and valid_flag = 1
     </select>
 
-
-
-    <resultMap id="orchestrator_user_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorUser">
+    <resultMap id="orchestrator_user_map"
+               type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorUser">
         <result column="id" property="id"/>
         <result column="workspace_id" property="workspaceId"/>
         <result column="project_id" property="projectId"/>
@@ -178,8 +185,8 @@
         <result column="last_update_time" property="lastUpdateTime"/>
     </resultMap>
 
-    <select id = "getOrchestratorUserByOrcId" resultMap="orchestrator_user_map" parameterType="java.lang.Long">
-        select * from dss_orchestrator_user  where `orchestrator_id` = #{orchestratorId}
+    <select id="getOrchestratorUserByOrcId" resultMap="orchestrator_user_map" parameterType="java.lang.Long">
+        select * from dss_orchestrator_user where `orchestrator_id` = #{orchestratorId}
     </select>
 
     <select id="getVersionByOrchestratorIdAndVersion" resultMap="orchestrator_version_info_result_map">
@@ -188,5 +195,32 @@
         ORDER BY app_id DESC limit 1
     </select>
 
+    <select id="getByNameAndProjectId" resultType="java.lang.Integer">
+        select count(1) from dss_orchestrator_info where name = #{name} and project_id=#{projectId}
+    </select>
 
+    <insert id="addOrchestratorRefOrchestration" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
+        insert into dss_orchestrator_ref_orchestration_relation (<include refid="orchestrator_ref_orchestration"/>)
+        values (#{id},#{orchestratorId},#{refProjectId},#{refOrchestrationId})
+    </insert>
+
+    <select id="getListByPage" parameterType="java.util.Map"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        select * from dss_orchestrator_info
+        <where>
+            <if test="params.workspace_id != null">
+                workspace_id=#{params.workspace_id}
+            </if>
+            <if test="params.project_id != null">
+                and project_id=#{params.project_id}
+            </if>
+            <if test="params.id != null">
+                and id=#{params.id}
+            </if>
+            <if test="params.orchestrator_mode != null and params.orchestrator_mode != ''">
+                and orchestrator_mode=#{params.orchestrator_mode}
+            </if>
+        </where>
+    </select>
 </mapper>

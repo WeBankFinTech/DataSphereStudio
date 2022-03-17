@@ -14,15 +14,15 @@
  *
  */
 
-package com.webank.wedatasphere.dss.framework.project.restful;
+package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
-import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.OrchestratorRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.CommonOrchestratorVo;
-import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -39,17 +39,16 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 
-//@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
-//@RestController
+@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RestController
 public class DSSFrameworkOrchestratorRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkOrchestratorRestful.class);
 
     @Autowired
-    private DSSFrameworkOrchestratorService dssFrameworkOrchestratorService;
+    private OrchestratorFrameworkService orchestratorFrameworkService;
     @Autowired
-    private DSSOrchestratorService orchestratorService;
-
+    private OrchestratorService orchestratorService;
 
     /**
      * 创建编排模式
@@ -58,7 +57,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @param createRequest
      * @return
      */
-    @RequestMapping(path ="createOrchestrator", method = RequestMethod.POST)
+    @RequestMapping(path = "createOrchestrator", method = RequestMethod.POST)
     public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
@@ -67,7 +66,7 @@ public class DSSFrameworkOrchestratorRestful {
             //保存编排模式
             //todo 先注释掉
             // orchestratorService.saveOrchestrator(createRequest,null,username);
-            CommonOrchestratorVo orchestratorVo = dssFrameworkOrchestratorService.createOrchestrator(username, createRequest, workspace);
+            CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
             return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
         } catch (Exception e) {
             LOGGER.error("Failed to create orchestrator {} for user {}", createRequest, username, e);
@@ -82,7 +81,7 @@ public class DSSFrameworkOrchestratorRestful {
      * @param orchestratorRequest
      * @return
      */
-    @RequestMapping(path ="getAllOrchestrator", method = RequestMethod.POST)
+    @RequestMapping(path = "getAllOrchestrator", method = RequestMethod.POST)
     public Message getAllOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
@@ -100,19 +99,19 @@ public class DSSFrameworkOrchestratorRestful {
      * @param modifyRequest
      * @return
      */
-    @RequestMapping(path ="modifyOrchestrator", method = RequestMethod.POST)
+    @RequestMapping(path = "modifyOrchestrator", method = RequestMethod.POST)
     public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
         try {
-             CommonOrchestratorVo orchestratorVo = dssFrameworkOrchestratorService.modifyOrchestrator(username, modifyRequest,workspace);
+            CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
             //保存编排模式
 //            orchestratorService.updateOrchestrator(modifyRequest, username);
-            return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
+            return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
         } catch (Exception e) {
             LOGGER.error("Failed to create orchestrator {} for user {}", modifyRequest, username, e);
-            return Message.error("创建工作流编排模式失败:" + e.getMessage());
+            return Message.error("修改工作流编排模式失败:" + e.getMessage());
         }
     }
 
@@ -123,12 +122,12 @@ public class DSSFrameworkOrchestratorRestful {
      * @param deleteRequest
      * @return
      */
-    @RequestMapping(path ="deleteOrchestrator", method = RequestMethod.POST)
+    @RequestMapping(path = "deleteOrchestrator", method = RequestMethod.POST)
     public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         try {
-            dssFrameworkOrchestratorService.deleteOrchestrator(username, deleteRequest, workspace);
+            orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
             return Message.ok("删除工作流编排模式成功");
         } catch (Exception e) {
             LOGGER.error("Failed to delete orchestrator {} for user {}.", deleteRequest.getId(), username, e);

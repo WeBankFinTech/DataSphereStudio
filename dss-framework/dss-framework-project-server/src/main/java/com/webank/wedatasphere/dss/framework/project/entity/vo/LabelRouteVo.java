@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.vo;
 
+@Deprecated
 public class LabelRouteVo {
 
     private String route;

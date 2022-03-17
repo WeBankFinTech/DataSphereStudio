@@ -31,12 +31,4 @@ public class WorkflowConversionIntegrationStandard extends AbstractConversionInt
         return new WorkflowToRelConversionService();
     }
 
-    @Override
-    protected RelToOrchestratorConversionService createRelToDSSConversionService() {
-        return null;
-    }
-
-    public RefQueryService getQueryService(AppInstance appInstance) {
-        return null;
-    }
 }

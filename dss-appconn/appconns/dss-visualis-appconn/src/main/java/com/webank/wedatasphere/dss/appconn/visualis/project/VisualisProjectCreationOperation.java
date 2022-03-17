@@ -17,8 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.visualis.project;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
@@ -35,7 +35,7 @@ public class VisualisProjectCreationOperation extends AbstractStructureOperation
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         String url = getBaseUrl() + projectUrl;
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(projectRef.getDSSProject().getCreateBy());
         visualisPostAction.addRequestPayload("name", projectRef.getName());
         visualisPostAction.addRequestPayload("description", projectRef.getDSSProject().getDescription());

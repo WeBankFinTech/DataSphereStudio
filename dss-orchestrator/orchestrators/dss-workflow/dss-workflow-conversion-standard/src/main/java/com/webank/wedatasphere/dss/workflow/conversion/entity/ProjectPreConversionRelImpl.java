@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import java.util.List;
 
 
-public class PreConversionRelImpl implements PreConversionRel {
+public class ProjectPreConversionRelImpl implements ProjectPreConversionRel {
 
     private List<Workflow> workflows;
     private DSSToRelConversionRequestRef dssToRelConversionRequestRef;

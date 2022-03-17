@@ -16,104 +16,98 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
+import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
+import com.webank.wedatasphere.dss.appconn.schedulis.service.AzkabanUserService;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.AzkabanUtils;
-import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
-import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisExceptionUtils;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
+import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchedulisProjectCreationOperation implements ProjectCreationOperation {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectCreationOperation.class);
-
-    private ProjectService schedulisProjectService;
+public class SchedulisProjectCreationOperation
+        extends AbstractStructureOperation<DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl, ProjectResponseRef>
+        implements ProjectCreationOperation<DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl> {
 
     private String projectUrl;
 
     private String managerUrl;
 
 
-    public SchedulisProjectCreationOperation() {
+    @Override
+    protected String getAppConnName() {
+        return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
     }
 
     @Override
     public void init() {
-        this.projectUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ?
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
-        managerUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
+        super.init();
+        this.projectUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" : getBaseUrl() + "/manager";
+        managerUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" : getBaseUrl() + "/manager";
     }
 
 
     @Override
-    public ProjectResponseRef createProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
-        LOGGER.info("begin to create project in schedulis project is {}", requestRef.getName());
-//        SchedulisProjectResponseRef responseRef = new SchedulisProjectResponseRef();
-        Map<String, String> params = new HashMap<>();
+    public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
+        logger.info("begin to create project in schedulis, project name is {}.", requestRef.getDSSProject().getName());
+        if(CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
+            // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
+            requestRef.getReleaseUsers().forEach(releaseUser -> {
+                if (!AzkabanUserService.containsReleaseUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
+                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请联系 Schedulis 管理员创建该用户！");
+                }
+            });
+        }
+        Map<String, String> params = new HashMap<>(3);
         params.put("action", "create");
-        params.put("name", requestRef.getName());
-        params.put("description", requestRef.getDescription());
+        params.put("name", requestRef.getDSSProject().getName());
+        params.put("description", requestRef.getDSSProject().getDescription());
         try {
-
-            String entStr = SSORequestWTSS.requestWTSSWithSSOPost(projectUrl,params,this.schedulisProjectService,requestRef.getWorkspace());
-            LOGGER.error("新建工程 {}, azkaban 返回的信息是 {}", requestRef.getName(), entStr);
+            String entStr = SchedulisHttpUtils.getHttpPostResult(projectUrl, params, ssoRequestOperation, requestRef.getWorkspace());
+            logger.error("新建工程 {}, Schedulis 返回的信息是 {}.", requestRef.getName(), entStr);
             String message = AzkabanUtils.handleAzkabanEntity(entStr);
             if (!"success".equals(message)) {
-                throw new ExternalOperationFailedException(90008, "新建工程失败, 原因:" + message);
+                throw new ExternalOperationFailedException(90008, "Schedulis 新建工程失败, 原因: " + message);
             }
-
         } catch (final Exception t) {
-            LOGGER.error("Failed to create project!", t);
+            logger.error("Failed to create project!", t);
             return ProjectResponseRef.newExternalBuilder().error(t);
         }
         Long projectId = null;
         try {
-            projectId = getSchedulisProjectId(requestRef.getName(),requestRef);
+            projectId = getSchedulisProjectId(requestRef.getName(), requestRef);
         } catch (Exception e) {
-            SchedulisExceptionUtils.dealErrorException(60051, "failed to get project id", e,
+            DSSExceptionUtils.dealWarnException(60051, "failed to get project id.", e,
                     ExternalOperationFailedException.class);
         }
 
-        // There is no project ID returned in schedulis, so there is no need to set.
-        // Other exceptions are thrown out, so the correct code returned as 0 is OK.
         return ProjectResponseRef.newExternalBuilder().setRefProjectId(projectId).success();
-    }
-
-    @Override
-    public void setStructureService(StructureService service) {
-        this.schedulisProjectService = (ProjectService) service;
     }
 
     /**
      * Get project ID.
      */
-    public Long getSchedulisProjectId(String projectName, ProjectRequestRef requestRef) throws Exception {
+    public Long getSchedulisProjectId(String projectName,
+                                      DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) {
 
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>(2);
         params.put("ajax", "getProjectId");
         params.put("project", projectName);
-
         long projectId = 0L;
         try {
-            String content = SSORequestWTSS.requestWTSSWithSSOGet(this.managerUrl, params, this.schedulisProjectService.getSSORequestService(), requestRef.getWorkspace());
-            LOGGER.info("Get  schedulis  project  id return str is " + content);
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readValue(content, JsonNode.class);
-            projectId = jsonNode.get("projectId").getLongValue();
+            String content = SchedulisHttpUtils.getHttpGetResult(this.managerUrl, params, ssoRequestOperation, requestRef.getWorkspace());
+            logger.info("Get Schedulis project id return str is {}.", content);
+            Map map = DSSCommonUtils.COMMON_GSON.fromJson(content, Map.class);
+            projectId = (long) map.get("projectId");
         } catch (final Throwable t) {
-            SchedulisExceptionUtils.dealErrorException(60051, "failed to create project in schedulis", t,
+            DSSExceptionUtils.dealWarnException(60051, "failed to fetch project id in schedulis.", t,
                     ExternalOperationFailedException.class);
         }
         return projectId;

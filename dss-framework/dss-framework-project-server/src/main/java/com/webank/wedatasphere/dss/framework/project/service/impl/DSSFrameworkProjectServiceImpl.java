@@ -218,35 +218,4 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return projectMap;
     }
 
-    /**
-     * 校验运维用户是否存在WTSS
-     * @param releaseUsers
-     * @param workspace
-     */
-//    public void validReleaseUserExistWtss(List<String> releaseUsers,Workspace workspace)throws DSSErrorException {
-//        if (releaseUsers == null || releaseUsers.size() == 0) {
-//            return;
-//        }
-//        SchedulisAppConn schedulisAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulisAppConn.class);
-//        if (schedulisAppConn == null || schedulisAppConn.getAppDesc() == null) {
-//            LOGGER.error("schedulisAppConn is null");
-//            return;
-//        }
-//        List<AppInstance> appInstances = schedulisAppConn.getAppDesc().getAppInstances();
-//        if (appInstances == null) {
-//            LOGGER.error("validReleaseUserExistWtss-appInstances of schedulerAppConn is null");
-//            return;
-//        }
-//        OnlyStructureAppConn onlyStructureAppConn = (OnlyStructureAppConn) schedulisAppConn;
-//        StructureIntegrationStandard appStandard = onlyStructureAppConn.getOrCreateStructureStandard();
-//        ProjectService projectService = appStandard.getProjectService(appInstances.get(0));
-//        String baseUrl = appInstances.get(0).getBaseUrl();
-//        for (String accessUser : releaseUsers) {
-//            String userId = AzkabanUserService.getUserIdByName(accessUser, baseUrl, projectService.getSSORequestService(), workspace);
-//            if (userId == null || userId.equals("")) {
-//                throw new DSSErrorException(100323, "当前设置用户: " + accessUser + ", 在WTSS系统不存在，请联系WTSS管理员创建该用户！");
-//            }
-//        }
-//    }
-
 }

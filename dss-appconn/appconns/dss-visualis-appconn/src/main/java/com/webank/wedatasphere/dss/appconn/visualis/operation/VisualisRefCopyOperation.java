@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 public class VisualisRefCopyOperation
@@ -17,7 +17,7 @@ public class VisualisRefCopyOperation
         String nodeType = requestRef.getType().toLowerCase();
         logger.info("The {} of Visualis try to copy ref RefJobContent: {} in url {}.", nodeType, requestRef.getRefJobContent(), url);
 
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("projectVersion", "v1");
         visualisPostAction.addRequestPayload("flowVersion", requestRef.getNewVersion());

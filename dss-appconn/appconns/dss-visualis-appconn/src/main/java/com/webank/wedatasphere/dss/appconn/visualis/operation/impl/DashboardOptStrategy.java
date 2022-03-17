@@ -2,10 +2,6 @@ package com.webank.wedatasphere.dss.appconn.visualis.operation.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisDeleteAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisDownloadAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPutAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
@@ -15,6 +11,10 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResp
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDownloadAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPutAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -40,7 +40,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     @Override
     public RefJobContentResponseRef createRef(ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException {
         String url = baseUrl + URLUtils.dashboardPortalUrl;
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("name", requestRef.getName());
         visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
@@ -61,7 +61,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
             throw new ExternalOperationFailedException(90177, "Delete Dashboard failed for portalId id is null", null);
         }
         String url = baseUrl + URLUtils.dashboardPortalUrl + "/" + portalId;
-        VisualisDeleteAction deleteAction = new VisualisDeleteAction();
+        DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
@@ -73,7 +73,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         String portalId = NumberUtils.parseDoubleString(dashboardCreateResponseRef.toMap().get("id").toString());
         String url = baseUrl + URLUtils.dashboardPortalUrl + "/" + portalId + "/dashboards";
 
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("config", "");
         visualisPostAction.addRequestPayload("dashboardPortalId", Long.parseLong(portalId));
@@ -88,7 +88,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     @Override
     public ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef,
                                        String url,
-                                       VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+                                       DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         String portalId = getDashboardPortalId(requestRef.getRefJobContent());
         if (StringUtils.isEmpty(portalId)) {
             throw new ExternalOperationFailedException(90177, "export Dashboard failed for portalId id is null", null);
@@ -113,7 +113,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
             throw new ExternalOperationFailedException(90177, "Update Dashboard Exception, id is null");
         }
         String url = baseUrl + URLUtils.dashboardPortalUrl + "/" + id;
-        VisualisPutAction putAction = new VisualisPutAction();
+        DSSPutAction putAction = new DSSPutAction();
         putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", Long.parseLong(id));
@@ -130,7 +130,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     @Override
     public RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl requestRef,
                                String url,
-                               VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         String oldDashboardPortalId = getDashboardPortalId(requestRef.getRefJobContent());
         visualisPostAction.addRequestPayload(VisualisConstant.DASHBOARD_PORTAL_IDS, oldDashboardPortalId);
         InternalResponseRef responseRef1 = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
@@ -153,9 +153,9 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     @Override
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
                                               String url,
-                                              VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+                                              DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
-        Map<String, Object> jobContent = new HashMap<>();
+        Map<String, Object> jobContent = new HashMap<>(3);
         jobContent.put("projectId", requestRef.getProjectRefId());
         String dashboardPortalId = getDashboardPortalId(requestRef.getRefJobContent());
         @SuppressWarnings("unchecked")
@@ -173,10 +173,10 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         String previewUrl = URLUtils.getUrl(baseUrl, URLUtils.DASHBOARD_PREVIEW_URL_FORMAT, getDashboardPortalId(ref.getRefJobContent()));
         logger.info("The {} of Visualis try to execute ref RefJobContent: {} in previewUrl {}.", ref.getType(), ref.getRefJobContent(), previewUrl);
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in previewUrl %s.", ref.getType(), ref.getRefJobContent(), previewUrl));
-        VisualisDownloadAction previewDownloadAction = new VisualisDownloadAction();
+        DSSDownloadAction previewDownloadAction = new DSSDownloadAction();
         previewDownloadAction.setUser(ref.getUserName());
 
-        VisualisDownloadAction metadataDownloadAction = new VisualisDownloadAction();
+        DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
         metadataDownloadAction.setUser(ref.getUserName());
 
         try {

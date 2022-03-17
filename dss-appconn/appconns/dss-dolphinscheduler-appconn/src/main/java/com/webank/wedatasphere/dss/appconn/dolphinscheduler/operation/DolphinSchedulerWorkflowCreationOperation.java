@@ -42,7 +42,9 @@ public class DolphinSchedulerWorkflowCreationOperation
                 StringUtils.replace(this.createProcessDefinitionByIdUrl, "${projectName}", dolphinProjectName);
         Map<String, Object> formData = MapUtils.newCommonMapBuilder().put("name", orchestrationRef.getDSSOrchestration().getName())
                 .put("description", orchestrationRef.getDSSOrchestration().getDescription())
-                .put("processDefinitionJson", "{}").put("locations", "").put("connects", "[]").build();
+                .put("processDefinitionJson", "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-60036\",\"name\":\"init_empty_node\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"This node is only used for DSS to create the workflow, when a publishment is called in DSS, this node will be updated by DSS.\\\"\"},\"description\":\"\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}")
+                .put("locations", "{\"tasks-60036\":{\"name\":\"init_empty_node\",\"targetarr\":\"\",\"nodenumber\":\"0\",\"x\":236,\"y\":60}}")
+                .put("connects", "[]").build();
         DolphinSchedulerHttpUtils.getHttpPostResult(ssoRequestOperation, createUrl, orchestrationRef.getUserName(), formData);
         // 获取id
         RefOrchestrationContentRequestRef.RefOrchestrationContentRequestRefImpl ref = new RefOrchestrationContentRequestRef.RefOrchestrationContentRequestRefImpl()

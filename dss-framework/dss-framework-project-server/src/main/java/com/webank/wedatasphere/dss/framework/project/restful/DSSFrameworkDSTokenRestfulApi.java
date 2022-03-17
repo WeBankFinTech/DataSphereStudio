@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
@@ -42,7 +41,7 @@ public class DSSFrameworkDSTokenRestfulApi {
             return Message.error("dolphinscheduler appconn is null");
         }
 
-        WorkflowConversionIntegrationStandard standard = schedulerAppConn.getOrCreateWorkflowConversionStandard();
+        WorkflowConversionIntegrationStandard standard = schedulerAppConn.getOrCreateConversionStandard();
         AppInstance schedulerInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
         RefQueryService tokenQueryService = standard.getQueryService(schedulerInstance);
         RefQueryOperation tokenRefQueryOperation = tokenQueryService.getRefQueryOperation();

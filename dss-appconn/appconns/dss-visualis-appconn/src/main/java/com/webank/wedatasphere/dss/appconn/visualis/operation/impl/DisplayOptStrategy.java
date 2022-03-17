@@ -3,10 +3,6 @@ package com.webank.wedatasphere.dss.appconn.visualis.operation.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisDeleteAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisDownloadAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPutAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
@@ -16,6 +12,10 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResp
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDownloadAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPutAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -43,7 +43,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         String url = baseUrl + URLUtils.displayUrl;
         logger.info("requestUrl:{}", url);
 
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("name", requestRef.getName());
         visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
@@ -63,7 +63,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     @Override
     public void deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl visualisDeleteRequestRef) throws ExternalOperationFailedException {
         String url = baseUrl + URLUtils.displayUrl + "/" + getDisplayId(visualisDeleteRequestRef.getRefJobContent());
-        VisualisDeleteAction deleteAction = new VisualisDeleteAction();
+        DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
@@ -72,7 +72,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     private void createDisplaySlide(String displayId, ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException {
         String id = NumberUtils.parseDoubleString(displayId);
         String url = baseUrl + URLUtils.displayUrl + "/" + id + "/slides";
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("config", URLUtils.displaySlideConfig);
         visualisPostAction.addRequestPayload("displayId", Long.parseLong(id));
@@ -84,10 +84,10 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
 
     @Override
     public ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef,
-                                 String url,
-                                 VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
-        visualisPostAction.addRequestPayload("displayIds", getDisplayId(requestRef.getRefJobContent()));
-        return VisualisCommonUtil.getExportResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+                                       String url,
+                                       DSSPostAction postAction) throws ExternalOperationFailedException {
+        postAction.addRequestPayload("displayIds", getDisplayId(requestRef.getRefJobContent()));
+        return VisualisCommonUtil.getExportResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
 
@@ -106,7 +106,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     public ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
         long id = getDisplayId(requestRef.getRefJobContent());
         String url = baseUrl + URLUtils.displayUrl + "/" + id;
-        VisualisPutAction putAction = new VisualisPutAction();
+        DSSPutAction putAction = new DSSPutAction();
         putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", id);
@@ -122,11 +122,11 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
 
     @Override
     public RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl requestRef,
-                               String url,
-                               VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+                                            String url,
+                                            DSSPostAction postAction) throws ExternalOperationFailedException {
         Long id = getDisplayId(requestRef.getRefJobContent());
-        visualisPostAction.addRequestPayload(VisualisConstant.DISPLAY_IDS, id);
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        postAction.addRequestPayload(VisualisConstant.DISPLAY_IDS, id);
+        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
         @SuppressWarnings("unchecked")
         Map<String, Object> displayData = (Map<String, Object>) responseRef.getData().get("display");
         Map<String, Object> refJobContent = new HashMap<>(1);
@@ -138,8 +138,8 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     @Override
     @SuppressWarnings("unchecked")
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
-                                 String url,
-                                 VisualisPostAction visualisPostAction) throws ExternalOperationFailedException {
+                                              String url,
+                                              DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>(1);
         String id = getDisplayId(requestRef.getRefJobContent()).toString();
@@ -155,10 +155,10 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         String previewUrl = URLUtils.getUrl(baseUrl, URLUtils.DISPLAY_PREVIEW_URL_FORMAT, getDisplayId(ref.getRefJobContent()).toString());
         logger.info("The {} of Visualis try to execute ref RefJobContent: {} in previewUrl {}.", ref.getType(), ref.getRefJobContent(), previewUrl);
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in previewUrl %s.", ref.getType(), ref.getRefJobContent(), previewUrl));
-        VisualisDownloadAction previewDownloadAction = new VisualisDownloadAction();
+        DSSDownloadAction previewDownloadAction = new DSSDownloadAction();
         previewDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
 
-        VisualisDownloadAction metadataDownloadAction = new VisualisDownloadAction();
+        DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
         metadataDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
 
         try {

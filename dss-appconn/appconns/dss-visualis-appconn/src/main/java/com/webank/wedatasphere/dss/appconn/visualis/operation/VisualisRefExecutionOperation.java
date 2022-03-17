@@ -18,16 +18,16 @@ package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisGetAction;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.ViewOptStrategy;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.VisualisRefExecutionAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.LongTermRefExecutionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -125,7 +125,7 @@ public class VisualisRefExecutionOperation
         //判断数据源是不是hiveDatesouce，异步只支持hiveDatesouce，不支持jdbc
         String url = URLUtils.getUrl(getBaseUrl(), URLUtils.VIEW_DATA_URL_IS__HIVE_DATA_SOURCE, viewStrategy.getId(ref.getRefJobContent()));
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, judge dataSource type from  " + url);
-        VisualisGetAction visualisGetAction = new VisualisGetAction();
+        DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
         InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
         return (boolean) responseRef.getData().get("isLinkisDataSource");

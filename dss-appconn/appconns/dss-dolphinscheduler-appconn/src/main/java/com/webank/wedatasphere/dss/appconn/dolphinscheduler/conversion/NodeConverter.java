@@ -1,16 +1,15 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class NodeConverter {
 
@@ -22,7 +21,7 @@ public class NodeConverter {
     /**
      * 将DSS中节点转为Dolphin Scheduler中节点task.
      *
-     * @param schedulerNode
+     * @param dssNode
      *            the scheduler node
      * @return the dolphin scheduler task
      */

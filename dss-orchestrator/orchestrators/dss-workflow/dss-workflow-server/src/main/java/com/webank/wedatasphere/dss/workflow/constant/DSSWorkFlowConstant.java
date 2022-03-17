@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.workflow.constant;
 
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.conf.CommonVars$;
 
@@ -35,7 +36,7 @@ public class DSSWorkFlowConstant {
 
     public static final String SPLIT = "_";
 
-    public static final String BDP_USER_TICKET_ID = "bdp-user-ticket-id";
+    public static final String BDP_USER_TICKET_ID = DSSCommonConf.DSS_TOKEN_TICKET_KEY.getValue();
 
     public static final String REF_PROJECT_ID_KEY = "refProjectId";
     public static final String TITLE_KEY = "title";

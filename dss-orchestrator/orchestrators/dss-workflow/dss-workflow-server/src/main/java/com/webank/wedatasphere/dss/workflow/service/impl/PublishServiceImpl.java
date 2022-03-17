@@ -60,7 +60,7 @@ public class PublishServiceImpl implements PublishService {
             SchedulerAppConn schedulerAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
             // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
-            requestFrameworkConvertOrchestration.setConvertAllOrcs(schedulerAppConn.getOrCreateWorkflowConversionStandard().getDSSToRelConversionService(appInstance).isConvertAllOrcs());
+            requestFrameworkConvertOrchestration.setConvertAllOrcs(schedulerAppConn.getOrCreateConversionStandard().getDSSToRelConversionService(appInstance).isConvertAllOrcs());
             requestFrameworkConvertOrchestration.setLabels(dssLabel);
             ResponseConvertOrchestrator response = (ResponseConvertOrchestrator) getOrchestratorSender().ask(requestFrameworkConvertOrchestration);
             return response.getId();

@@ -62,10 +62,11 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
     List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 
-    void updateDssWorkflowName(@Param("id") Long id, @Param("name") String name);
+    //todo delete redundant code
+//    void updateDssWorkflowName(@Param("id") Long id, @Param("name") String name);
 
-    @Select("SELECT 1 FROM dss_project_orchestrator WHERE project_id = #{projectId} LIMIT 1")
-    Long hasOrchestrator(Long projectId);
+//    @Select("SELECT 1 FROM dss_project_orchestrator WHERE project_id = #{projectId} LIMIT 1")
+//    Long hasOrchestrator(Long projectId);
 
     @Update("DELETE FROM dss_project where `id` = #{projectId}")
     void deleteProjectInfo(@Param("projectId") Long projectId);

@@ -16,20 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
-
-
-
 public class OrchestratorVo {
 
     DSSOrchestratorInfo dssOrchestratorInfo;
-
-    public DSSOrchestratorVersion getDssOrchestratorVersion() {
-        return dssOrchestratorVersion;
-    }
-
-    public void setDssOrchestratorVersion(DSSOrchestratorVersion dssOrchestratorVersion) {
-        this.dssOrchestratorVersion = dssOrchestratorVersion;
-    }
 
     DSSOrchestratorVersion dssOrchestratorVersion;
 
@@ -39,6 +28,14 @@ public class OrchestratorVo {
 
     public void setDssOrchestratorInfo(DSSOrchestratorInfo dssOrchestratorInfo) {
         this.dssOrchestratorInfo = dssOrchestratorInfo;
+    }
+
+    public DSSOrchestratorVersion getDssOrchestratorVersion() {
+        return dssOrchestratorVersion;
+    }
+
+    public void setDssOrchestratorVersion(DSSOrchestratorVersion dssOrchestratorVersion) {
+        this.dssOrchestratorVersion = dssOrchestratorVersion;
     }
 
 }

@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
 public class DSSOrchestratorServiceImpl extends ServiceImpl<DSSOrchestratorMapper, DSSOrchestrator> implements DSSOrchestratorService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorServiceImpl.class);
     public static final String MODE_SPLIT = ",";
-    @Autowired
-    private DSSOrchestratorMapper orchestratorMapper;
+//    @Autowired
+//    private DSSOrchestratorMapper orchestratorMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
     @Autowired

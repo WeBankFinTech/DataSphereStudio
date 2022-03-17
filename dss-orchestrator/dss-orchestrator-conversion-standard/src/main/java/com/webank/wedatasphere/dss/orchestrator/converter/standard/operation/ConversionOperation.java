@@ -28,6 +28,4 @@ public interface ConversionOperation<K extends ConversionRequestRef, V extends R
 
     V convert(K ref);
 
-    void init();
-
 }

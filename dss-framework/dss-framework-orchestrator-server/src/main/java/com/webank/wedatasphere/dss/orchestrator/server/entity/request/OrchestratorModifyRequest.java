@@ -16,24 +16,15 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
-import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
-
 @XmlRootElement
-public class OrchestratorModifyRequest {
+public class OrchestratorModifyRequest extends OrchestratorRequest {
 
     @NotNull(message = "id不能为空")
     private Long id;
-
-    @NotNull(message = "workspaceId不能为空")
-    private Long workspaceId;
-
-    @NotNull(message = "工程id不能为空")
-    private Long projectId;
 
     @NotNull(message = "编排名称不能为空")
     private String orchestratorName;
@@ -58,21 +49,7 @@ public class OrchestratorModifyRequest {
     @NotNull(message = "描述不能为空")
     private String description;
 
-
-    public List<String> getDssLabels() {
-        return dssLabels;
-    }
-
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
-    }
-
     private List<String> dssLabels;
-
-    /**
-     * labels是通过前端进行传入的，主要是用来进行当前的环境信息
-     */
-    private LabelRouteVo labels;
 
     public Long getId() {
         return id;
@@ -80,22 +57,6 @@ public class OrchestratorModifyRequest {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getWorkspaceId() {
-        return workspaceId;
-    }
-
-    public void setWorkspaceId(Long workspaceId) {
-        this.workspaceId = workspaceId;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
     }
 
     public String getOrchestratorName() {
@@ -138,26 +99,26 @@ public class OrchestratorModifyRequest {
         this.description = description;
     }
 
-    public LabelRouteVo getLabels() {
-        return labels;
+    public List<String> getDssLabels() {
+        return dssLabels;
     }
 
-    public void setLabels(LabelRouteVo labels) {
-        this.labels = labels;
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
     }
 
     @Override
     public String toString() {
         return "OrchestratorModifyRequest{" +
                 "id=" + id +
-                ", workspaceId=" + workspaceId +
-                ", projectId=" + projectId +
+                ", workspaceId=" + getWorkspaceId() +
+                ", projectId=" + getProjectId() +
                 ", orchestratorName='" + orchestratorName + '\'' +
                 ", orchestratorMode='" + orchestratorMode + '\'' +
                 ", orchestratorWays=" + orchestratorWays +
                 ", uses='" + uses + '\'' +
                 ", description='" + description + '\'' +
-                ", labels=" + labels +
+                ", labels=" + getLabels() +
                 '}';
     }
 }

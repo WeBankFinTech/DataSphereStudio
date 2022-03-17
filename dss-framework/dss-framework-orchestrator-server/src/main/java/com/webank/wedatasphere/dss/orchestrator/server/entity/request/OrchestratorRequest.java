@@ -16,14 +16,14 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
 public class OrchestratorRequest {
-
-    private Long id;
 
     @NotNull(message = "workspaceId不能为空")
     private Long workspaceId;
@@ -34,16 +34,20 @@ public class OrchestratorRequest {
     /**
      * 编排类型，如工作流，组合编排等
      */
-   // @NotNull(message = "编排类型不能为空")
+    // @NotNull(message = "编排类型不能为空")
     private String orchestratorMode;
 
+    /**
+     * dssLabels是通过前端进行传入的，主要是用来进行当前的环境信息
+     */
+    private LabelRouteVO labels;
 
-    public Long getId() {
-        return id;
+    public LabelRouteVO getLabels() {
+        return labels;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLabels(LabelRouteVO labels) {
+        this.labels = labels;
     }
 
     public Long getWorkspaceId() {
@@ -73,7 +77,6 @@ public class OrchestratorRequest {
     @Override
     public String toString() {
         return "OrchestratorRequest{" +
-                "id=" + id +
                 ", workspaceId=" + workspaceId +
                 ", projectId=" + projectId +
                 ", orchestratorMode='" + orchestratorMode + '\'' +

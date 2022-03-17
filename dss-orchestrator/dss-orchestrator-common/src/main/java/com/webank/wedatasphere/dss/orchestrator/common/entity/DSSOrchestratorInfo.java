@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 import java.util.Date;
 import java.util.List;
 
-
 public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private Long id;
@@ -43,6 +42,16 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
     private String uuid;
 
     private String secondaryType;
+
+    private Long workspaceId;
+
+    private String orchestratoMode;
+
+    private String orchestratorWay;
+
+    private String updateUser;
+
+    private Date updateTime;
 
     public DSSOrchestratorInfo() {
 
@@ -185,6 +194,46 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     public void setProjectId(long projectId) {
         this.projectId = projectId;
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public String getOrchestratoMode() {
+        return orchestratoMode;
+    }
+
+    public void setOrchestratoMode(String orchestratoMode) {
+        this.orchestratoMode = orchestratoMode;
+    }
+
+    public String getOrchestratorWay() {
+        return orchestratorWay;
+    }
+
+    public void setOrchestratorWay(String orchestratorWay) {
+        this.orchestratorWay = orchestratorWay;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override

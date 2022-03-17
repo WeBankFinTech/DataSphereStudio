@@ -16,21 +16,13 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
-import com.webank.wedatasphere.dss.framework.project.entity.vo.LabelRouteVo;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 
 @XmlRootElement
-public class OrchestratorCreateRequest {
-
-    @NotNull(message = "workspaceId不能为空")
-    private Long workspaceId;
-
-    @NotNull(message = "工程id不能为空")
-    private Long projectId;
+public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     @NotNull(message = "编排名称不能为空")
     private String orchestratorName;
@@ -48,14 +40,6 @@ public class OrchestratorCreateRequest {
     private List<String> orchestratorWays;
     private List<String> dssLabels;
 
-    public List<String> getDssLabels() {
-        return dssLabels;
-    }
-
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
-    }
-
     /**
      * 编排用途
      */
@@ -64,30 +48,16 @@ public class OrchestratorCreateRequest {
     @NotNull(message = "描述不能为空")
     private String description;
 
-
     private String projectName;
 
     private String workspaceName;
 
-    /**
-     * labels是通过前端进行传入的，主要是用来进行当前的环境信息
-     */
-    private LabelRouteVo labels;
-
-    public Long getWorkspaceId() {
-        return workspaceId;
+    public List<String> getDssLabels() {
+        return dssLabels;
     }
 
-    public void setWorkspaceId(Long workspaceId) {
-        this.workspaceId = workspaceId;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
     }
 
     public String getOrchestratorName() {
@@ -130,14 +100,6 @@ public class OrchestratorCreateRequest {
         this.description = description;
     }
 
-    public LabelRouteVo getLabels() {
-        return labels;
-    }
-
-    public void setLabels(LabelRouteVo labels) {
-        this.labels = labels;
-    }
-
     public String getProjectName() {
         return projectName;
     }
@@ -157,14 +119,14 @@ public class OrchestratorCreateRequest {
     @Override
     public String toString() {
         return "OrchestratorCreateRequest{" +
-                "workspaceId=" + workspaceId +
-                ", projectId=" + projectId +
+                "workspaceId=" + getWorkspaceId() +
+                ", projectId=" + getProjectId() +
                 ", arrangeName='" + orchestratorName + '\'' +
                 ", arrangeMode='" + orchestratorMode + '\'' +
                 ", arrangeWays=" + orchestratorWays +
                 ", uses='" + uses + '\'' +
                 ", description='" + description + '\'' +
-                ", labels=" + labels +
+                ", labels=" + getLabels() +
                 '}';
     }
 }

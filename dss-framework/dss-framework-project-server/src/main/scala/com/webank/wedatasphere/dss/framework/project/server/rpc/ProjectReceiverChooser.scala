@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component
 @Component
 class ProjectReceiverChooser extends ReceiverChooser {
 
-
   @Autowired
   var projectService: DSSProjectService = _
   @Autowired

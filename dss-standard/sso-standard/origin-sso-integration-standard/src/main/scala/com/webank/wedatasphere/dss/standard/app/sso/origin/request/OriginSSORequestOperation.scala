@@ -16,34 +16,28 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.request
 
+import java.net.URI
+import java.util.Date
+
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSHttpAction
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException
-import org.apache.commons.io.IOUtils
 import org.apache.http.impl.cookie.BasicClientCookie
-import org.apache.linkis.common.utils.{ByteTimeUtils, Logging, Utils}
-import org.apache.linkis.httpclient.Client
-import org.apache.linkis.httpclient.request.HttpAction
-import org.apache.linkis.httpclient.response.impl.DefaultHttpResult
-import org.apache.linkis.httpclient.response.{HttpResult, Result}
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.httpclient.response.HttpResult
 
-import java.net.URI
-import java.util
-import java.util.Date
-import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import scala.collection.convert.wrapAsScala._
 
 
-class OriginSSORequestOperation private[request](appName: String) extends SSORequestOperation[HttpAction, HttpResult] with Logging {
+class OriginSSORequestOperation private[request](appName: String) extends HttpSSORequestOperation(appName) {
 
-  override def requestWithSSO(urlBuilder: SSOUrlBuilderOperation, req: HttpAction): HttpResult = {
-
-    //    val httpClient = HttpClient.getHttpClient(urlBuilder.getBuiltUrl, appName)
-    val httpClient =OriginSSORequestOperation.getHttpClient(urlBuilder, appName)
+  override def requestWithSSO(urlBuilder: SSOUrlBuilderOperation, req: DSSHttpAction): HttpResult = {
     urlBuilder match {
-      case urlBuilderOperationImpl: SSOUrlBuilderOperationImpl => val cookies = urlBuilderOperationImpl.getCookies
+      case urlBuilderOperationImpl: SSOUrlBuilderOperationImpl =>
+        val cookies = urlBuilderOperationImpl.getCookies
         cookies.foreach {
           case (key, value) =>
             val basicClientCookie = new BasicClientCookie(key, value)
@@ -54,75 +48,22 @@ class OriginSSORequestOperation private[request](appName: String) extends SSOReq
             info("Add cookie for get user info " + basicClientCookie.toString)
             req.addCookie(basicClientCookie)
         }
+      case _ if urlBuilder != null =>
+        throw new AppStandardErrorException(20300, s"Not support SSOUrlBuilderOperation => ${urlBuilder.getClass.getName}.")
+      case _ =>
+        throw new AppStandardErrorException(20300, "SSOUrlBuilderOperation is null.")
     }
-
-    httpClient.execute(req) match {
-      case result: HttpResult => result
-      case result => if (Result.isSuccessResult(result)) {
-        val defaultHttpResult = new DefaultHttpResult
-        defaultHttpResult.set(null, 200, null, null)
-        defaultHttpResult
-      } else throw new AppStandardErrorException(20300, s"Not support Result => ${result.getClass.getName}.")
-    }
-
+    super.requestWithSSO(urlBuilder, req)
   }
 
-}
-
-object OriginSSORequestOperation extends Logging {
-
-  val MAX_ACTIVE_TIME = ByteTimeUtils.timeStringAsMs("15m")
-
-  private val httpClientLastAccessMap = new ConcurrentHashMap[String, Long]
-  private val httpClientMap = new util.HashMap[String, Client]
-
-  Utils.defaultScheduler.scheduleWithFixedDelay(new Runnable {
-    override def run(): Unit = httpClientLastAccessMap.keySet().toArray.foreach {
-      case key: String =>
-        if (System.currentTimeMillis - httpClientLastAccessMap.get(key) >= MAX_ACTIVE_TIME) httpClientMap synchronized {
-          if (httpClientLastAccessMap.containsKey(key)) {
-            httpClientLastAccessMap.remove(key)
-            IOUtils.closeQuietly(httpClientMap.get(key))
-            httpClientMap.remove(key)
-            info(s"SSORequestOperation removed expired key($key).")
-          }
+  override protected def getKey(urlBuilder: SSOUrlBuilderOperation, req: DSSHttpAction): String = {
+    val baseUrl = HttpClient.getBaseUrl(urlBuilder.getBuiltUrl)
+    urlBuilder match {
+      case builder: SSOUrlBuilderOperationImpl =>
+        builder.getCookies.find(_._1 == DSSCommonConf.DSS_TOKEN_TICKET_KEY.getValue).foreach{ case (_, ticketId) =>
+          return appName + ticketId + baseUrl
         }
     }
-  }, MAX_ACTIVE_TIME, MAX_ACTIVE_TIME, TimeUnit.MILLISECONDS)
-
-  def getHttpClient(urlBuilder: SSOUrlBuilderOperation, appName: String): Client = urlBuilder match {
-    case builder: SSOUrlBuilderOperationImpl =>
-      builder.getCookies.find(_._1 == "bdp-user-ticket-id").foreach { case (_, ticketId) =>
-        val baseUrl = HttpClient.getBaseUrl(builder.getBuiltUrl)
-        val key = getKey(ticketId, appName,baseUrl)
-        info("Get http client key is "+key)
-        if (httpClientMap.containsKey(key) && System.currentTimeMillis - httpClientLastAccessMap.get(key) < MAX_ACTIVE_TIME) {
-          httpClientLastAccessMap.put(key, System.currentTimeMillis)
-          return httpClientMap.get(key)
-        }
-        else httpClientMap synchronized {
-          if (httpClientMap.containsKey(key) && System.currentTimeMillis - httpClientLastAccessMap.get(key) < MAX_ACTIVE_TIME) {
-            httpClientLastAccessMap.put(key, System.currentTimeMillis)
-            return httpClientMap.get(key)
-          } else {
-            if (httpClientMap.containsKey(key)) {
-              httpClientMap.get(key).close()
-            }
-
-            val httpClient = HttpClient.getHttpClient(urlBuilder.getBuiltUrl, appName)
-            httpClientMap.put(key, httpClient)
-            httpClientLastAccessMap.put(key, System.currentTimeMillis)
-            info(s"SSORequestOperation add a new HttpClient for key($key).")
-            return httpClient
-          }
-        }
-      }
-      throw new AppStandardErrorException(20300, "User has not login, please login first.")
-    case _ =>
-      throw new AppStandardErrorException(20300, s"Not support SSOUrlBuilderOperation => ${urlBuilder.getClass.getName}.")
+    throw new AppStandardErrorException(20300, "User has not login, please login first.")
   }
-
-
-  private def getKey(ticketId: String, appName: String,baseUrl: String ): String = appName + ticketId+baseUrl
-
 }

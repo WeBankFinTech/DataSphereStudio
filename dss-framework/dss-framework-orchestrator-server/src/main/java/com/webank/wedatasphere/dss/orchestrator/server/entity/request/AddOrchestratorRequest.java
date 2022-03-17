@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
+@Deprecated
 public class AddOrchestratorRequest {
     private String name;
     private String workspaceName;

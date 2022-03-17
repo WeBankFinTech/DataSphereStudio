@@ -16,25 +16,26 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.linkisjob;
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.constant.AzkabanConstant;
 import com.webank.wedatasphere.dss.appconn.schedulis.conversion.NodeConverter;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.workflow.core.constant.WorkflowConstant;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 
 public class LinkisJobConverter implements NodeConverter {
 
-    public LinkisJobConverter(){
-        LinkisJobTuning[] linkisJobTunings = {new AzkabanSubFlowJobTuning()};
-        this.linkisJobTunings = linkisJobTunings;
-    }
     private LinkisJobTuning[] linkisJobTunings;
+
+    public LinkisJobConverter(){
+        this.linkisJobTunings = new LinkisJobTuning[]{new AzkabanSubFlowJobTuning()};
+    }
 
     @Override
     public String conversion(WorkflowNode workflowNode){
@@ -43,7 +44,7 @@ public class LinkisJobConverter implements NodeConverter {
 
     private String baseConversion(WorkflowNode workflowNode){
         LinkisJob job = new LinkisJob();
-        job.setConf(new HashMap<String,String>());
+        job.setConf(new HashMap<>());
         job.setName(workflowNode.getName());
         convertHead(workflowNode,job);
         convertDependencies(workflowNode,job);
@@ -59,16 +60,16 @@ public class LinkisJobConverter implements NodeConverter {
     }
 
     private String convertJobToString(LinkisJob job){
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<>(8);
         map.put(AzkabanConstant.LINKIS_VERSION, AzkabanConf.LINKIS_VERSION.getValue());
         map.put(AzkabanConstant.JOB_TYPE,job.getType());
         map.put(AzkabanConstant.LINKIS_TYPE,job.getLinkistype());
         map.put(AzkabanConstant.ZAKABAN_DEPENDENCIES_KEY,job.getDependencies());
         map.put(WorkflowConstant.PROXY_USER,job.getProxyUser());
         map.put(AzkabanConstant.JOB_COMMAND,job.getCommand());
-        Map<String,Object> labels = new HashMap<String,Object>();
-        labels.put("route",AzkabanConf.JOB_LABEL.getValue());
-        map.put(AzkabanConstant.JOB_LABELS, new Gson().toJson(labels));
+        Map<String, Object> labels = new HashMap<>(1);
+        labels.put("route", AzkabanConf.JOB_LABEL.getValue());
+        map.put(AzkabanConstant.JOB_LABELS, DSSCommonUtils.COMMON_GSON.toJson(labels));
         map.putAll(job.getConf());
         StringBuilder stringBuilder = new StringBuilder();
         map.forEach((k,v)->{
@@ -88,7 +89,7 @@ public class LinkisJobConverter implements NodeConverter {
         List<String> dependencys = workflowNode.getDSSNode().getDependencys();
         if(dependencys != null && !dependencys.isEmpty()) {
             StringBuilder dependencies = new StringBuilder();
-            dependencys.forEach(d ->dependencies.append(d + ","));
+            dependencys.forEach(d -> dependencies.append(d).append(","));
             job.setDependencies(dependencies.substring(0,dependencies.length()-1));
         }
     }
@@ -103,10 +104,9 @@ public class LinkisJobConverter implements NodeConverter {
     private void convertConfiguration(WorkflowNode workflowNode, LinkisJob job){
         Map<String, Object> params = workflowNode.getDSSNode().getParams();
         if (params != null && !params.isEmpty()) {
-            Object configuration = params.get("configuration");
+            Map<String, Map<String,Object>> configuration = (Map<String, Map<String, Object>>) params.get("configuration");
             String confprefix = "node.conf.";
-            ((Map<String,Map<String,Object>>)configuration).forEach((k,v)->
-            {
+            configuration.forEach((k,v)-> {
                 if(null!=v) {
                     v.forEach((k2, v2) -> {
                         if(null !=v2) {job.getConf().put(confprefix + k + "." + k2, v2.toString());}
@@ -121,7 +121,7 @@ public class LinkisJobConverter implements NodeConverter {
         Map<String, Object> jobContent = workflowNode.getDSSNode().getJobContent();
         if(jobContent != null) {
             jobContent.remove("jobParams");
-            job.setCommand(new Gson().toJson(jobContent));
+            job.setCommand(DSSCommonUtils.COMMON_GSON.toJson(jobContent));
         }
     }
 }

@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.appconn.schedulis.service;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.operation.SchedulisProjectCreationOperation;
 import com.webank.wedatasphere.dss.appconn.schedulis.operation.SchedulisProjectDeletionOperation;
-import com.webank.wedatasphere.dss.appconn.schedulis.operation.SchedulisProjectGetOperation;
+import com.webank.wedatasphere.dss.appconn.schedulis.operation.SchedulisProjectSearchOperation;
 import com.webank.wedatasphere.dss.appconn.schedulis.operation.SchedulisProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 
@@ -44,7 +44,7 @@ public class SchedulisProjectService extends ProjectService {
 
     @Override
     protected ProjectSearchOperation createProjectSearchOperation() {
-        return new SchedulisProjectGetOperation();
+        return new SchedulisProjectSearchOperation();
     }
 
 }

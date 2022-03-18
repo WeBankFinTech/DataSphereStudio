@@ -9,11 +9,14 @@ import org.apache.commons.collections.CollectionUtils;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 
 public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
+
     private ProcessDefinitionJson processDefinitionJson;
 
     private Map<String, LocationInfo> locations;
 
     private List<Connect> connects;
+
+    private String releaseState;
 
     public ProcessDefinitionJson getProcessDefinitionJson() {
         return processDefinitionJson;
@@ -37,6 +40,14 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
 
     public void setConnects(List<Connect> connects) {
         this.connects = connects;
+    }
+
+    public String getReleaseState() {
+        return releaseState;
+    }
+
+    public void setReleaseState(String releaseState) {
+        this.releaseState = releaseState;
     }
 
     public static class ProcessDefinitionJson {

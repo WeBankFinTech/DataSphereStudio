@@ -32,11 +32,12 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOr
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
-import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRefImpl;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.OrchestrationToRelConversionRequestRef;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.AppConnRefFactoryUtils;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
@@ -45,6 +46,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,17 +203,17 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         //TODO try to optimize it by select db in batch.
         List<DSSOrchestration> flows = requestConversionWorkflow.getOrcAppIds().stream().map(flowService::getFlowWithJsonAndSubFlowsByID).collect(Collectors.toList());
         SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
-//        List<AppInstance> appInstances = appConn.getAppDesc().getAppInstancesByLabels(requestConversionWorkflow.getDSSLabels());
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
-        DSSToRelConversionOperation operation = appConn.getOrCreateWorkflowConversionStandard()
+        DSSToRelConversionOperation operation = appConn.getOrCreateConversionStandard()
             .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
-        DSSToRelConversionRequestRef requestRef = AppConnRefFactoryUtils.newAppConnRef(DSSToRelConversionRequestRef.class, appConn.getAppDesc().getAppName());
-        if(requestRef instanceof ProjectToRelConversionRequestRefImpl) {
-            ProjectToRelConversionRequestRefImpl relConversionRequestRef = (ProjectToRelConversionRequestRefImpl) requestRef;
-            relConversionRequestRef.setDSSProject((DSSProject) requestConversionWorkflow.getProject());
-            relConversionRequestRef.setDSSOrcList(flows);
-            relConversionRequestRef.setUserName(requestConversionWorkflow.getUserName());
-            relConversionRequestRef.setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
+        DSSToRelConversionRequestRef requestRef = RequestRefUtils.getRequestRef(operation);
+        requestRef.setDSSProject((DSSProject) requestConversionWorkflow.getProject())
+                .setUserName(requestConversionWorkflow.getUserName())
+                .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
+        if(requestRef instanceof ProjectToRelConversionRequestRef) {
+            ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows);
+        } else if(requestRef instanceof OrchestrationToRelConversionRequestRef) {
+            ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(flows.get(0));
         }
         try{
             ResponseRef responseRef = operation.convert(requestRef);
@@ -220,8 +222,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             }
             return ResponseOperateOrchestrator.success();
         }catch (Exception e){
-            logger.error("convertWorkflow error:",e);
-            return ResponseOperateOrchestrator.failed(e.getMessage());
+            logger.error("user {} convert workflow {} error.", requestConversionWorkflow.getUserName(), requestConversionWorkflow.getOrcAppIds(), e);
+            return ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

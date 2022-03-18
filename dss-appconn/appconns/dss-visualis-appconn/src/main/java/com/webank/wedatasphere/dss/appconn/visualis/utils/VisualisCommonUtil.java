@@ -1,12 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisHttpAction;
 import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisResponseRefBuilder;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSHttpAction;
 import com.webank.wedatasphere.dss.standard.app.sso.ref.WorkspaceRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
@@ -38,7 +38,7 @@ public class VisualisCommonUtil {
     public static HttpResult getHttpResult(WorkspaceRequestRef requestRef,
                                            SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
                                            String url,
-                                           VisualisHttpAction visualisHttpAction) throws ExternalOperationFailedException {
+                                           DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
 
         try {
             SSOUrlBuilderOperation ssoUrlBuilderOperation = getSSOUrlBuilderOperation(requestRef, url);
@@ -52,7 +52,7 @@ public class VisualisCommonUtil {
     public static InternalResponseRef getInternalResponseRef(WorkspaceRequestRef requestRef,
                                                              SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
                                                              String url,
-                                                             VisualisHttpAction visualisHttpAction) throws ExternalOperationFailedException {
+                                                             DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
         HttpResult httpResult = getHttpResult(requestRef, ssoRequestOperation, url, visualisHttpAction);
         InternalResponseRef responseRef = ResponseRef.newInternalBuilder().setResponseBody(httpResult.getResponseBody()).build();
         checkResponseRef(responseRef);
@@ -62,7 +62,7 @@ public class VisualisCommonUtil {
     public static RefJobContentResponseRef getRefJobContentResponseRef(WorkspaceRequestRef requestRef,
                                                           SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
                                                           String url,
-                                                          VisualisHttpAction visualisHttpAction) throws ExternalOperationFailedException {
+                                                          DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
         ResponseRef responseRef = getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisHttpAction);
         return RefJobContentResponseRef.newBuilder().setRefJobContent(responseRef.toMap()).success();
     }
@@ -70,7 +70,7 @@ public class VisualisCommonUtil {
     public static ExportResponseRef getExportResponseRef(WorkspaceRequestRef requestRef,
                                                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
                                                          String url,
-                                                         VisualisHttpAction visualisHttpAction) throws ExternalOperationFailedException {
+                                                         DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
         ResponseRef responseRef = getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisHttpAction);
         return ExportResponseRef.newBuilder().setResourceMap(responseRef.toMap()).success();
     }
@@ -78,7 +78,7 @@ public class VisualisCommonUtil {
     public static ResponseRef getExternalResponseRef(WorkspaceRequestRef requestRef,
                                                          SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
                                                          String url,
-                                                         VisualisHttpAction visualisHttpAction) throws ExternalOperationFailedException {
+                                                         DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
         HttpResult httpResult = getHttpResult(requestRef, ssoRequestOperation, url, visualisHttpAction);
         ResponseRef responseRef = new VisualisResponseRefBuilder().setResponseBody(httpResult.getResponseBody()).build();
         checkResponseRef(responseRef);

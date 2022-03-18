@@ -20,16 +20,21 @@ import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandardFactory;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.OriginSSOIntegrationStandardFactory;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractOnlySSOAppConn extends AbstractAppConn implements OnlySSOAppConn {
 
     private static final SSOIntegrationStandard SSO_INTEGRATION_STANDARD;
 
     static {
-        SSOIntegrationStandardFactory ssoIntegrationStandardFactory = ClassUtils.getInstanceOrWarn(SSOIntegrationStandardFactory.class);
+        SSOIntegrationStandardFactory ssoIntegrationStandardFactory =
+                ClassUtils.getInstanceOrDefault(SSOIntegrationStandardFactory.class, new OriginSSOIntegrationStandardFactory());
         ssoIntegrationStandardFactory.init();
         SSO_INTEGRATION_STANDARD = ssoIntegrationStandardFactory.getSSOIntegrationStandard();
+        LoggerFactory.getLogger(AbstractOnlySSOAppConn.class).info("For the first SSO Standard, {} has created {}.",
+                ssoIntegrationStandardFactory.getClass().getName(), SSO_INTEGRATION_STANDARD.getClass().getName());
         // considering the plugin design model in different classloader, We must set it when each AppConn is instanced.
         SSOHelper.setSSOBuilderService(SSO_INTEGRATION_STANDARD.getSSOBuilderService());
     }

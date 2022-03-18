@@ -109,10 +109,14 @@ public class SSOHelper {
 
     public static SSOUrlBuilderOperation createSSOUrlBuilderOperation(Workspace workspace) {
         SSOUrlBuilderOperation operation = ssoBuilderService.createSSOUrlBuilderOperation();
+        setSSOUrlBuilderOperation(operation, workspace);
+        return operation;
+    }
+
+    public static void setSSOUrlBuilderOperation(SSOUrlBuilderOperation operation, Workspace workspace) {
         workspace.getCookies().forEach(operation::addCookie);
         operation.setDSSUrl(workspace.getDssUrl());
         operation.setWorkspace(workspace.getWorkspaceName());
-        return operation;
     }
 
     private static final Pattern DOMAIN_REGEX = Pattern.compile("[a-zA-Z][a-zA-Z0-9\\.]+");

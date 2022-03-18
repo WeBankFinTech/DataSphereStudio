@@ -17,32 +17,18 @@
 package com.webank.wedatasphere.dss.standard.app.sso.origin
 
 
-import com.webank.wedatasphere.dss.standard.app.sso.{SSOIntegrationStandard, SSOIntegrationStandardFactory}
-import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
-import com.webank.wedatasphere.dss.standard.app.sso.origin.plugin.OriginSSOPluginServiceImpl
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.OriginSSORequestServiceImpl
-import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOPluginService
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService
-import com.webank.wedatasphere.dss.standard.common.desc.AppDesc
+import com.webank.wedatasphere.dss.standard.app.sso.{SSOIntegrationStandard, SSOIntegrationStandardFactory}
 
 
-class OriginSSOIntegrationStandard private[origin]() extends SSOIntegrationStandard {
+class OriginSSOIntegrationStandard private[origin]() extends HttpSSOIntegrationStandard {
 
-  private val ssoPluginService: SSOPluginService = new OriginSSOPluginServiceImpl
-  private val ssoRequestService: SSORequestService = new OriginSSORequestServiceImpl
+  override protected def createSSORequestService(): SSORequestService = new OriginSSORequestServiceImpl
 
-  override def getSSORequestService: SSORequestService = ssoRequestService
-
-  override def getSSOPluginService: SSOPluginService = ssoPluginService
-
-  override def init(): Unit = {
-    ssoPluginService.setSSOBuilderService(getSSOBuilderService)
-  }
-
-  override def close(): Unit = HttpClient.close()
 }
 
-// SSO 工厂，通过该工程获取sso集成规范
+// SSO 工厂，通过该工程获取此默认的 sso 集成规范
 class OriginSSOIntegrationStandardFactory extends SSOIntegrationStandardFactory {
 
   private val ssoIntegrationStandard = new OriginSSOIntegrationStandard

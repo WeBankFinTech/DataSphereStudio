@@ -39,6 +39,18 @@ public abstract class AbstractOperation<K extends RequestRef, V extends Response
         return service.getAppInstance().getBaseUrl();
     }
 
+    protected String mergeUrl(String url, String suffix) {
+        if(url.endsWith("/")) {
+            return url + suffix;
+        } else {
+            return url + "/" + suffix;
+        }
+    }
+
+    protected String mergeBaseUrl(String suffix) {
+        return mergeUrl(getBaseUrl(), suffix);
+    }
+
     protected String toJson(Object object) {
         if(object == null) {
             return null;

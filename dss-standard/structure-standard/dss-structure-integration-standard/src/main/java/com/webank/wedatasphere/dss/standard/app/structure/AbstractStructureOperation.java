@@ -19,4 +19,8 @@ public abstract class AbstractStructureOperation<K extends RequestRef, V extends
         this.service = service;
     }
 
+    protected StructureService getStructureService() {
+        return (StructureService) this.service;
+    }
+
 }

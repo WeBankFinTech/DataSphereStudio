@@ -16,12 +16,11 @@
 
 package com.webank.wedatasphere.dss.orchestrator.converter.standard.ref;
 
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.ref.WorkspaceRequestRef;
 
 
-public interface ConversionRequestRef extends RequestRef {
+public interface ConversionRequestRef extends WorkspaceRequestRef {
 
-    Workspace getWorkspace();
+    String getUserName();
 
 }

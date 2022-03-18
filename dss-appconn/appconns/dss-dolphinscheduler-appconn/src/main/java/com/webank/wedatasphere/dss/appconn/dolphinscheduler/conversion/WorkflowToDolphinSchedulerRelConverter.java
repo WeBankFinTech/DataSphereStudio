@@ -1,21 +1,8 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerConvertedRel;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerWorkflow;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
@@ -24,6 +11,15 @@ import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelCo
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNodeEdge;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConverter {
 
@@ -34,10 +30,9 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)rel;
-        List<Workflow> workflows = dolphinSchedulerConvertedRel.getWorkflows();
-        List<Workflow> dolphinSchedulerWorkflows =
-            workflows.stream().map(workflow -> convertWorkflow(workflow)).collect(Collectors.toList());
-        dolphinSchedulerConvertedRel.setWorkflows(dolphinSchedulerWorkflows);
+        Workflow workflow = dolphinSchedulerConvertedRel.getWorkflow();
+        Workflow dolphinSchedulerWorkflows = convertWorkflow(workflow);
+        dolphinSchedulerConvertedRel.setWorkflow(dolphinSchedulerWorkflows);
         return dolphinSchedulerConvertedRel;
     }
 
@@ -54,14 +49,6 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
             throw new DSSRuntimeException(91500, "Copy workflow fields failed!", e);
         }
 
-        String contextID = dolphinSchedulerWorkflow.getContextID();
-        String user = null;
-        try {
-            String value = DolphinAppConnUtils.getValueFromJsonString(contextID, "value");
-            user = DolphinAppConnUtils.getValueFromJsonString(value, "user");
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
         DolphinSchedulerWorkflow.ProcessDefinitionJson processDefinitionJson =
             new DolphinSchedulerWorkflow.ProcessDefinitionJson();
         Map<String, DolphinSchedulerWorkflow.LocationInfo> locations = new HashMap<>();

@@ -29,12 +29,11 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdResponse;
+import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -95,7 +94,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //是否存在相同的编排名称
         newOrchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
-        DSSProject dssProject = isProjectExists(orchestratorCreateRequest.getProjectId());
+        DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
         //1.创建编排实体bean
         OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                 getType(OrchestratorTypeEnum.getTypeByKey(orchestratorCreateRequest.getOrchestratorMode()));
@@ -142,14 +141,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                                                                                                BiFunction<StructureOperation, K, V> responseRefConsumer, String operationName) {
         ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssLabels);
         Long refProjectId, refOrchestrationId;
-        if(askProjectSender) {
+        if (askProjectSender) {
             ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
                     .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId()));
             refProjectId = projectRefIdResponse.getRefProjectId();
             refOrchestrationId = null;
         } else {
             DSSOrchestratorRefOrchestration refOrchestration = orchestratorMapper.getRefOrchestrationId(dssOrchestrator.getId());
-            if(refOrchestration != null) {
+            if (refOrchestration != null) {
                 refProjectId = refOrchestration.getRefProjectId();
                 refOrchestrationId = refOrchestration.getRefOrchestrationId();
             } else {
@@ -165,13 +164,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     dssOrchestrationContentRequestRef ->
                             dssOrchestrationContentRequestRef.setDSSOrchestration(dssOrchestrator).setProjectName(projectName).setRefProjectId(refProjectId),
                     refOrchestrationContentRequestRef ->
-                        refOrchestrationContentRequestRef.setRefOrchestrationId(refOrchestrationId).setOrchestrationName(dssOrchestrator.getName())
-                                .setRefProjectId(refProjectId).setProjectName(projectName),
+                            refOrchestrationContentRequestRef.setRefOrchestrationId(refOrchestrationId).setOrchestrationName(dssOrchestrator.getName())
+                                    .setRefProjectId(refProjectId).setProjectName(projectName),
                     (structureOperation, structureRequestRef) -> {
                         structureRequestRef.setDSSLabels(dssLabels).setWorkspace(workspace);
                         return responseRefConsumer.apply(structureOperation, (K) structureRequestRef);
                     }, operationName + " orchestration " + dssOrchestrator.getName() + " in SchedulerAppConn");
-            if(askProjectSender) {
+            if (askProjectSender) {
                 orchestrationResponseRef.toMap().put("refProjectId", refProjectId);
             }
         }
@@ -181,7 +180,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
-        DSSProject dssProject = isProjectExists(orchestratorModifyRequest.getProjectId());
+        DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         //todo 需不需要判断用户是否有修改权限
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
@@ -221,7 +220,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     public CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
         //todo 需要判断是否有工程编辑权限
-        DSSProject dssProject = isProjectExists(orchestratorDeleteRequest.getProjectId());
+        DSSProject dssProject = validateOperation(orchestratorDeleteRequest.getProjectId(), username);
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
@@ -252,12 +251,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     /**
      * Determine whether the project exists.
+     * and validate user edit_auth for the project.
      *
      * @param projectId
      * @return
      * @throws DSSOrchestratorErrorException
      */
-    private DSSProject isProjectExists(long projectId) throws DSSOrchestratorErrorException {
+    private DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
@@ -265,7 +265,17 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (dssProject == null) {
             DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSOrchestratorErrorException.class);
         }
+        if (!hasProjectEditPriv(projectId, username)) {
+            DSSExceptionUtils.dealErrorException(6004, "用户没有工程编辑权限", DSSOrchestratorErrorException.class);
+        }
         return dssProject;
+    }
+
+    private boolean hasProjectEditPriv(Long projectId, String username) {
+        ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
+        return projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                || projectUserAuthResponse.getProjectOwner().equals(username);
     }
 
 }

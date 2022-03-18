@@ -16,10 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.project.conf;
 
-import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
-import com.webank.wedatasphere.dss.framework.project.service.impl.DSSFrameworkOrchestratorServiceImpl;
 import com.webank.wedatasphere.dss.framework.project.service.impl.DSSFrameworkProjectServiceImpl;
 import com.webank.wedatasphere.dss.framework.project.service.impl.DSSProjectUserServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -34,12 +32,6 @@ public class ProjectSpringConf {
     @ConditionalOnMissingBean
     public DSSProjectUserService createDSSProjectUserService() {
         return new DSSProjectUserServiceImpl();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public DSSFrameworkOrchestratorService createDSSFrameworkOrchestratorService() {
-        return new DSSFrameworkOrchestratorServiceImpl();
     }
 
     @Bean

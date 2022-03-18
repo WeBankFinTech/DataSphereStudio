@@ -92,7 +92,7 @@ public class OrchestratorBaseInfo {
 
     private List<String> orchestratorWays;
 
-    private boolean flowEditLockExist=false;
+    private boolean flowEditLockExist = false;
 
     public Boolean getEditable() {
         return editable;
@@ -120,7 +120,6 @@ public class OrchestratorBaseInfo {
      * 工作流是否可发布
      */
     private Boolean releasable;
-
 
 
     public Long getId() {

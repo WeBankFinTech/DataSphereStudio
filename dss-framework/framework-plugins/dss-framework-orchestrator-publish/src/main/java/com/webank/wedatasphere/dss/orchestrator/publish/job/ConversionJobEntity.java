@@ -20,17 +20,23 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class ConversionJobEntity {
 
     private DSSProject project;
 
-    private List<Long> orcIdList;
+    //这里的 key 为 DSS 具体编排（如 DSS 工作流）的 id；这里的 value 为 DSS 编排所对应的第三方调度系统的工作流 ID
+    //请注意：由于对接的 SchedulerAppConn 调度系统有可能没有实现 OrchestrationService，
+    //所以可能存在 DSS 在创建 DSS 编排时，无法同步去 SchedulerAppConn 创建工作流的情况，从而导致这个 Map 的所有 value 都为 null。
+    private Map<Long, Long> orchestrationIdMap;
 
-    private List<Long> refAppIdList;
+    // DSS编排的ID列表
+    private List<Long> orcIdList;
 
     private Workspace workspace;
 
@@ -52,20 +58,20 @@ public class ConversionJobEntity {
         this.project = project;
     }
 
+    public Map<Long, Long> getOrchestrationIdMap() {
+        return orchestrationIdMap;
+    }
+
+    public void setOrchestrationIdMap(Map<Long, Long> orchestrationIdMap) {
+        this.orchestrationIdMap = orchestrationIdMap;
+    }
+
     public List<Long> getOrcIdList() {
         return orcIdList;
     }
 
     public void setOrcIdList(List<Long> orcIdList) {
         this.orcIdList = orcIdList;
-    }
-
-    public List<Long> getRefAppIdList() {
-        return refAppIdList;
-    }
-
-    public void setRefAppIdList(List<Long> refAppIdList) {
-        this.refAppIdList = refAppIdList;
     }
 
     public String getUserName() {

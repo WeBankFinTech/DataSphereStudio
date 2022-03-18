@@ -1,122 +1,48 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerHttpPost;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerPostRequestOperation;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinAppConnUtils;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public class DolphinSchedulerProjectUpdateOperation implements ProjectUpdateOperation, DolphinSchedulerConf {
+import java.util.Map;
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerProjectUpdateOperation.class);
-
-    private SSOUrlBuilderOperation ssoUrlBuilderOperation;
-
-    private DolphinSchedulerProjectService dolphinSchedulerProjectService;
-
-    private String baseUrl;
+public class DolphinSchedulerProjectUpdateOperation
+        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ResponseRef>
+        implements ProjectUpdateOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl> {
 
     private String projectUpdateUrl;
 
-    private SSORequestOperation<DolphinSchedulerHttpPost, CloseableHttpResponse> postOperation;
-
-    public DolphinSchedulerProjectUpdateOperation() {
+    @Override
+    protected String getAppConnName() {
+        return DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME;
     }
 
     @Override
     public void init() {
-        this.baseUrl = this.dolphinSchedulerProjectService.getAppInstance().getBaseUrl();
-        this.projectUpdateUrl = baseUrl.endsWith("/") ? baseUrl + "projects/update" : baseUrl + "/projects/update";
-
-        this.postOperation = new DolphinSchedulerPostRequestOperation(baseUrl);
+        this.projectUpdateUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "projects/update" : getBaseUrl() + "/projects/update";
     }
 
     @Override
-    public void setStructureService(StructureService service) {
-        if (service instanceof DolphinSchedulerProjectService) {
-            this.dolphinSchedulerProjectService = (DolphinSchedulerProjectService)service;
-        }
-    }
-
-    @Override
-    public ProjectResponseRef updateProject(ProjectRequestRef requestRef) throws ExternalOperationFailedException {
+    public ProjectResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl requestRef) throws ExternalOperationFailedException {
         // Dolphin Scheduler项目名
         String dsProjectName =
-            ProjectUtils.generateDolphinProjectName(requestRef.getWorkspaceName(), requestRef.getName());
-        logger.info("begin to update project in DolphinScheduler, project is {}", dsProjectName);
-
-        DolphinSchedulerProjectQueryOperation projectQueryOperation =
-            new DolphinSchedulerProjectQueryOperation(this.baseUrl);
-        Long projectId = projectQueryOperation.getProjectId(dsProjectName, Constant.DS_ADMIN_USERNAME);
-
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("projectId", String.valueOf(projectId)));
-        params.add(new BasicNameValuePair("projectName", dsProjectName));
-        params.add(new BasicNameValuePair("description", requestRef.getDescription()));
-        HttpEntity entity =
-            EntityBuilder.create().setContentType(ContentType.create("application/x-www-form-urlencoded", Consts.UTF_8))
-                .setParameters(params).build();
-        DolphinSchedulerHttpPost httpPost = new DolphinSchedulerHttpPost(projectUpdateUrl, Constant.DS_ADMIN_USERNAME);
-        httpPost.setEntity(entity);
-
-        try (CloseableHttpResponse httpResponse =
-            this.postOperation.requestWithSSO(this.ssoUrlBuilderOperation, httpPost);) {
-            HttpEntity ent = httpResponse.getEntity();
-            String entString = IOUtils.toString(ent.getContent(), StandardCharsets.UTF_8);
-
-            if (HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()
-                && DolphinAppConnUtils.getCodeFromEntity(entString) == Constant.DS_RESULT_CODE_SUCCESS) {
-                logger.info("DolphinScheduler更新项目 {} 成功, 返回的信息是 {}", dsProjectName,
-                    DolphinAppConnUtils.getValueFromEntity(entString, "msg"));
-            } else {
-                throw new ExternalOperationFailedException(90026, "调度中心更新工程失败, 原因:" + entString);
-            }
-        } catch (ExternalOperationFailedException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90026, "调度中心更新项目失败", e);
-        }
-
-        DolphinSchedulerUserOperation userOperation = new DolphinSchedulerUserOperation(this.baseUrl);
-        // 新增授权用户
-        List<String> releaseUsersIncreased = (List<String>)requestRef.getParameter("releaseUsersIncreased");
-        List<String> releaseUsersDecreased = (List<String>)requestRef.getParameter("releaseUsersDecreased");
-        try {
-            for (String userName : releaseUsersIncreased) {
-                userOperation.grantProject(userName, projectId, false);
-            }
-            for (String userName : releaseUsersDecreased) {
-                userOperation.grantProject(userName, projectId, true);
-            }
-        } catch (ExternalOperationFailedException e) {
-            throw new ExternalOperationFailedException(90025, "调度中心授权出错", e);
-        }
-
+            ProjectUtils.generateDolphinProjectName(requestRef.getDSSProject().getWorkspaceName(),
+                    requestRef.getProjectName());
+        logger.info("user {} begin to update project in DolphinScheduler, project name is {}.", requestRef.getUserName(), dsProjectName);
+        Map<String, Object> formData = MapUtils.newCommonMapBuilder().put("projectId", requestRef.getRefProjectId())
+                .put("projectName", dsProjectName).put("description", requestRef.getDSSProject().getDescription()).build();
+        DolphinSchedulerHttpUtils.getHttpPostResult(ssoRequestOperation, projectUpdateUrl, DolphinSchedulerConf.DS_ADMIN_USER.getValue(), formData);
+        // 更新授权用户
+        ((DolphinSchedulerProjectService) service).getProjectGrantOperation().grantProject(requestRef);
         return ProjectResponseRef.newExternalBuilder().success();
     }
 

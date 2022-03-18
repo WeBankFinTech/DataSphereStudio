@@ -14,22 +14,37 @@
  *
  */
 
-package com.webank.wedatasphere.dss.orchestrator.server.entity.query;
+package com.webank.wedatasphere.dss.common.constant.project;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
-public class QueryOrchestratorVersion {
+public enum ProjectUserPrivEnum {
 
-    @NotNull(message = "orchestratorId不能为空")
-    private Long orchestratorId;
+    PRIV_ACCESS(1,"查看权限"),
+    PRIV_EDIT(2,"编辑权限"),
+    PRIV_RELEASE(3,"发布权限");
 
-    public Long getOrchestratorId() {
-        return orchestratorId;
+    ProjectUserPrivEnum(int rank, String name) {
+        this.rank = rank;
+        this.name = name;
     }
 
-    public void setOrchestratorId(Long orchestratorId) {
-        this.orchestratorId = orchestratorId;
+    private int rank;
+
+    private String name;
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 public class VisualisRefExportOperation extends VisualisDevelopmentOperation<ThirdlyRequestRef.RefJobContentRequestRefImpl, ExportResponseRef>
@@ -31,7 +31,7 @@ public class VisualisRefExportOperation extends VisualisDevelopmentOperation<Thi
         String url = getBaseUrl() + URLUtils.projectUrl + "/export";
         String nodeType = requestRef.getType().toLowerCase();
         logger.info("The {} of Visualis try to export ref RefJobContent: {} in url {}.", nodeType, requestRef.getRefJobContent(), url);
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         visualisPostAction.addRequestPayload("partial", true);

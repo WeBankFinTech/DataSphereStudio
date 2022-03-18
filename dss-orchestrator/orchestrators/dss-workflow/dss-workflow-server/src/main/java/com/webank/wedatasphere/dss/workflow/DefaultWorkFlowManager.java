@@ -27,7 +27,6 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
@@ -47,6 +46,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +201,10 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     @Override
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException {
         //TODO try to optimize it by select db in batch.
-        List<DSSOrchestration> flows = requestConversionWorkflow.getOrcAppIds().stream().map(flowService::getFlowWithJsonAndSubFlowsByID).collect(Collectors.toList());
+        List<ImmutablePair<DSSFlow, Long>> flowInfos = requestConversionWorkflow.getOrchestrationIdMap().entrySet()
+                .stream().map(entry -> new ImmutablePair<>(flowService.getFlowWithJsonAndSubFlowsByID(entry.getKey()), entry.getValue()))
+                .collect(Collectors.toList());
+        List<DSSFlow> flows = flowInfos.stream().map(ImmutablePair::getKey).collect(Collectors.toList());
         SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
         DSSToRelConversionOperation operation = appConn.getOrCreateConversionStandard()
@@ -211,9 +214,12 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 .setUserName(requestConversionWorkflow.getUserName())
                 .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
         if(requestRef instanceof ProjectToRelConversionRequestRef) {
-            ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows);
+            Map<String, Long> orchestrationMap = flowInfos.stream().map(pair -> new ImmutablePair<>(pair.getKey().getName(), pair.getValue()))
+                    .collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()), HashMap::putAll);
+            ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows).setRefOrchestrationId(orchestrationMap);
         } else if(requestRef instanceof OrchestrationToRelConversionRequestRef) {
-            ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(flows.get(0));
+            ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(flows.get(0))
+                    .setRefOrchestrationId(flowInfos.get(0).getValue());
         }
         try{
             ResponseRef responseRef = operation.convert(requestRef);
@@ -221,8 +227,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 return ResponseOperateOrchestrator.failed(responseRef.getErrorMsg());
             }
             return ResponseOperateOrchestrator.success();
-        }catch (Exception e){
-            logger.error("user {} convert workflow {} error.", requestConversionWorkflow.getUserName(), requestConversionWorkflow.getOrcAppIds(), e);
+        } catch (Exception e) {
+            logger.error("user {} convert workflow(s) {} failed.", requestConversionWorkflow.getUserName(),
+                    flows.stream().map(DSSFlow::getName).collect(Collectors.joining(", ")), e);
             return ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(e));
         }
     }

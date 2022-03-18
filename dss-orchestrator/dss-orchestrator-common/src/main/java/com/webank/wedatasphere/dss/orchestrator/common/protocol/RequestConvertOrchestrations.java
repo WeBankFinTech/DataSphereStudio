@@ -19,23 +19,26 @@ package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.common.entity.project.Project;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+
 import java.util.List;
+import java.util.Map;
 
 
 public class RequestConvertOrchestrations {
 
     private String userName;
-    private List<Long> orcAppIds;
+    // 这里的 key 为 DSS 具体编排（如 DSS 工作流）的 id，value为SchedulerAppConn的工作流Id
+    private Map<Long, Long> orchestrationIdMap;
     private Project project;
     private DSSWorkspace workspace;
     private List<DSSLabel> dssLabels;
 
-    public void setOrcAppIds(List<Long> orcAppIds) {
-        this.orcAppIds = orcAppIds;
+    public Map<Long, Long> getOrchestrationIdMap() {
+        return orchestrationIdMap;
     }
 
-    public List<Long> getOrcAppIds() {
-        return orcAppIds;
+    public void setOrchestrationIdMap(Map<Long, Long> orchestrationIdMap) {
+        this.orchestrationIdMap = orchestrationIdMap;
     }
 
     public Project getProject() {

@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
@@ -76,18 +77,15 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         }
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(toPublishOrcId);
         long projectId = dssOrchestratorInfo.getProjectId();
-        //这里的key为DSS编排ID，例如DSS工作流；这里的value为DSS编排所对应的第三方调度系统的工作流ID
-        //请注意：由于对接的SchedulerAppConn调度系统有可能没有实现OrchestrationOperation，
-        // 所以可能存在DSS在创建DSS编排时，无法同步去SchedulerAppConn创建工作流的情况，从而导致这个Map的所有value都为null。
+        //这里的 key 为 DSS 具体编排（如 DSS 工作流）的 id；这里的 value 为 DSS 编排所对应的第三方调度系统的工作流 ID
+        //请注意：由于对接的 SchedulerAppConn 调度系统有可能没有实现 OrchestrationService，
+        //所以可能存在 DSS 在创建 DSS 编排时，无法同步去 SchedulerAppConn 创建工作流的情况，从而导致这个 Map 的所有 value 都为 null。
         Map<Long, Long> orchestrationIdMap = new HashMap<>();
         List<Long> publishedOrcIds;
         List<DSSLabel> labels = LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(requestConversionOrchestration.getLabels());
         if(requestConversionOrchestration.isConvertAllOrcs()) {
             //这个地方应该是要获取所有的已经发布过的orchestrator
             publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId);
-            if (!publishedOrcIds.contains(toPublishOrcId)){
-                publishedOrcIds.add(toPublishOrcId);
-            }
             for (Long orcId : publishedOrcIds) {
                 int validFlag = 1;
                 if (orcId.longValue() == toPublishOrcId.longValue() && !DSSLabelUtil.isDevEnv(labels)) {
@@ -97,8 +95,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 if (dssOrchestratorVersion == null) {
                     continue;
                 }
-                orchestratorMapper
-                orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
+                DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(orcId);
+                if(dssOrchestratorRefOrchestration != null) {
+                    orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
+                } else {
+                    orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
+                }
             }
         } else {
             publishedOrcIds = new ArrayList<>();
@@ -106,17 +108,27 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 publishedOrcIds.add(toPublishOrcId);
                 DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(toPublishOrcId,1);
                 if (dssOrchestratorVersion != null) {
-                    orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
+                    DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(toPublishOrcId);
+                    if(dssOrchestratorRefOrchestration != null) {
+                        orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
+                    } else {
+                        orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
+                    }
                 }
             }
             if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
+                publishedOrcIds.addAll(requestConversionOrchestration.getOrcIds());
                 for (Long orcId : requestConversionOrchestration.getOrcIds()) {
                     DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
                     if (dssOrchestratorVersion == null) {
                         continue;
                     }
-                    publishedOrcIds.add(orcId);
-                    orchestrationIdMap.add(dssOrchestratorVersion.getAppId());
+                    DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(orcId);
+                    if(dssOrchestratorRefOrchestration != null) {
+                        orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
+                    } else {
+                        orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
+                    }
                 }
             }
         }
@@ -126,8 +138,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         entity.setResponse(ResponseOperateOrchestrator.inited());
         entity.setCreateTime(new Date());
         entity.setUserName(requestConversionOrchestration.getUserName());
+        entity.setOrchestrationIdMap(orchestrationIdMap);
         entity.setOrcIdList(publishedOrcIds);
-        entity.setRefAppIdList(orchestrationIdMap);
         entity.setLabels(labels);
         entity.setWorkspace((Workspace) requestConversionOrchestration.getWorkspace());
         DSSProject dssProject = new DSSProject();

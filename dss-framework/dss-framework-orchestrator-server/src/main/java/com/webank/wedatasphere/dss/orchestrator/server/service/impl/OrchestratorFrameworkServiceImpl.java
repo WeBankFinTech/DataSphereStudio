@@ -36,13 +36,9 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
-import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.type.OrchestratorKindEnum;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
@@ -55,23 +51,14 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestra
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.app.development.utils.DevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
@@ -82,7 +69,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -92,14 +78,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Autowired
     OrchestratorMapper orchestratorMapper;
-    //    @Autowired
-//    private DSSOrchestratorService orchestratorService;
     @Autowired
     OrchestratorService newOrchestratorService;
-//    @Autowired
-//    private DSSProjectService projectService;
-//    @Autowired
-//    private DSSWorkspaceService dssWorkspaceService;
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -137,63 +117,63 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         LOGGER.info("{} begins to create a orchestrator {}.", username, orchestratorCreateRequest);
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
         //2.如果调度系统要求同步创建工作流，向调度系统发送创建工作流的请求
-        OrchestrationResponseRef orchestrationResponseRef = tryOrchestrationOperation(dssLabels, dssOrchestratorInfo.getProjectId(),
+        OrchestrationResponseRef orchestrationResponseRef = tryOrchestrationOperation(dssLabels, true,
                 dssProject.getName(), workspace, dssOrchestratorInfo,
-                OrchestrationService::getOrchestrationCreationOperation, null,
+                OrchestrationService::getOrchestrationCreationOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
                         .createOrchestration((DSSOrchestrationContentRequestRef) structureRequestRef), "create");
-        //3.新建编排模式需要将编排模式的类型等内容提交给OrchestratorFramework
-//        RefJobContentResponseRef responseRef = DevelopmentOperationUtils.tryDSSJobContentRequestRefOperation(() -> getRefCRUDService(dssLabels),
-//                developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
-//                dssJobContentRequestRef -> dssJobContentRequestRef.setDSSJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY, dssOrchestratorInfo))
-//                        .setUserName(username).setWorkspace(workspace).setName(orchestratorCreateRequest.getOrchestratorName()).setDSSLabels(dssLabels), null,
-//                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(orchestratorCreateRequest.getProjectId()).setProjectName(orchestratorCreateRequest.getProjectName()),
-//                (developmentOperation, developmentRequestRef) -> {
-//                    return ((RefCreationOperation) developmentOperation).createRef((DSSJobContentRequestRef) developmentRequestRef);
-//                }, "create orchestration " + orchestratorCreateRequest.getOrchestratorName());
         OrchestratorVo orchestratorVo = newOrchestratorService.createOrchestrator(username, workspace.getWorkspaceName(), dssProject.getName(),
                 dssOrchestratorInfo.getProjectId(), dssOrchestratorInfo.getDesc(), dssOrchestratorInfo, dssLabels);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         Long orchestratorVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
-//        Long orchestratorId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_ID_KEY);
-//        Long orchestratorVersionId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_VERSION_ID_KEY);
         LOGGER.info("created orchestration {} with orchestratorId is {}, and versionId is {}.", orchestratorCreateRequest.getOrchestratorName(), orchestratorId, orchestratorVersionId);
         //4.将工程和orchestrator的关系存储到的数据库中
         if (orchestrationResponseRef != null) {
-//            orchestratorService.saveOrchestrator(orchestratorCreateRequest, orchestratorId, orchestratorVersionId, orchestrationResponseRef.getRefOrchestrationId(), username);
-            orchestratorMapper.addOrchestratorRefOrchestration(new DSSOrchestratorRefOrchestration(orchestratorId, null, orchestrationResponseRef.getRefOrchestrationId()));
-        } else {
-            //did not get thirdly orc_id
+            Long refProjectId = (Long) orchestrationResponseRef.toMap().get("refProjectId");
+            orchestratorMapper.addOrchestratorRefOrchestration(new DSSOrchestratorRefOrchestration(orchestratorId, refProjectId, orchestrationResponseRef.getRefOrchestrationId()));
         }
         CommonOrchestratorVo commonOrchestratorVo = new CommonOrchestratorVo();
         commonOrchestratorVo.setOrchestratorId(orchestratorId);
         return commonOrchestratorVo;
     }
 
-    private <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Long dssProjectId, String projectName, Workspace workspace, DSSOrchestration dssOrchestrator,
+    private <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Boolean askProjectSender, String projectName, Workspace workspace, DSSOrchestratorInfo dssOrchestrator,
                                                                                                Function<OrchestrationService, StructureOperation> getOrchestrationOperation,
-                                                                                               Consumer<RefOrchestrationContentRequestRef> refOrchestrationContentRequestRefConsumer,
                                                                                                BiFunction<StructureOperation, K, V> responseRefConsumer, String operationName) {
         ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssLabels);
-//        Long refProjectId = projectService.getAppConnProjectId(orchestrationPair.getValue().getId(), dssProjectId);
-        ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssProjectId));
-        Long refProjectId = projectRefIdResponse.getRefProjectId();
+        Long refProjectId, refOrchestrationId;
+        if(askProjectSender) {
+            ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId()));
+            refProjectId = projectRefIdResponse.getRefProjectId();
+            refOrchestrationId = null;
+        } else {
+            DSSOrchestratorRefOrchestration refOrchestration = orchestratorMapper.getRefOrchestrationId(dssOrchestrator.getId());
+            if(refOrchestration != null) {
+                refProjectId = refOrchestration.getRefProjectId();
+                refOrchestrationId = refOrchestration.getRefOrchestrationId();
+            } else {
+                refProjectId = null;
+                refOrchestrationId = null;
+            }
+        }
         V orchestrationResponseRef = null;
         if (refProjectId != null && orchestrationPair.getKey() != null) {
-            LOGGER.info("try to {} a orchestration {} in SchedulerAppConn.", operationName, dssOrchestrator.getName());
+            LOGGER.info("project {} try to {} a orchestration {} in SchedulerAppConn.", projectName, operationName, dssOrchestrator.getName());
             //这里无需进行重名判断，因为只在 SchedulerAppConn进行创建，一旦创建失败，会触发整个编排创建失败。
             orchestrationResponseRef = OrchestrationOperationUtils.tryOrchestrationOperation(() -> orchestrationPair.getKey(), getOrchestrationOperation,
                     dssOrchestrationContentRequestRef ->
                             dssOrchestrationContentRequestRef.setDSSOrchestration(dssOrchestrator).setProjectName(projectName).setRefProjectId(refProjectId),
-                    refOrchestrationContentRequestRef -> {
-                        refOrchestrationContentRequestRef.setRefProjectId(refProjectId).setProjectName(projectName);
-                        refOrchestrationContentRequestRefConsumer.accept(refOrchestrationContentRequestRef);
-                    },
+                    refOrchestrationContentRequestRef ->
+                        refOrchestrationContentRequestRef.setRefOrchestrationId(refOrchestrationId).setOrchestrationName(dssOrchestrator.getName())
+                                .setRefProjectId(refProjectId).setProjectName(projectName),
                     (structureOperation, structureRequestRef) -> {
                         structureRequestRef.setDSSLabels(dssLabels).setWorkspace(workspace);
                         return responseRefConsumer.apply(structureOperation, (K) structureRequestRef);
                     }, operationName + " orchestration " + dssOrchestrator.getName() + " in SchedulerAppConn");
+            if(askProjectSender) {
+                orchestrationResponseRef.toMap().put("refProjectId", refProjectId);
+            }
         }
         return orchestrationResponseRef;
     }
@@ -225,29 +205,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setOrchestratoMode(orchestratorModifyRequest.getOrchestratorMode());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorModifyRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setUses(orchestratorModifyRequest.getUses());
-        //1.如果调度系统要求同步创建工作流，向调度系统发送创建工作流的请求
-        List<Long> refOrchestrationId = orchestratorMapper.getRefOrchestrationId(dssOrchestratorInfo.getId());
-        tryOrchestrationOperation(dssLabels, dssProject.getId(), dssProject.getName(), workspace, dssOrchestratorInfo,
+        //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
+        tryOrchestrationOperation(dssLabels, false, dssProject.getName(), workspace, dssOrchestratorInfo,
                 OrchestrationService::getOrchestrationUpdateOperation,
-                refOrchestrationContentRequestRef ->
-                        refOrchestrationContentRequestRef.setRefOrchestrationId(CollectionUtils.isEmpty(refOrchestrationId) ? null : refOrchestrationId.get(0)),
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
-        //2.更新编排模式需要将编排模式的类型等内容提交给OrchestratorFramework
-//        DevelopmentOperationUtils.tryRefJobContentRequestRefOperation(() -> getRefCRUDService(dssLabels),
-//                developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
-//                refJobContentRequestRef -> {
-//                    refJobContentRequestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY, dssOrchestratorInfo))
-//                            .setUserName(username).setWorkspace(workspace).setName(orchestratorModifyRequest.getOrchestratorName()).setDSSLabels(dssLabels);
-//                }, null,
-//                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(orchestratorModifyRequest.getProjectId()).setProjectName(dssProject.getName()),
-//                (developmentOperation, developmentRequestRef) -> {
-//                    return ((RefUpdateOperation) developmentOperation).updateRef((UpdateRequestRef) developmentRequestRef);
-//                }, "update orchestration " + orchestratorModifyRequest.getOrchestratorName());
         newOrchestratorService.updateOrchestrator(username, workspace.getWorkspaceName(), dssOrchestratorInfo, dssLabels);
         //3.将工程和orchestrator的关系存储到的数据库中
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
-//        orchestratorService.updateOrchestrator(orchestratorModifyRequest, username);
         orchestratorVo.setOrchestratorId(orchestratorId);
         return orchestratorVo;
     }
@@ -260,60 +225,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
-        List<Long> refOrchestrationId = orchestratorMapper.getRefOrchestrationId(orchestratorInfo.getId());
-        tryOrchestrationOperation(dssLabels, dssProject.getId(), dssProject.getName(), workspace, null,
+        tryOrchestrationOperation(dssLabels, false, dssProject.getName(), workspace, null,
                 OrchestrationService::getOrchestrationDeletionOperation,
-                refOrchestrationContentRequestRef -> refOrchestrationContentRequestRef
-                        .setRefOrchestrationId(CollectionUtils.isEmpty(refOrchestrationId) ? null : refOrchestrationId.get(0)).setOrchestrationName(orchestratorInfo.getName()),
                 (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                         .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
-        //删除编排模式需要将编排模式的类型等内容提交给OrchestratorFramework
-        //调用orchestrator framework服务 删除编排模式、编排模式版本
-//        DevelopmentOperationUtils.tryRefJobContentRequestRefOperation(() -> getRefCRUDService(dssLabels),
-//                developmentService -> ((RefCRUDService) developmentService).getRefDeletionOperation(),
-//                refJobContentRequestRef -> {
-//                    refJobContentRequestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATOR_ID_KEY, orchestratorInfo.getId()))
-//                            .setUserName(username).setWorkspace(workspace).setName(orchestratorInfo.getName()).setDSSLabels(dssLabels);
-//                }, null,
-//                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(orchestratorInfo.getProjectId()).setProjectName(dssProject.getName()),
-//                (developmentOperation, developmentRequestRef) -> {
-//                    return ((RefDeletionOperation) developmentOperation).deleteRef((RefJobContentRequestRef) developmentRequestRef);
-//                }, "delete orchestration " + orchestratorInfo.getName());
 
         newOrchestratorService.deleteOrchestrator(username, workspace.getWorkspaceName(), dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
-        //删除编排模式
-//        orchestratorService.deleteOrchestrator(orchestratorDeleteRequest, username);
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         return orchestratorVo;
-    }
-
-    /**
-     * 获取更新的operation
-     *
-     * @param dssLabels 根据label获取对应label的创建operation
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                todo 目前已经写死
-     * @return
-     * @throws Exception
-     */
-    protected RefCRUDService getRefCRUDService(List<DSSLabel> dssLabels) {
-        OnlyDevelopmentAppConn orcAppConn = (OnlyDevelopmentAppConn) AppConnManager.getAppConnManager().getAppConn(DSSCommonConf.DSS_ORCHESTRATOR_FRAMEWORK_APP_CONN_NAME.getValue());
-        if (orcAppConn == null) {
-            LOGGER.error("OrchestratorFrameworkAppConn is not exists, please ask admin for help.");
-            throw new WarnException(60028, "OrchestratorFrameworkAppConn is not exists, please ask admin for help.");
-        }
-        DevelopmentIntegrationStandard standard = orcAppConn.getOrCreateDevelopmentStandard();
-        if (standard == null) {
-            LOGGER.error("OrchestratorFrameworkAppConn is not completed, please ask admin for help.");
-            throw new WarnException(60028, "OrchestratorFrameworkAppConn is not completed, please ask admin for help.");
-        }
-        AppInstance appInstance = null;
-        try {
-            appInstance = orcAppConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
-        } catch (NoSuchAppInstanceException e) {
-            throw new WarnException(60028, e.getDesc());
-        }
-        return standard.getRefCRUDService(appInstance);
     }
 
     protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(List<DSSLabel> dssLabels) {

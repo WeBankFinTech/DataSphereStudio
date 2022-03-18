@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.re
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRefImpl;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 
 /**

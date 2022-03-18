@@ -223,4 +223,10 @@
             </if>
         </where>
     </select>
+
+    <select id="getRefOrchestrationId" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
+        select *
+        from dss_orchestrator_ref_orchestration_relation
+        where orchestrator_id = #{orchestratorId}
+    </select>
 </mapper>

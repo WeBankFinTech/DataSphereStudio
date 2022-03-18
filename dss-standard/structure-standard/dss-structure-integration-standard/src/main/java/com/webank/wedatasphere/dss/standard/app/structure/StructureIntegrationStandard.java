@@ -21,10 +21,14 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.role.RoleService;
 import com.webank.wedatasphere.dss.standard.app.structure.status.AppStatusService;
 import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-
+/**
+ * DSS 的二级规范，为组织结构规范。组织结构规范主要提供了以下的能力：
+ * 1. 工程管理服务能力。工程管理服务用于打通 DSS 与第三方应用的工程体系。
+ * 2. 角色管理服务能力。角色管理服务用于打通 DSS 与第三方应用的角色体系。
+ * 3. 第三方应用状态管理能力。主要用于确认第三方应用的状态。
+ */
 public interface StructureIntegrationStandard extends AppIntegrationStandard<SSORequestService> {
 
     /**

@@ -36,6 +36,10 @@ public class DevelopmentOperationUtils {
             throw new ExternalOperationWarnException(60092, errorMsg + " failed. Caused by: The AppConn has no DevelopmentService.");
         }
         DevelopmentOperation operation = getDevelopmentOperation.apply(developmentService);
+        if(operation == null) {
+            LOGGER.error("{} failed. Caused by: The corresponding development operation is not exists.", errorMsg);
+            throw new ExternalOperationWarnException(60092, errorMsg + " failed. Caused by: The AppConn has no corresponding development operation.");
+        }
         K requestRef = RequestRefUtils.getRequestRef(operation);
         if(jobContentRequestRefConsumer != null && requestRef instanceof DSSJobContentRequestRef) {
             jobContentRequestRefConsumer.accept((DSSJobContentRequestRef) requestRef);

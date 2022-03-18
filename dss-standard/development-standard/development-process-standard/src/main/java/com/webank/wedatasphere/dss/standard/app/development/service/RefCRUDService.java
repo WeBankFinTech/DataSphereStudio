@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateO
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 
 public interface RefCRUDService extends DevelopmentService {
 
@@ -31,7 +32,7 @@ public interface RefCRUDService extends DevelopmentService {
 
      <K extends CopyRequestRef<K>> RefCopyOperation<K> getRefCopyOperation();
 
-     <K extends RefJobContentRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation();
+     <K extends UpdateRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation();
 
      <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> getRefDeletionOperation();
 

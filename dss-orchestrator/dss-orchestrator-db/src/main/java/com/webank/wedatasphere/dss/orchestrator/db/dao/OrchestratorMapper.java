@@ -138,6 +138,5 @@ public interface OrchestratorMapper {
 
     List<DSSOrchestratorInfo> getListByPage(@Param("params") Map<String, Object> params);
 
-    @Select("select ref_orchestration_id from dss_orchestrator_ref_orchestration_relation where orchestrator_id = #{orchestratorId}")
-    List<Long> getRefOrchestrationId(@Param("orchestratorId") Long orchestratorId);
+    DSSOrchestratorRefOrchestration getRefOrchestrationId(@Param("orchestratorId") Long orchestratorId);
 }

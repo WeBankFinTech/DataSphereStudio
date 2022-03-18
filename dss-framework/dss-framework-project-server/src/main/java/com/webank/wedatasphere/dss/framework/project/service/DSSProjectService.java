@@ -71,8 +71,6 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     List<String> getProjectAbilities(String username);
 
 
-    Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
-
     boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
 
     /**

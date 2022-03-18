@@ -162,6 +162,7 @@ CREATE TABLE `dss_application` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
+-- no use
 DROP TABLE IF EXISTS `dss_application_user_init_result`;
 CREATE TABLE `dss_application_user_init_result` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -172,6 +173,7 @@ CREATE TABLE `dss_application_user_init_result` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- no use
 DROP TABLE IF EXISTS `dss_component_info`;
 CREATE TABLE `dss_component_info` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -197,67 +199,6 @@ CREATE TABLE `dss_component_role` (
   `updateby` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5103 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_datawrangler_export`;
-CREATE TABLE `dss_datawrangler_export` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `spread_sheet_id` int(20) NOT NULL,
-  `sheet_id` int(20) DEFAULT NULL,
-  `data_sink` varchar(1000) DEFAULT NULL,
-  `user_id` varchar(120) DEFAULT '0',
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `status` varchar(10) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_datawrangler_sheet`;
-CREATE TABLE `dss_datawrangler_sheet` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) NOT NULL,
-  `spread_sheet_id` int(20) NOT NULL,
-  `order` int(3) DEFAULT NULL,
-  `data_source` varchar(1000) DEFAULT '0',
-  `content_location` varchar(500) DEFAULT NULL,
-  `operation_location` varchar(500) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `config` text,
-  `is_limited` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_datawrangler_spreadsheet`;
-CREATE TABLE `dss_datawrangler_spreadsheet` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) NOT NULL,
-  `source` varchar(128) DEFAULT NULL,
-  `workspace` varchar(120) DEFAULT NULL,
-  `is_hidden` tinyint(1) DEFAULT '0',
-  `config` text,
-  `description` varchar(500) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_access_time` datetime DEFAULT NULL,
-  `access_num` int(10) DEFAULT NULL,
-  `user_id` varchar(120) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_datawrangler_template`;
-CREATE TABLE `dss_datawrangler_template` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) NOT NULL,
-  `sheet_id` int(20) NOT NULL,
-  `source` varchar(120) DEFAULT NULL,
-  `workspace` varchar(120) DEFAULT '0',
-  `operation_location` varchar(500) DEFAULT NULL,
-  `description` varchar(500) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `user_id` varchar(120) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `dss_dev_flow`;
 CREATE TABLE `dss_dev_flow` (
@@ -340,19 +281,6 @@ CREATE TABLE `dss_flow_edit_lock` (
    UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
  ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `dss_flow_publish_history`;
-CREATE TABLE `dss_flow_publish_history` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_version_id` bigint(20) DEFAULT NULL,
-  `publish_time` datetime DEFAULT NULL,
-  `publisher_id` bigint(255) DEFAULT NULL,
-  `alert_flag` tinyint(1) DEFAULT NULL,
-  `alter_config` varchar(255) DEFAULT NULL,
-  `comment` varchar(255) DEFAULT NULL,
-  `state` varchar(10) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
 DROP TABLE IF EXISTS `dss_flow_relation`;
 CREATE TABLE `dss_flow_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -360,46 +288,6 @@ CREATE TABLE `dss_flow_relation` (
   `parent_flow_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_flow_schedule_info`;
-CREATE TABLE `dss_flow_schedule_info` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_id` bigint(20) NOT NULL,
-  `project_id` bigint(20) NOT NULL,
-  `workspace_id` bigint(20) NOT NULL,
-  `schedule_time` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
-  `alarm_level` varchar(32) COLLATE utf8_bin DEFAULT NULL,
-  `alarm_user_emails` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
-  `last_update_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_flow_user`;
-CREATE TABLE `dss_flow_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_id` bigint(20) NOT NULL,
-  `project_id` bigint(20) NOT NULL,
-  `username` varchar(100) COLLATE utf8_bin NOT NULL,
-  `workspace_id` bigint(20) NOT NULL,
-  `priv` tinyint(5) NOT NULL DEFAULT '0',
-  `last_update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_flow_version`;
-CREATE TABLE `dss_flow_version` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_id` bigint(20) DEFAULT NULL,
-  `source` varchar(255) DEFAULT NULL,
-  `version` varchar(255) DEFAULT NULL,
-  `bml_version` varchar(255) DEFAULT NULL,
-  `json_path` text,
-  `comment` varchar(255) DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `updator` varchar(32) DEFAULT NULL,
-  `project_version_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2668 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 DROP TABLE IF EXISTS `dss_homepage_demo_instance`;
 CREATE TABLE `dss_homepage_demo_instance` (
@@ -1284,18 +1172,6 @@ CREATE TABLE `dss_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 
-
-DROP TABLE IF EXISTS `dss_orchestrator_release_info`;
-CREATE TABLE `dss_orchestrator_release_info`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `orchestrator_id` bigint(20) NULL DEFAULT NULL,
-  `orchestrator_version_id` bigint(20) NULL DEFAULT NULL,
-  `orchestrator_version` varchar(255) DEFAULT NULL,
-  `scheduler_workflow_id` bigint(20) NULL DEFAULT NULL,
-  `create_time` datetime NULL DEFAULT NULL,
-  `update_time` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `dss_guide_group`;
 CREATE TABLE IF NOT EXISTS `dss_guide_group` (

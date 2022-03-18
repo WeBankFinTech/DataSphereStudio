@@ -26,7 +26,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -39,11 +39,9 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.service.DSSOrchestratorService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
@@ -66,8 +64,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSProjectUserService projectUserService;
-    @Autowired
-    private DSSOrchestratorService orchestratorService;
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
 
@@ -294,11 +290,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     public List<String> getProjectAbilities(String username) {
         LOGGER.info("{} begins to get project ability", username);
         return Arrays.asList(SUPPORT_ABILITY.trim().split(","));
-    }
-
-    @Override
-    public Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception {
-        return orchestratorService.importOrchestrator(orchestratorInfo);
     }
 
     @Override

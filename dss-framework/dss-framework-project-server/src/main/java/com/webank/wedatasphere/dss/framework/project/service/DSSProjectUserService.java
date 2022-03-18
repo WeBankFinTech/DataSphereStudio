@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.framework.project.service;
 
 import java.util.List;
 
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
@@ -40,17 +40,6 @@ public interface DSSProjectUserService {
      *             the dss project error exception
      */
     boolean isEditProjectAuth(Long projectId,String username) throws DSSProjectErrorException;
-
-    /**
-     * 根据用户名和工程id获取工程权限
-     *
-     * @param projectId
-     *            the project id
-     * @param username
-     *            the username
-     * @return edit project list
-     */
-    List<DSSProjectUser> getEditProjectList(Long projectId, String username);
 
     /**
      * 保存工程与用户关系

@@ -26,20 +26,15 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertO
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import com.webank.wedatasphere.dss.workflow.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
 public class PublishServiceImpl implements PublishService {
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private OrchestratorMapper orchestratorMapper;
 
     protected Sender getOrchestratorSender() {
         return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();

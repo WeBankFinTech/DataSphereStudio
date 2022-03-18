@@ -64,9 +64,6 @@ public interface DSSWorkspaceUserMapper {
     @Select("select username from dss_workspace_user where workspace_id = #{workspaceId}")
     List<String> getAllWorkspaceUsers(@Param("workspaceId") int workspaceId);
 
-    @Select("select username from dss_flow_user where flow_id = #{flowId}")
-    List<String> getFlowUser(@Param("flowId") Long flowId);
-
     @Select("select is_admin from dss_user where username = #{userName}")
     boolean isAdmin(@Param("userName") String userName);
 

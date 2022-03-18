@@ -71,7 +71,7 @@ public final class OrchestratorConversionJob implements Runnable {
         //1.从编排中心导出一次工作流,进行一次版本升级
         //2.进行发布到schedulis等调度系统
         LOGGER.info("Begin to convert project {} for user {} to scheduler, the orcIdList is {}.",
-            conversionJobEntity.getProject().getName(), conversionJobEntity.getUserName(), conversionJobEntity.getOrcIdList());
+            conversionJobEntity.getProject().getName(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
         for (DSSOrchestratorPlugin plugin: conversionDSSOrchestratorPlugins) {
@@ -87,7 +87,7 @@ public final class OrchestratorConversionJob implements Runnable {
             conversionJobEntity.setProject(project);
             Workspace workspace = conversionJobEntity.getWorkspace();
             ResponseOperateOrchestrator response = conversionDSSOrchestratorPlugin.convert(conversionJobEntity.getUserName(), project, workspace,
-                conversionJobEntity.getRefAppIdList(), conversionJobEntity.getLabels());
+                    conversionJobEntity.getOrchestrationIdMap(), conversionJobEntity.getLabels());
             if(response.isFailed()) {
                 String msg = response.getMessage() == null ? "Unknown reason, please ask admin for help!" : response.getMessage();
                 throw new DSSErrorException(50000, msg);

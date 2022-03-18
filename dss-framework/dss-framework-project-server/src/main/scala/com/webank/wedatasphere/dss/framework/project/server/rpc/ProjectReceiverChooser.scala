@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
-import com.webank.wedatasphere.dss.framework.project.service.{DSSOrchestratorService, DSSProjectService}
+import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace}
@@ -33,15 +33,17 @@ class ProjectReceiverChooser extends ReceiverChooser {
 
   @Autowired
   var projectService: DSSProjectService = _
-  @Autowired
-  var orchestratorService: DSSOrchestratorService = _
+
   @Autowired
   var dssWorkspaceUserService: DSSWorkspaceUserService = _
+
+  @Autowired
+  var dSSProjectUserService: DSSProjectUserService = _
 
   private var receiver: Option[ProjectReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, orchestratorService))
+  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: ProjectRelationRequest => receiver

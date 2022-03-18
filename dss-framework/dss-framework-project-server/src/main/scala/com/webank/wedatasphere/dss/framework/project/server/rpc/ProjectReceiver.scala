@@ -18,13 +18,11 @@ package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import java.util
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
-import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse}
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse, ProjectUserAuthRequest, ProjectUserAuthResponse}
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
-import com.webank.wedatasphere.dss.framework.project.service.{DSSOrchestratorService, DSSProjectService}
+import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace, ResponseUserWorkspace, ResponseWorkspaceUserList}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.springframework.beans.BeanUtils
@@ -35,7 +33,7 @@ import scala.concurrent.duration.Duration
 
 
 @Component
-class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService: DSSWorkspaceUserService, orchestratorService: DSSOrchestratorService) extends Receiver {
+class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService: DSSWorkspaceUserService, projectUserService: DSSProjectUserService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {
 
@@ -68,11 +66,13 @@ class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService
         DSSProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
         DSSProject
 
-      case projectImportOrchestrator: RequestProjectImportOrchestrator =>
-        projectService.importOrchestrator(projectImportOrchestrator)
-
-      case projectUpdateOrcVersion: RequestProjectUpdateOrcVersion =>
-        orchestratorService.updateProjectOrcVersionId(projectUpdateOrcVersion)
+      case projectUserAuthRequest: ProjectUserAuthRequest => {
+        val projectId = projectUserAuthRequest.getProjectId
+        val userName = projectUserAuthRequest.getUserName
+        val projectDo: DSSProjectDO = projectService.getProjectById(projectId)
+        val privList = projectUserService.getProjectUserPriv(projectId, userName).map(_.getPriv)
+        new ProjectUserAuthResponse(projectId, userName, privList, projectDo.getCreateBy)
+      }
     }
   }
 

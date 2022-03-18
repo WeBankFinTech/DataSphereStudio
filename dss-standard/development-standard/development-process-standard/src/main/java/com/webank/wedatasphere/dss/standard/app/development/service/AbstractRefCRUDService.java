@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateO
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 
 public abstract class AbstractRefCRUDService extends AbstractDevelopmentService implements RefCRUDService {
 
@@ -30,7 +31,7 @@ public abstract class AbstractRefCRUDService extends AbstractDevelopmentService 
 
     protected abstract <K extends CopyRequestRef<K>> RefCopyOperation<K> createRefCopyOperation();
 
-    protected abstract <K extends RefJobContentRequestRef<K>> RefUpdateOperation<K> createRefUpdateOperation();
+    protected abstract <K extends UpdateRequestRef<K>> RefUpdateOperation<K> createRefUpdateOperation();
 
     protected abstract <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> createRefDeletionOperation();
 
@@ -45,7 +46,7 @@ public abstract class AbstractRefCRUDService extends AbstractDevelopmentService 
     }
 
     @Override
-    public <K extends RefJobContentRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation() {
+    public <K extends UpdateRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation() {
         return getOrCreate(this::createRefUpdateOperation, RefUpdateOperation.class);
     }
 

@@ -29,12 +29,11 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRefIdResponse;
+import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestration;
@@ -85,21 +84,14 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-
 public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkService {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Autowired
     OrchestratorMapper orchestratorMapper;
-    //    @Autowired
-//    private DSSOrchestratorService orchestratorService;
     @Autowired
     OrchestratorService newOrchestratorService;
-//    @Autowired
-//    private DSSProjectService projectService;
-//    @Autowired
-//    private DSSWorkspaceService dssWorkspaceService;
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -115,7 +107,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //是否存在相同的编排名称
         newOrchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
-        DSSProject dssProject = isProjectExists(orchestratorCreateRequest.getProjectId());
+        DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
+
         //1.创建编排实体bean
         OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
                 getType(OrchestratorTypeEnum.getTypeByKey(orchestratorCreateRequest.getOrchestratorMode()));
@@ -201,8 +194,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
-        DSSProject dssProject = isProjectExists(orchestratorModifyRequest.getProjectId());
-        //todo 需不需要判断用户是否有修改权限
+        DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
         Long orchestratorId = newOrchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
@@ -256,7 +248,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     public CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
         //todo 需要判断是否有工程编辑权限
-        DSSProject dssProject = isProjectExists(orchestratorDeleteRequest.getProjectId());
+        DSSProject dssProject = validateOperation(orchestratorDeleteRequest.getProjectId(), username);
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
@@ -292,7 +284,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
      * 获取更新的operation
      *
      * @param dssLabels 根据label获取对应label的创建operation
-     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                todo 目前已经写死
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 todo 目前已经写死
      * @return
      * @throws Exception
      */
@@ -332,12 +324,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     /**
      * Determine whether the project exists.
+     * and validate user edit_auth for the project.
      *
      * @param projectId
      * @return
      * @throws DSSOrchestratorErrorException
      */
-    private DSSProject isProjectExists(long projectId) throws DSSOrchestratorErrorException {
+    private DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
@@ -345,7 +338,17 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (dssProject == null) {
             DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSOrchestratorErrorException.class);
         }
+        if (!hasProjectEditPriv(projectId, username)) {
+            DSSExceptionUtils.dealErrorException(6004, "用户没有工程编辑权限", DSSOrchestratorErrorException.class);
+        }
         return dssProject;
+    }
+
+    private boolean hasProjectEditPriv(Long projectId, String username) {
+        ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
+        return projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                || projectUserAuthResponse.getProjectOwner().equals(username);
     }
 
 }

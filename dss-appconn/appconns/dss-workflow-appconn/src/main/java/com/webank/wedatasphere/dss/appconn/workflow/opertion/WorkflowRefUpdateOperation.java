@@ -39,9 +39,9 @@ public class WorkflowRefUpdateOperation
     public ResponseRef updateRef(ThirdlyRequestRef.UpdateRequestRefImpl requestRef) throws ExternalOperationFailedException {
         String userName = requestRef.getUserName();
         long flowId = (long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
-        String flowName = (String) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME);
-        String description = (String) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
-        String uses = (String) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_USES);
+        String flowName = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME);
+        String description = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
+        String uses = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_USES);
         RequestUpdateWorkflow requestUpdateWorkflow = new RequestUpdateWorkflow(userName, flowId, flowName, description, uses);
         ResponseUpdateWorkflow responseUpdateWorkflow = (ResponseUpdateWorkflow) sender.ask(requestUpdateWorkflow);
         if(responseUpdateWorkflow.getJobStatus() == JobStatus.Success) {

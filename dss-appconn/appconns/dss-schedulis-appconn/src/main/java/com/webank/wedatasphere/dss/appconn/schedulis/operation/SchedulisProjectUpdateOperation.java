@@ -16,36 +16,35 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
+import com.webank.wedatasphere.dss.appconn.schedulis.service.AzkabanUserService;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.collections4.CollectionUtils;
 
-public class SchedulisProjectUpdateOperation implements ProjectUpdateOperation {
+public class SchedulisProjectUpdateOperation
+        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ResponseRef>
+        implements ProjectUpdateOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl> {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectUpdateOperation.class);
-
-    private ProjectService schedulisProjectService;
-
-    public SchedulisProjectUpdateOperation(){
-
+    @Override
+    public ResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
+        if(CollectionUtils.isNotEmpty(projectRef.getReleaseUsers())) {
+            // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
+            projectRef.getReleaseUsers().forEach(releaseUser -> {
+                if (!AzkabanUserService.containsReleaseUser(releaseUser, getBaseUrl(), ssoRequestOperation, projectRef.getWorkspace())) {
+                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请联系 Schedulis 管理员创建该用户！");
+                }
+            });
+        }
+        logger.info("ignore the update operation in SchedulisAppConn.");
+        return ResponseRef.newInternalBuilder().success();
     }
 
     @Override
-    public void init() {
-    }
-
-    @Override
-    public void setStructureService(StructureService service) {
-        this.schedulisProjectService = (ProjectService) service;
-    }
-
-    @Override
-    public ProjectResponseRef updateProject(ProjectRequestRef projectRef) {
-        return null;
+    protected String getAppConnName() {
+        return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
     }
 }

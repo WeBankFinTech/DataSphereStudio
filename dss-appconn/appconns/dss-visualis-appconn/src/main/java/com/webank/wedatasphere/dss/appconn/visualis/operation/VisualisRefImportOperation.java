@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
@@ -33,7 +33,7 @@ public class VisualisRefImportOperation
         String url = getBaseUrl() + URLUtils.projectUrl + "/import";
         String nodeType = requestRef.getType().toLowerCase();
         logger.info("The {} of Visualis try to import ref RefJobContent: {} in url {}.", nodeType, requestRef.getRefJobContent(), url);
-        VisualisPostAction visualisPostAction = new VisualisPostAction();
+        DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         if(null == requestRef.getProjectRefId()){
             throw new ExternalOperationFailedException(100067,"导入节点Visualis工程ID为空");

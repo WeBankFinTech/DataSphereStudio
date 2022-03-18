@@ -1,14 +1,14 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation.impl;
 
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisGetAction;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.OperationStrategy;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
@@ -64,7 +64,7 @@ public abstract class AbstractOperationStrategy implements OperationStrategy {
                               String url) throws ExternalOperationFailedException {
         logger.info("The {} of Visualis try to execute ref RefJobContent: {} in url {}.", ref.getType(), ref.getRefJobContent(), url);
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in url %s.", ref.getType(), ref.getRefJobContent(), url));
-        VisualisGetAction visualisGetAction = new VisualisGetAction();
+        DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(VisualisCommonUtil.getUser(ref));
         try {
             InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);

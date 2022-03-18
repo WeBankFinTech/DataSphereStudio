@@ -1,31 +1,32 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard.DolphinSchedulerStructureStandard;
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard.DolphinSchedulerWorkflowStandard;
 import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerAppConn;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
+import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerStructureIntegrationStandard;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.ConversionIntegrationStandard;
 import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
 
 public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn {
 
     public static final String DOLPHINSCHEDULER_APPCONN_NAME = "dolphinscheduler";
 
-    private DolphinSchedulerWorkflowStandard dolphinSchedulerWorkflowStandard;
+    private WorkflowConversionIntegrationStandard dolphinSchedulerWorkflowStandard;
 
     @Override
     protected void initialize() {
-        dolphinSchedulerWorkflowStandard = new DolphinSchedulerWorkflowStandard();
+        dolphinSchedulerWorkflowStandard = new WorkflowConversionIntegrationStandard();
     }
 
     @Override
-    public WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard() {
+    public ConversionIntegrationStandard getOrCreateConversionStandard() {
         dolphinSchedulerWorkflowStandard.setSSORequestService(this.getOrCreateSSOStandard().getSSORequestService());
-        dolphinSchedulerWorkflowStandard.setAppConnName(getAppDesc().getAppName());
+        dolphinSchedulerWorkflowStandard.setAppConn(this);
+        dolphinSchedulerWorkflowStandard.init();
         return dolphinSchedulerWorkflowStandard;
     }
 
     @Override
-    public StructureIntegrationStandard getOrCreateStructureStandard() {
+    public SchedulerStructureIntegrationStandard getOrCreateStructureStandard() {
         return DolphinSchedulerStructureStandard.getInstance();
     }
 

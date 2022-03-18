@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
  * @date 2022-03-17
  * @since 0.5.0
  */
-public class UserManager {
+public class UserCreationFactory {
 
     public User createUser(String userName) {
         return new User() {

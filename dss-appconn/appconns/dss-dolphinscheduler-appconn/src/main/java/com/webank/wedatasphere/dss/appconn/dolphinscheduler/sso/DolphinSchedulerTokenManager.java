@@ -25,6 +25,8 @@ public interface DolphinSchedulerTokenManager {
 
     String getToken(String userName);
 
+    long getTokenExpireTime(String userName);
+
     int getUserId(String userName);
 
     String getBaseUrl();

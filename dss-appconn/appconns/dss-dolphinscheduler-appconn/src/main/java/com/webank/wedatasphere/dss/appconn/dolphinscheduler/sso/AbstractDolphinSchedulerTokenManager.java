@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
             ClassUtils.getInstances(DolphinSchedulerTokenManager.class);
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected UserManager userManager;
+    protected UserCreationFactory userCreationFactory;
     protected final Map<String, DolphinSchedulerAccessToken> userTokens = new ConcurrentHashMap<>();
     protected String baseUrl;
     protected SSORequestOperation ssoRequestOperation;
@@ -44,8 +45,8 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     @Override
     public void init(String baseUrl) {
         this.baseUrl = baseUrl;
-        userManager = ClassUtils.getInstanceOrDefault(UserManager.class, new UserManager());
-        logger.info("use {} to create new DolphinScheduler users.", userManager.getClass().getSimpleName());
+        userCreationFactory = ClassUtils.getInstanceOrDefault(UserCreationFactory.class, new UserCreationFactory());
+        logger.info("use {} to create new DolphinScheduler users.", userCreationFactory.getClass().getSimpleName());
     }
 
     @Override
@@ -65,6 +66,18 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
             }
             return userId;
         }
+    }
+
+    @Override
+    public long getTokenExpireTime(String userName) {
+        if (DolphinSchedulerConf.DS_ADMIN_USER.getValue().equals(userName)) {
+            return System.currentTimeMillis() + ByteTimeUtils.timeStringAsMs("24h");
+        }
+        if(userTokens.containsKey(userName)) {
+            return userTokens.get(userName).getExpireTime().getTime();
+        }
+        getToken(userName);
+        return userTokens.get(userName).getExpireTime().getTime();
     }
 
     @Override

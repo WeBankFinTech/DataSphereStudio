@@ -1,11 +1,11 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
-import com.webank.wedatasphere.dss.appconn.visualis.model.VisualisPostAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
+import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
@@ -20,7 +20,7 @@ public interface OperationStrategy {
 
     ExportResponseRef exportRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef,
                                 String url,
-                                VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
+                                DSSPostAction visualisPostAction) throws ExternalOperationFailedException;
 
     QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef);
 
@@ -28,11 +28,11 @@ public interface OperationStrategy {
 
     RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl requestRef,
                         String url,
-                        VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
+                        DSSPostAction visualisPostAction) throws ExternalOperationFailedException;
 
     RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
                                        String url,
-                                       VisualisPostAction visualisPostAction) throws ExternalOperationFailedException;
+                                       DSSPostAction visualisPostAction) throws ExternalOperationFailedException;
 
     ResponseRef executeRef(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException;
 

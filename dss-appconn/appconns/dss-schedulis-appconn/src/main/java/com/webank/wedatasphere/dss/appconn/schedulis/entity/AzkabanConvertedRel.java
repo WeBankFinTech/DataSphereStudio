@@ -16,24 +16,23 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.entity;
 
-import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
-import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
-import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRelImpl;
+import com.webank.wedatasphere.dss.workflow.conversion.entity.ProjectPreConversionRel;
+import com.webank.wedatasphere.dss.workflow.conversion.entity.ProjectPreConversionRelImpl;
 
-public class AzkabanConvertedRel extends PreConversionRelImpl implements ConvertedRel {
+public class AzkabanConvertedRel extends ProjectPreConversionRelImpl implements ConvertedRel {
 
     private String storePath;
     public static final String DATE_FORMAT = "yyyyMMddHHmmss";
 
-    public AzkabanConvertedRel(PreConversionRel rel) {
+    public AzkabanConvertedRel(ProjectPreConversionRel rel) {
         setWorkflows(rel.getWorkflows());
         setDSSToRelConversionRequestRef(rel.getDSSToRelConversionRequestRef());
     }
 
     public AzkabanConvertedRel(AzkabanConvertedRel rel) {
-        this((PreConversionRel) rel);
+        this((ProjectPreConversionRel) rel);
         storePath = rel.getStorePath();
     }
 

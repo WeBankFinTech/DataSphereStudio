@@ -25,9 +25,12 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.OrchestrationResponseRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -452,26 +455,18 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         }});
         List<OrchestratorBaseInfo> retList = new ArrayList<>(list.size());
         if (!CollectionUtils.isEmpty(list)) {
-//            //获取工程的权限等级
-//            List<DSSProjectUser> projectUserList = projectUserService.getProjectUserPriv(orchestratorRequest.getProjectId(), username);
-//            List<Integer> editPriv = projectUserList.stream()
-//                    .map(DSSProjectUser::getPriv)
-//                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_EDIT.getRank())
-//                    .collect(Collectors.toList());
-//            List<Integer> releasePriv = projectUserList.stream()
-//                    .map(DSSProjectUser::getPriv)
-//                    .filter(priv -> priv == ProjectUserPrivEnum.PRIV_RELEASE.getRank())
-//                    .collect(Collectors.toList());
-
-            OrchestratorBaseInfo orchestratorBaseInfo = null;
+            //todo Is used in front-end?
+            ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
+                    .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username));
+            boolean isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+            boolean isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
             for (DSSOrchestratorInfo dssOrchestratorInfo : list) {
-                orchestratorBaseInfo = new OrchestratorBaseInfo();
+                OrchestratorBaseInfo orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(dssOrchestratorInfo, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(OrchestratorUtils.convertList(dssOrchestratorInfo.getOrchestratorWay()));
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
-                //todo 用rpc获取用户工程权限
-                orchestratorBaseInfo.setEditable(!editPriv.isEmpty() || !releasePriv.isEmpty());
-                orchestratorBaseInfo.setReleasable(!releasePriv.isEmpty());
+                orchestratorBaseInfo.setEditable(isEditable || isReleasable);
+                orchestratorBaseInfo.setReleasable(isReleasable);
                 retList.add(orchestratorBaseInfo);
             }
         }

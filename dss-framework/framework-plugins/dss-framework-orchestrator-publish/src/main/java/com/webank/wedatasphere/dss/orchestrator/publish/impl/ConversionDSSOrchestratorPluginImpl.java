@@ -25,26 +25,27 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestrato
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.rpc.Sender;
+
 import java.util.List;
+import java.util.Map;
 
 
 public class ConversionDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlugin implements ConversionDSSOrchestratorPlugin {
 
     @Override
     public ResponseOperateOrchestrator convert(String userName,
-        DSSProject project,
-        Workspace workspace,
-        List<Long> orcAppIdList,
-        List<DSSLabel> dssLabels) {
-        //1、导出第三方应用信息，如工作流、Visualis、Qualities
+                                               DSSProject project,
+                                               Workspace workspace,
+                                               Map<Long, Long> orchestrationIdMap,
+                                               List<DSSLabel> dssLabels) {
+        //1、发布DSS编排，如DSS工作流
         RequestConvertOrchestrations requestConvertOrchestrator = new RequestConvertOrchestrations();
-        requestConvertOrchestrator.setOrcAppIds(orcAppIdList);
+        requestConvertOrchestrator.setOrchestrationIdMap(orchestrationIdMap);
         requestConvertOrchestrator.setProject(project);
         requestConvertOrchestrator.setWorkspace(workspace);
         requestConvertOrchestrator.setDSSLabels(dssLabels);
         requestConvertOrchestrator.setUserName(userName);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
-        ResponseOperateOrchestrator response = (ResponseOperateOrchestrator) sender.ask(requestConvertOrchestrator);
-        return response;
+        return (ResponseOperateOrchestrator) sender.ask(requestConvertOrchestrator);
     }
 }

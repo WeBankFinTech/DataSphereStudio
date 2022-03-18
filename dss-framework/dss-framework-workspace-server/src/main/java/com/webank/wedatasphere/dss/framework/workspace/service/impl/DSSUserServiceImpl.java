@@ -38,8 +38,6 @@ public class DSSUserServiceImpl implements DSSUserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSUserServiceImpl.class);
     @Autowired
     private DSSUserMapper dssUserMapper;
-    @Autowired
-    private LinkisUserMapper linkisUserMapper;
 
     /**
      * 在用户及角色添加到工作空间 之前，
@@ -58,16 +56,6 @@ public class DSSUserServiceImpl implements DSSUserService {
             //INSERT INTO dss_user(<include refid = "dss_user" />)
             //        VALUES (#{id},#{username},#{name},#{isFirstLogin})
             dssUserMapper.insert(dssUser);
-
-            /*  INSERT INTO linkis_user(`username`,`name`,`create_time`,`update_time`,`is_first_login`)
-            VALUES (#{username},#{name},now(),now(),1)*/
-            LinkisUser linkisUser = new LinkisUser();
-            linkisUser.setUsername(userName);
-            linkisUser.setName(userName);
-            linkisUser.setCreateTime(new Date());
-            linkisUser.setUpdateTime(new Date());
-            linkisUser.setFirstLogin(true);
-            linkisUserMapper.insert(linkisUser);
         }
     }
 

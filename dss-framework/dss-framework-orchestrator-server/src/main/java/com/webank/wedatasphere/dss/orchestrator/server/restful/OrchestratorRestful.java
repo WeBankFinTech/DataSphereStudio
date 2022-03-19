@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OpenOrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.QueryOrchestratorVersion;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -48,32 +46,6 @@ public class OrchestratorRestful {
     private final static Logger LOGGER = LoggerFactory.getLogger(OrchestratorRestful.class);
     @Autowired
     OrchestratorService orchestratorService;
-
-//    @RequestMapping(path = "addOrchestrator", method = RequestMethod.POST)
-//    @Deprecated
-//    public Message addOrchestrator(HttpServletRequest req, @RequestBody AddOrchestratorRequest addOrchestratorRequest) throws Exception {
-//        String userName = SecurityFilter.getLoginUsername(req);
-//        String name = addOrchestratorRequest.getName();
-//        String workspaceName = addOrchestratorRequest.getWorkspaceName();
-//        String projectName = addOrchestratorRequest.getProjectName();
-//        String typeStr = addOrchestratorRequest.getType();
-//        String desc = addOrchestratorRequest.getDesc();
-//        Long projectID = addOrchestratorRequest.getProjectID();
-//        List<DSSLabel> dssLabelList = Collections.singletonList(new EnvDSSLabel(addOrchestratorRequest.getLabels().getRoute()));
-//        DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
-//        dssOrchestratorInfo.setName(name);
-//        dssOrchestratorInfo.setCreator(userName);
-//        dssOrchestratorInfo.setDesc(desc);
-//        dssOrchestratorInfo.setType(typeStr);
-//        OrchestratorVo orchestratorVo = orchestratorService.createOrchestrator(userName,
-//                workspaceName,
-//                projectName,
-//                projectID,
-//                desc,
-//                dssOrchestratorInfo,
-//                dssLabelList);
-//        return Message.ok().data("OrchestratorVo", orchestratorVo);
-//    }
 
     @RequestMapping(path = "rollbackOrchestrator", method = RequestMethod.POST)
     public Message rollbackOrchestrator(HttpServletRequest request, @RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {

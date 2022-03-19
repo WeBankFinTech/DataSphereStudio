@@ -41,6 +41,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportO
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefExportService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                     dssOrchestratorInfo.getAppConnName(), dssLabels);
             ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
-                    workspace, dssLabels, developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
+                    workspace, dssLabels, DevelopmentIntegrationStandard::getRefExportService,
+                    developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                     null,
                     projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
                     (developmentOperation, developmentRequestRef) -> {
@@ -181,7 +183,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                 dssOrchestratorInfo.getAppConnName(), dssLabels);
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
-                workspace, dssLabels, developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
+                workspace, dssLabels, DevelopmentIntegrationStandard::getRefCRUDService,
+                developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
                 projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
                 (developmentOperation, developmentRequestRef) -> {

@@ -177,7 +177,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     public CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
-        //todo 需不需要判断用户是否有修改权限
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
         Long orchestratorId = newOrchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
@@ -215,7 +214,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception {
         //判断工程是否存在,并且取出工程名称和空间名称
-        //todo 需要判断是否有工程编辑权限
         DSSProject dssProject = validateOperation(orchestratorDeleteRequest.getProjectId(), username);
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());

@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 //todo 改接口，需要和前端同步
-@RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
+@RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
 @RestController
 public class DSSFrameworkOrchestratorRestful {
 

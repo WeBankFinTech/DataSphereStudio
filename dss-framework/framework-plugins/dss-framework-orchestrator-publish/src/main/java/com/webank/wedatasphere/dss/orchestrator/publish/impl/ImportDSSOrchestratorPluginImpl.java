@@ -43,6 +43,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportO
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -169,6 +170,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         Long finalProjectId = projectId;
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(importDssOrchestratorInfo,
                 dssOrchestrator, userName, workspace, dssLabels,
+                DevelopmentIntegrationStandard::getRefImportService,
                 developmentService -> ((RefImportService) developmentService).getRefImportOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
                 projectRefRequestRef -> projectRefRequestRef.setProjectRefId(finalProjectId).setProjectName(projectName),

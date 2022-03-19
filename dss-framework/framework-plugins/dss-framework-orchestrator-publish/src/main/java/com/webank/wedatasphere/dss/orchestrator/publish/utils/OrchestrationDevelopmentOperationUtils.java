@@ -34,6 +34,7 @@ public class OrchestrationDevelopmentOperationUtils {
                                                                                        String userName,
                                                                                        Workspace workspace,
                                                                                        List<DSSLabel> dssLabels,
+                                                                                       BiFunction<DevelopmentIntegrationStandard, AppInstance, DevelopmentService> getDevelopmentService,
                                                                                        Function<DevelopmentService, DevelopmentOperation> getDevelopmentOperation,
                                                                                        Consumer<DSSContextRequestRef> contextRequestRefConsumer,
                                                                                        Consumer<ProjectRefRequestRef> projectRefRequestRefConsumer,
@@ -41,7 +42,7 @@ public class OrchestrationDevelopmentOperationUtils {
                                                                                        String operationName) throws DSSErrorException {
         ImmutablePair<AppInstance, DevelopmentIntegrationStandard> standMap =
                 OrchestratorLoaderUtils.getOrchestratorDevelopmentStandard(dssOrchestrator, dssLabels);
-        return DevelopmentOperationUtils.tryDevelopmentRequestRefOperation(() -> standMap.getValue().getRefCRUDService(standMap.getKey()),
+        return DevelopmentOperationUtils.tryDevelopmentRequestRefOperation(() -> getDevelopmentService.apply(standMap.getValue(), standMap.getKey()),
                 getDevelopmentOperation, contextRequestRefConsumer, projectRefRequestRefConsumer,
                 (developmentOperation, developmentRequestRef) -> {
                     developmentRequestRef.setWorkspace(workspace).setUserName(userName).setDSSLabels(dssLabels).setType(dssOrchestratorInfo.getType());

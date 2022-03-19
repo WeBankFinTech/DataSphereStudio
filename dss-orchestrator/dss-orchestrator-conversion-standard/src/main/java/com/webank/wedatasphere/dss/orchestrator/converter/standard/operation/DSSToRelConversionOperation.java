@@ -26,14 +26,12 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 public abstract class DSSToRelConversionOperation<K extends DSSToRelConversionRequestRef<K>, V extends ResponseRef>
         extends AbstractOperation<K, V> implements ConversionOperation<K, V> {
 
-    private DSSToRelConversionService conversionService;
-
     @Override
     public void setConversionService(ConversionService conversionService) {
-        this.conversionService = (DSSToRelConversionService) conversionService;
+        this.service =  conversionService;
     }
 
     public DSSToRelConversionService getConversionService() {
-        return this.conversionService;
+        return (DSSToRelConversionService) this.service;
     }
 }

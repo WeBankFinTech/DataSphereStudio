@@ -68,4 +68,14 @@ public class Workspace implements DSSWorkspace {
     public void setDssUrl(String dssUrl) {
         this.dssUrl = dssUrl;
     }
+
+    @Override
+    public String toString() {
+        return "Workspace{" +
+                "workspaceId=" + workspaceId +
+                ", workspaceName='" + workspaceName + '\'' +
+                ", cookies=" + cookies +
+                ", dssUrl='" + dssUrl + '\'' +
+                '}';
+    }
 }

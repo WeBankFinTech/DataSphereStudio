@@ -16,17 +16,11 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.receiver
 
-import java.util
-
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
-import com.webank.wedatasphere.dss.common.protocol._
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
-import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
+import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import org.apache.linkis.rpc.{Receiver, Sender}
 
 import scala.concurrent.duration.Duration
@@ -38,48 +32,23 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
   override def receive(message: Any, sender: Sender): Unit = {}
 
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
-    case reqCreateOrchestrator: RequestCreateOrchestrator =>
-      val orchestratorVo: OrchestratorVo = orchestratorService.createOrchestrator(reqCreateOrchestrator.getUserName,
-        reqCreateOrchestrator.getWorkspaceName,
-        reqCreateOrchestrator.getProjectName,
-        reqCreateOrchestrator.getProjectId,
-        reqCreateOrchestrator.getDescription,
-        reqCreateOrchestrator.getDssOrchestratorInfo,
-        reqCreateOrchestrator.getDssLabels)
-      ResponseCreateOrchestrator(orchestratorVo.getDssOrchestratorInfo.getId, orchestratorVo.getDssOrchestratorVersion.getId)
 
-    case reqUpdateOrchestrator: RequestUpdateOrchestrator =>
-      orchestratorService.updateOrchestrator(reqUpdateOrchestrator.getUserName,
-        reqUpdateOrchestrator.getWorkspaceName,
-        reqUpdateOrchestrator.getDssOrchestratorInfo,
-        reqUpdateOrchestrator.getDssLabels)
-      ResponseOperateOrchestrator.success()
-
-    case reqDeleteOrchestrator: RequestDeleteOrchestrator =>
-      orchestratorService.deleteOrchestrator(reqDeleteOrchestrator.getUserName,
-        reqDeleteOrchestrator.getWorkspaceName,
-        reqDeleteOrchestrator.getProjectName,
-        reqDeleteOrchestrator.getOrchestratorId,
-        reqDeleteOrchestrator.getDssLabels
-      )
-      ResponseOperateOrchestrator.success()
-
-    case reqExportOrchestrator: RequestExportOrchestrator =>
-      val dssExportOrcResource: util.Map[String, AnyRef] = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
-        reqExportOrchestrator.getUserName,
-        reqExportOrchestrator.getOrchestratorId,
-        reqExportOrchestrator.getOrcVersionId,
-        reqExportOrchestrator.getProjectName,
-        reqExportOrchestrator.getDssLabels,
-        reqExportOrchestrator.getAddOrcVersion,
-        reqExportOrchestrator.getWorkspace)
-      ResponseExportOrchestrator(dssExportOrcResource.get("resourceId").toString,
-        dssExportOrcResource.get("version").toString, dssExportOrcResource.get("orcVersionId").asInstanceOf[Long]
-      )
-
-    case requestImportOrchestrator: RequestImportOrchestrator =>
-      val importOrcId = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
-      ResponseImportOrchestrator(importOrcId)
+//    case reqExportOrchestrator: RequestExportOrchestrator =>
+//      val dssExportOrcResource: util.Map[String, AnyRef] = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
+//        reqExportOrchestrator.getUserName,
+//        reqExportOrchestrator.getOrchestratorId,
+//        reqExportOrchestrator.getOrcVersionId,
+//        reqExportOrchestrator.getProjectName,
+//        reqExportOrchestrator.getDssLabels,
+//        reqExportOrchestrator.getAddOrcVersion,
+//        reqExportOrchestrator.getWorkspace)
+//      ResponseExportOrchestrator(dssExportOrcResource.get("resourceId").toString,
+//        dssExportOrcResource.get("version").toString, dssExportOrcResource.get("orcVersionId").asInstanceOf[Long]
+//      )
+//
+//    case requestImportOrchestrator: RequestImportOrchestrator =>
+//      val importOrcId = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
+//      ResponseImportOrchestrator(importOrcId)
 
     case addVersionAfterPublish: RequestAddVersionAfterPublish =>
       orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).addVersionAfterPublish(
@@ -90,10 +59,10 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
         addVersionAfterPublish.getProjectName,
         addVersionAfterPublish.getDssLabels,addVersionAfterPublish.getComment)
 
-    case requestQueryOrchestrator: RequestQueryOrchestrator =>
-      val requestIdList = requestQueryOrchestrator.getOrchestratorIds
-      val queryOrchestratorList: util.List[OrchestratorVo] = orchestratorService.getOrchestratorVoList(requestIdList)
-      new ResponseQueryOrchestrator(queryOrchestratorList)
+//    case requestQueryOrchestrator: RequestQueryOrchestrator =>
+//      val requestIdList = requestQueryOrchestrator.getOrchestratorIds
+//      val queryOrchestratorList: util.List[OrchestratorVo] = orchestratorService.getOrchestratorVoList(requestIdList)
+//      new ResponseQueryOrchestrator(queryOrchestratorList)
 
     case requestConversionOrchestration: RequestFrameworkConvertOrchestration =>
       //发布调度，请注意
@@ -101,13 +70,13 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
     case requestConversionOrchestrationStatus: RequestFrameworkConvertOrchestrationStatus =>
       orchestratorPluginService.getConvertOrchestrationStatus(requestConversionOrchestrationStatus.getId)
 
-    case requestOrchestratorVersion: RequestOrchestratorVersion =>
-      val projectId = requestOrchestratorVersion.getProjectId
-      val username = requestOrchestratorVersion.getUsername
-      val orchestratorId = requestOrchestratorVersion.getOrchestratorId
-      val orchestratorVersions = orchestratorService.getOrchestratorVersions(username, projectId, orchestratorId)
-      new ResponseOrchetratorVersion(projectId, orchestratorId, orchestratorVersions)
-    case _ => throw new DSSErrorException(90000, "")
+//    case requestOrchestratorVersion: RequestOrchestratorVersion =>
+//      val projectId = requestOrchestratorVersion.getProjectId
+//      val username = requestOrchestratorVersion.getUsername
+//      val orchestratorId = requestOrchestratorVersion.getOrchestratorId
+//      val orchestratorVersions = orchestratorService.getOrchestratorVersions(username, projectId, orchestratorId)
+//      new ResponseOrchetratorVersion(projectId, orchestratorId, orchestratorVersions)
+    case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }
 
   override def receiveAndReply(message: Any, duration: Duration, sender: Sender): Any = {}

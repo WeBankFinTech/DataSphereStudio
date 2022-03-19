@@ -37,8 +37,4 @@ public class DolphinSchedulerProjectService extends ProjectService {
         return this.getOrCreate(DolphinSchedulerProjectGrantOperation::new, DolphinSchedulerProjectGrantOperation.class);
     }
 
-    public DolphinSchedulerTokenGetOperation getDolphinSchedulerTokenGetOperation() {
-        return this.getOrCreate(DolphinSchedulerTokenGetOperation::new, DolphinSchedulerTokenGetOperation.class);
-    }
-
 }

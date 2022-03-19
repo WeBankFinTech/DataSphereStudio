@@ -97,11 +97,19 @@ public class SSOHelper {
     }
 
     public static Workspace setAndGetWorkspace(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
+        boolean isWorkspaceExists = Arrays.stream(request.getCookies())
+                .anyMatch(cookie -> WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName()) && workspaceId == Long.parseLong(cookie.getValue()));
+        if(isWorkspaceExists) {
+            LOGGER.warn("workspace {} already exists in DSS cookies, ignore to set it again.", workspaceName);
+            return getWorkspace(request);
+        }
         String workspaceIdStr = String.valueOf(workspaceId);
-        String domain = getCookieDomain(request.getHeader("X-Real-IP"));
+        String domain = getCookieDomain(request.getHeader("Referer"));
         Cookie workspaceIdCookie = new Cookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
+        workspaceIdCookie.setPath("/");
         workspaceIdCookie.setDomain(domain);
         Cookie workspaceNameCookie = new Cookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
+        workspaceNameCookie.setPath("/");
         workspaceNameCookie.setDomain(domain);
         response.addCookie(workspaceIdCookie);
         response.addCookie(workspaceNameCookie);
@@ -142,6 +150,11 @@ public class SSOHelper {
      */
     public static String getCookieDomain(String host) {
         int level = DSSCommonConf.DSS_DOMAIN_LEVEL.getValue();
+        if(host.startsWith("https://")) {
+            host = host.substring(8);
+        } else if(host.startsWith("http://")) {
+            host = host.substring(7);
+        }
         if(DOMAIN_REGEX.matcher(host).find()) {
             String[] domains = host.split("\\.");
             int index = level;

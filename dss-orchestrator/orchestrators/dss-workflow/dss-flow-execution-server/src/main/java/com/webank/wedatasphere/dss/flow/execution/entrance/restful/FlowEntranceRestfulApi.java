@@ -170,10 +170,10 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         return message;
     }
 
-    @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
+    @RequestMapping(path = {"/{id}/killWorkflow"},method = {RequestMethod.GET})
     public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
-        Option job = Option.apply((Object)null);
+        Option job;
         try {
             job = this.entranceServer.getJob(realId);
         } catch (Exception var10) {
@@ -184,7 +184,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             message.setStatus(0);
             return message;
         }
-        Message message = null;
+        Message message;
         if (job.isEmpty()) {
             logger.warn("can not find a job in entranceServer, will force to kill it");
             JobHistoryHelper.forceKill(taskID);

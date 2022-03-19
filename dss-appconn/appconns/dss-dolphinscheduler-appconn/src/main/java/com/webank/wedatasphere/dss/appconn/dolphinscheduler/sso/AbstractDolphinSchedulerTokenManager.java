@@ -50,6 +50,11 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     }
 
     @Override
+    public void setSSORequestOperation(SSORequestOperation ssoRequestOperation) {
+        this.ssoRequestOperation = ssoRequestOperation;
+    }
+
+    @Override
     public int getUserId(String userName) {
         if(userTokens.containsKey(userName)) {
             return userTokens.get(userName).getUserId();

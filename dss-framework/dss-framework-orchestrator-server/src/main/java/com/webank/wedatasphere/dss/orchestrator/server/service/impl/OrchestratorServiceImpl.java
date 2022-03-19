@@ -378,7 +378,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
      * 查询编排模式
      *
      * @param orchestratorRequest request of front-end
-     * @param username username
+     * @param username            username
      * @return list of OrchestratorBaseInfo
      */
     @Override
@@ -393,8 +393,11 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             //todo Is used in front-end?
             ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
                     .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username));
-            boolean isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
-            boolean isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            boolean isReleasable = false, isEditable = false;
+            if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+                isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            }
             for (DSSOrchestratorInfo dssOrchestratorInfo : list) {
                 OrchestratorBaseInfo orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(dssOrchestratorInfo, orchestratorBaseInfo);

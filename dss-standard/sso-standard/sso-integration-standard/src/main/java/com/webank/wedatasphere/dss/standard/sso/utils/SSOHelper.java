@@ -70,9 +70,20 @@ public class SSOHelper {
         return workspace;
     }
 
+    private static void addWorkspaceInfo(HttpServletRequest request, Workspace workspace) {
+        workspace.setDssUrl("http://" + request.getRemoteHost() + ":" + request.getRemotePort());
+        if(StringUtils.isBlank(workspace.getWorkspaceName())) {
+            throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceName'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceName']).");
+        }
+        if(workspace.getWorkspaceId() <= 0) {
+            throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceId'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceId']).");
+        }
+        Cookie[] cookies = request.getCookies();
+        Arrays.stream(cookies).forEach(cookie -> workspace.addCookie(cookie.getName(), cookie.getValue()));
+    }
+
     public static Workspace getWorkspace(HttpServletRequest request){
         Workspace workspace = new Workspace();
-        workspace.setDssUrl("http://" + request.getRemoteHost() + ":" + request.getRemotePort());
         Cookie[] cookies = request.getCookies();
         Arrays.stream(cookies).forEach(cookie -> {
             if(WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName())) {
@@ -81,10 +92,7 @@ public class SSOHelper {
                 workspace.setWorkspaceId(Long.parseLong(cookie.getValue()));
             }
         });
-        if(StringUtils.isBlank(workspace.getWorkspaceName())) {
-            throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceId'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceId']).");
-        }
-        Arrays.stream(cookies).forEach(cookie -> workspace.addCookie(cookie.getName(), cookie.getValue()));
+        addWorkspaceInfo(request, workspace);
         return workspace;
     }
 
@@ -97,9 +105,12 @@ public class SSOHelper {
         workspaceNameCookie.setDomain(domain);
         response.addCookie(workspaceIdCookie);
         response.addCookie(workspaceNameCookie);
-        Workspace workspace = getWorkspace(request);
-        LOGGER.info("Try to change the workspace from [{}] to [{}] in DSS cookies of domain({}).",
-                workspace.getWorkspaceName(), workspaceName, domain);
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceId(workspaceId);
+        workspace.setWorkspaceName(workspaceName);
+        addWorkspaceInfo(request, workspace);
+        LOGGER.info("Try to change the workspace to [{}] in DSS cookies of domain({}), the workspace info is {}.",
+                workspaceName, domain, workspace);
         workspace.setWorkspaceId(workspaceId);
         workspace.setWorkspaceName(workspaceName);
         workspace.addCookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);

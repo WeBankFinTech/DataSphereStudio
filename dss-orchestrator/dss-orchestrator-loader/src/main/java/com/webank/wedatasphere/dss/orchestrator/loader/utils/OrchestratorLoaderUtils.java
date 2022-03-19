@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.orchestrator.loader.utils;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import javafx.util.Pair;
 
 @Component
 public class OrchestratorLoaderUtils {
@@ -65,33 +63,4 @@ public class OrchestratorLoaderUtils {
         }
     }
 
-
-    public static Pair<AppInstance,DevelopmentIntegrationStandard> getOrcDevelopStandard(String userName,
-                                                                                         String workspaceName,
-                                                                                         DSSOrchestratorInfo dssOrchestratorInfo,
-                                                                                         List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
-        DSSOrchestrator dssOrchestrator = orchestratorLoaderUtils.orchestratorManager.getOrCreateOrchestrator(userName,
-                workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
-        if (null != dssOrchestrator) {
-            AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
-
-            if(orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
-                DevelopmentIntegrationStandard  developmentIntegrationStandard = ((OnlyDevelopmentAppConn) orchestratorAppConn).getOrCreateDevelopmentStandard();
-
-                //todo labels判别
-                List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
-                if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
-                   return new Pair(appInstance.get(0),developmentIntegrationStandard);
-
-                }else{
-                    return null;
-                }
-            }
-        } else {
-            LOGGER.error("Can not get dssOrchestrator from manager");
-            return null;
-        }
-
-        return null;
-    }
 }

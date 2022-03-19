@@ -67,15 +67,6 @@ public class DSSWorkspaceRoleRestful {
         String username = SecurityFilter.getLoginUsername(req);
         userService.saveWorkspaceUser(username);
         List<DSSApplication> applicationList = applicationMapper.selectList(null);
-        DSSApplication schedulis = new DSSApplication();
-        schedulis.setName(ApplicationConf.SCHEDULER_APP_CONN_NAME);
-        String url = ApplicationConf.SCHEDULIS_URL.getValue();
-        schedulis.setUrl(url);
-        schedulis.setHomepageUrl(url + "/homepage");
-        schedulis.setProjectUrl(url + "/manager?project=${projectName}");
-        schedulis.setRedirectUrl(url + "/api/v1/redirect");
-        schedulis.setIfIframe(true);
-        applicationList.add(schedulis);
         for (DSSApplication application : applicationList) {
             String redirectUrl = application.getRedirectUrl();
             String enhanceJson = application.getEnhanceJson();

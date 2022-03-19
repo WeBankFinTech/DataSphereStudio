@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.standard.common.utils;
 
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 import java.lang.reflect.ParameterizedType;
@@ -20,6 +18,7 @@ public class RequestRefUtils {
         return newInstance(operation, parameterizedType);
     }
 
+    @Deprecated
     public static <T> T getRequestRef(Object operation, Class<T> clazz) {
         return Stream.of(operation.getClass().getGenericInterfaces())
             .filter(c -> clazz.isAssignableFrom((Class<?>) c)).map(c -> {
@@ -33,8 +32,9 @@ public class RequestRefUtils {
         if(types.length > 0 && types.length <= 2) {
             Class<T> t = (Class<T>) types[0];
             try {
-                return ClassUtils.getInstance(t);
-            } catch (DSSErrorException e) {
+                // please notice, don't try to use ClassUtils.getInstance() to create it.
+                return t.newInstance();
+            } catch (Exception e) {
                 throw new ExternalOperationFailedException(50063, "create the instance of " + types[0] + " failed.", e);
             }
         } else {

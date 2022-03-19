@@ -26,12 +26,10 @@ import com.webank.wedatasphere.dss.common.label.{DSSLabel, EnvDSSLabel, LabelKey
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.AbstractRefExecutionAction
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.Killable
-import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
-import com.webank.wedatasphere.dss.standard.app.development.ref.{DSSContextRequestRef, ProjectRefRequestRef}
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef
-import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.linkis.common.utils.{OverloadUtils, Utils}
 import org.apache.linkis.engineconn.computation.executor.async.AsyncConcurrentComputationExecutor
@@ -96,26 +94,12 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
       case Some(appInstance) =>
         val developmentIntegrationStandard = appConn.asInstanceOf[OnlyDevelopmentAppConn].getOrCreateDevelopmentStandard
         val refExecutionService = developmentIntegrationStandard.getRefExecutionService(appInstance)
-        val refExecutionOperation = refExecutionService.getRefExecutionOperation[RefExecutionRequestRef[_]]
-        val requestRef = RequestRefUtils.getRequestRef(refExecutionOperation, classOf[RefExecutionRequestRef[_]])
-        requestRef.setExecutionRequestRefContext(new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator))
-        requestRef.setDSSLabels(getLabels(labels))
-        requestRef.setName(getValue(source, NODE_NAME_STR))
-        requestRef.setType(getValue(engineExecutorContext.getProperties, NODE_TYPE))
-        requestRef.setUserName(userWithCreator.user)
-        requestRef.setWorkspace(workspace)
-        requestRef.setRefJobContent(BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
-        requestRef match {
-          case contextRequestRef: DSSContextRequestRef[_] =>
-            contextRequestRef.setContextId(getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY))
-          case _ =>
-        }
-        requestRef match {
-          case projectRequestRef: ProjectRefRequestRef[_] =>
-            projectRequestRef.setProjectName(getValue(source, PROJECT_NAME_STR))
-        }
         Utils.tryCatch {
-          refExecutionOperation.execute(requestRef) match {
+          val responseRef = AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
+            getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator),
+            getLabels(labels), getValue(source, NODE_NAME_STR), getValue(engineExecutorContext.getProperties, NODE_TYPE),
+            userWithCreator.user, workspace, BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
+          responseRef match {
             case asyncResponseRef: AsyncExecutionResponseRef =>
               engineExecutorContext.getJobId match {
                 case Some(id) =>

@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class RequestImportWorkflow {
     private Long projectId;
     private String projectName;
     private String orcVersion;
-    private String workspaceStr;
+    private Workspace workspace;
     private String contextId;
     private List<DSSLabel> dssLabels;
 
@@ -89,12 +90,12 @@ public class RequestImportWorkflow {
         this.orcVersion = orcVersion;
     }
 
-    public String getWorkspaceStr() {
-        return workspaceStr;
+    public Workspace getWorkspace() {
+        return workspace;
     }
 
-    public void setWorkspaceStr(String workspaceStr) {
-        this.workspaceStr = workspaceStr;
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
     public List<DSSLabel> getDssLabels() {
@@ -111,7 +112,7 @@ public class RequestImportWorkflow {
                                  Long projectId,
                                  String projectName,
                                  String orcVersion,
-                                 String workspaceStr,
+                                 Workspace workspace,
                                  String contextId,
                                  List<DSSLabel> dssLabels) {
         this.userName = userName;
@@ -120,7 +121,7 @@ public class RequestImportWorkflow {
         this.projectId = projectId;
         this.projectName = projectName;
         this.orcVersion = orcVersion;
-        this.workspaceStr = workspaceStr;
+        this.workspace = workspace;
         this.contextId = contextId;
         this.dssLabels = dssLabels;
     }

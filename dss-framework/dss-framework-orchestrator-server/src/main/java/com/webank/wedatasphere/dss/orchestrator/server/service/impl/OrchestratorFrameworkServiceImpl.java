@@ -107,7 +107,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //new field
         dssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorCreateRequest.getOrchestratorWays()));
-        dssOrchestratorInfo.setOrchestratoMode(orchestratorCreateRequest.getOrchestratorMode());
+        dssOrchestratorInfo.setOrchestratorMode(orchestratorCreateRequest.getOrchestratorMode());
         //1.去orchestratorFramework创建编排模式
         LOGGER.info("{} begins to create a orchestrator {}.", username, orchestratorCreateRequest);
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
@@ -197,7 +197,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setComment(orchestratorModifyRequest.getDescription());
         dssOrchestratorInfo.setSecondaryType(orchestratorModifyRequest.getOrchestratorWays().toString());
         dssOrchestratorInfo.setUpdateUser(username);
-        dssOrchestratorInfo.setOrchestratoMode(orchestratorModifyRequest.getOrchestratorMode());
+        dssOrchestratorInfo.setOrchestratorMode(orchestratorModifyRequest.getOrchestratorMode());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorModifyRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setUses(orchestratorModifyRequest.getUses());
         //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求

@@ -45,7 +45,7 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private Long workspaceId;
 
-    private String orchestratoMode;
+    private String orchestratorMode;
 
     private String orchestratorWay;
 
@@ -204,12 +204,12 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
         this.workspaceId = workspaceId;
     }
 
-    public String getOrchestratoMode() {
-        return orchestratoMode;
+    public String getOrchestratorMode() {
+        return orchestratorMode;
     }
 
-    public void setOrchestratoMode(String orchestratoMode) {
-        this.orchestratoMode = orchestratoMode;
+    public void setOrchestratorMode(String orchestratoMode) {
+        this.orchestratorMode = orchestratoMode;
     }
 
     public String getOrchestratorWay() {

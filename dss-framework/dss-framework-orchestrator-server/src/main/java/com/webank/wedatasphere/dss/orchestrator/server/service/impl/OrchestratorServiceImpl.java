@@ -160,7 +160,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                                                                                        String operationName) throws DSSErrorException {
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
                 workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
-        if(getDevelopmentService == null) {
+        if (getDevelopmentService == null) {
             getDevelopmentService = DevelopmentIntegrationStandard::getRefCRUDService;
         }
         return OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator,
@@ -354,7 +354,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     //新建前是否存在相同的编排名称
     @Override
     public void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String arrangeName) throws DSSFrameworkErrorException {
-int count = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
+        int count = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
         if (count > 0) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排名称已经存在");
         }
@@ -377,9 +377,9 @@ int count = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
     /**
      * 查询编排模式
      *
-     * @param orchestratorRequest
-     * @param username
-     * @return
+     * @param orchestratorRequest request of front-end
+     * @param username username
+     * @return list of OrchestratorBaseInfo
      */
     @Override
     public List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username) {
@@ -400,6 +400,7 @@ int count = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
                 BeanUtils.copyProperties(dssOrchestratorInfo, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(OrchestratorUtils.convertList(dssOrchestratorInfo.getOrchestratorWay()));
                 orchestratorBaseInfo.setOrchestratorName(dssOrchestratorInfo.getName());
+                orchestratorBaseInfo.setCreateUser(dssOrchestratorInfo.getCreator());
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);

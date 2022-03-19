@@ -20,6 +20,7 @@ import java.util.Properties
 
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnInstanceConfiguration
 import com.webank.wedatasphere.dss.appconn.sendemail.email.sender.SpringJavaEmailSender
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{ExecutionResponseRef, RefExecutionRequestRef}
 import com.webank.wedatasphere.dss.standard.app.development.operation.{AbstractDevelopmentOperation, RefExecutionOperation}
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef
@@ -77,13 +78,13 @@ class SendEmailRefExecutionOperation
     }
     Utils.tryCatch {
       emailSender.send(email)
-      ExecutionResponseRef.newBuilder().success()
+      new ExecutionResponseRefBuilder().success()
     }(putErrorMsg("发送邮件失败！", _))
   }
 
   protected def putErrorMsg(errorMsg: String, t: Throwable): ExecutionResponseRef = {
     logger.error(s"failed to send email, $errorMsg ", t)
-    ExecutionResponseRef.newBuilder().setException(t).setErrorMsg(errorMsg).error()
+    new ExecutionResponseRefBuilder().setException(t).setErrorMsg(errorMsg).error()
   }
 
 }

@@ -22,6 +22,7 @@ import java.util.{Properties, UUID}
 import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.linkis.common.log.LogUtils
 import org.apache.linkis.common.utils.Utils
@@ -32,18 +33,18 @@ class DataCheckerRefExecutionOperation
   extends LongTermRefExecutionOperation[RefExecutionRequestRef.RefExecutionRequestRefImpl] with Killable with Procedure{
 
   protected def putErrorMsg(errorMsg: String, t: Throwable, action: DataCheckerExecutionAction): DataCheckerExecutionAction = {
-    action.setExecutionResponseRef(ExecutionResponseRef.newBuilder().setErrorMsg(errorMsg).setException(t).error())
+    val responseRef = new ExecutionResponseRefBuilder().setErrorMsg(errorMsg).setException(t).error()
+    action.setExecutionResponseRef(responseRef)
     action
   }
 
   override def submit(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): RefExecutionAction = {
-    val asyncExecutionRequestRef = requestRef.asInstanceOf[RefExecutionRequestRef]
     val nodeAction = new DataCheckerExecutionAction()
     nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
     val InstanceConfig = this.service.getAppInstance.getConfig
-    val runTimeParams = asyncExecutionRequestRef.getExecutionRequestRefContext.getRuntimeMap
-    val variableParams: mutable.Map[String, Object]= asyncExecutionRequestRef.getRefJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
+    val runTimeParams = requestRef.getExecutionRequestRefContext.getRuntimeMap
+    val variableParams: mutable.Map[String, Object]= requestRef.getRefJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
     val inputParams = runTimeParams ++ variableParams
     val properties = new Properties()
     InstanceConfig.foreach {
@@ -116,11 +117,11 @@ class DataCheckerRefExecutionOperation
     action match {
       case action: DataCheckerExecutionAction =>
         if (action.getState.equals(RefExecutionState.Success)) {
-          ExecutionResponseRef.newBuilder().success()
+          new ExecutionResponseRefBuilder().success()
         } else if(action.getExecutionResponseRef != null) action.getExecutionResponseRef
-        else ExecutionResponseRef.newBuilder().error()
+        else new ExecutionResponseRefBuilder().error()
       case _ =>
-        ExecutionResponseRef.newBuilder().error()
+        new ExecutionResponseRefBuilder().error()
     }
   }
 
@@ -153,7 +154,7 @@ class DataCheckerRefExecutionOperation
     action match {
       case action: DataCheckerExecutionAction =>
         val response = super.createAsyncResponseRef(requestRef, action)
-        AsyncExecutionResponseRef.newBuilder().setMaxLoopTime(action.dc.maxWaitTime)
+        new AsyncExecutionResponseRef.Builder().setMaxLoopTime(action.dc.maxWaitTime)
         .setAskStatePeriod(action.dc.queryFrequency).setAsyncExecutionResponseRef(response).build()
     }
   }

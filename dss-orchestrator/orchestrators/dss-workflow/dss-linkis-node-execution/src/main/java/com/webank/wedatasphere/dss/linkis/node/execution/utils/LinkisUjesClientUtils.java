@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.linkis.common.exception.LinkisRetryException;
 import org.apache.linkis.common.utils.DefaultRetryHandler;
 import org.apache.linkis.common.utils.RetryHandler;
@@ -26,6 +27,7 @@ import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.UJESClientImpl;
 
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class LinkisUjesClientUtils {
 
     public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps) {
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
                 .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
@@ -43,15 +45,15 @@ public class LinkisUjesClientUtils {
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
                 .setAuthTokenKey(user).setAuthTokenValue(token)))
                 .setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
-        return clientConfig;
     }
 
     public static DWSClientConfig getClientConfig1_X(String url, String user, String token, Map<String, String> jobProps) {
-        //TODO This place needs Linkis to create a class,DefaultRetryHandler.
         RetryHandler retryHandler = new DefaultRetryHandler();
         retryHandler.addRetryException(LinkisRetryException.class);
+        retryHandler.addRetryException(ConnectTimeoutException.class);
+        retryHandler.addRetryException(ConnectException.class);
 
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
                 .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES)
@@ -63,7 +65,6 @@ public class LinkisUjesClientUtils {
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
                 .setAuthTokenKey(user).setAuthTokenValue(token)))
                 .setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
-        return clientConfig;
     }
 
     public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps) {

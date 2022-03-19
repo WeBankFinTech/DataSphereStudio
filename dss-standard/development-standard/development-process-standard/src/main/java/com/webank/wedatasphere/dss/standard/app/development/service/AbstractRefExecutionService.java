@@ -17,14 +17,13 @@
 package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 
 public abstract class AbstractRefExecutionService extends AbstractDevelopmentService implements RefExecutionService {
 
-   protected abstract <K extends RefJobContentRequestRef<K>> RefExecutionOperation<K> createRefExecutionOperation();
+   protected abstract RefExecutionOperation createRefExecutionOperation();
 
    @Override
-   public <K extends RefJobContentRequestRef<K>> RefExecutionOperation<K> getRefExecutionOperation() {
+   public RefExecutionOperation getRefExecutionOperation() {
           return getOrCreate(this::createRefExecutionOperation, RefExecutionOperation.class);
    }
 

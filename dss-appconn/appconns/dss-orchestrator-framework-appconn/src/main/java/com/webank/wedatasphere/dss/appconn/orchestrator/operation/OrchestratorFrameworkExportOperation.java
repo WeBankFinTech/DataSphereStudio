@@ -27,7 +27,6 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRe
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import org.apache.linkis.rpc.Sender;
-import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,9 +47,9 @@ public class OrchestratorFrameworkExportOperation
             addOrcVersionFlag = (boolean) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_ADD_VERSION_FLAG_KEY);
         }
         RequestExportOrchestrator exportRequest = new RequestExportOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspace().getWorkspaceName(), orchestratorId, orchestratorVersionId,
+                orchestratorId, orchestratorVersionId,
                 requestRef.getProjectName(), requestRef.getDSSLabels(), addOrcVersionFlag,
-                BDPJettyServerHelper.gson().toJson(requestRef.getWorkspace()));
+                requestRef.getWorkspace());
         ResponseExportOrchestrator exportResponse = (ResponseExportOrchestrator) sender.ask(exportRequest);
         logger.info("End to ask to export orchestrator, responseRef is {}.", DSSCommonUtils.COMMON_GSON.toJson(exportResponse));
         Map<String, Object> resourceMap = new HashMap<>(2);

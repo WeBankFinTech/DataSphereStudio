@@ -17,9 +17,8 @@
 package com.webank.wedatasphere.dss.standard.app.development.service;
 
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 
 
 public interface RefExecutionService extends DevelopmentService {
-     <K extends RefJobContentRequestRef<K>> RefExecutionOperation<K> getRefExecutionOperation();
+     RefExecutionOperation getRefExecutionOperation();
 }

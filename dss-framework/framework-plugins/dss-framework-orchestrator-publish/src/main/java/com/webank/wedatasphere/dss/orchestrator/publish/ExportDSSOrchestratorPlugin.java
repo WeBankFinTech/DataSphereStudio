@@ -31,7 +31,6 @@ public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
      * 导出Orchestrator基本信息和工作流基本信息
      */
     Map<String,Object> exportOrchestrator(String userName,
-                                          String workspaceName,
                                           Long orchestratorId,
                                           Long orcVersionId,
                                           String projectName,

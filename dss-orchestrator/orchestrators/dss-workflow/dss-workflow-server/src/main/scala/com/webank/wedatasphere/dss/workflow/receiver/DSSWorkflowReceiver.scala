@@ -72,7 +72,7 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       dssFlowImportParam.setProjectName(requestImportWorkflow.getProjectName)
       dssFlowImportParam.setUserName(requestImportWorkflow.getUserName)
       dssFlowImportParam.setOrcVersion(requestImportWorkflow.getOrcVersion)
-      dssFlowImportParam.setWorkspace(DSSCommonUtils.COMMON_GSON.fromJson(requestImportWorkflow.getWorkspaceStr, classOf[Workspace]))
+      dssFlowImportParam.setWorkspace(requestImportWorkflow.getWorkspace)
       dssFlowImportParam.setContextId(requestImportWorkflow.getContextId)
       val dssFlows = workflowManager.importWorkflow(requestImportWorkflow.getUserName,
         requestImportWorkflow.getResourceId,

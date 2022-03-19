@@ -21,6 +21,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.conf.RefExecutionConfiguration._
 import com.webank.wedatasphere.dss.standard.app.development.listener.exception.AppConnExecutionErrorException
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef}
 import org.apache.commons.lang.time.DateFormatUtils
 import org.apache.linkis.common.listener.ListenerEventBus
@@ -94,7 +95,8 @@ class ListenerEventBusRefExecutionScheduler(eventQueueCapacity: Int, name: Strin
 
       override def onEventError(event: AsyncResponseRefEvent, t: Throwable): Unit = t match {
         case e: Exception =>
-          onEventCompleted(event, ExecutionResponseRef.newBuilder().setException(e).error())
+          val responseRef = new ExecutionResponseRefBuilder().setException(e).error()
+          onEventCompleted(event, responseRef)
       }
     })
   }

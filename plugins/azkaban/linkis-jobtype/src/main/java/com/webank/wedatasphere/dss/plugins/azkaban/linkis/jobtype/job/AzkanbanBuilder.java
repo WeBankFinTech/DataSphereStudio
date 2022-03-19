@@ -127,46 +127,6 @@ public class AzkanbanBuilder extends Builder{
         job.setRuntimeParams(runtimeMap);
     }
 
-    private String getWorkspace(String user, Job job) throws Exception {
-        String linkisUrl = LinkisURLService.Factory.getLinkisURLService().getDefaultLinkisURL(job);
-        String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
-        String dssUrl = linkisUrl.endsWith("/") ? linkisUrl + "api/rest_j/v1/dss/framework/project/getWorkSpaceStr"
-                : linkisUrl + "/api/rest_j/v1/dss/framework/project/getWorkSpaceStr";
-        HttpGet httpGet = new HttpGet(dssUrl);
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("Token-User", user));
-        params.add(new BasicNameValuePair("Token-Code", token));
-        httpGet.addHeader("Token-User", user);
-        httpGet.addHeader("Token-Code", token);
-        CookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpClient = null;
-        CloseableHttpResponse response = null;
-        HttpClientContext context;
-        String responseContent;
-        try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-            context = HttpClientContext.create();
-            response = httpClient.execute(httpGet, context);
-            HttpEntity entity = response.getEntity();
-            responseContent = EntityUtils.toString(entity,"utf-8");
-            Gson gson = new Gson();
-            Map resultMap = gson.fromJson(responseContent, Map.class);
-            Object obj = resultMap.get("data");
-            if (obj instanceof Map){
-                if (null != ((Map) obj).get("workspaceStr")){
-                    return ((Map) obj).get("workspaceStr").toString();
-                }else {
-                    return "";
-                }
-            }
-        } finally {
-            IOUtils.closeQuietly(response);
-            IOUtils.closeQuietly(httpClient);
-        }
-        return "";
-    }
-
-
     private String getWorkspaceByHttpClient(Job job) throws Exception {
         String workspaceStr="";
         String user=job.getUser();
@@ -200,14 +160,8 @@ public class AzkanbanBuilder extends Builder{
         ClientConfig clientConfig = DWSClientConfigBuilder.newBuilder().setDWSVersion("v1").addServerUrl(gatewayUrl)
                 .connectionTimeout(300000).discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES).loadbalancerEnabled(false).setAuthenticationStrategy(new TokenAuthenticationStrategy()).setAuthTokenKey(user)
                 .setAuthTokenValue(token).maxConnectionSize(5).retryEnabled(true).setRetryHandler(retryHandler).readTimeout(300000).build();
-       DWSHttpClient client = new DWSHttpClient((DWSClientConfig) clientConfig, "Job-Type-Client-");
-
-
-       return client;
+       return new DWSHttpClient((DWSClientConfig) clientConfig, "Job-Type-Client-");
     }
-
-
-
 
 
     @Override

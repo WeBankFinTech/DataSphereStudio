@@ -21,6 +21,7 @@ import java.util.{Properties, UUID}
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.log.LogUtils
@@ -61,7 +62,7 @@ class EventCheckerRefExecutionOperation
   }
 
   protected def putErrorMsg(errorMsg: String, t: Throwable, action: EventCheckerExecutionAction): EventCheckerExecutionAction = {
-    action.setExecutionResponseRef(ExecutionResponseRef.newBuilder().setErrorMsg(errorMsg).setException(t).error())
+    action.setExecutionResponseRef(new ExecutionResponseRefBuilder().setErrorMsg(errorMsg).setException(t).error())
     action
   }
 
@@ -129,11 +130,11 @@ class EventCheckerRefExecutionOperation
             resultSetWriter.addMetaData(null)
             resultSetWriter.addRecord(new LineRecord(resultStr))
           }(IOUtils.closeQuietly(resultSetWriter))
-          ExecutionResponseRef.newBuilder().success()
+          new ExecutionResponseRefBuilder().success()
         } else if(action.getExecutionResponseRef != null) action.getExecutionResponseRef
-        else ExecutionResponseRef.newBuilder().error()
+        else new ExecutionResponseRefBuilder().error()
       case _ =>
-        ExecutionResponseRef.newBuilder().error()
+        new ExecutionResponseRefBuilder().error()
     }
 
   }
@@ -142,7 +143,7 @@ class EventCheckerRefExecutionOperation
     action match {
       case action: EventCheckerExecutionAction =>
         val response = super.createAsyncResponseRef(requestRef, action)
-        AsyncExecutionResponseRef.newBuilder().setMaxLoopTime(action.ec.maxWaitTime)
+        new AsyncExecutionResponseRef.Builder().setMaxLoopTime(action.ec.maxWaitTime)
           .setAskStatePeriod(action.ec.queryFrequency).setAsyncExecutionResponseRef(response).build()
     }
   }

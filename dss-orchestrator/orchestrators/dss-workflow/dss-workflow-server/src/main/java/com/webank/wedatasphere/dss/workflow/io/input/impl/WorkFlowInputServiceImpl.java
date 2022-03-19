@@ -22,12 +22,12 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.io.input.InputRelationService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -108,7 +108,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
     }
 
     private String updateFlowContextIdAndVersion(String flowJson, String contextId, String orcVersion) throws IOException {
-        return workFlowParser.updateFlowJsonWithMap(flowJson, MapUtils.newCommonMap(CSCommonUtils.CONTEXT_ID_STR, contextId, DSSWorkFlowConstant.ORC_VERSION_KEY, orcVersion));
+        return workFlowParser.updateFlowJsonWithMap(flowJson, MapUtils.newCommonMap(CSCommonUtils.CONTEXT_ID_STR, contextId, DSSJobContentConstant.ORC_VERSION_KEY, orcVersion));
     }
 
     private String inputWorkFlowNodes(String userName, String projectName, String flowJson,
@@ -118,7 +118,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         if (nodeJsonList == null) {
             throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败 " + dssFlow.getName());
         }
-        String updateContextId = workFlowParser.getValueWithKey(flowJson, "contextID");
+        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
         if (nodeJsonList.size() == 0) {
             return flowJson;
         }

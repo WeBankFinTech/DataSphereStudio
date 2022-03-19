@@ -67,13 +67,12 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService,orchestra
     case reqExportOrchestrator: RequestExportOrchestrator =>
       val dssExportOrcResource: util.Map[String, AnyRef] = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
         reqExportOrchestrator.getUserName,
-        reqExportOrchestrator.getWorkspaceName,
         reqExportOrchestrator.getOrchestratorId,
         reqExportOrchestrator.getOrcVersionId,
         reqExportOrchestrator.getProjectName,
         reqExportOrchestrator.getDssLabels,
         reqExportOrchestrator.getAddOrcVersion,
-        DSSCommonUtils.COMMON_GSON.fromJson(reqExportOrchestrator.getWorkspaceStr, classOf[Workspace]))
+        reqExportOrchestrator.getWorkspace)
       ResponseExportOrchestrator(dssExportOrcResource.get("resourceId").toString,
         dssExportOrcResource.get("version").toString, dssExportOrcResource.get("orcVersionId").asInstanceOf[Long]
       )

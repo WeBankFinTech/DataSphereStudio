@@ -44,7 +44,7 @@ public class WorkflowRefImportOperation
                 (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
                 requestRef.getProjectRefId(), requestRef.getProjectName(),
                 requestRef.getNewVersion(),
-                toJson(requestRef.getWorkspace()),
+                requestRef.getWorkspace(),
                 requestRef.getContextId(), requestRef.getDSSLabels());
 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());

@@ -18,7 +18,9 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
 import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplication;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRoleRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
@@ -27,7 +29,9 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.ApplicationUtils;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -35,12 +39,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
 
 
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
@@ -48,8 +53,6 @@ import java.util.List;
 public class DSSWorkspaceRoleRestful {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceRoleRestful.class);
-    private static final String WORKSPACE_ID_STR = "workspaceId";
-    private static final String DEFAULT_PATH = "/api/rest_j/v1";
     @Autowired
     DSSWorkspaceService dssWorkspaceService;
     @Autowired
@@ -134,20 +137,14 @@ public class DSSWorkspaceRoleRestful {
         if (workspaceId == null || workspaceId <= 0){
             workspaceId = dssWorkspaceRoleService.getWorkspaceIdByUser(username);
         }
-        //将workspaceId作为cookie写入
-        Cookie[] cookies = request.getCookies();
-        for(Cookie cookie : cookies){
-            if(WORKSPACE_ID_STR.equals(cookie.getName())){
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                cookie.setValue(null);
-                response.addCookie(cookie);
-                break;
-            }
+        DSSWorkspace workspace;
+        try {
+            workspace = dssWorkspaceService.getWorkspacesById(workspaceId.longValue(), username);
+        } catch (DSSErrorException e) {
+            return Message.error(ExceptionUtils.getRootCauseMessage(e));
         }
-        Cookie workspaceCookie = new Cookie(WORKSPACE_ID_STR, workspaceId.toString());
-        workspaceCookie.setPath("/");
-        response.addCookie(workspaceCookie);
+        //将workspaceId作为cookie写入
+        SSOHelper.setAndGetWorkspace(request, response, workspaceId, workspace.getName());
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId);
         if(roles == null || roles.isEmpty()){
             LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);

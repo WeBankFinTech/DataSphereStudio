@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
 
@@ -25,35 +26,32 @@ public class RequestImportOrchestrator {
 
 
     private String userName;
-    private String workspaceName;
     private String projectName;
     private Long projectId;
     private String resourceId;
     private String bmlVersion;
     private String orchestratorName;
     private List<DSSLabel> dssLabels;
-    private String workspaceStr;
+    private Workspace workspace;
     private Long copyProjectId;
     private String copyProjectName;
 
     public RequestImportOrchestrator(String userName,
-                                     String workspaceName,
                                      String projectName,
                                      Long projectId,
                                      String resourceId,
                                      String bmlVersion,
                                      String orchestratorName,
                                      List<DSSLabel> dssLabels,
-                                     String workspaceStr) {
+                                     Workspace workspace) {
         this.userName = userName;
-        this.workspaceName = workspaceName;
+        this.workspace = workspace;
         this.projectName = projectName;
         this.projectId = projectId;
         this.resourceId = resourceId;
         this.bmlVersion = bmlVersion;
         this.dssLabels = dssLabels;
         this.orchestratorName = orchestratorName;
-        this.workspaceStr = workspaceStr;
     }
 
 
@@ -65,12 +63,12 @@ public class RequestImportOrchestrator {
         this.userName = userName;
     }
 
-    public String getWorkspaceName() {
-        return workspaceName;
+    public Workspace getWorkspace() {
+        return workspace;
     }
 
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
     public String getProjectName() {
@@ -119,14 +117,6 @@ public class RequestImportOrchestrator {
 
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
-    }
-
-    public String getWorkspaceStr() {
-        return workspaceStr;
-    }
-
-    public void setWorkspaceStr(String workspaceStr) {
-        this.workspaceStr = workspaceStr;
     }
 
     public Long getCopyProjectId() {

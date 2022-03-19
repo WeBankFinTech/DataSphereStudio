@@ -76,7 +76,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> exportOrchestrator(String userName, String workspaceName, Long orchestratorId, Long orcVersionId, String projectName,
+    public Map<String, Object> exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
                                                   List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
         if (orcVersionId == null || orcVersionId < 0){
@@ -102,7 +102,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {}.", userName, dssOrchestratorInfo.getName(), orcVersionId);
 
             //2、导出第三方应用信息，如工作流、Visualis、Qualities
-            DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspaceName, dssOrchestratorInfo.getType(),
+            DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                     dssOrchestratorInfo.getAppConnName(), dssLabels);
             ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
                     workspace, dssLabels, developmentService -> ((RefExportService) developmentService).getRefExportOperation(),

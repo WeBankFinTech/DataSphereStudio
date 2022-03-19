@@ -464,6 +464,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 OrchestratorBaseInfo orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(dssOrchestratorInfo, orchestratorBaseInfo);
                 orchestratorBaseInfo.setOrchestratorWays(OrchestratorUtils.convertList(dssOrchestratorInfo.getOrchestratorWay()));
+                orchestratorBaseInfo.setOrchestratorName(dssOrchestratorInfo.getName());
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);

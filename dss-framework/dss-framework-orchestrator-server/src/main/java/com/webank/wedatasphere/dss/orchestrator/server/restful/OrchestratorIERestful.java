@@ -77,14 +77,8 @@ public class OrchestratorIERestful {
             String userName = SecurityFilter.getLoginUsername(req);
             //调用工具类生产label
             List<DSSLabel> dssLabelList = getDSSLabelList(labels);
-//            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                    .path("/downloadFile/")
-//                    .path(fileName)
-//                    .toUriString();
-//            java.nio.file.Path targetLocation = DSSFileService.fileStorageLocation.resolve(fileName);
             Workspace workspace = SSOHelper.getWorkspace(req);
             //3、打包新的zip包上传BML
-//            InputStream inputStream = bmlService.readLocalResourceFile(userName, targetLocation.toAbsolutePath().toString());
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {
@@ -123,13 +117,7 @@ public class OrchestratorIERestful {
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
-                    workspace.getWorkspaceName(),
-                    orchestratorId,
-                    orcVersionId,
-                    projectName,
-                    dssLabelList,
-                    addOrcVersion,
-                    workspace);
+                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());

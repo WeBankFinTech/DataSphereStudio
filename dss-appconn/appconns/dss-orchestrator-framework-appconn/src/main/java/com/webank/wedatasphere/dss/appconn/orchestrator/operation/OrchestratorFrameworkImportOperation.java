@@ -37,11 +37,11 @@ public class OrchestratorFrameworkImportOperation
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportRequestRefImpl requestRef) {
         logger.info("Begin to ask to import orchestrator, requestRef is {}.", toJson(requestRef));
         RequestImportOrchestrator importRequest = new RequestImportOrchestrator(requestRef.getUserName(),
-                requestRef.getWorkspace().getWorkspaceName(), requestRef.getProjectName(),
+                requestRef.getProjectName(),
                 requestRef.getProjectRefId(), (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY),
                 (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
                 requestRef.getName(), requestRef.getDSSLabels(),
-                toJson(requestRef.getWorkspace()));
+                requestRef.getWorkspace());
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(requestRef.getDSSLabels());
         ResponseImportOrchestrator importResponse = (ResponseImportOrchestrator) sender.ask(importRequest);
         logger.info("End to ask to import orchestrator, responseRef is {}", toJson(importResponse));

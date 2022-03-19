@@ -88,11 +88,9 @@ public class OrchestratorIERestful {
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {
-                RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName,
-                        workspace.getWorkspaceName(),projectName,
+                RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
                         projectID, resultMap.get("resourceId").toString(),
-                        resultMap.get("version").toString(), null, dssLabelList,
-                        DSSCommonUtils.COMMON_GSON.toJson(workspace));
+                        resultMap.get("version").toString(), null, dssLabelList, workspace);
                 importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
             } catch (Exception e) {
                 logger.error("Import orchestrator failed for ", e);

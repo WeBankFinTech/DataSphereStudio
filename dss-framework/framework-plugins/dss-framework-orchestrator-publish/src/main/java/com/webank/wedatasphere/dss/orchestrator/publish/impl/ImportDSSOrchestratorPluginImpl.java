@@ -19,7 +19,10 @@ package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
-import com.webank.wedatasphere.dss.common.utils.*;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -75,13 +78,12 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     @Transactional(rollbackFor = Exception.class)
     public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
         String userName = requestImportOrchestrator.getUserName();
-        String workspaceName = requestImportOrchestrator.getWorkspaceName();
         String projectName = requestImportOrchestrator.getProjectName();
         Long projectId = requestImportOrchestrator.getProjectId();
         String resourceId = requestImportOrchestrator.getResourceId();
         String version = requestImportOrchestrator.getBmlVersion();
         List<DSSLabel> dssLabels = requestImportOrchestrator.getDssLabels();
-        Workspace workspace = DSSCommonUtils.COMMON_GSON.fromJson(requestImportOrchestrator.getWorkspaceStr(), Workspace.class);
+        Workspace workspace = requestImportOrchestrator.getWorkspace();
 
         //1、下载BML的Orchestrator的导入包
         String inputZipPath = IoUtils.generateIOPath(userName, projectName, DEFAULT_ORC_NAME + ".zip");
@@ -154,7 +156,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         }
 
         //5、生成上下文ContextId
-        String contextId = contextService.createContextID(workspaceName, projectName, importDssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
+        String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, importDssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
         dssOrchestratorVersion.setFormatContextId(contextId);
         LOGGER.info("Create a new ContextId for import: {} ", contextId);
 
@@ -163,7 +165,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         //6、导出第三方应用信息，如工作流、Visualis、Qualities
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
-                workspaceName, importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
+                workspace.getWorkspaceName(), importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
         Long finalProjectId = projectId;
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(importDssOrchestratorInfo,
                 dssOrchestrator, userName, workspace, dssLabels,

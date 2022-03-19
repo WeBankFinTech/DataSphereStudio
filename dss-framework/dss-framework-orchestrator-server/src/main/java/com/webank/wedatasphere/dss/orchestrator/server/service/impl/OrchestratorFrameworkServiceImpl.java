@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
-import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
@@ -28,7 +27,6 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.OrchestrationUpdateRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
-import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -50,8 +48,6 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestra
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
@@ -121,7 +117,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationCreationOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
                         .createOrchestration((DSSOrchestrationContentRequestRef) structureRequestRef), "create");
-        OrchestratorVo orchestratorVo = newOrchestratorService.createOrchestrator(username, workspace.getWorkspaceName(), dssProject.getName(),
+        OrchestratorVo orchestratorVo = newOrchestratorService.createOrchestrator(username, workspace, dssProject.getName(),
                 dssOrchestratorInfo.getProjectId(), dssOrchestratorInfo.getDesc(), dssOrchestratorInfo, dssLabels);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         Long orchestratorVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
@@ -209,7 +205,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationUpdateOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
-        newOrchestratorService.updateOrchestrator(username, workspace.getWorkspaceName(), dssOrchestratorInfo, dssLabels);
+        newOrchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
         //3.将工程和orchestrator的关系存储到的数据库中
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorId(orchestratorId);
@@ -229,7 +225,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                         .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
 
-        newOrchestratorService.deleteOrchestrator(username, workspace.getWorkspaceName(), dssProject.getName(), orchestratorInfo.getId(), dssLabels);
+        newOrchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         return orchestratorVo;

@@ -98,7 +98,7 @@ public class SSOHelper {
 
     public static Workspace setAndGetWorkspace(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
         String workspaceIdStr = String.valueOf(workspaceId);
-        String domain = getCookieDomain(request.getHeader("Host"));
+        String domain = getCookieDomain(request.getHeader("X-Real-IP"));
         Cookie workspaceIdCookie = new Cookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
         workspaceIdCookie.setDomain(domain);
         Cookie workspaceNameCookie = new Cookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
@@ -165,7 +165,7 @@ public class SSOHelper {
         }
         Matcher matcher = IP_REGEX.matcher(host);
         if(matcher.find()) {
-            return matcher.group();
+            return matcher.group(1);
         } else {
             return host;
         }

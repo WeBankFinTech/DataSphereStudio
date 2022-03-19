@@ -71,10 +71,10 @@ public class OrchestratorRestful {
     public Message openOrchestrator(HttpServletRequest req, @RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
         String openUrl = "";
         String userName = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
-        String workspaceName = openOrchestratorRequest.getWorkspaceName();
         Long orchestratorId = openOrchestratorRequest.getOrchestratorId();
-        openUrl = orchestratorService.openOrchestrator(userName, workspaceName, orchestratorId, dssLabelList);
+        openUrl = orchestratorService.openOrchestrator(userName, workspace, orchestratorId, dssLabelList);
         OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
         LOGGER.info("open url is {}, orcId is {}, dssLabels is {}", openUrl, orchestratorId, dssLabelList);
         return Message.ok().data("OrchestratorOpenUrl", openUrl).

@@ -38,7 +38,7 @@ public interface OrchestratorService {
      * @return
      */
     OrchestratorVo createOrchestrator(String userName,
-                                      String workspaceName,
+                                      Workspace workspace,
                                       String projectName,
                                       Long projectId,
                                       String description,
@@ -52,7 +52,7 @@ public interface OrchestratorService {
      * @param dssOrchestratorInfo
      */
     void updateOrchestrator(String userName,
-                            String workspaceName,
+                            Workspace workspace,
                             DSSOrchestratorInfo dssOrchestratorInfo,
                             List<DSSLabel> dssLabels) throws Exception;
 
@@ -62,7 +62,7 @@ public interface OrchestratorService {
      * @param orchestratorInfoId
      */
     void deleteOrchestrator(String userName,
-                            String workspaceName,
+                            Workspace workspace,
                             String projectName,
                             Long orchestratorInfoId,
                             List<DSSLabel> dssLabels) throws Exception;
@@ -85,7 +85,7 @@ public interface OrchestratorService {
 
     List<OrchestratorVo> getOrchestratorVoList(List<Long> orchestratorIds);
 
-    String openOrchestrator(String userName, String workspaceName, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception;
+    String openOrchestrator(String userName, Workspace workspace, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception;
 
     /**
      * 获取编排模式下的版本号

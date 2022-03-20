@@ -30,9 +30,8 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)rel;
-        Workflow workflow = dolphinSchedulerConvertedRel.getWorkflow();
-        Workflow dolphinSchedulerWorkflows = convertWorkflow(workflow);
-        dolphinSchedulerConvertedRel.setWorkflow(dolphinSchedulerWorkflows);
+        Workflow dolphinSchedulerWorkflow = convertWorkflow(dolphinSchedulerConvertedRel);
+        dolphinSchedulerConvertedRel.setWorkflow(dolphinSchedulerWorkflow);
         return dolphinSchedulerConvertedRel;
     }
 
@@ -41,21 +40,21 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         return 10;
     }
 
-    private DolphinSchedulerWorkflow convertWorkflow(Workflow workflow) {
+    private DolphinSchedulerWorkflow convertWorkflow(DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel) {
         DolphinSchedulerWorkflow dolphinSchedulerWorkflow = new DolphinSchedulerWorkflow();
+        Workflow workflow = dolphinSchedulerConvertedRel.getWorkflow();
         try {
             BeanUtils.copyProperties(dolphinSchedulerWorkflow, workflow);
         } catch (Exception e) {
             throw new DSSRuntimeException(91500, "Copy workflow fields failed!", e);
         }
-
         DolphinSchedulerWorkflow.ProcessDefinitionJson processDefinitionJson =
             new DolphinSchedulerWorkflow.ProcessDefinitionJson();
+        processDefinitionJson.setGlobalParams(workflow.getFlowProperties());
         Map<String, DolphinSchedulerWorkflow.LocationInfo> locations = new HashMap<>();
         for (WorkflowNode workflowNode : workflow.getWorkflowNodes()) {
             DSSNode node = workflowNode.getDSSNode();
-
-            DolphinSchedulerTask dolphinSchedulerTask = nodeConverter.conversion(node);
+            DolphinSchedulerTask dolphinSchedulerTask = nodeConverter.convertNode(dolphinSchedulerConvertedRel, node);
             processDefinitionJson.addTask(dolphinSchedulerTask);
 
             DolphinSchedulerWorkflow.LocationInfo locationInfo = new DolphinSchedulerWorkflow.LocationInfo();

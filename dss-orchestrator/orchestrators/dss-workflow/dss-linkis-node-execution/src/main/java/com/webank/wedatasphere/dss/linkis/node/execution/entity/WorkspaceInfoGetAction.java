@@ -14,22 +14,35 @@
  *
  */
 
-package com.webank.wedatasphere.dss.workflow.constant;
+package com.webank.wedatasphere.dss.linkis.node.execution.entity;
 
-import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.dss.workflow.service.impl.PublishServiceImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.apache.linkis.httpclient.request.GetAction;
+import org.apache.linkis.httpclient.request.UserAction;
 
 
-@Configuration
-public class WorkflowSpringConfiguration {
+public class WorkspaceInfoGetAction extends GetAction  implements UserAction {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PublishService createPublishService() {
-        return new PublishServiceImpl();
+    private String url;
+    private String user;
+
+    @Override
+    public String getURL() {
+        return url;
     }
+
+    public void setURL(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    @Override
+    public String getUser() {
+        return user;
+    }
+
 
 }

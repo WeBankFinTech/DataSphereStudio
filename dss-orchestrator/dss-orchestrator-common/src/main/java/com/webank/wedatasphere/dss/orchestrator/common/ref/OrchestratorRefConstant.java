@@ -31,5 +31,6 @@ public interface OrchestratorRefConstant {
     String ORCHESTRATION_NAME = "orchestrationName";
     String ORCHESTRATION_DESCRIPTION = "orchestrationDescription";
     String ORCHESTRATION_USES = "orchestrationUses";
+    String ORCHESTRATION_SCHEDULER_APP_CONN = "schedulerAppConnName";
 
 }

@@ -166,7 +166,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         //6、导出第三方应用信息，如工作流、Visualis、Qualities
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
-                workspace.getWorkspaceName(), importDssOrchestratorInfo.getType(), importDssOrchestratorInfo.getAppConnName(), dssLabels);
+                workspace.getWorkspaceName(), importDssOrchestratorInfo.getType(), dssLabels);
         Long finalProjectId = projectId;
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(importDssOrchestratorInfo,
                 dssOrchestrator, userName, workspace, dssLabels,

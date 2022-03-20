@@ -209,11 +209,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-schedulis-appconn</artifactId>
-            <version>${dss.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

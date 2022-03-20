@@ -30,9 +30,9 @@ public interface DSSFlowService {
 
     DSSFlow getFlowWithJsonAndSubFlowsByID(Long rootFlowId);
 
-    DSSFlow addFlow(DSSFlow dssFlow, String contextIdStr, String orcVersion) throws DSSErrorException;
+    DSSFlow addFlow(DSSFlow dssFlow, String contextIdStr, String orcVersion, String schedulerAppConn) throws DSSErrorException;
 
-    DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowId, String contextIdStr, String orcVersion) throws DSSErrorException;
+    DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowId, String contextIdStr, String orcVersion, String schedulerAppConn) throws DSSErrorException;
 
     /**
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion

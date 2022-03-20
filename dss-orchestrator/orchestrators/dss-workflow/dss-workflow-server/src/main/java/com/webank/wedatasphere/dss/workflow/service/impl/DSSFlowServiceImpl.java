@@ -64,6 +64,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME;
+
 @Service
 public class DSSFlowServiceImpl implements DSSFlowService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -118,7 +120,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
     public DSSFlow addFlow(DSSFlow dssFlow,
-                           String contextID, String orcVersion) throws DSSErrorException {
+                           String contextID, String orcVersion,
+                           String schedulerAppConn) throws DSSErrorException {
         try {
             flowMapper.insertFlow(dssFlow);
         } catch (DuplicateKeyException e) {
@@ -132,6 +135,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         if(StringUtils.isNotBlank(orcVersion)) {
             flowJsonMap.put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
+        }
+        if(StringUtils.isNotBlank(schedulerAppConn)) {
+            flowJsonMap.put(SCHEDULER_APP_CONN_NAME, schedulerAppConn);
         }
         String jsonFlow = DSSCommonUtils.COMMON_GSON.toJson(flowJsonMap);
         Map<String, Object> bmlReturnMap = bmlService.upload(userName, jsonFlow, UUID.randomUUID().toString() + ".json",
@@ -153,10 +159,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
-    public DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr, String orcVersion) throws DSSErrorException {
+    public DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr, String orcVersion, String schedulerAppConn) throws DSSErrorException {
         DSSFlow parentFlow = flowMapper.selectFlowByID(parentFlowID);
         DSSFlow.setProjectID(parentFlow.getProjectID());
-        DSSFlow subFlow = addFlow(DSSFlow, contextIDStr, orcVersion);
+        DSSFlow subFlow = addFlow(DSSFlow, contextIDStr, orcVersion, schedulerAppConn);
         //数据库中插入关联信息
         flowMapper.insertFlowRelation(subFlow.getId(), parentFlowID);
         return subFlow;

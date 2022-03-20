@@ -53,8 +53,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
-import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,12 +232,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (appConn == null) {
             return null;
         }
-        AppInstance appInstance;
-        try {
-            appInstance = appConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
-        } catch (NoSuchAppInstanceException e) {
-            throw new WarnException(60028, e.getDesc());
-        }
+        AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
         return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
     }
 

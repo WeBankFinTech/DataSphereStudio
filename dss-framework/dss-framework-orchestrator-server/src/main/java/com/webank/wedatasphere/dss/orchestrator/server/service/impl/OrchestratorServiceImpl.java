@@ -134,19 +134,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         return orchestratorVo;
     }
 
-    protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(List<DSSLabel> dssLabels) {
-        SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
-        if (appConn == null) {
-            return null;
-        }
-        AppInstance appInstance;
-        try {
-            appInstance = appConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
-        } catch (NoSuchAppInstanceException e) {
-            throw new ExternalOperationWarnException(60028, e.getDesc());
-        }
-        return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
-    }
 
     private <K extends DevelopmentRequestRef, V extends ResponseRef> V tryRefOperation(DSSOrchestratorInfo dssOrchestratorInfo,
                                                                                        String userName,

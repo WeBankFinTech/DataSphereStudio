@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
@@ -28,16 +27,9 @@ import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLServic
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.action.WorkspaceInfoGetAction;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.utils.AzkabanHttpResultUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.linkis.common.exception.LinkisRetryException;
-
 import org.apache.linkis.common.utils.DefaultRetryHandler;
 import org.apache.linkis.httpclient.config.ClientConfig;
 import org.apache.linkis.httpclient.dws.DWSHttpClient;
@@ -45,20 +37,14 @@ import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrate
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import org.apache.linkis.httpclient.response.impl.DefaultHttpResult;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class AzkanbanBuilder extends Builder{
@@ -169,7 +155,7 @@ public class AzkanbanBuilder extends Builder{
         linkisJob.setConfiguration(findConfiguration(LinkisJobExecutionConfiguration.NODE_CONF_PREFIX));
         Map<String, Object> variables = findVariables(LinkisJobExecutionConfiguration.FLOW_VARIABLE_PREFIX);
         //只有工作流参数中没有设置,我们才会去进行替换
-        //改为不管工作流是否设置，在wtss这边都需要统一使用wtss设置的run_date,防止出现批量调度的误导作用
+        //改为不管工作流是否设置，在 Schedulis 这边都需要统一使用 Schedulis 设置的 run_date,防止出现批量调度的误导作用
         if(jobProps.containsKey(RUN_DATE_KEY)){
             if(variables.containsKey(RUN_DATE_KEY)){
                 //去掉工作流设置的变量

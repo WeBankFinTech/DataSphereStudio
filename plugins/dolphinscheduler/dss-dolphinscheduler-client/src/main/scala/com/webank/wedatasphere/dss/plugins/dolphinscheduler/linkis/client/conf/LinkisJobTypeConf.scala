@@ -17,30 +17,23 @@
 
 package com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf
 
-import org.apache.linkis.common.conf.CommonVars
-
 
 object LinkisJobTypeConf {
 
-  val JOB_TYPE = "type"
   val LINKIS_TYPE = "linkistype"
+  val RUN_DATE = "run_date"
+  val JOB_ID = "task.instance.key.str"
 
-  val COMMAND = "command"
-  val JOB_ID = "task.instance.key.str" // "azkaban.job.id";
+  val JOB_COMMAND = "jobCommand"
+  val JOB_PARAMS = "jobParams"
+  val JOB_SOURCE = "jobSource"
+  val JOB_RESOURCES = "jobResources"
 
-  val FLOW_ID = "flow.id" // "azkaban.flow.flowid";
+  val FLOW_RESOURCES = "flowResources"
+  val FLOW_PROPERTIES = "flowProperties"
 
-  val PROJECT_ID = "project.name" // "azkaban.flow.projectid";
-
-  val PROJECT_NAME = "project.name" // "azkaban.flow.projectname";
-
-  val FLOW_EXEC_ID = "run.id" // "azkaban.flow.execid";
 
   val PROXY_USER = "proxy.user"
-  val FLOW_SUBMIT_USER = "submit.user" // "azkaban.flow.submituser";
+  val FLOW_SUBMIT_USER = "submit.user"
 
-  val READ_NODE_TOKEN = "read.nodes"
-  val SHARED_NODE_TOKEN = "share.num"
-  val MSG_SAVE_KEY = "msg.savekey"
-  val SIGNAL_NODES: CommonVars[String] = CommonVars.apply("wds.dss.flow.signal.nodes", "linkis.appjoint.eventchecker.eventreceiver")
-}
+  }

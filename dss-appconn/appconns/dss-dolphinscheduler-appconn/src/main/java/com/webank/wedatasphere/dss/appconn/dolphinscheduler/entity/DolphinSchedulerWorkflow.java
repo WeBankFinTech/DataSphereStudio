@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
     }
 
     public static class ProcessDefinitionJson {
+        private List<Map<String, Object>> globalParams = new ArrayList<>(0);
         private List<DolphinSchedulerTask> tasks;
 
         public List<DolphinSchedulerTask> getTasks() {
@@ -66,6 +68,13 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
                 tasks = new LinkedList<>();
             }
             tasks.add(task);
+        }
+        public List<Map<String, Object>> getGlobalParams() {
+            return globalParams;
+        }
+
+        public void setGlobalParams(List<Map<String, Object>> globalParams) {
+            this.globalParams = globalParams;
         }
     }
 

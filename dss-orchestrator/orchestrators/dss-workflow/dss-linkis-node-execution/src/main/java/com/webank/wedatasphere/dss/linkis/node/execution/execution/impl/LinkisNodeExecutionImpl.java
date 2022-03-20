@@ -241,7 +241,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
                 //ignore
             }
             if (progress >= 0){
-                job.getLogObj().info("Update Progress info:" + progress);
+                job.getLogObj().info("Update Progress info: " + progress);
             }
             JobInfoResult oldJobInfo = jobInfo;
             try{

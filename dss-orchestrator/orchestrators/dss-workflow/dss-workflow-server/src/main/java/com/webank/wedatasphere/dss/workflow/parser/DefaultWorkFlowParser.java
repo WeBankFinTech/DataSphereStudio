@@ -18,13 +18,13 @@ package com.webank.wedatasphere.dss.workflow.parser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -39,38 +39,35 @@ import java.util.stream.Collectors;
 public class DefaultWorkFlowParser implements WorkFlowParser {
     @Override
     public List<Resource> getWorkFlowResources(String workFlowJson) {
-        Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray resourcesJsonArray = jsonObject.getAsJsonArray("resources");
-        List<Resource> resources = gson.fromJson(resourcesJsonArray, new com.google.gson.reflect.TypeToken<List<Resource>>() {
+        List<Resource> resources = DSSCommonUtils.COMMON_GSON.fromJson(resourcesJsonArray, new com.google.gson.reflect.TypeToken<List<Resource>>() {
         }.getType());
         return resources;
     }
 
     @Override
     public List<DSSNode> getWorkFlowNodes(String workFlowJson) {
-        Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
-        List<DSSNode> dwsNodes = gson.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
+        List<DSSNode> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
         }.getType());
         return dwsNodes;
     }
 
     @Override
     public List<String> getWorkFlowNodesJson(String workFlowJson) {
-        Gson gson = new Gson();
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
         if(nodeJsonArray==null){
             return null;
         }
-        List<Object> nodeJsonList = gson.fromJson(nodeJsonArray.toString(), new TypeToken<List<Object>>() {
+        List<Object> nodeJsonList = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray.toString(), new TypeToken<List<Object>>() {
         }.getType());
-        return nodeJsonList.stream().map(gson::toJson).collect(Collectors.toList());
+        return nodeJsonList.stream().map(DSSCommonUtils.COMMON_GSON::toJson).collect(Collectors.toList());
     }
 
     @Override
@@ -101,8 +98,13 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
         }
         Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(workFlowJson, Map.class);
 
-
-        return flowJsonObject.get(key).toString();
-
+        Object value = flowJsonObject.get(key);
+        if(value == null) {
+            return null;
+        } else if(value instanceof String){
+            return (String) value;
+        } else {
+            return value.toString();
+        }
     }
 }

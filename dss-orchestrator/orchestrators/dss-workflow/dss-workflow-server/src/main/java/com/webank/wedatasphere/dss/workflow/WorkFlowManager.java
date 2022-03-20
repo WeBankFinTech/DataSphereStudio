@@ -50,7 +50,8 @@ public interface WorkFlowManager {
                           String uses,
                           List<String> linkedAppConnNames,
                           List<DSSLabel> dssLabels,
-                          String orcVersion) throws DSSErrorException, JsonProcessingException;
+                          String orcVersion,
+                          String schedulerAppConn) throws DSSErrorException, JsonProcessingException;
 
 
     /**

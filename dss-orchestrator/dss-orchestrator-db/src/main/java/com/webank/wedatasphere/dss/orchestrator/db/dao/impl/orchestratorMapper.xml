@@ -49,7 +49,7 @@
         VALUES
         (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},
         #{uuid},#{secondaryType},
-        #{workspaceId},#{orchestratoMode},#{orchestratorWay},#{updateUser},#{updateTime})
+        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{updateUser},#{updateTime})
     </insert>
 
     <update id="updateOrchestrator"

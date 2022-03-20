@@ -50,7 +50,7 @@ public class ProjectInfoWorkflowToRelConverter implements WorkflowToRelConverter
         List<String> nodeNames = getAllNodeName(projectPreConversionRel.getWorkflows());
         String repeatNodes = nodeNames.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.joining(", "));
-        if (!StringUtils.isNotEmpty(repeatNodes)) {
+        if (StringUtils.isNotEmpty(repeatNodes)) {
             throw new DSSRuntimeException(80001, "重复的节点名称：" + repeatNodes);
         }
         AzkabanConvertedRel azkabanConvertedRel = new AzkabanConvertedRel(projectPreConversionRel);

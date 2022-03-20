@@ -38,6 +38,7 @@ public class DSSWorkFlowConstant {
 
     public static final String BDP_USER_TICKET_ID = DSSCommonConf.DSS_TOKEN_TICKET_KEY.getValue();
 
+    public static final String SCHEDULER_APP_CONN_NAME = "schedulerAppConnName";
     public static final String REF_PROJECT_ID_KEY = "refProjectId";
     public static final String TITLE_KEY = "title";
 
@@ -52,4 +53,8 @@ public class DSSWorkFlowConstant {
     public static final String PUBLISHING_ERROR_CODE = "-999";
 
     public static final CommonVars<String> GOTO_SCHEDULER_CENTER_URL = CommonVars.apply("wds.dss.workflow.schedulerCenter.url", "/scheduleCenter");
+    /**
+     * 仅仅用于兼容老的、已经创建的工作量，用于自动路由到一个默认的调度系统。
+     */
+    public static final CommonVars<String> DEFAULT_SCHEDULER_APP_CONN = CommonVars.apply("wds.dss.workflow.scheduler.default", "schedulis");
 }

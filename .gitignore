@@ -103,6 +103,6 @@ logs
 logs/*
 
 *.iml
-/plugins/dolphinscheduler/linkis-dolphinscheduler-client/target
+/plugins/dolphinscheduler/dss-dolphinscheduler-client/target
 /plugins/dolphinscheduler/dolphinscheduler-prod-metrics/target
 /plugins/dolphinscheduler/dss-dolphinscheduler-token/target

@@ -15,4 +15,6 @@ public interface DolphinSchedulerConf {
 
     CommonVars<String> DS_VERSION = CommonVars.apply("wds.dss.appconn.ds.version", "1.3.9");
 
+    CommonVars<String> DSS_DOLPHINSCHEDULER_CLIENT_HOME = CommonVars.apply("wds.dss.appconn.ds.client.home", "${DSS_DOLPHINSCHEDULER_CLIENT_HOME}");
+
 }

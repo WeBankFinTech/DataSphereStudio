@@ -20,13 +20,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dss</artifactId>
+        <artifactId>dss-plugin-dolphinscheduler</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>linkis-dolphinscheduler-client</artifactId>
+    <artifactId>dss-dolphinscheduler-client</artifactId>
 
     <dependencies>
         <dependency>
@@ -80,7 +80,7 @@
                 </executions>
                 <configuration>
                     <skipAssembly>false</skipAssembly>
-                    <finalName>linkis-airflow-client</finalName>
+                    <finalName>dss-dolphinscheduler-client</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <descriptorRefs>
@@ -90,7 +90,7 @@
                         <manifest>
                             <!-- 此处指定main方法入口的class -->
                             <mainClass>
-                                com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.LinkisDolphinSchedulerClient
+                                com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.DSSDolphinSchedulerClient
                             </mainClass>
                         </manifest>
                     </archive>
@@ -100,14 +100,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
 </project>

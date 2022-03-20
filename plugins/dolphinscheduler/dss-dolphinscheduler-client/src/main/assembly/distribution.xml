@@ -19,12 +19,12 @@
         xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.3"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.3 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>linkis-dolphinscheduler-client</id>
+    <id>dss-dolphinscheduler-client</id>
     <formats>
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>linkis-dolphinscheduler-client</baseDirectory>
+    <baseDirectory>dss-dolphinscheduler-client</baseDirectory>
 
     <dependencySets>
         <dependencySet>

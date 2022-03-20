@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -67,7 +66,7 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.POST)
     public Message post(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                         HttpServletRequest req) {
+                        HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.POST);
     }
@@ -94,8 +93,8 @@ public class ApiServiceExecuteRestfulApi {
             queryRequest.setParams(params);
         }
         String paramsJsonStr = req.getParameter("params");
-        JavaType javaType = BDPJettyServerHelper.jacksonJson().getTypeFactory().constructParametricType(Map.class,String.class,Object.class);
-        Map<String,Object> parmas = BDPJettyServerHelper.jacksonJson().readValue(paramsJsonStr, javaType);
+        JavaType javaType = BDPJettyServerHelper.jacksonJson().getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+        Map<String, Object> parmas = BDPJettyServerHelper.jacksonJson().readValue(paramsJsonStr, javaType);
         queryRequest.setParams(parmas);
 
         if (StringUtils.isEmpty(queryRequest.getModuleName())) {
@@ -107,14 +106,14 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.PUT)
     public Message put(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                        HttpServletRequest req) {
+                       HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.PUT);
     }
 
     @RequestMapping(value = "/execute/{path:.*}",method = RequestMethod.DELETE)
     public Message delete(@PathVariable("path") VariableString path, @RequestBody QueryRequest queryRequest,
-                           HttpServletRequest req) {
+                          HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
         return getResponse(userName,path.getPath(), queryRequest, HttpMethod.DELETE);
     }
@@ -131,7 +130,7 @@ public class ApiServiceExecuteRestfulApi {
                                 @RequestParam(required = false, name = "taskId") String taskId) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80004, path);
+            throw new ApiServiceQueryException(80004, path);
         }
         String dirFileTree="";
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
@@ -154,18 +153,18 @@ public class ApiServiceExecuteRestfulApi {
 
     @RequestMapping(value = "/openFile",method = RequestMethod.GET)
     public void openFile(HttpServletRequest req,
-                             @RequestParam(required = false, name = "path") String path,
-                             @RequestParam(required = false, name = "taskId") String taskId,
-                             @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
-                             @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-                             HttpServletResponse resp) throws IOException, ApiServiceQueryException {
+                         @RequestParam(required = false, name = "path") String path,
+                         @RequestParam(required = false, name = "taskId") String taskId,
+                         @RequestParam(required = false, defaultValue = ("1"), name = "page") Integer page,
+                         @RequestParam(required = false, defaultValue = "5000", name = "pageSize") Integer pageSize,
+                         @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset,
+                         HttpServletResponse resp) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80004, path);
+            throw new ApiServiceQueryException(80004, path);
         }
         if(StringUtils.isEmpty(taskId)){
-            throw new  ApiServiceQueryException(80005, "taskId is null");
+            throw new ApiServiceQueryException(80005, "taskId is null");
         }
         String fileContent="";
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
@@ -186,12 +185,12 @@ public class ApiServiceExecuteRestfulApi {
             HttpServletResponse resp,
             @RequestParam(required = false, name = "path") String path,
             @RequestParam(required = false, name = "taskId") String taskId,
-            @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-            @DefaultValue("csv") @RequestParam(required = false, name = "outputFileType") String outputFileType,
-            @DefaultValue(",") @RequestParam(required = false, name = "csvSeperator") String csvSeperator,
-            @DefaultValue("downloadResultset") @RequestParam(required = false, name = "outputFileName") String outputFileName,
-            @DefaultValue("result") @RequestParam(required = false, name = "sheetName") String sheetName,
-            @DefaultValue("NULL") @RequestParam(required = false, name = "nullValue") String nullValue) throws ApiServiceQueryException, IOException {
+            @RequestParam(required = false, name = "charset", defaultValue = ("utf-8")) String charset,
+            @RequestParam(required = false, name = "outputFileType", defaultValue = ("csv")) String outputFileType,
+            @RequestParam(required = false, name = "csvSeperator", defaultValue = (",")) String csvSeperator,
+            @RequestParam(required = false, name = "outputFileName", defaultValue = ("downloadResultset")) String outputFileName,
+            @RequestParam(required = false, name = "sheetName", defaultValue = ("result")) String sheetName,
+            @RequestParam(required = false, name = "nullValue", defaultValue = ("NULL")) String nullValue) throws ApiServiceQueryException, IOException {
 
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
@@ -211,7 +210,7 @@ public class ApiServiceExecuteRestfulApi {
 
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80005, path);
+            throw new ApiServiceQueryException(80005, path);
         }
         InputStream inputStream;
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
@@ -256,7 +255,7 @@ public class ApiServiceExecuteRestfulApi {
         }
     }
 
-    private Message getResponse(String user,String path, QueryRequest queryRequest, String httpMethod) {
+    private Message getResponse(String user, String path, QueryRequest queryRequest, String httpMethod) {
         Response response = ApiUtils.doAndResponse(() -> {
             validParam(queryRequest);
             String token = queryRequest.getParams().get(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue()).toString();
@@ -283,7 +282,7 @@ public class ApiServiceExecuteRestfulApi {
                     return messageVo;
                 }
 
-                HashMap<String,Object> queryRes = new HashMap<>();
+                HashMap<String, Object> queryRes = new HashMap<>();
                 queryRes.put("taskId",query.getTaskId());
                 queryRes.put("execId",query.getExecId());
                 messageVo = new MessageVo().setData(queryRes);

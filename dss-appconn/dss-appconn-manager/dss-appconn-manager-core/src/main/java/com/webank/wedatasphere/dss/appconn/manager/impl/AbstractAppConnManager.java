@@ -102,7 +102,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         appConnInfos.forEach(DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
             if(appConn != null) {
-                appConns.put(appConnInfo.getAppConnName(), appConn);
+                appConns.put(appConnInfo.getAppConnName().toLowerCase(), appConn);
             }
         }));
         synchronized (this.appConns) {
@@ -183,7 +183,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     @Override
     public AppConn getAppConn(String appConnName) {
         lazyLoadAppConns();
-        return appConns.get(appConnName);
+        return appConns.get(appConnName.toLowerCase());
     }
 
     @Override
@@ -208,7 +208,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             return;
         }
         synchronized (this.appConns) {
-            this.appConns.put(appConnInfo.getAppConnName(), appConn);
+            this.appConns.put(appConnInfo.getAppConnName().toLowerCase(), appConn);
             appConnList = Collections.unmodifiableList(new ArrayList<>(appConns.values()));
         }
         LOGGER.info("Reloaded AppConn {}.", appConnInfo.getAppConnName());

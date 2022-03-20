@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationDeletionOperation;
@@ -36,11 +35,13 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
-import com.webank.wedatasphere.dss.orchestrator.core.type.OrchestratorKindEnum;
+import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
+import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelationManager;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
-import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorTypeEnum;
+import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
@@ -70,9 +71,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    OrchestratorMapper orchestratorMapper;
+    private OrchestratorMapper orchestratorMapper;
     @Autowired
-    OrchestratorService newOrchestratorService;
+    private OrchestratorService newOrchestratorService;
+    @Autowired
+    private OrchestratorManager orchestratorManager;
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -90,13 +93,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
         //1.创建编排实体bean
-        OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
-                getType(OrchestratorTypeEnum.getTypeByKey(orchestratorCreateRequest.getOrchestratorMode()));
+        DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorCreateRequest.getOrchestratorMode());
         DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
-        dssOrchestratorInfo.setType(orchestratorKindEnum.getName());
+        dssOrchestratorInfo.setType(dssOrchestratorRelation.getDSSOrchestratorName());
+        dssOrchestratorInfo.setAppConnName(dssOrchestratorRelation.getBindingAppConnName());
         dssOrchestratorInfo.setDesc(orchestratorCreateRequest.getDescription());
         dssOrchestratorInfo.setCreateTime(new Date());
-        dssOrchestratorInfo.setAppConnName(orchestratorKindEnum.getName());
         dssOrchestratorInfo.setName(orchestratorCreateRequest.getOrchestratorName());
         dssOrchestratorInfo.setCreator(username);
         dssOrchestratorInfo.setProjectId(orchestratorCreateRequest.getProjectId());
@@ -110,7 +112,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         LOGGER.info("{} begins to create a orchestrator {}.", username, orchestratorCreateRequest);
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
         //2.如果调度系统要求同步创建工作流，向调度系统发送创建工作流的请求
-        OrchestrationResponseRef orchestrationResponseRef = tryOrchestrationOperation(dssLabels, true,
+        OrchestrationResponseRef orchestrationResponseRef = tryOrchestrationOperation(dssLabels, true, username,
                 dssProject.getName(), workspace, dssOrchestratorInfo,
                 OrchestrationService::getOrchestrationCreationOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
@@ -130,10 +132,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return commonOrchestratorVo;
     }
 
-    private <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Boolean askProjectSender, String projectName, Workspace workspace, DSSOrchestratorInfo dssOrchestrator,
+    private <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Boolean askProjectSender, String userName, String projectName,
+                                                                                               Workspace workspace, DSSOrchestratorInfo dssOrchestrator,
                                                                                                Function<OrchestrationService, StructureOperation> getOrchestrationOperation,
                                                                                                BiFunction<StructureOperation, K, V> responseRefConsumer, String operationName) {
-        ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssLabels);
+        ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssOrchestrator, userName, workspace, dssLabels);
         Long refProjectId, refOrchestrationId;
         if (askProjectSender) {
             ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
@@ -154,14 +157,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (refProjectId != null && orchestrationPair.getKey() != null) {
             LOGGER.info("project {} try to {} a orchestration {} in SchedulerAppConn.", projectName, operationName, dssOrchestrator.getName());
             //这里无需进行重名判断，因为只在 SchedulerAppConn进行创建，一旦创建失败，会触发整个编排创建失败。
-            orchestrationResponseRef = OrchestrationOperationUtils.tryOrchestrationOperation(() -> orchestrationPair.getKey(), getOrchestrationOperation,
+            orchestrationResponseRef = OrchestrationOperationUtils.tryOrchestrationOperation(orchestrationPair::getKey, getOrchestrationOperation,
                     dssOrchestrationContentRequestRef ->
                             dssOrchestrationContentRequestRef.setDSSOrchestration(dssOrchestrator).setProjectName(projectName).setRefProjectId(refProjectId),
                     refOrchestrationContentRequestRef ->
                             refOrchestrationContentRequestRef.setRefOrchestrationId(refOrchestrationId).setOrchestrationName(dssOrchestrator.getName())
                                     .setRefProjectId(refProjectId).setProjectName(projectName),
                     (structureOperation, structureRequestRef) -> {
-                        structureRequestRef.setDSSLabels(dssLabels).setWorkspace(workspace);
+                        structureRequestRef.setDSSLabels(dssLabels).setWorkspace(workspace).setUserName(userName);
                         return responseRefConsumer.apply(structureOperation, (K) structureRequestRef);
                     }, operationName + " orchestration " + dssOrchestrator.getName() + " in SchedulerAppConn");
             if (askProjectSender) {
@@ -180,14 +183,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         Long orchestratorId = newOrchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
         LOGGER.info("{} begins to update a orchestrator {}.", username, orchestratorModifyRequest.getOrchestratorName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
-        OrchestratorKindEnum orchestratorKindEnum = OrchestratorKindEnum.
-                getType(OrchestratorTypeEnum.getTypeByKey(orchestratorModifyRequest.getOrchestratorMode()));
+        DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorModifyRequest.getOrchestratorMode());
         DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
         dssOrchestratorInfo.setId(orchestratorId);
-        dssOrchestratorInfo.setType(orchestratorKindEnum.getName());
+        dssOrchestratorInfo.setType(dssOrchestratorRelation.getDSSOrchestratorName());
         dssOrchestratorInfo.setDesc(orchestratorModifyRequest.getDescription());
         dssOrchestratorInfo.setUpdateTime(new Date(System.currentTimeMillis()));
-        dssOrchestratorInfo.setAppConnName(orchestratorKindEnum.getName());
+        dssOrchestratorInfo.setAppConnName(dssOrchestratorRelation.getBindingAppConnName());
         dssOrchestratorInfo.setName(orchestratorModifyRequest.getOrchestratorName());
         dssOrchestratorInfo.setCreator(username);
         dssOrchestratorInfo.setProjectId(orchestratorModifyRequest.getProjectId());
@@ -198,7 +200,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorModifyRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setUses(orchestratorModifyRequest.getUses());
         //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
-        tryOrchestrationOperation(dssLabels, false, dssProject.getName(), workspace, dssOrchestratorInfo,
+        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, dssOrchestratorInfo,
                 OrchestrationService::getOrchestrationUpdateOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
@@ -216,7 +218,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
-        tryOrchestrationOperation(dssLabels, false, dssProject.getName(), workspace, null,
+        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, null,
                 OrchestrationService::getOrchestrationDeletionOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                         .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
@@ -227,8 +229,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return orchestratorVo;
     }
 
-    protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(List<DSSLabel> dssLabels) {
-        SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+    protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(DSSOrchestratorInfo dssOrchestratorInfo,
+                                                                                       String user,
+                                                                                       Workspace workspace,
+                                                                                       List<DSSLabel> dssLabels) {
+        DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(user, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
+        SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();
         if (appConn == null) {
             return null;
         }

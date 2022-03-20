@@ -68,10 +68,12 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
         this.orchestratorName = orchestratorName;
     }
 
+    @Override
     public String getOrchestratorMode() {
         return orchestratorMode;
     }
 
+    @Override
     public void setOrchestratorMode(String orchestratorMode) {
         this.orchestratorMode = orchestratorMode;
     }

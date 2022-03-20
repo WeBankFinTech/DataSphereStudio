@@ -104,7 +104,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
             //2、导出第三方应用信息，如工作流、Visualis、Qualities
             DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
-                    dssOrchestratorInfo.getAppConnName(), dssLabels);
+                    dssLabels);
             ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
                     workspace, dssLabels, DevelopmentIntegrationStandard::getRefExportService,
                     developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
@@ -181,7 +181,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setContextId(contextId);
         LOGGER.info("Create a new ContextId {} for orchestration {} to increase version to {}.", contextId, orcId, dssOrchestratorVersion.getVersion());
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
-                dssOrchestratorInfo.getAppConnName(), dssLabels);
+                dssLabels);
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
                 workspace, dssLabels, DevelopmentIntegrationStandard::getRefCRUDService,
                 developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
